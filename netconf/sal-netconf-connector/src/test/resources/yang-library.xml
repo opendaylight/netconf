@@ -1,0 +1,23 @@
+<modules xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library">
+    <module>
+        <name>module-with-revision</name>
+        <revision>2014-04-08</revision>
+        <schema>
+            http://localhost:8181/yanglib/schemas/module-with-revision/2014-04-08
+        </schema>
+    </module>
+    <module>
+        <name>another-module-with-revision</name>
+        <revision>2013-10-21</revision>
+        <schema>
+            http://localhost:8181/yanglib/schemas/another-module-with-revision/2013-10-21
+        </schema>
+    </module>
+    <module>
+        <name>module-without-revision</name>
+        <revision></revision>
+        <schema>
+            http://localhost:8181/yanglib/schemas/module-without-revision/
+        </schema>
+    </module>
+</modules>

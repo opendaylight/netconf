@@ -190,6 +190,25 @@ module odl-sal-netconf-connector-cfg {
 
                 description "Dedicated solely to keepalive execution";
             }
+
+            container yang-library {
+                leaf yang-library-url {
+                    config true;
+                    type inet:uri;
+                    description "Yang library to be plugged as additional source provider into the shared schema repository";
+                }
+
+                // credentials for basic http authentication for get request for yanglib data
+                leaf username {
+                    config true;
+                    type string;
+                }
+
+                leaf password {
+                    config true;
+                    type string;
+                }
+            }
         }
     }
 }
