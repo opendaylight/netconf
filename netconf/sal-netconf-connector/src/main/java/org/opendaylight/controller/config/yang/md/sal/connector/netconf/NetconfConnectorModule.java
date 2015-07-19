@@ -12,10 +12,12 @@ import static org.opendaylight.controller.config.api.JmxAttributeValidationExcep
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import io.netty.util.concurrent.EventExecutor;
 import java.io.File;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +44,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.UserPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
 import org.opendaylight.protocol.framework.ReconnectStrategy;
 import org.opendaylight.protocol.framework.ReconnectStrategyFactory;
 import org.opendaylight.protocol.framework.TimedReconnectStrategy;
@@ -50,7 +53,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
+import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
@@ -189,6 +195,16 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         initDependencies();
         final RemoteDeviceId id = new RemoteDeviceId(getIdentifier(), getSocketAddress());
 
+        // TODO move this away from here
+        List<SchemaSourceRegistration<YangTextSchemaSource>> registeredYangLibSources = Lists.newArrayList();
+        if (getYangLibrary() != null) {
+            final LibraryModulesSchemas libraryModulesSchemas = LibraryModulesSchemas.create(getYangLibrary().getValue());
+            for (Map.Entry<SourceIdentifier, URL> sourceIdentifierURLEntry : libraryModulesSchemas.getAvailableModels().entrySet()) {
+                registeredYangLibSources.add(schemaRegistry.registerSchemaSource(new YangLibrarySchemaYangSourceProvider(id, libraryModulesSchemas.getAvailableModels()),
+                        PotentialSchemaSource.create(sourceIdentifierURLEntry.getKey(), YangTextSchemaSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
+            }
+        }
+
         final ExecutorService globalProcessingExecutor = processingExecutor.getExecutor();
 
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade
@@ -206,7 +222,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = null;
         final String moduleSchemaCacheDirectory = getSchemaCacheDirectory();
         // Only checks to ensure the String is not empty or null;  further checks related to directory accessibility and file permissions
-        // are handled during the FilesystemScehamSourceCache initialization.
+        // are handled during the FilesystemSchemaSourceCache initialization.
         if (!Strings.isNullOrEmpty(moduleSchemaCacheDirectory)) {
             // If a custom schema cache directory is specified, create the backing DTO; otherwise, the SchemaRegistry and
             // SchemaContextFactory remain the default values.
@@ -255,7 +271,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         final NetconfReconnectingClientConfiguration clientConfig = getClientConfig(listener);
         listener.initializeRemoteConnection(clientDispatcher, clientConfig);
 
-        return new SalConnectorCloseable(listener, salFacade);
+        return new SalConnectorCloseable(listener, salFacade, registeredYangLibSources);
     }
 
     /**
@@ -339,6 +355,10 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         return Optional.of(parsedOverrideCapabilities);
     }
 
+    public void setBundleContext(final BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
+    }
+
     public NetconfReconnectingClientConfiguration getClientConfig(final NetconfDeviceCommunicator listener) {
         final InetSocketAddress socketAddress = getSocketAddress();
         final long clientConnectionTimeoutMillis = getConnectionTimeoutMillis();
@@ -362,16 +382,21 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
 
     private static final class SalConnectorCloseable implements AutoCloseable {
         private final RemoteDeviceHandler<NetconfSessionPreferences> salFacade;
+        private List<SchemaSourceRegistration<YangTextSchemaSource>> registeredYangLibSources;
         private final NetconfDeviceCommunicator listener;
 
         public SalConnectorCloseable(final NetconfDeviceCommunicator listener,
-                                     final RemoteDeviceHandler<NetconfSessionPreferences> salFacade) {
+                                     final RemoteDeviceHandler<NetconfSessionPreferences> salFacade, final List<SchemaSourceRegistration<YangTextSchemaSource>> registeredYangLibSources) {
             this.listener = listener;
             this.salFacade = salFacade;
+            this.registeredYangLibSources = registeredYangLibSources;
         }
 
         @Override
         public void close() {
+            for (SchemaSourceRegistration<YangTextSchemaSource> registeredYangLibSource : registeredYangLibSources) {
+                registeredYangLibSource.close();
+            }
             listener.close();
             salFacade.close();
         }

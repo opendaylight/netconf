@@ -190,6 +190,13 @@ module odl-sal-netconf-connector-cfg {
 
                 description "Dedicated solely to keepalive execution";
             }
+
+            leaf yang-library {
+                mandatory false;
+                type inet:uri;
+                // TODO this should not be here, but in the (to be created) schema repository dependency
+                description "Yang library to be plugged as additional source provider into the shared schema repository";
+            }
         }
     }
 }

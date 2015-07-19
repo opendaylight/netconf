@@ -45,6 +45,9 @@
             <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:threadpool">prefix:scheduled-threadpool</type>
             <name>global-netconf-ssh-scheduled-executor</name>
           </keepalive-executor>
+          <yang-library xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">
+            http://10.10.10.3:8181/restconf/config/ietf-yang-library:modules
+          </yang-library>
         </module>
         </modules>
     </data>

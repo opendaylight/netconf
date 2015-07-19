@@ -1,0 +1,27 @@
+{
+  "ietf-yang-library:modules-state": {
+    "module-set-id": "21429371628890",
+    "module": [
+      {
+        "na": "odl-netconf-cfg",
+        "revision": "2014-04-08",
+        "schema": "http://localhost:8181/yanglib/schemas/odl-netconf-cfg/2014-04-08"
+      },
+      {
+        "name": "network-topology",
+        "revision": "2014-06-08",
+        "schema": "http://localhost:8181/yanglib/schemas/network-topology/2013-10-21"
+      },
+      {
+        "name": "network-topology-test",
+        "revision": "2013-10-21",
+        "schema": "http://localhost:8181/yanglib/schemas/network-topology/2013-10-21"
+      },
+      {
+        "name": "network-topology-test2",
+        "revision": "2013-10-21",
+        "schema": "http://localhost:8181/yanglib/schemas/network-topology/2013-10-21"
+      }
+    ]
+  }
+}

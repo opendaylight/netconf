@@ -1,0 +1,20 @@
+<modules xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library">
+    <module-set-id>21429371628890</module-set-id>
+    <module>
+        <schema>
+            http://localhost:8181/yanglib/schemas/odl-netconf-cfg/2014-04-08
+        </schema>
+    </module>
+    <module>
+        <name>network-topology</name>
+        <revision>2013-10-21</revision>
+    </module>
+    <module>
+    </module>
+    <module>
+        <name>network-topology-test2</name>
+        <schema>
+            http://localhost:8181/yanglib/schemas/network-topology/2013-10-21
+        </schema>
+    </module>
+</modules>

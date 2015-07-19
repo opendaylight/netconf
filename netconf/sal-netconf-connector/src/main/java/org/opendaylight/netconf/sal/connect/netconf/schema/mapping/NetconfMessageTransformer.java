@@ -120,7 +120,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     private static final Function<SchemaNode, QName> QNAME_FUNCTION = new Function<SchemaNode, QName>() {
         @Override
-        public QName apply(final SchemaNode rpcDefinition) {
+          public QName apply(final SchemaNode rpcDefinition) {
             return rpcDefinition.getQName();
         }
     };

@@ -187,7 +187,7 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
 
     }
 
-    private static class NetconfYangTextSchemaSource extends YangTextSchemaSource {
+    static class NetconfYangTextSchemaSource extends YangTextSchemaSource {
         private final RemoteDeviceId id;
         private final Optional<String> schemaString;
 
