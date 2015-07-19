@@ -188,6 +188,13 @@ module netconf-node-topology {
             description "The destination schema repository for yang files relative to the cache directory.  This may be specified per netconf mount
                          so that the loaded yang files are stored to a distinct directory to avoid potential conflict.";
         }
+
+        leaf yang-library {
+            config true;
+            type inet:uri;
+            // TODO choice should be maybe better option here
+            description "Yang library to be plugged as additional source provider into the shared schema repository";
+        }
     }
 
     grouping netconf-node-fields {
