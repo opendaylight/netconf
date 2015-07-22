@@ -128,7 +128,14 @@
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>netty-config-api</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.opendaylight.controller</groupId>
+            <artifactId>sal-distributed-datastore</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>mdsal-netconf-connector</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
