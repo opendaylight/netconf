@@ -54,6 +54,7 @@ import org.apache.sshd.common.util.ThreadUtils;
 import org.apache.sshd.server.PasswordAuthenticator;
 import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
 import org.apache.sshd.server.session.ServerSession;
+import org.opendaylight.controller.config.util.capability.BasicCapability;
 import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -134,6 +135,8 @@ public class NetconfDeviceSimulator implements Closeable {
         final AggregatedNetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory = new AggregatedNetconfOperationServiceFactory();
         final NetconfOperationServiceFactory operationProvider = mdSal ? new MdsalOperationProvider(idProvider, capabilities, schemaContext) :
             new SimulatedOperationProvider(idProvider, capabilities, notificationsFile);
+
+        capabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0"));
 
         final NetconfMonitoringService monitoringService1 = new DummyMonitoringService(capabilities);
 
