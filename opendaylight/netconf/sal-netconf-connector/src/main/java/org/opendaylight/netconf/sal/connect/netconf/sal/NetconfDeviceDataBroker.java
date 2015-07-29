@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
+import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.Map;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -50,6 +51,8 @@ final class NetconfDeviceDataBroker implements DOMDataBroker {
         candidateSupported = netconfSessionPreferences.isCandidateSupported();
         runningWritable = netconfSessionPreferences.isRunningWritable();
         rollbackSupport = netconfSessionPreferences.isRollbackSupported();
+        Preconditions.checkArgument(candidateSupported || runningWritable,
+            "Device %s has advertised neither :writable-running nor :candidate capability. At least one of these should be advertised. Failed to establish a session.", id.getName());
     }
 
     @Override
