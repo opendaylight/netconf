@@ -116,6 +116,11 @@ BASE_MAC_1 = '00:4b:00:00:00:00'
 # Base IP of mininet hosts
 BASE_IP_1 = '75.75.0.0'
 
+# Vlan Custom Topology Path and File
+CREATE_VLAN_TOPOLOGY_FILE = "vlan_vtn_test.py"
+CREATE_VLAN_TOPOLOGY_FILE_PATH = "MininetTopo/" +\
+                                 CREATE_VLAN_TOPOLOGY_FILE
+
 # Mininet Custom Topology Path and File
 CREATE_FULLYMESH_TOPOLOGY_FILE = "create_fullymesh.py"
 CREATE_FULLYMESH_TOPOLOGY_FILE_PATH = "libraries/MininetTopo/" +\
