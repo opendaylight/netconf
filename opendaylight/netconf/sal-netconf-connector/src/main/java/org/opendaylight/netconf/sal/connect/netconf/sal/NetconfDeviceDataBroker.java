@@ -33,7 +33,7 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
-final class NetconfDeviceDataBroker implements DOMDataBroker {
+public final class NetconfDeviceDataBroker implements DOMDataBroker {
     private final RemoteDeviceId id;
     private final NetconfBaseOps netconfOps;
     private final long requestTimeoutMillis;
