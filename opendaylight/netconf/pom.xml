@@ -4,13 +4,12 @@
 
   <parent>
     <groupId>org.opendaylight.controller</groupId>
-    <artifactId>commons.opendaylight</artifactId>
-    <version>1.6.0-SNAPSHOT</version>
-    <relativePath>../commons/opendaylight</relativePath>
+    <artifactId>netconf-parent</artifactId>
+    <version>0.4.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
-  <artifactId>netconf-subsystem</artifactId>
 
-  <version>0.4.0-SNAPSHOT</version>
+  <artifactId>netconf-subsystem</artifactId>
   <packaging>pom</packaging>
   <name>${project.artifactId}</name>
 
@@ -60,6 +59,126 @@
     </dependency>
   </dependencies>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.opendaylight.controller</groupId>
+        <artifactId>config-artifacts</artifactId>
+        <version>${config.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.opendaylight.controller</groupId>
+        <artifactId>mdsal-artifacts</artifactId>
+        <version>${mdsal.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.opendaylight.controller</groupId>
+        <artifactId>netconf-artifacts</artifactId>
+        <version>${netconf.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.opendaylight.yangtools</groupId>
+        <artifactId>yangtools-artifacts</artifactId>
+        <version>${yangtools.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.opendaylight.controller</groupId>
+        <artifactId>features-protocol-framework</artifactId>
+        <version>${protocol-framework.version}</version>
+        <classifier>features</classifier>
+        <type>xml</type>
+        <scope>runtime</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.opendaylight.controller</groupId>
+        <artifactId>protocol-framework</artifactId>
+        <version>${protocol-framework.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.opendaylight.controller</groupId>
+        <artifactId>messagebus-api</artifactId>
+        <version>${mdsal.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.opendaylight.controller</groupId>
+        <artifactId>messagebus-config</artifactId>
+        <version>${mdsal.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.opendaylight.controller</groupId>
+        <artifactId>messagebus-impl</artifactId>
+        <version>${mdsal.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.opendaylight.controller</groupId>
+        <artifactId>messagebus-spi</artifactId>
+        <version>${mdsal.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.opendaylight.controller</groupId>
+        <artifactId>messagebus-util</artifactId>
+        <version>${mdsal.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.sshd</groupId>
+        <artifactId>sshd-core</artifactId>
+        <version>${sshd-core.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>openexi</groupId>
+        <artifactId>nagasena</artifactId>
+        <version>${exi.nagasena.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>openexi</groupId>
+        <artifactId>nagasena-rta</artifactId>
+        <version>${exi.nagasena.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey.test-framework.providers</groupId>
+        <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
+        <version>2.4</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.opendaylight.yangtools</groupId>
+        <artifactId>maven-sal-api-gen-plugin</artifactId>
+        <version>${yangtools.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.opendaylight.controller</groupId>
+        <artifactId>yang-jmx-generator-plugin</artifactId>
+        <version>${config.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.opendaylight.controller</groupId>
+        <artifactId>commons.logback_settings</artifactId>
+        <version>${commons.logback_settings.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.opendaylight.odlparent</groupId>
+        <artifactId>features-test</artifactId>
+        <version>${features.test.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
   <build>
     <pluginManagement>
       <plugins>
@@ -76,6 +195,7 @@
         <plugin>
           <groupId>org.opendaylight.yangtools</groupId>
           <artifactId>yang-maven-plugin</artifactId>
+          <version>${yangtools.version}</version>
           <executions>
             <execution>
               <id>config</id>
@@ -106,45 +226,22 @@
               <artifactId>yang-jmx-generator-plugin</artifactId>
               <version>${config.version}</version>
             </dependency>
+            <dependency>
+              <groupId>org.opendaylight.yangtools</groupId>
+              <artifactId>maven-sal-api-gen-plugin</artifactId>
+              <version>${yangtools.version}</version>
+              <type>jar</type>
+            </dependency>
+            <dependency>
+              <groupId>org.opendaylight.yangtools</groupId>
+              <artifactId>yang-binding</artifactId>
+              <version>${yangtools.version}</version>
+              <type>jar</type>
+            </dependency>
           </dependencies>
         </plugin>
       </plugins>
-
     </pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <failsOnError>false</failsOnError>
-          <failOnViolation>true</failOnViolation>
-          <configLocation>checkstyle-logging.xml</configLocation>
-          <consoleOutput>true</consoleOutput>
-          <includeTestSourceDirectory>true</includeTestSourceDirectory>
-          <sourceDirectory>${project.basedir}</sourceDirectory>
-          <includes>**\/*.java,**\/*.xml,**\/*.ini,**\/*.sh,**\/*.bat,**\/*.yang</includes>
-          <excludes>**\/target\/,**\/bin\/,**\/target-ide\/,**\/${jmxGeneratorPath}\/,**\/${salGeneratorPath}\/,**\/netconf\/test\/tool\/Main.java, **\/netconf\/test\/tool\/client\/stress\/StressClient.java</excludes>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>checkstyle-logging</artifactId>
-            <version>${yangtools.version}</version>
-          </dependency>
-        </dependencies>
-        <executions>
-          <execution>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-      </plugin>
-    </plugins>
   </build>
 
   <profiles>
