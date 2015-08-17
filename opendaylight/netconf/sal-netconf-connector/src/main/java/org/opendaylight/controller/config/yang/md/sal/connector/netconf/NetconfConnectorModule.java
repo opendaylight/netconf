@@ -12,14 +12,19 @@ import static org.opendaylight.controller.config.api.JmxAttributeValidationExcep
 
 import com.google.common.base.Optional;
 import io.netty.util.concurrent.EventExecutor;
+import java.io.File;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import org.opendaylight.controller.config.api.JmxAttributeValidationException;
+import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
+import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
@@ -41,7 +46,13 @@ import org.opendaylight.protocol.framework.TimedReconnectStrategy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.IpAddress;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
+import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
+import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
+import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
+import org.opendaylight.yangtools.yang.parser.util.TextToASTTransformer;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,10 +64,25 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
 {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfConnectorModule.class);
 
+    private static FilesystemSchemaSourceCache<YangTextSchemaSource> CACHE = null;
+    //when no topology is defined in connector config, we need to add a default schema repository to mantain backwards compatibility
+    private static SharedSchemaRepository DEFAULT_SCHEMA_REPOSITORY = null;
+
+    //keep track of already initialized repositories to avoid adding redundant listeners
+    private static final Set<SchemaRepository> INITIALIZED_SCHEMA_REPOSITORIES = new HashSet<>();
+
     private BundleContext bundleContext;
     private Optional<NetconfSessionPreferences> userCapabilities;
     private SchemaSourceRegistry schemaRegistry;
     private SchemaContextFactory schemaContextFactory;
+
+    private Broker domRegistry;
+    private NetconfClientDispatcher clientDispatcher;
+    private BindingAwareBroker bindingRegistry;
+    private ThreadPool processingExecutor;
+    private ScheduledThreadPool keepaliveExecutor;
+    private SharedSchemaRepository sharedSchemaRepository;
+    private EventExecutor eventExecutor;
 
     public NetconfConnectorModule(final org.opendaylight.controller.config.api.ModuleIdentifier identifier, final org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
         super(identifier, dependencyResolver);
@@ -71,8 +97,6 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         checkNotNull(getAddress(), addressJmxAttribute);
         checkCondition(isHostAddressPresent(getAddress()), "Host address not present in " + getAddress(), addressJmxAttribute);
         checkNotNull(getPort(), portJmxAttribute);
-        checkNotNull(getDomRegistry(), portJmxAttribute);
-        checkNotNull(getDomRegistry(), domRegistryJmxAttribute);
 
         checkNotNull(getConnectionTimeoutMillis(), connectionTimeoutMillisJmxAttribute);
         checkCondition(getConnectionTimeoutMillis() > 0, "must be > 0", connectionTimeoutMillisJmxAttribute);
@@ -83,9 +107,12 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         checkNotNull(getBetweenAttemptsTimeoutMillis(), betweenAttemptsTimeoutMillisJmxAttribute);
         checkCondition(getBetweenAttemptsTimeoutMillis() > 0, "must be > 0", betweenAttemptsTimeoutMillisJmxAttribute);
 
-        checkNotNull(getClientDispatcher(), clientDispatcherJmxAttribute);
-        checkNotNull(getBindingRegistry(), bindingRegistryJmxAttribute);
-        checkNotNull(getProcessingExecutor(), processingExecutorJmxAttribute);
+//        if (getNetconfTopology() == null) {
+//            checkNotNull(getDomRegistry(), domRegistryJmxAttribute);
+//            checkNotNull(getClientDispatcher(), clientDispatcherJmxAttribute);
+//            checkNotNull(getBindingRegistry(), bindingRegistryJmxAttribute);
+//            checkNotNull(getProcessingExecutor(), processingExecutorJmxAttribute);
+//        }
 
         // Check username + password in case of ssh
         if(getTcpOnly() == false) {
@@ -94,6 +121,70 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         }
 
         userCapabilities = getUserCapabilities();
+    }
+
+    private boolean isHostAddressPresent(final Host address) {
+        return address.getDomainName() != null ||
+               address.getIpAddress() != null && (address.getIpAddress().getIpv4Address() != null || address.getIpAddress().getIpv6Address() != null);
+    }
+
+    @Deprecated
+    private static ScheduledExecutorService DEFAULT_KEEPALIVE_EXECUTOR;
+
+    @Override
+    public java.lang.AutoCloseable createInstance() {
+        initDependenciesFromTopology();
+        final RemoteDeviceId id = new RemoteDeviceId(getIdentifier(), getSocketAddress());
+
+        final ExecutorService globalProcessingExecutor = processingExecutor.getExecutor();
+
+        RemoteDeviceHandler<NetconfSessionPreferences> salFacade
+                = new NetconfDeviceSalFacade(id, domRegistry, bindingRegistry, getDefaultRequestTimeoutMillis());
+
+        final Long keepaliveDelay = getKeepaliveDelay();
+        if (shouldSendKeepalive()) {
+            // Keepalive executor is optional for now and a default instance is supported
+            final ScheduledExecutorService executor = keepaliveExecutor == null ? DEFAULT_KEEPALIVE_EXECUTOR : keepaliveExecutor.getExecutor();
+
+            salFacade = new KeepaliveSalFacade(id, salFacade, executor, keepaliveDelay);
+        }
+
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO =
+                new NetconfDevice.SchemaResourcesDTO(schemaRegistry, schemaContextFactory, new NetconfStateSchemas.NetconfStateSchemasResolverImpl());
+
+        final NetconfDevice device =
+                new NetconfDevice(schemaResourcesDTO, id, salFacade, globalProcessingExecutor, getReconnectOnChangedSchema());
+
+        final NetconfDeviceCommunicator listener = userCapabilities.isPresent() ?
+                new NetconfDeviceCommunicator(id, device, userCapabilities.get()) : new NetconfDeviceCommunicator(id, device);
+
+        if (shouldSendKeepalive()) {
+            ((KeepaliveSalFacade) salFacade).setListener(listener);
+        }
+
+        final NetconfReconnectingClientConfiguration clientConfig = getClientConfig(listener);
+        listener.initializeRemoteConnection(clientDispatcher, clientConfig);
+
+        return new SalConnectorCloseable(listener, salFacade);
+    }
+
+    private void initDependenciesFromTopology() {
+//            topology = getNetconfTopologyDependency();
+
+//            domRegistry = topology.getDomRegistryDependency();
+//            clientDispatcher = topology.getNetconfClientDispatcherDependency();
+//            bindingRegistry = topology.getBindingAwareBroker();
+//            processingExecutor = topology.getProcessingExecutorDependency();
+//            keepaliveExecutor = topology.getKeepaliveExecutorDependency();
+//            sharedSchemaRepository = topology.getSharedSchemaRepository().getSharedSchemaRepository();
+//            eventExecutor = topology.getEventExecutorDependency();
+
+//            initFilesystemSchemaSourceCache(sharedSchemaRepository);
+        domRegistry = getDomRegistryDependency();
+        clientDispatcher = getClientDispatcherDependency();
+        bindingRegistry = getBindingRegistryDependency();
+        processingExecutor = getProcessingExecutorDependency();
+        eventExecutor = getEventExecutorDependency();
 
         if(getKeepaliveExecutor() == null) {
             LOG.warn("Keepalive executor missing. Using default instance for now, the configuration needs to be updated");
@@ -111,55 +202,26 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
                 });
             }
         }
+
+        LOG.warn("No topology defined in config, using default-shared-schema-repo");
+        if (DEFAULT_SCHEMA_REPOSITORY == null) {
+            DEFAULT_SCHEMA_REPOSITORY = new SharedSchemaRepository("default shared schema repo");
+        }
+        initFilesystemSchemaSourceCache(DEFAULT_SCHEMA_REPOSITORY);
     }
 
-    private boolean isHostAddressPresent(final Host address) {
-        return address.getDomainName() != null ||
-               address.getIpAddress() != null && (address.getIpAddress().getIpv4Address() != null || address.getIpAddress().getIpv6Address() != null);
-    }
-
-    @Deprecated
-    private static ScheduledExecutorService DEFAULT_KEEPALIVE_EXECUTOR;
-
-    @Override
-    public java.lang.AutoCloseable createInstance() {
-        final RemoteDeviceId id = new RemoteDeviceId(getIdentifier(), getSocketAddress());
-
-        final ExecutorService globalProcessingExecutor = getProcessingExecutorDependency().getExecutor();
-
-        final Broker domBroker = getDomRegistryDependency();
-        final BindingAwareBroker bindingBroker = getBindingRegistryDependency();
-
-        RemoteDeviceHandler<NetconfSessionPreferences> salFacade
-                = new NetconfDeviceSalFacade(id, domBroker, bindingBroker, getDefaultRequestTimeoutMillis());
-
-        final Long keepaliveDelay = getKeepaliveDelay();
-        if(shouldSendKeepalive()) {
-            // Keepalive executor is optional for now and a default instance is supported
-            final ScheduledExecutorService executor = getKeepaliveExecutor() == null ?
-                    DEFAULT_KEEPALIVE_EXECUTOR : getKeepaliveExecutorDependency().getExecutor();
-            salFacade = new KeepaliveSalFacade(id, salFacade, executor, keepaliveDelay);
+    private void initFilesystemSchemaSourceCache(SharedSchemaRepository repository) {
+        LOG.warn("Schema repository used: {}", repository.getIdentifier());
+        if (CACHE == null) {
+            CACHE = new FilesystemSchemaSourceCache<>(repository, YangTextSchemaSource.class, new File("cache/schema"));
         }
-
-        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO =
-                new NetconfDevice.SchemaResourcesDTO(schemaRegistry, schemaContextFactory, new NetconfStateSchemas.NetconfStateSchemasResolverImpl());
-
-        final NetconfDevice device =
-                new NetconfDevice(schemaResourcesDTO, id, salFacade, globalProcessingExecutor, getReconnectOnChangedSchema());
-
-        final NetconfDeviceCommunicator listener = userCapabilities.isPresent() ?
-                new NetconfDeviceCommunicator(id, device, userCapabilities.get()) : new NetconfDeviceCommunicator(id, device);
-
-        if(shouldSendKeepalive()) {
-            ((KeepaliveSalFacade) salFacade).setListener(listener);
+        if (!INITIALIZED_SCHEMA_REPOSITORIES.contains(repository)) {
+            repository.registerSchemaSourceListener(CACHE);
+            repository.registerSchemaSourceListener(TextToASTTransformer.create(repository, repository));
+            INITIALIZED_SCHEMA_REPOSITORIES.add(repository);
         }
-
-        final NetconfReconnectingClientConfiguration clientConfig = getClientConfig(listener);
-        final NetconfClientDispatcher dispatcher = getClientDispatcherDependency();
-
-        listener.initializeRemoteConnection(dispatcher, clientConfig);
-
-        return new SalConnectorCloseable(listener, salFacade);
+        setSchemaRegistry(repository);
+        setSchemaContextFactory(repository.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT));
     }
 
     private boolean shouldSendKeepalive() {
@@ -190,8 +252,8 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         final InetSocketAddress socketAddress = getSocketAddress();
         final long clientConnectionTimeoutMillis = getConnectionTimeoutMillis();
 
-        final ReconnectStrategyFactory sf = new TimedReconnectStrategyFactory(
-            getEventExecutorDependency(), getMaxConnectionAttempts(), getBetweenAttemptsTimeoutMillis(), getSleepFactor());
+        final ReconnectStrategyFactory sf = new TimedReconnectStrategyFactory(eventExecutor,
+                getMaxConnectionAttempts(), getBetweenAttemptsTimeoutMillis(), getSleepFactor());
         final ReconnectStrategy strategy = sf.createReconnectStrategy();
 
         return NetconfReconnectingClientConfigurationBuilder.create()
