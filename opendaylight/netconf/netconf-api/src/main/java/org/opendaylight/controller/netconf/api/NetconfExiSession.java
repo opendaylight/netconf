@@ -14,6 +14,7 @@ public interface NetconfExiSession {
 
     /**
      * Start exi communication with parameters included in start-exi message
+     * @param startExiMessage start exi message
      */
     void startExiCommunication(NetconfMessage startExiMessage);
 

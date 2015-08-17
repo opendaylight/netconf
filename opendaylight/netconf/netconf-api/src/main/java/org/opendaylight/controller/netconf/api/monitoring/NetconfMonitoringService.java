@@ -25,6 +25,8 @@ public interface NetconfMonitoringService extends CapabilityListener, SessionLis
 
     /**
      * Allows push based state information transfer. After the listener is registered, current state is pushed to the listener.
+     * @param listener Monitoring listener
+     * @return listener registration
      */
     AutoCloseable registerListener(MonitoringListener listener);
 
