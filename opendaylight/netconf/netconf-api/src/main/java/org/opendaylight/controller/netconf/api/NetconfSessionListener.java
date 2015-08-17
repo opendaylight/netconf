@@ -11,5 +11,4 @@ package org.opendaylight.controller.netconf.api;
 import org.opendaylight.protocol.framework.SessionListener;
 
 public interface NetconfSessionListener<S extends NetconfSession> extends SessionListener<NetconfMessage, S, NetconfTerminationReason> {
-
 }
