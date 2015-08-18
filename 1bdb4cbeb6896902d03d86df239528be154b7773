@@ -1,0 +1,8 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: Maros Marsalek <mmarsale@cisco.com>
+Verified+1: Maros Marsalek <mmarsale@cisco.com>
+Submitted-by: Maros Marsalek <mmarsale@cisco.com>
+Submitted-at: Tue, 18 Aug 2015 09:14:52 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/25399
+Project: netconf
+Branch: refs/heads/master
