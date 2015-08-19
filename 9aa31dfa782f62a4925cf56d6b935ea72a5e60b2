@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a79b1b5_b79ba5c8",
+        "filename": "opendaylight/netconf/netconf-topology/src/main/java/org/opendaylight/controller/netconf/topology/NetconfTopology.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-08-19T07:30:54Z",
+      "side": 1,
+      "message": "Netconf topology should not be just a DTO for all the dependencies. Some of the functionality from sal-netconf-connector has to come here. It should at least handle the writes and updates inside netconf-topology (name of the topology should be configurable) subtree (ideally also publishing and removing mountpoint instances) hiding the broker dependencies from netconf connector.\n\n\nIt might even hide the dispatcher and initiate connections for sal-netconf-connector. This (what other responsibilities to move here from netconf connector) needs to be thought through, but netconf-topology should be more than just sal-netconf-connector-dependencies.",
+      "range": {
+        "startLine": 18,
+        "startChar": 17,
+        "endLine": 18,
+        "endChar": 32
+      },
+      "revId": "9aa31dfa782f62a4925cf56d6b935ea72a5e60b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
