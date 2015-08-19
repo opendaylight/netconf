@@ -12,7 +12,7 @@
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.2.0 http://karaf.apache.org/xmlns/features/v1.2.0">
     <repository>mvn:org.opendaylight.controller/features-mdsal/${mdsal.version}/xml/features</repository>
     <repository>mvn:org.opendaylight.yangtools/features-yangtools/${yangtools.version}/xml/features</repository>
-    <repository>mvn:org.opendaylight.controller/features-netconf/${netconf.version}/xml/features</repository>
+    <repository>mvn:org.opendaylight.netconf/features-netconf/${netconf.version}/xml/features</repository>
 
     <feature name='odl-netconf-connector-all' version='${project.version}' description='OpenDaylight :: Netconf Connector :: All'>
         <feature version='${project.version}'>odl-netconf-connector</feature>
@@ -23,22 +23,22 @@
         <!-- messagebus endpoint for netconf connector-->
         <feature version='${project.version}'>odl-netconf-connector-all</feature>
         <feature version='${mdsal.version}'>odl-message-bus-collector</feature>
-        <bundle>mvn:org.opendaylight.controller/messagebus-netconf/${netconf.version}</bundle>
-        <configfile finalname="${config.configfile.directory}/06-message-netconf.xml">mvn:org.opendaylight.controller/messagebus-netconf/${netconf.version}/xml/config</configfile>
+        <bundle>mvn:org.opendaylight.netconf/messagebus-netconf/${netconf.version}</bundle>
+        <configfile finalname="${config.configfile.directory}/06-message-netconf.xml">mvn:org.opendaylight.netconf/messagebus-netconf/${netconf.version}/xml/config</configfile>
     </feature>
 
     <feature name='odl-netconf-connector' version='${project.version}' description="OpenDaylight :: Netconf Connector :: Netconf Connector">
         <feature version='${mdsal.version}'>odl-mdsal-broker</feature>
         <feature version='${netconf.version}'>odl-netconf-client</feature>
         <feature version='${yangtools.version}'>odl-yangtools-models</feature>
-        <bundle>mvn:org.opendaylight.controller/sal-netconf-connector/${project.version}</bundle>
+        <bundle>mvn:org.opendaylight.netconf/sal-netconf-connector/${project.version}</bundle>
         <bundle>mvn:org.opendaylight.controller.model/model-inventory/${mdsal.version}</bundle>
     </feature>
 
     <feature name='odl-netconf-connector-ssh' version='${project.version}' description="OpenDaylight :: Netconf Connector :: Netconf Connector + Netconf SSH Server + loopback connection configuration">
         <feature version='${netconf.version}'>odl-netconf-ssh</feature>
         <feature version='${project.version}'>odl-netconf-connector</feature>
-        <configfile finalname="${config.configfile.directory}/${config.netconf.connector.configfile}">mvn:org.opendaylight.controller/netconf-connector-config/${netconf.version}/xml/config</configfile>
+        <configfile finalname="${config.configfile.directory}/${config.netconf.connector.configfile}">mvn:org.opendaylight.netconf/netconf-connector-config/${netconf.version}/xml/config</configfile>
     </feature>
 
 </features>

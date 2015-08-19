@@ -3,10 +3,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.opendaylight.controller</groupId>
+    <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-parent</artifactId>
-    <version>0.4.0-SNAPSHOT</version>
-    <relativePath>../../pom.xml</relativePath>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../..</relativePath>
   </parent>
 
   <artifactId>netconf-subsystem</artifactId>
@@ -75,7 +75,7 @@
         <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>org.opendaylight.controller</groupId>
+        <groupId>org.opendaylight.netconf</groupId>
         <artifactId>netconf-artifacts</artifactId>
         <version>${netconf.version}</version>
         <type>pom</type>

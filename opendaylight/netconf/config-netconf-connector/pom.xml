@@ -3,9 +3,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.opendaylight.controller</groupId>
+    <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-subsystem</artifactId>
-    <version>0.4.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>..</relativePath>
   </parent>
   <artifactId>config-netconf-connector</artifactId>
   <packaging>bundle</packaging>
@@ -14,16 +15,15 @@
   <dependencies>
     <!-- compile dependencies -->
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.opendaylight.controller</groupId>
       <artifactId>config-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.opendaylight.controller</groupId>
       <artifactId>config-manager-facade-xml</artifactId>
-      <version>0.4.0-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.opendaylight.controller</groupId>
       <artifactId>config-util</artifactId>
     </dependency>
     <dependency>
@@ -47,7 +47,7 @@
       <artifactId>netconf-util</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.opendaylight.controller</groupId>
       <artifactId>yang-jmx-generator</artifactId>
     </dependency>
     <dependency>
@@ -79,13 +79,13 @@
       <artifactId>xmlunit</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.opendaylight.controller</groupId>
       <artifactId>config-manager</artifactId>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.opendaylight.controller</groupId>
       <artifactId>config-manager</artifactId>
       <scope>test</scope>
     </dependency>
@@ -98,7 +98,7 @@
     </dependency>
 
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.opendaylight.controller</groupId>
       <artifactId>yang-test</artifactId>
       <scope>test</scope>
     </dependency>
