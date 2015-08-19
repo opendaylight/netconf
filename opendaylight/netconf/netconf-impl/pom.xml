@@ -3,9 +3,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.opendaylight.controller</groupId>
+    <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-subsystem</artifactId>
-    <version>0.4.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>netconf-impl</artifactId>
   <packaging>bundle</packaging>
@@ -30,11 +30,11 @@
       <artifactId>netconf-mapping-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.controller</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>netconf-notifications-api</artifactId>
     </dependency>
     <dependency>
-       <groupId>org.opendaylight.controller</groupId>
+       <groupId>${project.groupId}</groupId>
        <artifactId>netconf-notifications-impl</artifactId>
     </dependency>
     <dependency>
