@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3a79b1b5_98da5977",
+        "filename": "opendaylight/netconf/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2015-08-19T14:05:56Z",
+      "side": 1,
+      "message": "It was declared in messagebus-netconf pom, but upon investigating why it\u0027s there it wasn\u0027t needed so i removed it.",
+      "parentUuid": "3a79b1b5_5737b1e3",
+      "range": {
+        "startLine": 151,
+        "startChar": 20,
+        "endLine": 151,
+        "endChar": 26
+      },
+      "revId": "d1067e4e19e432d4fb3d47f054593e015d88edbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a79b1b5_975c6927",
         "filename": "opendaylight/netconf/pom.xml",
         "patchSetId": 5
@@ -36,6 +60,30 @@
       "writtenOn": "2015-08-19T07:15:28Z",
       "side": 1,
       "message": "the plugin management section here and in restconf parent are probably identical, could we pull up the plugin management secton to netconf-parent ?",
+      "range": {
+        "startLine": 183,
+        "startChar": 5,
+        "endLine": 183,
+        "endChar": 21
+      },
+      "revId": "d1067e4e19e432d4fb3d47f054593e015d88edbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a79b1b5_38e78542",
+        "filename": "opendaylight/netconf/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2015-08-19T14:05:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a79b1b5_975c6927",
       "range": {
         "startLine": 183,
         "startChar": 5,
