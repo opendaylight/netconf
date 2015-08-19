@@ -35,7 +35,6 @@
     <module>netconf-notifications-api</module>
     <module>sal-netconf-connector</module>
     <module>messagebus-netconf</module>
-    <module>features</module>
     <module>models</module>
     <module>tools</module>
 
@@ -88,15 +87,6 @@
         <version>${yangtools.version}</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.opendaylight.controller</groupId>
-        <artifactId>features-protocol-framework</artifactId>
-        <version>${protocol-framework.version}</version>
-        <classifier>features</classifier>
-        <type>xml</type>
-        <scope>runtime</scope>
       </dependency>
 
       <dependency>
