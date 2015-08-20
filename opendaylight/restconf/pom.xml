@@ -10,7 +10,6 @@
     </parent>
     <artifactId>restconf-parent</artifactId>
     <version>1.3.0-SNAPSHOT</version>
-
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
 
@@ -20,6 +19,7 @@
         <module>sal-rest-docgen</module>
         <module>sal-rest-docgen-maven</module>
         <module>sal-restconf-broker</module>
+        <module>restconf-artifacts</module>
     </modules>
 
     <dependencyManagement>
@@ -42,6 +42,13 @@
                 <groupId>org.opendaylight.yangtools</groupId>
                 <artifactId>yangtools-artifacts</artifactId>
                 <version>${yangtools.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>restconf-artifacts</artifactId>
+                <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
