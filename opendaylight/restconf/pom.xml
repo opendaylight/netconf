@@ -15,6 +15,7 @@
 
     <modules>
         <module>sal-rest-connector</module>
+        <module>sal-rest-connector-config</module>
         <module>sal-rest-docgen</module>
         <module>sal-rest-docgen-maven</module>
         <module>sal-restconf-broker</module>
