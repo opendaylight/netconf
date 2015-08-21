@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a79b1b5_47adbc87",
+        "filename": "opendaylight/netconf/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-08-21T11:47:44Z",
+      "side": 1,
+      "message": "features-test should be deleted here since all the features are grouped at ../features",
+      "range": {
+        "startLine": 159,
+        "startChar": 29,
+        "endLine": 159,
+        "endChar": 33
+      },
+      "revId": "d3f16463f27305bd900108aff47b1870dce8f67a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
