@@ -19,6 +19,7 @@
         <module>opendaylight/restconf</module>
 
         <module>features</module>
+        <module>karaf</module>
     </modules>
 
     <properties>
@@ -32,6 +33,7 @@
         <commons.logback_settings.version>0.2.0-SNAPSHOT</commons.logback_settings.version>
         <commons.opendaylight.version>1.6.0-SNAPSHOT</commons.opendaylight.version>
         <config.version>0.4.0-SNAPSHOT</config.version>
+        <config.configfile.directory>etc/opendaylight/karaf</config.configfile.directory>
         <exi.nagasena.version>0000.0002.0053.0</exi.nagasena.version>
         <features.test.version>1.6.0-SNAPSHOT</features.test.version>
         <ietf-inet-types.version>2010.09.24.8-SNAPSHOT</ietf-inet-types.version>
