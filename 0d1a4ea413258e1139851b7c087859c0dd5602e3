@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a79b1b5_87dbd4ec",
+        "filename": "opendaylight/restconf/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-08-21T12:30:44Z",
+      "side": 1,
+      "message": "could this version also be replaced with project.version ? If no, we should use restconf.version instead of mdsal.version",
+      "range": {
+        "startLine": 51,
+        "startChar": 27,
+        "endLine": 51,
+        "endChar": 32
+      },
+      "revId": "0d1a4ea413258e1139851b7c087859c0dd5602e3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a79b1b5_c7d1ccce",
+        "filename": "opendaylight/restconf/restconf-artifacts/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-08-21T12:30:44Z",
+      "side": 1,
+      "message": "This could be replaced with project.version and the mdsal.version property can be removed",
+      "range": {
+        "startLine": 21,
+        "startChar": 27,
+        "endLine": 21,
+        "endChar": 32
+      },
+      "revId": "0d1a4ea413258e1139851b7c087859c0dd5602e3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
