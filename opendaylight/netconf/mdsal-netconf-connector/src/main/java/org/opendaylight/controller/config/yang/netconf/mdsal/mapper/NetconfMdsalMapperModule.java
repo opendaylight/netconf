@@ -8,7 +8,7 @@
 
 package org.opendaylight.controller.config.yang.netconf.mdsal.mapper;
 
-import org.opendaylight.controller.netconf.mdsal.connector.MdsalNetconfOperationServiceFactory;
+import org.opendaylight.netconf.mdsal.connector.MdsalNetconfOperationServiceFactory;
 
 public class NetconfMdsalMapperModule extends org.opendaylight.controller.config.yang.netconf.mdsal.mapper.AbstractNetconfMdsalMapperModule{
     public NetconfMdsalMapperModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier, org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {

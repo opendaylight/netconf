@@ -6,21 +6,21 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.mdsal.connector;
+package org.opendaylight.netconf.mdsal.connector;
 
 import com.google.common.collect.Sets;
 import java.util.Set;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.netconf.mapping.api.NetconfOperation;
-import org.opendaylight.controller.netconf.mdsal.connector.ops.Commit;
-import org.opendaylight.controller.netconf.mdsal.connector.ops.DiscardChanges;
-import org.opendaylight.controller.netconf.mdsal.connector.ops.EditConfig;
-import org.opendaylight.controller.netconf.mdsal.connector.ops.Lock;
-import org.opendaylight.controller.netconf.mdsal.connector.ops.RuntimeRpc;
-import org.opendaylight.controller.netconf.mdsal.connector.ops.Unlock;
-import org.opendaylight.controller.netconf.mdsal.connector.ops.get.Get;
-import org.opendaylight.controller.netconf.mdsal.connector.ops.get.GetConfig;
+import org.opendaylight.netconf.mdsal.connector.ops.Commit;
+import org.opendaylight.netconf.mdsal.connector.ops.DiscardChanges;
+import org.opendaylight.netconf.mdsal.connector.ops.EditConfig;
+import org.opendaylight.netconf.mdsal.connector.ops.Lock;
+import org.opendaylight.netconf.mdsal.connector.ops.RuntimeRpc;
+import org.opendaylight.netconf.mdsal.connector.ops.Unlock;
+import org.opendaylight.netconf.mdsal.connector.ops.get.Get;
+import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
 
 final class OperationProvider {
 

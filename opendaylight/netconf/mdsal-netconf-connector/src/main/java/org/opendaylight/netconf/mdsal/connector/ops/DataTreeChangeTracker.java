@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.mdsal.connector.ops;
+package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.collect.Lists;
 import java.util.ArrayDeque;
