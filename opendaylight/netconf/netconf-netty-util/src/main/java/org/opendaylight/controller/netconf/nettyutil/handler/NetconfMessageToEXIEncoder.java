@@ -18,7 +18,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.openexi.proc.common.EXIOptionsException;
 import org.openexi.sax.Transmogrifier;
 import org.openexi.sax.TransmogrifierException;

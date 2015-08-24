@@ -12,7 +12,7 @@ import com.google.common.base.Optional;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.controller.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.confignetconfconnector.operations.AbstractConfigNetconfOperation;
 import org.opendaylight.netconf.confignetconfconnector.operations.editconfig.EditConfigXmlParser;
 import org.w3c.dom.Attr;

@@ -22,7 +22,7 @@ import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.controller.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;

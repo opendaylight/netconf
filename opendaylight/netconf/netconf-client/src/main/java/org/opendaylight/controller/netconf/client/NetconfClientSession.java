@@ -12,7 +12,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import java.util.Collection;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.controller.netconf.nettyutil.AbstractNetconfSession;
 import org.opendaylight.controller.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.controller.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;

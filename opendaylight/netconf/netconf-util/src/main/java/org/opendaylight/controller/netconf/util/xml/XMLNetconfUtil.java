@@ -13,7 +13,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import org.opendaylight.controller.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 
 public final class XMLNetconfUtil {
     private static final XPathFactory FACTORY = XPathFactory.newInstance();

@@ -10,7 +10,7 @@ package org.opendaylight.controller.netconf.nettyutil;
 
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
-import org.opendaylight.controller.netconf.api.NetconfSession;
+import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.controller.netconf.nettyutil.handler.FramingMechanismHandlerFactory;
 import org.opendaylight.controller.netconf.nettyutil.handler.NetconfEOMAggregator;
 import org.opendaylight.controller.netconf.nettyutil.handler.NetconfHelloMessageToXMLEncoder;

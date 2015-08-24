@@ -16,7 +16,7 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import java.io.IOException;
 import java.util.List;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;

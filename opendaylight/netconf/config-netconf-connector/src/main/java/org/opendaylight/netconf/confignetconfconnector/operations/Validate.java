@@ -20,7 +20,7 @@ import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorType;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.controller.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;

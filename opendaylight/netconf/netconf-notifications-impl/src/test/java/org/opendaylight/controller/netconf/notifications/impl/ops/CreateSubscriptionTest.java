@@ -20,7 +20,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.controller.netconf.api.NetconfSession;
+import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.controller.netconf.notifications.NetconfNotificationListener;
 import org.opendaylight.controller.netconf.notifications.NetconfNotificationRegistry;
 import org.opendaylight.controller.netconf.notifications.NotificationListenerRegistration;

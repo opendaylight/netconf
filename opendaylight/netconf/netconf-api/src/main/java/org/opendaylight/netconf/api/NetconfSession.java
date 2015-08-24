@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.controller.netconf.api;
+package org.opendaylight.netconf.api;
 
 import io.netty.channel.ChannelFuture;
 import org.opendaylight.protocol.framework.ProtocolSession;

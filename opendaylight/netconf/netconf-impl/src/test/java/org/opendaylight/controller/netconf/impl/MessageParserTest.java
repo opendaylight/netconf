@@ -21,7 +21,7 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import java.util.Queue;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.controller.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.controller.netconf.nettyutil.handler.FramingMechanismHandlerFactory;
 import org.opendaylight.controller.netconf.nettyutil.handler.NetconfChunkAggregator;

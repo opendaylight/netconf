@@ -20,7 +20,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.openexi.proc.common.EXIOptionsException;
 import org.openexi.sax.EXIReader;
 import org.slf4j.Logger;

@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.parsers.ParserConfigurationException;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;

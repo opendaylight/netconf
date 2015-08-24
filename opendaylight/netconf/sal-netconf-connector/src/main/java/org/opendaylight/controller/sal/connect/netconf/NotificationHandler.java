@@ -13,7 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.controller.sal.connect.api.MessageTransformer;
 import org.opendaylight.controller.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.controller.sal.connect.util.RemoteDeviceId;

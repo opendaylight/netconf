@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.controller.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;

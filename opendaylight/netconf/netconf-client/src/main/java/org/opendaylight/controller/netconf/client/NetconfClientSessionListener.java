@@ -7,7 +7,7 @@
  */
 package org.opendaylight.controller.netconf.client;
 
-import org.opendaylight.controller.netconf.api.NetconfSessionListener;
+import org.opendaylight.netconf.api.NetconfSessionListener;
 
 public interface NetconfClientSessionListener extends NetconfSessionListener<NetconfClientSession> {
 

@@ -11,7 +11,7 @@ package org.opendaylight.controller.netconf.notifications;
 import com.google.common.base.Preconditions;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

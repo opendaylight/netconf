@@ -20,8 +20,8 @@ import io.netty.util.concurrent.GenericFutureListener;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
-import org.opendaylight.controller.netconf.api.NetconfSession;
+import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.controller.netconf.util.test.XmlFileLoader;
 import org.w3c.dom.Document;
 

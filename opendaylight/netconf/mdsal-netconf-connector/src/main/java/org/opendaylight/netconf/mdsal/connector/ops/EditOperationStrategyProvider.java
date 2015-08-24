@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 import javax.annotation.Nullable;
-import org.opendaylight.controller.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfigInput;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
