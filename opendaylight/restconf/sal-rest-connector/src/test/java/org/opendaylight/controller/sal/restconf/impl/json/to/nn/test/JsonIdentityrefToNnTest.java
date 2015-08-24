@@ -18,9 +18,9 @@ import javax.ws.rs.core.MediaType;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.controller.sal.rest.impl.JsonNormalizedNodeBodyReader;
+import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.controller.sal.rest.impl.test.providers.AbstractBodyReaderTest;
-import org.opendaylight.controller.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 

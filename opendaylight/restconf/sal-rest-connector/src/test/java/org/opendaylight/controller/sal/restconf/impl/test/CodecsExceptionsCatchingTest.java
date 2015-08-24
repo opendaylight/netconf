@@ -19,13 +19,13 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.opendaylight.controller.sal.rest.impl.JsonNormalizedNodeBodyReader;
-import org.opendaylight.controller.sal.rest.impl.NormalizedNodeJsonBodyWriter;
-import org.opendaylight.controller.sal.rest.impl.NormalizedNodeXmlBodyWriter;
-import org.opendaylight.controller.sal.rest.impl.RestconfDocumentedExceptionMapper;
-import org.opendaylight.controller.sal.rest.impl.XmlNormalizedNodeBodyReader;
-import org.opendaylight.controller.sal.restconf.impl.ControllerContext;
-import org.opendaylight.controller.sal.restconf.impl.RestconfImpl;
+import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
+import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
+import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
+import org.opendaylight.netconf.sal.rest.impl.RestconfDocumentedExceptionMapper;
+import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
+import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class CodecsExceptionsCatchingTest extends JerseyTest {

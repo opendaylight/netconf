@@ -13,7 +13,7 @@ import static org.mockito.Mockito.mock;
 
 import java.util.Collections;
 import org.junit.Test;
-import org.opendaylight.controller.sal.restconf.impl.RestCodec;
+import org.opendaylight.netconf.sal.restconf.impl.RestCodec;
 import org.opendaylight.yangtools.concepts.Codec;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;

@@ -22,10 +22,10 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
-import org.opendaylight.controller.sal.rest.api.RestconfConstants;
-import org.opendaylight.controller.sal.rest.impl.AbstractIdentifierAwareJaxRsProvider;
-import org.opendaylight.controller.sal.restconf.impl.ControllerContext;
-import org.opendaylight.controller.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
+import org.opendaylight.netconf.sal.rest.impl.AbstractIdentifierAwareJaxRsProvider;
+import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
+import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
