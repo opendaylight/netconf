@@ -5,7 +5,7 @@ import io.netty.util.concurrent.GenericFutureListener;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import org.opendaylight.controller.netconf.api.NetconfServerDispatcher;
+import org.opendaylight.netconf.api.NetconfServerDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

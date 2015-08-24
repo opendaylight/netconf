@@ -15,8 +15,6 @@
     </parent>
    <artifactId>features-netconf-connector</artifactId>
 
-    <!-- Preserve mdsal version-->
-   <version>${mdsal.version}</version>
    <packaging>jar</packaging>
    <properties>
       <features.file>features.xml</features.file>

@@ -7,7 +7,7 @@
  */
 package org.opendaylight.controller.config.yang.config.netconf.client.dispatcher;
 
-import org.opendaylight.controller.netconf.client.NetconfClientDispatcherImpl;
+import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
 
 /**
 *

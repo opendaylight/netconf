@@ -1,12 +1,12 @@
 package org.opendaylight.controller.config.yang.config.netconf.northbound.impl;
 
 import org.opendaylight.controller.config.api.JmxAttributeValidationException;
-import org.opendaylight.controller.netconf.api.monitoring.NetconfMonitoringService;
-import org.opendaylight.controller.netconf.impl.NetconfServerDispatcherImpl;
-import org.opendaylight.controller.netconf.impl.NetconfServerSessionNegotiatorFactory;
-import org.opendaylight.controller.netconf.impl.SessionIdProvider;
-import org.opendaylight.controller.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
-import org.opendaylight.controller.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.impl.NetconfServerDispatcherImpl;
+import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory;
+import org.opendaylight.netconf.impl.SessionIdProvider;
+import org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
+import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 
 public class NetconfServerDispatcherModule extends org.opendaylight.controller.config.yang.config.netconf.northbound.impl.AbstractNetconfServerDispatcherModule {
     public NetconfServerDispatcherModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier, org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {

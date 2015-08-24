@@ -1,6 +1,6 @@
 package org.opendaylight.controller.config.yang.config.netconf.northbound.impl;
 
-import org.opendaylight.controller.netconf.impl.osgi.NetconfMonitoringServiceImpl;
+import org.opendaylight.netconf.impl.osgi.NetconfMonitoringServiceImpl;
 
 public class NetconfServerMonitoringModule extends org.opendaylight.controller.config.yang.config.netconf.northbound.impl.AbstractNetconfServerMonitoringModule {
     public NetconfServerMonitoringModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier, org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {

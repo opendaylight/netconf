@@ -65,7 +65,7 @@ module netconf-cli {
          }
 
         leaf user-password {
-            cliext:argument-handler org.opendaylight.controller.netconf.cli.reader.custom.PasswordReader;
+            cliext:argument-handler PasswordReader;
             type string;
         }
       }

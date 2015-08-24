@@ -8,7 +8,6 @@
 package org.opendaylight.controller.config.yang.md.sal.connector.netconf;
 
 import java.io.File;
-
 import org.opendaylight.controller.config.api.DependencyResolver;
 import org.opendaylight.controller.config.api.DynamicMBeanWithInstance;
 import org.opendaylight.controller.config.spi.Module;

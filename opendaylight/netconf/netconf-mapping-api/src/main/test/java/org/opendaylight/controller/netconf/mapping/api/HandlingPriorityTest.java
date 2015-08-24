@@ -13,6 +13,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.opendaylight.netconf.mapping.api.HandlingPriority;
 
 public class HandlingPriorityTest {
 

@@ -16,12 +16,12 @@ module netconf-northbound-mapper {
 
     identity netconf-northbound-mapper {
         base "config:service-type";
-        config:java-class "org.opendaylight.controller.netconf.mapping.api.NetconfOperationServiceFactory";
+        config:java-class "org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory";
     }
 
     identity netconf-mapper-registry {
         base "config:service-type";
-        config:java-class "org.opendaylight.controller.netconf.mapping.api.NetconfOperationServiceFactoryListener";
+        config:java-class "org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener";
     }
 
 }
