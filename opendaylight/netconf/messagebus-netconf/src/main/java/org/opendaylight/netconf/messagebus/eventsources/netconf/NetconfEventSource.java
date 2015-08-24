@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.messagebus.eventsources.netconf;
+package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
 import static com.google.common.util.concurrent.Futures.immediateFuture;
 
