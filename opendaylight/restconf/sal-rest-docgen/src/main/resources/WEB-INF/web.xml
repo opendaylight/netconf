@@ -10,7 +10,7 @@
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
         <init-param>
             <param-name>javax.ws.rs.Application</param-name>
-            <param-value>org.opendaylight.controller.sal.rest.doc.jaxrs.ApiDocApplication</param-value>
+            <param-value>org.opendaylight.netconf.sal.rest.doc.jaxrs.ApiDocApplication</param-value>
         </init-param>
         <!-- AAA Auth Filter -->
         <init-param>

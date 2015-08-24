@@ -113,7 +113,7 @@
               *,
               com.sun.jersey.spi.container.servlet, org.eclipse.jetty.servlets
             </Import-Package>
-            <Bundle-Activator>org.opendaylight.controller.sal.rest.doc.DocProvider</Bundle-Activator>
+            <Bundle-Activator>org.opendaylight.netconf.sal.rest.doc.DocProvider</Bundle-Activator>
             <Web-ContextPath>/apidoc</Web-ContextPath>
           </instructions>
 
