@@ -6,11 +6,11 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.tcp.osgi;
+package org.opendaylight.netconf.tcp.osgi;
 
 import com.google.common.base.Optional;
 import java.net.InetSocketAddress;
-import org.opendaylight.controller.netconf.tcp.netty.ProxyServer;
+import org.opendaylight.netconf.tcp.netty.ProxyServer;
 import org.opendaylight.controller.netconf.util.osgi.NetconfConfigUtil;
 import org.opendaylight.controller.netconf.util.osgi.NetconfConfigUtil.InfixProp;
 import org.osgi.framework.BundleActivator;

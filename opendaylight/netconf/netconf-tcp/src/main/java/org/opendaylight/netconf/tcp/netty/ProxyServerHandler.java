@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.tcp.netty;
+package org.opendaylight.netconf.tcp.netty;
 
 import static com.google.common.base.Preconditions.checkState;
 

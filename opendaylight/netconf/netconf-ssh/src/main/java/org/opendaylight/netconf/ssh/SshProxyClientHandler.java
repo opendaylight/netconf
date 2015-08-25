@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.ssh;
+package org.opendaylight.netconf.ssh;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
