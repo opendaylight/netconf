@@ -23,9 +23,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.netconf.nettyutil.handler.NetconfEXICodec;
-import org.opendaylight.controller.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
-import org.opendaylight.controller.netconf.nettyutil.handler.NetconfMessageToEXIEncoder;
+import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
+import org.opendaylight.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
+import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToEXIEncoder;
 import org.openexi.proc.common.EXIOptions;
 
 public class NetconfClientSessionTest {
