@@ -16,7 +16,7 @@ module netconf-auth {
 
     identity netconf-auth-provider {
         base "config:service-type";
-        config:java-class "org.opendaylight.controller.netconf.auth.AuthProvider";
+        config:java-class "org.opendaylight.netconf.auth.AuthProvider";
     }
 
 }
