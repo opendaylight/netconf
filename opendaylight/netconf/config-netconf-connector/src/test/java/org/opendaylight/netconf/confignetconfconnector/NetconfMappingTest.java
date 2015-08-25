@@ -103,11 +103,11 @@ import org.opendaylight.netconf.confignetconfconnector.operations.editconfig.Edi
 import org.opendaylight.netconf.confignetconfconnector.operations.get.Get;
 import org.opendaylight.netconf.confignetconfconnector.operations.getconfig.GetConfig;
 import org.opendaylight.netconf.confignetconfconnector.operations.runtimerpc.RuntimeRpc;
-import org.opendaylight.controller.netconf.impl.NetconfServerSession;
-import org.opendaylight.controller.netconf.impl.NetconfServerSessionListener;
-import org.opendaylight.controller.netconf.impl.mapping.operations.DefaultCloseSession;
-import org.opendaylight.controller.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
-import org.opendaylight.controller.netconf.impl.osgi.NetconfOperationRouter;
+import org.opendaylight.netconf.impl.NetconfServerSession;
+import org.opendaylight.netconf.impl.NetconfServerSessionListener;
+import org.opendaylight.netconf.impl.mapping.operations.DefaultCloseSession;
+import org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
+import org.opendaylight.netconf.impl.osgi.NetconfOperationRouter;
 import org.opendaylight.controller.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.controller.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.controller.netconf.mapping.api.NetconfOperationChainedExecution;

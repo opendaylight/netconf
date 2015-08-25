@@ -1,6 +1,6 @@
 package org.opendaylight.controller.config.yang.config.netconf.northbound.impl;
 
-import org.opendaylight.controller.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
+import org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
 
 public class NetconfMapperAggregatorModule extends org.opendaylight.controller.config.yang.config.netconf.northbound.impl.AbstractNetconfMapperAggregatorModule {
     public NetconfMapperAggregatorModule(final org.opendaylight.controller.config.api.ModuleIdentifier identifier, final org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
