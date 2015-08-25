@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.monitoring;
+package org.opendaylight.netconf.monitoring;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
@@ -14,9 +14,9 @@ import java.util.Map;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.controller.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.controller.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;

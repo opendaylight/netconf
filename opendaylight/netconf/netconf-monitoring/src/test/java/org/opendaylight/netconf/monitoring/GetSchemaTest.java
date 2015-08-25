@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.monitoring;
+package org.opendaylight.netconf.monitoring;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;

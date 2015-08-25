@@ -56,8 +56,6 @@ import org.apache.sshd.server.PasswordAuthenticator;
 import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
 import org.apache.sshd.server.session.ServerSession;
 import org.opendaylight.controller.config.util.capability.Capability;
-import org.opendaylight.controller.netconf.monitoring.osgi.NetconfMonitoringActivator;
-import org.opendaylight.controller.netconf.monitoring.osgi.NetconfMonitoringOperationService;
 import org.opendaylight.controller.netconf.ssh.SshProxyServer;
 import org.opendaylight.controller.netconf.ssh.SshProxyServerConfiguration;
 import org.opendaylight.controller.netconf.ssh.SshProxyServerConfigurationBuilder;
@@ -79,6 +77,8 @@ import org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFacto
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.opendaylight.netconf.monitoring.osgi.NetconfMonitoringActivator;
+import org.opendaylight.netconf.monitoring.osgi.NetconfMonitoringOperationService;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;

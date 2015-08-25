@@ -5,19 +5,19 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.controller.netconf.monitoring;
+package org.opendaylight.netconf.monitoring;
 
 import java.util.Collections;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlMappingConstants;
+import org.opendaylight.controller.netconf.util.mapping.AbstractNetconfOperation;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
-import org.opendaylight.controller.netconf.monitoring.xml.JaxBSerializer;
-import org.opendaylight.controller.netconf.monitoring.xml.model.NetconfState;
-import org.opendaylight.controller.netconf.util.mapping.AbstractNetconfOperation;
+import org.opendaylight.netconf.monitoring.xml.JaxBSerializer;
+import org.opendaylight.netconf.monitoring.xml.model.NetconfState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;

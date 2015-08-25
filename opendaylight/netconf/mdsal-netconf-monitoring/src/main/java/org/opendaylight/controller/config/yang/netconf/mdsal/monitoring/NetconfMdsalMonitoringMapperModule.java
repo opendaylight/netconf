@@ -8,7 +8,7 @@ import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
-import org.opendaylight.controller.netconf.monitoring.GetSchema;
+import org.opendaylight.netconf.monitoring.GetSchema;
 
 public class NetconfMdsalMonitoringMapperModule extends org.opendaylight.controller.config.yang.netconf.mdsal.monitoring.AbstractNetconfMdsalMonitoringMapperModule {
     public NetconfMdsalMonitoringMapperModule(final org.opendaylight.controller.config.api.ModuleIdentifier identifier, final org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {

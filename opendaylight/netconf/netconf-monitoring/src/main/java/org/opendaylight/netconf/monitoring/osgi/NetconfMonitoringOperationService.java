@@ -6,15 +6,15 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.monitoring.osgi;
+package org.opendaylight.netconf.monitoring.osgi;
 
 import com.google.common.collect.Sets;
 import java.util.Set;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
-import org.opendaylight.controller.netconf.monitoring.Get;
-import org.opendaylight.controller.netconf.monitoring.GetSchema;
+import org.opendaylight.netconf.monitoring.Get;
+import org.opendaylight.netconf.monitoring.GetSchema;
 
 public class NetconfMonitoringOperationService implements NetconfOperationService {
 

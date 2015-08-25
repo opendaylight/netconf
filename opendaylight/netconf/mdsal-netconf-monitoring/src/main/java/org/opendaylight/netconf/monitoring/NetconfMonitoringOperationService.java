@@ -13,8 +13,6 @@ import java.util.Set;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
-import org.opendaylight.controller.netconf.monitoring.Get;
-import org.opendaylight.controller.netconf.monitoring.GetSchema;
 
 public class NetconfMonitoringOperationService implements NetconfOperationService {
 
