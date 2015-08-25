@@ -23,7 +23,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.openexi.proc.common.EXIOptions;
 import org.openexi.proc.common.EXIOptionsException;
 import org.openexi.sax.Transmogrifier;

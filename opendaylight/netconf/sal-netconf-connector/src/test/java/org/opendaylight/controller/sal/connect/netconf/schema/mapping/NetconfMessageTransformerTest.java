@@ -45,7 +45,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.controller.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.controller.sal.connect.netconf.schema.NetconfRemoteSchemaYangSourceProvider;
 import org.opendaylight.controller.sal.connect.netconf.util.NetconfBaseOps;

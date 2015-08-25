@@ -23,7 +23,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.controller.netconf.util.messages.NetconfHelloMessage;
 
 public class SimpleNetconfClientSessionListenerTest {

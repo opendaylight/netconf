@@ -13,7 +13,7 @@ import io.netty.util.HashedWheelTimer;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.concurrent.TimeUnit;
-import org.opendaylight.controller.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.controller.netconf.impl.NetconfServerDispatcherImpl;
 import org.opendaylight.controller.netconf.impl.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.controller.netconf.impl.SessionIdProvider;

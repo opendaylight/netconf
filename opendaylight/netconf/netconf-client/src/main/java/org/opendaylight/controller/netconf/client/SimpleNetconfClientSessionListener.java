@@ -15,8 +15,8 @@ import io.netty.util.concurrent.Promise;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import javax.annotation.concurrent.GuardedBy;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
-import org.opendaylight.controller.netconf.api.NetconfTerminationReason;
+import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

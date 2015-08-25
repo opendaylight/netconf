@@ -17,7 +17,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.netconf.api.NetconfDocumentedException;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.controller.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.controller.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.controller.sal.connect.util.RemoteDeviceId;

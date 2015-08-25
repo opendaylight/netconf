@@ -11,7 +11,7 @@ package org.opendaylight.netconf.monitoring;
 import java.util.Collections;
 import java.util.Set;
 import org.opendaylight.controller.config.util.capability.Capability;
-import org.opendaylight.controller.netconf.api.monitoring.CapabilityListener;
+import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.controller.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.controller.netconf.mapping.api.NetconfOperationServiceFactory;
 

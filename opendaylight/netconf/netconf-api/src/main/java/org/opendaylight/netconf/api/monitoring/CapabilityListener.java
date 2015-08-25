@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.api.monitoring;
+package org.opendaylight.netconf.api.monitoring;
 
 import java.util.Set;
 import org.opendaylight.controller.config.util.capability.Capability;

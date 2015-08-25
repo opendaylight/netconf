@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.controller.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.controller.netconf.impl.NetconfServerSession;
 import org.opendaylight.controller.netconf.impl.mapping.operations.DefaultCloseSession;
 import org.opendaylight.controller.netconf.impl.mapping.operations.DefaultNetconfOperation;

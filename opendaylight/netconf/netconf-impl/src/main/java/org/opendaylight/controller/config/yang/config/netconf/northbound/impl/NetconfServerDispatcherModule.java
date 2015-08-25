@@ -1,7 +1,7 @@
 package org.opendaylight.controller.config.yang.config.netconf.northbound.impl;
 
 import org.opendaylight.controller.config.api.JmxAttributeValidationException;
-import org.opendaylight.controller.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.controller.netconf.impl.NetconfServerDispatcherImpl;
 import org.opendaylight.controller.netconf.impl.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.controller.netconf.impl.SessionIdProvider;

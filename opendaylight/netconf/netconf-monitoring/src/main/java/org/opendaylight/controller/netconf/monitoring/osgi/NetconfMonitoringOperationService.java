@@ -10,7 +10,7 @@ package org.opendaylight.controller.netconf.monitoring.osgi;
 
 import com.google.common.collect.Sets;
 import java.util.Set;
-import org.opendaylight.controller.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.controller.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.controller.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.controller.netconf.monitoring.Get;

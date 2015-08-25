@@ -17,7 +17,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
-import org.opendaylight.controller.netconf.api.NetconfDocumentedException;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 
 public class NetconfHelloMessageTest {
 

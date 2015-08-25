@@ -15,9 +15,9 @@ import java.util.Set;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.controller.netconf.api.NetconfDocumentedException;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
-import org.opendaylight.controller.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
+import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

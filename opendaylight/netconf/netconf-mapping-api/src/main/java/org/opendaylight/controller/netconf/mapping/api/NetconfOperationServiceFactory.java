@@ -10,7 +10,7 @@ package org.opendaylight.controller.netconf.mapping.api;
 
 import java.util.Set;
 import org.opendaylight.controller.config.util.capability.Capability;
-import org.opendaylight.controller.netconf.api.monitoring.CapabilityListener;
+import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 
 /**
  * Factory that must be registered in OSGi service registry in order to be used

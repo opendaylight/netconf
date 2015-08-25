@@ -5,11 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.controller.netconf.api.monitoring;
 
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
+package org.opendaylight.netconf.api;
 
-public interface NetconfManagementSession {
+import org.opendaylight.protocol.framework.SessionListener;
 
-    Session toManagementSession();
+public interface NetconfSessionListener<S extends NetconfSession> extends SessionListener<NetconfMessage, S, NetconfTerminationReason> {
 }

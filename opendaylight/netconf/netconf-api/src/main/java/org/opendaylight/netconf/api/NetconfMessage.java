@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.api;
+package org.opendaylight.netconf.api;
 
 import java.io.StringWriter;
 import javax.xml.transform.OutputKeys;

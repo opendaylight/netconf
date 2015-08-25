@@ -16,7 +16,7 @@ import org.opendaylight.controller.config.facade.xml.ConfigSubsystemFacadeFactor
 import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.controller.config.util.capability.ModuleListener;
 import org.opendaylight.controller.config.util.capability.YangModuleCapability;
-import org.opendaylight.controller.netconf.api.monitoring.CapabilityListener;
+import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.controller.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.yangtools.yang.model.api.Module;
 

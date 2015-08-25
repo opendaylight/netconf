@@ -27,7 +27,7 @@ import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeve
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorType;
 import org.opendaylight.controller.config.util.xml.XmlElement;
-import org.opendaylight.controller.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.ops.Datastore;
 import org.opendaylight.controller.netconf.util.mapping.AbstractSingletonNetconfOperation;

@@ -8,7 +8,7 @@
 
 package org.opendaylight.controller.netconf.mapping.api;
 
-import org.opendaylight.controller.netconf.api.NetconfSession;
+import org.opendaylight.netconf.api.NetconfSession;
 
 public interface SessionAwareNetconfOperation extends NetconfOperation {
 

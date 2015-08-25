@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 import org.apache.sshd.server.PasswordAuthenticator;
 import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
 import org.apache.sshd.server.session.ServerSession;
-import org.opendaylight.controller.netconf.api.NetconfServerDispatcher;
+import org.opendaylight.netconf.api.NetconfServerDispatcher;
 import org.opendaylight.controller.netconf.ssh.SshProxyServer;
 import org.opendaylight.controller.netconf.ssh.SshProxyServerConfigurationBuilder;
 import org.slf4j.Logger;

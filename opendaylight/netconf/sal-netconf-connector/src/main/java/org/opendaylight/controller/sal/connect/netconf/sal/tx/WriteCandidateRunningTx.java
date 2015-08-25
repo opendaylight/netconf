@@ -11,7 +11,7 @@ package org.opendaylight.controller.sal.connect.netconf.sal.tx;
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.netconf.api.NetconfDocumentedException;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.controller.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.controller.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.controller.sal.connect.util.RemoteDeviceId;

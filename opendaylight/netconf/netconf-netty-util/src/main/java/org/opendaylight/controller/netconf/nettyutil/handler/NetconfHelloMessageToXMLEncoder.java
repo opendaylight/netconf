@@ -15,7 +15,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
 import javax.xml.transform.TransformerException;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.controller.netconf.util.messages.NetconfHelloMessage;
 import org.opendaylight.controller.netconf.util.messages.NetconfHelloMessageAdditionalHeader;
 

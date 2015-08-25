@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.api.util;
+package org.opendaylight.netconf.api.util;
 
 /**
  * These constants mark operation service factories that are auto wired with netconf endpoint
