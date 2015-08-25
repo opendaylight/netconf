@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.mdsal.connector.ops;
+package org.opendaylight.netconf.mdsal.connector.ops;
 
 public enum Datastore {
     candidate, running

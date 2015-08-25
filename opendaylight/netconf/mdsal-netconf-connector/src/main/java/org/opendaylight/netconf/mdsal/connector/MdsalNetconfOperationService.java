@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.mdsal.connector;
+package org.opendaylight.netconf.mdsal.connector;
 
 import java.util.Set;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;

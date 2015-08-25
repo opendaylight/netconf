@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.mdsal.connector.ops;
+package org.opendaylight.netconf.mdsal.connector.ops;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -47,10 +47,10 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.store.impl.InMemoryDOMDataStoreFactory;
 import org.opendaylight.controller.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.controller.netconf.mapping.api.NetconfOperationChainedExecution;
-import org.opendaylight.controller.netconf.mdsal.connector.CurrentSchemaContext;
-import org.opendaylight.controller.netconf.mdsal.connector.TransactionProvider;
-import org.opendaylight.controller.netconf.mdsal.connector.ops.get.Get;
-import org.opendaylight.controller.netconf.mdsal.connector.ops.get.GetConfig;
+import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
+import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
+import org.opendaylight.netconf.mdsal.connector.ops.get.Get;
+import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
 import org.opendaylight.controller.netconf.util.test.NetconfXmlUnitRecursiveQualifier;
 import org.opendaylight.controller.netconf.util.test.XmlFileLoader;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
