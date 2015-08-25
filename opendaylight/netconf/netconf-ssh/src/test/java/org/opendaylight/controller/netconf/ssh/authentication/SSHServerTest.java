@@ -34,7 +34,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
-import org.opendaylight.controller.netconf.util.osgi.NetconfConfigUtil;
+import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;

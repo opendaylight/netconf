@@ -14,7 +14,7 @@ import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorType
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
-import org.opendaylight.controller.netconf.util.mapping.AbstractSingletonNetconfOperation;
+import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.impl.NetconfServerSession;

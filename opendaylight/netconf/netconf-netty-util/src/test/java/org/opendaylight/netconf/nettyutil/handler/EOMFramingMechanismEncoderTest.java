@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.junit.Test;
-import org.opendaylight.controller.netconf.util.messages.NetconfMessageConstants;
+import org.opendaylight.netconf.util.messages.NetconfMessageConstants;
 
 public class EOMFramingMechanismEncoderTest {
 

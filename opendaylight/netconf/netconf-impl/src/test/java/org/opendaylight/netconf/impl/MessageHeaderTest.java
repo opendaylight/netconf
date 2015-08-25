@@ -12,7 +12,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.opendaylight.controller.netconf.util.messages.NetconfMessageHeader;
+import org.opendaylight.netconf.util.messages.NetconfMessageHeader;
 
 @Deprecated
 public class MessageHeaderTest {

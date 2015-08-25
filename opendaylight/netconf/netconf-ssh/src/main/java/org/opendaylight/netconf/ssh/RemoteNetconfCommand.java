@@ -31,7 +31,7 @@ import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
 import org.apache.sshd.server.SessionAware;
 import org.apache.sshd.server.session.ServerSession;
-import org.opendaylight.controller.netconf.util.messages.NetconfHelloMessageAdditionalHeader;
+import org.opendaylight.netconf.util.messages.NetconfHelloMessageAdditionalHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

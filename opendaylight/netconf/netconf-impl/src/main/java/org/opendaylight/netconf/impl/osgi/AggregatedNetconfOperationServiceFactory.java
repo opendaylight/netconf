@@ -22,7 +22,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
-import org.opendaylight.controller.netconf.util.CloseableUtil;
+import org.opendaylight.netconf.util.CloseableUtil;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

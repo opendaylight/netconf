@@ -27,10 +27,10 @@ import org.opendaylight.netconf.nettyutil.handler.NetconfChunkAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
-import org.opendaylight.controller.netconf.util.messages.FramingMechanism;
-import org.opendaylight.controller.netconf.util.messages.NetconfMessageConstants;
-import org.opendaylight.controller.netconf.util.messages.NetconfMessageHeader;
-import org.opendaylight.controller.netconf.util.test.XmlFileLoader;
+import org.opendaylight.netconf.util.messages.FramingMechanism;
+import org.opendaylight.netconf.util.messages.NetconfMessageConstants;
+import org.opendaylight.netconf.util.messages.NetconfMessageHeader;
+import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.netconf.api.NetconfMessage;
 
 public class MessageParserTest {

@@ -40,7 +40,7 @@ import org.opendaylight.controller.netconf.client.NetconfClientDispatcherImpl;
 import org.opendaylight.controller.netconf.client.TestingNetconfClient;
 import org.opendaylight.controller.netconf.test.tool.Main.Params;
 import org.opendaylight.controller.netconf.test.tool.NetconfDeviceSimulator;
-import org.opendaylight.controller.netconf.util.test.XmlFileLoader;
+import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.controller.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;

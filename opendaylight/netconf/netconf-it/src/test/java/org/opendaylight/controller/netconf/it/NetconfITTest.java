@@ -43,7 +43,7 @@ import org.opendaylight.controller.config.yang.test.impl.NetconfTestImplModuleMX
 import org.opendaylight.controller.netconf.api.NetconfMessage;
 import org.opendaylight.controller.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.controller.netconf.client.TestingNetconfClient;
-import org.opendaylight.controller.netconf.util.test.XmlFileLoader;
+import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.config.test.types.rev131127.TestIdentity1;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.config.test.types.rev131127.TestIdentity2;
 import org.opendaylight.yangtools.sal.binding.generator.util.BindingRuntimeContext;

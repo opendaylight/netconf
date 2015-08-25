@@ -40,9 +40,9 @@ import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
-import org.opendaylight.controller.netconf.util.messages.NetconfHelloMessage;
-import org.opendaylight.controller.netconf.util.messages.NetconfHelloMessageAdditionalHeader;
-import org.opendaylight.controller.netconf.util.test.XmlFileLoader;
+import org.opendaylight.netconf.util.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.util.messages.NetconfHelloMessageAdditionalHeader;
+import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.openexi.proc.common.EXIOptions;

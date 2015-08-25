@@ -21,7 +21,7 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import org.opendaylight.controller.netconf.util.osgi.NetconfConfigUtil;
+import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSession;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
-import org.opendaylight.controller.netconf.util.messages.NetconfHelloMessageAdditionalHeader;
+import org.opendaylight.netconf.util.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.DomainName;

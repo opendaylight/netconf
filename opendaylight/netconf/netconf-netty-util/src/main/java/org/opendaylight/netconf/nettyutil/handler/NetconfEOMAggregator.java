@@ -11,7 +11,7 @@ package org.opendaylight.netconf.nettyutil.handler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import org.opendaylight.controller.netconf.util.messages.NetconfMessageConstants;
+import org.opendaylight.netconf.util.messages.NetconfMessageConstants;
 
 public class NetconfEOMAggregator extends DelimiterBasedFrameDecoder {
 
