@@ -20,7 +20,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import org.opendaylight.controller.netconf.client.NetconfClientSession;
+import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.controller.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.slf4j.Logger;
