@@ -15,7 +15,6 @@ import java.util.List;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.netconf.util.mapping.AbstractLastNetconfOperation;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mapping.api.SessionAwareNetconfOperation;
@@ -24,6 +23,7 @@ import org.opendaylight.netconf.notifications.NetconfNotificationListener;
 import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
 import org.opendaylight.netconf.notifications.NotificationListenerRegistration;
 import org.opendaylight.netconf.notifications.impl.NetconfNotificationManager;
+import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.slf4j.Logger;
@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
  * Create subscription listens for create subscription requests and registers notification listeners into notification registry.
  * Received notifications are sent to the client right away
  */
-public class CreateSubscription extends AbstractLastNetconfOperation implements SessionAwareNetconfOperation, AutoCloseable {
+public class CreateSubscription extends AbstractSingletonNetconfOperation implements SessionAwareNetconfOperation, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(CreateSubscription.class);
 
