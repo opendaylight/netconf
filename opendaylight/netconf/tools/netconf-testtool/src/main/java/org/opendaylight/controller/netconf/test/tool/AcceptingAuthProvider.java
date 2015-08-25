@@ -8,7 +8,7 @@
 
 package org.opendaylight.controller.netconf.test.tool;
 
-import org.opendaylight.controller.netconf.auth.AuthProvider;
+import org.opendaylight.netconf.auth.AuthProvider;
 
 class AcceptingAuthProvider implements AuthProvider {
 
