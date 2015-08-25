@@ -21,7 +21,7 @@ import org.opendaylight.netconf.confignetconfconnector.operations.editconfig.Edi
 import org.opendaylight.netconf.confignetconfconnector.operations.get.Get;
 import org.opendaylight.netconf.confignetconfconnector.operations.getconfig.GetConfig;
 import org.opendaylight.netconf.confignetconfconnector.operations.runtimerpc.RuntimeRpc;
-import org.opendaylight.controller.netconf.mapping.api.NetconfOperation;
+import org.opendaylight.netconf.mapping.api.NetconfOperation;
 
 final class NetconfOperationProvider {
     private final Set<NetconfOperation> operations;

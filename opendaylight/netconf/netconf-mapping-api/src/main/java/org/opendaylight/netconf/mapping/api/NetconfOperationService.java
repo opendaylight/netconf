@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.mapping.api;
+package org.opendaylight.netconf.mapping.api;
 
 import java.util.Set;
 
