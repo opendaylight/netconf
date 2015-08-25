@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.ssh.osgi;
+package org.opendaylight.netconf.ssh.osgi;
 
 import com.google.common.base.Preconditions;
 import org.apache.sshd.server.PasswordAuthenticator;

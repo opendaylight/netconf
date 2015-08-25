@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.controller.netconf.ssh.osgi;
+package org.opendaylight.netconf.ssh.osgi;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -21,8 +21,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import org.apache.sshd.common.util.ThreadUtils;
 import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
-import org.opendaylight.controller.netconf.ssh.SshProxyServer;
-import org.opendaylight.controller.netconf.ssh.SshProxyServerConfigurationBuilder;
+import org.opendaylight.netconf.ssh.SshProxyServer;
+import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
 import org.opendaylight.controller.netconf.util.osgi.NetconfConfigUtil;
 import org.opendaylight.controller.netconf.util.osgi.NetconfConfigUtil.InfixProp;
 import org.osgi.framework.BundleActivator;

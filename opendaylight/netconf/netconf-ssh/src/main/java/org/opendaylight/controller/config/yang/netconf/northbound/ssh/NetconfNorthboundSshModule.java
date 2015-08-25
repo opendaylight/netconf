@@ -12,8 +12,8 @@ import org.apache.sshd.server.PasswordAuthenticator;
 import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
 import org.apache.sshd.server.session.ServerSession;
 import org.opendaylight.netconf.api.NetconfServerDispatcher;
-import org.opendaylight.controller.netconf.ssh.SshProxyServer;
-import org.opendaylight.controller.netconf.ssh.SshProxyServerConfigurationBuilder;
+import org.opendaylight.netconf.ssh.SshProxyServer;
+import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

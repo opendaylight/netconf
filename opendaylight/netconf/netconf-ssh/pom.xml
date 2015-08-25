@@ -83,7 +83,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-Activator>org.opendaylight.controller.netconf.ssh.osgi.NetconfSSHActivator</Bundle-Activator>
+            <Bundle-Activator>org.opendaylight.netconf.ssh.osgi.NetconfSSHActivator</Bundle-Activator>
           </instructions>
         </configuration>
       </plugin>
