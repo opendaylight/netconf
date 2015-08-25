@@ -86,7 +86,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>org.opendaylight.controller.netconf.cli.Main</mainClass>
+              <mainClass>org.opendaylight.netconf.cli.Main</mainClass>
             </manifest>
           </archive>
         </configuration>
@@ -104,7 +104,7 @@
             <configuration>
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>org.opendaylight.controller.netconf.cli.Main</mainClass>
+                  <mainClass>org.opendaylight.netconf.cli.Main</mainClass>
                 </transformer>
               </transformers>
               <shadedArtifactAttached>true</shadedArtifactAttached>
