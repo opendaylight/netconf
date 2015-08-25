@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.client;
+package org.opendaylight.netconf.client;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -21,16 +21,16 @@ import java.util.Collection;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
-import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.controller.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.controller.netconf.nettyutil.AbstractNetconfSessionNegotiator;
 import org.opendaylight.controller.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 import org.opendaylight.controller.netconf.util.messages.NetconfHelloMessage;
 import org.opendaylight.controller.netconf.util.messages.NetconfMessageUtil;
 import org.opendaylight.controller.netconf.util.xml.XMLNetconfUtil;
+import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
+import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;

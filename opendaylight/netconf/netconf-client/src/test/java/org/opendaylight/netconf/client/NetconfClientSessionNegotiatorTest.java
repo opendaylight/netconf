@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.client;
+package org.opendaylight.netconf.client;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
@@ -16,6 +16,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
 import com.google.common.base.Optional;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -35,8 +36,6 @@ import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
-import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.controller.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.controller.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 import org.opendaylight.controller.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
@@ -44,6 +43,8 @@ import org.opendaylight.controller.netconf.nettyutil.handler.exi.NetconfStartExi
 import org.opendaylight.controller.netconf.util.messages.NetconfHelloMessage;
 import org.opendaylight.controller.netconf.util.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.controller.netconf.util.test.XmlFileLoader;
+import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.openexi.proc.common.EXIOptions;
 import org.w3c.dom.Document;
 

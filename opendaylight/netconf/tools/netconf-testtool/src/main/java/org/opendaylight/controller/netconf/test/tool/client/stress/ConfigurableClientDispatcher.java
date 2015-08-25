@@ -11,9 +11,9 @@ package org.opendaylight.controller.netconf.test.tool.client.stress;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.Timer;
 import java.util.Set;
-import org.opendaylight.controller.netconf.client.NetconfClientDispatcherImpl;
-import org.opendaylight.controller.netconf.client.NetconfClientSessionNegotiatorFactory;
-import org.opendaylight.controller.netconf.client.conf.NetconfClientConfiguration;
+import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
+import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
+import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 
 public class ConfigurableClientDispatcher extends NetconfClientDispatcherImpl {
 

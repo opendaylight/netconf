@@ -8,6 +8,7 @@
 package org.opendaylight.controller.netconf.cli.reader.custom;
 
 import static org.opendaylight.controller.netconf.cli.io.IOUtil.isSkipInput;
+
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;

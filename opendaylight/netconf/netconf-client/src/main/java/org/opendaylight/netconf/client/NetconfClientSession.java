@@ -6,16 +6,16 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.client;
+package org.opendaylight.netconf.client;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import java.util.Collection;
-import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.controller.netconf.nettyutil.AbstractNetconfSession;
 import org.opendaylight.controller.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.controller.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
