@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.notifications.impl.ops;
+package org.opendaylight.netconf.notifications.impl.ops;
 
 import com.google.common.collect.Lists;
 import java.io.IOException;

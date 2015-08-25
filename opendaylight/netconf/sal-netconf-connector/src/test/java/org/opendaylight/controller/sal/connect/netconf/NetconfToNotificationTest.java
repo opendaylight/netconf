@@ -25,7 +25,7 @@ import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.dom.api.DOMEvent;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.controller.netconf.notifications.NetconfNotification;
+import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.controller.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
