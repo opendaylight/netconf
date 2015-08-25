@@ -10,9 +10,9 @@ package org.opendaylight.netconf.client;
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
 import java.io.IOException;
-import org.opendaylight.controller.netconf.nettyutil.AbstractChannelInitializer;
-import org.opendaylight.controller.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
-import org.opendaylight.controller.netconf.nettyutil.handler.ssh.client.AsyncSshHandler;
+import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
+import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler;
 import org.opendaylight.protocol.framework.SessionListenerFactory;
 
 final class SshClientChannelInitializer extends AbstractChannelInitializer<NetconfClientSession> {

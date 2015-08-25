@@ -51,8 +51,8 @@ import org.opendaylight.controller.netconf.client.SimpleNetconfClientSessionList
 import org.opendaylight.controller.netconf.client.TestingNetconfClient;
 import org.opendaylight.controller.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.controller.netconf.client.conf.NetconfClientConfigurationBuilder;
-import org.opendaylight.controller.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
-import org.opendaylight.controller.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
+import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
+import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
 import org.opendaylight.controller.netconf.ssh.SshProxyServer;
 import org.opendaylight.controller.netconf.ssh.SshProxyServerConfigurationBuilder;
 import org.opendaylight.controller.netconf.util.messages.NetconfMessageUtil;
