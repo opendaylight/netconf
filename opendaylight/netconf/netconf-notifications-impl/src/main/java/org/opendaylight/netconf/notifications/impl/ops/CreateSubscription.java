@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.notifications.impl.ops;
+package org.opendaylight.netconf.notifications.impl.ops;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
@@ -15,15 +15,15 @@ import java.util.List;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.controller.netconf.util.mapping.AbstractLastNetconfOperation;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mapping.api.SessionAwareNetconfOperation;
-import org.opendaylight.controller.netconf.notifications.NetconfNotification;
-import org.opendaylight.controller.netconf.notifications.NetconfNotificationListener;
-import org.opendaylight.controller.netconf.notifications.NetconfNotificationRegistry;
-import org.opendaylight.controller.netconf.notifications.NotificationListenerRegistration;
-import org.opendaylight.controller.netconf.notifications.impl.NetconfNotificationManager;
-import org.opendaylight.controller.netconf.util.mapping.AbstractLastNetconfOperation;
+import org.opendaylight.netconf.notifications.NetconfNotification;
+import org.opendaylight.netconf.notifications.NetconfNotificationListener;
+import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
+import org.opendaylight.netconf.notifications.NotificationListenerRegistration;
+import org.opendaylight.netconf.notifications.impl.NetconfNotificationManager;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.slf4j.Logger;

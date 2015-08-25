@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.notifications.impl.ops;
+package org.opendaylight.netconf.notifications.impl.ops;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -21,9 +21,9 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.NetconfSession;
-import org.opendaylight.controller.netconf.notifications.NetconfNotificationListener;
-import org.opendaylight.controller.netconf.notifications.NetconfNotificationRegistry;
-import org.opendaylight.controller.netconf.notifications.NotificationListenerRegistration;
+import org.opendaylight.netconf.notifications.NetconfNotificationListener;
+import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
+import org.opendaylight.netconf.notifications.NotificationListenerRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.w3c.dom.Element;
 

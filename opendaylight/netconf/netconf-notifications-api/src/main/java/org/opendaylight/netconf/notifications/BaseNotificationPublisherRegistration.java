@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.notifications;
+package org.opendaylight.netconf.notifications;
 
 /**
  * Registration for base notification publisher. This registration allows for publishing of base netconf notifications using generated classes

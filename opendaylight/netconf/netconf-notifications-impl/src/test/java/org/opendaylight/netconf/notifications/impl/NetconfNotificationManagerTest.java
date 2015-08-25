@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.notifications.impl;
+package org.opendaylight.netconf.notifications.impl;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -19,12 +19,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.netconf.notifications.BaseNotificationPublisherRegistration;
-import org.opendaylight.controller.netconf.notifications.NetconfNotification;
-import org.opendaylight.controller.netconf.notifications.NetconfNotificationCollector;
-import org.opendaylight.controller.netconf.notifications.NetconfNotificationListener;
-import org.opendaylight.controller.netconf.notifications.NetconfNotificationRegistry;
-import org.opendaylight.controller.netconf.notifications.NotificationListenerRegistration;
+import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
+import org.opendaylight.netconf.notifications.NetconfNotification;
+import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
+import org.opendaylight.netconf.notifications.NetconfNotificationListener;
+import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
+import org.opendaylight.netconf.notifications.NotificationListenerRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;

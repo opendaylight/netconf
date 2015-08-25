@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.notifications.impl.osgi;
+package org.opendaylight.netconf.notifications.impl.osgi;
 
 import com.google.common.collect.Sets;
 import java.util.Collections;
@@ -20,11 +20,11 @@ import org.opendaylight.netconf.api.util.NetconfConstants;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
-import org.opendaylight.controller.netconf.notifications.NetconfNotification;
-import org.opendaylight.controller.netconf.notifications.NetconfNotificationCollector;
-import org.opendaylight.controller.netconf.notifications.impl.NetconfNotificationManager;
-import org.opendaylight.controller.netconf.notifications.impl.ops.CreateSubscription;
-import org.opendaylight.controller.netconf.notifications.impl.ops.Get;
+import org.opendaylight.netconf.notifications.NetconfNotification;
+import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
+import org.opendaylight.netconf.notifications.impl.NetconfNotificationManager;
+import org.opendaylight.netconf.notifications.impl.ops.CreateSubscription;
+import org.opendaylight.netconf.notifications.impl.ops.Get;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;

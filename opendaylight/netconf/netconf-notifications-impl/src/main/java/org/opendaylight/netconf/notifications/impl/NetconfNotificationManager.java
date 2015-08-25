@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.notifications.impl;
+package org.opendaylight.netconf.notifications.impl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
@@ -20,15 +20,15 @@ import java.util.Map;
 import java.util.Set;
 import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
-import org.opendaylight.controller.netconf.notifications.BaseNotificationPublisherRegistration;
-import org.opendaylight.controller.netconf.notifications.NetconfNotification;
-import org.opendaylight.controller.netconf.notifications.NetconfNotificationCollector;
-import org.opendaylight.controller.netconf.notifications.NetconfNotificationListener;
-import org.opendaylight.controller.netconf.notifications.NetconfNotificationRegistry;
-import org.opendaylight.controller.netconf.notifications.NotificationListenerRegistration;
-import org.opendaylight.controller.netconf.notifications.NotificationPublisherRegistration;
-import org.opendaylight.controller.netconf.notifications.NotificationRegistration;
-import org.opendaylight.controller.netconf.notifications.impl.ops.NotificationsTransformUtil;
+import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
+import org.opendaylight.netconf.notifications.NetconfNotification;
+import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
+import org.opendaylight.netconf.notifications.NetconfNotificationListener;
+import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
+import org.opendaylight.netconf.notifications.NotificationListenerRegistration;
+import org.opendaylight.netconf.notifications.NotificationPublisherRegistration;
+import org.opendaylight.netconf.notifications.NotificationRegistration;
+import org.opendaylight.netconf.notifications.impl.ops.NotificationsTransformUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.StreamsBuilder;

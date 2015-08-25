@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.notifications;
+package org.opendaylight.netconf.notifications;
 
 /**
  * Generic registration, used as a base for other registration types

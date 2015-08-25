@@ -41,7 +41,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.controller.netconf.notifications.NetconfNotification;
+import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.controller.netconf.util.OrderedNormalizedNodeWriter;
 import org.opendaylight.controller.sal.connect.api.MessageTransformer;
 import org.opendaylight.controller.sal.connect.netconf.util.NetconfMessageTransformUtil;

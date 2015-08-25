@@ -6,11 +6,11 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.notifications;
+package org.opendaylight.netconf.notifications;
 
 /**
- * Registration for notification publisher. This registration allows for publishing any netconf notifications
+ * Manages the registration of a single listener
  */
-public interface NotificationPublisherRegistration extends NetconfNotificationListener, NotificationRegistration {
+public interface NotificationListenerRegistration extends NotificationRegistration {
 
 }

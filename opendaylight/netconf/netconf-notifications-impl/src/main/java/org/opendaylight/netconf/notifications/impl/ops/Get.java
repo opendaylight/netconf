@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.notifications.impl.ops;
+package org.opendaylight.netconf.notifications.impl.ops;
 
 import com.google.common.base.Preconditions;
 import java.io.IOException;
@@ -15,11 +15,11 @@ import javax.xml.transform.dom.DOMResult;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlMappingConstants;
+import org.opendaylight.controller.netconf.util.mapping.AbstractNetconfOperation;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
-import org.opendaylight.controller.netconf.notifications.NetconfNotificationRegistry;
-import org.opendaylight.controller.netconf.util.mapping.AbstractNetconfOperation;
+import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.NetconfBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
