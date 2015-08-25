@@ -405,7 +405,7 @@ module ietf-netconf {
         nc:get-filter-element-attributes;
         // TODO this extension should be augmented (anyxml nodes cannot be augmented)
         // or we can identify custom input/output arguments by schemaPath defined for custom handlers
-        cliext:argument-handler org.opendaylight.controller.netconf.cli.reader.custom.FilterReader;
+        cliext:argument-handler FilterReader;
       }
     }
 
@@ -415,7 +415,7 @@ module ietf-netconf {
           "Copy of the source datastore subset that matched
            the filter criteria (if any).  An empty data container
            indicates that the request did not produce any results.";
-       cliext:argument-handler org.opendaylight.controller.netconf.cli.writer.custom.DataWriter;
+       cliext:argument-handler DataWriter;
      }
     }
   }
@@ -522,12 +522,12 @@ module ietf-netconf {
         description
           "The content for the edit operation.";
 
-        cliext:argument-handler org.opendaylight.controller.netconf.cli.reader.custom.EditContentReader;
+        cliext:argument-handler EditContentReader;
 
         anyxml config {
           description
             "Inline Config content.";
-          cliext:argument-handler org.opendaylight.controller.netconf.cli.reader.custom.ConfigReader;
+          cliext:argument-handler ConfigReader;
         }
 
         leaf url {
@@ -752,7 +752,7 @@ module ietf-netconf {
            configuration and state data to retrieve.";
         nc:get-filter-element-attributes;
         // TODO this extension should be augmented (anyxml nodes cannot be augmented)
-        cliext:argument-handler org.opendaylight.controller.netconf.cli.reader.custom.FilterReader;
+        cliext:argument-handler FilterReader;
       }
     }
 
@@ -764,7 +764,7 @@ module ietf-netconf {
            An empty data container indicates that the request did not
            produce any results.";
 
-       cliext:argument-handler org.opendaylight.controller.netconf.cli.writer.custom.DataWriter;
+       cliext:argument-handler DataWriter;
 
       }
     }
