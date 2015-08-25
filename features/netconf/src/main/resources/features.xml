@@ -140,6 +140,7 @@
     <feature version='${project.version}'>odl-netconf-ssh</feature>
     <feature version='${project.version}'>odl-netconf-client</feature>
     <feature version='${controller.mdsal.version}'>odl-mdsal-broker</feature>
+    <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-notification/${project.version}</bundle>
     <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-connector/${project.version}</bundle>
     <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-monitoring/${project.version}</bundle>
     <configfile finalname='${config.configfile.directory}/${config.netconf.mdsal.configfile}'>mvn:org.opendaylight.netconf/netconf-mdsal-config/${project.version}/xml/config</configfile>
