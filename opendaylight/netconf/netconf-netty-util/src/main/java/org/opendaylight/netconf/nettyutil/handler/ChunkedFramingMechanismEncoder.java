@@ -13,7 +13,7 @@ import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import org.opendaylight.controller.netconf.util.messages.NetconfMessageConstants;
+import org.opendaylight.netconf.util.messages.NetconfMessageConstants;
 
 public class ChunkedFramingMechanismEncoder extends MessageToByteEncoder<ByteBuf> {
     public static final int DEFAULT_CHUNK_SIZE = 8192;

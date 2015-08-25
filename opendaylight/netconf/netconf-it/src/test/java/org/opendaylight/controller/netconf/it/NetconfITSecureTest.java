@@ -55,8 +55,8 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.Authenticat
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
 import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
-import org.opendaylight.controller.netconf.util.messages.NetconfMessageUtil;
-import org.opendaylight.controller.netconf.util.osgi.NetconfConfigUtil;
+import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
+import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
 import org.opendaylight.controller.sal.connect.api.RemoteDevice;
 import org.opendaylight.controller.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.controller.sal.connect.netconf.listener.NetconfSessionPreferences;

@@ -22,8 +22,8 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.controller.netconf.util.messages.NetconfHelloMessage;
-import org.opendaylight.controller.netconf.util.messages.NetconfHelloMessageAdditionalHeader;
+import org.opendaylight.netconf.util.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.util.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ import org.xml.sax.SAXException;
 /**
  * Customized NetconfXMLToMessageDecoder that reads additional header with
  * session metadata from
- * {@link org.opendaylight.controller.netconf.util.messages.NetconfHelloMessage}
+ * {@link NetconfHelloMessage}
  *
  *
  * This handler should be replaced in pipeline by regular message handler as last step of negotiation.

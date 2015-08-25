@@ -10,7 +10,7 @@ package org.opendaylight.netconf.impl;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
-import org.opendaylight.controller.netconf.util.test.XmlFileLoader;
+import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.netconf.api.NetconfMessage;
 
 public class ExiEncodeDecodeTest  {

@@ -13,7 +13,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.opendaylight.controller.netconf.util.test.XmlUnitUtil.assertContainsElementWithText;
+import static org.opendaylight.netconf.util.test.XmlUnitUtil.assertContainsElementWithText;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
@@ -34,7 +34,7 @@ import org.opendaylight.controller.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.controller.netconf.client.TestingNetconfClient;
 import org.opendaylight.controller.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
-import org.opendaylight.controller.netconf.util.test.XmlFileLoader;
+import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.w3c.dom.Document;
 
 public class NetconfITMonitoringTest extends AbstractNetconfConfigTest {

@@ -9,7 +9,7 @@
 package org.opendaylight.netconf.confignetconfconnector.operations;
 
 import org.opendaylight.controller.config.facade.xml.ConfigSubsystemFacade;
-import org.opendaylight.controller.netconf.util.mapping.AbstractLastNetconfOperation;
+import org.opendaylight.netconf.util.mapping.AbstractLastNetconfOperation;
 
 public abstract class AbstractConfigNetconfOperation extends AbstractLastNetconfOperation {
 

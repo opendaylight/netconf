@@ -15,14 +15,14 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
 import javax.xml.transform.TransformerException;
-import org.opendaylight.controller.netconf.util.messages.NetconfHelloMessage;
-import org.opendaylight.controller.netconf.util.messages.NetconfHelloMessageAdditionalHeader;
+import org.opendaylight.netconf.util.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.util.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.NetconfMessage;
 
 /**
  * Customized NetconfMessageToXMLEncoder that serializes additional header with
  * session metadata along with
- * {@link org.opendaylight.controller.netconf.util.messages.NetconfHelloMessage}
+ * {@link NetconfHelloMessage}
  * . Used by netconf clients to send information about the user, ip address,
  * protocol etc.
  * <p/>

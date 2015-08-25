@@ -21,7 +21,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import java.net.InetSocketAddress;
-import org.opendaylight.controller.netconf.util.osgi.NetconfConfigUtil;
+import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
 
 public class ProxyServer implements Runnable {
     private final ProxyHandlerFactory proxyHandlerFactory;

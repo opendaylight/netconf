@@ -11,7 +11,7 @@ package org.opendaylight.netconf.nettyutil.handler;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.junit.Test;
-import org.opendaylight.controller.netconf.util.messages.FramingMechanism;
+import org.opendaylight.netconf.util.messages.FramingMechanism;
 
 public class FramingMechanismHandlerFactoryTest {
 
