@@ -13,9 +13,9 @@
         },
         namespace = MonitoringConstants.NAMESPACE
 )
-package org.opendaylight.controller.netconf.monitoring.xml.model;
+package org.opendaylight.netconf.monitoring.xml.model;
 
 import javax.xml.bind.annotation.XmlNs;
 import javax.xml.bind.annotation.XmlNsForm;
 import javax.xml.bind.annotation.XmlSchema;
-import org.opendaylight.controller.netconf.monitoring.MonitoringConstants;
+import org.opendaylight.netconf.monitoring.MonitoringConstants;
