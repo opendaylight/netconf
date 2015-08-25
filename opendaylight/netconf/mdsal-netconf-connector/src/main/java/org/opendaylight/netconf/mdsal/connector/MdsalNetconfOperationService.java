@@ -11,8 +11,8 @@ package org.opendaylight.netconf.mdsal.connector;
 import java.util.Set;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.netconf.mapping.api.NetconfOperation;
-import org.opendaylight.controller.netconf.mapping.api.NetconfOperationService;
+import org.opendaylight.netconf.mapping.api.NetconfOperation;
+import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 
 public class MdsalNetconfOperationService implements NetconfOperationService {
 

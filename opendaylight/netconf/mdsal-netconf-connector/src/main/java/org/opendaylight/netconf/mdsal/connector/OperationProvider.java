@@ -12,7 +12,7 @@ import com.google.common.collect.Sets;
 import java.util.Set;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.netconf.mapping.api.NetconfOperation;
+import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mdsal.connector.ops.Commit;
 import org.opendaylight.netconf.mdsal.connector.ops.DiscardChanges;
 import org.opendaylight.netconf.mdsal.connector.ops.EditConfig;

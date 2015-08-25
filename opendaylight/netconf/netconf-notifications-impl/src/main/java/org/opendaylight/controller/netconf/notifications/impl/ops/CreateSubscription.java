@@ -17,7 +17,7 @@ import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.controller.netconf.mapping.api.SessionAwareNetconfOperation;
+import org.opendaylight.netconf.mapping.api.SessionAwareNetconfOperation;
 import org.opendaylight.controller.netconf.notifications.NetconfNotification;
 import org.opendaylight.controller.netconf.notifications.NetconfNotificationListener;
 import org.opendaylight.controller.netconf.notifications.NetconfNotificationRegistry;

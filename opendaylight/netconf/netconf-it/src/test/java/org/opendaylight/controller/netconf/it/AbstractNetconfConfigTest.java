@@ -55,7 +55,7 @@ import org.opendaylight.controller.netconf.impl.NetconfServerSessionNegotiatorFa
 import org.opendaylight.controller.netconf.impl.SessionIdProvider;
 import org.opendaylight.controller.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
 import org.opendaylight.controller.netconf.impl.osgi.NetconfMonitoringServiceImpl;
-import org.opendaylight.controller.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.controller.netconf.monitoring.osgi.NetconfMonitoringActivator;
 import org.opendaylight.controller.netconf.monitoring.osgi.NetconfMonitoringOperationService;
 import org.opendaylight.controller.netconf.util.test.XmlFileLoader;

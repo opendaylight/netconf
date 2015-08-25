@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.controller.netconf.mapping.api;
+package org.opendaylight.netconf.mapping.api;
 
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.w3c.dom.Document;

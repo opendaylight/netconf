@@ -17,8 +17,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
-import org.opendaylight.controller.netconf.mapping.api.HandlingPriority;
-import org.opendaylight.controller.netconf.mapping.api.NetconfOperationChainedExecution;
+import org.opendaylight.netconf.mapping.api.HandlingPriority;
+import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

@@ -10,8 +10,8 @@ package org.opendaylight.netconf.confignetconfconnector.osgi;
 
 import java.util.Set;
 import org.opendaylight.controller.config.facade.xml.ConfigSubsystemFacade;
-import org.opendaylight.controller.netconf.mapping.api.NetconfOperation;
-import org.opendaylight.controller.netconf.mapping.api.NetconfOperationService;
+import org.opendaylight.netconf.mapping.api.NetconfOperation;
+import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 
 public class NetconfOperationServiceImpl implements NetconfOperationService {
 

@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.config.util.capability.BasicCapability;
 import org.opendaylight.controller.config.util.capability.Capability;
-import org.opendaylight.controller.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.controller.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;

@@ -12,7 +12,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import org.opendaylight.controller.config.facade.xml.ConfigSubsystemFacadeFactory;
 import org.opendaylight.netconf.api.util.NetconfConstants;
-import org.opendaylight.controller.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
