@@ -41,25 +41,32 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.MessageBodyReader;
+import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.opendaylight.controller.config.yang.md.sal.rest.connector.RestconfCORSFilter;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYangBodyWriter;
+import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYinBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
-import org.opendaylight.netconf.sal.rest.impl.RestconfApplication;
 import org.opendaylight.netconf.sal.rest.impl.RestconfDocumentedExceptionMapper;
 import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
+import org.opendaylight.netconf.sal.restconf.impl.StatisticsRestconfServiceWrapper;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -118,17 +125,19 @@ public class RestGetOperationTest extends JerseyTest {
 
     @Override
     protected Application configure() {
-        /* enable/disable Jersey logs to console */
-        // enable(TestProperties.LOG_TRAFFIC);
-        // enable(TestProperties.DUMP_ENTITY);
-        // enable(TestProperties.RECORD_LOG_LEVEL);
-        // set(TestProperties.RECORD_LOG_LEVEL, Level.ALL.intValue());
-        ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig = resourceConfig.registerInstances(restconfImpl, new NormalizedNodeJsonBodyWriter(),
-                new NormalizedNodeXmlBodyWriter(), new XmlNormalizedNodeBodyReader(), new JsonNormalizedNodeBodyReader());
-        resourceConfig.registerClasses(RestconfDocumentedExceptionMapper.class);
-        resourceConfig.registerClasses(new RestconfApplication().getClasses());
-        return resourceConfig;
+        final ResourceConfig rc = new ResourceConfig();
+        rc.setApplicationName("RestconfApplication");
+        rc.register(new RestconfDocumentedExceptionMapper(), ExceptionMapper.class);
+        rc.register(new JsonNormalizedNodeBodyReader(), MessageBodyReader.class);
+        rc.register(new XmlNormalizedNodeBodyReader(), MessageBodyReader.class);
+        rc.register(StatisticsRestconfServiceWrapper.getInstance(), StatisticsRestconfServiceWrapper.class);
+        rc.register(NormalizedNodeJsonBodyWriter.class);
+        rc.register(NormalizedNodeXmlBodyWriter.class);
+        rc.register(SchemaExportContentYinBodyWriter.class);
+        rc.register(SchemaExportContentYangBodyWriter.class);
+        rc.register(RestconfCORSFilter.class);
+        EncodingFilter.enableFor(rc, GZipEncoder.class);
+        return rc;
     }
 
     private void setControllerContext(final SchemaContext schemaContext) {
