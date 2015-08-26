@@ -170,6 +170,7 @@ public class RestconfImpl implements RestconfService {
     }
 
     private RestconfImpl() {
+        setControllerContext(ControllerContext.getInstance());
     }
 
     public static RestconfImpl getInstance() {
