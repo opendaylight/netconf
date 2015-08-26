@@ -111,7 +111,7 @@
               !org.apache.maven.project,
               !org.opendaylight.yangtools.yang2sources.spi,
               *,
-              com.sun.jersey.spi.container.servlet, org.eclipse.jetty.servlets
+              org.eclipse.jetty.servlets
             </Import-Package>
             <Bundle-Activator>org.opendaylight.netconf.sal.rest.doc.DocProvider</Bundle-Activator>
             <Web-ContextPath>/apidoc</Web-ContextPath>
