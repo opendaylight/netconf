@@ -267,6 +267,7 @@ public class RestconfImpl implements RestconfService {
 
     @Override
     public NormalizedNodeContext getAvailableStreams(final UriInfo uriInfo) {
+        controllerContext = (controllerContext == null) ? ControllerContext.getInstance() : controllerContext;
         final SchemaContext schemaContext = controllerContext.getGlobalSchema();
         final Set<String> availableStreams = Notificator.getStreamNames();
         final Module restconfModule = getRestconfModule();
