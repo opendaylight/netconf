@@ -36,6 +36,8 @@ import org.opendaylight.netconf.sal.rest.impl.RestconfDocumentedExceptionMapper;
 import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 
+// TODO move to integration test suite
+@Ignore
 public class MediaTypesTest extends JerseyTest {
 
     private static RestconfService restconfService;
