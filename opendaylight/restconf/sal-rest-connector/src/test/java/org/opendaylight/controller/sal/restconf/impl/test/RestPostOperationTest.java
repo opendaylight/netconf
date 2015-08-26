@@ -53,6 +53,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
+// TODO move to test IntegrationTestSuite
+@Ignore
 public class RestPostOperationTest extends JerseyTest {
 
     private static String xmlDataAbsolutePath;

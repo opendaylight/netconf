@@ -15,15 +15,19 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.CheckedFuture;
+
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.Set;
+
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
@@ -38,6 +42,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
+// TODO move to test integration suite
+@Ignore
 public class RestDeleteOperationTest extends JerseyTest {
 
     private static ControllerContext controllerContext;
