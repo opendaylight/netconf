@@ -29,6 +29,7 @@ CONTROLLER_PASSWORD = ''  # empty means use keys
 MININET_PASSWORD = ''  # empty means use keys
 KEYFILE_PASS = 'any'
 SSH_KEY = 'id_rsa'
+CONTROLLER_STOP_TIMEOUT = 120  # Max number of seconds test will wait for a controller to stop
 
 # KARAF Variaable
 KARAF_SHELL_PORT = '8101'
