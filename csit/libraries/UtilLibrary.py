@@ -10,13 +10,17 @@ from SSHLibrary import SSHLibrary
 import robot
 import time
 import re
+import warnings
 
 global _cache
 
 
 def get(url, userId='admin', password='admin'):
     """Helps in making GET REST calls"""
-
+    warnings.warn(
+        "Use the Robot RequestsLibrary rather than this. See DatastoreCRUD.robot for examples",
+        DeprecationWarning
+    )
     headers = {}
     headers['Accept'] = 'application/xml'
 
@@ -30,6 +34,10 @@ def get(url, userId='admin', password='admin'):
 
 def nonprintpost(url, userId, password, data):
     """Helps in making POST REST calls without outputs"""
+    warnings.warn(
+        "Use the Robot RequestsLibrary rather than this. See DatastoreCRUD.robot for examples",
+        DeprecationWarning
+    )
 
     if userId is None:
         userId = 'admin'
@@ -49,6 +57,10 @@ def nonprintpost(url, userId, password, data):
 
 def post(url, userId, password, data):
     """Helps in making POST REST calls"""
+    warnings.warn(
+        "Use the Robot RequestsLibrary rather than this. See DatastoreCRUD.robot for examples",
+        DeprecationWarning
+    )
 
     if userId is None:
         userId = 'admin'
@@ -74,6 +86,10 @@ def post(url, userId, password, data):
 
 def delete(url, userId='admin', password='admin'):
     """Helps in making DELET REST calls"""
+    warnings.warn(
+        "Use the Robot RequestsLibrary rather than this. See DatastoreCRUD.robot for examples",
+        DeprecationWarning
+    )
     print("delete all resources belonging to url"+url)
     session = _cache.switch("CLUSTERING_DELETE")
     resp = session.delete(url, auth=(userId, password))  # noqa
