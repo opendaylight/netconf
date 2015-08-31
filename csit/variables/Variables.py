@@ -75,6 +75,20 @@ VLANMAP_CREATE = 'vlanmaps.json'
 # ports URL
 PORTS = 'ports/detail.json'
 
+# flowlist URL
+FLOWLISTS_CREATE = 'flowlists.json'
+
+# flowlistentry_URL
+FLOWLISTENTRIES_CREATE = 'flowlistentries.json'
+FLOWLISTS = 'flowlists'
+
+# flowfilter_URL
+FLOWFILTERS_CREATE = 'flowfilters.json'
+FLOWFILTERENTRIES_CREATE = 'flowfilterentries.json'
+FLOWFILTERS = 'flowfilters/in'
+FLOWFILTERS_UPDATE = 'flowfilterentries'
+
+
 # Common APIs
 CONFIG_NODES_API = '/restconf/config/opendaylight-inventory:nodes'
 OPERATIONAL_NODES_API = '/restconf/operational/opendaylight-inventory:nodes'
