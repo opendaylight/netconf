@@ -29,12 +29,12 @@
             <artifactId>netconf-util</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>binding-generator-impl</artifactId>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>msdal-binding-generator-impl</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>binding-data-codec</artifactId>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>mdsal-binding-dom-codec</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
