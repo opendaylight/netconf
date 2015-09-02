@@ -13,6 +13,7 @@
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
+    <!-- FIXME: Convert to features-parent -->
    <artifactId>features-netconf-connector</artifactId>
 
    <packaging>jar</packaging>
@@ -30,7 +31,7 @@
         <dependency>
           <groupId>org.opendaylight.controller</groupId>
           <artifactId>features-mdsal</artifactId>
-          <version>${mdsal.version}</version>
+          <version>${controller.mdsal.version}</version>
           <classifier>features</classifier>
           <type>xml</type>
         </dependency>
