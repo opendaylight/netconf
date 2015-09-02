@@ -41,7 +41,10 @@
         <ietf-topology.version>2013.10.21.8-SNAPSHOT</ietf-topology.version>
         <ietf-yang-types.version>2010.09.24.8-SNAPSHOT</ietf-yang-types.version>
         <jersey-servlet.version>1.17</jersey-servlet.version>
-        <mdsal.version>1.3.0-SNAPSHOT</mdsal.version>
+
+        <mdsal.version>2.0.0-SNAPSHOT</mdsal.version>
+        <mdsal.model.version>0.8.0-SNAPSHOT</mdsal.model.version>
+        <controller.mdsal.version>1.3.0-SNAPSHOT</controller.mdsal.version>
         <netconf.version>1.0.0-SNAPSHOT</netconf.version>
         <restconf.version>1.3.0-SNAPSHOT</restconf.version>
         <protocol-framework.version>0.7.0-SNAPSHOT</protocol-framework.version>
@@ -53,6 +56,54 @@
         <salGeneratorPath>src/main/yang-gen-sal</salGeneratorPath>
 
     </properties>
+
+
+    <dependencyManagement>
+      <dependencies>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>yangtools-artifacts</artifactId>
+            <version>${yangtools.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.opendaylight.mdsal</groupId>
+          <artifactId>mdsal-artifacts</artifactId>
+          <version>${mdsal.version}</version>
+          <type>pom</type>
+          <scope>import</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.opendaylight.mdsal.model</groupId>
+          <artifactId>mdsal-model-artifacts</artifactId>
+          <version>${mdsal.model.version}</version>
+          <type>pom</type>
+          <scope>import</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.opendaylight.aaa</groupId>
+          <artifactId>aaa-artifacts</artifactId>
+          <version>${aaa.version}</version>
+          <type>pom</type>
+          <scope>import</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.opendaylight.controller</groupId>
+          <artifactId>config-artifacts</artifactId>
+          <version>${config.version}</version>
+          <type>pom</type>
+          <scope>import</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.opendaylight.controller</groupId>
+          <artifactId>mdsal-artifacts</artifactId>
+          <version>${controller.mdsal.version}</version>
+          <type>pom</type>
+          <scope>import</scope>
+        </dependency>
+      </dependencies>
+    </dependencyManagement>
 
     <build>
         <pluginManagement>
@@ -130,13 +181,13 @@
                             <version>${config.version}</version>
                         </dependency>
                         <dependency>
-                            <groupId>org.opendaylight.yangtools</groupId>
+                            <groupId>org.opendaylight.mdsal</groupId>
                             <artifactId>maven-sal-api-gen-plugin</artifactId>
                             <version>${yangtools.version}</version>
                             <type>jar</type>
                         </dependency>
                         <dependency>
-                            <groupId>org.opendaylight.yangtools</groupId>
+                            <groupId>org.opendaylight.mdsal</groupId>
                             <artifactId>yang-binding</artifactId>
                             <version>${yangtools.version}</version>
                             <type>jar</type>
