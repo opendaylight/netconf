@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a79b1b5_51feb639",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-09-02T14:02:43Z",
+      "side": 1,
+      "message": "For the future:\n\nCommit message should be 65 chars long in first line and 80 in all the others. Its much more readable in gerrit.",
+      "range": {
+        "startLine": 1,
+        "startChar": 83,
+        "endLine": 1,
+        "endChar": 95
+      },
+      "revId": "1de9c10cc0673436528b450dafcee40b4738e022",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a79b1b5_9171aee2",
+        "filename": "opendaylight/netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfOperationServiceFactoryTracker.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-09-02T14:02:43Z",
+      "side": 1,
+      "message": "This condition is getting a bit big. Lets extract the 3 property.equals into a method called e.g. isMarkedForConfig. Also we could create a constant Set that contains the allowed names and then the condition might be shortened to ALLOWED_NAMES_SET.contains(property)",
+      "range": {
+        "startLine": 31,
+        "startChar": 19,
+        "endLine": 32,
+        "endChar": 125
+      },
+      "revId": "1de9c10cc0673436528b450dafcee40b4738e022",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
