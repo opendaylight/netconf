@@ -121,7 +121,7 @@
     <!-- FIXME: This introduces cycle between projects, which makes version updates
                 harder. Should be moved to different.
     -->
-    <feature version='${aaa.version}'>odl-aaa-netconf-plugin</feature>
+    <feature version='${project.version}'>odl-aaa-netconf-plugin</feature>
     <bundle>mvn:org.opendaylight.netconf/netconf-ssh/${project.version}</bundle>
   </feature>
 
@@ -142,5 +142,22 @@
     <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-connector/${project.version}</bundle>
     <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-monitoring/${project.version}</bundle>
     <configfile finalname='${config.configfile.directory}/${config.netconf.mdsal.configfile}'>mvn:org.opendaylight.netconf/netconf-mdsal-config/${project.version}/xml/config</configfile>
+  </feature>
+
+  <feature name='odl-aaa-netconf-plugin' description='OpenDaylight :: AAA :: ODL NETCONF Plugin'
+           version='${project.version}'>
+    <feature version='${config.version}'>odl-config-api</feature>
+    <bundle>mvn:org.opendaylight.netconf/netconf-auth/${project.version}</bundle>
+    <feature version='${aaa.version}'>odl-aaa-authn</feature>
+    <bundle>mvn:org.opendaylight.netconf/aaa-authn-odl-plugin/${project.version}</bundle>
+  </feature>
+
+  <feature name='odl-aaa-netconf-plugin-no-cluster'
+           description='OpenDaylight :: AAA :: ODL NETCONF Plugin - NO CLUSTER'
+           version='${project.version}'>
+    <feature version='${config.version}'>odl-config-api</feature>
+    <bundle>mvn:org.opendaylight.netconf/netconf-auth/${project.version}</bundle>
+    <feature version='${aaa.version}'>odl-aaa-authn-no-cluster</feature>
+    <bundle>mvn:org.opendaylight.netconf/aaa-authn-odl-plugin/${project.version}</bundle>
   </feature>
 </features>
