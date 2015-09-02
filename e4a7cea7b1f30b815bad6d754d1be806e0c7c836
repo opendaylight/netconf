@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a79b1b5_5150f65d",
+        "filename": "opendaylight/netconf/tools/netconf-testtool/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-09-02T13:44:32Z",
+      "side": 1,
+      "message": "Isnt inmemory datastore sufficient dependency ?",
+      "range": {
+        "startLine": 133,
+        "startChar": 28,
+        "endLine": 133,
+        "endChar": 39
+      },
+      "revId": "e4a7cea7b1f30b815bad6d754d1be806e0c7c836",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
