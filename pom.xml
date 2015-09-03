@@ -40,7 +40,7 @@
         <ietf-restconf.version>2013.10.19.8-SNAPSHOT</ietf-restconf.version>
         <ietf-topology.version>2013.10.21.8-SNAPSHOT</ietf-topology.version>
         <ietf-yang-types.version>2010.09.24.8-SNAPSHOT</ietf-yang-types.version>
-        <jersey-servlet.version>1.17</jersey-servlet.version>
+        <jersey-servlet.version>1.18</jersey-servlet.version>
 
         <mdsal.version>2.0.0-SNAPSHOT</mdsal.version>
         <mdsal.model.version>0.8.0-SNAPSHOT</mdsal.model.version>
