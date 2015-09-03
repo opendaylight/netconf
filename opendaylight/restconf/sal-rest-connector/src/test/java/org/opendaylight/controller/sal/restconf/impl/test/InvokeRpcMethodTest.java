@@ -69,6 +69,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.util.SchemaNodeUtils;
 
+@Ignore
 public class InvokeRpcMethodTest {
 
     private RestconfImpl restconfImpl = null;

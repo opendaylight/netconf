@@ -24,6 +24,7 @@ import javax.ws.rs.core.Response;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
@@ -38,6 +39,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
+@Ignore
 public class RestDeleteOperationTest extends JerseyTest {
 
     private static ControllerContext controllerContext;

@@ -75,6 +75,7 @@ import org.w3c.dom.NodeList;
  *
  * @author Thomas Pantelis
  */
+@Ignore
 public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
 
     interface ErrorInfoVerifier {

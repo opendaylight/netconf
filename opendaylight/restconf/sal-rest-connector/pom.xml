@@ -108,6 +108,27 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-core</artifactId>
+        <version>1.2.3</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-web</artifactId>
+        <version>1.2.3</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+      <version>1.8.3</version>
+    </dependency>
+    <!--     <dependency>
+      <groupId>org.secnod.shiro</groupId>
+      <artifactId>shiro-jersey</artifactId>
+      <version>0.1.0</version>
+    </dependency> -->
+
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>junit</groupId>
@@ -124,6 +145,7 @@
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
   <build>
@@ -142,11 +164,14 @@
               org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.rest.connector.rev140724.*,
             </Private-Package>
             <Import-Package>
-              com.sun.jersey.spi.container.servlet, org.eclipse.jetty.servlets,
-              <!-- Set the javax packages version to 0. Relying on "*" includes versions from jsr305 dependency whic are
-              incompatible with karaf provided packages -->
-              javax.*;version="0.0",
               *,
+              javax.*;version="0.0",
+              <!--com.sun.jersey,-->
+              org.eclipse.jetty.servlets,
+              org.opendaylight.aaa.shiro.filters,
+              org.opendaylight.aaa.shiro.realm,
+              org.opendaylight.aaa.shiro.web.env,
+              org.apache.shiro.web.env
             </Import-Package>
             <Embed-Dependency>stax-utils</Embed-Dependency>
             <Web-ContextPath>/restconf</Web-ContextPath>
