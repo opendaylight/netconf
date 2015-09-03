@@ -108,6 +108,24 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-core</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+      <version>1.8.3</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-server</artifactId>
+    </dependency>
+
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>junit</groupId>
@@ -124,10 +142,21 @@
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <classpathDependencyExcludes>
+            <!-- Removes com.sun.jersey from testing classpath so there is no conflict with org.glassfish.jersey -->
+            <classpathDependencyExclude>com.sun.jersey</classpathDependencyExclude>
+          </classpathDependencyExcludes>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -142,11 +171,13 @@
               org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.rest.connector.rev140724.*,
             </Private-Package>
             <Import-Package>
-              com.sun.jersey.spi.container.servlet, org.eclipse.jetty.servlets,
-              <!-- Set the javax packages version to 0. Relying on "*" includes versions from jsr305 dependency whic are
-              incompatible with karaf provided packages -->
-              javax.*;version="0.0",
               *,
+              com.sun.jersey.spi.container.servlet,
+              org.eclipse.jetty.servlets,
+              org.opendaylight.aaa.shiro.filters,
+              org.opendaylight.aaa.shiro.realm,
+              org.opendaylight.aaa.shiro.web.env,
+              org.apache.shiro.web.env
             </Import-Package>
             <Embed-Dependency>stax-utils</Embed-Dependency>
             <Web-ContextPath>/restconf</Web-ContextPath>
