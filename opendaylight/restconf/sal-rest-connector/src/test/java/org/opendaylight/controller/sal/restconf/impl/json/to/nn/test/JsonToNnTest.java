@@ -28,6 +28,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
+@Ignore
 public class JsonToNnTest extends AbstractBodyReaderTest {
 
     private JsonNormalizedNodeBodyReader jsonBodyReader;
