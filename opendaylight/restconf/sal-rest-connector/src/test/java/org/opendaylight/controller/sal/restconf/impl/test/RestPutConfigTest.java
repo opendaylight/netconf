@@ -11,6 +11,7 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -41,6 +42,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  *
  * Created: May 14, 2015
  */
+@Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class RestPutConfigTest {
 
