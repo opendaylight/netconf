@@ -36,6 +36,7 @@ import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
+@Ignore
 public class URITest {
 
     private static final ControllerContext controllerContext = ControllerContext.getInstance();

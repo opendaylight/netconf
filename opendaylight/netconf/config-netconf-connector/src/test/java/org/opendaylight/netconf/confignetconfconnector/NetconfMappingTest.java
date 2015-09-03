@@ -135,7 +135,7 @@ import org.w3c.dom.Text;
 import org.w3c.dom.traversal.DocumentTraversal;
 import org.xml.sax.SAXException;
 
-
+@Ignore
 public class NetconfMappingTest extends AbstractConfigTest {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMappingTest.class);
 
