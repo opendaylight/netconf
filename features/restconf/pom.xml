@@ -112,7 +112,7 @@
     </dependency>
     <!-- dependency>
       <groupId>org.opendaylight.aaa</groupId>
-      <artifactId>features-aaa</artifactId>
+      <artifactId>features-aaa-shiro</artifactId>
       <version>${aaa.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -134,6 +134,11 @@
       <artifactId>gson</artifactId>
     </dependency>
 
+    <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-web</artifactId>
+        <version>1.2.3</version>
+    </dependency>
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-core</artifactId>
