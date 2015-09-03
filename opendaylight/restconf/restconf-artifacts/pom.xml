@@ -37,7 +37,7 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>features-restconf</artifactId>
                 <version>${project.version}</version>
             </dependency>
