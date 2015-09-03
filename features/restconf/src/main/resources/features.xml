@@ -13,6 +13,7 @@
 
     <repository>mvn:org.opendaylight.controller/features-mdsal/${controller.mdsal.version}/xml/features</repository>
     <repository>mvn:org.opendaylight.yangtools/features-yangtools/${yangtools.version}/xml/features</repository>
+    <repository>mvn:org.opendaylight.aaa/features-aaa-shiro/${aaa.version}/xml/features</repository>
     <repository>mvn:org.opendaylight.aaa/features-aaa/${aaa.version}/xml/features</repository>
     <feature name='odl-restconf-all' version='${project.version}' description='OpenDaylight :: Restconf :: All'>
         <feature version='${project.version}'>odl-restconf</feature>
@@ -20,10 +21,30 @@
     </feature>
 
     <feature name='odl-restconf' version='${project.version}' description="OpenDaylight :: Restconf">
-        <feature version='${aaa.version}'>odl-aaa-authn</feature>
+        <bundle>mvn:org.apache.commons/commons-lang3/${commons.lang3.version}</bundle>
+        <feature version='${aaa.version}'>odl-aaa-shiro</feature>
         <feature version='${project.version}'>odl-restconf-noauth</feature>
     </feature>
     <feature name='odl-restconf-noauth' version='${project.version}' description="OpenDaylight :: Restconf">
+        <!-- OSGI -->
+        <!-- Start AAA/Shiro Dependencies -->
+        <bundle>wrap:mvn:javax.annotation/javax.annotation-api/${javax.annotation.api.version}</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.dependencymanager/${felix.dependencymanager.version}</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.metatype/${felix.metatype.version}</bundle>
+        <bundle>wrap:mvn:commons-codec/commons-codec/${commons.codec.version}</bundle>
+        <bundle>wrap:mvn:org.apache.oltu.oauth2/org.apache.oltu.oauth2.resourceserver/${oltu.oauth2.version}</bundle>
+        <bundle>wrap:mvn:org.apache.oltu.oauth2/org.apache.oltu.oauth2.authzserver/${oltu.oauth2.version}</bundle>
+        <bundle>wrap:mvn:org.apache.oltu.oauth2/org.apache.oltu.oauth2.common/${oltu.oauth2.version}</bundle>
+        <bundle>wrap:mvn:org.json/json/${json.version}</bundle>
+        <bundle>mvn:org.opendaylight.aaa/aaa-authn/${aaa.version}</bundle>
+        <bundle>mvn:org.opendaylight.aaa/aaa-authn-api/${aaa.version}</bundle>
+        <bundle>mvn:org.opendaylight.aaa/aaa-authn-sts/${aaa.version}</bundle>
+        <bundle>mvn:org.opendaylight.aaa/aaa-shiro/${aaa.version}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-beanutils/${servicemix.version}</bundle>
+        <bundle>mvn:org.apache.shiro/shiro-web/${shiro.version}</bundle>
+        <bundle>mvn:org.apache.shiro/shiro-core/${shiro.version}</bundle>
+        <bundle>wrap:mvn:org.secnod.shiro/shiro-jersey/${shiro.jersey.version}</bundle>
+        <!-- End AAA/Shiro Dependencies -->
         <feature version='${controller.mdsal.version}'>odl-mdsal-broker</feature>
         <feature>war</feature>
         <!-- presently we need sal-remote to be listed BEFORE sal-rest-connector because sal-rest-connector

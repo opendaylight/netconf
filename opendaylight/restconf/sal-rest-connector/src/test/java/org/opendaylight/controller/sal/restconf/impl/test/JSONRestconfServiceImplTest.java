@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -67,6 +68,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
  *
  * @author Thomas Pantelis
  */
+@Ignore
 public class JSONRestconfServiceImplTest {
     static final String IETF_INTERFACES_NS = "urn:ietf:params:xml:ns:yang:ietf-interfaces";
     static final String IETF_INTERFACES_VERSION = "2013-07-04";

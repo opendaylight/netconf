@@ -63,6 +63,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
  *
  * @author Thomas Pantelis
  */
+@Ignore
 public class BrokerFacadeTest {
 
     @Mock
