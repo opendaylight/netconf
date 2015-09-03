@@ -29,6 +29,13 @@
    <packaging>jar</packaging>
    <properties>
       <features.file>features.xml</features.file>
+      <javax.annotation.api.version>1.2</javax.annotation.api.version>
+      <felix.dependencymanager.version>3.1.0</felix.dependencymanager.version>
+      <felix.metatype.version>1.0.10</felix.metatype.version>
+      <commons.codec.version>1.10</commons.codec.version>
+      <oltu.oauth2.version>1.0.0</oltu.oauth2.version>
+      <json.version>20131018</json.version>
+      <servicemix.version>1.8.3_2</servicemix.version>
    </properties>
    <dependencies>
     <!--
@@ -113,12 +120,27 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.aaa</groupId>
-      <artifactId>features-aaa</artifactId>
+      <artifactId>features-aaa-shiro</artifactId>
       <version>${aaa.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
     </dependency>
-
+    <dependency>
+      <groupId>org.opendaylight.aaa</groupId>
+      <artifactId>aaa-shiro</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.aaa</groupId>
+      <artifactId>aaa-authn</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.aaa</groupId>
+      <artifactId>aaa-authn-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.aaa</groupId>
+      <artifactId>aaa-authn-sts</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.opendaylight.controller</groupId>
       <artifactId>sal-remote</artifactId>
@@ -135,6 +157,57 @@
       <artifactId>gson</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.dependencymanager</artifactId>
+      <version>${felix.dependencymanager.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.metatype</artifactId>
+      <version>${felix.metatype.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-web</artifactId>
+      <version>${shiro.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-core</artifactId>
+      <version>${shiro.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.oltu.oauth2</groupId>
+      <artifactId>org.apache.oltu.oauth2.resourceserver</artifactId>
+      <version>${oltu.oauth2.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.oltu.oauth2</groupId>
+      <artifactId>org.apache.oltu.oauth2.authzserver</artifactId>
+      <version>${oltu.oauth2.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.oltu.oauth2</groupId>
+      <artifactId>org.apache.oltu.oauth2.common</artifactId>
+      <version>${oltu.oauth2.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>javax.ws.rs-api</artifactId>
+      <version>2.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>${json.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>${commons.codec.version}</version>
+    </dependency>
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-core</artifactId>
@@ -217,10 +290,10 @@
       <artifactId>jackson-jaxrs-json-provider</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
+      <version>${javax.annotation.api.version}</version>
     </dependency>
-
     <dependency>
         <groupId>org.opendaylight.yangtools</groupId>
         <artifactId>yang-data-codec-gson</artifactId>
