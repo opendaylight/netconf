@@ -75,6 +75,13 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.opendaylight.aaa</groupId>
+      <artifactId>features-aaa-shiro</artifactId>
+      <version>${aaa.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+    </dependency>
+    <dependency>
       <groupId>org.opendaylight.controller</groupId>
       <artifactId>features-protocol-framework</artifactId>
       <version>${protocol-framework.version}</version>
