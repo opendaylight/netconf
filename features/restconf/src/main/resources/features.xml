@@ -89,6 +89,14 @@
         <feature version='${project.version}'>odl-restconf-noauth</feature>
     </feature>
     <feature name='odl-restconf-noauth' version='${project.version}' description="OpenDaylight :: Restconf">
+        <!-- OSGI -->
+        <bundle>mvn:org.apache.felix/org.apache.felix.dependencymanager/3.1.0</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.metatype/1.0.10</bundle>
+        <bundle>mvn:org.opendaylight.aaa/aaa-shiro/0.3.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-beanutils/1.8.3_2</bundle>
+        <bundle>mvn:org.apache.shiro/shiro-web/1.2.3</bundle>
+        <bundle>mvn:org.apache.shiro/shiro-core/1.2.3</bundle>
+        <bundle>wrap:mvn:org.secnod.shiro/shiro-jersey/0.1.0</bundle>
         <feature version='${mdsal.version}'>odl-mdsal-broker</feature>
         <feature>war</feature>
         <!-- presently we need sal-remote to be listed BEFORE sal-rest-connector because sal-rest-connector
