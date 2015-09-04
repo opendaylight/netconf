@@ -38,7 +38,7 @@
     </dependency>
     <!-- compile dependencies -->
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.opendaylight.controller</groupId>
       <artifactId>config-api</artifactId>
       <scope>test</scope>
     </dependency>
@@ -146,7 +146,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.opendaylight.controller</groupId>
       <artifactId>netty-config-api</artifactId>
       <scope>test</scope>
     </dependency>
