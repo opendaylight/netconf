@@ -171,16 +171,4 @@
 
     </dependencies>
   </dependencyManagement>
-
-  <profiles>
-    <profile>
-      <id>integrationtests</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <modules>
-        <module>netconf-it</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>
