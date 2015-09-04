@@ -1,0 +1,13 @@
+module test {
+  yang-version 1;
+  namespace "urn:opendaylight:test:netconf:crud";
+  prefix "tt";
+
+  revision "2014-10-18";
+
+  container cont {
+    leaf l {
+      type string;
+    }
+  }
+}
