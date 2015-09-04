@@ -174,7 +174,7 @@
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>sal-rest-connector-config</artifactId>
-      <version>${mdsal.version}</version>
+      <version>${restconf.version}</version>
       <type>xml</type>
       <classifier>config</classifier>
     </dependency>
@@ -249,8 +249,9 @@
       <classifier>testmoduleconf</classifier>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.controller</groupId>
+      <groupId>org.opendaylight.netconf</groupId>
       <artifactId>sal-rest-docgen</artifactId>
+      <version>${restconf.version}</version>
     </dependency>
 
     <!--
