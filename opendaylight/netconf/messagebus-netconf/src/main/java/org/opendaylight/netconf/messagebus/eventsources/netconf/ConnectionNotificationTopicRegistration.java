@@ -39,7 +39,7 @@ public class ConnectionNotificationTopicRegistration extends NotificationTopicRe
 
     public static final SchemaPath EVENT_SOURCE_STATUS_PATH = SchemaPath
         .create(true, QName.create(EventSourceStatusNotification.QNAME, "event-source-status"));
-    private static final NodeIdentifier EVENT_SOURCE_STATUS_ARG = new NodeIdentifier(
+    private static final NodeIdentifier EVENT_SOURCE_STATUS_ARG = NodeIdentifier.create(
         EventSourceStatusNotification.QNAME);
     private static final String XMLNS_ATTRIBUTE_KEY = "xmlns";
     private static final String XMLNS_URI = "http://www.w3.org/2000/xmlns/";

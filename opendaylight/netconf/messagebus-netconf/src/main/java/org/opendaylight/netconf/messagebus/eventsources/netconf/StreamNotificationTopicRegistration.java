@@ -35,12 +35,14 @@ import org.slf4j.LoggerFactory;
 public class StreamNotificationTopicRegistration extends NotificationTopicRegistration {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamNotificationTopicRegistration.class);
-    private static final NodeIdentifier STREAM_QNAME = new NodeIdentifier(
+    private static final NodeIdentifier STREAM_QNAME = NodeIdentifier.create(
         QName.create(CreateSubscriptionInput.QNAME, "stream"));
     private static final SchemaPath CREATE_SUBSCRIPTION = SchemaPath
         .create(true, QName.create(CreateSubscriptionInput.QNAME, "create-subscription"));
-    private static final NodeIdentifier START_TIME_SUBSCRIPTION = new NodeIdentifier(
+    private static final NodeIdentifier START_TIME_SUBSCRIPTION = NodeIdentifier.create(
         QName.create(CreateSubscriptionInput.QNAME, "startTime"));
+    private static final NodeIdentifier CREATE_SUBSCRIPTION_INPUT = NodeIdentifier.create(
+        CreateSubscriptionInput.QNAME);
 
     final private DOMMountPoint domMountPoint;
     final private String nodeId;
@@ -68,7 +70,7 @@ public class StreamNotificationTopicRegistration extends NotificationTopicRegist
         if (isActive() == false) {
             LOG.info("Stream {} is not active on node {}. Will subscribe.", this.getStreamName(), this.nodeId);
             final ContainerNode input = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(CreateSubscriptionInput.QNAME))
+                .withNodeIdentifier(CREATE_SUBSCRIPTION_INPUT)
                 .withChild(ImmutableNodes.leafNode(STREAM_QNAME, this.getStreamName())).build();
             CheckedFuture<DOMRpcResult, DOMRpcException> csFuture = domMountPoint.getService(DOMRpcService.class).get()
                 .invokeRpc(CREATE_SUBSCRIPTION, input);
@@ -89,7 +91,7 @@ public class StreamNotificationTopicRegistration extends NotificationTopicRegist
         if (isActive()) {
             LOG.info("Stream {} is reactivating on node {}.", this.getStreamName(), this.nodeId);
             DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> inputBuilder = Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(CreateSubscriptionInput.QNAME))
+                .withNodeIdentifier(CREATE_SUBSCRIPTION_INPUT)
                 .withChild(ImmutableNodes.leafNode(STREAM_QNAME, this.getStreamName()));
             if (isReplaySupported() && this.getLastEventTime() != null) {
                 inputBuilder.withChild(ImmutableNodes.leafNode(START_TIME_SUBSCRIPTION, this.getLastEventTime()));

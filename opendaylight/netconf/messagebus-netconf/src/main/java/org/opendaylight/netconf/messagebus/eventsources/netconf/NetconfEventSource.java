@@ -77,12 +77,12 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfEventSource.class);
 
-    private static final NodeIdentifier TOPIC_NOTIFICATION_ARG = new NodeIdentifier(TopicNotification.QNAME);
-    private static final NodeIdentifier EVENT_SOURCE_ARG = new NodeIdentifier(
+    private static final NodeIdentifier TOPIC_NOTIFICATION_ARG = NodeIdentifier.create(TopicNotification.QNAME);
+    private static final NodeIdentifier EVENT_SOURCE_ARG = NodeIdentifier.create(
         QName.create(TopicNotification.QNAME, "node-id"));
-    private static final NodeIdentifier TOPIC_ID_ARG = new NodeIdentifier(
+    private static final NodeIdentifier TOPIC_ID_ARG = NodeIdentifier.create(
         QName.create(TopicNotification.QNAME, "topic-id"));
-    private static final NodeIdentifier PAYLOAD_ARG = new NodeIdentifier(
+    private static final NodeIdentifier PAYLOAD_ARG = NodeIdentifier.create(
         QName.create(TopicNotification.QNAME, "payload"));
     private static final String ConnectionNotificationSourceName = "ConnectionNotificationSource";
 
