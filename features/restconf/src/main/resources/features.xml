@@ -85,7 +85,7 @@
     -->
 
     <feature name='odl-restconf' version='${project.version}' description="OpenDaylight :: Restconf">
-        <!-- feature version='${aaa.version}'>odl-aaa-authn</feature -->
+        <feature version='${aaa.version}'>odl-aaa-authn</feature>
         <feature version='${project.version}'>odl-restconf-noauth</feature>
     </feature>
     <feature name='odl-restconf-noauth' version='${project.version}' description="OpenDaylight :: Restconf">
