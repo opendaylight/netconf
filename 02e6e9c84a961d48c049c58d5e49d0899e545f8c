@@ -1,0 +1,9 @@
+Code-Review+1: Thanh Ha <thanh.ha@linuxfoundation.org>
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+1: Tomas Cere <tcere@cisco.com>
+Code-Review+2: Maros Marsalek <mmarsale@cisco.com>
+Submitted-by: Maros Marsalek <mmarsale@cisco.com>
+Submitted-at: Mon, 07 Sep 2015 07:29:29 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/26538
+Project: netconf
+Branch: refs/heads/master
