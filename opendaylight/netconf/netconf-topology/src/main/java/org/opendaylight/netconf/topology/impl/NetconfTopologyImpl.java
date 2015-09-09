@@ -8,10 +8,13 @@
 
 package org.opendaylight.netconf.topology.impl;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.util.concurrent.EventExecutor;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
+import java.util.HashMap;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
@@ -41,8 +44,12 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NetconfTopologyImpl implements NetconfTopology, AutoCloseable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyImpl.class);
 
     private final String topologyId;
     private final NetconfClientDispatcher clientDispatcher;
@@ -55,17 +62,7 @@ public class NetconfTopologyImpl implements NetconfTopology, AutoCloseable {
     private SchemaSourceRegistry schemaSourceRegistry;
     private SchemaContextFactory schemaContextFactory;
 
-    // TODO these will need to be retrieved from the configuration for each individual node, which requires model change
-    private long defaultRequestTimeoutMilis;
-    private long keepaliveDelay;
-    private boolean shouldSendKeepalives;
-    private boolean reconnectOnChangedSchema;
-    private Long maxConnectionAttempts;
-    private int betweenAteemptsTimeoutMilis;
-    private BigDecimal sleepFactor;
-    private String username;
-    private String password;
-    private boolean tcpOnly;
+    private final HashMap<NodeId, NetconfDeviceCommunicator> activeConnectors = new HashMap<>();
 
     public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                                final BindingAwareBroker bindingAwareBroker, final Broker domBroker,
@@ -83,7 +80,11 @@ public class NetconfTopologyImpl implements NetconfTopology, AutoCloseable {
 
     @Override
     public void close() throws Exception {
-        //NOOP
+        for (NetconfDeviceCommunicator communicator : activeConnectors.values()) {
+            communicator.disconnect();
+        }
+        activeConnectors.clear();
+        // close all existing connectors, delete whole topology in datastore?
     }
 
     @Override
@@ -93,55 +94,81 @@ public class NetconfTopologyImpl implements NetconfTopology, AutoCloseable {
 
     @Override
     public ListenableFuture<Void> connectNode(NodeId nodeId, Node configNode) {
-        // TODO keep a map of all open connections
-        return createConnection(nodeId, configNode);
+        return setupConnection(nodeId, configNode);
     }
 
     @Override
     public ListenableFuture<Void> disconnectNode(NodeId nodeId) {
+        if (!activeConnectors.containsKey(nodeId)) {
+            return Futures.immediateFailedFuture(new IllegalStateException("Unable to disconnect device that is not connected"));
+        }
+
         // retrieve connection, and disconnect it
-        return null;
+        activeConnectors.get(nodeId);
+        return Futures.immediateFuture(null);
     }
 
-    private ListenableFuture<Void> createConnection(final NodeId nodeId, final Node configNode) {
-        NetconfNode node = configNode.getAugmentation(NetconfNode.class);
+    private ListenableFuture<Void> setupConnection(final NodeId nodeId, Node configNode) {
+        final NetconfNode netconfNode = configNode.getAugmentation(NetconfNode.class);
+
+        final NetconfDeviceCommunicator deviceCommunicator = createDeviceCommunicator(nodeId, netconfNode);
+        final NetconfReconnectingClientConfiguration clientConfig = getClientConfig(deviceCommunicator, netconfNode);
+        final ListenableFuture<Void> future = deviceCommunicator.initializeRemoteConnection(clientDispatcher, clientConfig);
+
+        Futures.addCallback(future, new FutureCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                LOG.debug("Connector for : " + nodeId.getValue() + " started succesfully");
+                activeConnectors.put(nodeId, deviceCommunicator);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                LOG.error("Connector for : " + nodeId.getValue() + " failed");
+                // remove this node from active connectors?
+            }
+        });
+
+        return future;
+    }
+
+    private NetconfDeviceCommunicator createDeviceCommunicator(final NodeId nodeId, final NetconfNode node) {
         IpAddress ipAddress = node.getHost().getIpAddress();
         InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null ?
                 ipAddress.getIpv4Address().getValue() : ipAddress.getIpv6Address().getValue(),
                 node.getPort().getValue());
         RemoteDeviceId remoteDeviceId = new RemoteDeviceId(nodeId.getValue(), address);
 
+        // we might need to create a new SalFacade to maintain backwards compatibility with special case loopback connection
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade =
-                new NetconfDeviceSalFacade(remoteDeviceId, domBroker, bindingAwareBroker, defaultRequestTimeoutMilis);
-        if (shouldSendKeepalives) {
-            salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade, keepaliveExecutor.getExecutor(), keepaliveDelay);
+                new NetconfDeviceSalFacade(remoteDeviceId, domBroker, bindingAwareBroker, node.getDefaultRequestTimeoutMillis());
+        if (node.getKeepaliveDelay() > 0) {
+            salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade, keepaliveExecutor.getExecutor(), node.getKeepaliveDelay());
         }
 
         NetconfDevice.SchemaResourcesDTO schemaResourcesDTO =
                 new NetconfDevice.SchemaResourcesDTO(schemaSourceRegistry, schemaContextFactory, new NetconfStateSchemas.NetconfStateSchemasResolverImpl());
 
-        NetconfDevice device = new NetconfDevice(schemaResourcesDTO, remoteDeviceId, salFacade, processingExecutor.getExecutor(), reconnectOnChangedSchema);
+        NetconfDevice device = new NetconfDevice(schemaResourcesDTO, remoteDeviceId, salFacade,
+                processingExecutor.getExecutor(), node.isReconnectOnChangedSchema());
 
-        NetconfDeviceCommunicator listener = new NetconfDeviceCommunicator(remoteDeviceId, device);
-
-        final NetconfReconnectingClientConfiguration clientConfig = getClientConfig(listener, node.getHost(), node.getPort().getValue());
-        return listener.initializeRemoteConnection(clientDispatcher, clientConfig);
+        return new NetconfDeviceCommunicator(remoteDeviceId, device);
     }
 
-    public NetconfReconnectingClientConfiguration getClientConfig(final NetconfDeviceCommunicator listener, Host host, int port) {
-        final InetSocketAddress socketAddress = getSocketAddress(host, port);
-        final long clientConnectionTimeoutMillis = defaultRequestTimeoutMilis;
+    public NetconfReconnectingClientConfiguration getClientConfig(final NetconfDeviceCommunicator listener, NetconfNode node) {
+        final InetSocketAddress socketAddress = getSocketAddress(node.getHost(), node.getPort().getValue());
+        final long clientConnectionTimeoutMillis = node.getDefaultRequestTimeoutMillis();
 
         final ReconnectStrategyFactory sf = new TimedReconnectStrategyFactory(eventExecutor,
-                maxConnectionAttempts, betweenAteemptsTimeoutMilis, sleepFactor);
+                node.getMaxConnectionAttempts(), node.getBetweenAttemptsTimeoutMillis(), node.getSleepFactor());
         final ReconnectStrategy strategy = sf.createReconnectStrategy();
 
         return NetconfReconnectingClientConfigurationBuilder.create()
                 .withAddress(socketAddress)
                 .withConnectionTimeoutMillis(clientConnectionTimeoutMillis)
                 .withReconnectStrategy(strategy)
-                .withAuthHandler(new LoginPassword(username, password))
-                .withProtocol(tcpOnly ?
+                .withAuthHandler(new LoginPassword(node.getUsername(), node.getPassword()))
+                .withProtocol(node.isTcpOnly() ?
                         NetconfClientConfiguration.NetconfClientProtocol.TCP :
                         NetconfClientConfiguration.NetconfClientProtocol.SSH)
                 .withConnectStrategyFactory(sf)
