@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.controller.netconf.it;
+package org.opendaylight.netconf.it;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -29,10 +29,10 @@ import java.util.Set;
 import org.junit.Test;
 import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
-import org.opendaylight.controller.netconf.api.monitoring.CapabilityListener;
-import org.opendaylight.controller.netconf.client.TestingNetconfClient;
-import org.opendaylight.controller.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
+import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.monitoring.CapabilityListener;
+import org.opendaylight.netconf.client.TestingNetconfClient;
+import org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.w3c.dom.Document;

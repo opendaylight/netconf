@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.controller.netconf.it;
+package org.opendaylight.netconf.it;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -43,18 +43,18 @@ import org.opendaylight.controller.config.yang.test.impl.IdentityTestModuleFacto
 import org.opendaylight.controller.config.yang.test.impl.MultipleDependenciesModuleFactory;
 import org.opendaylight.controller.config.yang.test.impl.NetconfTestImplModuleFactory;
 import org.opendaylight.controller.config.yang.test.impl.TestImplModuleFactory;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
-import org.opendaylight.controller.netconf.api.monitoring.NetconfMonitoringService;
-import org.opendaylight.controller.netconf.client.NetconfClientDispatcherImpl;
-import org.opendaylight.controller.netconf.client.SimpleNetconfClientSessionListener;
-import org.opendaylight.controller.netconf.client.conf.NetconfClientConfiguration;
-import org.opendaylight.controller.netconf.client.conf.NetconfClientConfigurationBuilder;
-import org.opendaylight.controller.netconf.confignetconfconnector.osgi.NetconfOperationServiceFactoryImpl;
-import org.opendaylight.controller.netconf.impl.NetconfServerDispatcherImpl;
-import org.opendaylight.controller.netconf.impl.NetconfServerSessionNegotiatorFactory;
-import org.opendaylight.controller.netconf.impl.SessionIdProvider;
-import org.opendaylight.controller.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
-import org.opendaylight.controller.netconf.impl.osgi.NetconfMonitoringServiceImpl;
+import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
+import org.opendaylight.netconf.client.SimpleNetconfClientSessionListener;
+import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
+import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
+import org.opendaylight.netconf.confignetconfconnector.osgi.NetconfOperationServiceFactoryImpl;
+import org.opendaylight.netconf.impl.NetconfServerDispatcherImpl;
+import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory;
+import org.opendaylight.netconf.impl.SessionIdProvider;
+import org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
+import org.opendaylight.netconf.impl.osgi.NetconfMonitoringServiceImpl;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.monitoring.osgi.NetconfMonitoringActivator;
 import org.opendaylight.netconf.monitoring.osgi.NetconfMonitoringOperationService;

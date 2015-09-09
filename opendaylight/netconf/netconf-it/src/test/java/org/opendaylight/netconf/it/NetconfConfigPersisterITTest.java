@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.controller.netconf.it;
+package org.opendaylight.netconf.it;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -34,8 +34,8 @@ import org.opendaylight.controller.config.api.jmx.notifications.ConfigJMXNotific
 import org.opendaylight.controller.config.persist.api.ConfigSnapshotHolder;
 import org.opendaylight.controller.config.persist.api.Persister;
 import org.opendaylight.controller.config.persist.impl.ConfigPersisterNotificationHandler;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
-import org.opendaylight.controller.netconf.client.TestingNetconfClient;
+import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.client.TestingNetconfClient;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.config.test.types.rev131127.TestIdentity1;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.config.test.types.rev131127.TestIdentity2;

@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.it;
+package org.opendaylight.netconf.it;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
@@ -40,9 +40,9 @@ import org.opendaylight.controller.config.yang.test.impl.MultipleDependenciesMod
 import org.opendaylight.controller.config.yang.test.impl.MultipleDependenciesModuleMXBean;
 import org.opendaylight.controller.config.yang.test.impl.NetconfTestImplModuleFactory;
 import org.opendaylight.controller.config.yang.test.impl.NetconfTestImplModuleMXBean;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
-import org.opendaylight.controller.netconf.client.NetconfClientDispatcher;
-import org.opendaylight.controller.netconf.client.TestingNetconfClient;
+import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.client.TestingNetconfClient;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.config.test.types.rev131127.TestIdentity1;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.config.test.types.rev131127.TestIdentity2;

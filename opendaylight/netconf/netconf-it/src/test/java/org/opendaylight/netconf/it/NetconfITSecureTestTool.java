@@ -1,17 +1,17 @@
 /*
- * Copyright (c) 2014 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2014 Cisco Systems, Inc. and others. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
- * and is available at http://www.eclipse.org/legal/epl-v10.html.html
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.it;
+package org.opendaylight.netconf.it;
 
 import static java.lang.Thread.sleep;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.opendaylight.controller.netconf.it.NetconfITSecureTest.getSessionListener;
+import static org.opendaylight.netconf.it.NetconfITSecureTest.getSessionListener;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -34,10 +34,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.controller.netconf.api.NetconfMessage;
-import org.opendaylight.controller.netconf.client.NetconfClientDispatcher;
-import org.opendaylight.controller.netconf.client.NetconfClientDispatcherImpl;
-import org.opendaylight.controller.netconf.client.TestingNetconfClient;
+import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
+import org.opendaylight.netconf.client.TestingNetconfClient;
 import org.opendaylight.netconf.test.tool.Main.Params;
 import org.opendaylight.netconf.test.tool.NetconfDeviceSimulator;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
