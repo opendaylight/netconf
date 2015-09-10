@@ -20,6 +20,7 @@ SCOPE = 'sdn'
 HEADERS = {'Content-Type': 'application/json'}
 HEADERS_XML = {'Content-Type': 'application/xml'}
 ACCEPT_XML = {'Accept': 'application/xml'}
+ACCEPT_JSON = {'Accept': 'application/json'}
 ODL_CONTROLLER_SESSION = None
 TOPO_TREE_LEVEL = 2
 TOPO_TREE_DEPTH = 3
