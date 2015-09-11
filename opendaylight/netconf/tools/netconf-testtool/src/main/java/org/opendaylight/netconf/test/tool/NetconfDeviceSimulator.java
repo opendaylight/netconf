@@ -51,13 +51,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.sshd.common.util.ThreadUtils;
-import org.apache.sshd.server.PasswordAuthenticator;
 import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
-import org.apache.sshd.server.session.ServerSession;
 import org.opendaylight.controller.config.util.capability.BasicCapability;
 import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.impl.NetconfServerDispatcherImpl;
 import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.impl.SessionIdProvider;
@@ -277,9 +276,9 @@ public class NetconfDeviceSimulator implements Closeable {
         return new SshProxyServerConfigurationBuilder()
                 .setBindingAddress(bindingAddress)
                 .setLocalAddress(tcpLocalAddress)
-                .setAuthenticator(new PasswordAuthenticator() {
+                .setAuthenticator(new AuthProvider() {
                     @Override
-                    public boolean authenticate(final String username, final String password, final ServerSession session) {
+                    public boolean authenticated(final String username, final String password) {
                         return true;
                     }
                 })

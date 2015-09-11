@@ -35,9 +35,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.apache.sshd.server.PasswordAuthenticator;
 import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
-import org.apache.sshd.server.session.ServerSession;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,14 +51,14 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
-import org.opendaylight.netconf.ssh.SshProxyServer;
-import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
-import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
-import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.ssh.SshProxyServer;
+import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
+import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
+import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
 import org.opendaylight.protocol.framework.NeverReconnectStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
@@ -90,13 +88,13 @@ public class NetconfITSecureTest extends AbstractNetconfConfigTest {
                 new SshProxyServerConfigurationBuilder()
                         .setBindingAddress(TLS_ADDRESS)
                         .setLocalAddress(NetconfConfigUtil.getNetconfLocalAddress())
-                        .setAuthenticator(new PasswordAuthenticator() {
-                            @Override
-                            public boolean authenticate(final String username, final String password, final ServerSession session) {
-                                return true;
-                            }
-                        }
-                    )
+                        .setAuthenticator(new AuthProvider() {
+                                              @Override
+                                              public boolean authenticated(String username, String password) {
+                                                  return true;
+                                              }
+                                          }
+                        )
                         .setKeyPairProvider(new PEMGeneratorHostKeyProvider(Files.createTempFile("prefix", "suffix").toAbsolutePath().toString()))
                         .setIdleTimeout(Integer.MAX_VALUE)
                         .createSshProxyServerConfiguration());
