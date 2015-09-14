@@ -9,7 +9,6 @@ package org.opendaylight.netconf.cli.reader.impl;
 
 import static org.opendaylight.netconf.cli.io.IOUtil.isSkipInput;
 import static org.opendaylight.netconf.cli.io.IOUtil.listType;
-
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
@@ -161,7 +160,7 @@ public abstract class BasicDataHolderReader<T extends DataSchemaNode> extends Ab
             return type;
         }
 
-        private Optional<TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>>> getCodecForType(
+        private static Optional<TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>>> getCodecForType(
                 final TypeDefinition<?> type) {
             if (type != null) {
                 return Optional
