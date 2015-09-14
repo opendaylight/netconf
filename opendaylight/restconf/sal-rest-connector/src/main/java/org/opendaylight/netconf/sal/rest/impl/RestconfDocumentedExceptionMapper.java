@@ -45,7 +45,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
+import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
@@ -151,7 +153,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         return Response.status(status).type(mediaType).entity(responseBody).build();
     }
 
-    private MapEntryNode toErrorEntryNode(final RestconfError error, final DataSchemaNode errListSchemaNode) {
+    private static MapEntryNode toErrorEntryNode(final RestconfError error, final DataSchemaNode errListSchemaNode) {
         Preconditions.checkArgument(errListSchemaNode instanceof ListSchemaNode,
                 "errListSchemaNode has to be of type ListSchemaNode");
         final ListSchemaNode listStreamSchemaNode = (ListSchemaNode) errListSchemaNode;
@@ -188,13 +190,12 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         errNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) errMsgSchemaNode)
                 .withValue(error.getErrorMessage()).build());
 
-        // TODO : find how could we add possible "error-path" and "error-info"
+        // TODO : find out how we can add possible "error-path" and "error-info"
 
         return errNodeValues.build();
     }
 
-    private Object toJsonResponseBody(final NormalizedNodeContext errorsNode, final DataNodeContainer errorsSchemaNode) {
-
+    private static Object toJsonResponseBody(final NormalizedNodeContext errorsNode, final DataNodeContainer errorsSchemaNode) {
         final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         NormalizedNode<?, ?> data = errorsNode.getData();
         final InstanceIdentifierContext<?> context = errorsNode.getInstanceIdentifierContext();
@@ -214,24 +215,25 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
             path = path.getParent();
             // FIXME: Add proper handling of reading root.
         }
-        if(!schema.isAugmenting() && !(schema instanceof SchemaContext)) {
+        if (!schema.isAugmenting() && !(schema instanceof SchemaContext)) {
             initialNs = schema.getQName().getNamespace();
         }
-        final NormalizedNodeStreamWriter jsonWriter = JSONNormalizedNodeStreamWriter.create(context.getSchemaContext(),path,initialNs,outputWriter);
+        final NormalizedNodeStreamWriter jsonWriter =
+                JSONNormalizedNodeStreamWriter.createExclusiveWriter(JSONCodecFactory.create(context.getSchemaContext()),
+                    path, initialNs, JsonWriterFactory.createJsonWriter(outputWriter));
         final NormalizedNodeWriter nnWriter = NormalizedNodeWriter.forStreamWriter(jsonWriter);
         try {
-            if(isDataRoot) {
+            if (isDataRoot) {
                 writeDataRoot(outputWriter,nnWriter,(ContainerNode) data);
             } else {
-                if(data instanceof MapEntryNode) {
+                if (data instanceof MapEntryNode) {
                     data = ImmutableNodes.mapNodeBuilder(data.getNodeType()).withChild(((MapEntryNode) data)).build();
                 }
                 nnWriter.write(data);
             }
             nnWriter.flush();
             outputWriter.flush();
-        }
-        catch (final IOException e) {
+        } catch (final IOException e) {
             LOG.warn("Error writing error response body", e);
         }
 
@@ -239,8 +241,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
     }
 
-    private Object toXMLResponseBody(final NormalizedNodeContext errorsNode, final DataNodeContainer errorsSchemaNode) {
-
+    private static Object toXMLResponseBody(final NormalizedNodeContext errorsNode, final DataNodeContainer errorsSchemaNode) {
         final InstanceIdentifierContext<?> pathContext = errorsNode.getInstanceIdentifierContext();
         final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
@@ -285,7 +286,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         return outStream.toString();
     }
 
-    private void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter, final ContainerNode data)
+    private static void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter, final ContainerNode data)
             throws IOException {
         try {
             final QName name = SchemaContext.NAME;
@@ -301,9 +302,9 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         }
     }
 
-    private void writeDataRoot(final OutputStreamWriter outputWriter, final NormalizedNodeWriter nnWriter, final ContainerNode data) throws IOException {
+    private static void writeDataRoot(final OutputStreamWriter outputWriter, final NormalizedNodeWriter nnWriter, final ContainerNode data) throws IOException {
         final Iterator<DataContainerChild<? extends PathArgument, ?>> iterator = data.getValue().iterator();
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             final DataContainerChild<? extends PathArgument, ?> child = iterator.next();
             nnWriter.write(child);
             nnWriter.flush();
