@@ -214,24 +214,23 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
             path = path.getParent();
             // FIXME: Add proper handling of reading root.
         }
-        if(!schema.isAugmenting() && !(schema instanceof SchemaContext)) {
+        if (!schema.isAugmenting() && !(schema instanceof SchemaContext)) {
             initialNs = schema.getQName().getNamespace();
         }
-        final NormalizedNodeStreamWriter jsonWriter = JSONNormalizedNodeStreamWriter.create(context.getSchemaContext(),path,initialNs,outputWriter);
+        final NormalizedNodeStreamWriter jsonWriter = JSONNormalizedNodeStreamWriter.createExclusiveWriter(context.getSchemaContext(), path, initialNs, outputWriter);
         final NormalizedNodeWriter nnWriter = NormalizedNodeWriter.forStreamWriter(jsonWriter);
         try {
-            if(isDataRoot) {
+            if (isDataRoot) {
                 writeDataRoot(outputWriter,nnWriter,(ContainerNode) data);
             } else {
-                if(data instanceof MapEntryNode) {
+                if (data instanceof MapEntryNode) {
                     data = ImmutableNodes.mapNodeBuilder(data.getNodeType()).withChild(((MapEntryNode) data)).build();
                 }
                 nnWriter.write(data);
             }
             nnWriter.flush();
             outputWriter.flush();
-        }
-        catch (final IOException e) {
+        } catch (final IOException e) {
             LOG.warn("Error writing error response body", e);
         }
 
@@ -303,7 +302,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
     private void writeDataRoot(final OutputStreamWriter outputWriter, final NormalizedNodeWriter nnWriter, final ContainerNode data) throws IOException {
         final Iterator<DataContainerChild<? extends PathArgument, ?>> iterator = data.getValue().iterator();
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             final DataContainerChild<? extends PathArgument, ?> child = iterator.next();
             nnWriter.write(child);
             nnWriter.flush();
