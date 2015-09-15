@@ -244,22 +244,22 @@
           </execution>
         </executions>
       </plugin>
-      <!-- FIXME uncomment after merge -->
-      <!--<plugin>-->
-        <!--<groupId>org.apache.maven.plugins</groupId>-->
-        <!--<artifactId>maven-surefire-plugin</artifactId>-->
-        <!--<version>${surefire.version}</version>-->
-        <!--<configuration>-->
-          <!--<systemPropertyVariables>-->
-            <!--<karaf.distro.groupId>org.opendaylight.controller</karaf.distro.groupId>-->
-            <!--<karaf.distro.artifactId>opendaylight-karaf-empty</karaf.distro.artifactId>-->
-            <!--<karaf.distro.version>${commons.opendaylight.version}</karaf.distro.version>-->
-          <!--</systemPropertyVariables>-->
-          <!--<dependenciesToScan>-->
-            <!--<dependency>org.opendaylight.odlparent:features-test</dependency>-->
-          <!--</dependenciesToScan>-->
-        <!--</configuration>-->
-      <!--</plugin>-->
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${surefire.version}</version>
+        <configuration>
+          <systemPropertyVariables>
+            <karaf.distro.groupId>org.opendaylight.controller</karaf.distro.groupId>
+            <karaf.distro.artifactId>opendaylight-karaf-empty</karaf.distro.artifactId>
+            <karaf.distro.version>${commons.opendaylight.version}</karaf.distro.version>
+          </systemPropertyVariables>
+          <dependenciesToScan>
+            <dependency>org.opendaylight.odlparent:features-test</dependency>
+          </dependenciesToScan>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <scm>
