@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a79b1b5_a6ca446c",
+        "filename": "docs/design/netconf-connector-clustering.adoc",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2015-09-16T16:45:41Z",
+      "side": 1,
+      "message": "some?",
+      "range": {
+        "startLine": 11,
+        "startChar": 44,
+        "endLine": 11,
+        "endChar": 48
+      },
+      "revId": "3b8474d0db2bc5ea943ee7bda647d5c73c4d67a1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a79b1b5_66c42c5f",
+        "filename": "docs/design/netconf-connector-clustering.adoc",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2015-09-16T16:45:41Z",
+      "side": 1,
+      "message": "(single space)",
+      "range": {
+        "startLine": 56,
+        "startChar": 40,
+        "endLine": 56,
+        "endChar": 42
+      },
+      "revId": "3b8474d0db2bc5ea943ee7bda647d5c73c4d67a1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a79b1b5_46a0109f",
+        "filename": "docs/design/netconf-connector-clustering.adoc",
+        "patchSetId": 1
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2015-09-16T16:45:41Z",
+      "side": 1,
+      "message": "The rest of sentence is missing.",
+      "range": {
+        "startLine": 147,
+        "startChar": 61,
+        "endLine": 147,
+        "endChar": 70
+      },
+      "revId": "3b8474d0db2bc5ea943ee7bda647d5c73c4d67a1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a79b1b5_669bcc72",
+        "filename": "docs/design/netconf-connector-clustering.adoc",
+        "patchSetId": 1
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2015-09-16T16:45:41Z",
+      "side": 1,
+      "message": "ted",
+      "range": {
+        "startLine": 162,
+        "startChar": 49,
+        "endLine": 162,
+        "endChar": 51
+      },
+      "revId": "3b8474d0db2bc5ea943ee7bda647d5c73c4d67a1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
