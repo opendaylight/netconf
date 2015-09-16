@@ -1,0 +1,253 @@
+= NETCONF Connector Clustering
+Tony Tkacik <ttkacik@cisco.com>;Maros Marsalek <mmarsale@cisco.com>; Tomas Cere <tcere@cisco.com>
+
+== Terminology
+
+Entity Ownership Service :: Simplified RAFT service with
+YANG Instance-Identifier based namespace for registering ownership of logical
+entity. Such entity may be topology instance or node instance.
+
+Peer ::
+Instance of same logical component managing same logical state. Peer may
+be running in different JVM process.
+
+Master::
+Peer which is responsible for coordinating other peers,
+publishing services and state for other applications to consume.
+
+Slave::
+Peer which reports its state changes to master and may process some of the
+workload.
+
+Topology Administrator ::
+Component responsible for managing topology-wide operations and managing lifecycle
+of Node Administrators
+
+Node Administrator ::
+Component responsible for managing node specific context.
+Node Administrator is expected to manages only one node in topology.
+
+Controller-initiated connection :: Connection to managed extenal system which is
+initiated by application (in extension external trigger to controller
+  such as configuration change).
+
+External System-initiated connection :: Connection to controller which is
+  initiated by external system (e.g. Openflow switch, PCC).
+
+NETCONF Call-Home :: Use-case where NETCONF server initiates connection to client,
+the connection initiation is inversed as is standard NETCONF protocol.
+It is NETCONF specific case of External System-initiated connection.
+
+NOTE: Administrator suffix may change if it is required on review, other
+name candidates are Manager, Supervisor, Controller, Context
+
+
+== Basic Concepts
+
+IMPORTANT:
+This document references and considers functionality which is not
+implemented yet, which is not part of Beryllium delivery and may be delivered
+in subsequent releases.
++
+Some design details are not yet specified, which allows for more fine-tuning
+of design or to allow for new feature set.
+
+NETCONF Clustering model (and by extensions Topology-based protocol clustering model)
+is built on top of Actor supervision and  Actor hierarchy patterns,
+which allows us to model relationship between components similar to data hierarchy
+in topology model.
+
+[plantuml]
+....
+
+interface Peer<T> {
+  + getPeers() : Collection<PeerReference<T>>
+}
+
+interface TopologyAdministrator extends Peer {
+  + publishState(Node)
+  + removeNode(NodeId)
+  + createNodeAdministrator(Node) : NodeAdministrator
+}
+
+interface NodeAdministrator extends Peer {
+  + publishState(Node)
+}
+
+TopologyAdministrator -> NodeAdministrator : manages
+....
+
+=== Topology Administrator ===
+
+*Topology Administrator* is component with multiple instances
+ in cluster, logically grouped into peer groups which manages one NETCONF topology.
+
+It is responsible for:
+
+- *Coordinatation with logical peers* (other instances of same Topology Administrator):
+** participate on Master / Slave elections for logical peer group.
+** publishing / consuming application specific state among peers.
+
+- *management of local (child) Node Administrator instances* for particular
+  topology node:
+** creation of local Node Administrators when needed
+** managing their lifecycle based on application logic.
+
+
+- If instance is Master of logical peer group:
+** Request creation of Node Administrator for particular topology node
+   on peer Topology Administrators.
+** Assigning roles to concrete instances of Node Administrator in
+   Node Administrator peer group (usually master-slave election, but multimaster
+   may be also possible).
+** delegating write access to topology node in question to master Node Administrator
+   for particular node.
+** allows Node Administrators based on their role to publish state / functionality
+   for node in question.
+
+==== Use-case specific behaviour ====
+
+- *Controller-initiated connections* (Normal NETCONF behaviour)
+** Master listens on configuration NETCONF topology
+   and communicates node addition / change / removal to peers and schedules
+   * requests creation of Node Administrators on peers
+- *External-system initiated connections:* (NETCONF Call-Home)
+** Topology Administrator which received incoming connection is responsible to
+   propagate incoming connection state updates to it peers add to create
+   Node Administrator for incoming connection.
+** Topology Administrator assign logical cluster-wide roles based on protocol
+   semantic to all Node Administrator instances for same logical node.
+
+=== Node Administrator ===
+
+*Node administrator* is component with multiple instances in cluster, logically
+grouped into peer groups which manages one NETCONF topology node respectively.
+
+It is responsible for:
+
+- *Coordination with parent Topology Administrator*
+** publishing state changes to parent Topology Administrator.
+
+- *Coordination with logical peers*
+** important state updates with logical peers based on application logic.
+
+== Scope of implementation
+=== Beryllium scope of NETCONF Clustering
+
+- Implementation of logic as described above using *Akka Actor* system
+  and *Entity Ownership Service* to determine Master-Slave relationship for
+  Topology Administrator and Node Administrator instances.
+
+- Only support for *Controller-initiated connection* use-case based on NETCONF
+  Topology Configuration model.
+
+- *No planned support* of clustering of NETCONF devices configured by Helium
+  and Lithium style of configuration - *using config subsystem*.
+- *No support* of  clustering for *controller-config* NETCONF device, since it represents
+  loop to instance, which on each node in cluster represents different
+
+
+=== Possible future work-items
+
+IMPORTANT: Following items are not required to fulfill Beryllium NETCONF Clustering.
+
+- Extend framework to support *External system-initiated connections*
+- Abstract out NETCONF-specific details from described clustering framework
+  to allow for reausability for other "topology-based" applications.
+- Abstract out core framework to provide same functionlity for non-topology
+  based applications.
+
+== Design
+
+SPI & Base messages for NETCONF Connector Clustering are described and
+proposed in Java API form in Gerrit:
+  https://git.opendaylight.org/gerrit/#/c/26728/8
+
+
+=== Multiple transport backends
+
+Solution was designed in mind to allow for multiple implementation of cluster-wide
+communication between Topology Administrators and Node Administrators
+to allow easier porting to other transport solutions.
+
+[plantuml]
+....
+component "Netconf Connector" as netconf.connector
+
+interface "Abstract Topology API" as topo.api
+interface "Mount Point API" as mount.api
+
+component "Common Topology Backend" as topo.common
+component "Beryllium Topology Backend" as topo.actor
+component "Lithium Topology Backend" as topo.rpc
+
+interface "Entity Ownership API" as entity.api
+
+netconf.connector --> topo.api : uses
+netconf.connector --> mount.api : uses
+
+topo.api -- topo.actor
+topo.api -- topo.rpc
+
+topo.common --> entity.api
+topo.actor --> topo.common
+topo.rpc --> topo.common
+....
+
+=== Connecting a NETCONF device
+
+[plantuml]
+....
+actor User
+participant Topology as topo.master <<(M,#ADD1B2)>>
+participant Topology  as topo.slave <<(S,#FF7700)>>
+participant "MD SAL" as ds.cfg <<(C,#ADD1B2)>>
+participant "Oper DS" as ds.oper <<(C,#ADD1B2)>>
+autonumber
+topo.master -> EntityOwnershipService : registerCandidate(/topology/netconf)
+topo.slave -> EntityOwnershipService : registerCandidate(/topology/netconf)
+activate topo.master
+topo.master <-- EntityOwnershipService : ownershipChanged(isOwner=true)
+topo.slave <-- EntityOwnershipService : ownershipChanged(isOwner=false)
+
+topo.master -> ds.cfg : registerDataTreeChangeListener(/topology/netconf)
+deactivate topo.master
+User -> ds.cfg : create(/topology/netconf/node)
+activate topo.master
+ds.cfg -> topo.master : created(/topology/netconf/node)
+participant Node as node.master <<(M,#ADD1B2)>>
+participant Node as node.slave <<(S,#FF7700)>>
+
+topo.master -> topo.slave : connect(node)
+activate topo.slave
+create node.master
+topo.slave -> node.master : create(node)
+deactivate topo.slave
+topo.master -> topo.master : connect(node)
+activate topo.master
+create node.slave
+topo.master -> node.slave : create(node)
+deactivate topo.master
+deactivate topo.master
+
+node.master -> EntityOwnershipService : registerCandidate(/topology/netconf/node)
+node.slave -> EntityOwnershipService : registerCandidate(/topology/netconf/node)
+
+node.slave -> topo.master : updateStatus(connecting)
+node.master -> topo.slave : updateStatus(connecting)
+topo.slave -> topo.master : updateStatus(connecting)
+
+node.slave <-- EntityOwnershipService : ownershipChanged(isOwner=false)
+
+activate node.master
+node.master <-- EntityOwnershipService : ownershipChanged(isOwner=true)
+
+node.master -> node.master : createMountpoint()
+node.master -> MountPointService : registerMountpoint(/topology/netconf/node)
+activate topo.slave
+node.master --> topo.slave : updateStatus(published)
+deactivate node.master
+topo.slave --> topo.master : updateStatus(published)
+deactivate topo.slave
+
+....
