@@ -99,7 +99,7 @@ public class ChoiceReader extends AbstractReader<ChoiceSchemaNode> {
         return newNodes;
     }
 
-    private Object formatSet(final Set<String> values) {
+    private static Object formatSet(final Set<String> values) {
         final StringBuilder formatedValues = new StringBuilder();
         for (final String value : values) {
             formatedValues.append("\n  ");
@@ -108,7 +108,7 @@ public class ChoiceReader extends AbstractReader<ChoiceSchemaNode> {
         return formatedValues.toString();
     }
 
-    private boolean containsOnlyOneEmptyLeaf(final ChoiceCaseNode selectedCase) {
+    private static boolean containsOnlyOneEmptyLeaf(final ChoiceCaseNode selectedCase) {
         if (selectedCase.getChildNodes().size() != 1) {
             return false;
         }
@@ -122,7 +122,7 @@ public class ChoiceReader extends AbstractReader<ChoiceSchemaNode> {
         return false;
     }
 
-    private Map<String, ChoiceCaseNode> collectAllCases(final ChoiceSchemaNode schemaNode) {
+    private static Map<String, ChoiceCaseNode> collectAllCases(final ChoiceSchemaNode schemaNode) {
         return Maps.uniqueIndex(schemaNode.getCases(), new Function<ChoiceCaseNode, String>() {
             @Override
             public String apply(final ChoiceCaseNode input) {

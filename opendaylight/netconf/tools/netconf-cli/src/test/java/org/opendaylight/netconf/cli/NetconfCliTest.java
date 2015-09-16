@@ -9,7 +9,6 @@ package org.opendaylight.netconf.cli;
 
 import static org.junit.Assert.assertNotNull;
 import static org.opendaylight.netconf.cli.io.IOUtil.PROMPT_SUFIX;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -113,15 +112,15 @@ public class NetconfCliTest {
 
     }
 
-    private Deque<String> value(final String... values) {
+    private static Deque<String> value(final String... values) {
         return new ArrayDeque<>(Arrays.asList(values));
     }
 
-    private String prompt(final String path) {
+    private static String prompt(final String path) {
         return "/localhost" + path + PROMPT_SUFIX;
     }
 
-    private DataSchemaNode findTopLevelElement(final String namespace, final String revision,
+    private static DataSchemaNode findTopLevelElement(final String namespace, final String revision,
             final String topLevelElement, final SchemaContext schemaContext) {
         final QName requiredElement = QName.create(namespace, revision, topLevelElement);
         for (final DataSchemaNode dataSchemaNode : schemaContext.getChildNodes()) {
