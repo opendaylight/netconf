@@ -16,13 +16,6 @@ module netconf-node-topology {
     }
 
     grouping netconf-node-fields {
-        leaf connection-status {
-            type enumeration {
-                enum connecting;
-                enum connected;
-                enum unable-to-connect;
-            }
-        }
 
         leaf host {
             type inet:host;
@@ -30,6 +23,91 @@ module netconf-node-topology {
 
         leaf port {
             type inet:port-number;
+        }
+
+        leaf tcp-only {
+            config true;
+            type boolean;
+        }
+
+        leaf username {
+            config true;
+            type string;
+        }
+
+        leaf password {
+            config true;
+            type string;
+        }
+
+        container yang-module-capabilities {
+            config true;
+            leaf-list capability {
+                type string;
+                description "Set a list of capabilities to override capabilities provided in device's hello message.
+                             Can be used for devices that do not report any yang modules in their hello message";
+            }
+        }
+
+        leaf reconnect-on-changed-schema {
+            config true;
+            type boolean;
+            default false;
+            description "If true, the connector would auto disconnect/reconnect when schemas are changed in the remote device.
+                         The connector subscribes (right after connect) to base netconf notifications and listens for netconf-capability-change notification";
+        }
+
+        leaf connection-timeout-millis {
+            description "Specifies timeout in milliseconds after which connection must be established.";
+            config true;
+            type uint32;
+            default 20000;
+        }
+
+        leaf default-request-timeout-millis {
+            description "Timeout for blocking operations within transactions.";
+            config true;
+            type uint32;
+            default 60000;
+        }
+
+        leaf max-connection-attempts {
+            description "Maximum number of connection retries. Non positive value or null is interpreted as infinity.";
+            config true;
+            type uint32;
+            default 0; // retry forever
+        }
+
+        leaf between-attempts-timeout-millis {
+            description "Initial timeout in milliseconds to wait between connection attempts. Will be multiplied by sleep-factor with every additional attempt";
+            config true;
+            type uint16;
+            default 2000;
+        }
+
+        leaf sleep-factor {
+            config true;
+            type decimal64 {
+                fraction-digits 1;
+            }
+            default 1.5;
+        }
+
+        // Keepalive configuration
+        leaf keepalive-delay {
+            config true;
+            type uint32;
+            default 120;
+            description "Netconf connector sends keepalive RPCs while the session is idle, this delay specifies the delay between keepalive RPC in seconds
+                         If a value <1 is provided, no keepalives will be sent";
+        }
+
+        leaf connection-status {
+            type enumeration {
+                enum connecting;
+                enum connected;
+                enum unable-to-connect;
+            }
         }
 
         leaf connected-message {
