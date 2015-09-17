@@ -197,6 +197,7 @@
       <groupId>org.opendaylight.controller</groupId>
       <artifactId>opendaylight-karaf-empty</artifactId>
       <version>${commons.opendaylight.version}</version>
+      <scope>test</scope>
       <type>zip</type>
     </dependency>
   </dependencies>

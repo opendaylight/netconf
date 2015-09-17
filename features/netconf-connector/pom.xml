@@ -72,6 +72,10 @@
       <groupId>org.opendaylight.controller.model</groupId>
       <artifactId>model-inventory</artifactId>
     </dependency>
+   <dependency>
+       <groupId>${project.groupId}</groupId>
+       <artifactId>messagebus-netconf</artifactId>
+   </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-config-dispatcher</artifactId>
@@ -104,6 +108,13 @@
       <type>xml</type>
       <classifier>config</classifier>
     </dependency>
+   <dependency>
+       <groupId>${project.groupId}</groupId>
+       <artifactId>messagebus-netconf</artifactId>
+       <version>${netconf.version}</version>
+       <type>xml</type>
+       <classifier>config</classifier>
+   </dependency>
 
     <!--
       Optional TODO: Remove TODO comments.
@@ -120,6 +131,7 @@
       <groupId>org.opendaylight.controller</groupId>
       <artifactId>opendaylight-karaf-empty</artifactId>
       <version>${commons.opendaylight.version}</version>
+      <scope>test</scope>
       <type>zip</type>
     </dependency>
     <!-- Uncomment this if you get an error : java.lang.NoSuchMethodError: org.slf4j.helpers.MessageFormatter.format(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)Lorg/slf4j/helpers/FormattingTuple;
