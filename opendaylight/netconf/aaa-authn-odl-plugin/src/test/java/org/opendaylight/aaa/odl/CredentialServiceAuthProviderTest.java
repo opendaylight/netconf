@@ -62,7 +62,7 @@ public class CredentialServiceAuthProviderTest {
 
         Claim claim = mock(Claim.class);
         doReturn("domain").when(claim).domain();
-        doReturn(claim).when(credAuth).authenticate(any(PasswordCredentials.class), anyString());
+        doReturn(claim).when(credAuth).authenticate(any(PasswordCredentials.class));
 
         doReturn(credAuth).when(ctx).getService(serviceRef);
         CredentialServiceAuthProvider credentialServiceAuthProvider = new CredentialServiceAuthProvider(ctx);
@@ -80,7 +80,7 @@ public class CredentialServiceAuthProviderTest {
         ServiceListenerAnswer answer = new ServiceListenerAnswer();
         doAnswer(answer).when(ctx).addServiceListener(any(ServiceListener.class), anyString());
 
-        doThrow(AuthenticationException.class).when(credAuth).authenticate(any(PasswordCredentials.class), anyString());
+        doThrow(AuthenticationException.class).when(credAuth).authenticate(any(PasswordCredentials.class));
 
         doReturn(credAuth).when(ctx).getService(serviceRef);
         CredentialServiceAuthProvider credentialServiceAuthProvider = new CredentialServiceAuthProvider(ctx);

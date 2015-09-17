@@ -32,9 +32,6 @@ public final class CredentialServiceAuthProvider implements AuthProvider, AutoCl
      */
     public static volatile Map.Entry<BundleContext, CredentialServiceAuthProvider> INSTANCE;
 
-    // TODO what domain should be used for this ? can we leave null ?
-    public static final String DOMAIN = null;
-
     // FIXME CredentialAuth is generic and it causes warnings during compilation
     // Maybe there should be a PasswordCredentialAuth implements CredentialAuth<PasswordCredentials>
     private volatile CredentialAuth<PasswordCredentials> nullableCredService;
@@ -81,7 +78,7 @@ public final class CredentialServiceAuthProvider implements AuthProvider, AutoCl
 
         Claim claim;
         try {
-            claim = nullableCredService.authenticate(new PasswordCredentialsWrapper(username, password), DOMAIN);
+            claim = nullableCredService.authenticate(new PasswordCredentialsWrapper(username, password));
         } catch (AuthenticationException e) {
             logger.debug("Authentication failed for user '{}' : {}", username, e);
             return false;
@@ -114,6 +111,12 @@ public final class CredentialServiceAuthProvider implements AuthProvider, AutoCl
         @Override
         public String password() {
             return password;
+        }
+
+        @Override
+        public String domain() {
+            // If this is left null, default "sdn" domain is assumed
+            return null;
         }
     }
 }
