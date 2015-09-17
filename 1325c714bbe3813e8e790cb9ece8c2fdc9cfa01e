@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a79b1b5_993d26be",
+        "filename": "opendaylight/netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/util/NetconfConstants.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-09-17T10:44:47Z",
+      "side": 1,
+      "message": "The naming here is a bit odd, ALLOWED_NAMES would be sufficient, no need for SET. Also ALLOWED NAMES could be something more specific e.g. CONFIG_NETCONF_CONNECTORS.",
+      "range": {
+        "startLine": 28,
+        "startChar": 36,
+        "endLine": 28,
+        "endChar": 53
+      },
+      "revId": "1325c714bbe3813e8e790cb9ece8c2fdc9cfa01e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
