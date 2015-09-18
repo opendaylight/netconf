@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a79b1b5_4f16e0f2",
+        "filename": "opendaylight/netconf/abstract-topology/src/main/java/org/opendaylight/netconf/topology/example/ExampleTopologyCallback.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 27
+      },
+      "writtenOn": "2015-09-18T15:08:41Z",
+      "side": 1,
+      "message": "call it initalize (connect is a bit confusing)",
+      "range": {
+        "startLine": 74,
+        "startChar": 38,
+        "endLine": 74,
+        "endChar": 39
+      },
+      "revId": "5eb4a653e263e400ba1bf36c1cdc7446c5ccfaf6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a79b1b5_efa24cad",
+        "filename": "opendaylight/netconf/abstract-topology/src/main/java/org/opendaylight/netconf/topology/example/ExampleTopologyCallback.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 27
+      },
+      "writtenOn": "2015-09-18T15:08:41Z",
+      "side": 1,
+      "message": "Why are you creating a SanNodeWriter here? You already have a SanNodeWriter member in the class. Why not use that one?",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 76
+      },
+      "revId": "5eb4a653e263e400ba1bf36c1cdc7446c5ccfaf6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a79b1b5_8f915854",
+        "filename": "opendaylight/netconf/abstract-topology/src/main/java/org/opendaylight/netconf/topology/example/ExampleTopologyCallback.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 27
+      },
+      "writtenOn": "2015-09-18T15:08:41Z",
+      "side": 1,
+      "message": "Add comment that this is on a slave node. Also, you may want to put this into an else {...} statement - it will be more maintainable, since your intention will be clearer",
+      "range": {
+        "startLine": 96,
+        "startChar": 10,
+        "endLine": 96,
+        "endChar": 38
+      },
+      "revId": "5eb4a653e263e400ba1bf36c1cdc7446c5ccfaf6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
