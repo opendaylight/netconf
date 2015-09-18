@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a79b1b5_0ff30874",
+        "filename": "opendaylight/netconf/aaa-authn-odl-plugin/src/main/java/org/opendaylight/aaa/odl/CredentialServiceAuthProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2015-09-18T03:11:09Z",
+      "side": 1,
+      "message": "If this is left null, it assumes the default \"sdn\" domain.",
+      "revId": "51b958783c114613047ea171e35d993c5057edb9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
