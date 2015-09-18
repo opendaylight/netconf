@@ -38,6 +38,10 @@ KARAF_PROMPT = 'opendaylight-user'
 KARAF_USER = 'karaf'
 KARAF_PASSWORD = 'karaf'
 
+# BGP variables
+ODL_BGP_PORT = '1790'
+BGP_TOOL_PORT = '17900'
+
 # VM Environment Variables
 DEFAULT_LINUX_PROMPT = '>'
 
