@@ -20,6 +20,19 @@
    <properties>
       <features.file>features.xml</features.file>
    </properties>
+
+   <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.opendaylight.netconf</groupId>
+        <artifactId>netconf-artifacts</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+   </dependencyManagement>
+
    <dependencies>
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
@@ -67,6 +80,16 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>sal-netconf-connector</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>messagebus-netconf</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>messagebus-netconf</artifactId>
+      <type>xml</type>
+      <classifier>config</classifier>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.controller.model</groupId>
