@@ -95,6 +95,7 @@ public final class CredentialServiceAuthProvider implements AuthProvider, AutoCl
     }
 
     private static final class PasswordCredentialsWrapper implements PasswordCredentials {
+        private static final String SDN_DOMAIN = "sdn";
         private final String username;
         private final String password;
 
@@ -115,8 +116,7 @@ public final class CredentialServiceAuthProvider implements AuthProvider, AutoCl
 
         @Override
         public String domain() {
-            // If this is left null, default "sdn" domain is assumed
-            return null;
+            return SDN_DOMAIN;
         }
     }
 }
