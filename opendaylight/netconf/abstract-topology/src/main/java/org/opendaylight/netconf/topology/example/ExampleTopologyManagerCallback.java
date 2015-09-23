@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
+import org.opendaylight.controller.md.sal.common.api.clustering.EntityOwnershipChange;
 import org.opendaylight.netconf.topology.NodeManager;
 import org.opendaylight.netconf.topology.NodeManagerCallback.NodeManagerCallbackFactory;
 import org.opendaylight.netconf.topology.StateAggregator;
@@ -28,7 +29,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 public class ExampleTopologyManagerCallback implements TopologyManagerCallback<UserDefinedMessage> {
 
     private final DataBroker dataBroker;
-    private final boolean isMaster;
+    private boolean isMaster;
 
     private final String topologyId;
     private final StateAggregator aggregator;
@@ -50,14 +51,6 @@ public class ExampleTopologyManagerCallback implements TopologyManagerCallback<U
         this.aggregator = aggregator;
         this.naSalNodeWriter = naSalNodeWriter;
 
-        //this should be inherited from topologyAdmin
-        isMaster = elect();
-
-    }
-
-    private boolean elect() {
-        // FIXME implement this with EntityElectionService
-        return true;
     }
 
     @Override
@@ -75,7 +68,7 @@ public class ExampleTopologyManagerCallback implements TopologyManagerCallback<U
         // Init node admin and a writer for it
 
         // TODO let end user code notify the baseNodeManager about state changes and handle them here on topology level
-        final BaseNodeManager<UserDefinedMessage> naBaseNodeManager = new BaseNodeManager<>(nodeHandlerFactory.create());
+        final BaseNodeManager<UserDefinedMessage> naBaseNodeManager = new BaseNodeManager<>(nodeHandlerFactory);
         nodes.put(nodeId, naBaseNodeManager);
 
         // Set initial state ? in every peer or just master ? TODO
@@ -111,4 +104,9 @@ public class ExampleTopologyManagerCallback implements TopologyManagerCallback<U
         return Collections.emptySet();
     }
 
+    @Override
+    public void ownershipChanged(EntityOwnershipChange ownershipChange) {
+        isMaster = ownershipChange.isOwner();
+        // our post-election logic
+    }
 }

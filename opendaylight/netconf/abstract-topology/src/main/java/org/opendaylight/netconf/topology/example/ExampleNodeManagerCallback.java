@@ -9,12 +9,16 @@
 package org.opendaylight.netconf.topology.example;
 
 import com.google.common.base.Function;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opendaylight.controller.md.sal.common.api.clustering.EntityOwnershipChange;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
+import org.opendaylight.netconf.topology.ElectionStrategy;
 import org.opendaylight.netconf.topology.NetconfTopology;
+import org.opendaylight.netconf.topology.NodeManager;
 import org.opendaylight.netconf.topology.NodeManagerCallback;
 import org.opendaylight.netconf.topology.Peer;
 import org.opendaylight.netconf.topology.UserDefinedMessage;
@@ -24,14 +28,28 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExampleNodeManagerCallback implements NodeManagerCallback<UserDefinedMessage> {
 
-    private Peer.PeerContext<UserDefinedMessage> peerCtx;
-    private NetconfTopology topologyDispatcher;
+    private static final Logger LOG = LoggerFactory.getLogger(ExampleNodeManagerCallback.class);
 
-    public ExampleNodeManagerCallback(NetconfTopology topologyDispatcher) {
+    private Peer.PeerContext<UserDefinedMessage> peerCtx;
+    private boolean isMaster;
+
+    private NetconfTopology topologyDispatcher;
+    private final NodeManager electionListener;
+    private final ElectionStrategy electionStrategy;
+
+    public ExampleNodeManagerCallback(
+                                      final NetconfTopology topologyDispatcher,
+                                      final NodeManager electionListener,
+                                      final ElectionStrategy electionStrategy) {
         this.topologyDispatcher = topologyDispatcher;
+        this.electionListener = electionListener;
+        this.electionStrategy = electionStrategy;
+        isMaster = false;
     }
 
 
@@ -53,6 +71,18 @@ public class ExampleNodeManagerCallback implements NodeManagerCallback<UserDefin
         // connect magic
         // User logic goes here, f.ex connect your device
         final ListenableFuture<NetconfDeviceCapabilities> connectionFuture = topologyDispatcher.connectNode(nodeId, configNode);
+
+        Futures.addCallback(connectionFuture, new FutureCallback<NetconfDeviceCapabilities>() {
+            @Override
+            public void onSuccess(@Nullable NetconfDeviceCapabilities result) {
+                electionStrategy.preElect(electionListener);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                LOG.error("Connection to device failed", t);
+            }
+        });
 
         final NetconfNode netconfNode = configNode.getAugmentation(NetconfNode.class);
 
@@ -108,4 +138,11 @@ public class ExampleNodeManagerCallback implements NodeManagerCallback<UserDefin
         // notifications from peers
     }
 
+    @Override
+    public void ownershipChanged(EntityOwnershipChange ownershipChange) {
+        isMaster = ownershipChange.isOwner();
+        if (isMaster) {
+            // unregister old mountPoint if ownership changed, register a new one
+        }
+    }
 }
