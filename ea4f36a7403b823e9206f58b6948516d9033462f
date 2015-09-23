@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_358323ce",
+        "filename": "opendaylight/netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/BaseCapabilityChangeNotificationPublisher.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-09-23T14:18:58Z",
+      "side": 1,
+      "message": "Short javadoc might be useful here detailing the approach taken (listening on capabilities from other publisher (which one?))",
+      "range": {
+        "startLine": 29,
+        "startChar": 12,
+        "endLine": 29,
+        "endChar": 53
+      },
+      "revId": "ea4f36a7403b823e9206f58b6948516d9033462f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_b54893cd",
+        "filename": "opendaylight/netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/NetconfMdsalNotificationMapperModule.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-09-23T14:18:58Z",
+      "side": 1,
+      "message": "header missing",
+      "range": {
+        "startLine": 1,
+        "startChar": 7,
+        "endLine": 1,
+        "endChar": 8
+      },
+      "revId": "ea4f36a7403b823e9206f58b6948516d9033462f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_5511ffaa",
+        "filename": "opendaylight/netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/NetconfMdsalNotificationMapperModule.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-09-23T14:18:58Z",
+      "side": 1,
+      "message": "shouldnt we unregister on close ?",
+      "range": {
+        "startLine": 33,
+        "startChar": 42,
+        "endLine": 33,
+        "endChar": 58
+      },
+      "revId": "ea4f36a7403b823e9206f58b6948516d9033462f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_350c8394",
+        "filename": "opendaylight/netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/NetconfMdsalNotificationMapperModule.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-09-23T14:18:58Z",
+      "side": 1,
+      "message": "shouldnt we unregister the listener on close ?",
+      "range": {
+        "startLine": 37,
+        "startChar": 34,
+        "endLine": 37,
+        "endChar": 60
+      },
+      "revId": "ea4f36a7403b823e9206f58b6948516d9033462f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_7512fbb5",
+        "filename": "opendaylight/netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/NetconfMdsalNotificationMapperModule.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-09-23T14:18:58Z",
+      "side": 1,
+      "message": "this test should probably be removed",
+      "range": {
+        "startLine": 51,
+        "startChar": 15,
+        "endLine": 51,
+        "endChar": 19
+      },
+      "revId": "ea4f36a7403b823e9206f58b6948516d9033462f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_15238706",
+        "filename": "opendaylight/netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/NotificationToMdsalWriter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-09-23T14:18:58Z",
+      "side": 1,
+      "message": "Short javadoc for what this class does might be a good idea, even if its not public API",
+      "range": {
+        "startLine": 30,
+        "startChar": 12,
+        "endLine": 30,
+        "endChar": 37
+      },
+      "revId": "ea4f36a7403b823e9206f58b6948516d9033462f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_f525ab0a",
+        "filename": "opendaylight/netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/netconf/mdsal/notification/NetconfNotificationOperationService.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-09-23T14:18:58Z",
+      "side": 1,
+      "message": "If there is just a single instance, its better to use Collections.singleton() ... in this case it wont make a big difference, but if we invoked getNetconfOperations lots of times, we would be wasting memory.\n\nAlso it might be a good idea to create the set in constructor and provide the same instance for every invocation.",
+      "range": {
+        "startLine": 30,
+        "startChar": 38,
+        "endLine": 30,
+        "endChar": 48
+      },
+      "revId": "ea4f36a7403b823e9206f58b6948516d9033462f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
