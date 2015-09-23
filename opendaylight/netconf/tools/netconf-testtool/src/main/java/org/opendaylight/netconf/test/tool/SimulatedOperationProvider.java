@@ -34,9 +34,10 @@ class SimulatedOperationProvider implements NetconfOperationServiceFactory {
 
     public SimulatedOperationProvider(final SessionIdProvider idProvider,
                                       final Set<Capability> caps,
-                                      final Optional<File> notificationsFile) {
+                                      final Optional<File> notificationsFile,
+                                      final Optional<File> initialConfigXMLFile) {
         this.caps = caps;
-        simulatedOperationService = new SimulatedOperationService(idProvider.getCurrentSessionId(), notificationsFile);
+        simulatedOperationService = new SimulatedOperationService(idProvider.getCurrentSessionId(), notificationsFile, initialConfigXMLFile);
     }
 
     @Override
@@ -64,10 +65,12 @@ class SimulatedOperationProvider implements NetconfOperationServiceFactory {
     static class SimulatedOperationService implements NetconfOperationService {
         private final long currentSessionId;
         private final Optional<File> notificationsFile;
+        private final Optional<File> initialConfigXMLFile;
 
-        public SimulatedOperationService(final long currentSessionId, final Optional<File> notificationsFile) {
+        public SimulatedOperationService(final long currentSessionId, final Optional<File> notificationsFile, final Optional<File> initialConfigXMLFile) {
             this.currentSessionId = currentSessionId;
             this.notificationsFile = notificationsFile;
+            this.initialConfigXMLFile = initialConfigXMLFile;
         }
 
         @Override
@@ -75,7 +78,7 @@ class SimulatedOperationProvider implements NetconfOperationServiceFactory {
             final DataList storage = new DataList();
             final SimulatedGet sGet = new SimulatedGet(String.valueOf(currentSessionId), storage);
             final SimulatedEditConfig sEditConfig = new SimulatedEditConfig(String.valueOf(currentSessionId), storage);
-            final SimulatedGetConfig sGetConfig = new SimulatedGetConfig(String.valueOf(currentSessionId), storage);
+            final SimulatedGetConfig sGetConfig = new SimulatedGetConfig(String.valueOf(currentSessionId), storage, initialConfigXMLFile );
             final SimulatedCommit sCommit = new SimulatedCommit(String.valueOf(currentSessionId));
             final SimulatedLock sLock = new SimulatedLock(String.valueOf(currentSessionId));
             final SimulatedUnLock sUnlock = new SimulatedUnLock(String.valueOf(currentSessionId));

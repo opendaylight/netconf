@@ -83,6 +83,9 @@ public final class Main {
         @Arg(dest = "md-sal")
         public boolean mdSal;
 
+        @Arg(dest = "initial-config-xml-file")
+        public File initialConfigXMLFile;
+
         static ArgumentParser getParser() {
             final ArgumentParser parser = ArgumentParsers.newArgumentParser("netconf testool");
 
@@ -105,6 +108,11 @@ public final class Main {
                     .help("Xml file containing notifications that should be sent to clients after create subscription is called")
                     .dest("notification-file");
 
+            parser.addArgument("--initial-config-xml-file")
+                    .type(File.class)
+                    .help("Xml file containing initial simulatted configuration to be returned via get-config rpc")
+                    .dest("initial-config-xml-file");
+ 
             parser.addArgument("--starting-port")
                     .type(Integer.class)
                     .setDefault(17830)
