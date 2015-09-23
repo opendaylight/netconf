@@ -15,7 +15,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 
 @Beta
-public interface NodeListener {
+public interface NodeListener extends RoleChangeListener {
 
     @Nonnull ListenableFuture<Node> nodeCreated(@Nonnull NodeId nodeId, @Nonnull Node configNode);
 

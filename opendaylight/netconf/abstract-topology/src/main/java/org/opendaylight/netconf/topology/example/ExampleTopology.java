@@ -9,34 +9,54 @@
 package org.opendaylight.netconf.topology.example;
 
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
+import org.opendaylight.controller.md.sal.common.api.clustering.EntityOwnershipService;
+import org.opendaylight.netconf.topology.NetconfTopology;
+import org.opendaylight.netconf.topology.NodeManager;
 import org.opendaylight.netconf.topology.NodeManagerCallback;
 import org.opendaylight.netconf.topology.NodeManagerCallback.NodeManagerCallbackFactory;
 import org.opendaylight.netconf.topology.Peer;
 import org.opendaylight.netconf.topology.StateAggregator.SingleStateAggregator;
+import org.opendaylight.netconf.topology.TopologyManager;
+import org.opendaylight.netconf.topology.TopologyManagerCallback;
+import org.opendaylight.netconf.topology.TopologyManagerCallback.TopologyManagerCallbackFactory;
 import org.opendaylight.netconf.topology.UserDefinedMessage;
 import org.opendaylight.netconf.topology.util.BaseTopologyManager;
+import org.opendaylight.netconf.topology.util.NodeRoleChangeStrategy;
+import org.opendaylight.netconf.topology.util.SalNodeWriter;
+import org.opendaylight.netconf.topology.util.TopologyRoleChangeStrategy;
 
 public class ExampleTopology {
 
+    private static final String TOPOLOGY_NETCONF = "topology-netconf";
     private final BaseTopologyManager<UserDefinedMessage> netconfNodeBaseTopologyManager;
+    private final DataBroker dataBroker;
     private Peer.PeerContext<UserDefinedMessage> peerCtx;
 
-    public ExampleTopology(final DataBroker dataBroker) {
+    public ExampleTopology(final EntityOwnershipService entityOwnershipService,
+                           final NetconfTopology topologyDispatcher) {
+        dataBroker = topologyDispatcher.getDataBroker();
+
         final NodeManagerCallbackFactory<UserDefinedMessage> nodeManagerCallbackFactory = new NodeManagerCallbackFactory<UserDefinedMessage>() {
             @Override
-            public NodeManagerCallback<UserDefinedMessage> create() {
-                // TODO we need to inject the topologyDispatcher into these callbacks
-                return new ExampleNodeManagerCallback(null);
+            public NodeManagerCallback<UserDefinedMessage> create(TopologyManager topologyParent, NodeManager parentNodeManager, String nodeId) {
+                return new ExampleNodeManagerCallback(
+                        topologyDispatcher, topologyParent, parentNodeManager, new NodeRoleChangeStrategy(entityOwnershipService, "netconf", nodeId));
             }
         };
 
-        //User needs to implement own StateAggergator
-        final ExampleTopologyManagerCallback exampleTopologyManagerCallback = new ExampleTopologyManagerCallback(dataBroker,
-                "topology-netconf", nodeManagerCallbackFactory, new SingleStateAggregator());
+        final TopologyManagerCallbackFactory<UserDefinedMessage> topologyManagerCallbackFactory = new TopologyManagerCallbackFactory<UserDefinedMessage>() {
+            @Override
+            public TopologyManagerCallback<UserDefinedMessage> create(TopologyManager topologyParent) {
+                return new ExampleTopologyManagerCallback(dataBroker, TOPOLOGY_NETCONF, topologyParent, nodeManagerCallbackFactory, new SingleStateAggregator());
+            }
+        };
 
+        netconfNodeBaseTopologyManager = new BaseTopologyManager<>(dataBroker, TOPOLOGY_NETCONF,
+                topologyManagerCallbackFactory,
+                new SingleStateAggregator(),
+                new SalNodeWriter(dataBroker, TOPOLOGY_NETCONF),
+                new TopologyRoleChangeStrategy(dataBroker, entityOwnershipService, "netconf", TOPOLOGY_NETCONF));
 
-        netconfNodeBaseTopologyManager = new BaseTopologyManager<>(dataBroker, "topology-netconf",
-                exampleTopologyManagerCallback, new SingleStateAggregator());
     }
 
 }
