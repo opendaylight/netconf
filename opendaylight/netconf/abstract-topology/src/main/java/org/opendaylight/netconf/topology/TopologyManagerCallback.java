@@ -11,10 +11,9 @@ package org.opendaylight.netconf.topology;
 import com.google.common.annotations.Beta;
 
 @Beta
-public interface TopologyManagerCallback<M> extends TopologyManager {
+public interface TopologyManagerCallback<M> extends TopologyManager<M> {
 
-    void setPeerContext(Peer.PeerContext<M> peerContext);
-
-    void handle(M msg);
-
+    interface TopologyManagerCallbackFactory<M> {
+        TopologyManagerCallback<M> create(TopologyManager<M> topologyParent);
+    }
 }
