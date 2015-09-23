@@ -21,6 +21,7 @@ import org.opendaylight.netconf.topology.TopologyManagerCallback;
 import org.opendaylight.netconf.topology.UserDefinedMessage;
 import org.opendaylight.netconf.topology.util.BaseNodeManager;
 import org.opendaylight.netconf.topology.util.NodeWriter;
+import org.opendaylight.netconf.topology.util.NoopRoleChangeStrategy;
 import org.opendaylight.netconf.topology.util.SalNodeWriter;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -28,7 +29,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 public class ExampleTopologyManagerCallback implements TopologyManagerCallback<UserDefinedMessage> {
 
     private final DataBroker dataBroker;
-    private final boolean isMaster;
+    private boolean isMaster;
 
     private final String topologyId;
     private final StateAggregator aggregator;
@@ -50,14 +51,6 @@ public class ExampleTopologyManagerCallback implements TopologyManagerCallback<U
         this.aggregator = aggregator;
         this.naSalNodeWriter = naSalNodeWriter;
 
-        //this should be inherited from topologyAdmin
-        isMaster = elect();
-
-    }
-
-    private boolean elect() {
-        // FIXME implement this with EntityElectionService
-        return true;
     }
 
     @Override
@@ -75,13 +68,13 @@ public class ExampleTopologyManagerCallback implements TopologyManagerCallback<U
         // Init node admin and a writer for it
 
         // TODO let end user code notify the baseNodeManager about state changes and handle them here on topology level
-        final BaseNodeManager<UserDefinedMessage> naBaseNodeManager = new BaseNodeManager<>(nodeHandlerFactory.create());
+        final BaseNodeManager<UserDefinedMessage> naBaseNodeManager = new BaseNodeManager<>(node.getNodeId().getValue(), nodeHandlerFactory, new NoopRoleChangeStrategy());
         nodes.put(nodeId, naBaseNodeManager);
 
         // Set initial state ? in every peer or just master ? TODO
         naSalNodeWriter.init(nodeId, naBaseNodeManager.getInitialState(nodeId, node));
 
-        //trigger connect on this node
+        // trigger connect on this node
         return naBaseNodeManager.nodeCreated(nodeId, node);
 
     }
@@ -111,4 +104,9 @@ public class ExampleTopologyManagerCallback implements TopologyManagerCallback<U
         return Collections.emptySet();
     }
 
+    @Override
+    public void onRoleChanged(RoleChangeDTO roleChangeDTO) {
+        isMaster = roleChangeDTO.isOwner();
+        // our post-election logic
+    }
 }

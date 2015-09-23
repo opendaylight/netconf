@@ -9,12 +9,19 @@
 package org.opendaylight.netconf.topology.example;
 
 import com.google.common.base.Function;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
+import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
+import org.opendaylight.netconf.topology.RoleChangeStrategy;
 import org.opendaylight.netconf.topology.NetconfTopology;
+import org.opendaylight.netconf.topology.NodeManager;
 import org.opendaylight.netconf.topology.NodeManagerCallback;
 import org.opendaylight.netconf.topology.Peer;
 import org.opendaylight.netconf.topology.UserDefinedMessage;
@@ -24,14 +31,31 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class ExampleNodeManagerCallback implements NodeManagerCallback<UserDefinedMessage> {
+public class ExampleNodeManagerCallback implements NodeManagerCallback<UserDefinedMessage>, RemoteDeviceHandler<NetconfSessionPreferences>{
+
+    private static final Logger LOG = LoggerFactory.getLogger(ExampleNodeManagerCallback.class);
 
     private Peer.PeerContext<UserDefinedMessage> peerCtx;
+
+    private boolean isMaster = false;
     private NetconfTopology topologyDispatcher;
 
-    public ExampleNodeManagerCallback(NetconfTopology topologyDispatcher) {
+    private final NodeManager electionListener;
+    private final RoleChangeStrategy roleChangeStrategy;
+
+
+    private NodeId nodeId = null;
+
+    public ExampleNodeManagerCallback(final NetconfTopology topologyDispatcher,
+                                      final NodeManager electionListener,
+                                      final RoleChangeStrategy roleChangeStrategy) {
         this.topologyDispatcher = topologyDispatcher;
+        this.electionListener = electionListener;
+        this.roleChangeStrategy = roleChangeStrategy;
     }
 
 
@@ -50,9 +74,23 @@ public class ExampleNodeManagerCallback implements NodeManagerCallback<UserDefin
 
     @Nonnull @Override public ListenableFuture<Node> nodeCreated(@Nonnull final NodeId nodeId,
                                                                  @Nonnull final Node configNode) {
+        this.nodeId = nodeId;
         // connect magic
         // User logic goes here, f.ex connect your device
         final ListenableFuture<NetconfDeviceCapabilities> connectionFuture = topologyDispatcher.connectNode(nodeId, configNode);
+
+        Futures.addCallback(connectionFuture, new FutureCallback<NetconfDeviceCapabilities>() {
+            @Override
+            public void onSuccess(@Nullable NetconfDeviceCapabilities result) {
+                roleChangeStrategy.registerRoleCandidate(electionListener);
+                topologyDispatcher.registerConnectionStatusListener(nodeId, ExampleNodeManagerCallback.this);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                LOG.error("Connection to device failed", t);
+            }
+        });
 
         final NetconfNode netconfNode = configNode.getAugmentation(NetconfNode.class);
 
@@ -108,4 +146,37 @@ public class ExampleNodeManagerCallback implements NodeManagerCallback<UserDefin
         // notifications from peers
     }
 
+    @Override
+    public void onRoleChanged(RoleChangeDTO roleChangeDTO) {
+        isMaster = roleChangeDTO.isOwner();
+        if (isMaster) {
+            // unregister old mountPoint if ownership changed, register a new one
+        }
+    }
+
+    @Override
+    public void onDeviceConnected(SchemaContext remoteSchemaContext, NetconfSessionPreferences netconfSessionPreferences, DOMRpcService deviceRpc) {
+        // we need to notify the higher level that something happened, get a current status from all other nodes, and aggregate a new result
+        roleChangeStrategy.registerRoleCandidate(electionListener);
+    }
+
+    @Override
+    public void onDeviceDisconnected() {
+        // we need to notify the higher level that something happened, get a current status from all other nodes, and aggregate a new result
+    }
+
+    @Override
+    public void onDeviceFailed(Throwable throwable) {
+        // we need to notify the higher level that something happened, get a current status from all other nodes, and aggregate a new result
+    }
+
+    @Override
+    public void onNotification(DOMNotification domNotification) {
+        //NOOP
+    }
+
+    @Override
+    public void close() {
+        //NOOP
+    }
 }
