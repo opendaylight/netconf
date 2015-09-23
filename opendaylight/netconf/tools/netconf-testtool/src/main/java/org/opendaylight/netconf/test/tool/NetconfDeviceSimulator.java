@@ -115,7 +115,7 @@ public class NetconfDeviceSimulator implements Closeable {
         this.nioExecutor = nioExecutor;
     }
 
-    private NetconfServerDispatcherImpl createDispatcher(final Map<ModuleBuilder, String> moduleBuilders, final boolean exi, final int generateConfigsTimeout, final Optional<File> notificationsFile, final boolean mdSal) {
+    private NetconfServerDispatcherImpl createDispatcher(final Map<ModuleBuilder, String> moduleBuilders, final boolean exi, final int generateConfigsTimeout, final Optional<File> notificationsFile, final boolean mdSal, final Optional<File> initialConfigXMLFile) {
 
         final Set<Capability> capabilities = Sets.newHashSet(Collections2.transform(moduleBuilders.keySet(), new Function<ModuleBuilder, Capability>() {
             @Override
@@ -133,7 +133,7 @@ public class NetconfDeviceSimulator implements Closeable {
 
         final AggregatedNetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory = new AggregatedNetconfOperationServiceFactory();
         final NetconfOperationServiceFactory operationProvider = mdSal ? new MdsalOperationProvider(idProvider, capabilities, schemaContext) :
-            new SimulatedOperationProvider(idProvider, capabilities, notificationsFile);
+            new SimulatedOperationProvider(idProvider, capabilities, notificationsFile, initialConfigXMLFile);
 
         capabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0"));
 
@@ -189,7 +189,7 @@ public class NetconfDeviceSimulator implements Closeable {
 
         final Map<ModuleBuilder, String> moduleBuilders = parseSchemasToModuleBuilders(params);
 
-        final NetconfServerDispatcherImpl dispatcher = createDispatcher(moduleBuilders, params.exi, params.generateConfigsTimeout, Optional.fromNullable(params.notificationFile), params.mdSal);
+        final NetconfServerDispatcherImpl dispatcher = createDispatcher(moduleBuilders, params.exi, params.generateConfigsTimeout, Optional.fromNullable(params.notificationFile), params.mdSal, Optional.fromNullable(params.initialConfigXMLFile));
 
         int currentPort = params.startingPort;
 
