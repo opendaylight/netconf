@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a79b1b5_9cd99485",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-09-24T09:28:20Z",
+      "side": 1,
+      "message": "the credentials should be in a choice so we would support multiple credential types.\n\nThe credentials should be extracted into a grouping + another grouping for connection parameters + another grouping for reconnect ... we need to structure the model a bit because its quite a long list of nodes which is a bit hard to read",
+      "range": {
+        "startLine": 33,
+        "startChar": 13,
+        "endLine": 33,
+        "endChar": 21
+      },
+      "revId": "29e15327457d5379f84a391ba156ca914c74ecd9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a79b1b5_3cbf20fd",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-09-24T09:28:20Z",
+      "side": 1,
+      "message": "this is non-config data + connected-message and capabilities",
+      "range": {
+        "startLine": 105,
+        "startChar": 0,
+        "endLine": 111,
+        "endChar": 9
+      },
+      "revId": "29e15327457d5379f84a391ba156ca914c74ecd9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
