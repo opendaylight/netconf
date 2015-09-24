@@ -21,7 +21,7 @@
           <password xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">admin</password>
           <tcp-only xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">%s</tcp-only>
           <reconnect-on-changed-schema xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">false</reconnect-on-changed-schema>
-          <keepalive-delay xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">-1</keepalive-delay>
+          <keepalive-delay xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">0</keepalive-delay>
           <event-executor xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">
             <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netty">prefix:netty-event-executor</type>
             <name>global-event-executor</name>
