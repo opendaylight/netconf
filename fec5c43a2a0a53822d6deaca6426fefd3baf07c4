@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_eb1f07b6",
+        "filename": "opendaylight/restconf/sal-rest-connector/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2015-09-25T13:05:57Z",
+      "side": 1,
+      "message": "Minor thing but you should be able to omit this entirely.",
+      "revId": "fec5c43a2a0a53822d6deaca6426fefd3baf07c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_8bed338e",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2015-09-25T13:05:57Z",
+      "side": 1,
+      "message": "What is the purpose of this? Shouldn\u0027t this be set via setControllerContext during initial wiring?",
+      "revId": "fec5c43a2a0a53822d6deaca6426fefd3baf07c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_2b541f53",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfProviderImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2015-09-25T13:05:57Z",
+      "side": 1,
+      "message": "This can be final",
+      "revId": "fec5c43a2a0a53822d6deaca6426fefd3baf07c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_4b515b61",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfProviderImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2015-09-25T13:05:57Z",
+      "side": 1,
+      "message": "Do we need this setter now that port is passed in ctor? If this is removed then port can be final.",
+      "revId": "fec5c43a2a0a53822d6deaca6426fefd3baf07c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_cbcc8b38",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfProviderImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2015-09-25T13:05:57Z",
+      "side": 1,
+      "message": "You should unget the service ref below to clean it up (it\u0027s a method on BundleContext - forget the exact name).",
+      "revId": "fec5c43a2a0a53822d6deaca6426fefd3baf07c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_0b4b63b1",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfProviderImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2015-09-25T13:05:57Z",
+      "side": 1,
+      "message": "Does this need to be stored as a field?",
+      "revId": "fec5c43a2a0a53822d6deaca6426fefd3baf07c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_cbf32b72",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/restconf/impl/test/MediaTypesTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2015-09-25T13:05:57Z",
+      "side": 1,
+      "message": "What\u0027s the plan to get these tests working? Probably should be done in this patch.",
+      "revId": "fec5c43a2a0a53822d6deaca6426fefd3baf07c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
