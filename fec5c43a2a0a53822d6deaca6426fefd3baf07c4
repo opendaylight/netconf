@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_0e7e11af",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfProviderImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2015-09-25T17:56:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_2b541f53",
+      "revId": "fec5c43a2a0a53822d6deaca6426fefd3baf07c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_4b515b61",
         "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfProviderImpl.java",
         "patchSetId": 5
@@ -64,6 +82,24 @@
       "writtenOn": "2015-09-25T13:05:57Z",
       "side": 1,
       "message": "Do we need this setter now that port is passed in ctor? If this is removed then port can be final.",
+      "revId": "fec5c43a2a0a53822d6deaca6426fefd3baf07c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_ae4a7d81",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfProviderImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2015-09-25T17:56:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_4b515b61",
       "revId": "fec5c43a2a0a53822d6deaca6426fefd3baf07c4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -87,6 +123,24 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_ae311d0d",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfProviderImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2015-09-25T17:56:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_cbcc8b38",
+      "revId": "fec5c43a2a0a53822d6deaca6426fefd3baf07c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_0b4b63b1",
         "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfProviderImpl.java",
         "patchSetId": 5
@@ -104,6 +158,24 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_ce36d903",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfProviderImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2015-09-25T17:56:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_0b4b63b1",
+      "revId": "fec5c43a2a0a53822d6deaca6426fefd3baf07c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_cbf32b72",
         "filename": "opendaylight/restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/restconf/impl/test/MediaTypesTest.java",
         "patchSetId": 5
@@ -115,6 +187,24 @@
       "writtenOn": "2015-09-25T13:05:57Z",
       "side": 1,
       "message": "What\u0027s the plan to get these tests working? Probably should be done in this patch.",
+      "revId": "fec5c43a2a0a53822d6deaca6426fefd3baf07c4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_6e3b05ec",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/restconf/impl/test/MediaTypesTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2015-09-25T17:56:09Z",
+      "side": 1,
+      "message": "Done.  Upgraded the grizzly2 version so the containers are now sufficient for these tests.",
+      "parentUuid": "1a76adc5_cbf32b72",
       "revId": "fec5c43a2a0a53822d6deaca6426fefd3baf07c4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
