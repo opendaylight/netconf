@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_941230b3",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2015-09-26T14:23:30Z",
+      "side": 1,
+      "message": "I think this should be called externally like it was before so ControllerContext is injected into this class. This will help if/when we want to eliminate the static ControllerContext instance (which looks possible with jersey 2).",
+      "revId": "94d02c8ff2c4d48574afffd7626644a562c1077d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_b4172ca3",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfProviderImpl.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2015-09-26T14:23:30Z",
+      "side": 1,
+      "message": "The order should be private final. If you use eclipse I would encourage you to enable the save action that automatically adds the final modifier.",
+      "revId": "94d02c8ff2c4d48574afffd7626644a562c1077d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_540c9894",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfProviderImpl.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2015-09-26T14:23:30Z",
+      "side": 1,
+      "message": "Same as above",
+      "revId": "94d02c8ff2c4d48574afffd7626644a562c1077d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_d448a8ce",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfProviderImpl.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2015-09-26T14:23:30Z",
+      "side": 1,
+      "message": "It looks like both of these are only used here so don\u0027t need to be class members.",
+      "revId": "94d02c8ff2c4d48574afffd7626644a562c1077d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_741194ab",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/restconf/impl/test/RestDeleteOperationTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2015-09-26T14:23:30Z",
+      "side": 1,
+      "message": "No actual change was made to this file - can you eliminate the ws diff?",
+      "revId": "94d02c8ff2c4d48574afffd7626644a562c1077d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_14262017",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/restconf/impl/test/RestconfDocumentedExceptionMapperTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2015-09-26T14:23:30Z",
+      "side": 1,
+      "message": "No actual change was made to this file - can you eliminate the ws diff?",
+      "revId": "94d02c8ff2c4d48574afffd7626644a562c1077d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
