@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_6ee4600d",
+        "filename": "opendaylight/netconf/abstract-topology/src/main/java/org/opendaylight/netconf/topology/RoleChangeStrategy.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-09-28T13:31:44Z",
+      "side": 1,
+      "message": "Even if this is not the final version, javadoc describing the intentions of RoleChangeStrategy is essential.",
+      "range": {
+        "startLine": 13,
+        "startChar": 17,
+        "endLine": 13,
+        "endChar": 35
+      },
+      "revId": "1f35736f83d455b3c439d66e5ba35105f585e722",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_4ee72413",
+        "filename": "opendaylight/netconf/abstract-topology/src/main/java/org/opendaylight/netconf/topology/RoleChangeStrategy.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-09-28T13:31:44Z",
+      "side": 1,
+      "message": "Not sure if preElect is the best name .. I was looking for postElect (which I guess is inheritted from EntityOwnershipListener). Maybe a better name would be: requestRole.\n\nBtw. do we want to extend entityOwnershipListener ? or should we completely hide it ? So that utilizing entityOwnership APIs and Implementation is just the implementation detail of the default RoleChangeStrategy ?",
+      "range": {
+        "startLine": 18,
+        "startChar": 9,
+        "endLine": 18,
+        "endChar": 17
+      },
+      "revId": "1f35736f83d455b3c439d66e5ba35105f585e722",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_8edd3c45",
+        "filename": "opendaylight/netconf/abstract-topology/src/main/java/org/opendaylight/netconf/topology/util/NoopRoleChangeStrategy.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-09-28T13:31:44Z",
+      "side": 1,
+      "message": "This needs documentation: in what situations should this be used ?",
+      "range": {
+        "startLine": 15,
+        "startChar": 13,
+        "endLine": 15,
+        "endChar": 35
+      },
+      "revId": "1f35736f83d455b3c439d66e5ba35105f585e722",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
