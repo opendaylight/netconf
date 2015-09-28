@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_311a496f",
+        "filename": "opendaylight/netconf/mdsal-netconf-notification/src/test/java/org.opendaylight.controller.config.yang.netconf.mdsal.notification/BaseCapabilityChangeNotificationPublisherTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-09-28T15:33:08Z",
+      "side": 1,
+      "message": "Missing \u003c\u003e",
+      "revId": "a1d31ff4af00f4453757323126306a080b53a49c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_d12675ba",
+        "filename": "opendaylight/netconf/mdsal-netconf-notification/src/test/java/org.opendaylight.controller.config.yang.netconf.mdsal.notification/BaseCapabilityChangeNotificationPublisherTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-09-28T15:33:08Z",
+      "side": 1,
+      "message": "Collections.emptyMap",
+      "range": {
+        "startLine": 72,
+        "startChar": 17,
+        "endLine": 72,
+        "endChar": 34
+      },
+      "revId": "a1d31ff4af00f4453757323126306a080b53a49c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
