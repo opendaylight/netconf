@@ -130,3 +130,7 @@ GBP_REGEP_API = "/restconf/operations/endpoint:register-endpoint"
 GBP_UNREGEP_API = "/restconf/operations/endpoint:unregister-endpoint"
 GBP_TENANTS_API = "/restconf/config/policy:tenants"
 GBP_TUNNELS_API = "/restconf/config/opendaylight-inventory:nodes"
+
+# LISP Flow Mapping variables
+LFM_RPC_API = "/restconf/operations/mappingservice"
+LFM_RPC_API_LI = "/restconf/operations/lfm-mapping-database"
