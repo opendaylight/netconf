@@ -98,7 +98,7 @@ class ListEntryReader extends AbstractReader<ListSchemaNode> implements GenericL
                     ImmutableMapNodeBuilder.create()
                             .withNodeIdentifier(new NodeIdentifier(listNode.getQName()))
                             .withChild(builder.build()).build());
-//            return Collections.<DataContainerChild<?, ?>> singletonList(compositeNodeBuilder.toInstance());
+//            return Collections.<DataContainerChild<?, ?>> singletonList(compositeNodeBuilder.build());
         } else {
             return Collections.emptyList();
         }
