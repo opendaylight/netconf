@@ -511,7 +511,7 @@ public class ControllerContext implements SchemaContextListener {
         }
 
         if (strings.isEmpty()) {
-            return createContext(builder.toInstance(), ((DataSchemaNode) parentNode), mountPoint,mountPoint != null ? mountPoint.getSchemaContext() : globalSchema);
+            return createContext(builder.build(), ((DataSchemaNode) parentNode), mountPoint,mountPoint != null ? mountPoint.getSchemaContext() : globalSchema);
         }
 
         final String head = strings.iterator().next();
@@ -549,7 +549,7 @@ public class ControllerContext implements SchemaContextListener {
                 }
 
                 if (returnJustMountPoint || strings.size() == 1) {
-                    final YangInstanceIdentifier instance = YangInstanceIdentifier.builder().toInstance();
+                    final YangInstanceIdentifier instance = YangInstanceIdentifier.builder().build();
                     return new InstanceIdentifierContext<>(instance, mountPointSchema, mount,mountPointSchema);
                 }
 
