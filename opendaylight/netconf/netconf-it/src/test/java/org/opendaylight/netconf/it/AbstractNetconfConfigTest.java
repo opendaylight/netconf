@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2013 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2013 Cisco Systems, Inc. and others. All rights reserved.
  *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 which accompanies this distribution,
- * and is available at http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the terms of the Eclipse
+ * Public License v1.0 which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
  */
 package org.opendaylight.netconf.it;
 
@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import com.google.common.io.ByteStreams;
+import com.google.common.util.concurrent.CheckedFuture;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
@@ -64,6 +65,10 @@ import org.opendaylight.yangtools.sal.binding.generator.util.BindingRuntimeConte
 import org.opendaylight.yangtools.yang.binding.BindingMapping;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextProvider;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
+import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.opendaylight.yangtools.yang.parser.impl.YangParserImpl;
 
 public abstract class AbstractNetconfConfigTest extends AbstractConfigTest {
@@ -72,11 +77,9 @@ public abstract class AbstractNetconfConfigTest extends AbstractConfigTest {
     public static final int SERVER_CONNECTION_TIMEOUT_MILLIS = 5000;
     private static final int RESOURCE_TIMEOUT_MINUTES = 2;
 
-    static ModuleFactory[] FACTORIES = {new TestImplModuleFactory(),
-                                        new DepTestImplModuleFactory(),
-                                        new NetconfTestImplModuleFactory(),
-                                        new IdentityTestModuleFactory(),
-                                        new MultipleDependenciesModuleFactory() };
+    static ModuleFactory[] FACTORIES =
+            {new TestImplModuleFactory(), new DepTestImplModuleFactory(), new NetconfTestImplModuleFactory(),
+                    new IdentityTestModuleFactory(), new MultipleDependenciesModuleFactory()};
 
     protected ConfigSubsystemFacadeFactory configSubsystemFacadeFactory;
     private EventLoopGroup nettyThreadgroup;
@@ -102,22 +105,30 @@ public abstract class AbstractNetconfConfigTest extends AbstractConfigTest {
 
         setUpTestInitial();
 
-        final AggregatedNetconfOperationServiceFactory factoriesListener = new AggregatedNetconfOperationServiceFactory();
+        final AggregatedNetconfOperationServiceFactory factoriesListener =
+                new AggregatedNetconfOperationServiceFactory();
         final NetconfMonitoringService netconfMonitoringService = getNetconfMonitoringService(factoriesListener);
-        configSubsystemFacadeFactory = new ConfigSubsystemFacadeFactory(configRegistryClient, configRegistryClient, getYangStore());
-        factoriesListener.onAddNetconfOperationServiceFactory(new NetconfOperationServiceFactoryImpl(configSubsystemFacadeFactory));
-        factoriesListener.onAddNetconfOperationServiceFactory(new NetconfMonitoringActivator.NetconfMonitoringOperationServiceFactory(new NetconfMonitoringOperationService(netconfMonitoringService)));
+        configSubsystemFacadeFactory =
+                new ConfigSubsystemFacadeFactory(configRegistryClient, configRegistryClient, getYangStore());
+        factoriesListener.onAddNetconfOperationServiceFactory(
+                new NetconfOperationServiceFactoryImpl(configSubsystemFacadeFactory));
+        factoriesListener.onAddNetconfOperationServiceFactory(
+                new NetconfMonitoringActivator.NetconfMonitoringOperationServiceFactory(
+                        new NetconfMonitoringOperationService(netconfMonitoringService)));
 
-        for (final NetconfOperationServiceFactory netconfOperationServiceFactory : getAdditionalServiceFactories(factoriesListener)) {
+        for (final NetconfOperationServiceFactory netconfOperationServiceFactory : getAdditionalServiceFactories(
+                factoriesListener)) {
             factoriesListener.onAddNetconfOperationServiceFactory(netconfOperationServiceFactory);
         }
 
         serverTcpChannel = startNetconfTcpServer(factoriesListener, netconfMonitoringService);
-        clientDispatcher = new NetconfClientDispatcherImpl(getNettyThreadgroup(), getNettyThreadgroup(), getHashedWheelTimer());
+        clientDispatcher =
+                new NetconfClientDispatcherImpl(getNettyThreadgroup(), getNettyThreadgroup(), getHashedWheelTimer());
     }
 
     /**
-     * Called before setUp method is executed, so test classes can set up resources before setUpAbstractNetconfConfigTest method is called.
+     * Called before setUp method is executed, so test classes can set up resources before
+     * setUpAbstractNetconfConfigTest method is called.
      */
     protected void setUpTestInitial() throws Exception {}
 
@@ -134,11 +145,12 @@ public abstract class AbstractNetconfConfigTest extends AbstractConfigTest {
         return get;
     }
 
-    private Channel startNetconfTcpServer(final AggregatedNetconfOperationServiceFactory listener, final NetconfMonitoringService monitoring) throws Exception {
+    private Channel startNetconfTcpServer(final AggregatedNetconfOperationServiceFactory listener,
+            final NetconfMonitoringService monitoring) throws Exception {
         final NetconfServerDispatcherImpl dispatch = createDispatcher(listener, monitoring);
 
         final ChannelFuture s;
-        if(getTcpServerAddress() instanceof LocalAddress) {
+        if (getTcpServerAddress() instanceof LocalAddress) {
             s = dispatch.createLocalServer(((LocalAddress) getTcpServerAddress()));
         } else {
             s = dispatch.createServer(((InetSocketAddress) getTcpServerAddress()));
@@ -147,11 +159,13 @@ public abstract class AbstractNetconfConfigTest extends AbstractConfigTest {
         return s.channel();
     }
 
-    protected Iterable<NetconfOperationServiceFactory> getAdditionalServiceFactories(final AggregatedNetconfOperationServiceFactory factoriesListener) throws Exception {
+    protected Iterable<NetconfOperationServiceFactory> getAdditionalServiceFactories(
+            final AggregatedNetconfOperationServiceFactory factoriesListener) throws Exception {
         return Collections.emptySet();
     }
 
-    protected NetconfMonitoringService getNetconfMonitoringService(final AggregatedNetconfOperationServiceFactory factoriesListener) throws Exception {
+    protected NetconfMonitoringService getNetconfMonitoringService(
+            final AggregatedNetconfOperationServiceFactory factoriesListener) throws Exception {
         return new NetconfMonitoringServiceImpl(factoriesListener);
     }
 
@@ -168,13 +182,9 @@ public abstract class AbstractNetconfConfigTest extends AbstractConfigTest {
 
     static Collection<InputStream> getBasicYangs() throws IOException {
 
-        final List<String> paths = Arrays.asList(
-                "/META-INF/yang/config.yang",
-                "/META-INF/yang/rpc-context.yang",
-                "/META-INF/yang/config-test.yang",
-                "/META-INF/yang/config-test-impl.yang",
-                "/META-INF/yang/test-types.yang",
-                "/META-INF/yang/test-groups.yang",
+        final List<String> paths = Arrays.asList("/META-INF/yang/config.yang", "/META-INF/yang/rpc-context.yang",
+                "/META-INF/yang/config-test.yang", "/META-INF/yang/config-test-impl.yang",
+                "/META-INF/yang/test-types.yang", "/META-INF/yang/test-groups.yang",
                 "/META-INF/yang/ietf-inet-types.yang");
 
         final Collection<InputStream> yangDependencies = new ArrayList<>();
@@ -192,14 +202,16 @@ public abstract class AbstractNetconfConfigTest extends AbstractConfigTest {
     }
 
     protected NetconfServerDispatcherImpl createDispatcher(
-            final AggregatedNetconfOperationServiceFactory factoriesListener, final NetconfMonitoringService sessionMonitoringService) {
+            final AggregatedNetconfOperationServiceFactory factoriesListener,
+            final NetconfMonitoringService sessionMonitoringService) {
         final SessionIdProvider idProvider = new SessionIdProvider();
 
-        final NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new NetconfServerSessionNegotiatorFactory(
-                hashedWheelTimer, factoriesListener, idProvider, SERVER_CONNECTION_TIMEOUT_MILLIS, sessionMonitoringService);
+        final NetconfServerSessionNegotiatorFactory serverNegotiatorFactory =
+                new NetconfServerSessionNegotiatorFactory(hashedWheelTimer, factoriesListener, idProvider,
+                        SERVER_CONNECTION_TIMEOUT_MILLIS, sessionMonitoringService);
 
-        final NetconfServerDispatcherImpl.ServerChannelInitializer serverChannelInitializer = new NetconfServerDispatcherImpl.ServerChannelInitializer(
-                serverNegotiatorFactory);
+        final NetconfServerDispatcherImpl.ServerChannelInitializer serverChannelInitializer =
+                new NetconfServerDispatcherImpl.ServerChannelInitializer(serverNegotiatorFactory);
         return new NetconfServerDispatcherImpl(serverChannelInitializer, nettyThreadgroup, nettyThreadgroup);
     }
 
@@ -231,12 +243,21 @@ public abstract class AbstractNetconfConfigTest extends AbstractConfigTest {
     }
 
     public static final class HardcodedYangStoreService extends YangStoreService {
-        public HardcodedYangStoreService(final Collection<? extends InputStream> inputStreams, final BindingRuntimeContext bindingRuntimeContext) throws IOException {
+        public HardcodedYangStoreService(final Collection<? extends InputStream> inputStreams,
+                final BindingRuntimeContext bindingRuntimeContext) throws IOException {
             super(new SchemaContextProvider() {
                 @Override
                 public SchemaContext getSchemaContext() {
                     return getSchema(inputStreams);
                 }
+            }, new SchemaSourceProvider<YangTextSchemaSource>() {
+                @Override
+                public CheckedFuture<? extends YangTextSchemaSource, SchemaSourceException> getSource(
+                        SourceIdentifier sourceIdentifier) {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
+
             });
 
             refresh(bindingRuntimeContext);
@@ -265,7 +286,8 @@ public abstract class AbstractNetconfConfigTest extends AbstractConfigTest {
             }
 
             final YangParserImpl yangParser = new YangParserImpl();
-            return yangParser.resolveSchemaContext(new HashSet<>(yangParser.parseYangModelsFromStreamsMapped(byteArrayInputStreams).values()));
+            return yangParser.resolveSchemaContext(
+                    new HashSet<>(yangParser.parseYangModelsFromStreamsMapped(byteArrayInputStreams).values()));
         }
 
         @Override

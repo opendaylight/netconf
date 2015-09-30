@@ -120,6 +120,7 @@ import org.opendaylight.yangtools.sal.binding.generator.util.BindingRuntimeConte
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextProvider;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.opendaylight.yangtools.yang.parser.impl.YangParserImpl;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceListener;
@@ -733,11 +734,10 @@ public class NetconfMappingTest extends AbstractConfigTest {
         YangParserImpl yangParser = new YangParserImpl();
         final SchemaContext schemaContext = yangParser.resolveSchemaContext(new HashSet<>(yangParser.parseYangModelsFromStreamsMapped(yangDependencies).values()));
         YangStoreService yangStoreService = new YangStoreService(new SchemaContextProvider() {
-            @Override
-            public SchemaContext getSchemaContext() {
-                return schemaContext ;
+            @Override public SchemaContext getSchemaContext() {
+                return schemaContext;
             }
-        });
+        }, mock(SchemaSourceProvider.class));
         final BindingRuntimeContext bindingRuntimeContext = mock(BindingRuntimeContext.class);
         doReturn(getEnumMapping()).when(bindingRuntimeContext).getEnumMapping(any(Class.class));
         yangStoreService.refresh(bindingRuntimeContext);
