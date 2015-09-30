@@ -225,7 +225,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
-                <module>opendaylight/netconf/netconf-it</module>
+                <!-- module>opendaylight/netconf/netconf-it</module -->
             </modules>
         </profile>
         <profile>
