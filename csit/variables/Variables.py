@@ -134,3 +134,4 @@ GBP_TUNNELS_API = "/restconf/config/opendaylight-inventory:nodes"
 # LISP Flow Mapping variables
 LFM_RPC_API = "/restconf/operations/mappingservice"
 LFM_RPC_API_LI = "/restconf/operations/lfm-mapping-database"
+LFM_SB_RPC_API = "/restconf/operations/lisp-sb"
