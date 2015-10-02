@@ -72,6 +72,10 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>mdsal-netconf-notification</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>ietf-netconf</artifactId>
     </dependency>
     <dependency>
