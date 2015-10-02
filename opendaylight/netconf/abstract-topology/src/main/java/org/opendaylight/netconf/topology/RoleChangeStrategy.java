@@ -8,11 +8,14 @@
 
 package org.opendaylight.netconf.topology;
 
+import com.google.common.annotations.Beta;
+
 /**
  * A customizable strategy that gets executed when a BaseTopologyManager|BaseNodeManager is created.
  * If the election should be executed at another moment, you need to pass the NoopRoleChangeStrategy into the Manager
  * and the role candidate registration needs to happen in your implemented Node/Topology callback
  */
+@Beta
 public interface RoleChangeStrategy extends RoleChangeListener {
 
     /**

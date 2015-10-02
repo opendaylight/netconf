@@ -8,9 +8,12 @@
 
 package org.opendaylight.netconf.topology;
 
+import com.google.common.annotations.Beta;
+
 /**
  * A listener that recieves {@link #onRoleChanged(RoleChangeDTO)} callbacks when a role change occurs
  */
+@Beta
 public interface RoleChangeListener {
 
     /**

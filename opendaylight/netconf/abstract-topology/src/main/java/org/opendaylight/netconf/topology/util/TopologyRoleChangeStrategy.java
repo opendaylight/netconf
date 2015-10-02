@@ -54,7 +54,7 @@ public class TopologyRoleChangeStrategy implements RoleChangeStrategy, DataTreeC
     private EntityOwnershipCandidateRegistration candidateRegistration = null;
     private EntityOwnershipListenerRegistration ownershipListenerRegistration = null;
 
-    private ListenerRegistration<TopologyRoleChangeStrategy> changeListener;
+    private ListenerRegistration<TopologyRoleChangeStrategy> datastoreListenerRegistration;
 
     public TopologyRoleChangeStrategy(final DataBroker dataBroker,
                                       final EntityOwnershipService entityOwnershipService,
@@ -65,7 +65,7 @@ public class TopologyRoleChangeStrategy implements RoleChangeStrategy, DataTreeC
         this.entityType = entityType;
         this.entityName = entityName;
 
-        changeListener = null;
+        datastoreListenerRegistration = null;
     }
 
     @Override
@@ -96,14 +96,14 @@ public class TopologyRoleChangeStrategy implements RoleChangeStrategy, DataTreeC
         if (roleChangeDTO.isOwner()) {
             LOG.debug("Gained ownership of entity, registering datastore listener");
 
-            if (changeListener == null) {
-                changeListener = dataBroker.registerDataTreeChangeListener(
+            if (datastoreListenerRegistration == null) {
+                datastoreListenerRegistration = dataBroker.registerDataTreeChangeListener(
                         new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION, createTopologyId(entityName).child(Node.class)), this);
             }
-        } else if (changeListener != null) {
+        } else if (datastoreListenerRegistration != null) {
             LOG.debug("No longer owner of entity, unregistering datastore listener");
-            changeListener.close();
-            changeListener = null;
+            datastoreListenerRegistration.close();
+            datastoreListenerRegistration = null;
         }
         ownershipCandidate.onRoleChanged(roleChangeDTO);
     }
