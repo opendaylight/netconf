@@ -152,8 +152,13 @@
               org.opendaylight.netconf.md.sal.rest.common.*,
               org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.rest.connector.rev140724.*,
             </Private-Package>
-            <Import-Package>*,
-            com.sun.jersey.spi.container.servlet, org.eclipse.jetty.servlets</Import-Package>
+            <Import-Package>
+              com.sun.jersey.spi.container.servlet, org.eclipse.jetty.servlets,
+              <!-- Set the javax packages version to 0. Relying on "*" includes versions from jsr305 dependency whic are
+              incompatible with karaf provided packages -->
+              javax.*;version="0.0",
+              *,
+            </Import-Package>
             <Embed-Dependency>stax-utils</Embed-Dependency>
             <Web-ContextPath>/restconf</Web-ContextPath>
           </instructions>
