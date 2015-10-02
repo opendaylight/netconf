@@ -8,8 +8,14 @@
 
 package org.opendaylight.netconf.topology.util;
 
+import akka.actor.ActorContext;
+import akka.actor.TypedActor;
+import akka.actor.TypedProps;
+import akka.japi.Creator;
+import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collections;
+import java.util.List;
 import javax.annotation.Nonnull;
 import org.opendaylight.netconf.topology.NodeManager;
 import org.opendaylight.netconf.topology.NodeManagerCallback;
@@ -24,12 +30,15 @@ public final class BaseNodeManager<M> implements NodeManager, Peer<BaseNodeManag
 
     private boolean isMaster;
     private NodeManagerCallback<M> delegate;
+    private final List<String> remotePaths;
 
-    public BaseNodeManager(final String nodeId,
-                           final TopologyManager topologyParent,
-                           final NodeManagerCallbackFactory<M> delegateFactory,
-                           final RoleChangeStrategy roleChangeStrategy) {
-        this.delegate = delegateFactory.create(topologyParent, this, nodeId);
+    private BaseNodeManager(final String nodeId,
+                            final String topologyId,
+                            final NodeManagerCallbackFactory<M> delegateFactory,
+                            final RoleChangeStrategy roleChangeStrategy,
+                            final List<String> remotePaths) {
+        this.delegate = delegateFactory.create(nodeId, topologyId);
+        this.remotePaths = remotePaths;
         // if we want to override the place election happens,
         // we need to override this with noop election strategy and implement election in callback
         roleChangeStrategy.registerRoleCandidate(this);
@@ -77,5 +86,65 @@ public final class BaseNodeManager<M> implements NodeManager, Peer<BaseNodeManag
     public void onRoleChanged(RoleChangeDTO roleChangeDTO) {
         isMaster = roleChangeDTO.isOwner();
         delegate.onRoleChanged(roleChangeDTO);
+    }
+
+    /**
+     * Builder of BaseNodeManager instances that are proxied as TypedActors
+     * @param <M>
+     */
+    public static class BaseNodeManagerBuilder<M> {
+        private String nodeId;
+        private String topologyId;
+        private NodeManagerCallbackFactory<M> delegateFactory;
+        private RoleChangeStrategy roleChangeStrategy;
+        private ActorContext actorContext;
+        private List<String> remotePaths;
+
+
+        public BaseNodeManagerBuilder<M> setNodeId(final String nodeId) {
+            this.nodeId = nodeId;
+            return this;
+        }
+
+        public BaseNodeManagerBuilder<M> setTopologyId(final String topologyId) {
+            this.topologyId = topologyId;
+            return this;
+        }
+
+        public BaseNodeManagerBuilder<M> setDelegateFactory(final NodeManagerCallbackFactory<M> delegateFactory) {
+            this.delegateFactory = delegateFactory;
+            return this;
+        }
+
+        public BaseNodeManagerBuilder<M> setRoleChangeStrategy(final RoleChangeStrategy roleChangeStrategy) {
+            this.roleChangeStrategy = roleChangeStrategy;
+            return this;
+        }
+
+        public BaseNodeManagerBuilder<M> setActorContext(final ActorContext actorContext) {
+            this.actorContext = actorContext;
+            return this;
+        }
+
+        public BaseNodeManagerBuilder<M> setRemotePaths(final List<String> remotePaths) {
+            this.remotePaths = remotePaths;
+            return this;
+        }
+
+        public BaseNodeManager<M> build() {
+            Preconditions.checkNotNull(nodeId);
+            Preconditions.checkNotNull(topologyId);
+            Preconditions.checkNotNull(delegateFactory);
+            Preconditions.checkNotNull(roleChangeStrategy);
+            Preconditions.checkNotNull(actorContext);
+            Preconditions.checkNotNull(remotePaths);
+
+            return TypedActor.get(actorContext).typedActorOf(new TypedProps<>(NodeManager.class, new Creator<BaseNodeManager<M>>() {
+                @Override
+                public BaseNodeManager<M> create() throws Exception {
+                    return new BaseNodeManager<M>(nodeId, topologyId, delegateFactory, roleChangeStrategy, remotePaths);
+                }
+            }), nodeId);
+        }
     }
 }

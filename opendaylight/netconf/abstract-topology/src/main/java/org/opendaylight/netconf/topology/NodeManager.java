@@ -9,7 +9,9 @@
 package org.opendaylight.netconf.topology;
 
 import com.google.common.annotations.Beta;
+import java.util.List;
 import javax.annotation.Nonnull;
+import org.opendaylight.netconf.topology.NodeManagerCallback.NodeManagerCallbackFactory;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 
@@ -21,5 +23,12 @@ public interface NodeManager extends NodeListener {
 
     @Nonnull
     Node getFailedState(@Nonnull final NodeId nodeId, @Nonnull final Node configNode);
+
+    interface NodeManagerFactory {
+        @Nonnull
+        NodeManager create(@Nonnull final NodeManagerCallbackFactory nodeManagerCallbackFactory,
+                           @Nonnull final RoleChangeStrategy nodeManagerRoleStrategy,
+                           @Nonnull final List<String> remotePaths);
+    }
 
 }
