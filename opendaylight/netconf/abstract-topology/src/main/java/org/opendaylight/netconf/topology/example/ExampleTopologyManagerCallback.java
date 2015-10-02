@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.topology.example;
 
+import akka.actor.ActorContext;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,6 +21,8 @@ import org.opendaylight.netconf.topology.TopologyManager;
 import org.opendaylight.netconf.topology.TopologyManagerCallback;
 import org.opendaylight.netconf.topology.UserDefinedMessage;
 import org.opendaylight.netconf.topology.util.BaseNodeManager;
+import org.opendaylight.netconf.topology.util.BaseNodeManager.BaseNodeManagerBuilder;
+import org.opendaylight.netconf.topology.util.NodeRoleChangeStrategy;
 import org.opendaylight.netconf.topology.util.NodeWriter;
 import org.opendaylight.netconf.topology.util.NoopRoleChangeStrategy;
 import org.opendaylight.netconf.topology.util.SalNodeWriter;
@@ -56,21 +59,19 @@ public class ExampleTopologyManagerCallback implements TopologyManagerCallback<U
     }
 
     @Override
-    public void setPeerContext(PeerContext<UserDefinedMessage> peerContext) {
-
-    }
-
-    @Override
-    public void handle(UserDefinedMessage msg) {
-
-    }
-
-    @Override
-    public ListenableFuture<Node> nodeCreated(final NodeId nodeId, final Node node) {
+    public ListenableFuture<Node> nodeCreated(ActorContext context, NodeId nodeId, Node node) {
         // Init node admin and a writer for it
 
         // TODO let end user code notify the baseNodeManager about state changes and handle them here on topology level
-        final BaseNodeManager<UserDefinedMessage> naBaseNodeManager = new BaseNodeManager<>(node.getNodeId().getValue(), topologyParent, nodeHandlerFactory, new NoopRoleChangeStrategy());
+        final BaseNodeManager<UserDefinedMessage> naBaseNodeManager =
+                new BaseNodeManagerBuilder<UserDefinedMessage>().setNodeId(nodeId.getValue())
+                        .setActorContext(context)
+                        .setDelegateFactory(nodeHandlerFactory)
+                        .setRoleChangeStrategy(new NoopRoleChangeStrategy())
+                        .setTopologyId(topologyId)
+                        .setTopologyParent(topologyParent)
+                        .build();
+
         nodes.put(nodeId, naBaseNodeManager);
 
         // Set initial state ? in every peer or just master ? TODO
@@ -78,7 +79,6 @@ public class ExampleTopologyManagerCallback implements TopologyManagerCallback<U
 
         // trigger connect on this node
         return naBaseNodeManager.nodeCreated(nodeId, node);
-
     }
 
     @Override
