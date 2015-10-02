@@ -191,7 +191,11 @@
                 <artifactId>netconf-notifications-impl</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>mdsal-netconf-notification</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-client</artifactId>
