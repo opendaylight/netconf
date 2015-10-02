@@ -8,6 +8,11 @@
 
 package org.opendaylight.netconf.topology.util;
 
+import akka.actor.ActorContext;
+import akka.actor.TypedActor;
+import akka.actor.TypedActorExtension;
+import akka.actor.TypedProps;
+import akka.japi.Creator;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collections;
 import javax.annotation.Nonnull;
@@ -17,6 +22,7 @@ import org.opendaylight.netconf.topology.NodeManagerCallback.NodeManagerCallback
 import org.opendaylight.netconf.topology.Peer;
 import org.opendaylight.netconf.topology.RoleChangeStrategy;
 import org.opendaylight.netconf.topology.TopologyManager;
+import org.opendaylight.netconf.topology.UserDefinedMessage;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 
@@ -33,6 +39,20 @@ public final class BaseNodeManager<M> implements NodeManager, Peer<BaseNodeManag
         // if we want to override the place election happens,
         // we need to override this with noop election strategy and implement election in callback
         roleChangeStrategy.registerRoleCandidate(this);
+    }
+
+    public static BaseNodeManager create(final String nodeId,
+                                         final TopologyManager topologyParent,
+                                         final NodeManagerCallbackFactory<UserDefinedMessage> delegateFactory,
+                                         final RoleChangeStrategy roleChangeStrategy,
+                                         final ActorContext actorContext) {
+        return TypedActor.get(actorContext).typedActorOf(new TypedProps<BaseNodeManager>(NodeManager.class, new Creator<BaseNodeManager>() {
+            @Override
+            public BaseNodeManager create() throws Exception {
+                return new BaseNodeManager<>(nodeId, topologyParent, delegateFactory, roleChangeStrategy);
+            }
+        }));
+
     }
 
     @Override public boolean isMaster() {
