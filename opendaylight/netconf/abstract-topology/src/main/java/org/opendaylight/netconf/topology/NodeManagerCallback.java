@@ -20,6 +20,6 @@ public interface NodeManagerCallback<M> extends NodeManager {
     void handle(M msg);
 
     interface NodeManagerCallbackFactory<M> {
-        NodeManagerCallback<M> create(TopologyManager topologyParent, NodeManager parentNodeManager, String nodeId);
+        NodeManagerCallback<M> create(String nodeId, String topologyId);
     }
 }
