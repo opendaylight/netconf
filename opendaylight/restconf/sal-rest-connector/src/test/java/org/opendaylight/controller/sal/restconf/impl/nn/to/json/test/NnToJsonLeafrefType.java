@@ -18,8 +18,8 @@ import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
-import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.controller.sal.rest.impl.test.providers.AbstractBodyReaderTest;
+import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
@@ -71,7 +71,7 @@ public class NnToJsonLeafrefType extends AbstractBodyReaderTest {
     public void leafrefFromLeafListToLeafTest() throws Exception {
         final String json = toJson("/nn-to-json/leafref/xml/data_relativ_ref_from_leaflist_to_existing_leaf.xml");
         validateJson(
-                ".*\"cont-augment-module\\p{Blank}*:\\p{Blank}*lflst1\":\\p{Blank}*.*\"346\",*\"347\",*\"345\".*",
+                ".*\"cont-augment-module\\p{Blank}*:\\p{Blank}*lflst1\":\\p{Blank}*.*\"34[5|6|7]\",*\"34[5|6|7]\",*\"34[5|6|7]\".*",
                 json);
     }
 

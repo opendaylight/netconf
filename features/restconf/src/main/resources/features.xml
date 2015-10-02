@@ -44,6 +44,7 @@
         <bundle>mvn:io.netty/netty-handler/${netty.version}</bundle>
         <bundle>mvn:io.netty/netty-transport/${netty.version}</bundle>
         <configfile finalname="${config.configfile.directory}/${config.restconf.configfile}">mvn:org.opendaylight.netconf/sal-rest-connector-config/${project.version}/xml/config</configfile>
+        <configfile finalname="${config.configfile.directory}/${config.restconf.service.configfile}">mvn:org.opendaylight.netconf/sal-rest-connector-config/${project.version}/xml/configrestconfservice</configfile>
     </feature>
     <feature name ='odl-mdsal-apidocs' version='${project.version}' description="OpenDaylight :: MDSAL :: APIDOCS">
         <feature version='${project.version}'>odl-restconf</feature>
