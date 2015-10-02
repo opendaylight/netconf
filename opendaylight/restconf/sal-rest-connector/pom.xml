@@ -151,9 +151,13 @@
               org.opendaylight.netconf.sal.restconf.impl,
               org.opendaylight.netconf.md.sal.rest.common.*,
               org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.rest.connector.rev140724.*,
+              <!--FIXME keeping javax.annotation as private package to prevent version difference (impoty package * adds javax.annotation import with version 1.2)-->
+              javax.annotation,
             </Private-Package>
-            <Import-Package>*,
-            com.sun.jersey.spi.container.servlet, org.eclipse.jetty.servlets</Import-Package>
+            <Import-Package>
+              com.sun.jersey.spi.container.servlet, org.eclipse.jetty.servlets,
+              *,
+            </Import-Package>
             <Embed-Dependency>stax-utils</Embed-Dependency>
             <Web-ContextPath>/restconf</Web-ContextPath>
           </instructions>
