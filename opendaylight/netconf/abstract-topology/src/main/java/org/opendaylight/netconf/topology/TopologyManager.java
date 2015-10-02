@@ -9,13 +9,13 @@
 package org.opendaylight.netconf.topology;
 
 import com.google.common.annotations.Beta;
+import javax.annotation.Nonnull;
 
 @Beta
 public interface TopologyManager<M> extends Peer<TopologyManager<M>>, NodeListener{
 
-    void setPeerContext(Peer.PeerContext<M> peerContext);
-
-    void handle(M msg);
+    @Nonnull
+    String getTopologyId();
 
     /* Add useful getters to retrieve nodes and the topology
     @Nonnull

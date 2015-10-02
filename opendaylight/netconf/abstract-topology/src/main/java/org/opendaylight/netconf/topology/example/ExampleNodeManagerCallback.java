@@ -45,21 +45,19 @@ public class ExampleNodeManagerCallback implements NodeManagerCallback<UserDefin
     private boolean isMaster = false;
     private NetconfTopology topologyDispatcher;
 
-    private final TopologyManager parentTopology;
-    private final NodeManager parentNodeManager;
     private final RoleChangeStrategy roleChangeStrategy;
 
-
-    private NodeId nodeId = null;
+    private String nodeId;
+    private String topologyId;
 
     public ExampleNodeManagerCallback(final NetconfTopology topologyDispatcher,
-                                      final TopologyManager parentTopology,
-                                      final NodeManager parentNodeManager,
-                                      final RoleChangeStrategy roleChangeStrategy) {
+                                      final RoleChangeStrategy roleChangeStrategy,
+                                      final String nodeId,
+                                      final String topologyId) {
         this.topologyDispatcher = topologyDispatcher;
-        this.parentTopology = parentTopology;
-        this.parentNodeManager = parentNodeManager;
         this.roleChangeStrategy = roleChangeStrategy;
+        this.nodeId = nodeId;
+        this.topologyId = topologyId;
     }
 
 
@@ -78,7 +76,7 @@ public class ExampleNodeManagerCallback implements NodeManagerCallback<UserDefin
 
     @Nonnull @Override public ListenableFuture<Node> nodeCreated(@Nonnull final NodeId nodeId,
                                                                  @Nonnull final Node configNode) {
-        this.nodeId = nodeId;
+        this.nodeId = nodeId.getValue();
         // connect magic
         // User logic goes here, f.ex connect your device
         final ListenableFuture<NetconfDeviceCapabilities> connectionFuture = topologyDispatcher.connectNode(nodeId, configNode);

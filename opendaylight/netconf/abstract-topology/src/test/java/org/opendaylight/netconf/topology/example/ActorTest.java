@@ -8,18 +8,22 @@
 
 package org.opendaylight.netconf.topology.example;
 
+import static org.junit.Assert.assertTrue;
+
+import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.TypedActor;
 import akka.actor.TypedActorExtension;
 import akka.actor.TypedProps;
 import akka.japi.Creator;
+import org.junit.Test;
+import org.mockito.Mock;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.common.api.clustering.EntityOwnershipService;
 import org.opendaylight.netconf.topology.NetconfTopology;
 import org.opendaylight.netconf.topology.NodeManager;
 import org.opendaylight.netconf.topology.NodeManagerCallback;
 import org.opendaylight.netconf.topology.NodeManagerCallback.NodeManagerCallbackFactory;
-import org.opendaylight.netconf.topology.Peer;
 import org.opendaylight.netconf.topology.StateAggregator.SingleStateAggregator;
 import org.opendaylight.netconf.topology.TopologyManager;
 import org.opendaylight.netconf.topology.TopologyManagerCallback;
@@ -30,22 +34,27 @@ import org.opendaylight.netconf.topology.util.NodeRoleChangeStrategy;
 import org.opendaylight.netconf.topology.util.SalNodeWriter;
 import org.opendaylight.netconf.topology.util.TopologyRoleChangeStrategy;
 
-public class ExampleTopology {
+public class ActorTest {
 
     private static final String TOPOLOGY_NETCONF = "topology-netconf";
-    private final BaseTopologyManager<UserDefinedMessage> netconfNodeBaseTopologyManager;
-    private final DataBroker dataBroker;
-    private Peer.PeerContext<UserDefinedMessage> peerCtx;
 
-    public ExampleTopology(final EntityOwnershipService entityOwnershipService,
-                           final NetconfTopology topologyDispatcher) {
-        dataBroker = topologyDispatcher.getDataBroker();
+    @Mock
+    private NetconfTopology topologyDispatcher;
+
+    @Mock
+    private EntityOwnershipService entityOwnershipService;
+
+    @Mock
+    private DataBroker dataBroker;
+
+    @Test
+    public void actorTest() {
 
         final NodeManagerCallbackFactory<UserDefinedMessage> nodeManagerCallbackFactory = new NodeManagerCallbackFactory<UserDefinedMessage>() {
             @Override
-            public NodeManagerCallback<UserDefinedMessage> create(TopologyManager topologyParent, NodeManager parentNodeManager, String nodeId) {
+            public NodeManagerCallback<UserDefinedMessage> create(String nodeId, String topologyId) {
                 return new ExampleNodeManagerCallback(
-                        topologyDispatcher, topologyParent, parentNodeManager, new NodeRoleChangeStrategy(entityOwnershipService, "netconf", nodeId));
+                        topologyDispatcher,  new NodeRoleChangeStrategy(entityOwnershipService, "netconf", nodeId), String nodeId, String topologyId);
             }
         };
 
@@ -56,34 +65,9 @@ public class ExampleTopology {
             }
         };
 
-        netconfNodeBaseTopologyManager = new BaseTopologyManager<>(dataBroker, TOPOLOGY_NETCONF,
-                topologyManagerCallbackFactory,
-                new SingleStateAggregator(),
-                new SalNodeWriter(dataBroker, TOPOLOGY_NETCONF),
-                new TopologyRoleChangeStrategy(dataBroker, entityOwnershipService, "netconf", TOPOLOGY_NETCONF));
-
-    }
-
-    public void createActors(final EntityOwnershipService entityOwnershipService,
-                             final NetconfTopology topologyDispatcher) {
-        final NodeManagerCallbackFactory<UserDefinedMessage> nodeManagerCallbackFactory = new NodeManagerCallbackFactory<UserDefinedMessage>() {
-            @Override
-            public NodeManagerCallback<UserDefinedMessage> create(TopologyManager topologyParent, NodeManager parentNodeManager, String nodeId) {
-                return new ExampleNodeManagerCallback(
-                        topologyDispatcher, topologyParent, parentNodeManager, new NodeRoleChangeStrategy(entityOwnershipService, "netconf", nodeId));
-            }
-        };
-
-        final TopologyManagerCallbackFactory<UserDefinedMessage> topologyManagerCallbackFactory = new TopologyManagerCallbackFactory<UserDefinedMessage>() {
-            @Override
-            public TopologyManagerCallback<UserDefinedMessage> create(TopologyManager topologyParent) {
-                return new ExampleTopologyManagerCallback(dataBroker, TOPOLOGY_NETCONF, topologyParent, nodeManagerCallbackFactory, new SingleStateAggregator());
-            }
-        };
-
-        final ActorSystem actorSystem = ActorSystem.create("netconf-cluster");
+        final ActorSystem actorSystem = ActorSystem.create("netconf-test-cluster");
         final TypedActorExtension typedActorExtension = TypedActor.get(actorSystem);
-        final BaseTopologyManager netconf = typedActorExtension.typedActorOf(new TypedProps<>(TopologyManager.class, new Creator<BaseTopologyManager>() {
+        TopologyManager netconf = typedActorExtension.typedActorOf(new TypedProps<>(TopologyManager.class, new Creator<BaseTopologyManager>() {
             @Override
             public BaseTopologyManager create() throws Exception {
                 return new BaseTopologyManager<>(dataBroker, TOPOLOGY_NETCONF,
@@ -92,9 +76,14 @@ public class ExampleTopology {
                         new SalNodeWriter(dataBroker, TOPOLOGY_NETCONF),
                         new TopologyRoleChangeStrategy(dataBroker, entityOwnershipService, "netconf", TOPOLOGY_NETCONF));
             }
-        }));
-        TypedActor.context();
+        }), "topology1");
+        typedActorExtension.getActorRefFor(netconf);
+
+        ActorRef refFromTypedActor = typedActorExtension.getActorRefFor(netconf);
+        ActorRef refFromPath = actorSystem.actorFor("/user/topology1");
+
+        TopologyManager typedActorFromPath = typedActorExtension.typedActorOf(new TypedProps<>(TopologyManager.class, BaseTopologyManager.class), refFromPath);
+        assertTrue(refFromTypedActor == refFromPath);
 
     }
-
 }

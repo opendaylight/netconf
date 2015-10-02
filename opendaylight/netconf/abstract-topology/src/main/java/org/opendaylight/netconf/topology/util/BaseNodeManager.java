@@ -8,6 +8,10 @@
 
 package org.opendaylight.netconf.topology.util;
 
+import akka.actor.ActorContext;
+import akka.actor.TypedActor;
+import akka.actor.TypedProps;
+import akka.japi.Creator;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collections;
 import javax.annotation.Nonnull;
@@ -17,6 +21,7 @@ import org.opendaylight.netconf.topology.NodeManagerCallback.NodeManagerCallback
 import org.opendaylight.netconf.topology.Peer;
 import org.opendaylight.netconf.topology.RoleChangeStrategy;
 import org.opendaylight.netconf.topology.TopologyManager;
+import org.opendaylight.netconf.topology.UserDefinedMessage;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 
@@ -25,11 +30,12 @@ public final class BaseNodeManager<M> implements NodeManager, Peer<BaseNodeManag
     private boolean isMaster;
     private NodeManagerCallback<M> delegate;
 
-    public BaseNodeManager(final String nodeId,
-                           final TopologyManager topologyParent,
-                           final NodeManagerCallbackFactory<M> delegateFactory,
-                           final RoleChangeStrategy roleChangeStrategy) {
-        this.delegate = delegateFactory.create(topologyParent, this, nodeId);
+    private BaseNodeManager(final String nodeId,
+                            final String topologyId,
+                            final TopologyManager topologyParent,
+                            final NodeManagerCallbackFactory<M> delegateFactory,
+                            final RoleChangeStrategy roleChangeStrategy) {
+        this.delegate = delegateFactory.create(topologyParent, nodeId, topologyId);
         // if we want to override the place election happens,
         // we need to override this with noop election strategy and implement election in callback
         roleChangeStrategy.registerRoleCandidate(this);
@@ -77,5 +83,57 @@ public final class BaseNodeManager<M> implements NodeManager, Peer<BaseNodeManag
     public void onRoleChanged(RoleChangeDTO roleChangeDTO) {
         isMaster = roleChangeDTO.isOwner();
         delegate.onRoleChanged(roleChangeDTO);
+    }
+
+    /**
+     * Builder of BaseNodeManager instances that are proxied as TypedActors
+     * @param <M>
+     */
+    public static class BaseNodeManagerBuilder<M> {
+        private String nodeId;
+        private String topologyId;
+        private TopologyManager topologyParent;
+        private NodeManagerCallbackFactory<M> delegateFactory;
+        private RoleChangeStrategy roleChangeStrategy;
+        private ActorContext actorContext;
+
+        public BaseNodeManagerBuilder<M> setNodeId(String nodeId) {
+            this.nodeId = nodeId;
+            return this;
+        }
+
+        public BaseNodeManagerBuilder<M> setTopologyId(String topologyId) {
+            this.topologyId = topologyId;
+            return this;
+        }
+
+        public BaseNodeManagerBuilder<M> setTopologyParent(TopologyManager topologyParent) {
+            this.topologyParent = topologyParent;
+            return this;
+        }
+
+        public BaseNodeManagerBuilder<M> setDelegateFactory(NodeManagerCallbackFactory<M> delegateFactory) {
+            this.delegateFactory = delegateFactory;
+            return this;
+        }
+
+        public BaseNodeManagerBuilder<M> setRoleChangeStrategy(RoleChangeStrategy roleChangeStrategy) {
+            this.roleChangeStrategy = roleChangeStrategy;
+            return this;
+        }
+
+        public BaseNodeManagerBuilder<M> setActorContext(ActorContext actorContext) {
+            this.actorContext = actorContext;
+            return this;
+        }
+
+        public BaseNodeManager<M> build() {
+            return TypedActor.get(actorContext).typedActorOf(new TypedProps<>(NodeManager.class, new Creator<BaseNodeManager<M>>() {
+                @Override
+                public BaseNodeManager<M> create() throws Exception {
+                    return new BaseNodeManager<M>(nodeId, topologyId, topologyParent, delegateFactory, roleChangeStrategy);
+                }
+            }), nodeId);
+        }
     }
 }

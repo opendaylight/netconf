@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.topology.util;
 
+import akka.actor.TypedActor;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.netconf.topology.NodeManager;
 import org.opendaylight.netconf.topology.RoleChangeStrategy;
@@ -29,20 +31,16 @@ public final class BaseTopologyManager<M>
     implements TopologyManager<M> {
 
     private final DataBroker dataBroker;
+
     private final RoleChangeStrategy roleChangeStrategy;
-    private boolean isMaster;
-
-    private final TopologyManagerCallback<M> delegateTopologyHandler;
-
-    private final Map<NodeId, NodeManager> nodes = new HashMap<>();
     private final StateAggregator aggregator;
     private final NodeWriter naSalNodeWriter;
 
-//    public BaseTopologyManager(final DataBroker dataBroker, final String topologyId,
-//                               final TopologyManagerCallback<M> delegateTopologyHandler, final StateAggregator aggregator) {
-//
-//        this(dataBroker, topologyId, delegateTopologyHandler, aggregator, new SalNodeWriter(dataBroker, topologyId));
-//    }
+    private final String topologyId;
+    private final TopologyManagerCallback<M> delegateTopologyHandler;
+    private final Map<NodeId, NodeManager> nodes = new HashMap<>();
+
+    private boolean isMaster;
 
     public BaseTopologyManager(final DataBroker dataBroker,
                                final String topologyId,
@@ -52,6 +50,7 @@ public final class BaseTopologyManager<M>
                                final RoleChangeStrategy roleChangeStrategy) {
 
         this.dataBroker = dataBroker;
+        this.topologyId = topologyId;
         this.delegateTopologyHandler = topologyManagerCallbackFactory.create(this);
         this.aggregator = aggregator;
         this.naSalNodeWriter = naSalNodeWriter;
@@ -69,13 +68,14 @@ public final class BaseTopologyManager<M>
         return Collections.emptySet();
     }
 
+
     @Override
     public ListenableFuture<Node> nodeCreated(final NodeId nodeId, final Node node) {
         // TODO how to monitor the connection for failures and how to react ? what about reconnecting connections like in netconf
         ArrayList<ListenableFuture<Node>> futures = new ArrayList<>();
 
         if (isMaster) {
-            futures.add(delegateTopologyHandler.nodeCreated(nodeId, node));
+            futures.add(delegateTopologyHandler.nodeCreated(TypedActor.context(), nodeId, node));
             // only master should call connect on peers and aggregate futures
             for (TopologyManager topologyManager : getPeers()) {
                 futures.add(topologyManager.nodeCreated(nodeId, node));
@@ -104,7 +104,7 @@ public final class BaseTopologyManager<M>
         }
 
         // trigger create on this slave
-        return delegateTopologyHandler.nodeCreated(nodeId, node);
+        return delegateTopologyHandler.nodeCreated(TypedActor.context(), nodeId, node);
     }
 
     @Override
@@ -182,13 +182,9 @@ public final class BaseTopologyManager<M>
         delegateTopologyHandler.onRoleChanged(roleChangeDTO);
     }
 
+    @Nonnull
     @Override
-    public void setPeerContext(PeerContext<M> peerContext) {
-
-    }
-
-    @Override
-    public void handle(M msg) {
-        delegateTopologyHandler.handle(msg);
+    public String getTopologyId() {
+        return topologyId;
     }
 }
