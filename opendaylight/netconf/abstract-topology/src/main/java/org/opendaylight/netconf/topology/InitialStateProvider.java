@@ -8,20 +8,14 @@
 
 package org.opendaylight.netconf.topology;
 
-import com.google.common.annotations.Beta;
-import com.google.common.util.concurrent.ListenableFuture;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 
-@Beta
-public interface NodeListener extends RoleChangeListener {
+public interface InitialStateProvider {
+    @Nonnull
+    Node getInitialState(@Nonnull final NodeId nodeId, @Nonnull final Node configNode);
 
-    @Nonnull ListenableFuture<Node> nodeCreated(@Nonnull NodeId nodeId, @Nonnull Node configNode);
-
-    @Nonnull ListenableFuture<Node> nodeUpdated(@Nonnull NodeId nodeId, @Nonnull Node configNode);
-
-    @Nonnull ListenableFuture<Void> nodeDeleted(@Nonnull NodeId nodeId);
-
-    @Nonnull ListenableFuture<Node> getCurrentStatusForNode(@Nonnull NodeId nodeId);
+    @Nonnull
+    Node getFailedState(@Nonnull final NodeId nodeId, @Nonnull final Node configNode);
 }

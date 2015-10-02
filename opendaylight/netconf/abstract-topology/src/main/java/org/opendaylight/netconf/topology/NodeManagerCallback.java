@@ -8,18 +8,18 @@
 
 package org.opendaylight.netconf.topology;
 
+import akka.actor.ActorSystem;
+import akka.actor.TypedActor.Receiver;
 import com.google.common.annotations.Beta;
 
 @Beta
-public interface NodeManagerCallback<M> extends NodeManager {
+public interface NodeManagerCallback<M> extends InitialStateProvider, NodeListener, Receiver {
 
     // TODO how to handle peer communication on NodeAdmin callback level ?
 
     void setPeerContext(Peer.PeerContext<M> peerContext);
 
-    void handle(M msg);
-
     interface NodeManagerCallbackFactory<M> {
-        NodeManagerCallback<M> create(TopologyManager topologyParent, NodeManager parentNodeManager, String nodeId);
+        NodeManagerCallback<M> create(String nodeId, String topologyId, ActorSystem actorSystem);
     }
 }

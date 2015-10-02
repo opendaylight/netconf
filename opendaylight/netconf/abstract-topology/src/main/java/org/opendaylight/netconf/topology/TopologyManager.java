@@ -8,14 +8,21 @@
 
 package org.opendaylight.netconf.topology;
 
+import akka.actor.TypedActor.Receiver;
 import com.google.common.annotations.Beta;
+import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 
 @Beta
-public interface TopologyManager<M> extends Peer<TopologyManager<M>>, NodeListener{
+public interface TopologyManager<M> extends Peer<TopologyManager<M>>, NodeListener, Receiver, RemoteNodeListener{
 
-    void setPeerContext(Peer.PeerContext<M> peerContext);
+    void notifyNodeStatusChange(NodeId nodeId);
 
-    void handle(M msg);
+    // DEBUG helper methods
+    @Nonnull
+    String getTopologyId();
+
+    int getId();
 
     /* Add useful getters to retrieve nodes and the topology
     @Nonnull

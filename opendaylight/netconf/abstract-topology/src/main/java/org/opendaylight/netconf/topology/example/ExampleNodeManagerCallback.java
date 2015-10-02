@@ -8,6 +8,8 @@
 
 package org.opendaylight.netconf.topology.example;
 
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -19,12 +21,10 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.topology.RoleChangeStrategy;
 import org.opendaylight.netconf.topology.NetconfTopology;
-import org.opendaylight.netconf.topology.NodeManager;
 import org.opendaylight.netconf.topology.NodeManagerCallback;
 import org.opendaylight.netconf.topology.Peer;
-import org.opendaylight.netconf.topology.TopologyManager;
+import org.opendaylight.netconf.topology.RoleChangeStrategy;
 import org.opendaylight.netconf.topology.UserDefinedMessage;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
@@ -44,21 +44,22 @@ public class ExampleNodeManagerCallback implements NodeManagerCallback<UserDefin
 
     private boolean isMaster = false;
     private NetconfTopology topologyDispatcher;
+    private final ActorSystem actorSystem;
 
-    private final TopologyManager parentTopology;
-    private final NodeManager parentNodeManager;
     private final RoleChangeStrategy roleChangeStrategy;
 
+    private String nodeId;
+    private String topologyId;
 
-    private NodeId nodeId = null;
-
-    public ExampleNodeManagerCallback(final NetconfTopology topologyDispatcher,
-                                      final TopologyManager parentTopology,
-                                      final NodeManager parentNodeManager,
+    public ExampleNodeManagerCallback(final String nodeId,
+                                      final String topologyId,
+                                      final ActorSystem actorSystem,
+                                      final NetconfTopology topologyDispatcher,
                                       final RoleChangeStrategy roleChangeStrategy) {
+        this.nodeId = nodeId;
+        this.topologyId = topologyId;
+        this.actorSystem = actorSystem;
         this.topologyDispatcher = topologyDispatcher;
-        this.parentTopology = parentTopology;
-        this.parentNodeManager = parentNodeManager;
         this.roleChangeStrategy = roleChangeStrategy;
     }
 
@@ -78,7 +79,7 @@ public class ExampleNodeManagerCallback implements NodeManagerCallback<UserDefin
 
     @Nonnull @Override public ListenableFuture<Node> nodeCreated(@Nonnull final NodeId nodeId,
                                                                  @Nonnull final Node configNode) {
-        this.nodeId = nodeId;
+        this.nodeId = nodeId.getValue();
         // connect magic
         // User logic goes here, f.ex connect your device
         final ListenableFuture<NetconfDeviceCapabilities> connectionFuture = topologyDispatcher.connectNode(nodeId, configNode);
@@ -86,7 +87,7 @@ public class ExampleNodeManagerCallback implements NodeManagerCallback<UserDefin
         Futures.addCallback(connectionFuture, new FutureCallback<NetconfDeviceCapabilities>() {
             @Override
             public void onSuccess(@Nullable NetconfDeviceCapabilities result) {
-                roleChangeStrategy.registerRoleCandidate(parentNodeManager);
+//                roleChangeStrategy.registerRoleCandidate(parentNodeManager);
                 topologyDispatcher.registerConnectionStatusListener(nodeId, ExampleNodeManagerCallback.this);
             }
 
@@ -129,7 +130,7 @@ public class ExampleNodeManagerCallback implements NodeManagerCallback<UserDefin
         Futures.addCallback(connectionFuture, new FutureCallback<NetconfDeviceCapabilities>() {
             @Override
             public void onSuccess(@Nullable NetconfDeviceCapabilities result) {
-                roleChangeStrategy.registerRoleCandidate(parentNodeManager);
+//                roleChangeStrategy.registerRoleCandidate(parentNodeManager);
                 topologyDispatcher.registerConnectionStatusListener(nodeId, ExampleNodeManagerCallback.this);
             }
 
@@ -156,13 +157,15 @@ public class ExampleNodeManagerCallback implements NodeManagerCallback<UserDefin
         return topologyDispatcher.disconnectNode(nodeId);
     }
 
+    @Nonnull
+    @Override
+    public ListenableFuture<Node> getCurrentStatusForNode(@Nonnull NodeId nodeId) {
+        return null;
+    }
+
     @Override public void setPeerContext(final Peer.PeerContext<UserDefinedMessage> peerContext) {
         peerCtx = peerContext;
         peerContext.notifyPeers(new UserDefinedMessage() {});
-    }
-
-    @Override public void handle(final UserDefinedMessage msg) {
-        // notifications from peers
     }
 
     @Override
@@ -173,16 +176,16 @@ public class ExampleNodeManagerCallback implements NodeManagerCallback<UserDefin
         isMaster = roleChangeDTO.isOwner();
         if (isMaster) {
             // unregister old mountPoint if ownership changed, register a new one
-            topologyDispatcher.registerMountPoint(nodeId);
+//            topologyDispatcher.registerMountPoint(nodeId);
         } else {
-            topologyDispatcher.unregisterMountPoint(nodeId);
+//            topologyDispatcher.unregisterMountPoint(nodeId);
         }
     }
 
     @Override
     public void onDeviceConnected(final SchemaContext remoteSchemaContext, final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc) {
         // we need to notify the higher level that something happened, get a current status from all other nodes, and aggregate a new result
-        roleChangeStrategy.registerRoleCandidate(parentNodeManager);
+//        roleChangeStrategy.registerRoleCandidate(parentNodeManager);
     }
 
     @Override
@@ -207,5 +210,10 @@ public class ExampleNodeManagerCallback implements NodeManagerCallback<UserDefin
     @Override
     public void close() {
         //NOOP
+    }
+
+    @Override
+    public void onReceive(Object o, ActorRef actorRef) {
+
     }
 }

@@ -8,12 +8,16 @@
 
 package org.opendaylight.netconf.topology;
 
+import akka.actor.ActorSystem;
+import akka.actor.TypedActor.Receiver;
 import com.google.common.annotations.Beta;
+import java.util.List;
+import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 
 @Beta
-public interface TopologyManagerCallback<M> extends TopologyManager<M> {
+public interface TopologyManagerCallback<M> extends Peer<TopologyManager<M>>, NodeListener, Receiver, RoleChangeListener {
 
     interface TopologyManagerCallbackFactory<M> {
-        TopologyManagerCallback<M> create(TopologyManager<M> topologyParent);
+        TopologyManagerCallback<M> create(ActorSystem actorSystem, DataBroker dataBroker, String topologyId, List<String> remotePaths);
     }
 }
