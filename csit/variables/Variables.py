@@ -34,6 +34,8 @@ CONTROLLER_STOP_TIMEOUT = 120  # Max number of seconds test will wait for a cont
 
 # KARAF Variaable
 KARAF_SHELL_PORT = '8101'
+ESCAPE_CHARACTER = chr(int(27))
+KARAF_DETAILED_PROMPT = '@' + ESCAPE_CHARACTER + '[0m' + ESCAPE_CHARACTER + '[34mroot' + ESCAPE_CHARACTER + '[0m>'
 KARAF_PROMPT = 'opendaylight-user'
 KARAF_USER = 'karaf'
 KARAF_PASSWORD = 'karaf'
