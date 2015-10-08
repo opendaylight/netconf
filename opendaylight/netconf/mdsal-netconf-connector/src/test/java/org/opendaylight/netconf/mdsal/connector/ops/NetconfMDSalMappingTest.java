@@ -147,19 +147,6 @@ public class NetconfMDSalMappingTest {
     }
 
     @Test
-    public void testDiscard() throws Exception {
-
-        try {
-            discardChanges();
-            fail("Should have failed, need to execute an edit before discard");
-        } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.operation_failed);
-            assertTrue(e.getErrorType() == ErrorType.application);
-        }
-    }
-
-    @Test
     public void testIncorrectGet() throws Exception {
 
         try {
