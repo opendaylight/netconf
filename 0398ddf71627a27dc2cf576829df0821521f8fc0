@@ -1,0 +1,9 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+1: Ryan Goulding <ryandgoulding@gmail.com>
+Code-Review+1: James Gregory Hall <ghall@brocade.com>
+Code-Review+2: Maros Marsalek <mmarsale@cisco.com>
+Submitted-by: Maros Marsalek <mmarsale@cisco.com>
+Submitted-at: Fri, 09 Oct 2015 15:06:29 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/28200
+Project: netconf
+Branch: refs/heads/master
