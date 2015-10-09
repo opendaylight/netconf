@@ -8,15 +8,12 @@
 
 package org.opendaylight.netconf.test.tool;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.io.CharStreams;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -29,31 +26,23 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.BindException;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.AbstractMap;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.sshd.common.util.ThreadUtils;
 import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
 import org.opendaylight.controller.config.util.capability.BasicCapability;
 import org.opendaylight.controller.config.util.capability.Capability;
+import org.opendaylight.controller.config.util.capability.YangModuleCapability;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.auth.AuthProvider;
@@ -67,6 +56,8 @@ import org.opendaylight.netconf.monitoring.osgi.NetconfMonitoringOperationServic
 import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfiguration;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
+import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
+import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
@@ -78,11 +69,7 @@ import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceListener;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
-import org.opendaylight.yangtools.yang.parser.builder.impl.BuilderUtils;
-import org.opendaylight.yangtools.yang.parser.builder.impl.ModuleBuilder;
-import org.opendaylight.yangtools.yang.parser.impl.YangParserListenerImpl;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
-import org.opendaylight.yangtools.yang.parser.util.ASTSchemaSource;
 import org.opendaylight.yangtools.yang.parser.util.TextToASTTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,16 +102,16 @@ public class NetconfDeviceSimulator implements Closeable {
         this.nioExecutor = nioExecutor;
     }
 
-    private NetconfServerDispatcherImpl createDispatcher(final Map<ModuleBuilder, String> moduleBuilders, final boolean exi, final int generateConfigsTimeout, final Optional<File> notificationsFile, final boolean mdSal, final Optional<File> initialConfigXMLFile) {
+    private NetconfServerDispatcherImpl createDispatcher(final Set<Capability> capabilities, final boolean exi, final int generateConfigsTimeout, final Optional<File> notificationsFile, final boolean mdSal, final Optional<File> initialConfigXMLFile) {
 
-        final Set<Capability> capabilities = Sets.newHashSet(Collections2.transform(moduleBuilders.keySet(), new Function<ModuleBuilder, Capability>() {
+        final Set<Capability> transformedCapabilities = Sets.newHashSet(Collections2.transform(capabilities, new Function<Capability, Capability>() {
             @Override
-            public Capability apply(final ModuleBuilder input) {
+            public Capability apply(final Capability input) {
                 if (sendFakeSchema) {
                     sendFakeSchema = false;
-                    return new FakeModuleBuilderCapability(input, moduleBuilders.get(input));
+                    return new FakeCapability((YangModuleCapability) input);
                 } else {
-                    return new ModuleBuilderCapability(input, moduleBuilders.get(input));
+                    return input;
                 }
             }
         }));
@@ -132,12 +119,12 @@ public class NetconfDeviceSimulator implements Closeable {
         final SessionIdProvider idProvider = new SessionIdProvider();
 
         final AggregatedNetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory = new AggregatedNetconfOperationServiceFactory();
-        final NetconfOperationServiceFactory operationProvider = mdSal ? new MdsalOperationProvider(idProvider, capabilities, schemaContext) :
-            new SimulatedOperationProvider(idProvider, capabilities, notificationsFile, initialConfigXMLFile);
+        final NetconfOperationServiceFactory operationProvider = mdSal ? new MdsalOperationProvider(idProvider, transformedCapabilities, schemaContext) :
+            new SimulatedOperationProvider(idProvider, transformedCapabilities, notificationsFile, initialConfigXMLFile);
 
-        capabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0"));
+        transformedCapabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0"));
 
-        final NetconfMonitoringService monitoringService1 = new DummyMonitoringService(capabilities);
+        final NetconfMonitoringService monitoringService1 = new DummyMonitoringService(transformedCapabilities);
 
         final NetconfMonitoringActivator.NetconfMonitoringOperationServiceFactory monitoringService =
                 new NetconfMonitoringActivator.NetconfMonitoringOperationServiceFactory(
@@ -157,39 +144,13 @@ public class NetconfDeviceSimulator implements Closeable {
         return new NetconfServerDispatcherImpl(serverChannelInitializer, nettyThreadgroup, nettyThreadgroup);
     }
 
-    private Map<ModuleBuilder, String> toModuleBuilders(final Map<SourceIdentifier, Map.Entry<ASTSchemaSource, YangTextSchemaSource>> sources) {
-        final Map<SourceIdentifier, ParserRuleContext> asts = Maps.transformValues(sources, new Function<Map.Entry<ASTSchemaSource, YangTextSchemaSource>, ParserRuleContext>() {
-            @Override
-            public ParserRuleContext apply(final Map.Entry<ASTSchemaSource, YangTextSchemaSource> input) {
-                return input.getKey().getAST();
-            }
-        });
-        final Map<String, NavigableMap<Date, URI>> namespaceContext = BuilderUtils.createYangNamespaceContext(
-                asts.values(), Optional.<SchemaContext>absent());
-
-        final ParseTreeWalker walker = new ParseTreeWalker();
-        final Map<ModuleBuilder, String> sourceToBuilder = new HashMap<>();
-
-        for (final Map.Entry<SourceIdentifier, ParserRuleContext> entry : asts.entrySet()) {
-            final ModuleBuilder moduleBuilder = YangParserListenerImpl.create(namespaceContext, entry.getKey().getName(),
-                    walker, entry.getValue()).getModuleBuilder();
-
-            try(InputStreamReader stream = new InputStreamReader(sources.get(entry.getKey()).getValue().openStream(), Charsets.UTF_8)) {
-                sourceToBuilder.put(moduleBuilder, CharStreams.toString(stream));
-            } catch (final IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        return sourceToBuilder;
-    }
-
     public List<Integer> start(final Main.Params params) {
         LOG.info("Starting {}, {} simulated devices starting on port {}", params.deviceCount, params.ssh ? "SSH" : "TCP", params.startingPort);
 
-        final Map<ModuleBuilder, String> moduleBuilders = parseSchemasToModuleBuilders(params);
+        final Set<Capability> capabilities = parseSchemasToModuleCapabilities(params);
 
-        final NetconfServerDispatcherImpl dispatcher = createDispatcher(moduleBuilders, params.exi, params.generateConfigsTimeout, Optional.fromNullable(params.notificationFile), params.mdSal, Optional.fromNullable(params.initialConfigXMLFile));
+        final NetconfServerDispatcherImpl dispatcher = createDispatcher(capabilities, params.exi, params.generateConfigsTimeout,
+                Optional.fromNullable(params.notificationFile), params.mdSal, Optional.fromNullable(params.initialConfigXMLFile));
 
         int currentPort = params.startingPort;
 
@@ -297,11 +258,11 @@ public class NetconfDeviceSimulator implements Closeable {
         }
     }
 
-    private Map<ModuleBuilder, String> parseSchemasToModuleBuilders(final Main.Params params) {
+    private Set<Capability> parseSchemasToModuleCapabilities(final Main.Params params) {
         final SharedSchemaRepository consumer = new SharedSchemaRepository("netconf-simulator");
-        consumer.registerSchemaSourceListener(TextToASTTransformer.create(consumer, consumer));
-
         final Set<SourceIdentifier> loadedSources = Sets.newHashSet();
+
+        consumer.registerSchemaSourceListener(TextToASTTransformer.create(consumer, consumer));
 
         consumer.registerSchemaSourceListener(new SchemaSourceListener() {
             @Override
@@ -325,29 +286,31 @@ public class NetconfDeviceSimulator implements Closeable {
 
         addDefaultSchemas(consumer);
 
-        final Map<SourceIdentifier, Map.Entry<ASTSchemaSource, YangTextSchemaSource>> asts = Maps.newHashMap();
-
         try {
-            //necessary for creating mdsal datastores and operations
-            schemaContext = consumer.createSchemaContextFactory(
+            //necessary for creating mdsal data stores and operations
+            this.schemaContext = consumer.createSchemaContextFactory(
                 SchemaSourceFilter.ALWAYS_ACCEPT)
                 .createSchemaContext(loadedSources).checkedGet();
         } catch (final SchemaResolutionException e) {
             throw new RuntimeException("Cannot parse schema context", e);
         }
 
-        for (final SourceIdentifier loadedSource : loadedSources) {
+        final Set<Capability> capabilities = Sets.newHashSet();
+
+        for (final Module module : schemaContext.getModules()) {
+            final SourceIdentifier moduleSourceIdentifier = new SourceIdentifier(module.getName(),
+                    SimpleDateFormatUtil.getRevisionFormat().format(module.getRevision()));
             try {
-                final CheckedFuture<ASTSchemaSource, SchemaSourceException> ast = consumer.getSchemaSource(loadedSource, ASTSchemaSource.class);
-                final CheckedFuture<YangTextSchemaSource, SchemaSourceException> text = consumer.getSchemaSource(loadedSource, YangTextSchemaSource.class);
-                asts.put(loadedSource, new AbstractMap.SimpleEntry<>(ast.get(), text.get()));
-            } catch (final InterruptedException e) {
-                throw new RuntimeException(e);
-            } catch (final ExecutionException e) {
-                throw new RuntimeException("Cannot parse schema context", e);
+                String moduleContent = new String(consumer.getSchemaSource(moduleSourceIdentifier, YangTextSchemaSource.class)
+                        .checkedGet().read());
+                capabilities.add(new YangModuleCapability(module, moduleContent));
+                //IOException would be thrown in creating SchemaContext already
+            } catch (SchemaSourceException|IOException e) {
+                throw new RuntimeException("Cannot retrieve schema source for module " + moduleSourceIdentifier.toString() + " from schema repository", e);
             }
         }
-        return toModuleBuilders(asts);
+
+        return capabilities;
     }
 
     private void addDefaultSchemas(final SharedSchemaRepository consumer) {

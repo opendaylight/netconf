@@ -228,9 +228,8 @@
                                         <exclude>org.opendaylight.netconf.test.tool.rpc</exclude>
                                         <exclude>AcceptingAuthProvider</exclude>
                                         <exclude>org.opendaylight.netconf.test.tool.DummyMonitoringService</exclude>
-                                        <exclude>org.opendaylight.netconf.test.tool.FakeModuleBuilderCapability</exclude>
+                                        <exclude>org.opendaylight.netconf.test.tool.FakeCapability</exclude>
                                         <exclude>org.opendaylight.netconf.test.tool.Main</exclude>
-                                        <exclude>ModuleBuilderCapability</exclude>
                                         <exclude>org.opendaylight.netconf.test.tool.NetconfDeviceSimulator</exclude>
                                     </excludes>
                                 </filter>
@@ -272,9 +271,8 @@
                                         <exclude>org.opendaylight.netconf.test.tool.rpc</exclude>
                                         <exclude>AcceptingAuthProvider</exclude>
                                         <exclude>org.opendaylight.netconf.test.tool.DummyMonitoringService</exclude>
-                                        <exclude>org.opendaylight.netconf.test.tool.FakeModuleBuilderCapability</exclude>
+                                        <exclude>org.opendaylight.netconf.test.tool.FakeCapability</exclude>
                                         <exclude>org.opendaylight.netconf.test.tool.Main</exclude>
-                                        <exclude>ModuleBuilderCapability</exclude>
                                         <exclude>org.opendaylight.netconf.test.tool.NetconfDeviceSimulator</exclude>
                                     </excludes>
                                 </filter>
