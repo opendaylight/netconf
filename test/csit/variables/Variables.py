@@ -108,6 +108,7 @@ CONTROLLER_CONFIG_MOUNT = ('/restconf/config/network-topology:'
                            'controller-config/yang-ext:mount')
 CONFIG_API = '/restconf/config'
 OPERATIONAL_API = '/restconf/operational'
+MODULES_API = '/restconf/modules'
 
 # TOKEN
 AUTH_TOKEN_API = '/oauth2/token'
