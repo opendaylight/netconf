@@ -12,6 +12,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.FutureListener;
 import io.netty.util.concurrent.GenericFutureListener;
@@ -55,7 +56,9 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     // TODO implement concurrent message limit
     private final Queue<Request> requests = new ArrayDeque<>();
     private NetconfClientSession session;
+
     private Future<?> initFuture;
+    private SettableFuture<NetconfDeviceCapabilities> firstConnectionFuture;
 
     public NetconfDeviceCommunicator(final RemoteDeviceId id, final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice,
             final NetconfSessionPreferences NetconfSessionPreferences) {
@@ -72,6 +75,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         this.id = id;
         this.remoteDevice = remoteDevice;
         this.overrideNetconfCapabilities = overrideNetconfCapabilities;
+        this.firstConnectionFuture = SettableFuture.create();
     }
 
     @Override
@@ -93,14 +97,25 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                         id, netconfSessionPreferences);
             }
 
+
             remoteDevice.onRemoteSessionUp(netconfSessionPreferences, this);
+            if (!firstConnectionFuture.isDone()) {
+                firstConnectionFuture.set(netconfSessionPreferences.getNetconfDeviceCapabilities());
+            }
         }
         finally {
             sessionLock.unlock();
         }
     }
 
-    public void initializeRemoteConnection(final NetconfClientDispatcher dispatcher, final NetconfClientConfiguration config) {
+    /**
+     *
+     * @param dispatcher
+     * @param config
+     * @return future that returns succes on first succesfull connection and failure when the underlying
+     * reconnecting strategy runs out of reconnection attempts
+     */
+    public ListenableFuture<NetconfDeviceCapabilities> initializeRemoteConnection(final NetconfClientDispatcher dispatcher, final NetconfClientConfiguration config) {
         // TODO 2313 extract listener from configuration
         if(config instanceof NetconfReconnectingClientConfiguration) {
             initFuture = dispatcher.createReconnectingClient((NetconfReconnectingClientConfiguration) config);
@@ -116,10 +131,13 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                 if (!future.isSuccess() && !future.isCancelled()) {
                     LOG.debug("{}: Connection failed", id, future.cause());
                     NetconfDeviceCommunicator.this.remoteDevice.onRemoteSessionFailed(future.cause());
+                    if (firstConnectionFuture.isDone()) {
+                        firstConnectionFuture.setException(future.cause());
+                    }
                 }
             }
         });
-
+        return firstConnectionFuture;
     }
 
     public void disconnect() {
