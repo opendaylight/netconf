@@ -27,7 +27,7 @@ public class NetconfTopologyModule extends org.opendaylight.controller.config.ya
 
     @Override
     public AutoCloseable createInstance() {
-        return new NetconfTopologyImpl(getTopologyId(), getListenForConfigChanges(), getClientDispatcherDependency(), getBindingRegistryDependency(),
+        return new NetconfTopologyImpl(getTopologyId(), getClientDispatcherDependency(), getBindingRegistryDependency(),
                 getDomRegistryDependency(), getEventExecutorDependency(), getKeepaliveExecutorDependency(),
                 getProcessingExecutorDependency(), getSharedSchemaRepositoryDependency());
     }

@@ -9,8 +9,8 @@
 package org.opendaylight.netconf.topology;
 
 import com.google.common.annotations.Beta;
+import org.opendaylight.netconf.topology.util.messages.NormalizedNodeMessage;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import scala.concurrent.Future;
 
 /**
@@ -26,7 +26,7 @@ public interface RemoteNodeListener {
      * @param node
      * @return
      */
-    Future<Node> remoteNodeCreated(NodeId nodeId, Node node);
+    Future<NormalizedNodeMessage> remoteNodeCreated(NormalizedNodeMessage message);
 
     /**
      * This is called when a remote node is informing you that a configuration was updated.
@@ -34,7 +34,7 @@ public interface RemoteNodeListener {
      * @param node
      * @return
      */
-    Future<Node> remoteNodeUpdated(NodeId nodeId, Node node);
+    Future<NormalizedNodeMessage> remoteNodeUpdated(NormalizedNodeMessage message);
 
     /**
      * This is called when a remote node is informing you that a new configuration was deleted.
@@ -49,5 +49,5 @@ public interface RemoteNodeListener {
      * @param nodeId
      * @return
      */
-    Future<Node> remoteGetCurrentStatusForNode(NodeId nodeId);
+    Future<NormalizedNodeMessage> remoteGetCurrentStatusForNode(NodeId nodeId);
 }
