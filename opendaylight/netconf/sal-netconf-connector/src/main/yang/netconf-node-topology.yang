@@ -128,7 +128,8 @@ module netconf-node-topology {
                 }
                 leaf status {
                     type enumeration {
-                        enum successful;
+                        enum connected;
+                        enum unavailable;
                         enum failed;
                     }
                 }

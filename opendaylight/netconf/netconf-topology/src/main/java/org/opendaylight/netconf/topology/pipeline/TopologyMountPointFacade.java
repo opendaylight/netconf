@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.topology;
+package org.opendaylight.netconf.topology.pipeline;
 
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
@@ -19,7 +19,6 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceDataBroker;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
@@ -37,7 +36,7 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
     private SchemaContext remoteSchemaContext = null;
     private NetconfSessionPreferences netconfSessionPreferences = null;
     private DOMRpcService deviceRpc = null;
-    private final NetconfDeviceSalProvider salProvider;
+    private final ClusteredNetconfDeviceMountInstanceProxy salProvider;
 
     private final ArrayList<RemoteDeviceHandler<NetconfSessionPreferences>> connectionStatusListeners = new ArrayList<>();
 
@@ -50,13 +49,12 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
         this.domBroker = domBroker;
         this.bindingBroker = bindingBroker;
         this.defaultRequestTimeoutMillis = defaultRequestTimeoutMillis;
-        this.salProvider = new NetconfDeviceSalProvider(id);
-        registerToSal(domBroker, bindingBroker);
+        this.salProvider = new ClusteredNetconfDeviceMountInstanceProxy(id);
+        registerToSal(domBroker);
     }
 
-    public void registerToSal(final Broker domRegistryDependency, final BindingAwareBroker bindingBroker) {
+    public void registerToSal(final Broker domRegistryDependency) {
         domRegistryDependency.registerProvider(salProvider);
-        bindingBroker.registerProvider(salProvider);
     }
 
     @Override
@@ -74,7 +72,7 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
 
     @Override
     public void onDeviceDisconnected() {
-        salProvider.getMountInstance().onTopologyDeviceDisconnected();
+        // do not unregister mount point here, this gets handle by the underlying call from role change callback
         for (RemoteDeviceHandler<NetconfSessionPreferences> listener : connectionStatusListeners) {
             listener.onDeviceDisconnected();
         }
@@ -82,7 +80,7 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
 
     @Override
     public void onDeviceFailed(Throwable throwable) {
-        salProvider.getMountInstance().onTopologyDeviceDisconnected();
+        // do not unregister mount point here, this gets handle by the underlying call from role change callback
         for (RemoteDeviceHandler<NetconfSessionPreferences> listener : connectionStatusListeners) {
             listener.onDeviceFailed(throwable);
         }
@@ -95,8 +93,8 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
 
     public void registerMountPoint() {
         Preconditions.checkNotNull(id);
-        Preconditions.checkNotNull(remoteSchemaContext);
-        Preconditions.checkNotNull(netconfSessionPreferences);
+        Preconditions.checkNotNull(remoteSchemaContext, "Device has no remote schema context yet. Probably not fully connected.");
+        Preconditions.checkNotNull(netconfSessionPreferences, "Device has no capabilities yet. Probably not fully connected.");
 
         final DOMDataBroker netconfDeviceDataBroker = new NetconfDeviceDataBroker(id, remoteSchemaContext, deviceRpc, netconfSessionPreferences, defaultRequestTimeoutMillis);
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
@@ -108,8 +106,9 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
     }
 
-    public void registerConnectionStatusListener(final RemoteDeviceHandler<NetconfSessionPreferences> listener) {
+    public ConnectionStatusListenerRegistration registerConnectionStatusListener(final RemoteDeviceHandler<NetconfSessionPreferences> listener) {
         connectionStatusListeners.add(listener);
+        return new ConnectionStatusListenerRegistration(listener);
     }
 
     @Override
@@ -124,6 +123,19 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
             } catch (final Exception e) {
                 LOG.warn("{}: Ignoring exception while closing {}", id, resource, e);
             }
+        }
+    }
+
+    public class ConnectionStatusListenerRegistration{
+
+        private final RemoteDeviceHandler<NetconfSessionPreferences> listener;
+
+        public ConnectionStatusListenerRegistration(final RemoteDeviceHandler<NetconfSessionPreferences> listener) {
+            this.listener = listener;
+        }
+
+        public void close() {
+            connectionStatusListeners.remove(listener);
         }
     }
 }

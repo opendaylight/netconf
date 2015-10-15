@@ -9,8 +9,8 @@
 package org.opendaylight.netconf.topology;
 
 import com.google.common.annotations.Beta;
+import org.opendaylight.netconf.topology.util.messages.NormalizedNodeMessage;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import scala.concurrent.Future;
 
 /**
@@ -22,32 +22,30 @@ public interface RemoteNodeListener {
 
     /**
      * This is called when a remote node is informing you that a new configuration was recieved.
-     * @param nodeId
-     * @param node
-     * @return
+     * @param message - serializable message to send
+     * @return response from the remote node
      */
-    Future<Node> remoteNodeCreated(NodeId nodeId, Node node);
+    Future<NormalizedNodeMessage> remoteNodeCreated(NormalizedNodeMessage message);
 
     /**
      * This is called when a remote node is informing you that a configuration was updated.
-     * @param nodeId
-     * @param node
-     * @return
+     * @param message - serializable message to send
+     * @return response from the remote node
      */
-    Future<Node> remoteNodeUpdated(NodeId nodeId, Node node);
+    Future<NormalizedNodeMessage> remoteNodeUpdated(NormalizedNodeMessage message);
 
     /**
      * This is called when a remote node is informing you that a new configuration was deleted.
-     * @param nodeId
-     * @return
+     * @param nodeId - id of the node which was deleted
+     * @return void future success if delete succeed, failure otherwise
      */
     Future<Void> remoteNodeDeleted(NodeId nodeId);
 
     /**
      * Called when a remote node is requesting a node's status, after a status change notification(f.ex sessionUp, sessionDown)
      * on lower level
-     * @param nodeId
-     * @return
+     * @param nodeId - id of the node which status we want to retrieve
+     * @return status for the node requested
      */
-    Future<Node> remoteGetCurrentStatusForNode(NodeId nodeId);
+    Future<NormalizedNodeMessage> remoteGetCurrentStatusForNode(NodeId nodeId);
 }

@@ -115,6 +115,12 @@
        <type>xml</type>
     </dependency>
     <dependency>
+       <groupId>${project.groupId}</groupId>
+       <artifactId>netconf-topology-config</artifactId>
+       <classifier>clustered-config</classifier>
+       <type>xml</type>
+    </dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-tcp</artifactId>
     </dependency>
