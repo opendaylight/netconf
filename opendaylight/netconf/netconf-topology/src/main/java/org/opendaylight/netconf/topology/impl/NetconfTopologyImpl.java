@@ -95,7 +95,7 @@ public class NetconfTopologyImpl implements NetconfTopology, BindingAwareProvide
         registerToSal(this, this);
     }
 
-    private void registerToSal(BindingAwareProvider baProvider, Provider provider) {
+    private void registerToSal(final BindingAwareProvider baProvider, final Provider provider) {
         domBroker.registerProvider(provider);
         bindingAwareBroker.registerProvider(baProvider);
     }
@@ -120,7 +120,7 @@ public class NetconfTopologyImpl implements NetconfTopology, BindingAwareProvide
     }
 
     @Override
-    public ListenableFuture<NetconfDeviceCapabilities> connectNode(NodeId nodeId, Node configNode) {
+    public ListenableFuture<NetconfDeviceCapabilities> connectNode(final NodeId nodeId, final Node configNode) {
         return setupConnection(nodeId, configNode);
     }
 
@@ -136,7 +136,20 @@ public class NetconfTopologyImpl implements NetconfTopology, BindingAwareProvide
     }
 
     @Override
+    public void registerMountPoint(NodeId nodeId) {
+        Preconditions.checkState(activeConnectors.containsKey(nodeId));
+        activeConnectors.get(nodeId).getMountPointFacade().registerMountPoint();
+    }
+
+    @Override
+    public void unregisterMountPoint(NodeId nodeId) {
+        Preconditions.checkState(activeConnectors.containsKey(nodeId));
+        activeConnectors.get(nodeId).getMountPointFacade().unregisterMountPoint();
+    }
+
+    @Override
     public void registerConnectionStatusListener(NodeId node, RemoteDeviceHandler<NetconfSessionPreferences> listener) {
+        Preconditions.checkState(activeConnectors.containsKey(node));
         activeConnectors.get(node).getMountPointFacade().registerConnectionStatusListener(listener);
     }
 
