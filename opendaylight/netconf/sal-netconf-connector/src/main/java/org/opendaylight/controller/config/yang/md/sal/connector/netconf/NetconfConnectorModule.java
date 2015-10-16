@@ -201,6 +201,8 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
                     }
                 });
             }
+        } else {
+            keepaliveExecutor = getKeepaliveExecutorDependency();
         }
 
         LOG.warn("No topology defined in config, using default-shared-schema-repo");
