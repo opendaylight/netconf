@@ -214,6 +214,25 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <configuration>
+                        <filesets>
+                            <fileset>
+                                <directory>${jmxGeneratorPath}</directory>
+                                <includes>
+                                    <include>**</include>
+                                </includes>
+                            </fileset>
+                            <fileset>
+                                <directory>${salGeneratorPath}</directory>
+                                <includes>
+                                    <include>**</include>
+                                </includes>
+                            </fileset>
+                        </filesets>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
