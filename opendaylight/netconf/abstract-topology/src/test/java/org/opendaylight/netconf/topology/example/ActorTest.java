@@ -25,8 +25,11 @@ import com.typesafe.config.ConfigFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -34,6 +37,7 @@ import org.opendaylight.controller.md.sal.common.api.clustering.EntityOwnershipS
 import org.opendaylight.netconf.topology.NetconfTopology;
 import org.opendaylight.netconf.topology.NodeManagerCallback;
 import org.opendaylight.netconf.topology.NodeManagerCallback.NodeManagerCallbackFactory;
+import org.opendaylight.netconf.topology.RoleChangeStrategy;
 import org.opendaylight.netconf.topology.StateAggregator;
 import org.opendaylight.netconf.topology.TopologyManager;
 import org.opendaylight.netconf.topology.TopologyManagerCallback;
@@ -81,12 +85,14 @@ public class ActorTest {
     private static final ActorSystem ACTOR_SYSTEM_SLAVE1 = ActorSystem.create("NetconfNode", ConfigFactory.load("netconf-node2"));
     private static final ActorSystem ACTOR_SYSTEM_SLAVE2 = ActorSystem.create("NetconfNode", ConfigFactory.load("netconf-node3"));
 
+    private static final ExecutorService callbackExecutor = Executors.newFixedThreadPool(8);
+
     @Test
     public void testRealActors() throws Exception {
         // load from config
-        final TopologyManager master = createNode(ACTOR_SYSTEM, TOPOLOGY_NETCONF, PATHS_MASTER, true, createRealTopoTestingNodeCallbackFactory());
-        final TopologyManager slave1 = createNode(ACTOR_SYSTEM_SLAVE1, TOPOLOGY_NETCONF, PATHS_SLAVE1, false, createRealTopoTestingNodeCallbackFactory());
-        final TopologyManager slave2 = createNode(ACTOR_SYSTEM_SLAVE2, TOPOLOGY_NETCONF, PATHS_SLAVE2, false, createRealTopoTestingNodeCallbackFactory());
+        final TopologyManager master = createNoopRoleChangeNode(ACTOR_SYSTEM, TOPOLOGY_NETCONF, PATHS_MASTER, true, createRealTopoTestingNodeCallbackFactory());
+        final TopologyManager slave1 = createNoopRoleChangeNode(ACTOR_SYSTEM_SLAVE1, TOPOLOGY_NETCONF, PATHS_SLAVE1, false, createRealTopoTestingNodeCallbackFactory());
+        final TopologyManager slave2 = createNoopRoleChangeNode(ACTOR_SYSTEM_SLAVE2, TOPOLOGY_NETCONF, PATHS_SLAVE2, false, createRealTopoTestingNodeCallbackFactory());
 
         await().atMost(10L, TimeUnit.SECONDS).until(new Callable<Boolean>() {
             @Override
@@ -168,11 +174,87 @@ public class ActorTest {
         Futures.allAsList(futures).get();
         Futures.allAsList(deleteFutures).get();
 
+        TypedActor.get(ACTOR_SYSTEM).stop(master);
+        TypedActor.get(ACTOR_SYSTEM_SLAVE1).stop(slave1);
+        TypedActor.get(ACTOR_SYSTEM_SLAVE2).stop(slave2);
+
     }
 
-    private TopologyManager createNode(final ActorSystem actorSystem, final String topologyId, final List<String> remotePaths, final boolean isMaster,
-                                      final TopologyManagerCallbackFactory topologyManagerCallbackFactory) {
+    // TODO seems like stopping actors is not enough to create an actor with same name, split this into multiple classes?
+    @Ignore
+    @Test
+    public void testWithDummyOwnershipService() throws Exception {
 
+        final TestingEntityOwnershipService ownershipService = new TestingEntityOwnershipService();
+        // load from config
+        final TopologyManager master = createNoopRoleChangeNode(ACTOR_SYSTEM, TOPOLOGY_NETCONF, PATHS_MASTER, true, createRealTopoCallbackFactory(ownershipService));
+        final TopologyManager slave1 = createNoopRoleChangeNode(ACTOR_SYSTEM_SLAVE1, TOPOLOGY_NETCONF, PATHS_SLAVE1, false, createRealTopoCallbackFactory(ownershipService));
+        final TopologyManager slave2 = createNoopRoleChangeNode(ACTOR_SYSTEM_SLAVE2, TOPOLOGY_NETCONF, PATHS_SLAVE2, false, createRealTopoCallbackFactory(ownershipService));
+
+        await().atMost(10L, TimeUnit.SECONDS).until(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                return master.hasAllPeersUp();
+            }
+        });
+
+        final List<ListenableFuture<Node>> futures = new ArrayList<>();
+        for (int i = 0; i <= 0; i++) {
+            final String nodeid = "testing-node" + i;
+            final Node testingNode = new NodeBuilder()
+                    .setNodeId(new NodeId(nodeid))
+                    .addAugmentation(NetconfNode.class,
+                            new NetconfNodeBuilder()
+                                    .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+                                    .setPort(new PortNumber(10000 + i))
+                                    .build())
+                    .build();
+            final ListenableFuture<Node> nodeListenableFuture = master.nodeCreated(new NodeId(nodeid), testingNode);
+            futures.add(nodeListenableFuture);
+            Futures.addCallback(nodeListenableFuture, new FutureCallback<Node>() {
+                @Override
+                public void onSuccess(Node result) {
+                    LOG.warn("Node {} created succesfully on all nodes", result.getNodeId().getValue());
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    LOG.warn("Node creation failed. ", t);
+                }
+            });
+        }
+
+        Futures.allAsList(futures).get();
+        ownershipService.distributeOwnership();
+
+        Thread.sleep(30000);
+        TypedActor.get(ACTOR_SYSTEM).stop(master);
+        TypedActor.get(ACTOR_SYSTEM_SLAVE1).stop(slave1);
+        TypedActor.get(ACTOR_SYSTEM_SLAVE2).stop(slave2);
+    }
+
+    private TopologyManager createNoopRoleChangeNode(final ActorSystem actorSystem, final String topologyId, final List<String> remotePaths, final boolean isMaster,
+                                                     final TopologyManagerCallbackFactory topologyManagerCallbackFactory) {
+
+        final TypedActorExtension typedActorExtension = TypedActor.get(actorSystem);
+        return typedActorExtension.typedActorOf(new TypedProps<>(TopologyManager.class, new Creator<BaseTopologyManager>() {
+            @Override
+            public BaseTopologyManager create() throws Exception {
+                return new BaseTopologyManager(actorSystem,
+                        remotePaths,
+                        dataBroker,
+                        topologyId,
+                        topologyManagerCallbackFactory,
+                        new OnlySuccessStateAggregator(),
+                        new LoggingSalNodeWriter(),
+                        new NoopRoleChangeStrategy(),
+                        isMaster);
+            }
+        }), TOPOLOGY_NETCONF);
+    }
+
+    private TopologyManager createManagerWithOwnership(final ActorSystem actorSystem, final String topologyId, final List<String> remotePaths, final boolean isMaster,
+                                                       final TopologyManagerCallbackFactory topologyManagerCallbackFactory, final RoleChangeStrategy roleChangeStrategy) {
         final TypedActorExtension typedActorExtension = TypedActor.get(actorSystem);
         return typedActorExtension.typedActorOf(new TypedProps<>(TopologyManager.class, new Creator<BaseTopologyManager>() {
             @Override
@@ -206,12 +288,12 @@ public class ActorTest {
         };
     }
 
-    private TopologyManagerCallbackFactory createRealTopoCallbackFactory() {
+    private TopologyManagerCallbackFactory createRealTopoCallbackFactory(final EntityOwnershipService entityOwnershipService) {
         final NodeManagerCallbackFactory nodeManagerCallbackFactory = new NodeManagerCallbackFactory() {
             @Override
             public NodeManagerCallback create(String nodeId, String topologyId, ActorSystem actorSystem) {
                 return new ExampleNodeManagerCallback(
-                        nodeId, topologyId, actorSystem, topologyDispatcher,  new NodeRoleChangeStrategy(entityOwnershipService, "netconf", nodeId));
+                        nodeId, topologyId, actorSystem, new TestingTopologyDispatcher(topologyId),  new NodeRoleChangeStrategy(entityOwnershipService, "netconf", nodeId));
             }
         };
 

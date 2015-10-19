@@ -255,8 +255,43 @@ public final class BaseTopologyManager
 
     @Nonnull
     @Override
-    public ListenableFuture<Node> getCurrentStatusForNode(@Nonnull NodeId nodeId) {
-        return null;
+    public ListenableFuture<Node> getCurrentStatusForNode(@Nonnull final NodeId nodeId) {
+        ArrayList<ListenableFuture<Node>> futures = new ArrayList<>();
+
+        if (isMaster) {
+            futures.add(delegateTopologyHandler.getCurrentStatusForNode(nodeId));
+            for (TopologyManager topologyManager : peers) {
+                final SettableFuture<Node> settableFuture = SettableFuture.create();
+                futures.add(settableFuture);
+                final Future<Node> scalaFuture = topologyManager.remoteGetCurrentStatusForNode(nodeId);
+                scalaFuture.onComplete(new OnComplete<Node>() {
+                    @Override
+                    public void onComplete(Throwable failure, Node success) throws Throwable {
+                        if (failure != null) {
+                            settableFuture.setException(failure);
+                            return;
+                        }
+
+                        settableFuture.set(success);
+                    }
+                }, TypedActor.context().dispatcher());
+            }
+
+            final ListenableFuture<Node> aggregatedFuture = aggregator.combineUpdateAttempts(futures);
+            Futures.addCallback(aggregatedFuture, new FutureCallback<Node>() {
+                @Override
+                public void onSuccess(Node result) {
+                    naSalNodeWriter.update(nodeId, result);
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    naSalNodeWriter.update(nodeId, nodes.get(nodeId).getFailedState(nodeId, null));
+                }
+            });
+        }
+
+        return delegateTopologyHandler.getCurrentStatusForNode(nodeId);
     }
 
     @Override
@@ -267,11 +302,28 @@ public final class BaseTopologyManager
     }
 
     @Override
+    public Future<Boolean> isMaster() {
+        return new DefaultPromise<Boolean>().success(isMaster).future();
+    }
+
+    @Override
     public void notifyNodeStatusChange(NodeId nodeId) {
+        LOG.debug("Connection status has changed on node {}", nodeId.getValue());
         if (isMaster) {
             // grab status from all peers and aggregate
+            return;
         }
+        LOG.debug("Not master, forwarding..");
         for (TopologyManager manager : peers) {
+            final Future<Boolean> future = manager.isMaster();
+            future.onComplete(new OnComplete<Boolean>() {
+                @Override
+                public void onComplete(Throwable failure, Boolean success) throws Throwable {
+                    if (failure != null) {
+                        LOG.debug("Cannot ",failure);
+                    }
+                }
+            }, TypedActor.context().dispatcher());
             manager.notifyNodeStatusChange(nodeId);
         }
     }
@@ -284,6 +336,8 @@ public final class BaseTopologyManager
 
     @Override
     public Future<Node> remoteNodeCreated(NodeId nodeId, Node node) {
+        LOG.warn("TopologyManager({}) remoteNodeCreated received, nodeid: {}", id, nodeId.getValue());
+
         final ListenableFuture<Node> nodeListenableFuture = nodeCreated(nodeId, node);
         final DefaultPromise<Node> promise = new DefaultPromise<>();
         Futures.addCallback(nodeListenableFuture, new FutureCallback<Node>() {
@@ -303,6 +357,8 @@ public final class BaseTopologyManager
 
     @Override
     public Future<Node> remoteNodeUpdated(NodeId nodeId, Node node) {
+        LOG.warn("TopologyManager({}) remoteNodeUpdated received, nodeid: {}", id, nodeId.getValue());
+
         final ListenableFuture<Node> nodeListenableFuture = nodeUpdated(nodeId, node);
         final DefaultPromise<Node> promise = new DefaultPromise<>();
         Futures.addCallback(nodeListenableFuture, new FutureCallback<Node>() {
@@ -321,6 +377,8 @@ public final class BaseTopologyManager
 
     @Override
     public Future<Void> remoteNodeDeleted(NodeId nodeId) {
+        LOG.warn("TopologyManager({}) remoteNodeDeleted received, nodeid: {}", id, nodeId.getValue());
+
         final ListenableFuture<Void> listenableFuture = nodeDeleted(nodeId);
         final DefaultPromise<Void> promise = new DefaultPromise<>();
         Futures.addCallback(listenableFuture, new FutureCallback<Void>() {

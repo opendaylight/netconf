@@ -22,8 +22,12 @@ import org.opendaylight.controller.md.sal.common.api.clustering.EntityOwnershipL
 import org.opendaylight.controller.md.sal.common.api.clustering.EntityOwnershipListenerRegistration;
 import org.opendaylight.controller.md.sal.common.api.clustering.EntityOwnershipService;
 import org.opendaylight.controller.md.sal.common.api.clustering.EntityOwnershipState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestingEntityOwnershipService implements EntityOwnershipService{
+
+    private static final Logger LOG = LoggerFactory.getLogger(TestingEntityOwnershipService.class);
 
     private final List<EntityOwnershipListener> listeners = new ArrayList<>();
     private final ExecutorService executorService = Executors.newFixedThreadPool(1);
@@ -37,7 +41,7 @@ public class TestingEntityOwnershipService implements EntityOwnershipService{
         return new EntityOwnershipCandidateRegistration() {
             @Override
             public void close() {
-
+                LOG.debug("Closing candidate registration");
             }
 
             @Override
@@ -49,6 +53,10 @@ public class TestingEntityOwnershipService implements EntityOwnershipService{
 
     @Override
     public EntityOwnershipListenerRegistration registerListener(final String entityType, final EntityOwnershipListener listener) {
+        listeners.add(listener);
+        if (listeners.size() == 3) {
+            distributeOwnership();
+        }
         return new EntityOwnershipListenerRegistration() {
             @Nonnull
             @Override
@@ -73,10 +81,13 @@ public class TestingEntityOwnershipService implements EntityOwnershipService{
         return null;
     }
 
-    public void startService() {
+    public void distributeOwnership() {
+        LOG.debug("Distributing ownership");
         executorService.submit(new Runnable() {
             @Override
             public void run() {
+                masterSet = false;
+                LOG.debug("Distributing ownership for {} listeners", listeners.size());
                 for (final EntityOwnershipListener listener : listeners) {
                     if (!masterSet) {
                         listener.ownershipChanged(new EntityOwnershipChange(entity, false, true, true));

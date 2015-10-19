@@ -42,6 +42,7 @@ public class NodeRoleChangeStrategy implements RoleChangeStrategy, EntityOwnersh
 
     @Override
     public void registerRoleCandidate(NodeListener electionCandidate) {
+        LOG.debug("Registering role candidate");
         this.ownershipCandidate = electionCandidate;
         try {
             if (candidateRegistration != null) {
@@ -57,6 +58,7 @@ public class NodeRoleChangeStrategy implements RoleChangeStrategy, EntityOwnersh
 
     @Override
     public void unregisterRoleCandidate() {
+        LOG.debug("Unregistering role candidate");
         candidateRegistration.close();
         candidateRegistration = null;
         ownershipListenerRegistration.close();
@@ -65,11 +67,13 @@ public class NodeRoleChangeStrategy implements RoleChangeStrategy, EntityOwnersh
 
     @Override
     public void onRoleChanged(RoleChangeDTO roleChangeDTO) {
+        LOG.debug("Role was changed {}", roleChangeDTO);
         ownershipCandidate.onRoleChanged(roleChangeDTO);
     }
 
     @Override
     public void ownershipChanged(EntityOwnershipChange ownershipChange) {
+        LOG.debug("Ownership has changed {}", ownershipChange);
         ownershipCandidate.onRoleChanged(new RoleChangeDTO(ownershipChange.wasOwner(), ownershipChange.isOwner(), ownershipChange.hasOwner()));
     }
 }

@@ -187,6 +187,16 @@ public class NetconfTopologyImpl implements NetconfTopology, DataTreeChangeListe
     }
 
     @Override
+    public void registerMountPoint(NodeId nodeId) {
+        throw new UnsupportedOperationException("MountPoint registration is not supported in regular topology, this happens automaticaly in the netconf pipeline");
+    }
+
+    @Override
+    public void unregisterMountPoint(NodeId nodeId) {
+        throw new UnsupportedOperationException("MountPoint registration is not supported in regular topology, this happens automaticaly in the netconf pipeline");
+    }
+
+    @Override
     public void registerConnectionStatusListener(NodeId node, RemoteDeviceHandler<NetconfSessionPreferences> listener) {
         if (activeConnectors.get(node).getFacade() instanceof TopologyMountPointFacade) {
             ((TopologyMountPointFacade) activeConnectors.get(node).getFacade()).registerConnectionStatusListener(listener);

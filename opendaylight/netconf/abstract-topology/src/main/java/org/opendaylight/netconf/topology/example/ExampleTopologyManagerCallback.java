@@ -131,7 +131,7 @@ public class ExampleTopologyManagerCallback implements TopologyManagerCallback {
     @Nonnull
     @Override
     public ListenableFuture<Node> getCurrentStatusForNode(@Nonnull NodeId nodeId) {
-        return null;
+        return nodes.get(nodeId).getCurrentStatusForNode(nodeId);
     }
 
     @Override
