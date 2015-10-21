@@ -58,7 +58,7 @@ public class RestconfValidationUtils {
      */
     public static <T> T checkNotNullDocumented(final T value, final String moduleName) {
         if(value == null) {
-            final String errMsg = "Module " + moduleName + "was not found.";
+            final String errMsg = "Module " + moduleName + " was not found.";
             throw new RestconfDocumentedException(errMsg, ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
         }
         return value;
