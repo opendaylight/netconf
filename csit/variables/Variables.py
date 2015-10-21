@@ -31,6 +31,8 @@ MININET_PASSWORD = ''  # empty means use keys
 KEYFILE_PASS = 'any'
 SSH_KEY = 'id_rsa'
 CONTROLLER_STOP_TIMEOUT = 120  # Max number of seconds test will wait for a controller to stop
+TOPOLOGY_URL = 'network-topology:network-topology/topology'
+SEND_ACCEPT_XML_HEADERS = {'Content-Type': 'application/xml', 'Accept': 'application/xml'}
 
 # KARAF Variaable
 KARAF_SHELL_PORT = '8101'
