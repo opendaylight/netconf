@@ -49,6 +49,13 @@ BGP_TOOL_PORT = '17900'
 # VM Environment Variables
 DEFAULT_LINUX_PROMPT = '>'
 
+# Netconf variables
+ODL_NETCONF_PORT = '2830'
+ODL_NETCONF_USER = 'admin'
+ODL_NETCONF_PASSWORD = 'admin'
+ODL_NETCONF_PROMPT = ']]>]]>'
+ODL_NETCONF_NAMESPACE = 'urn:ietf:params:xml:ns:netconf:base:1.0'
+
 # VTN Coordinator Variables
 VTNC = '127.0.0.1'
 VTNCPORT = '8083'
