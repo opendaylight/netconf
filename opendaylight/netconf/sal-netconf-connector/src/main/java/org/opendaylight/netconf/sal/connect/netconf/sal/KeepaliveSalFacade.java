@@ -128,7 +128,9 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
     private void scheduleKeepalive() {
         Preconditions.checkState(currentDeviceRpc != null);
         LOG.trace("{}: Scheduling next keepalive in {} {}", id, keepaliveDelaySeconds, TimeUnit.SECONDS);
-        currentKeepalive = executor.schedule(new Keepalive(), keepaliveDelaySeconds, TimeUnit.SECONDS);
+        if (executor != null) {
+            currentKeepalive = executor.schedule(new Keepalive(), keepaliveDelaySeconds, TimeUnit.SECONDS);
+        }
     }
 
     @Override
