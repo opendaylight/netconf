@@ -80,7 +80,9 @@ public final class NetconfDevice implements RemoteDevice<NetconfSessionPreferenc
                     Lists.newArrayList(
                             $YangModuleInfoImpl.getInstance(),
                             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.$YangModuleInfoImpl.getInstance(),
-                            org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl.getInstance()));
+                            org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl.getInstance(),
+ org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.$YangModuleInfoImpl
+                            .getInstance()));
             INIT_SCHEMA_CTX = moduleInfoBackedContext.tryToCreateSchemaContext().get();
         } catch (final RuntimeException e) {
             LOG.error("Unable to prepare schema context for netconf initialization", e);
