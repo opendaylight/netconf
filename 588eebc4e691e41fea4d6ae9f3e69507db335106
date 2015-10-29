@@ -1,0 +1,7 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: Tony Tkacik <ttkacik@cisco.com>
+Submitted-by: Tony Tkacik <ttkacik@cisco.com>
+Submitted-at: Thu, 29 Oct 2015 20:21:42 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/28969
+Project: netconf
+Branch: refs/heads/master
