@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bada0100_190f4fe3",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-11-02T15:28:42Z",
+      "side": 1,
+      "message": "This check should be a Preconditions.checkNotNull(executor). And needs to be in constructor, not here.\n\nNote: This was caused by the Module class passing null here and that is probably fixed now. However keeping the non-null check in constructor is a good idea.",
+      "range": {
+        "startLine": 131,
+        "startChar": 0,
+        "endLine": 133,
+        "endChar": 9
+      },
+      "revId": "507b00c792704b816cdbacccdb43d81613743e3b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
