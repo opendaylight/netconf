@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bada0100_996b3f85",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-11-02T15:25:30Z",
+      "side": 1,
+      "message": "Maybe a bit more detailed message could be here e.g. \"BUG-4100 Adding notification yang schema to default schema context for netconf\"",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 17
+      },
+      "revId": "a4dcf68eb190824dbfde848686f902b6c391bbe1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
