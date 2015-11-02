@@ -16,15 +16,14 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import io.netty.util.internal.ConcurrentSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.config.util.capability.BasicCapability;
 import org.opendaylight.controller.config.util.capability.Capability;
@@ -71,9 +70,9 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
         }
     };
 
-    private final Set<NetconfManagementSession> sessions = new ConcurrentSet<>();
+    private final Set<NetconfManagementSession> sessions = new HashSet<>();
     private final NetconfOperationServiceFactory netconfOperationProvider;
-    private final Map<Uri, Capability> capabilities = new ConcurrentHashMap<>();
+    private final Map<Uri, Capability> capabilities = new HashMap<>();
 
     private final Set<MonitoringListener> listeners = Sets.newHashSet();
     private volatile BaseNotificationPublisherRegistration notificationPublisher;
