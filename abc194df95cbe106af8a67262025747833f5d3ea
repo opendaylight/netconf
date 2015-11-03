@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fad0f9df_ec8887c8",
+        "filename": "opendaylight/netconf/abstract-topology/src/main/java/org/opendaylight/netconf/topology/NodeListener.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2015-11-03T15:21:26Z",
+      "side": 1,
+      "message": "onNodeCreated",
+      "range": {
+        "startLine": 23,
+        "startChar": 36,
+        "endLine": 23,
+        "endChar": 47
+      },
+      "revId": "abc194df95cbe106af8a67262025747833f5d3ea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fad0f9df_ac927ff4",
+        "filename": "opendaylight/netconf/abstract-topology/src/main/java/org/opendaylight/netconf/topology/NodeListener.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2015-11-03T15:21:26Z",
+      "side": 1,
+      "message": "onNodeUpdated",
+      "range": {
+        "startLine": 25,
+        "startChar": 36,
+        "endLine": 25,
+        "endChar": 47
+      },
+      "revId": "abc194df95cbe106af8a67262025747833f5d3ea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fad0f9df_6cbc976d",
+        "filename": "opendaylight/netconf/abstract-topology/src/main/java/org/opendaylight/netconf/topology/NodeListener.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2015-11-03T15:21:26Z",
+      "side": 1,
+      "message": "onNodeDeleted",
+      "range": {
+        "startLine": 27,
+        "startChar": 36,
+        "endLine": 27,
+        "endChar": 47
+      },
+      "revId": "abc194df95cbe106af8a67262025747833f5d3ea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fad0f9df_8cc1bbe6",
+        "filename": "opendaylight/netconf/abstract-topology/src/main/java/org/opendaylight/netconf/topology/NodeListener.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2015-11-03T15:21:26Z",
+      "side": 1,
+      "message": "having implement getter in *Listener interface is bit confusing, is not there better name for this interface?",
+      "range": {
+        "startLine": 29,
+        "startChar": 4,
+        "endLine": 29,
+        "endChar": 84
+      },
+      "revId": "abc194df95cbe106af8a67262025747833f5d3ea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
