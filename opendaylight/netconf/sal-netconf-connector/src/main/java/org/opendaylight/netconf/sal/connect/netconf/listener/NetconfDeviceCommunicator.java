@@ -147,6 +147,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     }
 
     private void tearDown( String reason ) {
+        LOG.debug("Tearing down {}", reason);
         List<UncancellableFuture<RpcResult<NetconfMessage>>> futuresToCancel = Lists.newArrayList();
         sessionLock.lock();
         try {
