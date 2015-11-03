@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dad5f5cf_b147404b",
+        "filename": "opendaylight/netconf/abstract-topology/src/main/java/org/opendaylight/netconf/topology/example/ExampleNodeManagerCallback.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2015-11-03T15:21:21Z",
+      "side": 1,
+      "message": "Please move it to separate JAR / project",
+      "range": {
+        "startLine": 9,
+        "startChar": 8,
+        "endLine": 9,
+        "endChar": 50
+      },
+      "revId": "5e459f2ea3ac4f69261f99c610665886f3f2f21c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dad5f5cf_f13dc8bc",
+        "filename": "opendaylight/netconf/abstract-topology/src/main/java/org/opendaylight/netconf/topology/example/ExampleNodeManagerCallback.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2015-11-03T15:21:21Z",
+      "side": 1,
+      "message": "Unnecessary",
+      "range": {
+        "startLine": 43,
+        "startChar": 4,
+        "endLine": 43,
+        "endChar": 42
+      },
+      "revId": "5e459f2ea3ac4f69261f99c610665886f3f2f21c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dad5f5cf_914a3c54",
+        "filename": "opendaylight/netconf/abstract-topology/src/main/java/org/opendaylight/netconf/topology/example/ExampleNodeManagerCallback.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2015-11-03T15:21:21Z",
+      "side": 1,
+      "message": "Unnecessary",
+      "range": {
+        "startLine": 52,
+        "startChar": 38,
+        "endLine": 52,
+        "endChar": 68
+      },
+      "revId": "5e459f2ea3ac4f69261f99c610665886f3f2f21c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
