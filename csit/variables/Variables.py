@@ -8,17 +8,19 @@ Edited: Many times by many people
 
 # VM Environment defaults
 DEFAULT_LINUX_PROMPT = '>'
+DEFAULT_USER = 'jenkins'
+DEFAULT_TIMEOUT = '30s'
 
 # ODL system variables
 ODL_SYSTEM_IP = '127.0.0.1'  # Override if ODL is not running locally to pybot
 ODL_SYSTEM_IP_LIST = ['ODL_SYSTEM_1_IP', 'ODL_SYSTEM_2_IP', 'ODL_SYSTEM_3_IP']
-ODL_SYSTEM_USER = 'jenkins'
+ODL_SYSTEM_USER = DEFAULT_USER
 ODL_SYSTEM_PASSWORD = ''  # empty means use public key authentication
 ODL_SYSTEM_PROMPT = DEFAULT_LINUX_PROMPT
 
 # "Tools" system variables (mininet etc).
 TOOLS_SYSTEM_IP = '127.0.0.1'  # Override if tools are not run locally to pybot
-TOOLS_SYSTEM_USER = 'jenkins'
+TOOLS_SYSTEM_USER = DEFAULT_USER
 TOOLS_SYSTEM_PASSWORD = ''  # empty means use public key authentication
 TOOLS_SYSTEM_PROMPT = DEFAULT_LINUX_PROMPT
 
@@ -177,6 +179,8 @@ CONTROLLER = ODL_SYSTEM_IP
 CONTROLLERS = ['CONTROLLER', 'CONTROLLER1', 'CONTROLLER2']
 CONTROLLER_PASSWORD = ODL_SYSTEM_PASSWORD
 CONTROLLER_PROMPT = ODL_SYSTEM_PROMPT
+MININET = TOOLS_SYSTEM_IP
+MININET_USER = TOOLS_SYSTEM_USER
 MININET_PASSWORD = TOOLS_SYSTEM_PASSWORD
 MININET_PROMPT = TOOLS_SYSTEM_PROMPT
 PROMPT = '>'  # TODO: remove this as it's vague.  need to fix any occurances of it first.
