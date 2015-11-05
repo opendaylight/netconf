@@ -1,7 +1,7 @@
-module netconf-topology {
+module clustered-netconf-topology {
 
     yang-version 1;
-    namespace "urn:opendaylight:params:xml:ns:yang:controller:netconf:topology";
+    namespace "urn:opendaylight:params:xml:ns:yang:controller:clustered:netconf:topology";
     prefix "nt";
 
     import config { prefix config; revision-date 2013-04-05; }
@@ -11,29 +11,27 @@ module netconf-topology {
     import opendaylight-md-sal-binding {prefix md-sal-binding; revision-date 2013-10-28;}
     import odl-netconf-cfg { prefix cfg-net; revision-date 2014-04-08; }
     import shared-schema-repository { prefix sh; revision-date 2015-07-27; }
+    import netconf-topology { prefix topo; revision-date 2015-07-27; }
+    import opendaylight-entity-ownership-service { prefix eos; revision-date 2015-08-10; }
+    import actor-system-provider-service { prefix asp; revision-date 2015-10-05; }
 
     description
             "Module definition for Netconf topolgy. Netconf topology provides a set of common configuration ";
 
-    revision "2015-07-27" {
+    revision "2015-11-04" {
         description
             "Initial revision";
     }
 
-    identity netconf-topology {
-        base config:service-type;
-        config:java-class "org.opendaylight.netconf.topology.NetconfTopology";
-    }
-
-    identity netconf-topology-impl {
+    identity clustered-netconf-topology-impl {
         base config:module-type;
-        config:java-name-prefix NetconfTopology;
-        config:provided-service netconf-topology;
+        config:java-name-prefix ClusteredNetconfTopology;
+        config:provided-service topo:netconf-topology;
     }
 
     augment "/config:modules/config:module/config:configuration" {
-        case netconf-topology-impl {
-            when "/config:modules/config:module/config:type = 'netconf-topology-impl'";
+        case clustered-netconf-topology-impl {
+            when "/config:modules/config:module/config:type = 'clustered-netconf-topology-impl'";
 
             leaf topology-id {
                 mandatory true;
@@ -103,6 +101,24 @@ module netconf-topology {
                     refine type {
                         mandatory true;
                         config:required-identity sh:shared-schema-repository;
+                    }
+                }
+            }
+
+            container entity-ownership-service {
+                uses config:service-ref {
+                    refine type {
+                        mandatory true;
+                        config:required-identity eos:entity-ownership-service;
+                    }
+                }
+            }
+
+            container actor-system-provider-service {
+                uses config:service-ref {
+                    refine type {
+                        mandatory true;
+                        config:required-identity asp:actor-system-provider-service;
                     }
                 }
             }

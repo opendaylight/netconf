@@ -40,13 +40,25 @@
         <bundle>mvn:org.opendaylight.netconf/sal-netconf-connector/${netconf.connector.version}</bundle>
         <bundle>mvn:org.opendaylight.netconf/netconf-config-dispatcher/${netconf.version}</bundle>
         <configfile finalname='${config.configfile.directory}/${config.netconf.client.configfile}'>mvn:org.opendaylight.netconf/netconf-config/${netconf.version}/xml/config</configfile>
-        <configfile finalname='${config.configfile.directory}/${config.netconf.topology.configfile}'>mvn:org.opendaylight.netconf/netconf-topology-config/${netconf.version}/xml/config</configfile>
     </feature>
 
     <feature name='odl-netconf-connector-ssh' version='${project.version}' description="OpenDaylight :: Netconf Connector :: Netconf Connector + Netconf SSH Server + loopback connection configuration">
         <feature version='${netconf.version}'>odl-netconf-ssh</feature>
         <feature version='${project.version}'>odl-netconf-connector</feature>
         <configfile finalname="${config.configfile.directory}/${config.netconf.connector.configfile}">mvn:org.opendaylight.netconf/netconf-connector-config/${netconf.version}/xml/config</configfile>
+    </feature>
+
+    <feature name='odl-netconf-topology' version='${project.version}' description="OpenDaylight :: Netconf Topology :: Netconf Connector + Netconf SSH Server + Netconf configuration via config topology datastore">
+        <feature version='${project.version}'>odl-netconf-connector</feature>
+        <feature version='${project.version}'>odl-netconf-connector-ssh</feature>
+        <configfile finalname='${config.configfile.directory}/${config.netconf.topology.configfile}'>mvn:org.opendaylight.netconf/netconf-topology-config/${netconf.version}/xml/config</configfile>
+    </feature>
+
+    <feature name='odl-netconf-clustered-topology' version='${project.version}' description="OpenDaylight :: Clustered Netconf Topology :: Netconf Connector + Netconf SSH Server + Clustered Netconf configuration via config topology datastore">
+        <feature version='${project.version}'>odl-netconf-connector</feature>
+        <feature version='${project.version}'>odl-netconf-connector-ssh</feature>
+
+        <configfile finalname='${config.configfile.directory}/${config.netconf.topology.configfile}'>mvn:org.opendaylight.netconf/netconf-topology-config/${netconf.version}/xml/clustered-config</configfile>
     </feature>
 
 </features>
