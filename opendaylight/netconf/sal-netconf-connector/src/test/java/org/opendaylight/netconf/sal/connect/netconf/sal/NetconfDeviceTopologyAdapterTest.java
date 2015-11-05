@@ -64,7 +64,7 @@ public class NetconfDeviceTopologyAdapterTest {
         adapter.setDeviceAsFailed(null);
 
         verify(txChain, times(2)).newWriteOnlyTransaction();
-        verify(writeTx, times(3)).put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(Node.class));
+        verify(writeTx, times(2)).put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(Node.class));
     }
 
     @Test
@@ -75,7 +75,7 @@ public class NetconfDeviceTopologyAdapterTest {
         adapter.updateDeviceData(true, new NetconfDeviceCapabilities());
 
         verify(txChain, times(2)).newWriteOnlyTransaction();
-        verify(writeTx, times(3)).put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(Node.class));
+        verify(writeTx, times(2)).put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(Node.class));
     }
 
 }

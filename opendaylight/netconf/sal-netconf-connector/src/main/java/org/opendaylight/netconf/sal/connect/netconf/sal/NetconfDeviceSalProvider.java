@@ -159,7 +159,7 @@ public final class NetconfDeviceSalProvider implements AutoCloseable, Provider, 
             mountBuilder.addService(DOMNotificationService.class, notificationService);
 
             topologyRegistration = mountBuilder.register();
-            logger.debug("{}: TOPOLOGY Mountpoint exposed into MD-SAL {}", id, registration);
+            logger.debug("{}: TOPOLOGY Mountpoint exposed into MD-SAL {}", id, topologyRegistration);
 
         }
 
@@ -175,7 +175,7 @@ public final class NetconfDeviceSalProvider implements AutoCloseable, Provider, 
                 // Only log and ignore
                 logger.warn("Unable to unregister mount instance for {}. Ignoring exception", id.getTopologyPath(), e);
             } finally {
-                logger.debug("{}: TOPOLOGY Mountpoint removed from MD-SAL {}", id, registration);
+                logger.debug("{}: TOPOLOGY Mountpoint removed from MD-SAL {}", id, topologyRegistration);
                 topologyRegistration = null;
             }
         }
