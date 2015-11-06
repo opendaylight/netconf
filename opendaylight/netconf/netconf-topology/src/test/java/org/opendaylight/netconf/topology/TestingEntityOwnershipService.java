@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.topology.example;
+package org.opendaylight.netconf.topology;
 
 import com.google.common.base.Optional;
 import java.util.ArrayList;
@@ -37,6 +37,7 @@ public class TestingEntityOwnershipService implements EntityOwnershipService{
 
     @Override
     public EntityOwnershipCandidateRegistration registerCandidate(final Entity entity) throws CandidateAlreadyRegisteredException {
+        LOG.warn("Registering Candidate");
         this.entity = entity;
         return new EntityOwnershipCandidateRegistration() {
             @Override

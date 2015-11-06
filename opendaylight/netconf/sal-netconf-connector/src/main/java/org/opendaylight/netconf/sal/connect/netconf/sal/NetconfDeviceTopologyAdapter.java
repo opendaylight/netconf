@@ -161,7 +161,7 @@ final class NetconfDeviceTopologyAdapter implements AutoCloseable {
                 id, writeTx.getIdentifier());
         writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath(), data);
         LOG.trace(
-                "{}: Setting device state as failed {} putting operational data ended.",
+                "{}: Setting device state as failed {} putting operationral data ended.",
                 id, writeTx.getIdentifier());
 
         commitTransaction(writeTx, "update-failed-device");

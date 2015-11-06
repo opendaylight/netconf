@@ -8,6 +8,8 @@
 
 package org.opendaylight.netconf.topology;
 
+import akka.actor.TypedActor.PostStop;
+import akka.actor.TypedActor.PreStart;
 import akka.actor.TypedActor.Receiver;
 import com.google.common.annotations.Beta;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -17,7 +19,7 @@ import scala.concurrent.Future;
  * Top level topology manager that handles comunication between nodes, aggregates results, and handles writes into the datastore
  */
 @Beta
-public interface TopologyManager extends NodeListener, Receiver, RemoteNodeListener{
+public interface TopologyManager extends NodeListener, Receiver, RemoteNodeListener, PreStart, PostStop{
 
     /**
      * ask if this manager is master

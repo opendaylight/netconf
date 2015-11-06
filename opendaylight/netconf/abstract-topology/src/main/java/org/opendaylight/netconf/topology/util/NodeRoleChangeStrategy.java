@@ -36,13 +36,13 @@ public class NodeRoleChangeStrategy implements RoleChangeStrategy, EntityOwnersh
                                   final String entityType,
                                   final String entityName) {
         this.entityOwnershipService = entityOwnershipService;
-        this.entityType = entityType;
+        this.entityType = entityType + "/" + entityName;
         this.entityName = entityName;
     }
 
     @Override
     public void registerRoleCandidate(NodeListener electionCandidate) {
-        LOG.debug("Registering role candidate");
+        LOG.debug("Registering role candidate type: {} , name: {}", entityType, entityName);
         this.ownershipCandidate = electionCandidate;
         try {
             if (candidateRegistration != null) {

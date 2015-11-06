@@ -6,9 +6,11 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.topology.example;
+package org.opendaylight.netconf.topology;
 
 import static com.jayway.awaitility.Awaitility.await;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -29,22 +31,24 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
+import org.opendaylight.controller.md.sal.binding.api.DataChangeListener;
 import org.opendaylight.controller.md.sal.common.api.clustering.EntityOwnershipService;
-import org.opendaylight.netconf.topology.NetconfTopology;
-import org.opendaylight.netconf.topology.NodeManagerCallback;
+import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
+import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.netconf.topology.NodeManagerCallback.NodeManagerCallbackFactory;
-import org.opendaylight.netconf.topology.RoleChangeStrategy;
-import org.opendaylight.netconf.topology.StateAggregator;
-import org.opendaylight.netconf.topology.TopologyManager;
-import org.opendaylight.netconf.topology.TopologyManagerCallback;
 import org.opendaylight.netconf.topology.TopologyManagerCallback.TopologyManagerCallbackFactory;
+import org.opendaylight.netconf.topology.example.ExampleNodeManagerCallback;
+import org.opendaylight.netconf.topology.example.ExampleTopologyManagerCallback;
+import org.opendaylight.netconf.topology.example.LoggingSalNodeWriter;
 import org.opendaylight.netconf.topology.util.BaseTopologyManager;
-import org.opendaylight.netconf.topology.util.NodeRoleChangeStrategy;
 import org.opendaylight.netconf.topology.util.NoopRoleChangeStrategy;
+import org.opendaylight.netconf.topology.util.TopologyRoleChangeStrategy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Ipv4Address;
@@ -55,6 +59,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,9 +68,6 @@ public class ActorTest {
     private static final Logger LOG = LoggerFactory.getLogger(ActorTest.class);
 
     private static final String TOPOLOGY_NETCONF = "TopologyNetconf";
-
-    @Mock
-    private NetconfTopology topologyDispatcher;
 
     @Mock
     private EntityOwnershipService entityOwnershipService;
@@ -87,14 +89,26 @@ public class ActorTest {
 
     private static final ExecutorService callbackExecutor = Executors.newFixedThreadPool(8);
 
+    @Before
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+        when(dataBroker.registerDataChangeListener(
+                any(LogicalDatastoreType.class),
+                any(InstanceIdentifier.class),
+                any(DataChangeListener.class),
+                any(DataChangeScope.class))).thenReturn(null);
+    }
+
     @Test
     public void testRealActors() throws Exception {
-        // load from config
-        final TopologyManager master = createNoopRoleChangeNode(ACTOR_SYSTEM, TOPOLOGY_NETCONF, PATHS_MASTER, true, createRealTopoTestingNodeCallbackFactory());
-        final TopologyManager slave1 = createNoopRoleChangeNode(ACTOR_SYSTEM_SLAVE1, TOPOLOGY_NETCONF, PATHS_SLAVE1, false, createRealTopoTestingNodeCallbackFactory());
-        final TopologyManager slave2 = createNoopRoleChangeNode(ACTOR_SYSTEM_SLAVE2, TOPOLOGY_NETCONF, PATHS_SLAVE2, false, createRealTopoTestingNodeCallbackFactory());
 
-        await().atMost(10L, TimeUnit.SECONDS).until(new Callable<Boolean>() {
+        EntityOwnershipService topoOwnership = new TestingEntityOwnershipService();
+        // load from config
+        final TopologyManager master = createManagerWithOwnership(ACTOR_SYSTEM, TOPOLOGY_NETCONF, true, createRealTopoTestingNodeCallbackFactory(), new TopologyRoleChangeStrategy(dataBroker, topoOwnership, TOPOLOGY_NETCONF, "topology-manager"));
+        final TopologyManager slave1 = createManagerWithOwnership(ACTOR_SYSTEM_SLAVE1, TOPOLOGY_NETCONF, false, createRealTopoTestingNodeCallbackFactory(), new TopologyRoleChangeStrategy(dataBroker, topoOwnership, TOPOLOGY_NETCONF, "topology-manager"));
+        final TopologyManager slave2 = createManagerWithOwnership(ACTOR_SYSTEM_SLAVE2, TOPOLOGY_NETCONF, false, createRealTopoTestingNodeCallbackFactory(), new TopologyRoleChangeStrategy(dataBroker, topoOwnership, TOPOLOGY_NETCONF, "topology-manager"));
+
+        await().atMost(30L, TimeUnit.SECONDS).until(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 return master.hasAllPeersUp();
@@ -187,9 +201,9 @@ public class ActorTest {
 
         final TestingEntityOwnershipService ownershipService = new TestingEntityOwnershipService();
         // load from config
-        final TopologyManager master = createNoopRoleChangeNode(ACTOR_SYSTEM, TOPOLOGY_NETCONF, PATHS_MASTER, true, createRealTopoCallbackFactory(ownershipService));
-        final TopologyManager slave1 = createNoopRoleChangeNode(ACTOR_SYSTEM_SLAVE1, TOPOLOGY_NETCONF, PATHS_SLAVE1, false, createRealTopoCallbackFactory(ownershipService));
-        final TopologyManager slave2 = createNoopRoleChangeNode(ACTOR_SYSTEM_SLAVE2, TOPOLOGY_NETCONF, PATHS_SLAVE2, false, createRealTopoCallbackFactory(ownershipService));
+        final TopologyManager master = createNoopRoleChangeNode(ACTOR_SYSTEM, TOPOLOGY_NETCONF, true, createRealTopoCallbackFactory(ownershipService));
+        final TopologyManager slave1 = createNoopRoleChangeNode(ACTOR_SYSTEM_SLAVE1, TOPOLOGY_NETCONF, false, createRealTopoCallbackFactory(ownershipService));
+        final TopologyManager slave2 = createNoopRoleChangeNode(ACTOR_SYSTEM_SLAVE2, TOPOLOGY_NETCONF, false, createRealTopoCallbackFactory(ownershipService));
 
         await().atMost(10L, TimeUnit.SECONDS).until(new Callable<Boolean>() {
             @Override
@@ -233,7 +247,7 @@ public class ActorTest {
         TypedActor.get(ACTOR_SYSTEM_SLAVE2).stop(slave2);
     }
 
-    private TopologyManager createNoopRoleChangeNode(final ActorSystem actorSystem, final String topologyId, final List<String> remotePaths, final boolean isMaster,
+    private TopologyManager createNoopRoleChangeNode(final ActorSystem actorSystem, final String topologyId, final boolean isMaster,
                                                      final TopologyManagerCallbackFactory topologyManagerCallbackFactory) {
 
         final TypedActorExtension typedActorExtension = TypedActor.get(actorSystem);
@@ -241,7 +255,6 @@ public class ActorTest {
             @Override
             public BaseTopologyManager create() throws Exception {
                 return new BaseTopologyManager(actorSystem,
-                        remotePaths,
                         dataBroker,
                         topologyId,
                         topologyManagerCallbackFactory,
@@ -253,20 +266,19 @@ public class ActorTest {
         }), TOPOLOGY_NETCONF);
     }
 
-    private TopologyManager createManagerWithOwnership(final ActorSystem actorSystem, final String topologyId, final List<String> remotePaths, final boolean isMaster,
+    private TopologyManager createManagerWithOwnership(final ActorSystem actorSystem, final String topologyId, final boolean isMaster,
                                                        final TopologyManagerCallbackFactory topologyManagerCallbackFactory, final RoleChangeStrategy roleChangeStrategy) {
         final TypedActorExtension typedActorExtension = TypedActor.get(actorSystem);
         return typedActorExtension.typedActorOf(new TypedProps<>(TopologyManager.class, new Creator<BaseTopologyManager>() {
             @Override
             public BaseTopologyManager create() throws Exception {
                 return new BaseTopologyManager(actorSystem,
-                        remotePaths,
                         dataBroker,
                         topologyId,
                         topologyManagerCallbackFactory,
                         new OnlySuccessStateAggregator(),
                         new LoggingSalNodeWriter(),
-                        new NoopRoleChangeStrategy(),
+                        roleChangeStrategy,
                         isMaster);
             }
         }), TOPOLOGY_NETCONF);
@@ -282,8 +294,8 @@ public class ActorTest {
 
         return new TopologyManagerCallbackFactory() {
             @Override
-            public TopologyManagerCallback create(ActorSystem actorSystem, DataBroker dataBroker, String topologyId, List<String> remotePaths) {
-                return new ExampleTopologyManagerCallback(actorSystem, dataBroker, topologyId, remotePaths, nodeManagerCallbackFactory, new LoggingSalNodeWriter());
+            public TopologyManagerCallback create(ActorSystem actorSystem, DataBroker dataBroker, String topologyId) {
+                return new ExampleTopologyManagerCallback(actorSystem, dataBroker, topologyId, nodeManagerCallbackFactory, new LoggingSalNodeWriter());
             }
         };
     }
@@ -292,15 +304,14 @@ public class ActorTest {
         final NodeManagerCallbackFactory nodeManagerCallbackFactory = new NodeManagerCallbackFactory() {
             @Override
             public NodeManagerCallback create(String nodeId, String topologyId, ActorSystem actorSystem) {
-                return new ExampleNodeManagerCallback(
-                        nodeId, topologyId, actorSystem, new TestingTopologyDispatcher(topologyId),  new NodeRoleChangeStrategy(entityOwnershipService, "netconf", nodeId));
+                return new ExampleNodeManagerCallback();
             }
         };
 
         return new TopologyManagerCallbackFactory() {
             @Override
-            public TopologyManagerCallback create(ActorSystem actorSystem, DataBroker dataBroker, String topologyId, List<String> remotePaths) {
-                return new ExampleTopologyManagerCallback(actorSystem, dataBroker, topologyId, remotePaths, nodeManagerCallbackFactory);
+            public TopologyManagerCallback create(ActorSystem actorSystem, DataBroker dataBroker, String topologyId) {
+                return new ExampleTopologyManagerCallback(actorSystem, dataBroker, topologyId, nodeManagerCallbackFactory);
             }
         };
     }
@@ -308,7 +319,7 @@ public class ActorTest {
     private TopologyManagerCallbackFactory createTestingTopoCallbackFactory() {
         return new TopologyManagerCallbackFactory() {
             @Override
-            public TopologyManagerCallback create(ActorSystem actorSystem, DataBroker dataBroker, String topologyId, List<String> remotePaths) {
+            public TopologyManagerCallback create(ActorSystem actorSystem, DataBroker dataBroker, String topologyId) {
                 return new TestingTopologyManagerCallback();
             }
         };
@@ -399,7 +410,7 @@ public class ActorTest {
         }
     }
 
-    public static class TestingTopologyManagerCallback implements TopologyManagerCallback{
+    public static class TestingTopologyManagerCallback implements TopologyManagerCallback {
 
         public TestingTopologyManagerCallback() {
 

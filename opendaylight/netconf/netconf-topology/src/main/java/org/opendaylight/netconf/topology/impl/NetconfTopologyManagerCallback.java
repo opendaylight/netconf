@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.topology.example;
+package org.opendaylight.netconf.topology.impl;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -30,9 +30,9 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ExampleTopologyManagerCallback implements TopologyManagerCallback {
+public class NetconfTopologyManagerCallback implements TopologyManagerCallback {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ExampleTopologyManagerCallback.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyManagerCallback.class);
 
     private final DataBroker dataBroker;
     private final ActorSystem actorSystem;
@@ -43,14 +43,14 @@ public class ExampleTopologyManagerCallback implements TopologyManagerCallback {
     private final Map<NodeId, NodeManager> nodes = new HashMap<>();
     private final NodeManagerCallbackFactory nodeHandlerFactory;
 
-    public ExampleTopologyManagerCallback(final ActorSystem actorSystem,
+    public NetconfTopologyManagerCallback(final ActorSystem actorSystem,
                                           final DataBroker dataBroker,
                                           final String topologyId,
                                           final NodeManagerCallbackFactory nodeHandlerFactory) {
         this(actorSystem, dataBroker, topologyId, nodeHandlerFactory, new SalNodeWriter(dataBroker, topologyId));
     }
 
-    public ExampleTopologyManagerCallback(final ActorSystem actorSystem,
+    public NetconfTopologyManagerCallback(final ActorSystem actorSystem,
                                           final DataBroker dataBroker,
                                           final String topologyId,
                                           final NodeManagerCallbackFactory nodeHandlerFactory,
@@ -59,7 +59,7 @@ public class ExampleTopologyManagerCallback implements TopologyManagerCallback {
 
     }
 
-    public ExampleTopologyManagerCallback(final ActorSystem actorSystem,
+    public NetconfTopologyManagerCallback(final ActorSystem actorSystem,
                                           final DataBroker dataBroker,
                                           final String topologyId,
                                           final NodeManagerCallbackFactory nodeHandlerFactory,
@@ -110,6 +110,7 @@ public class ExampleTopologyManagerCallback implements TopologyManagerCallback {
             @Override
             public void onSuccess(Void result) {
                 // remove proxy from node list and stop the actor
+                LOG.debug("Stopping node actor for node : {}", nodeId.getValue());
                 final NodeManager remove = nodes.remove(nodeId);
                 TypedActor.get(actorSystem).stop(remove);
             }

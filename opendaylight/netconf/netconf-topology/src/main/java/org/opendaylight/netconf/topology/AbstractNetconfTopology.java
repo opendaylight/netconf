@@ -45,6 +45,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommun
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.topology.pipeline.TopologyMountPointFacade.ConnectionStatusListenerRegistration;
 import org.opendaylight.protocol.framework.ReconnectStrategy;
 import org.opendaylight.protocol.framework.ReconnectStrategyFactory;
 import org.opendaylight.protocol.framework.TimedReconnectStrategy;
@@ -118,11 +119,9 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         this.sharedSchemaRepository = schemaRepositoryProvider.getSharedSchemaRepository();
 
         initFilesystemSchemaSourceCache(sharedSchemaRepository);
-
-        registerToSal(this, this);
     }
 
-    private void registerToSal(BindingAwareProvider baProvider, Provider provider) {
+    protected void registerToSal(BindingAwareProvider baProvider, Provider provider) {
         domBroker.registerProvider(provider);
         bindingAwareBroker.registerProvider(baProvider);
     }
@@ -284,9 +283,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     protected abstract RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id, final Broker domBroker, final BindingAwareBroker bindingBroker, long defaultRequestTimeoutMillis);
 
     @Override
-    public void registerConnectionStatusListener(NodeId node, RemoteDeviceHandler<NetconfSessionPreferences> listener) {
-
-    }
+    public abstract ConnectionStatusListenerRegistration registerConnectionStatusListener(NodeId node, RemoteDeviceHandler<NetconfSessionPreferences> listener);
 
     @Override
     public void onSessionInitiated(ProviderSession session) {

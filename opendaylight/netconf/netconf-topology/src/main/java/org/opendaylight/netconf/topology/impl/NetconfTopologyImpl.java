@@ -29,6 +29,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.SchemaRepositoryProvider;
+import org.opendaylight.netconf.topology.pipeline.TopologyMountPointFacade.ConnectionStatusListenerRegistration;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
@@ -48,6 +49,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
         super(topologyId, clientDispatcher,
                 bindingAwareBroker, domBroker, eventExecutor,
                 keepaliveExecutor, processingExecutor, schemaRepositoryProvider);
+        registerToSal(this, this);
     }
 
     @Override
@@ -80,7 +82,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
     }
 
     @Override
-    public void registerConnectionStatusListener(NodeId node, RemoteDeviceHandler<NetconfSessionPreferences> listener) {
+    public ConnectionStatusListenerRegistration registerConnectionStatusListener(NodeId node, RemoteDeviceHandler<NetconfSessionPreferences> listener) {
         throw new UnsupportedOperationException("Registering a listener on a regular netconf device is not supported(supported only in clustered netconf topology)");
     }
 

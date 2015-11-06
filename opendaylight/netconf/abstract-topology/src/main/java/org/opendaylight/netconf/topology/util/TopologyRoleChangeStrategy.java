@@ -70,6 +70,7 @@ public class TopologyRoleChangeStrategy implements RoleChangeStrategy, DataTreeC
 
     @Override
     public void registerRoleCandidate(NodeListener electionCandidate) {
+        LOG.debug("Registering candidate");
         ownershipCandidate = electionCandidate;
         try {
             if (candidateRegistration != null) {
@@ -97,8 +98,9 @@ public class TopologyRoleChangeStrategy implements RoleChangeStrategy, DataTreeC
             LOG.debug("Gained ownership of entity, registering datastore listener");
 
             if (datastoreListenerRegistration == null) {
+                LOG.debug("Listener on path {}", createTopologyId(entityType).child(Node.class).getPathArguments());
                 datastoreListenerRegistration = dataBroker.registerDataTreeChangeListener(
-                        new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION, createTopologyId(entityName).child(Node.class)), this);
+                        new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION, createTopologyId(entityType).child(Node.class)), this);
             }
         } else if (datastoreListenerRegistration != null) {
             LOG.debug("No longer owner of entity, unregistering datastore listener");
@@ -119,10 +121,15 @@ public class TopologyRoleChangeStrategy implements RoleChangeStrategy, DataTreeC
             final DataObjectModification<Node> rootNode = change.getRootNode();
             switch (rootNode.getModificationType()) {
                 case WRITE:
+                    LOG.debug("Data was Created {}, {}", rootNode.getIdentifier(), rootNode.getDataAfter());
                     ownershipCandidate.nodeCreated(getNodeId(rootNode.getIdentifier()), rootNode.getDataAfter());
+                    break;
                 case SUBTREE_MODIFIED:
+                    LOG.debug("Data was Updated {}, {}", rootNode.getIdentifier(), rootNode.getDataAfter());
                     ownershipCandidate.nodeUpdated(getNodeId(rootNode.getIdentifier()), rootNode.getDataAfter());
+                    break;
                 case DELETE:
+                    LOG.debug("Data was Deleted {}", rootNode.getIdentifier());
                     ownershipCandidate.nodeDeleted(getNodeId(rootNode.getIdentifier()));
             }
         }

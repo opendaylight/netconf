@@ -16,7 +16,6 @@ import akka.actor.TypedProps;
 import akka.japi.Creator;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.List;
 import javax.annotation.Nonnull;
 import org.opendaylight.netconf.topology.NodeManager;
 import org.opendaylight.netconf.topology.NodeManagerCallback;
@@ -38,20 +37,17 @@ public final class BaseNodeManager implements NodeManager {
 
     private boolean isMaster;
     private NodeManagerCallback delegate;
-    private final List<String> remotePaths;
 
     private BaseNodeManager(final String nodeId,
                             final String topologyId,
                             final ActorSystem actorSystem,
                             final NodeManagerCallbackFactory delegateFactory,
-                            final RoleChangeStrategy roleChangeStrategy,
-                            final List<String> remotePaths) {
+                            final RoleChangeStrategy roleChangeStrategy) {
         LOG.debug("Creating BaseNodeManager, id: {}, {}", topologyId, nodeId );
         this.nodeId = nodeId;
         this.topologyId = topologyId;
         this.actorSystem = actorSystem;
         this.delegate = delegateFactory.create(nodeId, topologyId, actorSystem);
-        this.remotePaths = remotePaths;
         // if we want to override the place election happens,
         // we need to override this with noop election strategy and implement election in callback
         // cannot leak this here! have to use TypedActor.self()
@@ -134,7 +130,6 @@ public final class BaseNodeManager implements NodeManager {
         private NodeManagerCallbackFactory delegateFactory;
         private RoleChangeStrategy roleChangeStrategy;
         private ActorContext actorContext;
-        private List<String> remotePaths;
 
 
         public BaseNodeManagerBuilder setNodeId(final String nodeId) {
@@ -162,24 +157,18 @@ public final class BaseNodeManager implements NodeManager {
             return this;
         }
 
-        public BaseNodeManagerBuilder setRemotePaths(final List<String> remotePaths) {
-            this.remotePaths = remotePaths;
-            return this;
-        }
-
         public NodeManager build() {
             Preconditions.checkNotNull(nodeId);
             Preconditions.checkNotNull(topologyId);
             Preconditions.checkNotNull(delegateFactory);
             Preconditions.checkNotNull(roleChangeStrategy);
             Preconditions.checkNotNull(actorContext);
-            Preconditions.checkNotNull(remotePaths);
             LOG.debug("Creating typed actor with id: {}", nodeId);
 
             return TypedActor.get(actorContext).typedActorOf(new TypedProps<>(NodeManager.class, new Creator<BaseNodeManager>() {
                 @Override
                 public BaseNodeManager create() throws Exception {
-                    return new BaseNodeManager(nodeId, topologyId, actorContext.system(), delegateFactory, roleChangeStrategy, remotePaths);
+                    return new BaseNodeManager(nodeId, topologyId, actorContext.system(), delegateFactory, roleChangeStrategy);
                 }
             }), nodeId);
         }

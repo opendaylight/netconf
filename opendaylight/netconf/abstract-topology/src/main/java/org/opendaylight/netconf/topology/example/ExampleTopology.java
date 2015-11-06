@@ -9,16 +9,13 @@
 package org.opendaylight.netconf.topology.example;
 
 import akka.actor.ActorSystem;
-import java.util.List;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.common.api.clustering.EntityOwnershipService;
-import org.opendaylight.netconf.topology.NetconfTopology;
 import org.opendaylight.netconf.topology.NodeManagerCallback;
 import org.opendaylight.netconf.topology.NodeManagerCallback.NodeManagerCallbackFactory;
 import org.opendaylight.netconf.topology.TopologyManagerCallback;
 import org.opendaylight.netconf.topology.TopologyManagerCallback.TopologyManagerCallbackFactory;
 import org.opendaylight.netconf.topology.util.BaseTopologyManager;
-import org.opendaylight.netconf.topology.util.NodeRoleChangeStrategy;
 
 public class ExampleTopology {
 
@@ -26,23 +23,22 @@ public class ExampleTopology {
     private BaseTopologyManager netconfNodeBaseTopologyManager;
     private final DataBroker dataBroker;
 
-    public ExampleTopology(final EntityOwnershipService entityOwnershipService,
-                           final NetconfTopology topologyDispatcher) {
-        dataBroker = topologyDispatcher.getDataBroker();
+    public ExampleTopology(final EntityOwnershipService entityOwnershipService, DataBroker dataBroker) {
         final ActorSystem actorSystem = ActorSystem.create("netconf-cluster");
+
+        this.dataBroker = dataBroker;
 
         final NodeManagerCallbackFactory nodeManagerCallbackFactory = new NodeManagerCallbackFactory() {
             @Override
             public NodeManagerCallback create(String nodeId, String topologyId, ActorSystem actorSystem) {
-                return new ExampleNodeManagerCallback(
-                        nodeId, topologyId, actorSystem, topologyDispatcher, new NodeRoleChangeStrategy(entityOwnershipService, "netconf", nodeId));
+                return new ExampleNodeManagerCallback();
             }
         };
 
         final TopologyManagerCallbackFactory topologyManagerCallbackFactory = new TopologyManagerCallbackFactory() {
             @Override
-            public TopologyManagerCallback create(ActorSystem actorSystem, DataBroker dataBroker, String topologyId, List<String> remotePaths) {
-                return new ExampleTopologyManagerCallback(actorSystem, dataBroker, topologyId, remotePaths, nodeManagerCallbackFactory);
+            public TopologyManagerCallback create(ActorSystem actorSystem, DataBroker dataBroker, String topologyId) {
+                return new ExampleTopologyManagerCallback(actorSystem, dataBroker, topologyId, nodeManagerCallbackFactory);
             }
         };
 

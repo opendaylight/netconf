@@ -57,7 +57,7 @@
     <feature name='odl-netconf-clustered-topology' version='${project.version}' description="OpenDaylight :: Clustered Netconf Topology :: Netconf Connector + Netconf SSH Server + Clustered Netconf configuration via config topology datastore">
         <feature version='${project.version}'>odl-netconf-connector</feature>
         <feature version='${project.version}'>odl-netconf-connector-ssh</feature>
-
+        <bundle>mvn:org.opendaylight.netconf/abstract-topology/${netconf.version}</bundle>
         <configfile finalname='${config.configfile.directory}/${config.netconf.topology.configfile}'>mvn:org.opendaylight.netconf/netconf-topology-config/${netconf.version}/xml/clustered-config</configfile>
     </feature>
 
