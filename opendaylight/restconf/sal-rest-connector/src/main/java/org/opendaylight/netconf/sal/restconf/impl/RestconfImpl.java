@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.sal.restconf.impl;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
@@ -40,7 +41,6 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import org.apache.commons.lang3.StringUtils;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.OptimisticLockFailedException;
@@ -391,7 +391,7 @@ public class RestconfImpl implements RestconfService {
         return restconfModule;
     }
 
-    private QName getModuleNameAndRevision(final String identifier) {
+    private static QName getModuleNameAndRevision(final String identifier) {
         final int mountIndex = identifier.indexOf(ControllerContext.MOUNT);
         String moduleNameAndRevision = "";
         if (mountIndex >= 0) {
@@ -464,7 +464,7 @@ public class RestconfImpl implements RestconfService {
                 QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
-    private DOMRpcResult checkRpcResponse(final CheckedFuture<DOMRpcResult, DOMRpcException> response) {
+    private static DOMRpcResult checkRpcResponse(final CheckedFuture<DOMRpcResult, DOMRpcException> response) {
         if (response == null) {
             return null;
         }
@@ -502,7 +502,7 @@ public class RestconfImpl implements RestconfService {
         }
     }
 
-    private void validateInput(final SchemaNode inputSchema, final NormalizedNodeContext payload) {
+    private static void validateInput(final SchemaNode inputSchema, final NormalizedNodeContext payload) {
         if (inputSchema != null && payload.getData() == null) {
             // expected a non null payload
             throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
@@ -569,7 +569,7 @@ public class RestconfImpl implements RestconfService {
 
     @Override
     public NormalizedNodeContext invokeRpc(final String identifier, final String noPayload, final UriInfo uriInfo) {
-        if (StringUtils.isNotBlank(noPayload)) {
+        if (noPayload != null && !CharMatcher.WHITESPACE.matchesAllOf(noPayload)) {
             throw new RestconfDocumentedException("Content must be empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
@@ -633,7 +633,7 @@ public class RestconfImpl implements RestconfService {
                 result.getResult(), QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
-    private RpcDefinition findRpc(final SchemaContext schemaContext, final String identifierDecoded) {
+    private static RpcDefinition findRpc(final SchemaContext schemaContext, final String identifierDecoded) {
         final String[] splittedIdentifier = identifierDecoded.split(":");
         if (splittedIdentifier.length != 2) {
             final String errMsg = identifierDecoded + " couldn't be splitted to 2 parts (module:rpc name)";
@@ -747,7 +747,7 @@ public class RestconfImpl implements RestconfService {
         return Response.status(Status.OK).build();
     }
 
-    private void validateTopLevelNodeName(final NormalizedNodeContext node,
+    private static void validateTopLevelNodeName(final NormalizedNodeContext node,
             final YangInstanceIdentifier identifier) {
 
         final String payloadName = node.getData().getNodeType().getLocalName();
@@ -818,7 +818,7 @@ public class RestconfImpl implements RestconfService {
     }
 
     // FIXME create RestconfIdetifierHelper and move this method there
-    private YangInstanceIdentifier checkConsistencyOfNormalizedNodeContext(final NormalizedNodeContext payload) {
+    private static YangInstanceIdentifier checkConsistencyOfNormalizedNodeContext(final NormalizedNodeContext payload) {
         Preconditions.checkArgument(payload != null);
         Preconditions.checkArgument(payload.getData() != null);
         Preconditions.checkArgument(payload.getData().getNodeType() != null);
@@ -987,7 +987,7 @@ public class RestconfImpl implements RestconfService {
      *            contains value
      * @return enum object if its string value is equal to {@code paramName}. In other cases null.
      */
-    private <T> T parseEnumTypeParameter(final ContainerNode value, final Class<T> classDescriptor,
+    private static <T> T parseEnumTypeParameter(final ContainerNode value, final Class<T> classDescriptor,
             final String paramName) {
         final Optional<DataContainerChild<? extends PathArgument, ?>> augNode = value.getChild(SAL_REMOTE_AUG_IDENTIFIER);
         if (!augNode.isPresent() && !(augNode instanceof AugmentationNode)) {
@@ -1012,14 +1012,14 @@ public class RestconfImpl implements RestconfService {
      * @return enum object if string value of {@code classDescriptor} enumeration is equal to {@code value}. Other cases
      *         null.
      */
-    private <T> T parserURIEnumParameter(final Class<T> classDescriptor, final String value) {
+    private static <T> T parserURIEnumParameter(final Class<T> classDescriptor, final String value) {
         if (Strings.isNullOrEmpty(value)) {
             return null;
         }
         return resolveAsEnum(classDescriptor, value);
     }
 
-    private <T> T resolveAsEnum(final Class<T> classDescriptor, final String value) {
+    private static <T> T resolveAsEnum(final Class<T> classDescriptor, final String value) {
         final T[] enumConstants = classDescriptor.getEnumConstants();
         if (enumConstants != null) {
             for (final T enm : classDescriptor.getEnumConstants()) {
@@ -1031,7 +1031,7 @@ public class RestconfImpl implements RestconfService {
         return null;
     }
 
-    private Map<String, String> resolveValuesFromUri(final String uri) {
+    private static Map<String, String> resolveValuesFromUri(final String uri) {
         final Map<String, String> result = new HashMap<>();
         final String[] tokens = uri.split("/");
         for (int i = 1; i < tokens.length; i++) {
