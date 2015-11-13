@@ -9,8 +9,8 @@
 package org.opendaylight.netconf.sal.connect.netconf.listener;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0;
-
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -44,7 +44,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -88,7 +87,6 @@ public class NetconfDeviceCommunicatorTest {
         communicator = new NetconfDeviceCommunicator( new RemoteDeviceId( "test", InetSocketAddress.createUnresolved("localhost", 22)), mockDevice);
     }
 
-    @SuppressWarnings("unchecked")
     void setupSession() {
         doReturn(Collections.<String>emptySet()).when(mockSession).getServerCapabilities();
         doNothing().when(mockDevice).onRemoteSessionUp(any(NetconfSessionPreferences.class),
@@ -101,7 +99,7 @@ public class NetconfDeviceCommunicatorTest {
     }
 
     @SuppressWarnings("unchecked")
-    private ListenableFuture<RpcResult<NetconfMessage>> sendRequest( String messageID ) throws Exception {
+    private ListenableFuture<RpcResult<NetconfMessage>> sendRequest( final String messageID ) throws Exception {
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         Element element = doc.createElement( "request" );
         element.setAttribute( "message-id", messageID );
@@ -284,7 +282,7 @@ public class NetconfDeviceCommunicatorTest {
                     rpcError.getMessage().contains( "mock error" ) );
     }
 
-    private NetconfMessage createSuccessResponseMessage( String messageID ) throws ParserConfigurationException {
+    private static NetconfMessage createSuccessResponseMessage( final String messageID ) throws ParserConfigurationException {
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         Element rpcReply = doc.createElementNS( URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, XmlMappingConstants.RPC_REPLY_KEY);
         rpcReply.setAttribute( "message-id", messageID );
@@ -430,7 +428,7 @@ public class NetconfDeviceCommunicatorTest {
                       errorInfo.contains( "expected-message-id" ) );
     }
 
-    private NetconfMessage createErrorResponseMessage( String messageID ) throws Exception {
+    private static NetconfMessage createErrorResponseMessage( final String messageID ) throws Exception {
         String xmlStr =
             "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"" +
             "           message-id=\"" + messageID + "\">" +
@@ -451,7 +449,7 @@ public class NetconfDeviceCommunicatorTest {
         return new NetconfMessage( doc );
     }
 
-    private void verifyResponseMessage( RpcResult<NetconfMessage> rpcResult, String dataText ) {
+    private static void verifyResponseMessage( final RpcResult<NetconfMessage> rpcResult, final String dataText ) {
         assertNotNull( "RpcResult is null", rpcResult );
         assertEquals( "isSuccessful", true, rpcResult.isSuccessful() );
         NetconfMessage messageResult = rpcResult.getResult();
@@ -463,8 +461,8 @@ public class NetconfDeviceCommunicatorTest {
 //        assertEquals( "SimpleNode value", dataText, nodes.iterator().next().getValue() );
     }
 
-    private RpcError verifyErrorRpcResult( RpcResult<NetconfMessage> rpcResult,
-                                           RpcError.ErrorType expErrorType, String expErrorTag ) {
+    private static RpcError verifyErrorRpcResult( final RpcResult<NetconfMessage> rpcResult,
+                                           final RpcError.ErrorType expErrorType, final String expErrorTag ) {
         assertNotNull( "RpcResult is null", rpcResult );
         assertEquals( "isSuccessful", false, rpcResult.isSuccessful() );
         assertNotNull( "RpcResult errors is null", rpcResult.getErrors() );
@@ -473,7 +471,11 @@ public class NetconfDeviceCommunicatorTest {
         assertEquals( "getErrorSeverity", RpcError.ErrorSeverity.ERROR, rpcError.getSeverity() );
         assertEquals( "getErrorType", expErrorType, rpcError.getErrorType() );
         assertEquals( "getErrorTag", expErrorTag, rpcError.getTag() );
-        assertTrue( "getMessage is empty", StringUtils.isNotEmpty( rpcError.getMessage() ) );
+
+        final String msg = rpcError.getMessage();
+        assertNotNull("getMessage is null", msg);
+        assertFalse("getMessage is empty", msg.isEmpty());
+        assertFalse("getMessage is blank", CharMatcher.WHITESPACE.matchesAllOf(msg));
         return rpcError;
     }
 }
