@@ -22,13 +22,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import com.google.common.base.Optional;
+import com.google.common.io.Resources;
 import com.google.common.util.concurrent.Futures;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -111,9 +111,8 @@ public class JSONRestconfServiceImplTest {
         reset(brokerFacade);
     }
 
-    private String loadData(String path) throws IOException {
-        InputStream stream = JSONRestconfServiceImplTest.class.getResourceAsStream(path);
-        return IOUtils.toString(stream, "UTF-8");
+    private static String loadData(final String path) throws IOException {
+        return Resources.asCharSource(JSONRestconfServiceImplTest.class.getResource(path), StandardCharsets.UTF_8).read();
     }
 
     @SuppressWarnings("rawtypes")
@@ -398,7 +397,7 @@ public class JSONRestconfServiceImplTest {
         service.invokeRpc(uriPath, Optional.<String>absent());
     }
 
-    void testGet(LogicalDatastoreType datastoreType) throws OperationFailedException {
+    void testGet(final LogicalDatastoreType datastoreType) throws OperationFailedException {
         MapEntryNode entryNode = ImmutableNodes.mapEntryBuilder(INTERFACE_QNAME, NAME_QNAME, "eth0")
                 .withChild(ImmutableNodes.leafNode(NAME_QNAME, "eth0"))
                 .withChild(ImmutableNodes.leafNode(TYPE_QNAME, "ethernetCsmacd"))
@@ -447,13 +446,13 @@ public class JSONRestconfServiceImplTest {
         return mockMountPoint;
     }
 
-    void verifyLeafNode(DataContainerNode<?> parent, QName leafType, Object leafValue) {
+    void verifyLeafNode(final DataContainerNode<?> parent, final QName leafType, final Object leafValue) {
         Optional<DataContainerChild<?, ?>> leafChild = parent.getChild(new NodeIdentifier(leafType));
         assertEquals(leafType.toString() + " present", true, leafChild.isPresent());
         assertEquals(leafType.toString() + " value", leafValue, leafChild.get().getValue());
     }
 
-    void verifyPath(YangInstanceIdentifier path, Object... expArgs) {
+    void verifyPath(final YangInstanceIdentifier path, final Object... expArgs) {
         List<PathArgument> pathArgs = path.getPathArguments();
         assertEquals("Arg count for actual path " + path, expArgs.length, pathArgs.size());
         int i = 0;
