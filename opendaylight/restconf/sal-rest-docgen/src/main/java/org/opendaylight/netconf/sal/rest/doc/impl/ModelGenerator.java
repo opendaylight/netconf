@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.concurrent.NotThreadSafe;
-import org.apache.commons.lang3.BooleanUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -197,7 +196,7 @@ public class ModelGenerator {
      *            The JSONObject in which the parsed identity will be put as a 'model' obj
      * @throws JSONException
      */
-    private void processIdentities(final Module module, final JSONObject models) throws JSONException {
+    private static void processIdentities(final Module module, final JSONObject models) throws JSONException {
 
         String moduleName = module.getName();
         Set<IdentitySchemaNode> idNodes = module.getIdentities();
@@ -252,19 +251,19 @@ public class ModelGenerator {
      */
     private JSONObject processDataNodeContainer(final DataNodeContainer dataNode, final String moduleName, final JSONObject models,
             final SchemaContext schemaContext) throws JSONException, IOException {
-        return processDataNodeContainer(dataNode, moduleName, models, (Boolean) null, schemaContext);
+        return processDataNodeContainer(dataNode, moduleName, models, true, schemaContext);
     }
 
     private JSONObject processDataNodeContainer(final DataNodeContainer dataNode, final String moduleName, final JSONObject models,
-            final Boolean isConfig, final SchemaContext schemaContext) throws JSONException, IOException {
+            final boolean isConfig, final SchemaContext schemaContext) throws JSONException, IOException {
         if (dataNode instanceof ListSchemaNode || dataNode instanceof ContainerSchemaNode) {
             Preconditions.checkArgument(dataNode instanceof SchemaNode, "Data node should be also schema node");
             Iterable<DataSchemaNode> containerChildren = dataNode.getChildNodes();
             JSONObject properties = processChildren(containerChildren, ((SchemaNode) dataNode).getQName(), moduleName,
                     models, isConfig, schemaContext);
 
-            String nodeName = (BooleanUtils.isNotFalse(isConfig) ? OperationBuilder.CONFIG
-                    : OperationBuilder.OPERATIONAL) + ((SchemaNode) dataNode).getQName().getLocalName();
+            String nodeName = (isConfig ? OperationBuilder.CONFIG : OperationBuilder.OPERATIONAL)
+                    + ((SchemaNode) dataNode).getQName().getLocalName();
 
             JSONObject childSchema = getSchemaTemplate();
             childSchema.put(TYPE_KEY, OBJECT_TYPE);
@@ -272,7 +271,7 @@ public class ModelGenerator {
             childSchema.put("id", nodeName);
             models.put(nodeName, childSchema);
 
-            if (BooleanUtils.isNotFalse(isConfig)) {
+            if (isConfig) {
                 createConcreteModelForPost(models, ((SchemaNode) dataNode).getQName().getLocalName(),
                         createPropertiesForPost(dataNode));
             }
@@ -288,8 +287,8 @@ public class ModelGenerator {
         return null;
     }
 
-    private void createConcreteModelForPost(final JSONObject models, final String localName, final JSONObject properties)
-            throws JSONException {
+    private static void createConcreteModelForPost(final JSONObject models, final String localName,
+            final JSONObject properties) throws JSONException {
         String nodePostName = OperationBuilder.CONFIG + localName + Post.METHOD_NAME;
         JSONObject postSchema = getSchemaTemplate();
         postSchema.put(TYPE_KEY, OBJECT_TYPE);
@@ -318,7 +317,7 @@ public class ModelGenerator {
 
     private JSONObject processChildren(final Iterable<DataSchemaNode> nodes, final QName parentQName, final String moduleName,
             final JSONObject models, final SchemaContext schemaContext) throws JSONException, IOException {
-        return processChildren(nodes, parentQName, moduleName, models, null, schemaContext);
+        return processChildren(nodes, parentQName, moduleName, models, true, schemaContext);
     }
 
     /**
@@ -333,12 +332,12 @@ public class ModelGenerator {
      * @throws IOException
      */
     private JSONObject processChildren(final Iterable<DataSchemaNode> nodes, final QName parentQName, final String moduleName,
-            final JSONObject models, final Boolean isConfig, final SchemaContext schemaContext) throws JSONException, IOException {
+            final JSONObject models, final boolean isConfig, final SchemaContext schemaContext) throws JSONException, IOException {
 
         JSONObject properties = new JSONObject();
 
         for (DataSchemaNode node : nodes) {
-            if (isConfig == null || node.isConfiguration() == isConfig) {
+            if (node.isConfiguration() == isConfig) {
 
                 String name = resolveNodesName(node, topLevelModule, schemaContext);
                 JSONObject property = null;
@@ -427,7 +426,7 @@ public class ModelGenerator {
      * @param props
      * @throws JSONException
      */
-    private void processConstraints(final ConstraintDefinition constraints, final JSONObject props) throws JSONException {
+    private static void processConstraints(final ConstraintDefinition constraints, final JSONObject props) throws JSONException {
         boolean isMandatory = constraints.isMandatory();
         props.put(REQUIRED_KEY, isMandatory);
 
@@ -465,7 +464,7 @@ public class ModelGenerator {
      * @return
      * @throws JSONException
      */
-    private JSONObject processAnyXMLNode(final AnyXmlSchemaNode leafNode) throws JSONException {
+    private static JSONObject processAnyXMLNode(final AnyXmlSchemaNode leafNode) throws JSONException {
         JSONObject property = new JSONObject();
 
         String leafDescription = leafNode.getDescription();
@@ -532,10 +531,7 @@ public class ModelGenerator {
 
     }
 
-    /*
-   *
-   */
-    private void processBinaryType(final BinaryTypeDefinition binaryType, final JSONObject property) throws JSONException {
+    private static void processBinaryType(final BinaryTypeDefinition binaryType, final JSONObject property) throws JSONException {
         property.put(TYPE_KEY, STRING);
         JSONObject media = new JSONObject();
         media.put(BINARY_ENCODING_KEY, BASE_64);
@@ -548,7 +544,7 @@ public class ModelGenerator {
      * @param property
      * @throws JSONException
      */
-    private void processEnumType(final EnumerationType enumLeafType, final JSONObject property) throws JSONException {
+    private static void processEnumType(final EnumerationType enumLeafType, final JSONObject property) throws JSONException {
         List<EnumPair> enumPairs = enumLeafType.getValues();
         List<String> enumNames = new ArrayList<String>();
         for (EnumPair enumPair : enumPairs) {
@@ -563,7 +559,7 @@ public class ModelGenerator {
      * @param property
      * @throws JSONException
      */
-    private void processBitsType(final BitsTypeDefinition bitsType, final JSONObject property) throws JSONException {
+    private static void processBitsType(final BitsTypeDefinition bitsType, final JSONObject property) throws JSONException {
         property.put(TYPE_KEY, ARRAY_TYPE);
         property.put(MIN_ITEMS, 0);
         property.put(UNIQUE_ITEMS_KEY, true);
@@ -584,7 +580,7 @@ public class ModelGenerator {
      * @param property
      * @throws JSONException
      */
-    private void processUnionType(final UnionTypeDefinition unionType, final JSONObject property) throws JSONException {
+    private static void processUnionType(final UnionTypeDefinition unionType, final JSONObject property) throws JSONException {
 
         StringBuilder type = new StringBuilder();
         for (TypeDefinition<?> typeDef : unionType.getTypes()) {
@@ -603,7 +599,7 @@ public class ModelGenerator {
      * @return
      * @throws JSONException
      */
-    private JSONObject getSchemaTemplate() throws JSONException {
+    private static JSONObject getSchemaTemplate() throws JSONException {
         JSONObject schemaJSON = new JSONObject();
         schemaJSON.put(SCHEMA_KEY, SCHEMA_URL);
 
