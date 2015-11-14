@@ -37,6 +37,7 @@ import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurati
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurationBuilder;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
+import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemas;
@@ -96,7 +97,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     private final EventExecutor eventExecutor;
     private final ScheduledThreadPool keepaliveExecutor;
     private final ThreadPool processingExecutor;
-    private final SharedSchemaRepository sharedSchemaRepository;
+    protected final SharedSchemaRepository sharedSchemaRepository;
 
     private SchemaSourceRegistry schemaRegistry = null;
     private SchemaContextFactory schemaContextFactory = null;
@@ -239,7 +240,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         NetconfDevice device = new NetconfDevice(schemaResourcesDTO, remoteDeviceId, salFacade,
                 processingExecutor.getExecutor(), reconnectOnChangedSchema);
 
-        return new NetconfConnectorDTO(new NetconfDeviceCommunicator(remoteDeviceId, device), salFacade);
+
+        return new NetconfConnectorDTO(initCommunicator(remoteDeviceId, device), salFacade);
+    }
+
+    protected NetconfDeviceCommunicator initCommunicator(RemoteDeviceId deviceId, RemoteDevice device) {
+        return new NetconfDeviceCommunicator(deviceId, device);
     }
 
     public NetconfReconnectingClientConfiguration getClientConfig(final NetconfDeviceCommunicator listener, NetconfNode node) {

@@ -135,6 +135,17 @@ public class ActorTest {
     }
 
     @Test
+    public void testResolvingSchemaContext() throws InterruptedException {
+        EntityOwnershipService topoOwnership = new TestingEntityOwnershipService();
+        // load from config
+        final TopologyManager master = createManagerWithOwnership(ACTOR_SYSTEM, TOPOLOGY_NETCONF, true, createRealTopoTestingNodeCallbackFactory(), new TopologyRoleChangeStrategy(dataBroker, topoOwnership, TOPOLOGY_NETCONF, "topology-manager"));
+        Thread.sleep(1000);
+        final TopologyManager slave1 = createManagerWithOwnership(ACTOR_SYSTEM_SLAVE1, TOPOLOGY_NETCONF, false, createRealTopoTestingNodeCallbackFactory(), new TopologyRoleChangeStrategy(dataBroker, topoOwnership, TOPOLOGY_NETCONF, "topology-manager"));
+        final TopologyManager slave2 = createManagerWithOwnership(ACTOR_SYSTEM_SLAVE2, TOPOLOGY_NETCONF, false, createRealTopoTestingNodeCallbackFactory(), new TopologyRoleChangeStrategy(dataBroker, topoOwnership, TOPOLOGY_NETCONF, "topology-manager"));
+
+    }
+
+    @Test
     public void testRealActors() throws Exception {
 
         EntityOwnershipService topoOwnership = new TestingEntityOwnershipService();
@@ -150,6 +161,8 @@ public class ActorTest {
                 return master.hasAllPeersUp();
             }
         });
+
+
 
         final List<ListenableFuture<Node>> futures = new ArrayList<>();
         for (int i = 0; i <= 1; i++) {
@@ -322,6 +335,8 @@ public class ActorTest {
             }
         }), TOPOLOGY_NETCONF);
     }
+
+
 
     private TopologyManagerCallbackFactory createRealTopoTestingNodeCallbackFactory() {
         final NodeManagerCallbackFactory nodeManagerCallbackFactory = new NodeManagerCallbackFactory() {
