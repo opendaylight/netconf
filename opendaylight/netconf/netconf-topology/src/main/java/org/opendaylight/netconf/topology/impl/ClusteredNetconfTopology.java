@@ -25,10 +25,13 @@ import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker.ProviderContext;
 import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.AbstractNetconfTopology;
+import org.opendaylight.netconf.topology.ClusteredNetconfDeviceCommunicator;
 import org.opendaylight.netconf.topology.NetconfTopology;
 import org.opendaylight.netconf.topology.NodeManagerCallback;
 import org.opendaylight.netconf.topology.NodeManagerCallback.NodeManagerCallbackFactory;
@@ -45,6 +48,8 @@ import org.opendaylight.netconf.topology.util.NodeRoleChangeStrategy;
 import org.opendaylight.netconf.topology.util.NodeWriter;
 import org.opendaylight.netconf.topology.util.TopologyRoleChangeStrategy;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +75,10 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
         LOG.warn("Clustered netconf topo started");
     }
 
+    public SharedSchemaRepository getSchemaRepository(){
+        return sharedSchemaRepository;
+    }
+
     @Override
     public void onSessionInitiated(final ProviderContext session) {
         dataBroker = session.getSALService(DataBroker.class);
@@ -87,6 +96,21 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
                         new TopologyRoleChangeStrategy(dataBroker, entityOwnershipService, "topology-netconf", "topology-manager"));
             }
         }), topologyId);
+    }
+
+    @Override
+    protected NetconfDeviceCommunicator initCommunicator(RemoteDeviceId deviceId, RemoteDevice device) {
+        return new ClusteredNetconfDeviceCommunicator(deviceId, device);
+    }
+
+    public void notifySalFacade(NodeId nodeId, SchemaContext context) {
+        ClusteredNetconfDeviceCommunicator communicator = (ClusteredNetconfDeviceCommunicator) activeConnectors.get(nodeId).getCommunicator();
+        //TODO notify SAL Facade via communicator, compute preferences from context, create new DeviceRPC
+    }
+
+    public void initSchemaDownload(NodeId nodeId) {
+        ClusteredNetconfDeviceCommunicator communicator = (ClusteredNetconfDeviceCommunicator) activeConnectors.get(nodeId).getCommunicator();
+        communicator.callOnDeviceUp();
     }
 
     @Override
@@ -156,4 +180,6 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
             return new NetconfNodeManagerCallback(nodeId, topologyId, actorSystem, netconfTopology, new NodeRoleChangeStrategy(entityOwnershipService, "netconf-node", nodeId));
         }
     }
+
+
 }
