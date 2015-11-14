@@ -14,19 +14,28 @@ import akka.actor.TypedActor;
 import akka.actor.TypedProps;
 import akka.cluster.Cluster;
 import akka.dispatch.OnComplete;
+import akka.japi.Creator;
+import akka.util.Timeout;
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opendaylight.controller.cluster.schema.repository.RemoteSchemaRepository;
+import org.opendaylight.controller.cluster.schema.repository.impl.RemoteSchemaProvider;
+import org.opendaylight.controller.cluster.schema.repository.impl.RemoteSchemaRepositoryImpl;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
@@ -54,7 +63,12 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.model.api.ModuleIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
+import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
@@ -195,6 +209,8 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, RemoteDe
             @Override
             public void onSuccess(@Nullable NetconfDeviceCapabilities result) {
                 registration = topologyDispatcher.registerConnectionStatusListener(nodeId, NetconfNodeManagerCallback.this);
+                LOG.debug("connection established, registering role candidate");
+                roleChangeStrategy.registerRoleCandidate(NetconfNodeManagerCallback.this);
             }
 
             @Override
@@ -310,20 +326,84 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, RemoteDe
             return;
         }
         isMaster = roleChangeDTO.isOwner();
-        //TODO instead of registering mount point, init remote schema repo when its done
         if (isMaster) {
+            //we need to ininitialize downloading and resolving schemas from device
+            topologyDispatcher.initSchemaDownload(new NodeId(nodeId));
             // unregister old mountPoint if ownership changed, register a new one
             topologyDispatcher.registerMountPoint(new NodeId(nodeId));
         } else {
-            topologyDispatcher.unregisterMountPoint(new NodeId(nodeId));
+            //we need to download schemas from master
+            //we must select remote schema repository actor
+            Future<ActorRef> remoteRepFuture = actorSystem.actorSelection("/user/" + topologyId + "/remoteRepository").resolveOne(Timeout.intToTimeout(20));
+            remoteRepFuture.onComplete(new OnComplete<ActorRef>() {
+                @Override
+                public void onComplete(Throwable throwable, ActorRef actorRef) throws Throwable {
+                    RemoteSchemaRepository remoteRepo = TypedActor.get(actorSystem).typedActorOf(new TypedProps<RemoteSchemaRepository>(RemoteSchemaRepository.class), actorRef);
+                    slaveSetupSchema(remoteRepo);
+                }
+            }, actorSystem.dispatcher());
+
+
         }
+    }
+
+    private void slaveSetupSchema(final RemoteSchemaRepository remoteRepo) {
+
+        Future sourcesFuture = remoteRepo.getProvidedSources();
+        final RemoteSchemaProvider remoteProvider = new RemoteSchemaProvider(remoteRepo, actorSystem.dispatcher());
+
+        sourcesFuture.onComplete(new OnComplete<Set<SourceIdentifier>>() {
+            @Override
+            public void onComplete(Throwable throwable, Set<SourceIdentifier> sourceIdentifiers) throws Throwable {
+                for (SourceIdentifier sourceId : sourceIdentifiers) {
+                    topologyDispatcher.getSchemaRepository().registerSchemaSource(remoteProvider,
+                            PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue()));
+                }
+
+                ListenableFuture schemaContextFuture = topologyDispatcher
+                        .getSchemaRepository()
+                        .createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT)
+                        .createSchemaContext(sourceIdentifiers);
+
+                Futures.addCallback(schemaContextFuture, new FutureCallback<SchemaContext>() {
+                    @Override
+                    public void onSuccess(@Nullable SchemaContext result) {
+                        topologyDispatcher.notifySalFacade(new NodeId(nodeId), result);
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+
+                    }
+                });
+            }
+        }, actorSystem.dispatcher());
+
+
     }
 
     @Override
     public void onDeviceConnected(final SchemaContext remoteSchemaContext, final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc) {
-        // we need to notify the higher level that something happened, get a current status from all other nodes, and aggregate a new result
-        LOG.debug("onDeviceConnected received, registering role candidate");
-        roleChangeStrategy.registerRoleCandidate(this);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("mm-dd-yyyy");
+
+        //if master initialize remote schema repo
+        if(isMaster) {
+            //get all module identifiers from schemacontext
+            final Set<SourceIdentifier> sourceIds = Sets.newHashSet();
+            for(ModuleIdentifier id : remoteSchemaContext.getAllModuleIdentifiers()) {
+                sourceIds.add(SourceIdentifier.create(id.getName(), Optional.of(dateFormat.format(id.getRevision()))));
+            }
+
+            RemoteSchemaRepository remoteRepo = TypedActor.get(TypedActor.context()).typedActorOf(
+                    new TypedProps<RemoteSchemaRepositoryImpl>(RemoteSchemaRepository.class,
+                            new Creator<RemoteSchemaRepositoryImpl>() {
+                                @Override
+                                public RemoteSchemaRepositoryImpl create() throws Exception {
+                                    return new RemoteSchemaRepositoryImpl(topologyDispatcher.getSchemaRepository(), sourceIds);
+                                }
+                            }), "remoteRepository");
+        }
+
         List<String> capabilityList = new ArrayList<>();
         capabilityList.addAll(netconfSessionPreferences.getNetconfDeviceCapabilities().getNonModuleBasedCapabilities());
         capabilityList.addAll(FluentIterable.from(netconfSessionPreferences.getNetconfDeviceCapabilities().getResolvedCapabilities()).transform(AVAILABLE_CAPABILITY_TRANSFORMER).toList());

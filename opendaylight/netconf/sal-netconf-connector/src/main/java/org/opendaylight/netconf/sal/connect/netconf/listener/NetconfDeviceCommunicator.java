@@ -48,7 +48,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceCommunicator.class);
 
-    private final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice;
+    protected final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice;
     private final Optional<NetconfSessionPreferences> overrideNetconfCapabilities;
     private final RemoteDeviceId id;
     private final Lock sessionLock = new ReentrantLock();
@@ -56,6 +56,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     // TODO implement concurrent message limit
     private final Queue<Request> requests = new ArrayDeque<>();
     private NetconfClientSession session;
+    protected NetconfSessionPreferences netconfSessionPreferences;
 
     private Future<?> initFuture;
     private SettableFuture<NetconfDeviceCapabilities> firstConnectionFuture;
@@ -85,8 +86,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             LOG.debug("{}: Session established", id);
             this.session = session;
 
-            NetconfSessionPreferences netconfSessionPreferences =
-                                             NetconfSessionPreferences.fromNetconfSession(session);
+            netconfSessionPreferences = NetconfSessionPreferences.fromNetconfSession(session);
             LOG.trace("{}: Session advertised capabilities: {}", id,
                     netconfSessionPreferences);
 
@@ -98,7 +98,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             }
 
 
-            remoteDevice.onRemoteSessionUp(netconfSessionPreferences, this);
+            initDevice(netconfSessionPreferences);
             if (!firstConnectionFuture.isDone()) {
                 firstConnectionFuture.set(netconfSessionPreferences.getNetconfDeviceCapabilities());
             }
@@ -106,6 +106,10 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         finally {
             sessionLock.unlock();
         }
+    }
+
+    protected void initDevice(NetconfSessionPreferences netconfSessionPreferences) {
+        remoteDevice.onRemoteSessionUp(netconfSessionPreferences, this);
     }
 
     /**
