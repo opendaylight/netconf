@@ -45,10 +45,13 @@ public class NodeRoleChangeStrategy implements RoleChangeStrategy, EntityOwnersh
         LOG.debug("Registering role candidate type: {} , name: {}", entityType, entityName);
         this.ownershipCandidate = electionCandidate;
         try {
-            if (candidateRegistration != null) {
-                unregisterRoleCandidate();
+            Entity entity = new Entity(entityType, entityName);
+            //TODO: Change pipeline in clustered schema resolution
+            if (entityOwnershipService.isCandidateRegistered(entity)) {
+                LOG.debug("Trying to register already registered candidate for election.");
+                return;
             }
-            candidateRegistration = entityOwnershipService.registerCandidate(new Entity(entityType, entityName));
+            candidateRegistration = entityOwnershipService.registerCandidate(entity);
             ownershipListenerRegistration = entityOwnershipService.registerListener(entityType, this);
         } catch (CandidateAlreadyRegisteredException e) {
             LOG.error("Candidate already registered for election", e);

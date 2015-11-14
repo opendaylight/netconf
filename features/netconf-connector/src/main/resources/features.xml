@@ -35,6 +35,7 @@
         <feature version='${netconf.version}'>odl-netconf-client</feature>
         <feature version='${yangtools.version}'>odl-mdsal-models</feature>
         <bundle>mvn:org.opendaylight.netconf/sal-netconf-connector/${controller.mdsal.version}</bundle>
+        <bundle>mvn:org.opendaylight.controller/sal-clustering-commons/${controller.mdsal.version}</bundle>
         <bundle>mvn:org.opendaylight.controller.model/model-inventory/${controller.mdsal.version}</bundle>
         <bundle>mvn:org.opendaylight.netconf/netconf-topology/${netconf.version}</bundle>
         <bundle>mvn:org.opendaylight.netconf/abstract-topology/${netconf.version}</bundle>
