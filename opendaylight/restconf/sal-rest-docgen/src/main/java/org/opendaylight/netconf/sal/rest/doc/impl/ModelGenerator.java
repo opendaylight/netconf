@@ -9,12 +9,9 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolveNodesName;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.json.JSONArray;
@@ -42,23 +39,17 @@ import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BinaryTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition.Bit;
+import org.opendaylight.yangtools.yang.model.api.type.BooleanTypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.DecimalTypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.EnumTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.EnumTypeDefinition.EnumPair;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.IntegerTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LengthConstraint;
+import org.opendaylight.yangtools.yang.model.api.type.StringTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.UnionTypeDefinition;
-import org.opendaylight.yangtools.yang.model.util.BooleanType;
-import org.opendaylight.yangtools.yang.model.util.Decimal64;
-import org.opendaylight.yangtools.yang.model.util.EnumerationType;
+import org.opendaylight.yangtools.yang.model.api.type.UnsignedIntegerTypeDefinition;
 import org.opendaylight.yangtools.yang.model.util.ExtendedType;
-import org.opendaylight.yangtools.yang.model.util.Int16;
-import org.opendaylight.yangtools.yang.model.util.Int32;
-import org.opendaylight.yangtools.yang.model.util.Int64;
-import org.opendaylight.yangtools.yang.model.util.Int8;
-import org.opendaylight.yangtools.yang.model.util.StringType;
-import org.opendaylight.yangtools.yang.model.util.Uint16;
-import org.opendaylight.yangtools.yang.model.util.Uint32;
-import org.opendaylight.yangtools.yang.model.util.Uint64;
-import org.opendaylight.yangtools.yang.model.util.Uint8;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,31 +88,28 @@ public class ModelGenerator {
     private static final String ID_KEY = "id";
     private static final String SUB_TYPES_KEY = "subTypes";
 
-    private static final Map<Class<?>, String> YANG_TYPE_TO_JSON_TYPE_MAPPING;
-
-    static {
-        final Builder<Class<?>, String> b = ImmutableMap.builder();
-
-        b.put(StringType.class, STRING);
-        b.put(BooleanType.class, BOOLEAN);
-        b.put(Int8.class, INTEGER);
-        b.put(Int16.class, INTEGER);
-        b.put(Int32.class, INTEGER);
-        b.put(Int64.class, INTEGER);
-        b.put(Uint16.class, INTEGER);
-        b.put(Uint32.class, INTEGER);
-        b.put(Uint64.class, INTEGER);
-        b.put(Uint8.class, INTEGER);
-        b.put(Decimal64.class, NUMBER);
-        b.put(EnumerationType.class, ENUM);
-        // TODO: Binary type
-
-        YANG_TYPE_TO_JSON_TYPE_MAPPING = b.build();
-    }
-
     private Module topLevelModule;
 
     public ModelGenerator() {
+    }
+
+    private static String jsonTypeFor(final TypeDefinition<?> type) {
+        if (type instanceof BooleanTypeDefinition) {
+            return BOOLEAN;
+        } else if (type instanceof DecimalTypeDefinition) {
+            return NUMBER;
+        } else if (type instanceof EnumTypeDefinition) {
+            return ENUM;
+        } else if (type instanceof IntegerTypeDefinition) {
+            return INTEGER;
+        } else if (type instanceof UnsignedIntegerTypeDefinition) {
+            return INTEGER;
+        } else if (type instanceof StringTypeDefinition) {
+            return STRING;
+        }
+
+        // TODO: Binary type
+        return null;
     }
 
     public JSONObject convertToJsonSchema(final Module module, final SchemaContext schemaContext) throws IOException, JSONException {
@@ -483,8 +471,8 @@ public class ModelGenerator {
 
         if (leafTypeDef instanceof ExtendedType) {
             processExtendedType(leafTypeDef, property);
-        } else if (leafTypeDef instanceof EnumerationType) {
-            processEnumType((EnumerationType) leafTypeDef, property);
+        } else if (leafTypeDef instanceof EnumTypeDefinition) {
+            processEnumType((EnumTypeDefinition) leafTypeDef, property);
 
         } else if (leafTypeDef instanceof BitsTypeDefinition) {
             processBitsType((BitsTypeDefinition) leafTypeDef, property);
@@ -497,8 +485,7 @@ public class ModelGenerator {
         } else if (leafTypeDef instanceof BinaryTypeDefinition) {
             processBinaryType((BinaryTypeDefinition) leafTypeDef, property);
         } else {
-            // System.out.println("In else: " + leafTypeDef.getClass());
-            String jsonType = YANG_TYPE_TO_JSON_TYPE_MAPPING.get(leafTypeDef.getClass());
+            String jsonType = jsonTypeFor(leafTypeDef);
             if (jsonType == null) {
                 jsonType = "object";
             }
@@ -513,10 +500,10 @@ public class ModelGenerator {
      * @throws JSONException
      */
     private void processExtendedType(final TypeDefinition<?> leafTypeDef, final JSONObject property) throws JSONException {
-        Object leafBaseType = leafTypeDef.getBaseType();
+        TypeDefinition<?> leafBaseType = leafTypeDef.getBaseType();
         if (leafBaseType instanceof ExtendedType) {
             // recursively process an extended type until we hit a base type
-            processExtendedType((TypeDefinition<?>) leafBaseType, property);
+            processExtendedType(leafBaseType, property);
         } else {
             List<LengthConstraint> lengthConstraints = ((ExtendedType) leafTypeDef).getLengthConstraints();
             for (LengthConstraint lengthConstraint : lengthConstraints) {
@@ -525,7 +512,7 @@ public class ModelGenerator {
                 property.putOpt(MIN_LENGTH_KEY, min);
                 property.putOpt(MAX_LENGTH_KEY, max);
             }
-            String jsonType = YANG_TYPE_TO_JSON_TYPE_MAPPING.get(leafBaseType.getClass());
+            String jsonType = jsonTypeFor(leafBaseType);
             property.putOpt(TYPE_KEY, jsonType);
         }
 
@@ -544,7 +531,7 @@ public class ModelGenerator {
      * @param property
      * @throws JSONException
      */
-    private static void processEnumType(final EnumerationType enumLeafType, final JSONObject property) throws JSONException {
+    private static void processEnumType(final EnumTypeDefinition enumLeafType, final JSONObject property) throws JSONException {
         List<EnumPair> enumPairs = enumLeafType.getValues();
         List<String> enumNames = new ArrayList<String>();
         for (EnumPair enumPair : enumPairs) {
@@ -587,7 +574,7 @@ public class ModelGenerator {
             if (type.length() > 0) {
                 type.append(" or ");
             }
-            type.append(YANG_TYPE_TO_JSON_TYPE_MAPPING.get(typeDef.getClass()));
+            type.append(jsonTypeFor(typeDef));
         }
 
         property.put(TYPE_KEY, type);
