@@ -62,15 +62,27 @@ public final class StressClient {
     }
 
     static final QName EDIT_QNAME = QName.create(EditConfigInput.QNAME, "edit-config");
-    static final org.w3c.dom.Document editBlueprint;
+    static final org.w3c.dom.Document editCandidateBlueprint;
+    static final org.w3c.dom.Document editRunningBlueprint;
 
     static {
         try {
-            editBlueprint = XmlUtil.readXmlToDocument(
+            editCandidateBlueprint = XmlUtil.readXmlToDocument(
                     "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
                             "    <edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
                             "        <target>\n" +
                             "            <candidate/>\n" +
+                            "        </target>\n" +
+                            "        <default-operation>none</default-operation>" +
+                            "        <config/>\n" +
+                            "    </edit-config>\n" +
+                            "</rpc>");
+
+            editRunningBlueprint = XmlUtil.readXmlToDocument(
+                    "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
+                            "    <edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
+                            "        <target>\n" +
+                            "            <running/>\n" +
                             "        </target>\n" +
                             "        <default-operation>none</default-operation>" +
                             "        <config/>\n" +
@@ -86,9 +98,11 @@ public final class StressClient {
 
     private static long macStart = 0xAABBCCDD0000L;
 
+    private static Parameters params;
+
     public static void main(final String[] args) {
 
-        final Parameters params = parseArgs(args, Parameters.getParser());
+        params = parseArgs(args, Parameters.getParser());
         params.validate();
 
         final ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
@@ -179,7 +193,7 @@ public final class StressClient {
     }
 
     static NetconfMessage prepareMessage(final int id, final String editContentString) {
-        final Document msg = XmlUtil.createDocumentCopy(editBlueprint);
+        final Document msg = XmlUtil.createDocumentCopy(params.candidateDatastore ? editCandidateBlueprint : editRunningBlueprint);
         msg.getDocumentElement().setAttribute("message-id", Integer.toString(id));
         final NetconfMessage netconfMessage = new NetconfMessage(msg);
 
