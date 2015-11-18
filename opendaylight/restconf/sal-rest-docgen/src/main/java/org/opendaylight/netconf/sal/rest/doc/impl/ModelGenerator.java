@@ -471,19 +471,18 @@ public class ModelGenerator {
 
         if (leafTypeDef instanceof ExtendedType) {
             processExtendedType(leafTypeDef, property);
-        } else if (leafTypeDef instanceof EnumTypeDefinition) {
-            processEnumType((EnumTypeDefinition) leafTypeDef, property);
-
-        } else if (leafTypeDef instanceof BitsTypeDefinition) {
-            processBitsType((BitsTypeDefinition) leafTypeDef, property);
-
-        } else if (leafTypeDef instanceof UnionTypeDefinition) {
-            processUnionType((UnionTypeDefinition) leafTypeDef, property);
-
-        } else if (leafTypeDef instanceof IdentityrefTypeDefinition) {
-            property.putOpt(TYPE_KEY, ((IdentityrefTypeDefinition) leafTypeDef).getIdentity().getQName().getLocalName());
         } else if (leafTypeDef instanceof BinaryTypeDefinition) {
             processBinaryType((BinaryTypeDefinition) leafTypeDef, property);
+        } else if (leafTypeDef instanceof BitsTypeDefinition) {
+            processBitsType((BitsTypeDefinition) leafTypeDef, property);
+        } else if (leafTypeDef instanceof EnumTypeDefinition) {
+            processEnumType((EnumTypeDefinition) leafTypeDef, property);
+        } else if (leafTypeDef instanceof IdentityrefTypeDefinition) {
+            property.putOpt(TYPE_KEY, ((IdentityrefTypeDefinition) leafTypeDef).getIdentity().getQName().getLocalName());
+        } else if (leafTypeDef instanceof StringTypeDefinition) {
+            processStringType((StringTypeDefinition) leafTypeDef, property);
+        } else if (leafTypeDef instanceof UnionTypeDefinition) {
+            processUnionType((UnionTypeDefinition) leafTypeDef, property);
         } else {
             String jsonType = jsonTypeFor(leafTypeDef);
             if (jsonType == null) {
@@ -559,6 +558,24 @@ public class ModelGenerator {
         JSONObject itemsValue = new JSONObject();
         itemsValue.put(ENUM, enumValues);
         property.put(ITEMS_KEY, itemsValue);
+    }
+
+    private static void processStringType(final StringTypeDefinition stringType, final JSONObject property) throws JSONException {
+        StringTypeDefinition type = stringType;
+        List<LengthConstraint> lengthConstraints = stringType.getLengthConstraints();
+        while (lengthConstraints.isEmpty() && type.getBaseType() != null) {
+           type = type.getBaseType();
+           lengthConstraints = type.getLengthConstraints();
+        }
+
+        for (LengthConstraint lengthConstraint : lengthConstraints) {
+            Number min = lengthConstraint.getMin();
+            Number max = lengthConstraint.getMax();
+            property.putOpt(MIN_LENGTH_KEY, min);
+            property.putOpt(MAX_LENGTH_KEY, max);
+        }
+
+        property.put(TYPE_KEY, STRING);
     }
 
     /**
