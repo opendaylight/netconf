@@ -207,12 +207,12 @@ public class NetconfTopologyImpl implements NetconfTopology, DataTreeChangeListe
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
         final NetconfReconnectingClientConfiguration clientConfig = getClientConfig(deviceCommunicator, netconfNode);
         final ListenableFuture<NetconfDeviceCapabilities> future = deviceCommunicator.initializeRemoteConnection(clientDispatcher, clientConfig);
+        activeConnectors.put(nodeId, deviceCommunicatorDTO);
 
         Futures.addCallback(future, new FutureCallback<NetconfDeviceCapabilities>() {
             @Override
             public void onSuccess(NetconfDeviceCapabilities result) {
                 LOG.debug("Connector for : " + nodeId.getValue() + " started succesfully");
-                activeConnectors.put(nodeId, deviceCommunicatorDTO);
             }
 
             @Override
