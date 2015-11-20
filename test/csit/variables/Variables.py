@@ -152,6 +152,7 @@ LFM_SB_RPC_API = "/restconf/operations/odl-lisp-sb"
 PORT = '8080'
 RESTPORT = '8282'
 RESTCONFPORT = '8181'
+OVSDBPORT = '6640'
 CONTAINER = 'default'
 PREFIX = 'http://' + ODL_SYSTEM_IP + ':' + PORT  # TODO: determine where this is used; create a better named variable
 USER = 'admin'  # TODO: who is using this?  Can we make it more specific? (e.g.  RESTCONF_USER)
