@@ -446,8 +446,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
     /**
      * Sets {@link ListenerRegistration} registration.
      *
-     * @param registration
-     *            ListenerRegistration<DataChangeListener>
+     * @param registration DOMDataChangeListener registration
      */
     public void setRegistration(final ListenerRegistration<DOMDataChangeListener> registration) {
         this.registration = registration;

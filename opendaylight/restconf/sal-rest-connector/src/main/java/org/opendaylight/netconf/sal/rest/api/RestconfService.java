@@ -29,18 +29,18 @@ import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
  * <ul>
  * <li><b>/restconf</b> - {@link #getRoot()}
  * <ul>
- *      <li><b>/config</b> - {@link #readConfigurationData(String)}
+ *      <li><b>/config</b> - {@link #readConfigurationData(String, UriInfo)}
  *                              {@link #updateConfigurationData(String, NormalizedNodeContext)}
- *                              {@link #createConfigurationData(NormalizedNodeContext)}
- *                              {@link #createConfigurationData(String, NormalizedNodeContext)}
+ *                              {@link #createConfigurationData(NormalizedNodeContext, UriInfo)}
+ *                              {@link #createConfigurationData(String, NormalizedNodeContext, UriInfo)}
  * {@link #deleteConfigurationData(String)}
- * <li><b>/operational</b> - {@link #readOperationalData(String)}
- * <li>/modules - {@link #getModules()}
+ * <li><b>/operational</b> - {@link #readOperationalData(String, UriInfo)}
+ * <li>/modules - {@link #getModules(UriInfo)}
  * <ul>
  * <li>/module
  * </ul>
- *      <li><b>/operations</b> - {@link #invokeRpc(String, NormalizedNodeContext)}
- *                               {@link #invokeRpc(String, NormalizedNodeContext)}
+ *      <li><b>/operations</b> - {@link #invokeRpc(String, NormalizedNodeContext, UriInfo)}
+ *                               {@link #invokeRpc(String, NormalizedNodeContext, UriInfo)}
  * <li>/version (field)
  * </ul>
  * </ul>

@@ -30,7 +30,7 @@ public interface NetconfOperation {
      * HandlingPriority.HANDLE_WITH_MAX_PRIORITY, last operations
      * HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY.
      *
-     * @param requestMessage
+     * @param message request message
      * @return
      */
     HandlingPriority canHandle(Document message) throws DocumentedException;

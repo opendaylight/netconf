@@ -25,7 +25,7 @@ import org.opendaylight.yangtools.yang.common.RpcError;
  *
  * @author Devin Avery
  * @author Thomas Pantelis
- * @see {@link https://tools.ietf.org/html/draft-bierman-netconf-restconf-02}
+ * See also <a href="https://tools.ietf.org/html/draft-bierman-netconf-restconf-02">RESTCONF</a>
  */
 public class RestconfDocumentedException extends WebApplicationException {
 

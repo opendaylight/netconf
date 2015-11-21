@@ -162,7 +162,7 @@ module odl-sal-netconf-connector-cfg {
                 type uint32;
                 default 120;
                 description "Netconf connector sends keepalive RPCs while the session is idle, this delay specifies the delay between keepalive RPC in seconds
-                             If a value <1 is provided, no keepalives will be sent";
+                             If a value less than 1 is provided, no keepalives will be sent";
             }
 
             container keepalive-executor {

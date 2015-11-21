@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This is an experimental iterator over a {@link NormalizedNode}. This is essentially
- * the opposite of a {@link XMLStreamReader} -- unlike instantiating an iterator over
+ * the opposite of a {@link javax.xml.stream.XMLStreamReader} -- unlike instantiating an iterator over
  * the backing data, this encapsulates a {@link NormalizedNodeStreamWriter} and allows
  * us to write multiple nodes.
  */
@@ -70,7 +70,7 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
     }
 
     /**
-     * Create a new writer backed by a {@link NormalizedNodeStreamWriter}. Unlike the simple {@link #forStreamWriter(NormalizedNodeStreamWriter)}
+     * Create a new writer backed by a {@link NormalizedNodeStreamWriter}. Unlike the simple {@link #forStreamWriter(NormalizedNodeStreamWriter, int)}
      * method, this allows the caller to switch off RFC6020 XML compliance, providing better
      * throughput. The reason is that the XML mapping rules in RFC6020 require the encoding
      * to emit leaf nodes which participate in a list's key first and in the order in which

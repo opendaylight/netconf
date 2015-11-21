@@ -161,7 +161,7 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
      *
      * @param operationElement operation element
      * @return if Filter is present and not empty returns Optional of the InstanceIdentifier to the read location in datastore.
-     *          empty filter returns Optional.absent() which should equal an empty <data/> container in the response.
+     *          empty filter returns Optional.absent() which should equal an empty &lt;data/&gt; container in the response.
      *         if filter is not present we want to read the entire datastore - return ROOT.
      * @throws DocumentedException
      */

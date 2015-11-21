@@ -25,9 +25,9 @@ import org.opendaylight.netconf.api.NetconfMessage;
  * {@link NetconfHelloMessage}
  * . Used by netconf clients to send information about the user, ip address,
  * protocol etc.
- * <p/>
+ * <p>
  * Hello message with header example:
- * <p/>
+ * <p>
  *
  * <pre>
  * {@code

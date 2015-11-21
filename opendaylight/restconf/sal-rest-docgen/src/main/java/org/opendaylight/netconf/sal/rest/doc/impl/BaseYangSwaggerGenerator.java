@@ -78,7 +78,8 @@ public class BaseYangSwaggerGenerator {
     /**
      *
      * @param uriInfo
-     * @param operType
+     * @param schemaContext
+     * @param context
      * @return list of modules converted to swagger compliant resource list.
      */
     public ResourceList getResourceListing(UriInfo uriInfo, SchemaContext schemaContext, String context) {

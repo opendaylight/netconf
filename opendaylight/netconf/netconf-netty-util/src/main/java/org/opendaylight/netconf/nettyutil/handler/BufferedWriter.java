@@ -16,11 +16,11 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Custom BufferedWriter optimized for netconf pipeline implemented instead of default BufferedWriter provided by jdk.
- * <p/>
+ * <p>
  * The line separator instance field in java.io.BufferedWriter is
  * assigned using AccessController and takes considerable amount of time especially
  * if lots of BufferedWriters are created in the system.
- * <p/>
+ * <p>
  * This implementation should only be used if newLine method is not required
  * such as netconf message to XML encoders.
  * Methods in this implementation are not synchronized.

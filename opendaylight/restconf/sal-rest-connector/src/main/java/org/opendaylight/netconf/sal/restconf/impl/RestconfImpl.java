@@ -935,8 +935,8 @@ public class RestconfImpl implements RestconfService {
      *
      * Additional parameters for subscribing to stream are loaded via rpc input parameters:
      * <ul>
-     * <li>datastore</li> - default CONFIGURATION (other values of {@link LogicalDatastoreType} enum type)
-     * <li>scope</li> - default BASE (other values of {@link DataChangeScope})
+     * <li>datastore - default CONFIGURATION (other values of {@link LogicalDatastoreType} enum type)</li>
+     * <li>scope - default BASE (other values of {@link DataChangeScope})</li>
      * </ul>
      */
     @Override

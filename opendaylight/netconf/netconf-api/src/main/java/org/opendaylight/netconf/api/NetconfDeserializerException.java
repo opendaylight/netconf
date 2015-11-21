@@ -10,7 +10,7 @@ package org.opendaylight.netconf.api;
 
 /**
  * This exception is thrown by
- * {@link NetconfSessionListener#onMessage(NetconfSession, NetconfMessage)} to indicate fatal
+ * {@link NetconfSessionListener#onMessage} to indicate fatal
  * communication problem after which the session should be closed.
  */
 public class NetconfDeserializerException extends Exception {

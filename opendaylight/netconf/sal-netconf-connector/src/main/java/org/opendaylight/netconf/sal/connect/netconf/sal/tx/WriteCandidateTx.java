@@ -35,18 +35,20 @@ import org.slf4j.LoggerFactory;
  * Tx implementation for netconf devices that support only candidate datastore and no writable running
  * The sequence goes as:
  * <ol>
- * <li/> Lock candidate datastore on tx construction
- *  <ul>
- * <li/> Lock has to succeed, if it does not, an attempt to discard changes is made
- * <li/> Discard changes has to succeed
- * <li/> If discard is successful, lock is reattempted
- * <li/> Second lock attempt has to succeed
- * </ul>
- * <li/> Edit-config in candidate N times
- * <ul>
- * <li/> If any issue occurs during edit, datastore is discarded using discard-changes rpc, unlocked and an exception is thrown async
- * </ul>
- * <li/> Commit and Unlock candidate datastore async
+ *   <li>Lock candidate datastore on tx construction
+ *     <ul>
+ *       <li>Lock has to succeed, if it does not, an attempt to discard changes is made</li>
+ *       <li>Discard changes has to succeed</li>
+ *       <li>If discard is successful, lock is reattempted</li>
+ *       <li>Second lock attempt has to succeed</li>
+ *     </ul>
+ *   </li>
+ *   <li>Edit-config in candidate N times
+ *     <ul>
+ *       <li>If any issue occurs during edit, datastore is discarded using discard-changes rpc, unlocked and an exception is thrown async</li>
+ *     </ul>
+ *   </li>
+ *   <li>Commit and Unlock candidate datastore async</li>
  * </ol>
  */
 public class WriteCandidateTx extends AbstractWriteTx {

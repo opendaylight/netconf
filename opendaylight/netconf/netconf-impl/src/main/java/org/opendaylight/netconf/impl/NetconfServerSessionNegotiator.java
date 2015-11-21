@@ -81,7 +81,7 @@ public class NetconfServerSessionNegotiator
      * @param socketAddress
      *            type of socket address LocalAddress, or
      *            InetSocketAddress, for others returns unknown
-     * @return Map<port, host > two values - port and host of socket address
+     * @return Two values - port and host of socket address
      */
     protected static Map.Entry<String, String> getHostName(
             SocketAddress socketAddress) {

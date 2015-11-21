@@ -33,15 +33,17 @@ import org.slf4j.LoggerFactory;
  * Tx implementation for netconf devices that support only writable-running with no candidate
  * The sequence goes as:
  * <ol>
- * <li/> Lock running datastore on tx construction
- * <ul>
- * <li/> Lock has to succeed, if it does not, transaction is failed
- * </ul>
- * <li/> Edit-config in running N times
- * <ul>
- * <li/> If any issue occurs during edit, datastore is unlocked and an exception is thrown
- * </ul>
- * <li/> Unlock running datastore on tx commit
+ *   <li>Lock running datastore on tx construction
+ *     <ul>
+ *       <li> Lock has to succeed, if it does not, transaction is failed</li>
+ *     </ul>
+ *   </li>
+ *   <li>Edit-config in running N times
+ *     <ul>
+ *       <li>If any issue occurs during edit, datastore is unlocked and an exception is thrown</li>
+ *     </ul>
+ *   </li>
+ *   <li>Unlock running datastore on tx commit</li>
  * </ol>
  */
 public class WriteRunningTx extends AbstractWriteTx {

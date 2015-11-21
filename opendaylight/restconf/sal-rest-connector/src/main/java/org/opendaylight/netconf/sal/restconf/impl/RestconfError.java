@@ -20,7 +20,7 @@ import org.opendaylight.yangtools.yang.common.RpcError;
  * <b>Note:</b> Enumerations defined within are provided by the ietf restconf draft.
  *
  * @author Devin Avery
- * @see {@link https://tools.ietf.org/html/draft-bierman-netconf-restconf-02}
+ * See also <a href="https://tools.ietf.org/html/draft-bierman-netconf-restconf-02">RESTCONF</a>.
  */
 public class RestconfError {
 

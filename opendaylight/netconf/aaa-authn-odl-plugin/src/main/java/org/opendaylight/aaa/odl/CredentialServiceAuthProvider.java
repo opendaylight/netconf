@@ -66,7 +66,7 @@ public final class CredentialServiceAuthProvider implements AuthProvider, AutoCl
     }
 
     /**
-     * Authenticate user. This implementation tracks CredentialAuth<PasswordCredentials> and delegates the decision to it. If the service is not
+     * Authenticate user. This implementation tracks CredentialAuth&lt;PasswordCredentials&gt; and delegates the decision to it. If the service is not
      * available, IllegalStateException is thrown.
      */
     @Override

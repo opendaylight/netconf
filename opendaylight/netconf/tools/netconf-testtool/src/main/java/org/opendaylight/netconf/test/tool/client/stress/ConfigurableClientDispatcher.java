@@ -32,7 +32,7 @@ public class ConfigurableClientDispatcher extends NetconfClientDispatcherImpl {
     }
 
     /**
-     * EXI + ]]>]]> framing
+     * EXI + ]]gt;]]gt; framing
      */
     public static ConfigurableClientDispatcher createLegacyExi(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup, final Timer timer) {
         return new ConfigurableClientDispatcher(bossGroup, workerGroup, timer, NetconfClientSessionNegotiatorFactory.LEGACY_EXI_CLIENT_CAPABILITIES);
@@ -46,7 +46,7 @@ public class ConfigurableClientDispatcher extends NetconfClientDispatcherImpl {
     }
 
     /**
-     * ]]>]]> framing
+     * ]]gt;]]gt; framing
      */
     public static ConfigurableClientDispatcher createLegacy(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup, final Timer timer) {
         return new ConfigurableClientDispatcher(bossGroup, workerGroup, timer, NetconfClientSessionNegotiatorFactory.LEGACY_FRAMING_CLIENT_CAPABILITIES);

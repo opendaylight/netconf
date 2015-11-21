@@ -19,7 +19,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
  * Utility class is centralizing all needed validation functionality for a Restconf osgi module.
  * All methods have to throw {@link RestconfDocumentedException} only, which is a representation
  * for all error situation followed by restconf-netconf specification.
- * @see {@link https://tools.ietf.org/html/draft-bierman-netconf-restconf-02}
+ * See also <a href="https://tools.ietf.org/html/draft-bierman-netconf-restconf-02">RESTCONF</a>.
  *
  * @author <a href="mailto:vdemcak@cisco.com">Vaclav Demcak</a>
  *
@@ -50,7 +50,7 @@ public class RestconfValidationUtils {
      * Method returns {@link RestconfDocumentedException} if value is NULL or same input value.
      * {@link ErrorType} is relevant for server application layer
      * {@link ErrorTag} is 404 data-missing
-     * @see {@link https://tools.ietf.org/html/draft-bierman-netconf-restconf-02}
+     * See also <a href="https://tools.ietf.org/html/draft-bierman-netconf-restconf-02">RESTCONF</a>.
      *
      * @param value         - some value from {@link org.opendaylight.yangtools.yang.model.api.Module}
      * @param moduleName    - name of {@link org.opendaylight.yangtools.yang.model.api.Module}
