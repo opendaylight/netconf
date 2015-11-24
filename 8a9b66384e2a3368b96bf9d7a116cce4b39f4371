@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aade967_341a396f",
+        "filename": "opendaylight/netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/OrderedNormalizedNodeWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2015-11-24T12:22:21Z",
+      "side": 1,
+      "message": ":",
+      "revId": "8a9b66384e2a3368b96bf9d7a116cce4b39f4371",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aade967_d42645ba",
+        "filename": "opendaylight/netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/OrderedNormalizedNodeWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2015-11-24T12:22:21Z",
+      "side": 1,
+      "message": ":",
+      "revId": "8a9b66384e2a3368b96bf9d7a116cce4b39f4371",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aade967_b425c9ac",
+        "filename": "opendaylight/netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/OrderedNormalizedNodeWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2015-11-24T12:22:21Z",
+      "side": 1,
+      "message": ":",
+      "revId": "8a9b66384e2a3368b96bf9d7a116cce4b39f4371",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aade967_743751e4",
+        "filename": "opendaylight/netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/OrderedNormalizedNodeWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2015-11-24T12:22:21Z",
+      "side": 1,
+      "message": ":",
+      "revId": "8a9b66384e2a3368b96bf9d7a116cce4b39f4371",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aade967_3431d9ec",
+        "filename": "opendaylight/netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/OrderedNormalizedNodeWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2015-11-24T12:22:21Z",
+      "side": 1,
+      "message": ":",
+      "revId": "8a9b66384e2a3368b96bf9d7a116cce4b39f4371",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aade967_b45ce926",
+        "filename": "opendaylight/netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/OrderedNormalizedNodeWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2015-11-24T12:22:21Z",
+      "side": 1,
+      "message": ":",
+      "revId": "8a9b66384e2a3368b96bf9d7a116cce4b39f4371",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
