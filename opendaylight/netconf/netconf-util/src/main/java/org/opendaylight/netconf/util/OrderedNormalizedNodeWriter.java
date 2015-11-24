@@ -55,7 +55,7 @@ public class OrderedNormalizedNodeWriter implements Closeable, Flushable{
     private final SchemaNode root;
     private final NormalizedNodeStreamWriter writer;
 
-    public OrderedNormalizedNodeWriter(NormalizedNodeStreamWriter writer, SchemaContext schemaContext, SchemaPath path) {
+    public OrderedNormalizedNodeWriter(final NormalizedNodeStreamWriter writer,final SchemaContext schemaContext,final SchemaPath path) {
         this.writer = writer;
         this.schemaContext = schemaContext;
         this.root = findParentSchemaOnPath(schemaContext, path);
@@ -78,7 +78,7 @@ public class OrderedNormalizedNodeWriter implements Closeable, Flushable{
 
     }
 
-    private OrderedNormalizedNodeWriter write(NormalizedNode<?, ?> node, SchemaNode dataSchemaNode) throws IOException {
+    private OrderedNormalizedNodeWriter write(final NormalizedNode<?, ?> node, final SchemaNode dataSchemaNode) throws IOException {
         if (node == null) {
             return this;
         }
@@ -94,7 +94,7 @@ public class OrderedNormalizedNodeWriter implements Closeable, Flushable{
         throw new IllegalStateException("It wasn't possible to serialize node " + node);
     }
 
-    private void write(List<NormalizedNode<?, ?>> nodes, SchemaNode dataSchemaNode) throws IOException {
+    private void write(final List<NormalizedNode<?, ?>> nodes, final SchemaNode dataSchemaNode) throws IOException {
         for (NormalizedNode<?, ?> node : nodes) {
             write(node, dataSchemaNode);
         }
@@ -108,7 +108,7 @@ public class OrderedNormalizedNodeWriter implements Closeable, Flushable{
         throw new IllegalStateException("It wasn't possible to serialize node " + node);
     }
 
-    private boolean writeChildren(final Iterable<? extends NormalizedNode<?, ?>> children, SchemaNode parentSchemaNode, boolean endParent) throws IOException {
+    private boolean writeChildren(final Iterable<? extends NormalizedNode<?, ?>> children, final SchemaNode parentSchemaNode, boolean endParent) throws IOException {
         //Augmentations cannot be gotten with node.getChild so create our own structure with augmentations resolved
         ArrayListMultimap<QName, NormalizedNode<?, ?>> qNameToNodes = ArrayListMultimap.create();
         for (NormalizedNode<?, ?> child : children) {
@@ -146,7 +146,7 @@ public class OrderedNormalizedNodeWriter implements Closeable, Flushable{
         return true;
     }
 
-    private ArrayListMultimap<QName, NormalizedNode<?, ?>> resolveAugmentations(NormalizedNode<?, ?> child) {
+    private ArrayListMultimap<QName, NormalizedNode<?, ?>> resolveAugmentations(final NormalizedNode<?, ?> child) {
         final ArrayListMultimap<QName, NormalizedNode<?, ?>> resolvedAugs = ArrayListMultimap.create();
         for (NormalizedNode<?, ?> node : ((AugmentationNode) child).getValue()) {
             if (node instanceof AugmentationNode) {
@@ -194,7 +194,7 @@ public class OrderedNormalizedNodeWriter implements Closeable, Flushable{
         return false;
     }
 
-    private boolean wasProcessedAsCompositeNode(final NormalizedNode<?, ?> node, SchemaNode dataSchemaNode) throws IOException {
+    private boolean wasProcessedAsCompositeNode(final NormalizedNode<?, ?> node, final SchemaNode dataSchemaNode) throws IOException {
         if (node instanceof ContainerNode) {
             final ContainerNode n = (ContainerNode) node;
             if(writer instanceof NormalizedNodeStreamAttributeWriter) {
@@ -252,7 +252,7 @@ public class OrderedNormalizedNodeWriter implements Closeable, Flushable{
     }
 
     //TODO similar code is already present in schemaTracker, unify this when this writer is moved back to yangtools
-    private SchemaNode findParentSchemaOnPath(SchemaContext schemaContext, SchemaPath path) {
+    private SchemaNode findParentSchemaOnPath(final SchemaContext schemaContext, final SchemaPath path) {
         SchemaNode current = Preconditions.checkNotNull(schemaContext);
         for (final QName qname : path.getPathFromRoot()) {
             SchemaNode child;
