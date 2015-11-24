@@ -252,7 +252,7 @@ public class OrderedNormalizedNodeWriter implements Closeable, Flushable{
     }
 
     //TODO similar code is already present in schemaTracker, unify this when this writer is moved back to yangtools
-    private SchemaNode findParentSchemaOnPath(SchemaContext schemaContext, SchemaPath path) {
+    private SchemaNode findParentSchemaOnPath(final SchemaContext schemaContext, final SchemaPath path) {
         SchemaNode current = Preconditions.checkNotNull(schemaContext);
         for (final QName qname : path.getPathFromRoot()) {
             SchemaNode child;
