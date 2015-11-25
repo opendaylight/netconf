@@ -59,6 +59,8 @@ public final class EXIParameters {
             case EXI_PARAMETER_PRE_COMPRESSION:
                 options.setAlignmentType(AlignmentType.preCompress);
                 break;
+            //Added as part of Bug#3890 fix.
+            default:break;
             }
         }
 
