@@ -95,6 +95,7 @@ public final class NetconfStartExiMessage extends NetconfMessage {
             alignmentString = EXIParameters.EXI_PARAMETER_PRE_COMPRESSION;
             break;
         }
+        default:break;
         }
 
         alignmentElement.setTextContent(alignmentString);
