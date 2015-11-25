@@ -160,6 +160,7 @@ PASSWORD = 'EMPTY'
 AUTH = [u'admin', u'admin']
 SCOPE = 'sdn'
 HEADERS = {'Content-Type': 'application/json'}
+HEADERS_YANG_JSON = {'Content-Type': 'application/yang.data+json'}
 HEADERS_XML = {'Content-Type': 'application/xml'}
 ACCEPT_XML = {'Accept': 'application/xml'}
 ACCEPT_JSON = {'Accept': 'application/json'}
