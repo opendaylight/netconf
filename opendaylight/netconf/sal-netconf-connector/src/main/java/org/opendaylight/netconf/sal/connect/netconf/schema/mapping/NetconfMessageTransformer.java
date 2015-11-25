@@ -41,6 +41,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.util.NetconfConstants;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -147,9 +148,9 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         protected SimpleDateFormat initialValue() {
 
             final SimpleDateFormat withMillis = new SimpleDateFormat(
-                NetconfNotification.RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT);
+                NetconfConstants.RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT);
 
-            return new SimpleDateFormat(NetconfNotification.RFC3339_DATE_FORMAT_BLUEPRINT) {
+            return new SimpleDateFormat(NetconfConstants.RFC3339_DATE_FORMAT_BLUEPRINT) {
                 @Override public Date parse(final String source) throws ParseException {
                     try {
                         return super.parse(source);

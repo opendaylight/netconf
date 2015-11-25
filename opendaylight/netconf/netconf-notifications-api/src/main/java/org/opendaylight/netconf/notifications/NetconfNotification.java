@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.util.NetconfConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -19,16 +20,6 @@ import org.w3c.dom.Element;
  * Special kind of netconf message that contains a timestamp.
  */
 public final class NetconfNotification extends NetconfMessage {
-
-    public static final String NOTIFICATION = "notification";
-    public static final String NOTIFICATION_NAMESPACE = "urn:ietf:params:netconf:capability:notification:1.0";
-    public static final String RFC3339_DATE_FORMAT_BLUEPRINT = "yyyy-MM-dd'T'HH:mm:ssXXX";
-    // The format with milliseconds is a bit fragile, it cannot be used for timestamps without millis (thats why its a separate format)
-    // + it might not work properly with more than 6 digits
-    // TODO try to find a better solution with Java8
-    public static final String RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX";
-    public static final String EVENT_TIME = "eventTime";
-
     /**
      * Used for unknown/un-parse-able event-times
      */
@@ -53,10 +44,10 @@ public final class NetconfNotification extends NetconfMessage {
         Preconditions.checkNotNull(eventTime);
 
         final Element baseNotification = notificationContent.getDocumentElement();
-        final Element entireNotification = notificationContent.createElementNS(NOTIFICATION_NAMESPACE, NOTIFICATION);
+        final Element entireNotification = notificationContent.createElementNS(NetconfConstants.NOTIFICATION_NAMESPACE, NetconfConstants.NOTIFICATION);
         entireNotification.appendChild(baseNotification);
 
-        final Element eventTimeElement = notificationContent.createElementNS(NOTIFICATION_NAMESPACE, EVENT_TIME);
+        final Element eventTimeElement = notificationContent.createElementNS(NetconfConstants.NOTIFICATION_NAMESPACE, NetconfConstants.EVENT_TIME);
         eventTimeElement.setTextContent(getSerializedEventTime(eventTime));
         entireNotification.appendChild(eventTimeElement);
 
@@ -66,6 +57,6 @@ public final class NetconfNotification extends NetconfMessage {
 
     private static String getSerializedEventTime(final Date eventTime) {
         // SimpleDateFormat is not threadsafe, cannot be in a constant
-        return new SimpleDateFormat(RFC3339_DATE_FORMAT_BLUEPRINT).format(eventTime);
+        return new SimpleDateFormat(NetconfConstants.RFC3339_DATE_FORMAT_BLUEPRINT).format(eventTime);
     }
 }

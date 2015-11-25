@@ -20,6 +20,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.junit.Test;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.netconf.api.util.NetconfConstants;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
@@ -37,7 +38,7 @@ public class NotificationsTransformUtilTest {
 
     private static final String expectedNotification = "<notification xmlns=\"urn:ietf:params:netconf:capability:notification:1.0\">" +
             innerNotification +
-            "<eventTime>" + new SimpleDateFormat(NetconfNotification.RFC3339_DATE_FORMAT_BLUEPRINT).format(DATE) + "</eventTime>" +
+            "<eventTime>" + new SimpleDateFormat(NetconfConstants.RFC3339_DATE_FORMAT_BLUEPRINT).format(DATE) + "</eventTime>" +
             "</notification>";
 
     @Test
