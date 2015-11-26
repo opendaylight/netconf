@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5aaae553_85c3e237",
+        "filename": "opendaylight/netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/util/NetconfConstants.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2015-11-26T09:33:10Z",
+      "side": 1,
+      "message": "No need for this comment",
+      "revId": "ff07f2b8ef6bc93e0b374d68c92c0d7f344c9e1c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
