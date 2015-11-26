@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5aaae553_85752234",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2015-11-26T09:30:40Z",
+      "side": 1,
+      "message": "Your name is already in the Signed-off-by part and git author so no need to put it here :). Also if you write bug number in a format like Bug 3890 or Bug-3890 it links it to a bugzilla bug.",
+      "revId": "7d55c9a4674d5d28ddeba0d46d1f928277580eec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5aaae553_658d8631",
+        "filename": "opendaylight/netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/exi/EXIParameters.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2015-11-26T09:30:40Z",
+      "side": 1,
+      "message": "No neeed for this comment",
+      "revId": "7d55c9a4674d5d28ddeba0d46d1f928277580eec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5aaae553_05829200",
+        "filename": "opendaylight/netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/exi/EXIParameters.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2015-11-26T09:30:40Z",
+      "side": 1,
+      "message": "We should atleast log the unexpected value that might trigger this. Adding just a break seems kind of pointless to me.",
+      "revId": "7d55c9a4674d5d28ddeba0d46d1f928277580eec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
