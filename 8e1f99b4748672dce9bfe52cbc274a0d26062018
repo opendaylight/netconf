@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5aaae553_05b052dc",
+        "filename": "opendaylight/netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/exi/NetconfStartExiMessage.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2015-11-26T09:31:25Z",
+      "side": 1,
+      "message": "We should atleast log the unexpected value that might trigger this.",
+      "revId": "8e1f99b4748672dce9bfe52cbc274a0d26062018",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
