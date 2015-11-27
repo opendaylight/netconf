@@ -19,7 +19,9 @@
             <top xmlns="urn:opendaylight:mdsal:mapping:test">
                 <choice-wrapper>
                     <text>choice updated</text>
+                    <!-- RFC6020 requires that at most once case inside a choice is present at any time
                     <text2 xmlns:a="urn:ietf:params:xml:ns:netconf:base:1.0" a:operation="create">choice text2 created</text2>
+                    -->
                 </choice-wrapper>
             </top>
         </config>
