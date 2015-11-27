@@ -25,6 +25,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
 import org.xml.sax.SAXException;
+import org.opendaylight.netconf.api.util.NetconfConstants;
+
 
 public class NotificationsTransformUtilTest {
 
@@ -37,7 +39,7 @@ public class NotificationsTransformUtilTest {
 
     private static final String expectedNotification = "<notification xmlns=\"urn:ietf:params:netconf:capability:notification:1.0\">" +
             innerNotification +
-            "<eventTime>" + new SimpleDateFormat(NetconfNotification.RFC3339_DATE_FORMAT_BLUEPRINT).format(DATE) + "</eventTime>" +
+            "<eventTime>" + new SimpleDateFormat(NetconfConstants.RFC3339_DATE_FORMAT_BLUEPRINT).format(DATE) + "</eventTime>" +
             "</notification>";
 
     @Test
