@@ -67,6 +67,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.opendaylight.netconf.api.util.NetconfConstants;
 
 public class NetconfMessageTransformer implements MessageTransformer<NetconfMessage> {
 
@@ -146,10 +147,9 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     private static final ThreadLocal<SimpleDateFormat> EVENT_TIME_FORMAT = new ThreadLocal<SimpleDateFormat>() {
         protected SimpleDateFormat initialValue() {
 
-            final SimpleDateFormat withMillis = new SimpleDateFormat(
-                NetconfNotification.RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT);
+            final SimpleDateFormat withMillis = new SimpleDateFormat(NetconfConstants.RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT);
 
-            return new SimpleDateFormat(NetconfNotification.RFC3339_DATE_FORMAT_BLUEPRINT) {
+            return new SimpleDateFormat(NetconfConstants.RFC3339_DATE_FORMAT_BLUEPRINT) {
                 @Override public Date parse(final String source) throws ParseException {
                     try {
                         return super.parse(source);

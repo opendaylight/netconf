@@ -20,7 +20,6 @@ import org.opendaylight.netconf.api.util.NetconfConstants;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
-import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.notifications.impl.NetconfNotificationManager;
 import org.opendaylight.netconf.notifications.impl.ops.CreateSubscription;
@@ -49,7 +48,7 @@ public class Activator implements BundleActivator {
 
         final NetconfOperationServiceFactory netconfOperationServiceFactory = new NetconfOperationServiceFactory() {
 
-            private final Set<Capability> capabilities = Collections.<Capability>singleton(new BasicCapability(NetconfNotification.NOTIFICATION_NAMESPACE));
+            private final Set<Capability> capabilities = Collections.<Capability>singleton(new BasicCapability(NetconfConstants.NOTIFICATION_NAMESPACE));
 
             @Override
             public Set<Capability> getCapabilities() {

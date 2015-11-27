@@ -25,7 +25,6 @@ import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.dom.api.DOMEvent;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -33,6 +32,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.parser.api.YangContextParser;
 import org.opendaylight.yangtools.yang.parser.impl.YangParserImpl;
 import org.w3c.dom.Document;
+import org.opendaylight.netconf.api.util.NetconfConstants;
 
 public class NetconfToNotificationTest {
 
@@ -74,7 +74,7 @@ public class NetconfToNotificationTest {
         assertNotNull(root);
         assertEquals(6, Iterables.size(root.getValue()));
         assertEquals("user-visited-page", root.getNodeType().getLocalName());
-        assertEquals(new SimpleDateFormat(NetconfNotification.RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT).parse("2015-10-23T09:42:27.67175+00:00"),
+        assertEquals(new SimpleDateFormat(NetconfConstants.RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT).parse("2015-10-23T09:42:27.67175+00:00"),
                 ((DOMEvent) domNotification).getEventTime());
     }
 }

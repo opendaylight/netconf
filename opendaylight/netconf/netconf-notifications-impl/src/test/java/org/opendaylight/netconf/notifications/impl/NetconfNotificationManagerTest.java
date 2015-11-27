@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.netconf.api.util.NetconfConstants;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
@@ -45,11 +46,8 @@ public class NetconfNotificationManagerTest {
 
 
     @Test public void testEventTime() throws Exception {
-        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-            NetconfNotification.RFC3339_DATE_FORMAT_BLUEPRINT);
-        final SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat(
-            NetconfNotification.RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT);
-
+        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(NetconfConstants.RFC3339_DATE_FORMAT_BLUEPRINT);
+        final SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat(NetconfConstants.RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT);
         for (String time : Lists.newArrayList(
             "2001-07-04T12:08:56.235-07:00",
             "2015-10-23T09:42:27.67175+00:00",
