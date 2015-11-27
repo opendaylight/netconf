@@ -379,7 +379,12 @@ public final class Main {
             checkExistingDir(distroFolder, String.format("Folder %s does not exist", distroFolder));
 
             final File systemDir = checkExistingDir(new File(distroFolder, "system"), String.format("Folder %s does not contain a karaf distro, folder system is missing", distroFolder));
-            final File netconfConnectorFeaturesParentDir = checkExistingDir(new File(systemDir, "org/opendaylight/controller/" + featureName), String.format("Karaf distro in %s does not contain netconf-connector features", distroFolder));
+
+            //check if beryllium path exists, if it doesnt check for lithium and fail/succeed after
+            File netconfConnectorFeaturesParentDir = new File(systemDir, "org/opendaylight/netconf/" + featureName);
+            if (!netconfConnectorFeaturesParentDir.exists() || !netconfConnectorFeaturesParentDir.isDirectory()) {
+                netconfConnectorFeaturesParentDir = checkExistingDir(new File(systemDir, "org/opendaylight/controller/" + featureName), String.format("Karaf distro in %s does not contain netconf-connector features", distroFolder));
+            }
 
             // Find newest version for features
             final File newestVersionDir = Collections.max(
