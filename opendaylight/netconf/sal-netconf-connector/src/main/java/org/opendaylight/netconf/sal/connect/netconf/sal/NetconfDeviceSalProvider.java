@@ -27,7 +27,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class NetconfDeviceSalProvider implements AutoCloseable, Provider, BindingAwareProvider {
+public class NetconfDeviceSalProvider implements AutoCloseable, Provider, BindingAwareProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(NetconfDeviceSalProvider.class);
 
@@ -101,7 +101,7 @@ public final class NetconfDeviceSalProvider implements AutoCloseable, Provider, 
 
         private ObjectRegistration<DOMMountPoint> topologyRegistration;
 
-        MountInstance(final DOMMountPointService mountService, final RemoteDeviceId id) {
+        public MountInstance(final DOMMountPointService mountService, final RemoteDeviceId id) {
             this.mountService = Preconditions.checkNotNull(mountService);
             this.id = Preconditions.checkNotNull(id);
         }
