@@ -23,13 +23,6 @@
     </modules>
 
     <properties>
-        <config.netconf.client.configfile>01-netconf.xml</config.netconf.client.configfile>
-        <config.netconf.topology.configfile>02-netconf-topology.xml</config.netconf.topology.configfile>
-        <config.netconf.mdsal.configfile>08-mdsal-netconf.xml</config.netconf.mdsal.configfile>
-        <config.restconf.configfile>10-rest-connector.xml</config.restconf.configfile>
-        <config.restconf.service.configfile>10-restconf-service.xml</config.restconf.service.configfile>
-        <config.netconf.connector.configfile>99-netconf-connector.xml</config.netconf.connector.configfile>
-
         <aaa.version>0.3.0-SNAPSHOT</aaa.version>
         <akka.version>2.3.14</akka.version>
         <commons.logback_settings.version>0.2.0-SNAPSHOT</commons.logback_settings.version>
