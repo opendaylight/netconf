@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5aaae553_34b57ecd",
+        "filename": "opendaylight/netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/Main.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-11-27T15:45:12Z",
+      "side": 1,
+      "message": "Maybe a better implementation would be (even if we are relying on exception in our control flow):\n\ntry {\n checkExistingDir(...     // dont have to duplicate the check code\n} catch (IllegalArgEx e) {\n try {\n checkExistingDir(...\n } catch (IllegalArgEx e2) {\n  e2.addSuppressed(e);    // can add suppressed exception\n  throw e2;\n }\n}\n\n.. even though in our case the suppressed exception gives us nothing and the check code is very small",
+      "range": {
+        "startLine": 383,
+        "startChar": 0,
+        "endLine": 387,
+        "endChar": 13
+      },
+      "revId": "7b9c61684674c455507b2b12b9c9b096057dc3bc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
