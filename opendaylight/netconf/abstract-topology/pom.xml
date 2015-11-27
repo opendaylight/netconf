@@ -50,13 +50,13 @@
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-cluster_2.11</artifactId>
-            <version>2.3.14</version>
+            <artifactId>akka-cluster_${scala.major.version}</artifactId>
+            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-osgi_2.11</artifactId>
-            <version>2.3.14</version>
+            <artifactId>akka-osgi_${scala.major.version}</artifactId>
+            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe</groupId>
