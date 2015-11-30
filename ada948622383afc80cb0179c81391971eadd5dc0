@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "5aaae553_87a67dc0",
+        "filename": "features/netconf/pom.xml",
+        "patchSetId": 16
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2015-11-30T18:39:29Z",
+      "side": 1,
+      "message": "is this FIXME still accurate?",
+      "revId": "ada948622383afc80cb0179c81391971eadd5dc0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5aaae553_c7c47561",
         "filename": "opendaylight/restconf/sal-rest-connector/pom.xml",
         "patchSetId": 16
