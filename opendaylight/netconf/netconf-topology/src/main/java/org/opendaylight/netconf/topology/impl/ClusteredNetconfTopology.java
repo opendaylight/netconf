@@ -8,7 +8,9 @@
 
 package org.opendaylight.netconf.topology.impl;
 
+import akka.actor.ActorContext;
 import akka.actor.ActorSystem;
+import akka.actor.Address;
 import akka.actor.TypedActor;
 import akka.actor.TypedActorExtension;
 import akka.actor.TypedProps;
@@ -123,16 +125,16 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
 
     @Override
     protected RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id, final Broker domBroker, final BindingAwareBroker bindingBroker, long defaultRequestTimeoutMillis) {
-        return new TopologyMountPointFacade(id, domBroker, bindingBroker, defaultRequestTimeoutMillis);
+        return new TopologyMountPointFacade(topologyId, id, domBroker, bindingBroker, defaultRequestTimeoutMillis);
     }
 
     @Override
-    public void registerMountPoint(NodeId nodeId) {
-        ((TopologyMountPointFacade) activeConnectors.get(nodeId).getFacade()).registerMountPoint();
+    public void registerMountPoint(final ActorContext context, final NodeId nodeId, final Address masterAddress, final boolean isMaster) {
+        ((TopologyMountPointFacade) activeConnectors.get(nodeId).getFacade()).registerMountPoint(actorSystem, context, masterAddress, isMaster);
     }
 
     @Override
-    public void unregisterMountPoint(NodeId nodeId) {
+    public void unregisterMountPoint(final NodeId nodeId) {
         Preconditions.checkState(activeConnectors.containsKey(nodeId), "Cannot unregister nonexistent mountpoint");
         ((TopologyMountPointFacade) activeConnectors.get(nodeId).getFacade()).unregisterMountPoint();
     }

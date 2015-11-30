@@ -10,9 +10,11 @@ package org.opendaylight.netconf.topology.impl;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import akka.actor.Address;
 import akka.actor.TypedActor;
 import akka.actor.TypedProps;
 import akka.cluster.Cluster;
+import akka.cluster.Member;
 import akka.dispatch.OnComplete;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
@@ -33,11 +35,15 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.topology.NetconfTopology;
+import org.opendaylight.netconf.topology.NodeManager;
 import org.opendaylight.netconf.topology.NodeManagerCallback;
 import org.opendaylight.netconf.topology.RoleChangeStrategy;
 import org.opendaylight.netconf.topology.TopologyManager;
 import org.opendaylight.netconf.topology.pipeline.TopologyMountPointFacade.ConnectionStatusListenerRegistration;
+import org.opendaylight.netconf.topology.util.BaseNodeManager;
 import org.opendaylight.netconf.topology.util.BaseTopologyManager;
+import org.opendaylight.netconf.topology.util.messages.AnnounceMasterMountPoint;
+import org.opendaylight.netconf.topology.util.messages.AnnounceMasterMountPointDown;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
@@ -92,11 +98,15 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, RemoteDe
     private String nodeId;
     private String topologyId;
     private TopologyManager topologyManager;
+    private NodeManager nodeManager;
 
     private Node currentConfig;
     private Node currentOperationalNode;
 
     private ConnectionStatusListenerRegistration registration = null;
+
+    private Address masterAdress = null;
+    private boolean connected = false;
 
     public NetconfNodeManagerCallback(final String nodeId,
                                       final String topologyId,
@@ -121,6 +131,18 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, RemoteDe
 
                 LOG.debug("Actor ref for path {} resolved", "/user/" + topologyId);
                 topologyManager = TypedActor.get(actorSystem).typedActorOf(new TypedProps<>(TopologyManager.class, BaseTopologyManager.class), actorRef);
+            }
+        }, actorSystem.dispatcher());
+
+        final Future<ActorRef> nodeRefFuture = actorSystem.actorSelection("/user/" + topologyId + "/" + nodeId).resolveOne(FiniteDuration.create(10L, TimeUnit.SECONDS));
+        nodeRefFuture.onComplete(new OnComplete<ActorRef>() {
+            @Override
+            public void onComplete(Throwable throwable, ActorRef actorRef) throws Throwable {
+                if (throwable != null) {
+                    LOG.warn("Unable to resolve actor for path: {} ", "/user/" + topologyId + "/" + nodeId, throwable);
+                }
+                LOG.debug("Actor ref for path {} resolved", "/user/" + topologyId);
+                nodeManager = TypedActor.get(actorSystem).typedActorOf(new TypedProps<>(NodeManager.class, BaseNodeManager.class), actorRef);
             }
         }, actorSystem.dispatcher());
     }
@@ -284,7 +306,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, RemoteDe
                                         .setAvailableCapabilities(new AvailableCapabilitiesBuilder().build())
                                         .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().build())
                                         .build())
-                                .build();
+                        .build();
             }
         });
     }
@@ -306,16 +328,19 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, RemoteDe
 
     @Override
     public void onRoleChanged(final RoleChangeDTO roleChangeDTO) {
-        if (roleChangeDTO.isOwner() && roleChangeDTO.wasOwner()) {
-            return;
-        }
+        topologyDispatcher.unregisterMountPoint(currentOperationalNode.getNodeId());
+
         isMaster = roleChangeDTO.isOwner();
-        //TODO instead of registering mount point, init remote schema repo when its done
         if (isMaster) {
-            // unregister old mountPoint if ownership changed, register a new one
-            topologyDispatcher.registerMountPoint(new NodeId(nodeId));
+            topologyDispatcher.registerMountPoint(TypedActor.context(), new NodeId(nodeId), clusterExtension.selfAddress(), isMaster);
         } else {
-            topologyDispatcher.unregisterMountPoint(new NodeId(nodeId));
+            // even though mount point is ready, we dont know who the master mount point will be since we havent received the announce msg
+            // after we receive the message we can go ahead and register the mount point
+            if (connected && masterAdress != null) {
+                topologyDispatcher.registerMountPoint(TypedActor.context(), new NodeId(nodeId), masterAdress, isMaster);
+            } else {
+                LOG.debug("Mount point is ready, still waiting for master mount point");
+            }
         }
     }
 
@@ -323,7 +348,8 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, RemoteDe
     public void onDeviceConnected(final SchemaContext remoteSchemaContext, final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc) {
         // we need to notify the higher level that something happened, get a current status from all other nodes, and aggregate a new result
         LOG.debug("onDeviceConnected received, registering role candidate");
-        roleChangeStrategy.registerRoleCandidate(this);
+        connected = true;
+        roleChangeStrategy.registerRoleCandidate(nodeManager);
         List<String> capabilityList = new ArrayList<>();
         capabilityList.addAll(netconfSessionPreferences.getNetconfDeviceCapabilities().getNonModuleBasedCapabilities());
         capabilityList.addAll(FluentIterable.from(netconfSessionPreferences.getNetconfDeviceCapabilities().getResolvedCapabilities()).transform(AVAILABLE_CAPABILITY_TRANSFORMER).toList());
@@ -363,7 +389,13 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, RemoteDe
         // we need to notify the higher level that something happened, get a current status from all other nodes, and aggregate a new result
         // no need to remove mountpoint, we should receive onRoleChanged callback after unregistering from election that unregisters the mountpoint
         LOG.debug("onDeviceDisconnected received, unregistering role candidate");
-        topologyDispatcher.unregisterMountPoint(currentOperationalNode.getNodeId());
+        connected = false;
+        if (isMaster) {
+            // announce that master mount point is going down
+            for (final Member member : clusterExtension.state().getMembers()) {
+                actorSystem.actorSelection(member.address() + "/user/" + topologyId + "/" + nodeId).tell(new AnnounceMasterMountPointDown(), null);
+            }
+        }
         roleChangeStrategy.unregisterRoleCandidate();
         final NetconfNode netconfNode = currentConfig.getAugmentation(NetconfNode.class);
         currentOperationalNode = new NodeBuilder().setNodeId(new NodeId(nodeId))
@@ -391,6 +423,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, RemoteDe
         // we need to notify the higher level that something happened, get a current status from all other nodes, and aggregate a new result
         // no need to remove mountpoint, we should receive onRoleChanged callback after unregistering from election that unregisters the mountpoint
         LOG.debug("onDeviceFailed received");
+        connected = false;
         String reason = (throwable != null && throwable.getMessage() != null) ? throwable.getMessage() : UNKNOWN_REASON;
 
         roleChangeStrategy.unregisterRoleCandidate();
@@ -412,7 +445,6 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, RemoteDe
         topologyManager.notifyNodeStatusChange(new NodeId(nodeId));
     }
 
-
     @Override
     public void onNotification(DOMNotification domNotification) {
         //NOOP
@@ -424,7 +456,19 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, RemoteDe
     }
 
     @Override
-    public void onReceive(Object o, ActorRef actorRef) {
-
+    public void onReceive(Object message, ActorRef actorRef) {
+        LOG.debug("Netconf node callback received message {}", message);
+        if (message instanceof AnnounceMasterMountPoint) {
+            masterAdress = ((AnnounceMasterMountPoint) message).getAddress();
+            // candidate gets registered when mount point is already prepared so we can go ahead a register it
+            if (roleChangeStrategy.isCandidateRegistered()) {
+                topologyDispatcher.registerMountPoint(TypedActor.context(), new NodeId(nodeId), masterAdress, isMaster);
+            } else {
+                LOG.debug("Announce master mount point msg received but mount point is not ready yet");
+            }
+        } else if (message instanceof AnnounceMasterMountPointDown) {
+            LOG.debug("Master mountpoint went down");
+            masterAdress = null;
+        }
     }
 }

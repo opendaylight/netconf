@@ -8,6 +8,17 @@
 
 package org.opendaylight.netconf.topology.pipeline;
 
+import akka.actor.ActorContext;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.Address;
+import akka.actor.TypedActor;
+import akka.actor.TypedProps;
+import akka.cluster.Cluster;
+import akka.cluster.Member;
+import akka.dispatch.OnComplete;
+import akka.japi.Creator;
+import akka.util.Timeout;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
@@ -20,14 +31,19 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPrefe
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceDataBroker;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.topology.util.messages.AnnounceMasterMountPoint;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.concurrent.Future;
 
 public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessionPreferences> {
 
     private static final Logger LOG = LoggerFactory.getLogger(TopologyMountPointFacade.class);
 
+    private static final String MOUNT_POINT = "mountpoint";
+
+    private final String topologyId;
     private final RemoteDeviceId id;
     private final Broker domBroker;
     private final BindingAwareBroker bindingBroker;
@@ -38,13 +54,17 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
     private DOMRpcService deviceRpc = null;
     private final ClusteredNetconfDeviceMountInstanceProxy salProvider;
 
+    private ActorSystem actorSystem;
+    private DOMDataBroker deviceDataBroker = null;
+
     private final ArrayList<RemoteDeviceHandler<NetconfSessionPreferences>> connectionStatusListeners = new ArrayList<>();
 
-    public TopologyMountPointFacade(final RemoteDeviceId id,
+    public TopologyMountPointFacade(final String topologyId,
+                                    final RemoteDeviceId id,
                                     final Broker domBroker,
                                     final BindingAwareBroker bindingBroker,
                                     long defaultRequestTimeoutMillis) {
-
+        this.topologyId = topologyId;
         this.id = id;
         this.domBroker = domBroker;
         this.bindingBroker = bindingBroker;
@@ -91,11 +111,56 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
         salProvider.getMountInstance().publish(domNotification);
     }
 
+    public void registerMountPoint(final ActorSystem actorSystem, final ActorContext context, final Address masterNode, final boolean isMaster) {
+        Preconditions.checkNotNull(id);
+        Preconditions.checkNotNull(remoteSchemaContext, "Device has no remote schema context yet. Probably not fully connected.");
+        Preconditions.checkNotNull(netconfSessionPreferences, "Device has no capabilities yet. Probably not fully connected.");
+        this.actorSystem = actorSystem;
+        final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
+        if (isMaster) {
+            LOG.warn("Creating master data broker for device {}", id);
+            deviceDataBroker = TypedActor.get(context).typedActorOf(new TypedProps<>(ProxyNetconfDeviceDataBroker.class, new Creator<NetconfDeviceMasterDataBroker>() {
+                @Override
+                public NetconfDeviceMasterDataBroker create() throws Exception {
+                    return new NetconfDeviceMasterDataBroker(actorSystem, id, remoteSchemaContext, deviceRpc, netconfSessionPreferences, defaultRequestTimeoutMillis);
+                }
+            }), MOUNT_POINT);
+            LOG.warn("Master data broker registered on path {}", TypedActor.get(actorSystem).getActorRefFor(deviceDataBroker).path());
+            salProvider.getMountInstance().onTopologyDeviceConnected(remoteSchemaContext, deviceDataBroker, deviceRpc, notificationService);
+            final Cluster cluster = Cluster.get(actorSystem);
+            final Iterable<Member> members = cluster.state().getMembers();
+            for (final Member member : members) {
+                if (!member.address().equals(cluster.selfAddress())) {
+                    final String path = member.address() + "/user/" + topologyId + "/" + id.getName();
+                    actorSystem.actorSelection(path).tell(new AnnounceMasterMountPoint(cluster.selfAddress()), null);
+                }
+            }
+        } else {
+            LOG.warn("Looking up master mount point on path {}", masterNode + "/user/" + topologyId + "/" + id.getName() + "/" + MOUNT_POINT);
+            final Future<ActorRef> actorRefFuture = actorSystem.actorSelection(masterNode + "/user/" + topologyId + "/" + id.getName() + "/" + MOUNT_POINT).resolveOne(Timeout.intToTimeout(20));
+            actorRefFuture.onComplete(new OnComplete<ActorRef>() {
+                @Override
+                public void onComplete(Throwable throwable, ActorRef actorRef) throws Throwable {
+                    if (throwable == null) {
+                        LOG.warn("Creating slave data broker for device {}", id);
+                        final ProxyNetconfDeviceDataBroker masterBroker = TypedActor.get(actorSystem)
+                                .typedActorOf(new TypedProps<>(ProxyNetconfDeviceDataBroker.class, NetconfDeviceMasterDataBroker.class), actorRef);
+                        final DOMDataBroker deviceDataBroker = new NetconfDeviceSlaveDataBroker(actorSystem, id, masterBroker);
+                        salProvider.getMountInstance().onTopologyDeviceConnected(remoteSchemaContext, deviceDataBroker, deviceRpc, notificationService);
+                    } else {
+                        LOG.error("Unable to find remote mount point", throwable);
+                    }
+                }
+            }, actorSystem.dispatcher());
+        }
+    }
+
     public void registerMountPoint() {
         Preconditions.checkNotNull(id);
         Preconditions.checkNotNull(remoteSchemaContext, "Device has no remote schema context yet. Probably not fully connected.");
         Preconditions.checkNotNull(netconfSessionPreferences, "Device has no capabilities yet. Probably not fully connected.");
 
+        //TODO need to start master/slave data broker
         final DOMDataBroker netconfDeviceDataBroker = new NetconfDeviceDataBroker(id, remoteSchemaContext, deviceRpc, netconfSessionPreferences, defaultRequestTimeoutMillis);
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
 
@@ -104,6 +169,10 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
 
     public void unregisterMountPoint() {
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
+        if (deviceDataBroker != null) {
+            LOG.warn("Stopping master data broker for device {}", id.getName());
+            TypedActor.get(actorSystem).stop(deviceDataBroker);
+        }
     }
 
     public ConnectionStatusListenerRegistration registerConnectionStatusListener(final RemoteDeviceHandler<NetconfSessionPreferences> listener) {

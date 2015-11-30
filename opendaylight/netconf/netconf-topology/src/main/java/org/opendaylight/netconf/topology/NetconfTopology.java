@@ -8,6 +8,8 @@
 
 package org.opendaylight.netconf.topology;
 
+import akka.actor.ActorContext;
+import akka.actor.Address;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
@@ -28,7 +30,7 @@ public interface NetconfTopology {
 
     ListenableFuture<Void> disconnectNode(NodeId nodeId);
 
-    void registerMountPoint(NodeId nodeId);
+    void registerMountPoint(ActorContext context, NodeId nodeId, Address masterAddress, boolean isMaster);
 
     void unregisterMountPoint(NodeId nodeId);
 

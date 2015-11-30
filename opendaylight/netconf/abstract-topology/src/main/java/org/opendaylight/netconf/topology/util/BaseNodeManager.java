@@ -36,7 +36,7 @@ public final class BaseNodeManager implements NodeManager {
     private final String topologyId;
     private final ActorSystem actorSystem;
 
-    private boolean isMaster;
+    private boolean isMaster = false;
     private NodeManagerCallback delegate;
 
     private BaseNodeManager(final String nodeId,
@@ -99,7 +99,7 @@ public final class BaseNodeManager implements NodeManager {
 
     @Override
     public void onReceive(Object o, ActorRef actorRef) {
-
+        delegate.onReceive(o, actorRef);
     }
 
     @Override
