@@ -17,6 +17,9 @@ import akka.japi.Creator;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ListenableFuture;
 import javax.annotation.Nonnull;
+import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.topology.NodeManager;
 import org.opendaylight.netconf.topology.NodeManagerCallback;
 import org.opendaylight.netconf.topology.NodeManagerCallback.NodeManagerCallbackFactory;
@@ -24,6 +27,7 @@ import org.opendaylight.netconf.topology.RoleChangeStrategy;
 import org.opendaylight.netconf.topology.util.messages.NormalizedNodeMessage;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
@@ -36,7 +40,7 @@ public final class BaseNodeManager implements NodeManager {
     private final String topologyId;
     private final ActorSystem actorSystem;
 
-    private boolean isMaster;
+    private boolean isMaster = false;
     private NodeManagerCallback delegate;
 
     private BaseNodeManager(final String nodeId,
@@ -99,7 +103,7 @@ public final class BaseNodeManager implements NodeManager {
 
     @Override
     public void onReceive(Object o, ActorRef actorRef) {
-
+        delegate.onReceive(o, actorRef);
     }
 
     @Override
@@ -120,6 +124,31 @@ public final class BaseNodeManager implements NodeManager {
     @Override
     public Future<NormalizedNodeMessage> remoteGetCurrentStatusForNode(final NodeId nodeId) {
         return null;
+    }
+
+    @Override
+    public void onDeviceConnected(SchemaContext remoteSchemaContext, NetconfSessionPreferences netconfSessionPreferences, DOMRpcService deviceRpc) {
+        delegate.onDeviceConnected(remoteSchemaContext, netconfSessionPreferences, deviceRpc);
+    }
+
+    @Override
+    public void onDeviceDisconnected() {
+        delegate.onDeviceDisconnected();
+    }
+
+    @Override
+    public void onDeviceFailed(Throwable throwable) {
+        delegate.onDeviceFailed(throwable);
+    }
+
+    @Override
+    public void onNotification(DOMNotification domNotification) {
+        delegate.onNotification(domNotification);
+    }
+
+    @Override
+    public void close() {
+        // NOOP
     }
 
     /**
