@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5aaae553_47b965e8",
+        "filename": "features/netconf-connector/pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2015-11-30T18:36:37Z",
+      "side": 1,
+      "message": "this should not be necessary, features-parent should pull it in",
+      "revId": "978ac1144f81a1d26186f787f7aa3adf3fe1e3ef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
