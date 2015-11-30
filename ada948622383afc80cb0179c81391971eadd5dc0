@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5aaae553_c7a9d57c",
+        "filename": "features/netconf/pom.xml",
+        "patchSetId": 16
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2015-11-30T18:50:18Z",
+      "side": 1,
+      "message": "No we removed the cyclic dependency.  I can remove the comment;  it probably should have been removed when we moved the AAA plugin into the netconf project.  I will remove that in a separate patch since it is unrelated to this patch.",
+      "parentUuid": "5aaae553_87a67dc0",
+      "revId": "ada948622383afc80cb0179c81391971eadd5dc0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5aaae553_c7c47561",
         "filename": "opendaylight/restconf/sal-rest-connector/pom.xml",
         "patchSetId": 16
@@ -30,6 +48,24 @@
       "writtenOn": "2015-11-30T18:38:28Z",
       "side": 1,
       "message": "does this need to be synchronized with aaa? If it\u0027s used in more than one place, we probably want to introduce the declaration in odlparent and use it here without versions",
+      "revId": "ada948622383afc80cb0179c81391971eadd5dc0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5aaae553_a7acd98d",
+        "filename": "opendaylight/restconf/sal-rest-connector/pom.xml",
+        "patchSetId": 16
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2015-11-30T18:50:18Z",
+      "side": 1,
+      "message": "Sure, I can work on doing that.",
+      "parentUuid": "5aaae553_c7c47561",
       "revId": "ada948622383afc80cb0179c81391971eadd5dc0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
