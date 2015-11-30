@@ -12,6 +12,9 @@ import akka.actor.ActorRef;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import javax.annotation.Nonnull;
+import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.topology.NodeManagerCallback;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
@@ -19,6 +22,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class ExampleNodeManagerCallback implements NodeManagerCallback {
 
@@ -68,6 +72,31 @@ public class ExampleNodeManagerCallback implements NodeManagerCallback {
 
     @Override
     public void onRoleChanged(RoleChangeDTO roleChangeDTO) {
+
+    }
+
+    @Override
+    public void onDeviceConnected(SchemaContext remoteSchemaContext, NetconfSessionPreferences netconfSessionPreferences, DOMRpcService deviceRpc) {
+
+    }
+
+    @Override
+    public void onDeviceDisconnected() {
+
+    }
+
+    @Override
+    public void onDeviceFailed(Throwable throwable) {
+
+    }
+
+    @Override
+    public void onNotification(DOMNotification domNotification) {
+
+    }
+
+    @Override
+    public void close() {
 
     }
 }

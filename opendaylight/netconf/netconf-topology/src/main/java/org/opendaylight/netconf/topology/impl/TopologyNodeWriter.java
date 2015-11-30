@@ -134,7 +134,6 @@ public class TopologyNodeWriter implements NodeWriter{
                 throw new IllegalStateException(id.getValue() + "  Transaction(" + txType + ") not committed correctly", t);
             }
         });
-
     }
 
     private void createNetworkTopologyIfNotPresent(final WriteTransaction writeTx) {

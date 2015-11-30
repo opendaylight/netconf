@@ -11,12 +11,14 @@ package org.opendaylight.netconf.topology;
 import akka.actor.ActorSystem;
 import akka.actor.TypedActor.Receiver;
 import com.google.common.annotations.Beta;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 
 /**
  * Customizable layer that handles communication with your application.
  */
 @Beta
-public interface NodeManagerCallback extends InitialStateProvider, NodeListener, Receiver {
+public interface NodeManagerCallback extends InitialStateProvider, NodeListener, Receiver, RemoteDeviceHandler<NetconfSessionPreferences> {
 
     interface NodeManagerCallbackFactory<M> {
         NodeManagerCallback create(String nodeId, String topologyId, ActorSystem actorSystem);
