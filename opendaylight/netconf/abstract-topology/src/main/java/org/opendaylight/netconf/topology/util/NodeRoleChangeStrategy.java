@@ -27,6 +27,7 @@ public class NodeRoleChangeStrategy implements RoleChangeStrategy, EntityOwnersh
     private final EntityOwnershipService entityOwnershipService;
     private final String entityType;
     private final String entityName;
+    private final Entity entity;
     private NodeListener ownershipCandidate;
 
     private EntityOwnershipCandidateRegistration candidateRegistration = null;
@@ -38,6 +39,7 @@ public class NodeRoleChangeStrategy implements RoleChangeStrategy, EntityOwnersh
         this.entityOwnershipService = entityOwnershipService;
         this.entityType = entityType + "/" + entityName;
         this.entityName = entityName;
+        this.entity = new Entity(this.entityType, entityName);
     }
 
     @Override
@@ -48,7 +50,7 @@ public class NodeRoleChangeStrategy implements RoleChangeStrategy, EntityOwnersh
             if (candidateRegistration != null) {
                 unregisterRoleCandidate();
             }
-            candidateRegistration = entityOwnershipService.registerCandidate(new Entity(entityType, entityName));
+            candidateRegistration = entityOwnershipService.registerCandidate(entity);
             ownershipListenerRegistration = entityOwnershipService.registerListener(entityType, this);
         } catch (CandidateAlreadyRegisteredException e) {
             LOG.error("Candidate already registered for election", e);
@@ -63,6 +65,11 @@ public class NodeRoleChangeStrategy implements RoleChangeStrategy, EntityOwnersh
         candidateRegistration = null;
         ownershipListenerRegistration.close();
         ownershipListenerRegistration = null;
+    }
+
+    @Override
+    public boolean isCandidateRegistered() {
+        return entityOwnershipService.isCandidateRegistered(entity);
     }
 
     @Override

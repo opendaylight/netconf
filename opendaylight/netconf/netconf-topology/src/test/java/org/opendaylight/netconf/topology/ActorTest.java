@@ -45,6 +45,9 @@ import org.opendaylight.controller.md.sal.binding.api.DataChangeListener;
 import org.opendaylight.controller.md.sal.common.api.clustering.EntityOwnershipService;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.topology.NodeManagerCallback.NodeManagerCallbackFactory;
 import org.opendaylight.netconf.topology.TopologyManagerCallback.TopologyManagerCallbackFactory;
 import org.opendaylight.netconf.topology.example.ExampleNodeManagerCallback;
@@ -484,6 +487,31 @@ public class ActorTest {
 
         @Override
         public void onReceive(Object o, ActorRef actorRef) {
+
+        }
+
+        @Override
+        public void onDeviceConnected(SchemaContext remoteSchemaContext, NetconfSessionPreferences netconfSessionPreferences, DOMRpcService deviceRpc) {
+
+        }
+
+        @Override
+        public void onDeviceDisconnected() {
+
+        }
+
+        @Override
+        public void onDeviceFailed(Throwable throwable) {
+
+        }
+
+        @Override
+        public void onNotification(DOMNotification domNotification) {
+
+        }
+
+        @Override
+        public void close() {
 
         }
     }
