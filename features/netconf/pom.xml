@@ -17,7 +17,6 @@
   </properties>
 
   <dependencies>
-    <!-- FIXME AAA netconf dependency loop-->
     <dependency>
       <groupId>org.opendaylight.aaa</groupId>
       <artifactId>features-aaa</artifactId>
