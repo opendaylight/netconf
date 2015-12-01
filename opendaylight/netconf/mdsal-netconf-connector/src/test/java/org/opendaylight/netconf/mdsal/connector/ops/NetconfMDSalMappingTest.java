@@ -13,7 +13,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import com.google.common.io.ByteSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -24,6 +23,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -31,6 +31,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -45,6 +46,8 @@ import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.store.impl.InMemoryDOMDataStoreFactory;
+import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.controller.sal.core.spi.data.DOMStore;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
@@ -53,8 +56,6 @@ import org.opendaylight.netconf.mdsal.connector.ops.get.Get;
 import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
 import org.opendaylight.netconf.util.test.NetconfXmlUnitRecursiveQualifier;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
-import org.opendaylight.controller.sal.core.spi.data.DOMStore;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -72,6 +73,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.google.common.io.ByteSource;
 
 public class NetconfMDSalMappingTest {
 
@@ -410,6 +413,7 @@ public class NetconfMDSalMappingTest {
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_multiple_operations_5_choice_setup.xml"), RPC_REPLY_OK);
         verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument("messages/mapping/editConfigs/editConfig_merge_multiple_operations_5_choice_setup-control.xml"));
 
+        // Test files have been modified. RFC6020 requires that at most once case inside a choice is present at any time
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_multiple_operations_5_choice_setup2.xml"), RPC_REPLY_OK);
         verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument("messages/mapping/editConfigs/editConfig_merge_multiple_operations_5_choice_setup2-control.xml"));
 
@@ -465,20 +469,32 @@ public class NetconfMDSalMappingTest {
 
         verifyResponse(getConfigWithFilter("messages/mapping/filters/get-filter-augmented-case.xml"),
                 XmlFileLoader.xmlFileToDocument("messages/mapping/filters/response-augmented-case.xml"));
-        verifyResponse(edit("messages/mapping/editConfigs/editConfig-filtering-setup2.xml"), RPC_REPLY_OK);
-        verifyResponse(commit(), RPC_REPLY_OK);
 
-        verifyFilterIdentifier("messages/mapping/filters/get-filter-augmented-case-inner-choice.xml",
-                YangInstanceIdentifier.builder().node(TOP).node(CHOICE_NODE).node(CHOICE_WRAPPER).build());
-        verifyFilterIdentifier("messages/mapping/filters/get-filter-augmented-case-inner-case.xml",
-                YangInstanceIdentifier.builder().node(TOP).node(CHOICE_NODE).node(CHOICE_WRAPPER).node(INNER_CHOICE).node(INNER_CHOICE_TEXT).build());
+        /*
+         *  RFC6020 requires that at most once case inside a choice is present at any time.
+         *  Therefore
+         *  <augmented-case>augmented case</augmented-case>
+         *  from
+         *  messages/mapping/editConfigs/editConfig-filtering-setup.xml
+         *  cannot exists together with
+         *  <text>augmented nested choice text1</text>
+         *  from
+         *  messages/mapping/editConfigs/editConfig-filtering-setup2.xml
+         */
+        //verifyResponse(edit("messages/mapping/editConfigs/editConfig-filtering-setup2.xml"), RPC_REPLY_OK);
+        //verifyResponse(commit(), RPC_REPLY_OK);
 
-        verifyResponse(getConfigWithFilter("messages/mapping/filters/get-filter-augmented-string.xml"),
-                XmlFileLoader.xmlFileToDocument("messages/mapping/filters/response-augmented-string.xml"));
-        verifyResponse(getConfigWithFilter("messages/mapping/filters/get-filter-augmented-case-inner-choice.xml"),
-                XmlFileLoader.xmlFileToDocument("messages/mapping/filters/response-augmented-case-inner-choice.xml"));
-        verifyResponse(getConfigWithFilter("messages/mapping/filters/get-filter-augmented-case-inner-case.xml"),
-                XmlFileLoader.xmlFileToDocument("messages/mapping/filters/response-augmented-case-inner-choice.xml"));
+//        verifyFilterIdentifier("messages/mapping/filters/get-filter-augmented-case-inner-choice.xml",
+//                YangInstanceIdentifier.builder().node(TOP).node(CHOICE_NODE).node(CHOICE_WRAPPER).build());
+//        verifyFilterIdentifier("messages/mapping/filters/get-filter-augmented-case-inner-case.xml",
+//                YangInstanceIdentifier.builder().node(TOP).node(CHOICE_NODE).node(CHOICE_WRAPPER).node(INNER_CHOICE).node(INNER_CHOICE_TEXT).build());
+
+//        verifyResponse(getConfigWithFilter("messages/mapping/filters/get-filter-augmented-string.xml"),
+//                XmlFileLoader.xmlFileToDocument("messages/mapping/filters/response-augmented-string.xml"));
+//        verifyResponse(getConfigWithFilter("messages/mapping/filters/get-filter-augmented-case-inner-choice.xml"),
+//                XmlFileLoader.xmlFileToDocument("messages/mapping/filters/response-augmented-case-inner-choice.xml"));
+//        verifyResponse(getConfigWithFilter("messages/mapping/filters/get-filter-augmented-case-inner-case.xml"),
+//                XmlFileLoader.xmlFileToDocument("messages/mapping/filters/response-augmented-case-inner-choice.xml"));
 
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_delete-top.xml"), RPC_REPLY_OK);
         verifyResponse(commit(), RPC_REPLY_OK);
