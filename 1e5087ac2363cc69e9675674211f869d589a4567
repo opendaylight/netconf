@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5aaae553_5cddb341",
+        "filename": "opendaylight/netconf/netconf-topology-config/src/main/resources/initial/02-netconf-topology.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2015-12-02T11:27:05Z",
+      "side": 0,
+      "message": "I dont think this was ever used, apart from the first topology commit since this was introduced in it. This should be safe to remove since this wasn\u0027t present in previous release.",
+      "parentUuid": "5aaae553_3cc1d780",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 48
+      },
+      "revId": "1e5087ac2363cc69e9675674211f869d589a4567",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5aaae553_1c4bbb2c",
         "filename": "opendaylight/netconf/netconf-topology/src/main/yang/netconf-topology.yang",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2015-12-02T09:47:53Z",
       "side": 0,
       "message": "Please do not remove leaf, rather make it non-mandatory with state deprecated and add description to that it is unused.",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 13
+      },
+      "revId": "1e5087ac2363cc69e9675674211f869d589a4567",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5aaae553_7ce2ef04",
+        "filename": "opendaylight/netconf/netconf-topology/src/main/yang/netconf-topology.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2015-12-02T11:27:05Z",
+      "side": 0,
+      "message": "I dont think this was ever used, apart from the first topology commit since this was introduced in it. This should be safe to remove since this wasn\u0027t present in a previous release.",
+      "parentUuid": "5aaae553_1c4bbb2c",
       "range": {
         "startLine": 43,
         "startChar": 0,
