@@ -26,6 +26,7 @@ import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
 import org.opendaylight.netconf.sal.rest.impl.AbstractIdentifierAwareJaxRsProvider;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
@@ -61,6 +62,10 @@ public abstract class AbstractBodyReaderTest {
     protected static SchemaContext schemaContextLoader(final String yangPath,
             final SchemaContext schemaContext) {
         return TestRestconfUtils.loadSchemaContext(yangPath, schemaContext);
+    }
+
+    protected static SchemaContext effectiveSchemaContextLoader(final String yangPath) {
+        return TestRestconfUtils.loadEffectiveSchemaContext(yangPath);
     }
 
     protected static <T extends AbstractIdentifierAwareJaxRsProvider> void mockBodyReader(
@@ -99,5 +104,12 @@ public abstract class AbstractBodyReaderTest {
         assertNotNull(nnContext.getInstanceIdentifierContext()
                 .getSchemaContext());
         assertNotNull(nnContext.getInstanceIdentifierContext().getSchemaNode());
+    }
+
+    protected static void checkPATCHContext(final PATCHContext patchContext) {
+        assertNotNull(patchContext.getData());
+        assertNotNull(patchContext.getInstanceIdentifierContext().getInstanceIdentifier());
+        assertNotNull(patchContext.getInstanceIdentifierContext().getSchemaContext());
+        assertNotNull(patchContext.getInstanceIdentifierContext().getSchemaNode());
     }
 }
