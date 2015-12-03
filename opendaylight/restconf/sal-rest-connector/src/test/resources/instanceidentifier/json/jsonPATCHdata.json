@@ -1,0 +1,65 @@
+{
+    "_patchId" : "test-patch",
+    "_comment" : "this is test patch",
+    "_edit" : [
+
+      {   "_editId" : "edit0",
+          "_operation" : "Create",
+          "_target" : "/instance-identifier-patch-module:patch-cont/",
+          "_value" :
+            { "list1" : [
+                  {
+                    "keyvalue" : "value",
+                    "leaf1" : {
+                        "type" : "string"
+                      }
+                  }
+              ]
+
+             },
+          "augmentation" : {}
+      },
+
+      {
+          "_editId" : "edit1",
+          "_operation" : "Delete",
+          "_target" : "/instance-identifier-patch-module:patch-cont/",
+          "_value" : "new_cont",
+          "augmentation" : {}
+      },
+
+      {
+          "_editId" : "edit2",
+          "_operation" : "Replace",
+          "_target" : "/instance-identifier-patch-module:cont/instance-identifier-patch-module:patch-cont1/",
+          "_value" : "new_cont2",
+          "augmentation" : {}
+      },
+
+      {
+          "_editId" : "edit3",
+          "_operation" : "Remove",
+          "_target" : "/instance-identifier-patch-module:cont/instance-identifier-patch-module:patch-cont1/",
+          "_value" : "new_cont",
+          "augmentation" : {}
+      },
+
+      {
+          "_editId" : "edit4",
+          "_operation" : "Move",
+          "_target" : "/instance-identifier-patch-module:cont/instance-identifier-patch-module:patch-cont1/",
+          "_value" : "new_cont",
+          "augmentation" : {}
+      },
+
+      {
+          "_editId" : "edit5",
+          "_operation" : "Merge",
+          "_target" : "/instance-identifier-patch-module:cont/instance-identifier-patch-module:patch-cont1/",
+          "_value" : "new_cont",
+          "augmentation" : {}
+      }
+    ],
+
+  "augmentation" : {}
+}

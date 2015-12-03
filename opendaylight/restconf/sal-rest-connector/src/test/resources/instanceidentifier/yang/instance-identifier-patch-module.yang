@@ -1,0 +1,16 @@
+module instance-identifier-patch-module {
+  namespace "instance:identifier:patch:module";
+
+  prefix "iipmodule";
+  revision 2015-11-21 {
+  }
+
+    container patch-cont {
+        container patch-cont1 {
+            leaf patch-leaf1 {
+                type string;
+            }
+        }
+    }
+  
+}
