@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2014, 2015 Brocade Communication Systems, Inc., Cisco Systems, Inc. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -979,6 +980,22 @@ public class RestconfImpl implements RestconfService {
         final URI uriToWebsocketServer = uriToWebsocketServerBuilder.replacePath(streamName).build();
 
         return Response.status(Status.OK).location(uriToWebsocketServer).build();
+    }
+
+    @Override
+    public PATCHStatusContext patchConfigurationData(String identifier, PATCHContext context, UriInfo uriInfo) {
+        if (context == null) {
+            throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+        }
+        return broker.patchConfigurationDataWithinTransaction(context, controllerContext.getGlobalSchema());
+    }
+
+    @Override
+    public PATCHStatusContext patchConfigurationData(PATCHContext context, @Context UriInfo uriInfo) {
+        if (context == null) {
+            throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+        }
+        return broker.patchConfigurationDataWithinTransaction(context, controllerContext.getGlobalSchema());
     }
 
     /**
