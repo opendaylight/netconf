@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2014, 2015 Brocade Communication Systems, Inc., Cisco Systems, Inc. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
@@ -979,6 +979,11 @@ public class RestconfImpl implements RestconfService {
         final URI uriToWebsocketServer = uriToWebsocketServerBuilder.replacePath(streamName).build();
 
         return Response.status(Status.OK).location(uriToWebsocketServer).build();
+    }
+
+    @Override
+    public PATCHStatusContext patchConfigurationData(String identifier, PATCHContext context, UriInfo uriInfo) {
+        return broker.patchConfigurationDataWithinTransaction(context, controllerContext.getGlobalSchema());
     }
 
     /**
