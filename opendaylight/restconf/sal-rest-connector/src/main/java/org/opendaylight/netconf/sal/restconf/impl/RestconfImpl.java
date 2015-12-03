@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2014, 2015 Brocade Communication Systems, Inc., Cisco Systems, Inc. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
@@ -16,6 +16,7 @@ import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -979,6 +980,56 @@ public class RestconfImpl implements RestconfService {
         final URI uriToWebsocketServer = uriToWebsocketServerBuilder.replacePath(streamName).build();
 
         return Response.status(Status.OK).location(uriToWebsocketServer).build();
+    }
+
+    @Override
+    public PATCHStatusContext patchConfigurationData(String identifier, PATCHContext context, UriInfo uriInfo) {
+        List<PATCHStatusEntity> editCollection = new ArrayList<>();
+        List<RestconfError> editErrors;
+        List<RestconfError> globalErrors;
+
+        for (PATCHEntity patchEntity : context.getData()) {
+            final PATCHEditOperation operation = PATCHEditOperation.valueOf(patchEntity.getOperation().toUpperCase());
+
+            switch (operation) {
+                case CREATE:
+                    try {
+                        broker.commitConfigurationDataPost(controllerContext.getGlobalSchema(), patchEntity.getTargetNode(),
+                                patchEntity.getNode());
+                        editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
+                    } catch (Exception e) {
+                        //TODO: handle proper exception to fill up editErrors collection subsequently
+                        editErrors = new ArrayList<>();
+                        editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
+                    }
+                    break;
+                case REPLACE:
+                    try {
+                        broker.commitConfigurationDataPut(controllerContext.getGlobalSchema(), patchEntity.getTargetNode(),
+                            patchEntity.getNode());
+                        editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
+                    } catch (Exception e) {
+                        //TODO: handle proper exception to fill up editErrors collection subsequently
+                        editErrors = new ArrayList<>();
+                        editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
+                    }
+                    break;
+                case DELETE:
+                    try {
+                        broker.commitConfigurationDataDelete(patchEntity.getTargetNode());
+                        editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
+                    } catch (Exception e) {
+                        //TODO: handle proper exception to fill up editErrors collection subsequently
+                        editErrors = new ArrayList<>();
+                        editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
+                    }
+                    break;
+            }
+        }
+
+        //TODO: based on result, make sure global OK and possible global errors are filled up correctly
+        globalErrors = new ArrayList<>();
+        return new PATCHStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), true, globalErrors);
     }
 
     /**
