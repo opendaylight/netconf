@@ -446,6 +446,11 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         }
 
         @Override
+        public void startYangModeledAnyXmlNode(NodeIdentifier name, int childSizeHint) throws IOException {
+            //TODO implement
+        }
+
+        @Override
         public void endNode() throws IOException, IllegalStateException {
             delegate.endNode();
         }
