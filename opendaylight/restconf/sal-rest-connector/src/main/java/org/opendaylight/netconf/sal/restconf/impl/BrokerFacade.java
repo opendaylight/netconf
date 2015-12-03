@@ -126,6 +126,15 @@ public class BrokerFacade {
         throw new RestconfDocumentedException(errMsg);
     }
 
+    public CheckedFuture<Void, TransactionCommitFailedException> patchConfigurationDataViaTransaction(
+            final SchemaContext globalSchema, final YangInstanceIdentifier path, final PATCHContext context) {
+        final DOMDataReadWriteTransaction newTransaction = domDataBroker.newReadWriteTransaction();
+        for (PATCHEntity patchEntity : context.getData()) {
+            //TODO: implement body
+        }
+        return null;
+    }
+
     // POST configuration
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataPost(
             final SchemaContext globalSchema, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload) {
