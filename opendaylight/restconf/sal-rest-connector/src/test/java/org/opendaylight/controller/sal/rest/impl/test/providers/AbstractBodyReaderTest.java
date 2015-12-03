@@ -13,6 +13,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 
 import javax.ws.rs.core.MediaType;
@@ -22,11 +24,13 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
+import org.opendaylight.controller.sal.restconf.impl.test.TestUtils;
 import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
 import org.opendaylight.netconf.sal.rest.impl.AbstractIdentifierAwareJaxRsProvider;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 /**
  * sal-rest-connector org.opendaylight.controller.sal.rest.impl.test.providers
@@ -61,6 +65,10 @@ public abstract class AbstractBodyReaderTest {
     protected static SchemaContext schemaContextLoader(final String yangPath,
             final SchemaContext schemaContext) {
         return TestRestconfUtils.loadSchemaContext(yangPath, schemaContext);
+    }
+
+    protected static SchemaContext effectiveSchemaContextLoader(final String yangPath) {
+        return TestRestconfUtils.loadEffectiveSchemaContext(yangPath);
     }
 
     protected static <T extends AbstractIdentifierAwareJaxRsProvider> void mockBodyReader(
