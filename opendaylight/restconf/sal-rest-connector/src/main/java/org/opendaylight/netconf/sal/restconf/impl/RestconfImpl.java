@@ -293,6 +293,12 @@ public class RestconfImpl implements RestconfService {
     }
 
     @Override
+    public Response patchConfigurationData(PATCHContext payload) {
+        //TODO: iterate over patch entities given by payload and use BrokerFacade to apply each operation
+        return Response.status(Status.OK).build();
+    }
+
+    @Override
     public NormalizedNodeContext getOperations(final UriInfo uriInfo) {
         final Set<Module> allModules = controllerContext.getAllModules();
         return operationsFromModulesToNormalizedContext(allModules, null);

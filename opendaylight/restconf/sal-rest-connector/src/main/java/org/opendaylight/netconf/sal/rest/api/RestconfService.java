@@ -21,7 +21,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.opendaylight.netconf.sal.rest.api.Draft02.MediaTypes;
+import org.opendaylight.netconf.sal.rest.impl.PATCH;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 
 /**
  * The URI hierarchy for the RESTCONF resources consists of an entry point container, 4 top-level resources, and 1
@@ -150,5 +153,11 @@ public interface RestconfService {
     @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public NormalizedNodeContext getAvailableStreams(@Context UriInfo uriInfo);
+
+    @PATCH
+    @Path("/config/{identifier:.+}")
+    @Consumes({MediaTypes.PATCH, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaTypes.PATCH_STATUS, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response patchConfigurationData(PATCHContext payload);
 
 }
