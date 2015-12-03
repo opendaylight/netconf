@@ -11,6 +11,7 @@ import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastor
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.OPERATIONAL;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
@@ -126,6 +127,88 @@ public class BrokerFacade {
         throw new RestconfDocumentedException(errMsg);
     }
 
+    public PATCHStatusContext patchConfigurationDataWithinTransaction(final PATCHContext context, final SchemaContext
+            globalSchema) {
+        final DOMDataReadWriteTransaction patchTransaction = domDataBroker.newReadWriteTransaction();
+        List<PATCHStatusEntity> editCollection = new ArrayList<>();
+        List<RestconfError> editErrors;
+        List<RestconfError> globalErrors = null;
+        int errorCounter = 0;
+
+        for (PATCHEntity patchEntity : context.getData()) {
+            final PATCHEditOperation operation = PATCHEditOperation.valueOf(patchEntity.getOperation().toUpperCase());
+
+            switch (operation) {
+                case CREATE:
+                    if (errorCounter == 0) {
+                        try {
+                            postDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity.getTargetNode(),
+                                    patchEntity.getNode(), globalSchema);
+                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
+                        } catch (RestconfDocumentedException e) {
+                            editErrors = new ArrayList<>();
+                            editErrors.addAll(e.getErrors());
+                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
+                            errorCounter++;
+                        }
+                    }
+                    break;
+                case REPLACE:
+                    if (errorCounter == 0) {
+                        try {
+                            putDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
+                                    .getTargetNode(), patchEntity.getNode(), globalSchema);
+                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
+                        } catch (RestconfDocumentedException e) {
+                            editErrors = new ArrayList<>();
+                            editErrors.addAll(e.getErrors());
+                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
+                            errorCounter++;
+                        }
+                    }
+                    break;
+                case DELETE:
+                    if (errorCounter == 0) {
+                        try {
+                            deleteDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
+                                    .getTargetNode());
+                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
+                        } catch (RestconfDocumentedException e) {
+                            editErrors = new ArrayList<>();
+                            editErrors.addAll(e.getErrors());
+                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
+                            errorCounter++;
+                        }
+                    }
+                    break;
+                case REMOVE:
+                    if (errorCounter == 0) {
+                        try {
+                            deleteDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
+                                    .getTargetNode());
+                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
+                        } catch (RestconfDocumentedException e) {
+                            LOG.error("Error removing %s by %s operation", patchEntity.getTargetNode().toString(),
+                                    patchEntity.getEditId(), e);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        //TODO: make sure possible global errors are filled up correctly and decide transaction submission based on that
+        //globalErrors = new ArrayList<>();
+        if (errorCounter == 0) {
+            final CheckedFuture<Void, TransactionCommitFailedException> submit = patchTransaction.submit();
+            return new PATCHStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), true,
+                    globalErrors);
+        } else {
+            patchTransaction.cancel();
+            return new PATCHStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), false,
+                    globalErrors);
+        }
+    }
+
     // POST configuration
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataPost(
             final SchemaContext globalSchema, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload) {
@@ -234,6 +317,28 @@ public class BrokerFacade {
         return rWTransaction.submit();
     }
 
+    private void postDataWithinTransaction(
+            final DOMDataReadWriteTransaction rWTransaction, final LogicalDatastoreType datastore,
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
+        // FIXME: This is doing correct post for container and list children
+        //        not sure if this will work for choice case
+        if(payload instanceof MapNode) {
+            LOG.trace("POST " + datastore.name() + " within Restconf PATCH: {} with payload {}", path, payload);
+            final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
+            rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+            ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
+            for(final MapEntryNode child : ((MapNode) payload).getValue()) {
+                final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
+                checkItemDoesNotExists(rWTransaction, datastore, childPath);
+                rWTransaction.put(datastore, childPath, child);
+            }
+        } else {
+            checkItemDoesNotExists(rWTransaction,datastore, path);
+            ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
+            rWTransaction.put(datastore, path, payload);
+        }
+    }
+
     private void checkItemDoesNotExists(final DOMDataReadWriteTransaction rWTransaction,final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         final ListenableFuture<Boolean> futureDatastoreData = rWTransaction.exists(store, path);
         try {
@@ -259,12 +364,27 @@ public class BrokerFacade {
         return writeTransaction.submit();
     }
 
+    private void putDataWithinTransaction(
+            final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
+        LOG.trace("Put " + datastore.name() + "within Restconf PATCH: {} with payload {}", path, payload);
+        ensureParentsByMerge(datastore, path, writeTransaction, schemaContext);
+        writeTransaction.put(datastore, path, payload);
+    }
+
     private CheckedFuture<Void, TransactionCommitFailedException> deleteDataViaTransaction(
             final DOMDataWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path) {
         LOG.trace("Delete " + datastore.name() + " via Restconf: {}", path);
         writeTransaction.delete(datastore, path);
         return writeTransaction.submit();
+    }
+
+    private void deleteDataWithinTransaction(
+            final DOMDataWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
+            final YangInstanceIdentifier path) {
+        LOG.trace("Delete " + datastore.name() + " within Restconf PATCH: {}", path);
+        writeTransaction.delete(datastore, path);
     }
 
     public void setDomDataBroker(final DOMDataBroker domDataBroker) {
