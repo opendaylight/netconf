@@ -1,0 +1,28 @@
+<yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+    <patch-id>test-patch</patch-id>
+    <comment>this is test patch</comment>
+    <edit>
+        <edit-id>edit1</edit-id>
+        <operation>create</operation>
+        <target>/my-list2</target>
+        <value>
+            <my-list2 xmlns="instance:identifier:patch:module">
+                <name>my-leaf20</name>
+                <my-leaf21>I am leaf21-0</my-leaf21>
+                <my-leaf22>I am leaf22-0</my-leaf22>
+            </my-list2>
+        </value>
+    </edit>
+    <edit>
+        <edit-id>edit2</edit-id>
+        <operation>create</operation>
+        <target>/my-list2</target>
+        <value>
+            <my-list2 xmlns="instance:identifier:patch:module">
+                <name>my-leaf21</name>
+                <my-leaf21>I am leaf21-1</my-leaf21>
+                <my-leaf22>I am leaf22-1</my-leaf22>
+            </my-list2>
+        </value>
+    </edit>
+</yang-patch>
