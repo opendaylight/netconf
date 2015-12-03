@@ -15,6 +15,7 @@ import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaRetrievalService;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 
 public class RestconfCompositeWrapper implements RestconfService, SchemaRetrievalService {
 
@@ -105,6 +106,11 @@ public class RestconfCompositeWrapper implements RestconfService, SchemaRetrieva
     @Override
     public NormalizedNodeContext getAvailableStreams(final UriInfo uriInfo) {
         return restconf.getAvailableStreams(uriInfo);
+    }
+
+    @Override
+    public Response patchConfigurationData(PATCHContext payload) {
+        return restconf.patchConfigurationData(payload);
     }
 
     @Override
