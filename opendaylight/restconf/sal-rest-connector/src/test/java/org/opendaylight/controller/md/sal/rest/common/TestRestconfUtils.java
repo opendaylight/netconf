@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,6 +39,12 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.parser.api.YangContextParser;
 import org.opendaylight.yangtools.yang.model.parser.api.YangSyntaxErrorException;
 import org.opendaylight.yangtools.yang.parser.impl.YangParserImpl;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
+import org.opendaylight.yangtools.yang.parser.spi.source.SourceException;
+import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
+import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
+import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangStatementSourceImpl;
+import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.effective.EffectiveSchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -180,6 +188,42 @@ public class TestRestconfUtils {
     private static SchemaContext loadSchemaContext(final String resourceDirectory) throws IOException {
         final Collection<File> testFiles = loadFiles(resourceDirectory);
         return parser.parseFiles(testFiles);
+    }
+
+    public static SchemaContext loadEffectiveSchemaContext(final String resourceDirectory) {
+        Preconditions.checkArgument(resourceDirectory != null, "Path can not be null.");
+        Preconditions.checkArgument(( !resourceDirectory.isEmpty()), "Path can not be empty.");
+        try {
+            final CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
+                    .newBuild();
+            File[] files = new File[0];
+
+                files = new File(TestRestconfUtils.class.getResource(resourceDirectory).toURI()).listFiles();
+
+            for (File file : files) {
+                if (file.getName().endsWith(".yang")) {
+                    addSources(reactor, new YangStatementSourceImpl(file.getPath(), true));
+                } else {
+                    LOG.info("Ignoring non-yang file {}", file);
+                }
+            }
+            return reactor.buildEffective();
+
+        } catch (ReactorException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private static void addSources(
+            final CrossSourceStatementReactor.BuildAction reactor,
+            final YangStatementSourceImpl... sources) {
+        for (YangStatementSourceImpl source : sources) {
+            reactor.addSource(source);
+        }
     }
 
     private static SchemaContext addSchemaContext(final String resourceDirectory,

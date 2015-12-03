@@ -1,0 +1,57 @@
+{
+  "ietf-yang-patch:yang-patch" : {
+
+    "patch-id" : "test-patch",
+    "comment" : "this is test patch",
+    "edit" : [
+
+      {   "edit-id" : "edit1",
+          "operation" : "create",
+          "target" : "/instance-identifier-patch-module:patch-cont/",
+          "value" : "new_cont"
+      },
+
+      {
+          "edit-id" : "edit2",
+          "operation" : "delete",
+          "target" : "/instance-identifier-patch-module:patch-cont/",
+          "value" : "new_cont"
+      },
+
+      {
+          "edit-id" : "edit3",
+          "operation" : "replace",
+          "target" : "/instance-identifier-patch-module:cont/instance-identifier-patch-module:patch-cont1/",
+          "value" : "new_cont2"
+      },
+
+//      {
+//          "edit-id" : "edit4",
+//          "operation" : "insert",
+//          "target" : "/instance-identifier-patch-module:cont/instance-identifier-patch-module:patch-cont1/",
+//          "value" : "leaf2"
+//      },
+
+      {
+          "edit-id" : "edit5",
+          "operation" : "remove",
+          "target" : "/instance-identifier-patch-module:cont/instance-identifier-patch-module:patch-cont1/",
+          "value" : "new_cont"
+      },
+
+      {
+          "edit-id" : "edit6",
+          "operation" : "move",
+          "target" : "/instance-identifier-patch-module:cont/instance-identifier-patch-module:patch-cont1/",
+          "value" : "new_cont"
+      },
+
+      {
+          "edit-id" : "edit7",
+          "operation" : "merge",
+          "target" : "/instance-identifier-patch-module:cont/instance-identifier-patch-module:patch-cont1/",
+          "value" : "new_cont"
+      }
+    ]
+  }
+}
