@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -209,6 +210,17 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
     @Override
     public NormalizedNodeContext getAvailableStreams(final UriInfo uriInfo) {
         return delegate.getAvailableStreams(uriInfo);
+    }
+
+    @Override
+    public PATCHStatusContext patchConfigurationData(final String identifier, final PATCHContext payload, final UriInfo
+            uriInfo) {
+        return delegate.patchConfigurationData(identifier, payload, uriInfo);
+    }
+
+    @Override
+    public PATCHStatusContext patchConfigurationData(final PATCHContext payload, final UriInfo uriInfo) {
+        return delegate.patchConfigurationData(payload, uriInfo);
     }
 
     public BigInteger getConfigDelete() {
