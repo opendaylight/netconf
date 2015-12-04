@@ -22,6 +22,30 @@
       "revId": "95800f49d9e514fedcb8840ba727c89af2bbde1b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5aaae553_cc9ec356",
+        "filename": "features/netconf/pom.xml",
+        "patchSetId": 24
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2015-12-04T23:35:20Z",
+      "side": 1,
+      "message": "Yes, this was done by Tomas Cere in this https://git.opendaylight.org/gerrit/#/c/30302/ .  I just updated it in this patch;  if you would rather I can pull it into a separate patch but that seems a bit overkill.",
+      "parentUuid": "5aaae553_09536d18",
+      "range": {
+        "startLine": 10,
+        "startChar": 7,
+        "endLine": 10,
+        "endChar": 13
+      },
+      "revId": "95800f49d9e514fedcb8840ba727c89af2bbde1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
