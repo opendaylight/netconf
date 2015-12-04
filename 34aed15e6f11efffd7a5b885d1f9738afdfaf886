@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5aaae553_8603cd72",
+        "filename": "features/restconf/src/main/resources/features.xml",
+        "patchSetId": 22
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2015-12-04T12:35:07Z",
+      "side": 1,
+      "message": "Perhaps a stupid question, but why are AAA dependencies included exactly in *-noauth feature?\nAs a user, I always think odl-restconf-noauth means \"restconf without AAA\".\nDoes this mean that from now on, it is not possible to use restconf without pulling in AAA stuff such as oauth2?",
+      "range": {
+        "startLine": 30,
+        "startChar": 19,
+        "endLine": 30,
+        "endChar": 22
+      },
+      "revId": "34aed15e6f11efffd7a5b885d1f9738afdfaf886",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
