@@ -15,11 +15,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Iterables;
+
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
@@ -62,7 +65,7 @@ public class OrderedNormalizedNodeWriter implements Closeable, Flushable{
     }
 
     public OrderedNormalizedNodeWriter write(final NormalizedNode<?, ?> node) throws IOException {
-        if (root == schemaContext) {
+        if (Objects.equals(root, schemaContext)) {
             return write(node, schemaContext.getDataChildByName(node.getNodeType()));
         }
 
