@@ -62,7 +62,7 @@ public class OrderedNormalizedNodeWriter implements Closeable, Flushable{
     }
 
     public OrderedNormalizedNodeWriter write(final NormalizedNode<?, ?> node) throws IOException {
-        if (root == schemaContext) {
+        if (root.equals(schemaContext)) {
             return write(node, schemaContext.getDataChildByName(node.getNodeType()));
         }
 
