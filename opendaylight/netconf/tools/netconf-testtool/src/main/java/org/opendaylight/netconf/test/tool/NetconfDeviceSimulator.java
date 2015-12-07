@@ -298,19 +298,25 @@ public class NetconfDeviceSimulator implements Closeable {
         final Set<Capability> capabilities = Sets.newHashSet();
 
         for (final Module module : schemaContext.getModules()) {
-            final SourceIdentifier moduleSourceIdentifier = new SourceIdentifier(module.getName(),
-                    SimpleDateFormatUtil.getRevisionFormat().format(module.getRevision()));
-            try {
-                String moduleContent = new String(consumer.getSchemaSource(moduleSourceIdentifier, YangTextSchemaSource.class)
-                        .checkedGet().read());
-                capabilities.add(new YangModuleCapability(module, moduleContent));
-                //IOException would be thrown in creating SchemaContext already
-            } catch (SchemaSourceException|IOException e) {
-                throw new RuntimeException("Cannot retrieve schema source for module " + moduleSourceIdentifier.toString() + " from schema repository", e);
+            for (final Module subModule : module.getSubmodules()) {
+                addModuleCapability(consumer, capabilities, subModule);
             }
+            addModuleCapability(consumer, capabilities, module);
         }
-
         return capabilities;
+    }
+
+    private void addModuleCapability(SharedSchemaRepository consumer, Set<Capability> capabilities, Module module) {
+        final SourceIdentifier moduleSourceIdentifier = new SourceIdentifier(module.getName(),
+                SimpleDateFormatUtil.getRevisionFormat().format(module.getRevision()));
+        try {
+            String moduleContent = new String(consumer.getSchemaSource(moduleSourceIdentifier, YangTextSchemaSource.class)
+                    .checkedGet().read());
+            capabilities.add(new YangModuleCapability(module, moduleContent));
+            //IOException would be thrown in creating SchemaContext already
+        } catch (SchemaSourceException |IOException e) {
+            throw new RuntimeException("Cannot retrieve schema source for module " + moduleSourceIdentifier.toString() + " from schema repository", e);
+        }
     }
 
     private void addDefaultSchemas(final SharedSchemaRepository consumer) {
