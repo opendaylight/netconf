@@ -132,14 +132,14 @@
     <bundle>mvn:org.opendaylight.netconf/netconf-tcp/{{VERSION}}</bundle>
   </feature>
 
-  <feature name='odl-netconf-mdsal' version='${project.version}' description="OpenDaylight :: Netconf :: Mdsal">
+  <feature name='odl-netconf-mdsal' version='${controller.mdsal.version}' description="OpenDaylight :: Netconf :: Mdsal">
     <feature version='${config.version}'>odl-config-all</feature>
     <feature version='${config.version}'>odl-config-netty</feature>
     <feature version='${project.version}'>odl-netconf-all</feature>
     <feature version='${project.version}'>odl-netconf-tcp</feature>
     <feature version='${project.version}'>odl-netconf-ssh</feature>
     <feature version='${project.version}'>odl-netconf-client</feature>
-    <feature version='${controller.sal.version}'>odl-mdsal-broker</feature>
+    <feature version='${controller.mdsal.version}'>odl-mdsal-broker</feature>
     <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-notification/{{VERSION}}</bundle>
     <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-connector/{{VERSION}}</bundle>
     <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-monitoring/{{VERSION}}</bundle>
