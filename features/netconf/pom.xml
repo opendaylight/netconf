@@ -16,7 +16,7 @@
   <properties>
     <aaa.version>0.3.0-SNAPSHOT</aaa.version>
     <commons.opendaylight.version>1.6.0-SNAPSHOT</commons.opendaylight.version>
-    <controller.sal.version>1.3.0-SNAPSHOT</controller.sal.version>
+    <controller.mdsal.version>1.3.0-SNAPSHOT</controller.mdsal.version>
     <config.version>0.4.0-SNAPSHOT</config.version>
     <exi.nagasena.version>0000.0002.0053.0</exi.nagasena.version>
     <features.test.version>1.6.0-SNAPSHOT</features.test.version>
@@ -45,7 +45,7 @@
       <dependency>
         <groupId>org.opendaylight.controller</groupId>
         <artifactId>mdsal-artifacts</artifactId>
-        <version>${controller.sal.version}</version>
+        <version>${controller.mdsal.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
