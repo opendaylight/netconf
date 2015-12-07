@@ -82,6 +82,7 @@ public class RestconfErrorTest {
         lookUpMap.put("missing-attribute", 400);
         lookUpMap.put("bad-attribute", 400);
         lookUpMap.put("unknown-attribute", 400);
+        lookUpMap.put("missing-element", 400);
         lookUpMap.put("bad-element", 400);
         lookUpMap.put("unknown-element", 400);
         lookUpMap.put("unknown-namespace", 400);

@@ -54,6 +54,7 @@ public class RestconfError {
         MISSING_ATTRIBUTE("missing-attribute", 400 /* Bad Request */),
         BAD_ATTRIBUTE("bad-attribute", 400 /* Bad Request */),
         UNKNOWN_ATTRIBUTE("unknown-attribute", 400 /* Bad Request */),
+        MISSING_ELEMENT("missing-element", 400 /* Bad Request */),
         BAD_ELEMENT("bad-element", 400 /* Bad Request */),
         UNKNOWN_ELEMENT("unknown-element", 400 /* Bad Request */),
         UNKNOWN_NAMESPACE("unknown-namespace", 400 /* Bad Request */),
