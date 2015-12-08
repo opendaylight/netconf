@@ -22,6 +22,30 @@
       "revId": "1b037df8c3bcf82a229f005a7fe40bbef503cf37",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa4ed85_b78c1081",
+        "filename": "opendaylight/netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/OrderedNormalizedNodeWriter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2015-12-08T17:50:47Z",
+      "side": 1,
+      "message": "I did this patch only to address the opened bug, I personally have no preference between .equals() and \u003d\u003d and no good reason for the change.\n\nI can drop the patch and close the bug if you want?",
+      "parentUuid": "1aa4ed85_4c31930a",
+      "range": {
+        "startLine": 65,
+        "startChar": 8,
+        "endLine": 65,
+        "endChar": 41
+      },
+      "revId": "1b037df8c3bcf82a229f005a7fe40bbef503cf37",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
