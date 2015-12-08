@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1aa4ed85_4c31930a",
+        "filename": "opendaylight/netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/OrderedNormalizedNodeWriter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-12-08T17:04:07Z",
+      "side": 1,
+      "message": "does this help in any way ? The \"\u003d\u003d\" might be intentional, since its not expected to have different instances of root and schemaContext that would actually be equal but not the same instance. And \u003d\u003d might be slightly faster than equals().",
+      "range": {
+        "startLine": 65,
+        "startChar": 8,
+        "endLine": 65,
+        "endChar": 41
+      },
+      "revId": "1b037df8c3bcf82a229f005a7fe40bbef503cf37",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
