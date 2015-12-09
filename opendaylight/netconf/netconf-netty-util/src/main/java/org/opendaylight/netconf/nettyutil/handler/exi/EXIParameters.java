@@ -82,7 +82,7 @@ public final class EXIParameters {
         return new EXIParameters(options);
     }
 
-    public final EXIOptions getOptions() {
+    public EXIOptions getOptions() {
         return options;
     }
 }

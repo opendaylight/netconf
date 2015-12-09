@@ -79,6 +79,7 @@ public final class NetconfConfigUtil {
      * @param infixProp either tcp or ssh
      * @return value if address and port are present and valid, Optional.absent otherwise.
      * @throws IllegalStateException if address or port are invalid, or configuration is missing
+     * @throws SecurityException thrown by the security manager to indicate a security violation.
      */
     public static Optional<InetSocketAddress> extractNetconfServerAddress(final BundleContext context,
                                                                            final InfixProp infixProp) {
@@ -89,8 +90,14 @@ public final class NetconfConfigUtil {
         if (address.isPresent() && port.isPresent()) {
             try {
                 return Optional.of(parseAddress(address, port));
-            } catch (final RuntimeException e) {
-                LOG.warn("Unable to parse {} netconf address from {}:{}, fallback to default",
+            }catch (final IllegalArgumentException e) {
+                LOG.warn("IllegalArgumentException :Address or port are invalid, or configuration is missing, fallback to default",
+                        infixProp, address, port, e);
+            }catch (final SecurityException e) {
+                LOG.warn("Security violation, fallback to default",
+                        infixProp, address, port, e);
+            }catch (final RuntimeException e) {
+                LOG.warn("RuntimeException : Unable to parse {} netconf address from {}:{}, fallback to default",
                         infixProp, address, port, e);
             }
         }
