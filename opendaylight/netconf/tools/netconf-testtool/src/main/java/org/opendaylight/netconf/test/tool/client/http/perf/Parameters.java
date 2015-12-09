@@ -13,8 +13,10 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.annotation.Arg;
+import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 
 public class Parameters {
@@ -48,6 +50,9 @@ public class Parameters {
 
     @Arg(dest = "throttle")
     public int throttle;
+
+    @Arg(dest = "auth")
+    public ArrayList auth;
 
     static ArgumentParser getParser() {
         final ArgumentParser parser = ArgumentParsers.newArgumentParser("netconf stress client");
@@ -112,6 +117,11 @@ public class Parameters {
                 .help("Maximum amount of async requests that can be open at a time, " +
                         "with mutltiple threads this gets divided among all threads")
                 .dest("throttle");
+
+        parser.addArgument("--auth")
+                .nargs(2)
+                .help("Username and password for HTTP basic authentication in order username password.")
+                .dest("auth");
 
         return parser;
     }
