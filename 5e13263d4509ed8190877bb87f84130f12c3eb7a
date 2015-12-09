@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1aa4ed85_60f80be6",
+        "filename": "features/restconf/src/main/features/features.xml",
+        "patchSetId": 26
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2015-12-09T22:26:31Z",
+      "side": 1,
+      "message": "Apache Shiro requires commons-lang3, not just guava.  Regardless, I have moved the dependency to the AAA project and will update this patch once that one is merged.  I am waiting to avoid wasting Jenkins resources:\n\nhttps://git.opendaylight.org/gerrit/#/c/31098/",
+      "parentUuid": "1aa4ed85_524daa71",
+      "revId": "5e13263d4509ed8190877bb87f84130f12c3eb7a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1aa4ed85_52260abc",
         "filename": "features/restconf/src/main/features/features.xml",
         "patchSetId": 26
@@ -30,6 +48,24 @@
       "writtenOn": "2015-12-08T20:30:31Z",
       "side": 1,
       "message": "these should be packaged with the aaa feature and that feature should be pulled in here",
+      "revId": "5e13263d4509ed8190877bb87f84130f12c3eb7a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa4ed85_00dd9770",
+        "filename": "features/restconf/src/main/features/features.xml",
+        "patchSetId": 26
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2015-12-09T22:26:31Z",
+      "side": 1,
+      "message": "Done in https://git.opendaylight.org/gerrit/#/c/31098/",
+      "parentUuid": "1aa4ed85_52260abc",
       "revId": "5e13263d4509ed8190877bb87f84130f12c3eb7a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
