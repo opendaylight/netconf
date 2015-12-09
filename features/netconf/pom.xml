@@ -64,6 +64,13 @@
         <scope>import</scope>
       </dependency>
       <dependency>
+        <groupId>org.opendaylight.odlparent</groupId>
+        <artifactId>odlparent-artifacts</artifactId>
+        <version>1.6.0-SNAPSHOT</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
         <groupId>org.opendaylight.yangtools</groupId>
         <artifactId>yangtools-artifacts</artifactId>
         <version>${yangtools.version}</version>
@@ -74,6 +81,12 @@
   </dependencyManagement>
 
   <dependencies>
+    <dependency>
+      <groupId>org.opendaylight.odlparent</groupId>
+      <artifactId>features-odlparent</artifactId>
+      <classifier>features</classifier>
+      <type>xml</type>
+    </dependency>
     <dependency>
       <groupId>org.opendaylight.controller</groupId>
       <artifactId>features-protocol-framework</artifactId>
@@ -145,10 +158,10 @@
       <groupId>org.opendaylight.mdsal.model</groupId>
       <artifactId>ietf-yang-types</artifactId>
     </dependency>
-      <dependency>
-          <groupId>org.opendaylight.yangtools</groupId>
-          <artifactId>yang-model-api</artifactId>
-      </dependency>
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-model-api</artifactId>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-mapping-api</artifactId>

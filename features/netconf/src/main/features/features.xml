@@ -3,13 +3,11 @@
 <features name="odl-netconf-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.2.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.2.0 http://karaf.apache.org/xmlns/features/v1.2.0">
+  <repository>mvn:org.opendaylight.aaa/features-aaa/${aaa.version}/xml/features</repository>
   <repository>mvn:org.opendaylight.controller/features-protocol-framework/{{VERSION}}/xml/features</repository>
   <repository>mvn:org.opendaylight.controller/features-config/{{VERSION}}/xml/features</repository>
   <repository>mvn:org.opendaylight.controller/features-config-persister/{{VERSION}}/xml/features</repository>
-  <!-- FIXME: This introduces cycle between projects, which makes version updates
-              harder. Should be moved to different.
-      -->
-  <repository>mvn:org.opendaylight.aaa/features-aaa/${aaa.version}/xml/features</repository>
+  <repository>mvn:org.opendaylight.odlparent/features-odlparent/{{VERSION}}/xml/features</repository>
 
   <feature name='odl-netconf-all' version='${project.version}' description="OpenDaylight :: Netconf :: All">
     <feature version='${project.version}'>odl-netconf-api</feature>
@@ -80,16 +78,12 @@
     <feature version='${project.version}'>odl-netconf-api</feature>
     <feature version='${project.version}'>odl-netconf-mapping-api</feature>
     <feature version='${project.version}'>odl-netconf-util</feature>
+    <feature version='[4.0.30,4.1.0)'>odl-netty</feature>
     <bundle>mvn:org.opendaylight.netconf/netconf-netty-util/{{VERSION}}</bundle>
-    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bouncycastle.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bouncycastle.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/{{VERSION}}</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/{{VERSION}}</bundle>
     <bundle>mvn:org.apache.sshd/sshd-core/{{VERSION}}</bundle>
     <bundle>mvn:openexi/nagasena/{{VERSION}}</bundle>
-    <bundle>mvn:io.netty/netty-codec/{{VERSION}}</bundle>
-    <bundle>mvn:io.netty/netty-handler/{{VERSION}}</bundle>
-    <bundle>mvn:io.netty/netty-common/{{VERSION}}</bundle>
-    <bundle>mvn:io.netty/netty-buffer/{{VERSION}}</bundle>
-    <bundle>mvn:io.netty/netty-transport/{{VERSION}}</bundle>
   </feature>
 
   <feature name='odl-netconf-client' version='${project.version}' description="OpenDaylight :: Netconf :: Client">
