@@ -72,7 +72,7 @@ public class NetconfImplActivator implements BundleActivator {
                     new ServiceTracker<>(context, NetconfNotificationCollector.class, new ServiceTrackerCustomizer<NetconfNotificationCollector, NetconfNotificationCollector>() {
                         @Override
                         public NetconfNotificationCollector addingService(ServiceReference<NetconfNotificationCollector> reference) {
-                            Preconditions.checkState(listenerReg != null, "Notification collector service was already added");
+                            Preconditions.checkState(listenerReg == null, "Notification collector service was already added");
                             listenerReg = context.getService(reference).registerBaseNotificationPublisher();
                             monitoringService.setNotificationPublisher(listenerReg);
                             return null;
