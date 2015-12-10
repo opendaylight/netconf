@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1aa4ed85_183ae7cd",
+        "filename": "opendaylight/netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/exi/NetconfStartExiMessage.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-12-10T17:03:48Z",
+      "side": 1,
+      "message": "The formatting seems a bit odd. Can you reformat the line with ODL code formatter ?",
+      "range": {
+        "startLine": 95,
+        "startChar": 0,
+        "endLine": 95,
+        "endChar": 124
+      },
+      "revId": "db9354994f54aa021dc81acf28159676ee5b81dc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
