@@ -103,6 +103,10 @@
             <version>1.6.5</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>yang-model-api</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
