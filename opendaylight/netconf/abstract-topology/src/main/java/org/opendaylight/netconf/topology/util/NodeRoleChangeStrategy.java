@@ -61,10 +61,14 @@ public class NodeRoleChangeStrategy implements RoleChangeStrategy, EntityOwnersh
     @Override
     public void unregisterRoleCandidate() {
         LOG.debug("Unregistering role candidate");
-        candidateRegistration.close();
-        candidateRegistration = null;
-        ownershipListenerRegistration.close();
-        ownershipListenerRegistration = null;
+        if (candidateRegistration != null) {
+            candidateRegistration.close();
+            candidateRegistration = null;
+        }
+        if (ownershipListenerRegistration != null) {
+            ownershipListenerRegistration.close();
+            ownershipListenerRegistration = null;
+        }
     }
 
     @Override

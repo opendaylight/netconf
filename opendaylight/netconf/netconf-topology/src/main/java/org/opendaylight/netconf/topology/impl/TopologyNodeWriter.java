@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -48,6 +49,8 @@ public class TopologyNodeWriter implements NodeWriter{
     private final InstanceIdentifier<NetworkTopology> networkTopologyPath;
     private final KeyedInstanceIdentifier<Topology, TopologyKey> topologyListPath;
 
+    private final ReentrantLock lock = new ReentrantLock(true);
+
     public TopologyNodeWriter(final String topologyId, final DataBroker dataBroker) {
         this.topologyId = topologyId;
         this.txChain = Preconditions.checkNotNull(dataBroker).createTransactionChain(new TransactionChainListener() {
@@ -70,49 +73,65 @@ public class TopologyNodeWriter implements NodeWriter{
 
     @Override
     public void init(@Nonnull NodeId id, @Nonnull Node operationalDataNode) {
-        final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
+        lock.lock();
+        try {
+            final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
 
-        createNetworkTopologyIfNotPresent(writeTx);
-        final InstanceIdentifier<Node> path = createBindingPathForTopology(new NodeKey(id), topologyId);
+            createNetworkTopologyIfNotPresent(writeTx);
+            final InstanceIdentifier<Node> path = createBindingPathForTopology(new NodeKey(id), topologyId);
 
-        LOG.trace("{}: Init device state transaction {} putting if absent operational data started. Putting data on path {}",
-                id.getValue(), writeTx.getIdentifier(), path);
-        writeTx.put(LogicalDatastoreType.OPERATIONAL, path, operationalDataNode);
-        LOG.trace("{}: Init device state transaction {} putting operational data ended.",
-                id.getValue(), writeTx.getIdentifier());
+            LOG.trace("{}: Init device state transaction {} putting if absent operational data started. Putting data on path {}",
+                    id.getValue(), writeTx.getIdentifier(), path);
+            writeTx.put(LogicalDatastoreType.OPERATIONAL, path, operationalDataNode);
+            LOG.trace("{}: Init device state transaction {} putting operational data ended.",
+                    id.getValue(), writeTx.getIdentifier());
 
-        commitTransaction(writeTx, "init", id);
+            commitTransaction(writeTx, "init", id);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
     public void update(@Nonnull NodeId id, @Nonnull Node operationalDataNode) {
-        final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
+        lock.lock();
+        try {
+            final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
 
-        final InstanceIdentifier<Node> path = createBindingPathForTopology(new NodeKey(id), topologyId);
-        LOG.trace("{}: Update device state transaction {} merging operational data started. Putting data on path {}",
-                id, writeTx.getIdentifier(), operationalDataNode);
-        writeTx.put(LogicalDatastoreType.OPERATIONAL, path, operationalDataNode);
-        LOG.trace("{}: Update device state transaction {} merging operational data ended.",
-                id, writeTx.getIdentifier());
+            final InstanceIdentifier<Node> path = createBindingPathForTopology(new NodeKey(id), topologyId);
+            LOG.trace("{}: Update device state transaction {} merging operational data started. Putting data on path {}",
+                    id, writeTx.getIdentifier(), operationalDataNode);
+            writeTx.put(LogicalDatastoreType.OPERATIONAL, path, operationalDataNode);
+            LOG.trace("{}: Update device state transaction {} merging operational data ended.",
+                    id, writeTx.getIdentifier());
 
-        commitTransaction(writeTx, "update", id);
+            commitTransaction(writeTx, "update", id);
+        } finally {
+            lock.unlock();
+        }
+
     }
 
     @Override
     public void delete(@Nonnull NodeId id) {
-        final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
+        lock.lock();
+        try {
+            final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
 
-        final InstanceIdentifier<Node> path = createBindingPathForTopology(new NodeKey(id), topologyId);
+            final InstanceIdentifier<Node> path = createBindingPathForTopology(new NodeKey(id), topologyId);
 
-        LOG.trace(
-                "{}: Close device state transaction {} removing all data started. Path: {}",
-                id, writeTx.getIdentifier(), path);
-        writeTx.delete(LogicalDatastoreType.OPERATIONAL, path);
-        LOG.trace(
-                "{}: Close device state transaction {} removing all data ended.",
-                id, writeTx.getIdentifier());
+            LOG.trace(
+                    "{}: Close device state transaction {} removing all data started. Path: {}",
+                    id, writeTx.getIdentifier(), path);
+            writeTx.delete(LogicalDatastoreType.OPERATIONAL, path);
+            LOG.trace(
+                    "{}: Close device state transaction {} removing all data ended.",
+                    id, writeTx.getIdentifier());
 
-        commitTransaction(writeTx, "close", id);
+            commitTransaction(writeTx, "close", id);
+        } finally {
+            lock.unlock();
+        }
     }
 
     private void commitTransaction(final WriteTransaction transaction, final String txType, final NodeId id) {
