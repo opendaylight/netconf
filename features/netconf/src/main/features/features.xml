@@ -81,8 +81,8 @@
     <feature version='${project.version}'>odl-netconf-mapping-api</feature>
     <feature version='${project.version}'>odl-netconf-util</feature>
     <bundle>mvn:org.opendaylight.netconf/netconf-netty-util/{{VERSION}}</bundle>
-    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bouncycastle.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bouncycastle.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/{{VERSION}}</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/{{VERSION}}</bundle>
     <bundle>mvn:org.apache.sshd/sshd-core/{{VERSION}}</bundle>
     <bundle>mvn:openexi/nagasena/{{VERSION}}</bundle>
     <bundle>mvn:io.netty/netty-codec/{{VERSION}}</bundle>
