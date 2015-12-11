@@ -16,6 +16,8 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.openexi.proc.common.EXIOptions;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Start-exi netconf message.
@@ -30,7 +32,7 @@ public final class NetconfStartExiMessage extends NetconfMessage {
     public static final String LEXICAL_VALUES_KEY = "lexical-values";
     public static final String PIS_KEY = "pis";
     public static final String PREFIXES_KEY = "prefixes";
-
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfStartExiMessage.class);
     private NetconfStartExiMessage(final Document doc) {
         super(doc);
     }
@@ -83,16 +85,18 @@ public final class NetconfStartExiMessage extends NetconfMessage {
             alignmentString = EXIParameters.EXI_PARAMETER_BYTE_ALIGNED;
             break;
         }
-        case bitPacked: {
-            alignmentString = EXIParameters.EXI_PARAMETER_BIT_PACKED;
-            break;
-        }
         case compress: {
             alignmentString = EXIParameters.EXI_PARAMETER_COMPRESSED;
             break;
         }
         case preCompress: {
             alignmentString = EXIParameters.EXI_PARAMETER_PRE_COMPRESSION;
+            break;
+        }
+        default:
+            LOG.warn("Unexpected value in EXI alignment type: {} , using default value", exiOptions.getAlignmentType());
+        case bitPacked: {
+            alignmentString = EXIParameters.EXI_PARAMETER_BIT_PACKED;
             break;
         }
         }
