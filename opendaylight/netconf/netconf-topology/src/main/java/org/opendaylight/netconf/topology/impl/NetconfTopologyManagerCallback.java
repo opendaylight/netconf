@@ -149,4 +149,16 @@ public class NetconfTopologyManagerCallback implements TopologyManagerCallback {
     public void onReceive(Object o, ActorRef actorRef) {
 
     }
+
+    @Nonnull
+    @Override
+    public Node getInitialState(@Nonnull NodeId nodeId, @Nonnull Node configNode) {
+        return nodes.get(nodeId).getInitialState(nodeId, configNode);
+    }
+
+    @Nonnull
+    @Override
+    public Node getFailedState(@Nonnull NodeId nodeId, @Nonnull Node configNode) {
+        return nodes.get(nodeId).getFailedState(nodeId, configNode);
+    }
 }

@@ -17,6 +17,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.netconf.topology.NodeManager;
 import org.opendaylight.netconf.topology.NodeManagerCallback.NodeManagerCallbackFactory;
@@ -146,5 +147,17 @@ public class ExampleTopologyManagerCallback implements TopologyManagerCallback {
     @Override
     public void onReceive(Object o, ActorRef actorRef) {
 
+    }
+
+    @Nonnull
+    @Override
+    public Node getInitialState(@Nonnull NodeId nodeId, @Nonnull Node configNode) {
+        return nodes.get(nodeId).getInitialState(nodeId, configNode);
+    }
+
+    @Nonnull
+    @Override
+    public Node getFailedState(@Nonnull NodeId nodeId, @Nullable Node configNode) {
+        return nodes.get(nodeId).getFailedState(nodeId, configNode);
     }
 }
