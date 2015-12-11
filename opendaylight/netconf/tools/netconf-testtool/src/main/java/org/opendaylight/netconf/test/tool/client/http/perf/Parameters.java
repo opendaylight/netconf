@@ -132,6 +132,9 @@ public class Parameters {
         Preconditions.checkArgument(editContent.exists(), "Edit content file missing");
         Preconditions.checkArgument(editContent.isDirectory() == false, "Edit content file is a dir");
         Preconditions.checkArgument(editContent.canRead(), "Edit content file is unreadable");
+
+        Preconditions.checkArgument(destination.startsWith("/"), "Destination should start with a '/'");
+
         // TODO validate
     }
 
