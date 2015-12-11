@@ -181,8 +181,8 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback{
     }
 
     @Nonnull @Override public Node getFailedState(@Nonnull final NodeId nodeId,
-                                                  @Nonnull final Node configNode) {
-        final NetconfNode netconfNode = configNode.getAugmentation(NetconfNode.class);
+                                                  @Nullable final Node configNode) {
+        final NetconfNode netconfNode = configNode == null ? currentOperationalNode.getAugmentation(NetconfNode.class) : configNode.getAugmentation(NetconfNode.class);
 
         return new NodeBuilder()
                 .setNodeId(nodeId)

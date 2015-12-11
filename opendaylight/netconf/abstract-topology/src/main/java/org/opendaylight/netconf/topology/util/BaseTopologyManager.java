@@ -35,7 +35,6 @@ import java.util.Map.Entry;
 import java.util.Random;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.netconf.topology.NodeManager;
 import org.opendaylight.netconf.topology.RoleChangeStrategy;
 import org.opendaylight.netconf.topology.StateAggregator;
 import org.opendaylight.netconf.topology.TopologyManager;
@@ -81,7 +80,6 @@ public final class BaseTopologyManager
     private final String topologyId;
     private final TopologyManagerCallback delegateTopologyHandler;
 
-    private final Map<NodeId, NodeManager> nodes = new HashMap<>();
     private final Map<Address, TopologyManager> peers = new HashMap<>();
     private TopologyManager masterPeer = null;
     private final int id = new Random().nextInt();
@@ -191,7 +189,7 @@ public final class BaseTopologyManager
                 public void onFailure(final Throwable t) {
                     // If the combined connection attempt failed, set the node to connection failed
                     LOG.debug("Futures aggregation failed");
-                    naSalNodeWriter.update(nodeId, nodes.get(nodeId).getFailedState(nodeId, node));
+                    naSalNodeWriter.update(nodeId, delegateTopologyHandler.getFailedState(nodeId, node));
                     // FIXME disconnect those which succeeded
                     // just issue a delete on delegateTopologyHandler that gets handled on lower level
                 }
@@ -250,7 +248,7 @@ public final class BaseTopologyManager
                 @Override
                 public void onFailure(final Throwable t) {
                     // If the combined connection attempt failed, set the node to connection failed
-                    naSalNodeWriter.update(nodeId, nodes.get(nodeId).getFailedState(nodeId, node));
+                    naSalNodeWriter.update(nodeId, delegateTopologyHandler.getFailedState(nodeId, node));
                     // FIXME disconnect those which succeeded
                     // just issue a delete on delegateTopologyHandler that gets handled on lower level
                 }
@@ -376,7 +374,7 @@ public final class BaseTopologyManager
                 public void onFailure(final Throwable t) {
                     // If the combined connection attempt failed, set the node to connection failed
                     LOG.debug("Futures aggregation failed");
-                    naSalNodeWriter.update(nodeId, nodes.get(nodeId).getFailedState(nodeId, null));
+                    naSalNodeWriter.update(nodeId, delegateTopologyHandler.getFailedState(nodeId, null));
                     // FIXME disconnect those which succeeded
                     // just issue a delete on delegateTopologyHandler that gets handled on lower level
                 }

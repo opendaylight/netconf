@@ -572,6 +572,34 @@ public class ActorTest {
         public void onReceive(Object o, ActorRef actorRef) {
 
         }
+
+        @Nonnull
+        @Override
+        public Node getInitialState(@Nonnull NodeId nodeId, @Nonnull Node configNode) {
+            return new NodeBuilder()
+                    .setNodeId(nodeId)
+                    .addAugmentation(NetconfNode.class,
+                            new NetconfNodeBuilder()
+                                    .setConnectionStatus(ConnectionStatus.Connecting)
+                                    .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+                                    .setPort(new PortNumber(65535))
+                                    .build())
+                    .build();
+        }
+
+        @Nonnull
+        @Override
+        public Node getFailedState(@Nonnull NodeId nodeId, @Nonnull Node configNode) {
+            return new NodeBuilder()
+                    .setNodeId(nodeId)
+                    .addAugmentation(NetconfNode.class,
+                            new NetconfNodeBuilder()
+                                    .setConnectionStatus(ConnectionStatus.UnableToConnect)
+                                    .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+                                    .setPort(new PortNumber(65535))
+                                    .build())
+                    .build();
+        }
     }
 
     public class TestingSuccesfulStateAggregator implements StateAggregator {

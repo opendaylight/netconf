@@ -118,7 +118,7 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
     public void close() throws Exception {
         // close all existing connectors, delete whole topology in datastore?
         for (NetconfConnectorDTO connectorDTO : activeConnectors.values()) {
-            connectorDTO.getCommunicator().disconnect();
+            connectorDTO.getCommunicator().close();
         }
         activeConnectors.clear();
     }
