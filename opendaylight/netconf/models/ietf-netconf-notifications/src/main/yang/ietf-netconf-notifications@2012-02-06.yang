@@ -103,15 +103,13 @@ module ietf-netconf-notifications {
          of the session that made the change will be reported.";
       choice server-or-user {
         mandatory true;
-        //FIXME: After Bug 4414 is resolved, use shorthand version of case statement
-        case server {
-          leaf server {
-            type empty;
-            description
+        leaf server {
+          type empty;
+          description
             "If present, the change was caused
-            by the server.";
-          }
+             by the server.";
         }
+
         case by-user {
           uses common-session-parms;
         }
