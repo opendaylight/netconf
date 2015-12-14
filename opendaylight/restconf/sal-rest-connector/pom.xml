@@ -115,6 +115,15 @@
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-server</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
+      <version>1.2</version>
+    </dependency>
 
     <!-- Testing Dependencies -->
     <dependency>
@@ -158,6 +167,7 @@
               org.opendaylight.netconf.sal.restconf.impl,
               org.opendaylight.netconf.md.sal.rest.common.*,
               org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.rest.connector.rev140724.*,
+              javax.annotation
             </Private-Package>
             <Import-Package>
               *,
