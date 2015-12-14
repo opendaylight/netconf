@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1aa4ed85_e12b9380",
+        "filename": "opendaylight/netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigUtil.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2015-12-14T11:54:09Z",
+      "side": 1,
+      "message": "I think the whole point of bug 3900 was to replace the catch for RuntimeException with a more specific exception and letting everything else propagate.\nAlso since we\u0027re logging the exception itself I don\u0027t think that 2 catch branches that differ only in the message that\u0027s logged are necessary.\nCollapsing the 2 catch branches into one and keeping the old message looks better IMO.",
+      "revId": "2184a0c837076865a4728bb08de2ab2716d7ba2a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
