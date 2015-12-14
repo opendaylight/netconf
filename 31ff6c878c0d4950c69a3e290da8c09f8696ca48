@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1aa4ed85_de4f5291",
+        "filename": "opendaylight/netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/exi/EXIParameters.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-12-14T11:22:21Z",
+      "side": 1,
+      "message": "formatting",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 120
+      },
+      "revId": "31ff6c878c0d4950c69a3e290da8c09f8696ca48",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
