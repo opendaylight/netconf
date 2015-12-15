@@ -28,6 +28,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPrefe
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.util.messages.AnnounceMasterMountPoint;
+import org.opendaylight.netconf.topology.util.messages.AnnounceMasterMountPointDown;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,6 +152,12 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
         if (deviceDataBroker != null) {
             LOG.warn("Stopping master data broker for device {}", id.getName());
+            for (final Member member : Cluster.get(actorSystem).state().getMembers()) {
+                if (member.address().equals(Cluster.get(actorSystem).selfAddress())) {
+                    continue;
+                }
+                actorSystem.actorSelection(member.address() + "/user/" + topologyId + "/" + id.getName()).tell(new AnnounceMasterMountPointDown(), null);
+            }
             TypedActor.get(actorSystem).stop(deviceDataBroker);
             deviceDataBroker = null;
         }
