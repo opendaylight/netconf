@@ -14,6 +14,8 @@ import org.openexi.proc.common.EXIOptions;
 import org.openexi.proc.common.EXIOptionsException;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class EXIParameters {
     private static final String EXI_PARAMETER_ALIGNMENT = "alignment";
@@ -30,6 +32,7 @@ public final class EXIParameters {
     private static final String EXI_FIDELITY_PREFIXES = "prefixes";
 
     private final EXIOptions options;
+    private static final Logger LOG = LoggerFactory.getLogger(EXIParameters.class);
 
     private EXIParameters(final EXIOptions options) {
         this.options = Preconditions.checkNotNull(options);
@@ -38,18 +41,12 @@ public final class EXIParameters {
 
     public static EXIParameters fromXmlElement(final XmlElement root) throws EXIOptionsException {
         final EXIOptions options =  new EXIOptions();
-
-        options.setAlignmentType(AlignmentType.bitPacked);
-
         final NodeList alignmentElements = root.getElementsByTagName(EXI_PARAMETER_ALIGNMENT);
         if (alignmentElements.getLength() > 0) {
             final Element alignmentElement = (Element) alignmentElements.item(0);
             final String alignmentTextContent = alignmentElement.getTextContent().trim();
 
             switch (alignmentTextContent) {
-            case EXI_PARAMETER_BIT_PACKED:
-                options.setAlignmentType(AlignmentType.bitPacked);
-                break;
             case EXI_PARAMETER_BYTE_ALIGNED:
                 options.setAlignmentType(AlignmentType.byteAligned);
                 break;
@@ -59,7 +56,14 @@ public final class EXIParameters {
             case EXI_PARAMETER_PRE_COMPRESSION:
                 options.setAlignmentType(AlignmentType.preCompress);
                 break;
+            default:
+                LOG.warn("Unexpected value in alignmentTextContent: {} , using default value", alignmentTextContent);
+            case EXI_PARAMETER_BIT_PACKED:
+                options.setAlignmentType(AlignmentType.bitPacked);
+                break;
             }
+        } else {
+            options.setAlignmentType(AlignmentType.bitPacked);
         }
 
         if (root.getElementsByTagName(EXI_PARAMETER_FIDELITY).getLength() > 0) {
