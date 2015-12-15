@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.topology.util;
 
+import akka.actor.ActorIdentity;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Address;
@@ -516,6 +517,8 @@ public final class BaseTopologyManager
             final String path = member.address() + PATH + topologyId;
             LOG.debug("Actor at :{} is resolving topology actor for path {}", clusterExtension.selfAddress(), path);
 
+            // first send basic identify message in case our messages have not been loaded through osgi yet to prevent crashing akka.
+//            clusterExtension.system().actorSelection(path).tell(new Identify(member.address()), TypedActor.context().self());
             clusterExtension.system().actorSelection(path).tell(new CustomIdentifyMessage(clusterExtension.selfAddress()), TypedActor.context().self());
         } else if (message instanceof MemberExited) {
             // remove peer
@@ -544,8 +547,21 @@ public final class BaseTopologyManager
             final String path = member.address() + PATH + topologyId;
             LOG.debug("Actor at :{} is resolving topology actor for path {}", clusterExtension.selfAddress(), path);
 
+//            clusterExtension.system().actorSelection(path).tell(new Identify(member.address()), TypedActor.context().self());
             clusterExtension.system().actorSelection(path).tell(new CustomIdentifyMessage(clusterExtension.selfAddress()), TypedActor.context().self());
-        } else if (message instanceof CustomIdentifyMessageReply) {
+        } else if (message instanceof ActorIdentity) {
+            LOG.warn("Received ActorIdentity from node {}, ActorRef: {}", ((ActorIdentity) message).correlationId(), actorRef);
+            final String path = ((ActorIdentity) message).correlationId() + PATH + topologyId;
+            LOG.warn("Adress {} , without address {}", actorRef.path(), actorRef.path().toStringWithoutAddress());
+            if (actorRef.path().toStringWithoutAddress().equals("/deadLetters")) {
+                LOG.warn("Idenfity message recipient not ready yet, recieved ActorIdentifty from DeadLetters {}", actorRef);
+                return;
+            }
+            LOG.warn("Actor at :{} is resolving topology actor for path {}, with a custom message", clusterExtension.selfAddress(), path);
+
+            clusterExtension.system().actorSelection(path).tell(new CustomIdentifyMessage(clusterExtension.selfAddress()), TypedActor.context().self());
+        } else if (message instanceof CustomIdenNtifyMessageReply) {
+
             LOG.debug("Received a custom identify reply message from: {}", ((CustomIdentifyMessageReply) message).getAddress());
             if (!peers.containsKey(((CustomIdentifyMessage) message).getAddress())) {
                 final TopologyManager peer = typedExtension.typedActorOf(new TypedProps<>(TopologyManager.class, BaseTopologyManager.class), actorRef);

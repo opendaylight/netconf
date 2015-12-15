@@ -127,6 +127,9 @@ public class NetconfTopologyManagerCallback implements TopologyManagerCallback {
     @Nonnull
     @Override
     public ListenableFuture<Node> getCurrentStatusForNode(@Nonnull NodeId nodeId) {
+        if (!nodes.containsKey(nodeId)) {
+            nodes.put(nodeId, createNodeManager(nodeId));
+        }
         return nodes.get(nodeId).getCurrentStatusForNode(nodeId);
     }
 

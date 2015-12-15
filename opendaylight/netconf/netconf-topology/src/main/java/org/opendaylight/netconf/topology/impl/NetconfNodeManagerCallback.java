@@ -184,7 +184,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback{
                                                   @Nullable final Node configNode) {
         final NetconfNode netconfNode = configNode == null ? currentOperationalNode.getAugmentation(NetconfNode.class) : configNode.getAugmentation(NetconfNode.class);
 
-        return new NodeBuilder()
+        final Node failedNode = new NodeBuilder()
                 .setNodeId(nodeId)
                 .addAugmentation(NetconfNode.class,
                         new NetconfNodeBuilder()
@@ -202,6 +202,12 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback{
                                                 .build())
                                 .build())
                 .build();
+
+        if (currentOperationalNode == null) {
+            currentOperationalNode = failedNode;
+        }
+
+        return failedNode;
     }
 
     @Nonnull @Override public ListenableFuture<Node> onNodeCreated(@Nonnull final NodeId nodeId,
