@@ -166,6 +166,8 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
                                 .setHost(netconfNode.getHost())
                                 .setPort(netconfNode.getPort())
                                 .setConnectionStatus(ConnectionStatus.Connecting)
+                                .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                 .setClusteredConnectionStatus(
                                         new ClusteredConnectionStatusBuilder()
                                                 .setNodeStatus(
@@ -196,6 +198,8 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
                                 .setHost(netconfNode.getHost())
                                 .setPort(netconfNode.getPort())
                                 .setConnectionStatus(ConnectionStatus.UnableToConnect)
+                                .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                 .setClusteredConnectionStatus(
                                         new ClusteredConnectionStatusBuilder()
                                                 .setNodeStatus(
@@ -262,8 +266,8 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
                                                         .build())
                                         .setHost(netconfNode.getHost())
                                         .setPort(netconfNode.getPort())
-                                        .setAvailableCapabilities(new AvailableCapabilitiesBuilder().build())
-                                        .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().build())
+                                        .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                        .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                         .build()).build();
                 return currentOperationalNode;
             }
@@ -320,8 +324,8 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
                                                         .build())
                                         .setHost(netconfNode.getHost())
                                         .setPort(netconfNode.getPort())
-                                        .setAvailableCapabilities(new AvailableCapabilitiesBuilder().build())
-                                        .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().build())
+                                        .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                        .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                         .build())
                         .build();
             }
@@ -351,29 +355,20 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
         topologyDispatcher.unregisterMountPoint(new NodeId(nodeId));
 
         isMaster = roleChangeDTO.isOwner();
-        if (isMaster) {
-            LOG.warn("Gained ownership of node - registering master mount point");
-            topologyDispatcher.registerMountPoint(TypedActor.context(), new NodeId(nodeId));
-        } else {
-            // even though mount point is ready, we dont know who the master mount point will be since we havent received the announce msg
-            // after we receive the message we can go ahead and register the mount point
-            if (connected && masterDataBrokerRef != null) {
-                topologyDispatcher.registerMountPoint(TypedActor.context(), new NodeId(nodeId), masterDataBrokerRef);
-            } else {
-                LOG.debug("Mount point is ready, still waiting for master mount point");
-            }
-        }
     }
 
     @Override
     public void onDeviceConnected(final SchemaContext remoteSchemaContext, final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc) {
         // we need to notify the higher level that something happened, get a current status from all other nodes, and aggregate a new result
         connected = true;
-        if (!isMaster && masterDataBrokerRef != null) {
-            // if we're not master but one is present already, we need to register mountpoint
+        if (isMaster) {
+            LOG.debug("Master is done with schema resolution, registering mount point");
+            topologyDispatcher.registerMountPoint(TypedActor.context(), new NodeId(nodeId));
+        } else if (masterDataBrokerRef != null) {
             LOG.warn("Device connected, master already present in topology, registering mount point");
             topologyDispatcher.registerMountPoint(cachedContext, new NodeId(nodeId), masterDataBrokerRef);
         }
+
         List<String> capabilityList = new ArrayList<>();
         capabilityList.addAll(netconfSessionPreferences.getNetconfDeviceCapabilities().getNonModuleBasedCapabilities());
         capabilityList.addAll(FluentIterable.from(netconfSessionPreferences.getNetconfDeviceCapabilities().getResolvedCapabilities()).transform(AVAILABLE_CAPABILITY_TRANSFORMER).toList());
@@ -413,10 +408,6 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
         LOG.debug("onDeviceDisconnected received, unregistered role candidate");
         connected = false;
         if (isMaster) {
-            // announce that master mount point is going down
-//            for (final Member member : clusterExtension.state().getMembers()) {
-//                actorSystem.actorSelection(member.address() + "/user/" + topologyId + "/" + nodeId).tell(new AnnounceMasterMountPointDown(), null);
-//            }
             // set master to false since we are unregistering, the ownershipChanged callback can sometimes lag behind causing multiple nodes behaving as masters
             isMaster = false;
             // onRoleChanged() callback can sometimes lag behind, so unregister the mount right when it disconnects
@@ -428,6 +419,8 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
                 .addAugmentation(NetconfNode.class,
                         new NetconfNodeBuilder()
                                 .setConnectionStatus(ConnectionStatus.Connecting)
+                                .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                 .setClusteredConnectionStatus(
                                         new ClusteredConnectionStatusBuilder()
                                                 .setNodeStatus(
@@ -447,7 +440,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
     public void onDeviceFailed(Throwable throwable) {
         // we need to notify the higher level that something happened, get a current status from all other nodes, and aggregate a new result
         // no need to remove mountpoint, we should receive onRoleChanged callback after unregistering from election that unregisters the mountpoint
-        LOG.debug("onDeviceFailed received");
+        LOG.warn("Netconf node {} failed with {}", nodeId, throwable);
         connected = false;
         String reason = (throwable != null && throwable.getMessage() != null) ? throwable.getMessage() : UNKNOWN_REASON;
 
@@ -455,6 +448,8 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
                 .addAugmentation(NetconfNode.class,
                         new NetconfNodeBuilder()
                                 .setConnectionStatus(ConnectionStatus.UnableToConnect)
+                                .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                 .setClusteredConnectionStatus(
                                         new ClusteredConnectionStatusBuilder()
                                                 .setNodeStatus(
@@ -481,17 +476,17 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
 
     @Override
     public void onReceive(Object message, ActorRef actorRef) {
-        LOG.warn("Netconf node callback received message {}", message);
+        LOG.debug("Netconf node callback received message {}", message);
         if (message instanceof AnnounceMasterMountPoint) {
             masterDataBrokerRef = actorRef;
             // candidate gets registered when mount point is already prepared so we can go ahead a register it
-            if (roleChangeStrategy.isCandidateRegistered()) {
+            if (connected) {
                 topologyDispatcher.registerMountPoint(TypedActor.context(), new NodeId(nodeId), masterDataBrokerRef);
             } else {
-                LOG.warn("Announce master mount point msg received but mount point is not ready yet");
+                LOG.debug("Announce master mount point msg received but mount point is not ready yet");
             }
         } else if (message instanceof AnnounceMasterMountPointDown) {
-            LOG.warn("Master mountpoint went down");
+            LOG.debug("Master mountpoint went down");
             masterDataBrokerRef = null;
             topologyDispatcher.unregisterMountPoint(new NodeId(nodeId));
         }

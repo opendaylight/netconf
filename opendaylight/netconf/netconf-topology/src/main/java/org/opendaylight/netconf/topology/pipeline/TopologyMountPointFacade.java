@@ -78,6 +78,7 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
                                   final NetconfSessionPreferences netconfSessionPreferences,
                                   final DOMRpcService deviceRpc) {
         // prepare our prerequisites for mountpoint
+        LOG.debug("Mount point facade onConnected capabilities {}", netconfSessionPreferences);
         this.remoteSchemaContext = remoteSchemaContext;
         this.netconfSessionPreferences = netconfSessionPreferences;
         this.deviceRpc = deviceRpc;
@@ -108,6 +109,11 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
     }
 
     public void registerMountPoint(final ActorSystem actorSystem, final ActorContext context) {
+        if (remoteSchemaContext == null || netconfSessionPreferences == null) {
+            LOG.debug("Master mount point does not have schemas ready yet, delaying registration");
+            return;
+        }
+
         Preconditions.checkNotNull(id);
         Preconditions.checkNotNull(remoteSchemaContext, "Device has no remote schema context yet. Probably not fully connected.");
         Preconditions.checkNotNull(netconfSessionPreferences, "Device has no capabilities yet. Probably not fully connected.");
@@ -121,7 +127,7 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
                 return new NetconfDeviceMasterDataBroker(actorSystem, id, remoteSchemaContext, deviceRpc, netconfSessionPreferences, defaultRequestTimeoutMillis);
             }
         }), MOUNT_POINT);
-        LOG.warn("Master data broker registered on path {}", TypedActor.get(actorSystem).getActorRefFor(deviceDataBroker).path());
+        LOG.debug("Master data broker registered on path {}", TypedActor.get(actorSystem).getActorRefFor(deviceDataBroker).path());
         salProvider.getMountInstance().onTopologyDeviceConnected(remoteSchemaContext, deviceDataBroker, deviceRpc, notificationService);
         final Cluster cluster = Cluster.get(actorSystem);
         final Iterable<Member> members = cluster.state().getMembers();
@@ -135,13 +141,17 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
     }
 
     public void registerMountPoint(final ActorSystem actorSystem, final ActorContext context, final ActorRef masterRef) {
+        if (remoteSchemaContext == null || netconfSessionPreferences == null) {
+            LOG.debug("Slave mount point does not have schemas ready yet, delaying registration");
+            return;
+        }
+
         Preconditions.checkNotNull(id);
         Preconditions.checkNotNull(remoteSchemaContext, "Device has no remote schema context yet. Probably not fully connected.");
         Preconditions.checkNotNull(netconfSessionPreferences, "Device has no capabilities yet. Probably not fully connected.");
         this.actorSystem = actorSystem;
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
 
-        LOG.warn("Creating a proxy for master data broker");
         final ProxyNetconfDeviceDataBroker masterDataBroker = TypedActor.get(actorSystem).typedActorOf(new TypedProps<>(ProxyNetconfDeviceDataBroker.class, NetconfDeviceMasterDataBroker.class), masterRef);
         LOG.warn("Creating slave data broker for device {}", id);
         final DOMDataBroker deviceDataBroker = new NetconfDeviceSlaveDataBroker(actorSystem, id, masterDataBroker);
@@ -151,7 +161,7 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
     public void unregisterMountPoint() {
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
         if (deviceDataBroker != null) {
-            LOG.warn("Stopping master data broker for device {}", id.getName());
+            LOG.debug("Stopping master data broker for device {}", id.getName());
             for (final Member member : Cluster.get(actorSystem).state().getMembers()) {
                 if (member.address().equals(Cluster.get(actorSystem).selfAddress())) {
                     continue;
