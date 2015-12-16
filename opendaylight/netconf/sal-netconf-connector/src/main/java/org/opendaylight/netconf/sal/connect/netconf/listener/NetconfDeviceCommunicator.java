@@ -48,9 +48,9 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceCommunicator.class);
 
-    private final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice;
+    protected final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice;
     private final Optional<NetconfSessionPreferences> overrideNetconfCapabilities;
-    private final RemoteDeviceId id;
+    protected final RemoteDeviceId id;
     private final Lock sessionLock = new ReentrantLock();
 
     // TODO implement concurrent message limit
