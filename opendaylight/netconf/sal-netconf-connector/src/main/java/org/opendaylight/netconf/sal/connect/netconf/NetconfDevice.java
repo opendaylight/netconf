@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
@@ -64,7 +63,7 @@ import org.slf4j.LoggerFactory;
 /**
  *  This is a mediator between NetconfDeviceCommunicator and NetconfDeviceSalFacade
  */
-public final class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> {
+public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDevice.class);
 
@@ -95,16 +94,16 @@ public final class NetconfDevice implements RemoteDevice<NetconfSessionPreferenc
         }
     };
 
-    private final RemoteDeviceId id;
+    protected final RemoteDeviceId id;
     private final boolean reconnectOnSchemasChange;
 
-    private final SchemaContextFactory schemaContextFactory;
+    protected final SchemaContextFactory schemaContextFactory;
     private final RemoteDeviceHandler<NetconfSessionPreferences> salFacade;
     private final ListeningExecutorService processingExecutor;
-    private final SchemaSourceRegistry schemaRegistry;
+    protected final SchemaSourceRegistry schemaRegistry;
     private final NetconfStateSchemas.NetconfStateSchemasResolver stateSchemasResolver;
     private final NotificationHandler notificationHandler;
-    private final List<SchemaSourceRegistration<? extends SchemaSourceRepresentation>> sourceRegistrations = Lists.newArrayList();
+    protected final List<SchemaSourceRegistration<? extends SchemaSourceRepresentation>> sourceRegistrations = Lists.newArrayList();
 
     // Message transformer is constructed once the schemas are available
     private MessageTransformer<NetconfMessage> messageTransformer;
@@ -214,8 +213,7 @@ public final class NetconfDevice implements RemoteDevice<NetconfSessionPreferenc
         return remoteSessionCapabilities.isNotificationsSupported() && reconnectOnSchemasChange;
     }
 
-    @VisibleForTesting
-    void handleSalInitializationSuccess(final SchemaContext result, final NetconfSessionPreferences remoteSessionCapabilities, final DOMRpcService deviceRpc) {
+    protected void handleSalInitializationSuccess(final SchemaContext result, final NetconfSessionPreferences remoteSessionCapabilities, final DOMRpcService deviceRpc) {
         messageTransformer = new NetconfMessageTransformer(result, true);
 
         updateTransformer(messageTransformer);
@@ -226,7 +224,7 @@ public final class NetconfDevice implements RemoteDevice<NetconfSessionPreferenc
         LOG.info("{}: Netconf connector initialized successfully", id);
     }
 
-    private void handleSalInitializationFailure(final Throwable t, final RemoteDeviceCommunicator<NetconfMessage> listener) {
+    protected void handleSalInitializationFailure(final Throwable t, final RemoteDeviceCommunicator<NetconfMessage> listener) {
         LOG.error("{}: Initialization in sal failed, disconnecting from device", id, t);
         listener.close();
         onRemoteSessionDown();
@@ -460,7 +458,7 @@ public final class NetconfDevice implements RemoteDevice<NetconfSessionPreferenc
             Futures.addCallback(schemaBuilderFuture, RecursiveSchemaBuilderCallback);
         }
 
-        private NetconfDeviceRpc getDeviceSpecificRpc(final SchemaContext result) {
+        protected NetconfDeviceRpc getDeviceSpecificRpc(final SchemaContext result) {
             return new NetconfDeviceRpc(result, listener, new NetconfMessageTransformer(result, true));
         }
 
