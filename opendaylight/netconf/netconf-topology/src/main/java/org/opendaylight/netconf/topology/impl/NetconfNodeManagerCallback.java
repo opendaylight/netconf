@@ -351,26 +351,16 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
         topologyDispatcher.unregisterMountPoint(new NodeId(nodeId));
 
         isMaster = roleChangeDTO.isOwner();
-        if (isMaster) {
-            LOG.warn("Gained ownership of node - registering master mount point");
-            topologyDispatcher.registerMountPoint(TypedActor.context(), new NodeId(nodeId));
-        } else {
-            // even though mount point is ready, we dont know who the master mount point will be since we havent received the announce msg
-            // after we receive the message we can go ahead and register the mount point
-            if (connected && masterDataBrokerRef != null) {
-                topologyDispatcher.registerMountPoint(TypedActor.context(), new NodeId(nodeId), masterDataBrokerRef);
-            } else {
-                LOG.debug("Mount point is ready, still waiting for master mount point");
-            }
-        }
     }
 
     @Override
     public void onDeviceConnected(final SchemaContext remoteSchemaContext, final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc) {
         // we need to notify the higher level that something happened, get a current status from all other nodes, and aggregate a new result
         connected = true;
-        if (!isMaster && masterDataBrokerRef != null) {
-            // if we're not master but one is present already, we need to register mountpoint
+        if (isMaster) {
+            LOG.warn("Master is done with schema resolution, registering mount point");
+            topologyDispatcher.registerMountPoint(TypedActor.context(), new NodeId(nodeId));
+        } else if (masterDataBrokerRef != null) {
             LOG.warn("Device connected, master already present in topology, registering mount point");
             topologyDispatcher.registerMountPoint(cachedContext, new NodeId(nodeId), masterDataBrokerRef);
         }
