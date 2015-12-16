@@ -18,9 +18,11 @@ import akka.actor.TypedActor;
 import akka.actor.TypedActorExtension;
 import akka.actor.TypedProps;
 import akka.japi.Creator;
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -35,6 +37,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import javassist.ClassPool;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -42,9 +45,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.DataChangeListener;
+import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.common.api.clustering.EntityOwnershipService;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -65,10 +70,14 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.AvailableCapabilitiesBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.ClusteredConnectionStatusBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.UnavailableCapabilitiesBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.clustered.connection.status.NodeStatus.Status;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.clustered.connection.status.NodeStatusBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yangtools.binding.data.codec.gen.impl.StreamWriterGenerator;
@@ -92,6 +101,9 @@ public class ActorTest {
 
     @Mock
     private DataBroker dataBroker;
+
+    @Mock
+    private ReadOnlyTransaction mockedReadOnlyTx;
 
     private static final BindingNormalizedNodeCodecRegistry CODEC_REGISTRY;
 
@@ -126,11 +138,22 @@ public class ActorTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
+        final SettableFuture<Optional<Topology>> settableFuture = SettableFuture.create();
+        final CheckedFuture<Optional<Topology>, ReadFailedException> checkedFuture = Futures.makeChecked(settableFuture, new Function<Exception, ReadFailedException>() {
+            @Nullable
+            @Override
+            public ReadFailedException apply(Exception input) {
+                return new ReadFailedException("Dummy future should never return this");
+            }
+        });
+        settableFuture.set(Optional.<Topology>absent());
+        when(mockedReadOnlyTx.read(any(LogicalDatastoreType.class), any(InstanceIdentifier.class))).thenReturn(checkedFuture);
         when(dataBroker.registerDataChangeListener(
                 any(LogicalDatastoreType.class),
                 any(InstanceIdentifier.class),
                 any(DataChangeListener.class),
                 any(DataChangeScope.class))).thenReturn(null);
+        when(dataBroker.newReadOnlyTransaction()).thenReturn(mockedReadOnlyTx);
     }
 
     private void setMaster(final TopologyManager manager) {
@@ -204,6 +227,8 @@ public class ActorTest {
                 }
             });
         }
+        LOG.debug("Waiting for updates to finish");
+        Futures.allAsList(futures).get();
 
 
         final List<ListenableFuture<Void>> deleteFutures = new ArrayList<>();
@@ -380,6 +405,8 @@ public class ActorTest {
                                     .setHost(netconfNode.getHost())
                                     .setPort(netconfNode.getPort())
                                     .setConnectionStatus(ConnectionStatus.Connecting)
+                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                    .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                     .setClusteredConnectionStatus(
                                             new ClusteredConnectionStatusBuilder()
                                                     .setNodeStatus(
@@ -404,6 +431,8 @@ public class ActorTest {
                                     .setHost(netconfNode.getHost())
                                     .setPort(netconfNode.getPort())
                                     .setConnectionStatus(ConnectionStatus.UnableToConnect)
+                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                    .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                     .setClusteredConnectionStatus(
                                             new ClusteredConnectionStatusBuilder()
                                                     .setNodeStatus(
@@ -429,6 +458,8 @@ public class ActorTest {
                                     .setConnectionStatus(ConnectionStatus.Connected)
                                     .setHost(augmentation.getHost())
                                     .setPort(augmentation.getPort())
+                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                    .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                     .setClusteredConnectionStatus(
                                             new ClusteredConnectionStatusBuilder()
                                                     .setNodeStatus(
@@ -454,6 +485,8 @@ public class ActorTest {
                                     .setConnectionStatus(ConnectionStatus.Connected)
                                     .setHost(augmentation.getHost())
                                     .setPort(augmentation.getPort())
+                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                    .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                     .setClusteredConnectionStatus(
                                             new ClusteredConnectionStatusBuilder()
                                                     .setNodeStatus(
@@ -532,6 +565,8 @@ public class ActorTest {
                                     .setConnectionStatus(ConnectionStatus.Connected)
                                     .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                                     .setPort(new PortNumber(2555))
+                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                    .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                     .build())
                     .build());
         }
@@ -547,6 +582,8 @@ public class ActorTest {
                                     .setConnectionStatus(ConnectionStatus.Connected)
                                     .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                                     .setPort(new PortNumber(65535))
+                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                    .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                     .build())
                     .build());
         }
@@ -583,6 +620,8 @@ public class ActorTest {
                                     .setConnectionStatus(ConnectionStatus.Connecting)
                                     .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                                     .setPort(new PortNumber(65535))
+                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                    .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                     .build())
                     .build();
         }
@@ -597,6 +636,8 @@ public class ActorTest {
                                     .setConnectionStatus(ConnectionStatus.UnableToConnect)
                                     .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                                     .setPort(new PortNumber(65535))
+                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                    .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                     .build())
                     .build();
         }
