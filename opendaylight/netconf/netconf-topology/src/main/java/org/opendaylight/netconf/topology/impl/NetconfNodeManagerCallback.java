@@ -31,6 +31,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.NetconfTerminationReason;
+import org.opendaylight.netconf.client.NetconfClientSession;
+import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.topology.NetconfTopology;
@@ -38,6 +42,7 @@ import org.opendaylight.netconf.topology.NodeManager;
 import org.opendaylight.netconf.topology.NodeManagerCallback;
 import org.opendaylight.netconf.topology.RoleChangeStrategy;
 import org.opendaylight.netconf.topology.TopologyManager;
+import org.opendaylight.netconf.topology.pipeline.ClusteredNetconfDeviceCommunicator.NetconfClientSessionListenerRegistration;
 import org.opendaylight.netconf.topology.pipeline.TopologyMountPointFacade.ConnectionStatusListenerRegistration;
 import org.opendaylight.netconf.topology.util.BaseNodeManager;
 import org.opendaylight.netconf.topology.util.BaseTopologyManager;
@@ -65,7 +70,7 @@ import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
 import scala.concurrent.duration.FiniteDuration;
 
-public class NetconfNodeManagerCallback implements NodeManagerCallback{
+public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfClientSessionListener{
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeManagerCallback.class);
 
@@ -104,7 +109,8 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback{
     private Node currentConfig;
     private Node currentOperationalNode;
 
-    private ConnectionStatusListenerRegistration registration = null;
+    private ConnectionStatusListenerRegistration connectionStatusregistration = null;
+    private NetconfClientSessionListenerRegistration sessionListener = null;
 
     private ActorRef masterDataBrokerRef = null;
     private boolean connected = false;
@@ -218,7 +224,8 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback{
         Futures.addCallback(connectionFuture, new FutureCallback<NetconfDeviceCapabilities>() {
             @Override
             public void onSuccess(@Nullable NetconfDeviceCapabilities result) {
-                registration = topologyDispatcher.registerConnectionStatusListener(nodeId, nodeManager);
+                connectionStatusregistration = topologyDispatcher.registerConnectionStatusListener(nodeId, nodeManager);
+                sessionListener = topologyDispatcher.registerNetconfClientSessionListener(nodeId, NetconfNodeManagerCallback.this);
             }
 
             @Override
@@ -264,7 +271,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback{
                                                 @Nonnull final Node configNode) {
         // first disconnect this node
         topologyDispatcher.unregisterMountPoint(nodeId);
-        registration.close();
+        connectionStatusregistration.close();
         topologyDispatcher.disconnectNode(nodeId);
 
         // now reinit this connection with new settings
@@ -273,7 +280,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback{
         Futures.addCallback(connectionFuture, new FutureCallback<NetconfDeviceCapabilities>() {
             @Override
             public void onSuccess(@Nullable NetconfDeviceCapabilities result) {
-                registration = topologyDispatcher.registerConnectionStatusListener(nodeId, NetconfNodeManagerCallback.this);
+                connectionStatusregistration = topologyDispatcher.registerConnectionStatusListener(nodeId, NetconfNodeManagerCallback.this);
             }
 
             @Override
@@ -316,7 +323,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback{
     @Nonnull @Override public ListenableFuture<Void> onNodeDeleted(@Nonnull final NodeId nodeId) {
         // cleanup and disconnect
         topologyDispatcher.unregisterMountPoint(nodeId);
-        registration.close();
+        connectionStatusregistration.close();
         roleChangeStrategy.unregisterRoleCandidate();
         return topologyDispatcher.disconnectNode(nodeId);
     }
@@ -350,9 +357,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback{
     @Override
     public void onDeviceConnected(final SchemaContext remoteSchemaContext, final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc) {
         // we need to notify the higher level that something happened, get a current status from all other nodes, and aggregate a new result
-        LOG.debug("onDeviceConnected received, registering role candidate");
         connected = true;
-        roleChangeStrategy.registerRoleCandidate(nodeManager);
         if (!isMaster && masterDataBrokerRef != null) {
             // if we're not master but one is present already, we need to register mountpoint
             LOG.warn("Device connected, master already present in topology, registering mount point");
@@ -394,7 +399,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback{
     @Override
     public void onDeviceDisconnected() {
         // we need to notify the higher level that something happened, get a current status from all other nodes, and aggregate a new result
-        LOG.debug("onDeviceDisconnected received, unregistering role candidate");
+        LOG.debug("onDeviceDisconnected received, unregistered role candidate");
         connected = false;
         if (isMaster) {
             // announce that master mount point is going down
@@ -406,7 +411,6 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback{
             // onRoleChanged() callback can sometimes lag behind, so unregister the mount right when it disconnects
             topologyDispatcher.unregisterMountPoint(new NodeId(nodeId));
         }
-        roleChangeStrategy.unregisterRoleCandidate();
 
         final NetconfNode netconfNode = currentConfig.getAugmentation(NetconfNode.class);
         currentOperationalNode = new NodeBuilder().setNodeId(new NodeId(nodeId))
@@ -436,7 +440,6 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback{
         connected = false;
         String reason = (throwable != null && throwable.getMessage() != null) ? throwable.getMessage() : UNKNOWN_REASON;
 
-        roleChangeStrategy.unregisterRoleCandidate();
         currentOperationalNode = new NodeBuilder().setNodeId(new NodeId(nodeId))
                 .addAugmentation(NetconfNode.class,
                         new NetconfNodeBuilder()
@@ -481,5 +484,29 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback{
             masterDataBrokerRef = null;
             topologyDispatcher.unregisterMountPoint(new NodeId(nodeId));
         }
+    }
+
+    @Override
+    public void onSessionUp(NetconfClientSession netconfClientSession) {
+        //NetconfClientSession is up, we can register role candidate
+        LOG.debug("Netconf client session is up, registering role candidate");
+        roleChangeStrategy.registerRoleCandidate(nodeManager);
+    }
+
+    @Override
+    public void onSessionDown(NetconfClientSession netconfClientSession, Exception e) {
+        LOG.debug("Netconf client session is down, unregistering role candidate");
+        roleChangeStrategy.unregisterRoleCandidate();
+    }
+
+    @Override
+    public void onSessionTerminated(NetconfClientSession netconfClientSession, NetconfTerminationReason netconfTerminationReason) {
+        LOG.debug("Netconf client session is down, unregistering role candidate");
+        roleChangeStrategy.unregisterRoleCandidate();
+    }
+
+    @Override
+    public void onMessage(NetconfClientSession netconfClientSession, NetconfMessage netconfMessage) {
+        //NOOP
     }
 }
