@@ -14,7 +14,6 @@ import akka.actor.ActorSystem;
 import akka.actor.TypedActor;
 import akka.actor.TypedProps;
 import akka.cluster.Cluster;
-import akka.cluster.Member;
 import akka.dispatch.OnComplete;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
@@ -270,7 +269,9 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback{
                                                 @Nonnull final Node configNode) {
         // first disconnect this node
         topologyDispatcher.unregisterMountPoint(nodeId);
-        registration.close();
+        if (registration != null) {
+            registration.close();
+        }
         topologyDispatcher.disconnectNode(nodeId);
 
         // now reinit this connection with new settings
@@ -279,7 +280,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback{
         Futures.addCallback(connectionFuture, new FutureCallback<NetconfDeviceCapabilities>() {
             @Override
             public void onSuccess(@Nullable NetconfDeviceCapabilities result) {
-                registration = topologyDispatcher.registerConnectionStatusListener(nodeId, NetconfNodeManagerCallback.this);
+                registration = topologyDispatcher.registerConnectionStatusListener(nodeId, nodeManager);
             }
 
             @Override
@@ -322,7 +323,9 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback{
     @Nonnull @Override public ListenableFuture<Void> onNodeDeleted(@Nonnull final NodeId nodeId) {
         // cleanup and disconnect
         topologyDispatcher.unregisterMountPoint(nodeId);
-        registration.close();
+        if (registration != null) {
+            registration.close();
+        }
         roleChangeStrategy.unregisterRoleCandidate();
         return topologyDispatcher.disconnectNode(nodeId);
     }
@@ -336,7 +339,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback{
 
     @Override
     public void onRoleChanged(final RoleChangeDTO roleChangeDTO) {
-        topologyDispatcher.unregisterMountPoint(currentOperationalNode.getNodeId());
+        topologyDispatcher.unregisterMountPoint(new NodeId(nodeId));
 
         isMaster = roleChangeDTO.isOwner();
         if (isMaster) {
@@ -404,9 +407,9 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback{
         connected = false;
         if (isMaster) {
             // announce that master mount point is going down
-            for (final Member member : clusterExtension.state().getMembers()) {
-                actorSystem.actorSelection(member.address() + "/user/" + topologyId + "/" + nodeId).tell(new AnnounceMasterMountPointDown(), null);
-            }
+//            for (final Member member : clusterExtension.state().getMembers()) {
+//                actorSystem.actorSelection(member.address() + "/user/" + topologyId + "/" + nodeId).tell(new AnnounceMasterMountPointDown(), null);
+//            }
             // set master to false since we are unregistering, the ownershipChanged callback can sometimes lag behind causing multiple nodes behaving as masters
             isMaster = false;
             // onRoleChanged() callback can sometimes lag behind, so unregister the mount right when it disconnects
