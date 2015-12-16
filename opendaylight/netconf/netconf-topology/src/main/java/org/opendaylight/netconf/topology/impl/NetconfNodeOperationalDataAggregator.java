@@ -18,7 +18,9 @@ import org.opendaylight.netconf.topology.StateAggregator;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.AvailableCapabilities;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.ClusteredConnectionStatusBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.UnavailableCapabilities;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.clustered.connection.status.NodeStatus;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
@@ -38,12 +40,23 @@ public class NetconfNodeOperationalDataAggregator implements StateAggregator{
             public void onSuccess(final List<Node> result) {
                 Node base = null;
                 NetconfNode baseAugmentation = null;
+                AvailableCapabilities masterCaps = null;
+                UnavailableCapabilities unavailableMasterCaps = null;
                 final ArrayList<NodeStatus> statusList = new ArrayList<>();
                 for (final Node node : result) {
                     final NetconfNode netconfNode = node.getAugmentation(NetconfNode.class);
                     if (base == null && netconfNode.getConnectionStatus().equals(ConnectionStatus.Connected)) {
                         base = node;
                         baseAugmentation = netconfNode;
+                    }
+                    // we need to pull out caps from master, since slave does not go through resolution
+                    if (masterCaps == null) {
+                        masterCaps = netconfNode.getAvailableCapabilities();
+                        unavailableMasterCaps = netconfNode.getUnavailableCapabilities();
+                    }
+                    if (netconfNode.getAvailableCapabilities().getAvailableCapability().size() > masterCaps.getAvailableCapability().size()) {
+                        masterCaps = netconfNode.getAvailableCapabilities();
+                        unavailableMasterCaps = netconfNode.getUnavailableCapabilities();
                     }
                     LOG.debug(netconfNode.toString());
                     statusList.addAll(netconfNode.getClusteredConnectionStatus().getNodeStatus());
@@ -52,10 +65,8 @@ public class NetconfNodeOperationalDataAggregator implements StateAggregator{
                 if (base == null) {
                     base = result.get(0);
                     baseAugmentation = result.get(0).getAugmentation(NetconfNode.class);
-                    LOG.warn("All results {}", result.toString());
+                    LOG.debug("All results {}", result.toString());
                 }
-
-                LOG.warn("Base node: {}", base);
 
                 final Node aggregatedNode =
                         new NodeBuilder(base)
@@ -65,8 +76,11 @@ public class NetconfNodeOperationalDataAggregator implements StateAggregator{
                                                         new ClusteredConnectionStatusBuilder()
                                                                 .setNodeStatus(statusList)
                                                                 .build())
+                                                .setAvailableCapabilities(masterCaps)
+                                                .setUnavailableCapabilities(unavailableMasterCaps)
                                                 .build())
                                 .build();
+
                 future.set(aggregatedNode);
             }
 
@@ -88,12 +102,23 @@ public class NetconfNodeOperationalDataAggregator implements StateAggregator{
             public void onSuccess(final List<Node> result) {
                 Node base = null;
                 NetconfNode baseAugmentation = null;
+                AvailableCapabilities masterCaps = null;
+                UnavailableCapabilities unavailableMasterCaps = null;
                 final ArrayList<NodeStatus> statusList = new ArrayList<>();
                 for (final Node node : result) {
                     final NetconfNode netconfNode = node.getAugmentation(NetconfNode.class);
                     if (base == null && netconfNode.getConnectionStatus().equals(ConnectionStatus.Connected)) {
                         base = node;
                         baseAugmentation = netconfNode;
+                    }
+                    // we need to pull out caps from master, since slave does not go through resolution
+                    if (masterCaps == null) {
+                        masterCaps = netconfNode.getAvailableCapabilities();
+                        unavailableMasterCaps = netconfNode.getUnavailableCapabilities();
+                    }
+                    if (netconfNode.getAvailableCapabilities().getAvailableCapability().size() > masterCaps.getAvailableCapability().size()) {
+                        masterCaps = netconfNode.getAvailableCapabilities();
+                        unavailableMasterCaps = netconfNode.getUnavailableCapabilities();
                     }
                     LOG.debug(netconfNode.toString());
                     statusList.addAll(netconfNode.getClusteredConnectionStatus().getNodeStatus());
@@ -102,7 +127,7 @@ public class NetconfNodeOperationalDataAggregator implements StateAggregator{
                 if (base == null) {
                     base = result.get(0);
                     baseAugmentation = result.get(0).getAugmentation(NetconfNode.class);
-                    LOG.warn("All results {}", result.toString());
+                    LOG.debug("All results {}", result.toString());
                 }
 
                 final Node aggregatedNode =
@@ -113,6 +138,8 @@ public class NetconfNodeOperationalDataAggregator implements StateAggregator{
                                                         new ClusteredConnectionStatusBuilder()
                                                                 .setNodeStatus(statusList)
                                                                 .build())
+                                                .setAvailableCapabilities(masterCaps)
+                                                .setUnavailableCapabilities(unavailableMasterCaps)
                                                 .build())
                                 .build();
                 future.set(aggregatedNode);
