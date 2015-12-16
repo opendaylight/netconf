@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1aa4ed85_2d067521",
+        "filename": "opendaylight/netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigUtil.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-12-16T09:49:23Z",
+      "side": 1,
+      "message": "Are you sure these are all possible unchecked exceptions ?\nWhat about:\nNumberFormatException - from Integer.valueOf\nIllegalStateException - from port.get()",
+      "range": {
+        "startLine": 92,
+        "startChar": 27,
+        "endLine": 92,
+        "endChar": 71
+      },
+      "revId": "ef63af898efc9a52ffdb14e6ee351f97c9041a02",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
