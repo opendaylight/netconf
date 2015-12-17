@@ -16,13 +16,18 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -41,6 +46,8 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
+import com.google.common.util.concurrent.Futures;
+
 public class KeepaliveSalFacadeTest {
 
     private static final RemoteDeviceId REMOTE_DEVICE_ID = new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
@@ -48,7 +55,7 @@ public class KeepaliveSalFacadeTest {
     @Mock
     private RemoteDeviceHandler<NetconfSessionPreferences> underlyingSalFacade;
 
-    private static java.util.concurrent.ScheduledExecutorService executorService;
+    private ScheduledExecutorService executorServiceSpy;
 
     @Mock
     private NetconfDeviceCommunicator listener;
@@ -57,9 +64,12 @@ public class KeepaliveSalFacadeTest {
 
     private DOMRpcService proxyRpc;
 
+    @Mock
+    private ScheduledFuture currentKeepalive;
+
     @Before
     public void setUp() throws Exception {
-        executorService = Executors.newScheduledThreadPool(1);
+        executorServiceSpy = Executors.newScheduledThreadPool(1);
 
         MockitoAnnotations.initMocks(this);
 
@@ -67,11 +77,25 @@ public class KeepaliveSalFacadeTest {
         doReturn("mockedRpc").when(deviceRpc).toString();
         doNothing().when(underlyingSalFacade).onDeviceConnected(
                 any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
+
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+        executorServiceSpy = Mockito.spy(executorService);
+        doAnswer(new Answer<ScheduledFuture>() {
+            @Override
+            public ScheduledFuture answer(InvocationOnMock invocationOnMock)
+                    throws Throwable {
+                invocationOnMock.callRealMethod();
+                return currentKeepalive;
+            }
+        }).when(executorServiceSpy).schedule(Mockito.<Runnable> any(),
+                Mockito.anyLong(), Matchers.<TimeUnit> any());
+
+        Mockito.when(currentKeepalive.isDone()).thenReturn(true);
     }
 
     @After
     public void tearDown() throws Exception {
-        executorService.shutdownNow();
+        executorServiceSpy.shutdownNow();
     }
 
     @Test
@@ -82,7 +106,7 @@ public class KeepaliveSalFacadeTest {
         doReturn(Futures.immediateCheckedFuture(result)).when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
         final KeepaliveSalFacade keepaliveSalFacade =
-                new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, executorService, 1L);
+                new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, executorServiceSpy, 1L);
         keepaliveSalFacade.setListener(listener);
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
@@ -90,7 +114,7 @@ public class KeepaliveSalFacadeTest {
         verify(underlyingSalFacade).onDeviceConnected(
                 any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
 
-        verify(deviceRpc, timeout(15000).times(5)).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+        verify(deviceRpc, timeout(15000).times(1)).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
     }
 
     @Test
@@ -109,7 +133,7 @@ public class KeepaliveSalFacadeTest {
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
         final KeepaliveSalFacade keepaliveSalFacade =
-                new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, executorService, 1L);
+                new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, executorServiceSpy, 1L);
         keepaliveSalFacade.setListener(listener);
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
@@ -160,7 +184,7 @@ public class KeepaliveSalFacadeTest {
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
         final KeepaliveSalFacade keepaliveSalFacade =
-                new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, executorService, 100L);
+                new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, executorServiceSpy, 100L);
         keepaliveSalFacade.setListener(listener);
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
