@@ -164,15 +164,20 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>sal-binding-broker-impl</artifactId>
-      <type>test-jar</type>
-      <scope>test</scope>
+        <groupId>org.opendaylight.controller</groupId>
+        <artifactId>sal-binding-broker-impl</artifactId>
+        <type>test-jar</type>
+        <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>mockito-configuration</artifactId>
-      <scope>test</scope>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <scope>compile</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-all</artifactId>
+        <scope>test</scope>
     </dependency>
   </dependencies>
 
