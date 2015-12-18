@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1aa4ed85_3546afc0",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacadeTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2015-12-18T14:04:34Z",
+      "side": 1,
+      "message": "with the current implementation done in order to mock the return statement of executorService.schedule(), I can\u0027t control the number of call within 15000 milliseconds. This is why I\u0027m asking here for atLeast(5).\n\nLet me know if you\u0027re fine with that\n\nAlso in first patch set I forget to add the test under testKeepaliveFail (bad cherry-pick from lithium)",
+      "range": {
+        "startLine": 117,
+        "startChar": 41,
+        "endLine": 117,
+        "endChar": 48
+      },
+      "revId": "2e3db8b044ccb12d8ff51ca4515c26d9ffe98f69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
