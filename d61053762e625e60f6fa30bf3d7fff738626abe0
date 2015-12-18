@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1aa4ed85_55132b5c",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacadeTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-12-18T11:38:24Z",
+      "side": 1,
+      "message": "With just a single verification here, this test is a subset of the \"testKeepaliveFail\" test. I would like to keep more successful executions of keepalive in this test. This would require moving mocking of \"when(executorServiceSpy).schedule(Mockito.\" into testKeppaliveFail test to keep specific only to that test.",
+      "range": {
+        "startLine": 117,
+        "startChar": 0,
+        "endLine": 117,
+        "endChar": 111
+      },
+      "revId": "d61053762e625e60f6fa30bf3d7fff738626abe0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
