@@ -12,8 +12,10 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+
 import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
@@ -95,17 +97,30 @@ public class WriteCandidateTx extends AbstractWriteTx {
     }
 
     private void lock() throws NetconfDocumentedException {
-        try {
-            invokeBlocking("Lock candidate", new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
-                @Override
-                public ListenableFuture<DOMRpcResult> apply(final NetconfBaseOps input) {
-                    return input.lockCandidate(new NetconfRpcFutureCallback("Lock candidate", id));
-                }
-            });
-        } catch (final NetconfDocumentedException e) {
-            LOG.warn("{}: Failed to lock candidate", id, e);
-            throw e;
-        }
+        invoke("Lock candidate", new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
+            @Override
+            public ListenableFuture<DOMRpcResult> apply(final NetconfBaseOps input) {
+                return input.lockCandidate(new FutureCallback<DOMRpcResult>() {
+                    @Override
+                    public void onSuccess(DOMRpcResult result) {
+                        if (result.getErrors().isEmpty()) {
+                            if (LOG.isTraceEnabled()) {
+                                LOG.trace("Lock candidate succesfull");
+                            }
+                        } else {
+                            LOG.warn("{}: lock candidate invoked unsuccessfully: {}", id, result.getErrors());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        LOG.warn("Lock candidate operation failed. {}", t);
+                        finished = true;
+                        throw new RuntimeException(id + ": Failed to lock candidate datastore", t);
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -185,14 +200,28 @@ public class WriteCandidateTx extends AbstractWriteTx {
 
     @Override
     protected void editConfig(final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> defaultOperation) throws NetconfDocumentedException {
-        invokeBlocking("Edit candidate", new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
+        invoke("Edit candidate", new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
             @Override
             public ListenableFuture<DOMRpcResult> apply(final NetconfBaseOps input) {
-                    return defaultOperation.isPresent()
-                            ? input.editConfigCandidate(new NetconfRpcFutureCallback("Edit candidate", id), editStructure, defaultOperation.get(),
-                            rollbackSupport)
-                            : input.editConfigCandidate(new NetconfRpcFutureCallback("Edit candidate", id), editStructure,
-                            rollbackSupport);
+                return input.editConfigCandidate(new FutureCallback<DOMRpcResult>() {
+                    @Override
+                    public void onSuccess(DOMRpcResult result) {
+                        if (result.getErrors().isEmpty()) {
+                            if (LOG.isTraceEnabled()) {
+                                LOG.trace("Edit candidate succesfull");
+                            }
+                        } else {
+                            LOG.warn("{}: Edit candidate invoked unsuccessfully: {}", id, result.getErrors());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        LOG.warn("Edit candidate operation failed. {}", t);
+                        finished = true;
+                        throw new RuntimeException(id + ": Failed to edit candidate datastore", t);
+                    }
+                }, editStructure, finished);
             }
         });
     }
@@ -201,7 +230,30 @@ public class WriteCandidateTx extends AbstractWriteTx {
      * This has to be non blocking since it is called from a callback on commit and its netty threadpool that is really sensitive to blocking calls
      */
     private void unlock() {
-        netOps.unlockCandidate(new NetconfRpcFutureCallback("Unlock candidate", id));
+        invoke("Unlocking candidate", new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
+            @Override
+            public ListenableFuture<DOMRpcResult> apply(final NetconfBaseOps input) {
+                return input.unlockCandidate(new FutureCallback<DOMRpcResult>() {
+                    @Override
+                    public void onSuccess(DOMRpcResult result) {
+                        if (result.getErrors().isEmpty()) {
+                            if (LOG.isTraceEnabled()) {
+                                LOG.trace("Unlock succesfull");
+                            }
+                        } else {
+                            LOG.warn("{}: Unlock candidate invoked unsuccessfully: {}", id, result.getErrors());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        LOG.warn("Unlock candidate operation failed. {}", t);
+                        finished = true;
+                        throw new RuntimeException(id + ": Failed to unlock candidate datastore", t);
+                    }
+                });
+            }
+        });
     }
 
 }
