@@ -8,11 +8,6 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
@@ -28,6 +23,12 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 
 /**
  * Tx implementation for netconf devices that support only writable-running with no candidate
@@ -57,27 +58,34 @@ public class WriteRunningTx extends AbstractWriteTx {
 
     @Override
     protected synchronized void init() {
-        lock();
+    	lock();
     }
 
     private void lock() {
-        try {
-            invokeBlocking("Lock running", new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
-                @Override
-                public ListenableFuture<DOMRpcResult> apply(final NetconfBaseOps input) {
-                    return input.lockRunning(new NetconfRpcFutureCallback("Lock running", id));
-                }
-            });
-        } catch (final NetconfDocumentedException e) {
-            LOG.warn("{}: Failed to initialize netconf transaction (lock running)", id, e);
-            finished = true;
-            throw new RuntimeException(id + ": Failed to initialize netconf transaction (lock running)", e);
-        }
+    	final FutureCallback<DOMRpcResult> lockCallback = new FutureCallback<DOMRpcResult>() {
+			@Override
+			public void onSuccess(DOMRpcResult result) {
+				if (isSuccess(result)) {
+					if (LOG.isTraceEnabled()) {
+						LOG.trace("Lock running succesfull");
+					}
+				} else {
+					LOG.warn("{}: lock running invoked unsuccessfully: {}", id, result.getErrors());
+				}
+			}
+
+			@Override
+			public void onFailure(Throwable t) {
+				LOG.warn("Lock running operation failed. {}", t);
+				throw new RuntimeException(id + ": Failed to lock running datastore", t);
+			}
+		};
+    	netOps.lockRunning(lockCallback);
     }
 
     @Override
     protected void cleanup() {
-        unlock();
+		unlock();
     }
 
     @Override
@@ -85,13 +93,6 @@ public class WriteRunningTx extends AbstractWriteTx {
         LOG.warn("{}: Error {} data to (running){}, data: {}, canceling", id, editType, path, data, e);
         cancel();
         throw new RuntimeException(id + ": Error while " + editType + ": (running)" + path, e);
-    }
-
-    @Override
-    protected void handleDeleteException(final YangInstanceIdentifier path, final NetconfDocumentedException e) {
-        LOG.warn("{}: Error deleting data (running){}, canceling", id, path, e);
-        cancel();
-        throw new RuntimeException(id + ": Error while deleting (running)" + path, e);
     }
 
     @Override
@@ -118,30 +119,39 @@ public class WriteRunningTx extends AbstractWriteTx {
     }
 
     @Override
-    protected void editConfig(final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> defaultOperation) throws NetconfDocumentedException {
-        invokeBlocking("Edit running", new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
-            @Override
-            public ListenableFuture<DOMRpcResult> apply(final NetconfBaseOps input) {
-                    return defaultOperation.isPresent()
-                            ? input.editConfigRunning(new NetconfRpcFutureCallback("Edit running", id), editStructure, defaultOperation.get(),
-                            rollbackSupport)
-                            : input.editConfigRunning(new NetconfRpcFutureCallback("Edit running", id), editStructure,
-                            rollbackSupport);
-            }
-        });
+    protected void editConfig(final YangInstanceIdentifier path, 
+    						  final Optional<NormalizedNode<?, ?>> data, 
+    						  final DataContainerChild<?, ?> editStructure, 
+    						  final Optional<ModifyAction> defaultOperation, 
+    						  final String operation) {
+    	FutureCallback<DOMRpcResult> editConfigCallback = new FutureCallback<DOMRpcResult>() {
+    		@Override
+    		public void onSuccess(DOMRpcResult result) {
+    			if (isSuccess(result)) {
+    				if (LOG.isTraceEnabled()) {
+    					LOG.trace("Edit running succesfull");
+    				}
+    			} else {
+    				LOG.warn("{}: Edit running invoked unsuccessfully: {}", id, result.getErrors());			
+    			}
+    		}
+
+    		@Override
+    		public void onFailure(Throwable t) {
+    			LOG.warn("Edit running operation failed. {}", t);
+    			NetconfDocumentedException e = new NetconfDocumentedException(id + ": Edit running operation failed.", NetconfDocumentedException.ErrorType.application,
+                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
+    			handleEditException(path, data.orNull(), e, operation);
+    		}
+    	};
+    	if (defaultOperation.isPresent()) {
+    		netOps.editConfigRunning(editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport);
+    	} else {
+    		netOps.editConfigRunning(editConfigCallback, editStructure, rollbackSupport);
+    	}	
     }
 
     private void unlock() {
-        try {
-            invokeBlocking("Unlocking running", new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
-                @Override
-                public ListenableFuture<DOMRpcResult> apply(final NetconfBaseOps input) {
-                    return input.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
-                }
-            });
-        } catch (final NetconfDocumentedException e) {
-            LOG.warn("{}: Failed to unlock running datastore", id, e);
-            throw new RuntimeException(id + ": Failed to unlock running datastore", e);
-        }
+    	netOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
     }
 }
