@@ -17,6 +17,8 @@ import com.google.common.util.concurrent.Futures;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
@@ -80,6 +82,8 @@ final class NetconfDeviceTopologyAdapter implements AutoCloseable {
     private final KeyedInstanceIdentifier<Topology, TopologyKey> topologyListPath;
     private static final String UNKNOWN_REASON = "Unknown reason";
 
+    private final ReentrantLock lock = new ReentrantLock(true);
+
     NetconfDeviceTopologyAdapter(final RemoteDeviceId id, final DataBroker dataService) {
         this.id = id;
         this.txChain = Preconditions.checkNotNull(dataService).createTransactionChain(new TransactionChainListener() {
@@ -103,68 +107,83 @@ final class NetconfDeviceTopologyAdapter implements AutoCloseable {
     }
 
     private void initDeviceData() {
-        final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
+        lock.lock();
+        try {
+            final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
 
-        createNetworkTopologyIfNotPresent(writeTx);
+            createNetworkTopologyIfNotPresent(writeTx);
 
-        final InstanceIdentifier<Node> path = id.getTopologyBindingPath();
-        NodeBuilder nodeBuilder = getNodeIdBuilder(id);
-        NetconfNodeBuilder netconfNodeBuilder = new NetconfNodeBuilder();
-        netconfNodeBuilder.setConnectionStatus(ConnectionStatus.Connecting);
-        netconfNodeBuilder.setHost(id.getHost());
-        netconfNodeBuilder.setPort(new PortNumber(id.getAddress().getPort()));
-        nodeBuilder.addAugmentation(NetconfNode.class, netconfNodeBuilder.build());
-        Node node = nodeBuilder.build();
+            final InstanceIdentifier<Node> path = id.getTopologyBindingPath();
+            NodeBuilder nodeBuilder = getNodeIdBuilder(id);
+            NetconfNodeBuilder netconfNodeBuilder = new NetconfNodeBuilder();
+            netconfNodeBuilder.setConnectionStatus(ConnectionStatus.Connecting);
+            netconfNodeBuilder.setHost(id.getHost());
+            netconfNodeBuilder.setPort(new PortNumber(id.getAddress().getPort()));
+            nodeBuilder.addAugmentation(NetconfNode.class, netconfNodeBuilder.build());
+            Node node = nodeBuilder.build();
 
-        LOG.trace(
-                "{}: Init device state transaction {} putting if absent operational data started.",
-                id, writeTx.getIdentifier());
-        writeTx.put(LogicalDatastoreType.OPERATIONAL, path, node);
-        LOG.trace(
-                "{}: Init device state transaction {} putting operational data ended.",
-                id, writeTx.getIdentifier());
+            LOG.trace(
+                    "{}: Init device state transaction {} putting if absent operational data started.",
+                    id, writeTx.getIdentifier());
+            writeTx.put(LogicalDatastoreType.OPERATIONAL, path, node);
+            LOG.trace(
+                    "{}: Init device state transaction {} putting operational data ended.",
+                    id, writeTx.getIdentifier());
 
-        LOG.trace(
-                "{}: Init device state transaction {} putting if absent config data started.",
-                id, writeTx.getIdentifier());
-        LOG.trace(
-                "{}: Init device state transaction {} putting config data ended.",
-                id, writeTx.getIdentifier());
+            LOG.trace(
+                    "{}: Init device state transaction {} putting if absent config data started.",
+                    id, writeTx.getIdentifier());
+            LOG.trace(
+                    "{}: Init device state transaction {} putting config data ended.",
+                    id, writeTx.getIdentifier());
 
-        commitTransaction(writeTx, "init");
+            commitTransaction(writeTx, "init");
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void updateDeviceData(boolean up, NetconfDeviceCapabilities capabilities) {
-        final Node data = buildDataForNetconfNode(up, capabilities);
+        lock.lock();
+        try {
+            final Node data = buildDataForNetconfNode(up, capabilities);
 
-        final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
-        LOG.trace(
-                "{}: Update device state transaction {} merging operational data started.",
-                id, writeTx.getIdentifier());
-        writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath(), data);
-        LOG.trace(
-                "{}: Update device state transaction {} merging operational data ended.",
-                id, writeTx.getIdentifier());
+            final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
+            LOG.trace(
+                    "{}: Update device state transaction {} merging operational data started.",
+                    id, writeTx.getIdentifier());
+            writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath(), data);
+            LOG.trace(
+                    "{}: Update device state transaction {} merging operational data ended.",
+                    id, writeTx.getIdentifier());
 
-        commitTransaction(writeTx, "update");
+            commitTransaction(writeTx, "update");
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void setDeviceAsFailed(Throwable throwable) {
-        String reason = (throwable != null && throwable.getMessage() != null) ? throwable.getMessage() : UNKNOWN_REASON;
+        lock.lock();
+        try {
+            String reason = (throwable != null && throwable.getMessage() != null) ? throwable.getMessage() : UNKNOWN_REASON;
 
-        final NetconfNode netconfNode = new NetconfNodeBuilder().setConnectionStatus(ConnectionStatus.UnableToConnect).setConnectedMessage(reason).build();
-        final Node data = getNodeIdBuilder(id).addAugmentation(NetconfNode.class, netconfNode).build();
+            final NetconfNode netconfNode = new NetconfNodeBuilder().setConnectionStatus(ConnectionStatus.UnableToConnect).setConnectedMessage(reason).build();
+            final Node data = getNodeIdBuilder(id).addAugmentation(NetconfNode.class, netconfNode).build();
 
-        final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
-        LOG.trace(
-                "{}: Setting device state as failed {} putting operational data started.",
-                id, writeTx.getIdentifier());
-        writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath(), data);
-        LOG.trace(
-                "{}: Setting device state as failed {} putting operational data ended.",
-                id, writeTx.getIdentifier());
+            final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
+            LOG.trace(
+                    "{}: Setting device state as failed {} putting operational data started.",
+                    id, writeTx.getIdentifier());
+            writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath(), data);
+            LOG.trace(
+                    "{}: Setting device state as failed {} putting operational data ended.",
+                    id, writeTx.getIdentifier());
 
-        commitTransaction(writeTx, "update-failed-device");
+            commitTransaction(writeTx, "update-failed-device");
+        } finally {
+            lock.unlock();
+        }
     }
 
     private Node buildDataForNetconfNode(boolean up, NetconfDeviceCapabilities capabilities) {
@@ -191,17 +210,22 @@ final class NetconfDeviceTopologyAdapter implements AutoCloseable {
     }
 
     public void removeDeviceConfiguration() {
-        final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
+        lock.lock();
+        try {
+            final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
 
-        LOG.trace(
-                "{}: Close device state transaction {} removing all data started.",
-                id, writeTx.getIdentifier());
-        writeTx.delete(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath());
-        LOG.trace(
-                "{}: Close device state transaction {} removing all data ended.",
-                id, writeTx.getIdentifier());
+            LOG.trace(
+                    "{}: Close device state transaction {} removing all data started.",
+                    id, writeTx.getIdentifier());
+            writeTx.delete(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath());
+            LOG.trace(
+                    "{}: Close device state transaction {} removing all data ended.",
+                    id, writeTx.getIdentifier());
 
-        commitTransaction(writeTx, "close");
+            commitTransaction(writeTx, "close");
+        } finally {
+            lock.unlock();
+        }
     }
 
     private void createNetworkTopologyIfNotPresent(final WriteTransaction writeTx) {
