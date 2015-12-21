@@ -42,12 +42,12 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
             XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_EXI_1_0
     );
 
-    private final Timer timer;
+    protected final Timer timer;
 
-    private final SessionIdProvider idProvider;
-    private final NetconfOperationServiceFactory aggregatedOpService;
-    private final long connectionTimeoutMillis;
-    private final NetconfMonitoringService monitoringService;
+    protected final SessionIdProvider idProvider;
+    protected final NetconfOperationServiceFactory aggregatedOpService;
+    protected final long connectionTimeoutMillis;
+    protected final NetconfMonitoringService monitoringService;
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSessionNegotiatorFactory.class);
     private final Set<String> baseCapabilities;
 
@@ -119,7 +119,7 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
 
     }
 
-    private NetconfHelloMessage createHelloMessage(final long sessionId, final NetconfMonitoringService capabilityProvider) throws NetconfDocumentedException {
+    protected NetconfHelloMessage createHelloMessage(final long sessionId, final NetconfMonitoringService capabilityProvider) throws NetconfDocumentedException {
         return NetconfHelloMessage.createServerHello(Sets.union(transformCapabilities(capabilityProvider.getCapabilities()), baseCapabilities), sessionId);
     }
 
