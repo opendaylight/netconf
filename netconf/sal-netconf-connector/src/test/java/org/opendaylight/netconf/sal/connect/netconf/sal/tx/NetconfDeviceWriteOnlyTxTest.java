@@ -124,24 +124,19 @@ public class NetconfDeviceWriteOnlyTxTest {
 
     @Test
     public void testDiscardChangesNotSentWithoutCandidate() {
-        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(((NormalizedNode<?, ?>) null))))
+        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null)))
                 .doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("Failed tx")))
                 .when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
         final WriteRunningTx tx = new WriteRunningTx(id, new NetconfBaseOps(rpc, NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext()),
                 false);
-        try {
-            tx.delete(LogicalDatastoreType.CONFIGURATION, yangIId);
-        } catch (final Exception e) {
-            // verify discard changes was sent
-            final InOrder inOrder = inOrder(rpc);
-            inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME), NetconfBaseOps.getLockContent(NETCONF_RUNNING_QNAME));
-            inOrder.verify(rpc).invokeRpc(eq(toPath(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)), any(NormalizedNode.class));
-            inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME), NetconfBaseOps.getUnLockContent(NETCONF_RUNNING_QNAME));
-            return;
-        }
 
-        fail("Delete should fail");
+        tx.delete(LogicalDatastoreType.CONFIGURATION, yangIId);
+        // verify discard changes was sent
+        final InOrder inOrder = inOrder(rpc);
+        inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME), NetconfBaseOps.getLockContent(NETCONF_RUNNING_QNAME));
+        inOrder.verify(rpc).invokeRpc(eq(toPath(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)), any(NormalizedNode.class));
+        inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME), NetconfBaseOps.getUnLockContent(NETCONF_RUNNING_QNAME));
     }
 
 }
