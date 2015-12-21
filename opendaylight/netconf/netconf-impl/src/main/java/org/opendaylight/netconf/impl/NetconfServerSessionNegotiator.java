@@ -33,7 +33,7 @@ public class NetconfServerSessionNegotiator
 
     private static final String UNKNOWN = "unknown";
 
-    protected NetconfServerSessionNegotiator(
+    public NetconfServerSessionNegotiator(
             NetconfServerSessionPreferences sessionPreferences,
             Promise<NetconfServerSession> promise, Channel channel,
             Timer timer, NetconfServerSessionListener sessionListener,
