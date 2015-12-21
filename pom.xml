@@ -47,7 +47,6 @@
         <scala.major.version>2.10</scala.major.version>
         <scala.minor.version>4</scala.minor.version>
         <surefire.version>2.15</surefire.version>
-        <typesafe.config.version>1.2.1</typesafe.config.version>
         <yangtools.version>0.8.0-SNAPSHOT</yangtools.version>
 
         <jmxGeneratorPath>src/main/yang-gen-config</jmxGeneratorPath>
