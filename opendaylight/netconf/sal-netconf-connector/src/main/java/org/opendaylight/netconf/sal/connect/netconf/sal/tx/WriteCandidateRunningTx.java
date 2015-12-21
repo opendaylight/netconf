@@ -8,15 +8,15 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
-import com.google.common.base.Function;
-import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
-import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Function;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.ListenableFuture;
 
 /**
  * Tx implementation for netconf devices that support only candidate datastore and writable running
@@ -46,24 +46,59 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
     }
 
     private void lockRunning() {
-        try {
-            invokeBlocking("Lock running", new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
-                @Override
-                public ListenableFuture<DOMRpcResult> apply(final NetconfBaseOps input) {
-                    return input.lockRunning(new NetconfRpcFutureCallback("Lock running", id));
-                }
-            });
-        } catch (final NetconfDocumentedException e) {
-            LOG.warn("{}: Failed to lock running. Failed to initialize transaction", id, e);
-            finished = true;
-            throw new RuntimeException(id + ": Failed to lock running. Failed to initialize transaction", e);
-        }
+        invoke("Lock running", new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
+            @Override
+            public ListenableFuture<DOMRpcResult> apply(final NetconfBaseOps input) {
+                return input.lockRunning(new FutureCallback<DOMRpcResult>() {
+                    @Override
+                    public void onSuccess(DOMRpcResult result) {
+                        if (result.getErrors().isEmpty()) {
+                            if (LOG.isTraceEnabled()) {
+                                LOG.trace("Lock running succesfull");
+                            }
+                        } else {
+                            LOG.warn("{}: lock running invoked unsuccessfully: {}", id, result.getErrors());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        LOG.warn("{}: Failed to lock running. Failed to initialize transaction", id, t);
+                        finished = true;
+                        throw new RuntimeException(id + ": Failed to lock running. Failed to initialize transaction", t);
+                    }
+                });
+            }
+        });
     }
 
     /**
      * This has to be non blocking since it is called from a callback on commit and its netty threadpool that is really sensitive to blocking calls
      */
     private void unlockRunning() {
-        netOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
+        invoke("Unlocking running", new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
+            @Override
+            public ListenableFuture<DOMRpcResult> apply(final NetconfBaseOps input) {
+                return input.unlockRunning(new FutureCallback<DOMRpcResult>() {
+                    @Override
+                    public void onSuccess(DOMRpcResult result) {
+                        if (result.getErrors().isEmpty()) {
+                            if (LOG.isTraceEnabled()) {
+                                LOG.trace("Unlock running succesfull");
+                            }
+                        } else {
+                            LOG.warn("{}: Unlock running invoked unsuccessfully: {}", id, result.getErrors());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        LOG.warn("Unlock running operation failed. {}", t);
+                        finished = true;
+                        throw new RuntimeException(id + ": Failed to unlock runing datastore", t);
+                    }
+                });
+            }
+        });
     }
 }
