@@ -16,6 +16,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.ReadWriteTransaction;
@@ -52,6 +53,8 @@ final class NetconfDeviceDatastoreAdapter implements AutoCloseable {
     private final RemoteDeviceId id;
     private final BindingTransactionChain txChain;
 
+    private final ReentrantLock lock = new ReentrantLock(true);
+
     NetconfDeviceDatastoreAdapter(final RemoteDeviceId deviceId, final DataBroker dataService) {
         this.id = Preconditions.checkNotNull(deviceId);
         this.txChain = Preconditions.checkNotNull(dataService).createTransactionChain(new TransactionChainListener() {
@@ -71,25 +74,36 @@ final class NetconfDeviceDatastoreAdapter implements AutoCloseable {
     }
 
     public void updateDeviceState(final boolean up, final Set<QName> capabilities) {
-        final org.opendaylight.yang.gen.v1.urn.opendaylight.inventory.rev130819.nodes.Node data = buildDataForDeviceState(
-                up, capabilities, id);
+        lock.lock();
+        try {
+            final org.opendaylight.yang.gen.v1.urn.opendaylight.inventory.rev130819.nodes.Node data = buildDataForDeviceState(
+                    up, capabilities, id);
 
-        final ReadWriteTransaction transaction = txChain.newReadWriteTransaction();
-        logger.trace("{}: Update device state transaction {} merging operational data started.", id, transaction.getIdentifier());
-        transaction.put(LogicalDatastoreType.OPERATIONAL, id.getBindingPath(), data);
-        logger.trace("{}: Update device state transaction {} merging operational data ended.", id, transaction.getIdentifier());
+            final ReadWriteTransaction transaction = txChain.newReadWriteTransaction();
+            logger.trace("{}: Update device state transaction {} merging operational data started.", id, transaction.getIdentifier());
+            transaction.put(LogicalDatastoreType.OPERATIONAL, id.getBindingPath(), data);
+            logger.trace("{}: Update device state transaction {} merging operational data ended.", id, transaction.getIdentifier());
 
-        commitTransaction(transaction, "update");
+            commitTransaction(transaction, "update");
+        } finally {
+            lock.unlock();
+        }
+
     }
 
     private void removeDeviceConfigAndState() {
-        final WriteTransaction transaction = txChain.newWriteOnlyTransaction();
-        logger.trace("{}: Close device state transaction {} removing all data started.", id, transaction.getIdentifier());
-        transaction.delete(LogicalDatastoreType.CONFIGURATION, id.getBindingPath());
-        transaction.delete(LogicalDatastoreType.OPERATIONAL, id.getBindingPath());
-        logger.trace("{}: Close device state transaction {} removing all data ended.", id, transaction.getIdentifier());
+        lock.lock();
+        try {
+            final WriteTransaction transaction = txChain.newWriteOnlyTransaction();
+            logger.trace("{}: Close device state transaction {} removing all data started.", id, transaction.getIdentifier());
+            transaction.delete(LogicalDatastoreType.CONFIGURATION, id.getBindingPath());
+            transaction.delete(LogicalDatastoreType.OPERATIONAL, id.getBindingPath());
+            logger.trace("{}: Close device state transaction {} removing all data ended.", id, transaction.getIdentifier());
 
-        commitTransaction(transaction, "close");
+            commitTransaction(transaction, "close");
+        } finally {
+            lock.unlock();
+        }
     }
 
     private void initDeviceData() {
@@ -135,7 +149,6 @@ final class NetconfDeviceDatastoreAdapter implements AutoCloseable {
                 throw new IllegalStateException(id + "  Transaction(" + txType + ") not committed correctly", t);
             }
         });
-
     }
 
     @Override
