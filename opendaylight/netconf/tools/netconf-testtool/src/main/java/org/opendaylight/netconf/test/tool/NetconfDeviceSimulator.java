@@ -159,7 +159,7 @@ public class NetconfDeviceSimulator implements Closeable {
         // Generate key to temp folder
         final PEMGeneratorHostKeyProvider keyPairProvider = getPemGeneratorHostKeyProvider();
 
-        for (int i = 0; i < params.deviceCount; i++) {
+        for (int i = 0; i < params.portCount; i++) {
             if (currentPort > 65535) {
                 LOG.warn("Port cannot be greater than 65535, stopping further attempts.");
                 break;
