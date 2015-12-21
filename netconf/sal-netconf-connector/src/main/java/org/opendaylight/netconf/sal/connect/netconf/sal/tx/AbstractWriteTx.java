@@ -8,11 +8,9 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.concurrent.ExecutionException;
 import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
@@ -46,7 +44,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
         init();
     }
 
-    static boolean isSuccess(final DOMRpcResult result) {
+    protected static boolean isSuccess(final DOMRpcResult result) {
         return result.getErrors().isEmpty();
     }
 
@@ -56,22 +54,6 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
 
     protected boolean isFinished() {
         return finished;
-    }
-
-    protected void invokeBlocking(final String msg, final Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>> op) throws NetconfDocumentedException {
-        try {
-            final DOMRpcResult compositeNodeRpcResult = op.apply(netOps).get();
-            if(isSuccess(compositeNodeRpcResult) == false) {
-                throw new NetconfDocumentedException(id + ": " + msg + " failed: " + compositeNodeRpcResult.getErrors(), NetconfDocumentedException.ErrorType.application,
-                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
-            }
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        } catch (final ExecutionException e) {
-            throw new NetconfDocumentedException(id + ": " + msg + " failed: " + e.getMessage(), e, NetconfDocumentedException.ErrorType.application,
-                    NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
-        }
     }
 
     @Override
@@ -104,16 +86,11 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
             return;
         }
 
-        try {
-            editConfig(
-                    netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>fromNullable(data), Optional.of(ModifyAction.REPLACE), path), Optional.of(ModifyAction.NONE));
-        } catch (final NetconfDocumentedException e) {
-            handleEditException(path, data, e, "putting");
-        }
+        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>fromNullable(data), Optional.of(ModifyAction.REPLACE), path);
+        editConfig(path, Optional.fromNullable(data), editStructure, Optional.of(ModifyAction.NONE), "put");
     }
 
     protected abstract void handleEditException(YangInstanceIdentifier path, NormalizedNode<?, ?> data, NetconfDocumentedException e, String editType);
-    protected abstract void handleDeleteException(YangInstanceIdentifier path, NetconfDocumentedException e);
 
     @Override
     public synchronized void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode<?, ?> data) {
@@ -125,12 +102,8 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
             return;
         }
 
-        try {
-            editConfig(
-                    netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>fromNullable(data), Optional.<ModifyAction>absent(), path), Optional.<ModifyAction>absent());
-        } catch (final NetconfDocumentedException e) {
-            handleEditException(path, data, e, "merge");
-        }
+        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>fromNullable(data), Optional.<ModifyAction>absent(), path);
+        editConfig(path, Optional.fromNullable(data), editStructure, Optional.<ModifyAction>absent(), "merge");
     }
 
     /**
@@ -145,13 +118,8 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
     @Override
     public synchronized void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         checkEditable(store);
-
-        try {
-            editConfig(
-                    netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>absent(), Optional.of(ModifyAction.DELETE), path), Optional.of(ModifyAction.NONE));
-        } catch (final NetconfDocumentedException e) {
-            handleDeleteException(path, e);
-        }
+        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>absent(), Optional.of(ModifyAction.DELETE), path);
+        editConfig(path, Optional.<NormalizedNode<?, ?>>absent(), editStructure, Optional.of(ModifyAction.NONE), "delete");
     }
 
     @Override
@@ -169,5 +137,5 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
         Preconditions.checkArgument(store == LogicalDatastoreType.CONFIGURATION, "Can edit only configuration data, not %s", store);
     }
 
-    protected abstract void editConfig(DataContainerChild<?, ?> editStructure, Optional<ModifyAction> defaultOperation) throws NetconfDocumentedException;
+    protected abstract void editConfig(final YangInstanceIdentifier path, final Optional<NormalizedNode<?, ?>> data, final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> defaultOperation, final String operation);
 }
