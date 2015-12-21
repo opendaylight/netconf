@@ -8,10 +8,8 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
-import com.google.common.base.Function;
-import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.FutureCallback;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -46,18 +44,25 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
     }
 
     private void lockRunning() {
-        try {
-            invokeBlocking("Lock running", new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
-                @Override
-                public ListenableFuture<DOMRpcResult> apply(final NetconfBaseOps input) {
-                    return input.lockRunning(new NetconfRpcFutureCallback("Lock running", id));
+        final FutureCallback<DOMRpcResult> lockRunningCallback = new FutureCallback<DOMRpcResult>() {
+            @Override
+            public void onSuccess(DOMRpcResult result) {
+                if (isSuccess(result)) {
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("Lock running succesfull");
+                    }
+                } else {
+                    LOG.warn("{}: lock running invoked unsuccessfully: {}", id, result.getErrors());
                 }
-            });
-        } catch (final NetconfDocumentedException e) {
-            LOG.warn("{}: Failed to lock running. Failed to initialize transaction", id, e);
-            finished = true;
-            throw new RuntimeException(id + ": Failed to lock running. Failed to initialize transaction", e);
-        }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                LOG.warn("{}: Failed to lock running. Failed to initialize transaction", id, t);
+                throw new RuntimeException(id + ": Failed to lock running. Failed to initialize transaction", t);
+            }
+        };
+        netOps.lockRunning(lockRunningCallback);
     }
 
     /**
