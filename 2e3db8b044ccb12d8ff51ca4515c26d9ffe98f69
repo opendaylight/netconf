@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "1aa4ed85_02eed188",
+        "filename": "opendaylight/netconf/sal-netconf-connector/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-12-22T11:42:45Z",
+      "side": 1,
+      "message": "test scope should be enough, compile would make it also a src/main/java code runtime dependnecy which for mockito is never wanted",
+      "range": {
+        "startLine": 175,
+        "startChar": 15,
+        "endLine": 175,
+        "endChar": 22
+      },
+      "revId": "2e3db8b044ccb12d8ff51ca4515c26d9ffe98f69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa4ed85_a2025d3c",
+        "filename": "opendaylight/netconf/sal-netconf-connector/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-12-22T11:42:45Z",
+      "side": 1,
+      "message": "doesn\u0027t all cover also mockito-core ?\nbtw. in ODL there should be mockito-configuration artifact to bring all necessary mockito artifacts and some useful configuration:\n\nhttp://nexus.opendaylight.org/#nexus-search;gav~org.opendaylight.yangtools~mockito-configuration~~~~kw,versionexpand",
+      "range": {
+        "startLine": 177,
+        "startChar": 0,
+        "endLine": 181,
+        "endChar": 17
+      },
+      "revId": "2e3db8b044ccb12d8ff51ca4515c26d9ffe98f69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1aa4ed85_3546afc0",
         "filename": "opendaylight/netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacadeTest.java",
         "patchSetId": 2
@@ -13,6 +59,30 @@
       "writtenOn": "2015-12-18T14:04:34Z",
       "side": 1,
       "message": "with the current implementation done in order to mock the return statement of executorService.schedule(), I can\u0027t control the number of call within 15000 milliseconds. This is why I\u0027m asking here for atLeast(5).\n\nLet me know if you\u0027re fine with that\n\nAlso in first patch set I forget to add the test under testKeepaliveFail (bad cherry-pick from lithium)",
+      "range": {
+        "startLine": 117,
+        "startChar": 41,
+        "endLine": 117,
+        "endChar": 48
+      },
+      "revId": "2e3db8b044ccb12d8ff51ca4515c26d9ffe98f69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa4ed85_42c289ea",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacadeTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-12-22T11:42:45Z",
+      "side": 1,
+      "message": "atLeast(5) here is fine",
+      "parentUuid": "1aa4ed85_3546afc0",
       "range": {
         "startLine": 117,
         "startChar": 41,
