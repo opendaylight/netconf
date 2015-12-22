@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1aa4ed85_78ee52ee",
+        "filename": "opendaylight/netconf/sal-netconf-connector/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2015-12-22T15:45:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1aa4ed85_02eed188",
+      "range": {
+        "startLine": 175,
+        "startChar": 15,
+        "endLine": 175,
+        "endChar": 22
+      },
+      "revId": "2e3db8b044ccb12d8ff51ca4515c26d9ffe98f69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1aa4ed85_a2025d3c",
         "filename": "opendaylight/netconf/sal-netconf-connector/pom.xml",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2015-12-22T11:42:45Z",
       "side": 1,
       "message": "doesn\u0027t all cover also mockito-core ?\nbtw. in ODL there should be mockito-configuration artifact to bring all necessary mockito artifacts and some useful configuration:\n\nhttp://nexus.opendaylight.org/#nexus-search;gav~org.opendaylight.yangtools~mockito-configuration~~~~kw,versionexpand",
+      "range": {
+        "startLine": 177,
+        "startChar": 0,
+        "endLine": 181,
+        "endChar": 17
+      },
+      "revId": "2e3db8b044ccb12d8ff51ca4515c26d9ffe98f69",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa4ed85_78c5f259",
+        "filename": "opendaylight/netconf/sal-netconf-connector/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2015-12-22T15:45:14Z",
+      "side": 1,
+      "message": "I checked and -all doesn\u0027t cover -core.\n\nRegardless, as a matter of fact I don\u0027t need -all. I do need -core, because it brings hamcrest-core that is used by some of the test classes.\n\nThe reason I\u0027m not using mockito-configuration from yangtools is it overrides the Returns.java class given by Mockito [0] returning the value for the stubbed object. \n\nThe configuration from yangtools [1] throws an UnstubbedMethodException each time one want to use Mockito.when().thenReturn(). Using Mockito\u0027s API, this work fine/as design.\n\n[0]: http://docs.mockito.googlecode.com/hg/org/mockito/internal/stubbing/answers/Returns.html#answer%28org.mockito.invocation.InvocationOnMock%29 \n\n[1]: https://github.com/opendaylight/yangtools/blob/master/common/mockito-configuration/src/main/java/org/mockito/configuration/ThrowsUnstubbedMethodException.java\n\nI believe this mockito-configuration from yangtools has been done for a particular scope/reason.",
+      "parentUuid": "1aa4ed85_a2025d3c",
       "range": {
         "startLine": 177,
         "startChar": 0,
