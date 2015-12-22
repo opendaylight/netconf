@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1aa4ed85_255f57e7",
+        "filename": "opendaylight/netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/NetconfServerSessionNegotiatorFactory.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-12-22T12:23:08Z",
+      "side": 1,
+      "message": "Wouldn\u0027t it be easier to extract this line into a protected method (template pattern) ? Then just overriding it in Testing.*NetconfFactory.\n\n... just pass the channel.getLocalAddress to getListener (its private method so you can easily change it) and then to the new protected method. No need changing access to private fields.\n\nThis would reduce the code required in extending factory + access modifiers update here and in the Negotiator.",
+      "range": {
+        "startLine": 114,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 85
+      },
+      "revId": "aee44a380de1c396bf42706378d29fa8066e790f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa4ed85_0547bb20",
+        "filename": "opendaylight/netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/rpc/TesttoolNegotiationFactory.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-12-22T12:23:08Z",
+      "side": 1,
+      "message": "Is this the right package for negotiation factory ?",
+      "range": {
+        "startLine": 9,
+        "startChar": 43,
+        "endLine": 9,
+        "endChar": 46
+      },
+      "revId": "aee44a380de1c396bf42706378d29fa8066e790f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
