@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1aa4ed85_e50fffdf",
+        "filename": "opendaylight/netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/Main.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-12-22T12:37:02Z",
+      "side": 1,
+      "message": "port vs device count is confusing. Now port-count is the number of devices to start and device-count is number of mountpoint config files to generate for ODL. We should clarify that in the description .. or rename port count to something else",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 41
+      },
+      "revId": "48e1165aaa18a2d3e2ef078f95b09a2f17920f78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1aa4ed85_05157bf0",
+        "filename": "opendaylight/netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/Main.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2015-12-22T12:37:02Z",
+      "side": 1,
+      "message": "We need to refactor this code... the whole generate method. Its becoming impossible to read",
+      "range": {
+        "startLine": 307,
+        "startChar": 1,
+        "endLine": 333,
+        "endChar": 21
+      },
+      "revId": "48e1165aaa18a2d3e2ef078f95b09a2f17920f78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
