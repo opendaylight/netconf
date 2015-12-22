@@ -53,6 +53,9 @@ public final class Main {
         @Arg(dest = "devices-count")
         public int deviceCount;
 
+        @Arg(dest = "devices-per-port")
+        public int devicesPerPort;
+
         @Arg(dest = "starting-port")
         public int startingPort;
 
@@ -94,9 +97,14 @@ public final class Main {
             parser.addArgument("--device-count")
                     .type(Integer.class)
                     .setDefault(1)
-                    .type(Integer.class)
-                    .help("Number of simulated netconf devices to spin")
+                    .help("Number of simulated netconf devices to spin. This is the number of actual ports open for the devices.")
                     .dest("devices-count");
+
+            parser.addArgument("--devices-per-port")
+                    .type(Integer.class)
+                    .setDefault(1)
+                    .help("Amount of config files generated per port to spoof more devices then are actually running")
+                    .dest("devices-per-port");
 
             parser.addArgument("--schemas-dir")
                     .type(File.class)
@@ -172,6 +180,7 @@ public final class Main {
         void validate() {
             checkArgument(deviceCount > 0, "Device count has to be > 0");
             checkArgument(startingPort > 1023, "Starting port has to be > 1023");
+            checkArgument(devicesPerPort > 0, "Atleast one device per port needed");
 
             if(schemasDir != null) {
                 checkArgument(schemasDir.exists(), "Schemas dir has to exist");
@@ -197,7 +206,10 @@ public final class Main {
             }
             if(params.distroFolder != null) {
                 final ConfigGenerator configGenerator = new ConfigGenerator(params.distroFolder, openDevices);
-                final List<File> generated = configGenerator.generate(params.ssh, params.generateConfigBatchSize, params.generateConfigsTimeout, params.generateConfigsAddress);
+                final List<File> generated = configGenerator.generate(
+                        params.ssh, params.generateConfigBatchSize,
+                        params.generateConfigsTimeout, params.generateConfigsAddress,
+                        params.devicesPerPort);
                 configGenerator.updateFeatureFile(generated);
                 configGenerator.changeLoadOrder();
             }
@@ -255,7 +267,9 @@ public final class Main {
             this.openDevices = openDevices;
         }
 
-        public List<File> generate(final boolean useSsh, final int batchSize, final int generateConfigsTimeout, final String address) {
+        public List<File> generate(final boolean useSsh, final int batchSize,
+                                   final int generateConfigsTimeout, final String address,
+                                   final int devicesPerPort) {
             if(configDir.exists() == false) {
                 Preconditions.checkState(configDir.mkdirs(), "Unable to create directory " + configDir);
             }
@@ -289,21 +303,23 @@ public final class Main {
                         batchStart = openDevice;
                     }
 
-                    final String name = String.valueOf(openDevice) + SIM_DEVICE_SUFFIX;
-                    String configContent = String.format(middleBlueprint, name, address, String.valueOf(openDevice), String.valueOf(!useSsh));
-                    configContent = String.format("%s%s%d%s\n%s\n", configContent, "<connection-timeout-millis>", generateConfigsTimeout, "</connection-timeout-millis>", "</module>");
+                    for (int i = 0; i < devicesPerPort; i++) {
+                        final String name = String.valueOf(openDevice) + SIM_DEVICE_SUFFIX + (i == 0 ? "" : "-" + String.valueOf(i));
+                        String configContent = String.format(middleBlueprint, name, address, String.valueOf(openDevice), String.valueOf(!useSsh));
+                        configContent = String.format("%s%s%d%s\n%s\n", configContent, "<connection-timeout-millis>", generateConfigsTimeout, "</connection-timeout-millis>", "</module>");
 
-                    b.append(configContent);
-                    connectorCount++;
-                    if(connectorCount == batchSize) {
-                        b.append(after);
-                        final File to = new File(configDir, String.format(SIM_DEVICE_CFG_PREFIX + "%d-%d.xml", batchStart, openDevice));
-                        generatedConfigs.add(to);
-                        Files.write(b.toString(), to, Charsets.UTF_8);
-                        connectorCount = 0;
-                        b = new StringBuilder();
-                        b.append(before);
-                        batchStart = null;
+                        b.append(configContent);
+                        connectorCount++;
+                        if(connectorCount == batchSize) {
+                            b.append(after);
+                            final File to = new File(configDir, String.format(SIM_DEVICE_CFG_PREFIX + "%d-%d.xml", batchStart, openDevice));
+                            generatedConfigs.add(to);
+                            Files.write(b.toString(), to, Charsets.UTF_8);
+                            connectorCount = 0;
+                            b = new StringBuilder();
+                            b.append(before);
+                            batchStart = null;
+                        }
                     }
                 }
 
