@@ -427,7 +427,7 @@ public final class NetconfDevice implements RemoteDevice<NetconfSessionPreferenc
                 @Override
                 public void onSuccess(final SchemaContext result) {
                     LOG.debug("{}: Schema context built successfully from {}", id, requiredSources);
-                    final Collection<QName> filteredQNames = Sets.difference(deviceSources.getProvidedSourcesQName(), capabilities.getUnresolvedCapabilites().keySet());
+                    final Collection<QName> filteredQNames = Sets.difference(deviceSources.getRequiredSourcesQName(), capabilities.getUnresolvedCapabilites().keySet());
                     capabilities.addCapabilities(filteredQNames);
                     capabilities.addNonModuleBasedCapabilities(remoteSessionCapabilities.getNonModuleCaps());
                     handleSalInitializationSuccess(result, remoteSessionCapabilities, getDeviceSpecificRpc(result));
