@@ -87,12 +87,12 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
             NetconfSessionPreferences netconfSessionPreferences =
                                              NetconfSessionPreferences.fromNetconfSession(session);
-            LOG.trace("{}: Session advertised capabilities: {}", id,
+            LOG.info("{}: Session advertised capabilities: {}", id,
                     netconfSessionPreferences);
 
             if(overrideNetconfCapabilities.isPresent()) {
                 netconfSessionPreferences = netconfSessionPreferences.addModuleCaps(overrideNetconfCapabilities.get());
-                LOG.debug(
+                LOG.info(
                         "{}: Session capabilities overridden, capabilities that will be used: {}",
                         id, netconfSessionPreferences);
             }
