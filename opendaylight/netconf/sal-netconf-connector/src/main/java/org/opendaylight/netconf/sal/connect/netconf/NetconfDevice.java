@@ -72,6 +72,7 @@ public final class NetconfDevice implements RemoteDevice<NetconfSessionPreferenc
      * Initial schema context contains schemas for netconf monitoring and netconf notifications
      */
     public static final SchemaContext INIT_SCHEMA_CTX;
+    public static final SchemaContext INIT_SCHEMA_CTX_WITH_IETF_NOTIFICATION;
 
     static {
         try {
@@ -82,6 +83,13 @@ public final class NetconfDevice implements RemoteDevice<NetconfSessionPreferenc
                             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.$YangModuleInfoImpl.getInstance(),
                             org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl.getInstance()));
             INIT_SCHEMA_CTX = moduleInfoBackedContext.tryToCreateSchemaContext().get();
+            final ModuleInfoBackedContext moduleInfoBackedContextWithIetfNotification = ModuleInfoBackedContext.create();
+            moduleInfoBackedContextWithIetfNotification.addModuleInfos(Lists.newArrayList(
+                    $YangModuleInfoImpl.getInstance(),
+                    org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.$YangModuleInfoImpl.getInstance(),
+                    org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl.getInstance(),
+                    org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.$YangModuleInfoImpl.getInstance()));
+            INIT_SCHEMA_CTX_WITH_IETF_NOTIFICATION = moduleInfoBackedContextWithIetfNotification.tryToCreateSchemaContext().get();
         } catch (final RuntimeException e) {
             LOG.error("Unable to prepare schema context for netconf initialization", e);
             throw new ExceptionInInitializerError(e);
@@ -117,7 +125,10 @@ public final class NetconfDevice implements RemoteDevice<NetconfSessionPreferenc
     /**
      * Create rpc implementation capable of handling RPC for monitoring and notifications even before the schemas of remote device are downloaded
      */
-    static NetconfDeviceRpc getRpcForInitialization(final NetconfDeviceCommunicator listener) {
+    static NetconfDeviceRpc getRpcForInitialization(final NetconfDeviceCommunicator listener, final NetconfSessionPreferences remoteSessionCapabilities) {
+        if (remoteSessionCapabilities.isNotificationsSupported()) {
+            return new NetconfDeviceRpc(INIT_SCHEMA_CTX_WITH_IETF_NOTIFICATION, listener, new NetconfMessageTransformer                  (INIT_SCHEMA_CTX_WITH_IETF_NOTIFICATION, false));
+            }
         return new NetconfDeviceRpc(INIT_SCHEMA_CTX, listener, new NetconfMessageTransformer(INIT_SCHEMA_CTX, false));
     }
 
@@ -145,7 +156,7 @@ public final class NetconfDevice implements RemoteDevice<NetconfSessionPreferenc
         // http://netty.io/wiki/thread-model.html
         LOG.debug("{}: Session to remote device established with {}", id, remoteSessionCapabilities);
 
-        final NetconfDeviceRpc initRpc = getRpcForInitialization(listener);
+        final NetconfDeviceRpc initRpc = getRpcForInitialization(listener, remoteSessionCapabilities);
         final DeviceSourcesResolver task = new DeviceSourcesResolver(remoteSessionCapabilities, id, stateSchemasResolver, initRpc);
         final ListenableFuture<DeviceSources> sourceResolverFuture = processingExecutor.submit(task);
 
