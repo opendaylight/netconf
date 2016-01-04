@@ -57,11 +57,14 @@ public class NetconfSessionPreferencesTest {
                 "namespace:2?module=module2",
                 "namespace:2?module=module2&amp;revision=2012-12-12",
                 "namespace:2?module=module1&amp;RANDOMSTRING;revision=2013-12-12",
-                "namespace:2?module=module2&amp;RANDOMSTRING;revision=2013-12-12" // This one should be ignored(same as first), since revision is in wrong format
+                // Revision parameter present, but no revision defined
+                "namespace:2?module=module4&amp;RANDOMSTRING;revision=",
+                // This one should be ignored(same as first), since revision is in wrong format
+                "namespace:2?module=module2&amp;RANDOMSTRING;revision=2013-12-12"
         );
 
         final NetconfSessionPreferences sessionCaps1 = NetconfSessionPreferences.fromStrings(caps1);
-        assertCaps(sessionCaps1, 0, 3);
+        assertCaps(sessionCaps1, 0, 4);
     }
 
     private void assertCaps(final NetconfSessionPreferences sessionCaps1, final int nonModuleCaps, final int moduleCaps) {

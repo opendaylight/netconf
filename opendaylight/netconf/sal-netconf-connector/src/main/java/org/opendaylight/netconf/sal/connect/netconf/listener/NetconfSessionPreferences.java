@@ -13,6 +13,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -135,11 +136,11 @@ public final class NetconfSessionPreferences {
     }
 
     private static QName cachedQName(final String namespace, final String revision, final String moduleName) {
-        return QName.cachedReference(QName.create(namespace, revision, moduleName));
+        return QName.create(namespace, revision, moduleName).intern();
     }
 
     private static QName cachedQName(final String namespace, final String moduleName) {
-        return QName.cachedReference(QName.create(URI.create(namespace), null, moduleName).withoutRevision());
+        return QName.create(URI.create(namespace), null, moduleName).withoutRevision().intern();
     }
 
     public static NetconfSessionPreferences fromStrings(final Collection<String> capabilities) {
@@ -155,12 +156,12 @@ public final class NetconfSessionPreferences {
             final String namespace = capability.substring(0, qmark);
             final Iterable<String> queryParams = AMP_SPLITTER.split(capability.substring(qmark + 1));
             final String moduleName = MODULE_PARAM.from(queryParams);
-            if (moduleName == null) {
+            if (Strings.isNullOrEmpty(moduleName)) {
                 continue;
             }
 
             String revision = REVISION_PARAM.from(queryParams);
-            if (revision != null) {
+            if (!Strings.isNullOrEmpty(revision)) {
                 addModuleQName(moduleBasedCaps, nonModuleCaps, capability, cachedQName(namespace, revision, moduleName));
                 continue;
             }
@@ -173,7 +174,7 @@ public final class NetconfSessionPreferences {
 
                 LOG.debug("Netconf device was not reporting revision correctly, trying to get amp;revision=");
                 revision = BROKEN_REVISON_PARAM.from(queryParams);
-                if (revision == null) {
+                if (Strings.isNullOrEmpty(revision)) {
                     LOG.warn("Netconf device returned revision incorrectly escaped for {}, ignoring it", capability);
                     addModuleQName(moduleBasedCaps, nonModuleCaps, capability, cachedQName(namespace, moduleName));
                 } else {
