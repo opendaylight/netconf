@@ -49,7 +49,7 @@ public class TopologyRoleChangeStrategy implements RoleChangeStrategy, Clustered
     private NodeListener ownershipCandidate;
     private final String entityType;
     // use topologyId as entityName
-    private final String entityName;
+    private final Entity entity;
 
     private EntityOwnershipCandidateRegistration candidateRegistration = null;
     private EntityOwnershipListenerRegistration ownershipListenerRegistration = null;
@@ -63,7 +63,7 @@ public class TopologyRoleChangeStrategy implements RoleChangeStrategy, Clustered
         this.dataBroker = dataBroker;
         this.entityOwnershipService = entityOwnershipService;
         this.entityType = entityType;
-        this.entityName = entityName;
+        this.entity = new Entity(entityType, entityName);
 
         datastoreListenerRegistration = null;
     }
@@ -76,7 +76,7 @@ public class TopologyRoleChangeStrategy implements RoleChangeStrategy, Clustered
             if (candidateRegistration != null) {
                 unregisterRoleCandidate();
             }
-            candidateRegistration = entityOwnershipService.registerCandidate(new Entity(entityType, entityName));
+            candidateRegistration = entityOwnershipService.registerCandidate(entity);
             ownershipListenerRegistration = entityOwnershipService.registerListener(entityType, this);
         } catch (CandidateAlreadyRegisteredException e) {
             LOG.error("Candidate already registered for election", e);
@@ -90,6 +90,11 @@ public class TopologyRoleChangeStrategy implements RoleChangeStrategy, Clustered
         candidateRegistration = null;
         ownershipListenerRegistration.close();
         ownershipListenerRegistration = null;
+    }
+
+    @Override
+    public boolean isCandidateRegistered() {
+        return entityOwnershipService.isCandidateRegistered(entity);
     }
 
     @Override

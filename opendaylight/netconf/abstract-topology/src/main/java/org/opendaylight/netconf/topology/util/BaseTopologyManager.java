@@ -8,9 +8,12 @@
 
 package org.opendaylight.netconf.topology.util;
 
+import akka.actor.ActorContext;
+import akka.actor.ActorIdentity;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Address;
+import akka.actor.Identify;
 import akka.actor.TypedActor;
 import akka.actor.TypedActorExtension;
 import akka.actor.TypedProps;
@@ -24,18 +27,25 @@ import akka.cluster.ClusterEvent.ReachableMember;
 import akka.cluster.ClusterEvent.UnreachableMember;
 import akka.cluster.Member;
 import akka.dispatch.OnComplete;
+import com.google.common.base.Optional;
+import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.netconf.topology.NodeManager;
+import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
+import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.netconf.topology.RoleChangeStrategy;
 import org.opendaylight.netconf.topology.StateAggregator;
 import org.opendaylight.netconf.topology.TopologyManager;
@@ -53,17 +63,22 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.binding.data.codec.impl.BindingNormalizedNodeCodecRegistry;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
+import scala.concurrent.duration.FiniteDuration;
 import scala.concurrent.impl.Promise.DefaultPromise;
 
 public final class BaseTopologyManager
         implements TopologyManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseTopologyManager.class);
+    private static final InstanceIdentifier<NetworkTopology> NETWORK_TOPOLOGY_PATH = InstanceIdentifier.builder(NetworkTopology.class).build();
+
+    private final KeyedInstanceIdentifier<Topology, TopologyKey> topologyListPath;
 
     private final ActorSystem system;
     private final TypedActorExtension typedExtension;
@@ -80,8 +95,8 @@ public final class BaseTopologyManager
     private final NodeWriter naSalNodeWriter;
     private final String topologyId;
     private final TopologyManagerCallback delegateTopologyHandler;
+    private final Set<NodeId> created = new HashSet<>();
 
-    private final Map<NodeId, NodeManager> nodes = new HashMap<>();
     private final Map<Address, TopologyManager> peers = new HashMap<>();
     private TopologyManager masterPeer = null;
     private final int id = new Random().nextInt();
@@ -123,6 +138,8 @@ public final class BaseTopologyManager
         // election has not yet happened
         this.isMaster = isMaster;
 
+        this.topologyListPath = NETWORK_TOPOLOGY_PATH.child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
+
         LOG.debug("Base manager started ", +id);
     }
 
@@ -146,6 +163,11 @@ public final class BaseTopologyManager
     public ListenableFuture<Node> onNodeCreated(final NodeId nodeId, final Node node) {
         LOG.debug("TopologyManager({}) onNodeCreated received, nodeid: {} , isMaster: {}", id, nodeId.getValue(), isMaster);
 
+        if (created.contains(nodeId)) {
+            LOG.warn("Node{} already exists, triggering update..", nodeId);
+            return onNodeUpdated(nodeId, node);
+        }
+        created.add(nodeId);
         final ArrayList<ListenableFuture<Node>> futures = new ArrayList<>();
 
         if (isMaster) {
@@ -191,7 +213,7 @@ public final class BaseTopologyManager
                 public void onFailure(final Throwable t) {
                     // If the combined connection attempt failed, set the node to connection failed
                     LOG.debug("Futures aggregation failed");
-                    naSalNodeWriter.update(nodeId, nodes.get(nodeId).getFailedState(nodeId, node));
+                    naSalNodeWriter.update(nodeId, delegateTopologyHandler.getFailedState(nodeId, node));
                     // FIXME disconnect those which succeeded
                     // just issue a delete on delegateTopologyHandler that gets handled on lower level
                 }
@@ -209,55 +231,37 @@ public final class BaseTopologyManager
     public ListenableFuture<Node> onNodeUpdated(final NodeId nodeId, final Node node) {
         LOG.debug("TopologyManager({}) onNodeUpdated received, nodeid: {}", id, nodeId.getValue());
 
-        final ArrayList<ListenableFuture<Node>> futures = new ArrayList<>();
-
         // Master needs to trigger onNodeUpdated on peers and combine results
         if (isMaster) {
-            futures.add(delegateTopologyHandler.onNodeUpdated(nodeId, node));
-            for (TopologyManager topologyManager : peers.values()) {
-                // convert binding into NormalizedNode for transfer
-                final Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> normalizedNodeEntry = codecRegistry.toNormalizedNode(getNodeIid(topologyId), node);
-
-                // add a future into our futures that gets its completion status from the converted scala future
-                final SettableFuture<Node> settableFuture = SettableFuture.create();
-                futures.add(settableFuture);
-                final Future<NormalizedNodeMessage> scalaFuture = topologyManager.onRemoteNodeUpdated(new NormalizedNodeMessage(normalizedNodeEntry.getKey(), normalizedNodeEntry.getValue()));
-                scalaFuture.onComplete(new OnComplete<NormalizedNodeMessage>() {
-                    @Override
-                    public void onComplete(Throwable failure, NormalizedNodeMessage success) throws Throwable {
-                        if (failure != null) {
-                            settableFuture.setException(failure);
-                            return;
+            // first cleanup old node
+            final ListenableFuture<Void> deleteFuture = onNodeDeleted(nodeId);
+            final SettableFuture<Node> createFuture = SettableFuture.create();
+            final TopologyManager selfProxy = TypedActor.self();
+            final ActorContext context = TypedActor.context();
+            Futures.addCallback(deleteFuture, new FutureCallback<Void>() {
+                @Override
+                public void onSuccess(Void result) {
+                    LOG.warn("Delete part of update succesfull, triggering create");
+                    // trigger create on all nodes
+                    Futures.addCallback(selfProxy.onNodeCreated(nodeId, node), new FutureCallback<Node>() {
+                        @Override
+                        public void onSuccess(Node result) {
+                            createFuture.set(result);
                         }
-                        final Entry<InstanceIdentifier<?>, DataObject> fromNormalizedNode =
-                                codecRegistry.fromNormalizedNode(success.getIdentifier(), success.getNode());
-                        final Node value = (Node) fromNormalizedNode.getValue();
 
-                        settableFuture.set(value);
-                    }
-                }, TypedActor.context().dispatcher());
-            }
-
-            final ListenableFuture<Node> aggregatedFuture = aggregator.combineUpdateAttempts(futures);
-            Futures.addCallback(aggregatedFuture, new FutureCallback<Node>() {
-                @Override
-                public void onSuccess(final Node result) {
-                    // FIXME make this (writing state data for nodes) optional and customizable
-                    // this should be possible with providing your own NodeWriter implementation, maybe rename this interface?
-                    naSalNodeWriter.update(nodeId, result);
+                        @Override
+                        public void onFailure(Throwable t) {
+                            createFuture.setException(t);
+                        }
+                    }, context.dispatcher());
                 }
 
                 @Override
-                public void onFailure(final Throwable t) {
-                    // If the combined connection attempt failed, set the node to connection failed
-                    naSalNodeWriter.update(nodeId, nodes.get(nodeId).getFailedState(nodeId, node));
-                    // FIXME disconnect those which succeeded
-                    // just issue a delete on delegateTopologyHandler that gets handled on lower level
+                public void onFailure(Throwable t) {
+                    LOG.warn("Delete part of update failed, {}", t);
                 }
-            });
-
-            //combine peer futures
-            return aggregatedFuture;
+            }, context.dispatcher());
+            return createFuture;
         }
 
         // Trigger update on this slave
@@ -272,6 +276,7 @@ public final class BaseTopologyManager
     @Override
     public ListenableFuture<Void> onNodeDeleted(final NodeId nodeId) {
         final ArrayList<ListenableFuture<Void>> futures = new ArrayList<>();
+        created.remove(nodeId);
 
         // Master needs to trigger delete on peers and combine results
         if (isMaster) {
@@ -376,7 +381,7 @@ public final class BaseTopologyManager
                 public void onFailure(final Throwable t) {
                     // If the combined connection attempt failed, set the node to connection failed
                     LOG.debug("Futures aggregation failed");
-                    naSalNodeWriter.update(nodeId, nodes.get(nodeId).getFailedState(nodeId, null));
+                    naSalNodeWriter.update(nodeId, delegateTopologyHandler.getFailedState(nodeId, null));
                     // FIXME disconnect those which succeeded
                     // just issue a delete on delegateTopologyHandler that gets handled on lower level
                 }
@@ -518,7 +523,8 @@ public final class BaseTopologyManager
             final String path = member.address() + PATH + topologyId;
             LOG.debug("Actor at :{} is resolving topology actor for path {}", clusterExtension.selfAddress(), path);
 
-            clusterExtension.system().actorSelection(path).tell(new CustomIdentifyMessage(clusterExtension.selfAddress()), TypedActor.context().self());
+            // first send basic identify message in case our messages have not been loaded through osgi yet to prevent crashing akka.
+            clusterExtension.system().actorSelection(path).tell(new Identify(member.address()), TypedActor.context().self());
         } else if (message instanceof MemberExited) {
             // remove peer
             final Member member = ((MemberExited) message).member();
@@ -546,20 +552,71 @@ public final class BaseTopologyManager
             final String path = member.address() + PATH + topologyId;
             LOG.debug("Actor at :{} is resolving topology actor for path {}", clusterExtension.selfAddress(), path);
 
+            clusterExtension.system().actorSelection(path).tell(new Identify(member.address()), TypedActor.context().self());
+        } else if (message instanceof ActorIdentity) {
+            LOG.debug("Received ActorIdentity message", message);
+            final String path = ((ActorIdentity) message).correlationId() + PATH + topologyId;
+            if (((ActorIdentity) message).getRef() == null) {
+                LOG.debug("ActorIdentity has null actor ref, retrying..", message);
+                final ActorRef self = TypedActor.context().self();
+                final ActorContext context = TypedActor.context();
+                system.scheduler().scheduleOnce(new FiniteDuration(5, TimeUnit.SECONDS), new Runnable() {
+                    @Override
+                    public void run() {
+                        LOG.debug("Retrying identify message from master to node {} , full path {}", ((ActorIdentity) message).correlationId(), path);
+                        context.system().actorSelection(path).tell(new Identify(((ActorIdentity) message).correlationId()), self);
+
+                    }
+                }, system.dispatcher());
+                return;
+            }
+            LOG.debug("Actor at :{} is resolving topology actor for path {}, with a custom message", clusterExtension.selfAddress(), path);
+
             clusterExtension.system().actorSelection(path).tell(new CustomIdentifyMessage(clusterExtension.selfAddress()), TypedActor.context().self());
         } else if (message instanceof CustomIdentifyMessageReply) {
-            LOG.debug("Received a custom identify reply message from: {}", ((CustomIdentifyMessageReply) message).getAddress());
+
+            LOG.warn("Received a custom identify reply message from: {}", ((CustomIdentifyMessageReply) message).getAddress());
             if (!peers.containsKey(((CustomIdentifyMessage) message).getAddress())) {
                 final TopologyManager peer = typedExtension.typedActorOf(new TypedProps<>(TopologyManager.class, BaseTopologyManager.class), actorRef);
                 peers.put(((CustomIdentifyMessageReply) message).getAddress(), peer);
+                if (isMaster) {
+                    resyncPeer(peer);
+                }
             }
         } else if (message instanceof CustomIdentifyMessage) {
-            LOG.debug("Received a custom identify message from: {}", ((CustomIdentifyMessage) message).getAddress());
+            LOG.warn("Received a custom identify message from: {}", ((CustomIdentifyMessage) message).getAddress());
             if (!peers.containsKey(((CustomIdentifyMessage) message).getAddress())) {
                 final TopologyManager peer = typedExtension.typedActorOf(new TypedProps<>(TopologyManager.class, BaseTopologyManager.class), actorRef);
                 peers.put(((CustomIdentifyMessage) message).getAddress(), peer);
+                if (isMaster) {
+                    resyncPeer(peer);
+                }
             }
             actorRef.tell(new CustomIdentifyMessageReply(clusterExtension.selfAddress()), TypedActor.context().self());
         }
+    }
+
+    private void resyncPeer(final TopologyManager peer) {
+        final ReadOnlyTransaction rTx = dataBroker.newReadOnlyTransaction();
+        final CheckedFuture<Optional<Topology>, ReadFailedException> read = rTx.read(LogicalDatastoreType.CONFIGURATION, topologyListPath);
+
+        Futures.addCallback(read, new FutureCallback<Optional<Topology>>() {
+            @Override
+            public void onSuccess(Optional<Topology> result) {
+                if (result.isPresent()) {
+                    for (final Node node : result.get().getNode()) {
+                        final Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> entry = codecRegistry.toNormalizedNode(getNodeIid(topologyId), node);
+                        peer.onRemoteNodeCreated(new NormalizedNodeMessage(entry.getKey(), entry.getValue()));
+                        // we dont care about the future from now on since we will be notified by the onConnected event
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                LOG.error("Unable to read from datastore");
+            }
+        });
+
     }
 }

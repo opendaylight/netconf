@@ -8,6 +8,8 @@
 
 package org.opendaylight.netconf.topology;
 
+import akka.actor.ActorContext;
+import akka.actor.ActorRef;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
@@ -28,7 +30,20 @@ public interface NetconfTopology {
 
     ListenableFuture<Void> disconnectNode(NodeId nodeId);
 
-    void registerMountPoint(NodeId nodeId);
+    /**
+     * register master mount point
+     * @param context
+     * @param nodeId
+     */
+    void registerMountPoint(ActorContext context, NodeId nodeId);
+
+    /**
+     * register slave mountpoint with the provided ActorRef
+     * @param context
+     * @param nodeId
+     * @param masterRef
+     */
+    void registerMountPoint(ActorContext context, NodeId nodeId, ActorRef masterRef);
 
     void unregisterMountPoint(NodeId nodeId);
 

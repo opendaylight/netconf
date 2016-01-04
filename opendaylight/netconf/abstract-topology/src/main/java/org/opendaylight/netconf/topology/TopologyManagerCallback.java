@@ -16,7 +16,7 @@ import com.google.common.annotations.Beta;
  * Customizable extension layer between the top level TopologyManager and NodeManager
  */
 @Beta
-public interface TopologyManagerCallback extends NodeListener, Receiver, RoleChangeListener {
+public interface TopologyManagerCallback extends InitialStateProvider, NodeListener, Receiver, RoleChangeListener {
 
     interface TopologyManagerCallbackFactory {
         TopologyManagerCallback create(ActorSystem actorSystem, String topologyId);

@@ -8,6 +8,8 @@
 
 package org.opendaylight.netconf.topology.impl;
 
+import akka.actor.ActorContext;
+import akka.actor.ActorRef;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
 import javax.annotation.Nonnull;
@@ -72,7 +74,12 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
     }
 
     @Override
-    public void registerMountPoint(NodeId nodeId) {
+    public void registerMountPoint(ActorContext context, NodeId nodeId) {
+        throw new UnsupportedOperationException("MountPoint registration is not supported in regular topology, this happens automaticaly in the netconf pipeline");
+    }
+
+    @Override
+    public void registerMountPoint(ActorContext context, NodeId nodeId, ActorRef masterRef) {
         throw new UnsupportedOperationException("MountPoint registration is not supported in regular topology, this happens automaticaly in the netconf pipeline");
     }
 

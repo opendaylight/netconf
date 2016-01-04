@@ -83,8 +83,10 @@ public class NetconfTopologyManagerCallback implements TopologyManagerCallback {
                 createNodeManager(nodeId);
         nodes.put(nodeId, naBaseNodeManager);
 
-        // put initial state into datastore
-        naSalNodeWriter.init(nodeId, naBaseNodeManager.getInitialState(nodeId, node));
+        // only master should put initial state into datastore
+        if (isMaster) {
+            naSalNodeWriter.init(nodeId, naBaseNodeManager.getInitialState(nodeId, node));
+        }
 
         // trigger connect on this node
         return naBaseNodeManager.onNodeCreated(nodeId, node);
@@ -92,8 +94,10 @@ public class NetconfTopologyManagerCallback implements TopologyManagerCallback {
 
     @Override
     public ListenableFuture<Node> onNodeUpdated(final NodeId nodeId, final Node node) {
-        // put initial state into datastore
-        naSalNodeWriter.init(nodeId, nodes.get(nodeId).getInitialState(nodeId, node));
+        // only master should put initial state into datastore
+        if (isMaster) {
+            naSalNodeWriter.init(nodeId, nodes.get(nodeId).getInitialState(nodeId, node));
+        }
 
         // Trigger onNodeUpdated only on this node
         return nodes.get(nodeId).onNodeUpdated(nodeId, node);
@@ -123,6 +127,9 @@ public class NetconfTopologyManagerCallback implements TopologyManagerCallback {
     @Nonnull
     @Override
     public ListenableFuture<Node> getCurrentStatusForNode(@Nonnull NodeId nodeId) {
+        if (!nodes.containsKey(nodeId)) {
+            nodes.put(nodeId, createNodeManager(nodeId));
+        }
         return nodes.get(nodeId).getCurrentStatusForNode(nodeId);
     }
 
@@ -144,5 +151,17 @@ public class NetconfTopologyManagerCallback implements TopologyManagerCallback {
     @Override
     public void onReceive(Object o, ActorRef actorRef) {
 
+    }
+
+    @Nonnull
+    @Override
+    public Node getInitialState(@Nonnull NodeId nodeId, @Nonnull Node configNode) {
+        return nodes.get(nodeId).getInitialState(nodeId, configNode);
+    }
+
+    @Nonnull
+    @Override
+    public Node getFailedState(@Nonnull NodeId nodeId, @Nonnull Node configNode) {
+        return nodes.get(nodeId).getFailedState(nodeId, configNode);
     }
 }

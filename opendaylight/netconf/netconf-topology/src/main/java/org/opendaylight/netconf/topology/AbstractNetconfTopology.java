@@ -32,6 +32,7 @@ import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.controller.sal.core.api.Broker.ProviderSession;
 import org.opendaylight.controller.sal.core.api.Provider;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurationBuilder;
@@ -78,12 +79,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfTopology.class);
 
-    private static final long DEFAULT_REQUEST_TIMEOUT_MILIS = 60000L;
-    private static final int DEFAULT_KEEPALIVE_DELAY = 0;
-    private static final boolean DEFAULT_RECONNECT_ON_CHANGED_SCHEMA = false;
-    private static final int DEFAULT_MAX_CONNECTION_ATTEMPTS = 0;
-    private static final int DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS = 2000;
-    private static final BigDecimal DEFAULT_SLEEP_FACTOR = new BigDecimal(1.5);
+    protected static final long DEFAULT_REQUEST_TIMEOUT_MILIS = 60000L;
+    protected static final int DEFAULT_KEEPALIVE_DELAY = 0;
+    protected static final boolean DEFAULT_RECONNECT_ON_CHANGED_SCHEMA = false;
+    protected static final int DEFAULT_MAX_CONNECTION_ATTEMPTS = 0;
+    protected static final int DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS = 2000;
+    protected static final BigDecimal DEFAULT_SLEEP_FACTOR = new BigDecimal(1.5);
 
     private static FilesystemSchemaSourceCache<YangTextSchemaSource> CACHE = null;
     //keep track of already initialized repositories to avoid adding redundant listeners
@@ -92,14 +93,14 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     protected final String topologyId;
     private final NetconfClientDispatcher clientDispatcher;
     protected final BindingAwareBroker bindingAwareBroker;
-    private final Broker domBroker;
+    protected final Broker domBroker;
     private final EventExecutor eventExecutor;
-    private final ScheduledThreadPool keepaliveExecutor;
-    private final ThreadPool processingExecutor;
-    private final SharedSchemaRepository sharedSchemaRepository;
+    protected final ScheduledThreadPool keepaliveExecutor;
+    protected final ThreadPool processingExecutor;
+    protected final SharedSchemaRepository sharedSchemaRepository;
 
-    private SchemaSourceRegistry schemaRegistry = null;
-    private SchemaContextFactory schemaContextFactory = null;
+    protected SchemaSourceRegistry schemaRegistry = null;
+    protected SchemaContextFactory schemaContextFactory = null;
 
     protected DOMMountPointService mountPointService = null;
     protected DataBroker dataBroker = null;
@@ -181,7 +182,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         return Futures.immediateFuture(null);
     }
 
-    private ListenableFuture<NetconfDeviceCapabilities> setupConnection(final NodeId nodeId,
+    protected ListenableFuture<NetconfDeviceCapabilities> setupConnection(final NodeId nodeId,
                                                                         final Node configNode) {
         final NetconfNode netconfNode = configNode.getAugmentation(NetconfNode.class);
 
@@ -191,8 +192,10 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
 
         final NetconfConnectorDTO deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode);
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
-        final NetconfReconnectingClientConfiguration clientConfig = getClientConfig(deviceCommunicator, netconfNode);
+        final NetconfClientSessionListener netconfClientSessionListener = deviceCommunicatorDTO.getSessionListener();
+        final NetconfReconnectingClientConfiguration clientConfig = getClientConfig(netconfClientSessionListener, netconfNode);
         final ListenableFuture<NetconfDeviceCapabilities> future = deviceCommunicator.initializeRemoteConnection(clientDispatcher, clientConfig);
+
         activeConnectors.put(nodeId, deviceCommunicatorDTO);
 
         Futures.addCallback(future, new FutureCallback<NetconfDeviceCapabilities>() {
@@ -211,7 +214,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         return future;
     }
 
-    private NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId,
+    protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId,
                                                          final NetconfNode node) {
         //setup default values since default value is not supported yet in mdsal
         // TODO remove this when mdsal starts supporting default values
@@ -242,7 +245,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         return new NetconfConnectorDTO(new NetconfDeviceCommunicator(remoteDeviceId, device), salFacade);
     }
 
-    public NetconfReconnectingClientConfiguration getClientConfig(final NetconfDeviceCommunicator listener, NetconfNode node) {
+    public NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener, NetconfNode node) {
 
         //setup default values since default value is not supported yet in mdsal
         // TODO remove this when mdsal starts supporting default values
@@ -357,12 +360,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         }
     }
 
-    protected static final class NetconfConnectorDTO {
+    protected static class NetconfConnectorDTO {
 
         private final NetconfDeviceCommunicator communicator;
         private final RemoteDeviceHandler<NetconfSessionPreferences> facade;
 
-        private NetconfConnectorDTO(final NetconfDeviceCommunicator communicator, final RemoteDeviceHandler<NetconfSessionPreferences> facade) {
+        public NetconfConnectorDTO(final NetconfDeviceCommunicator communicator, final RemoteDeviceHandler<NetconfSessionPreferences> facade) {
             this.communicator = communicator;
             this.facade = facade;
         }
@@ -373,6 +376,10 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
 
         public RemoteDeviceHandler<NetconfSessionPreferences> getFacade() {
             return facade;
+        }
+
+        public NetconfClientSessionListener getSessionListener() {
+            return communicator;
         }
     }
 

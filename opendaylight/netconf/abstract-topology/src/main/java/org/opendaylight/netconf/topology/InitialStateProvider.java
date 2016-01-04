@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology;
 
 import com.google.common.annotations.Beta;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 
@@ -22,5 +23,5 @@ public interface InitialStateProvider {
     Node getInitialState(@Nonnull final NodeId nodeId, @Nonnull final Node configNode);
 
     @Nonnull
-    Node getFailedState(@Nonnull final NodeId nodeId, @Nonnull final Node configNode);
+    Node getFailedState(@Nonnull final NodeId nodeId, @Nullable final Node configNode);
 }
