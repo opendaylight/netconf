@@ -24,7 +24,6 @@
     <netconf.version>1.0.0-SNAPSHOT</netconf.version>
     <protocol-framework.version>0.7.0-SNAPSHOT</protocol-framework.version>
     <yangtools.version>0.8.0-SNAPSHOT</yangtools.version>
-    <surefire.version>2.15</surefire.version>
     <sshd-core.version>0.14.0</sshd-core.version>
 
     <features.file>features.xml</features.file>
@@ -35,6 +34,20 @@
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.opendaylight.aaa</groupId>
+        <artifactId>aaa-artifacts</artifactId>
+        <version>${aaa.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.opendaylight.odlparent</groupId>
+        <artifactId>odlparent-artifacts</artifactId>
+        <version>1.6.0-SNAPSHOT</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <dependency>
         <groupId>org.opendaylight.controller</groupId>
         <artifactId>config-artifacts</artifactId>
@@ -75,9 +88,14 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.opendaylight.odlparent</groupId>
+      <artifactId>features-odlparent</artifactId>
+      <classifier>features</classifier>
+      <type>xml</type>
+    </dependency>
+    <dependency>
       <groupId>org.opendaylight.aaa</groupId>
       <artifactId>features-aaa-shiro</artifactId>
-      <version>${aaa.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
     </dependency>
@@ -92,7 +110,6 @@
     <dependency>
       <groupId>org.opendaylight.aaa</groupId>
       <artifactId>features-aaa</artifactId>
-      <version>${aaa.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
     </dependency>
@@ -145,18 +162,6 @@
       <artifactId>ietf-netconf-notifications</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.mdsal.model</groupId>
-      <artifactId>ietf-inet-types</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.mdsal.model</groupId>
-      <artifactId>ietf-yang-types</artifactId>
-    </dependency>
-      <dependency>
-          <groupId>org.opendaylight.yangtools</groupId>
-          <artifactId>yang-model-api</artifactId>
-      </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-mapping-api</artifactId>
     </dependency>
@@ -193,26 +198,6 @@
       <groupId>openexi</groupId>
       <artifactId>nagasena</artifactId>
       <version>${exi.nagasena.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-codec</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-handler</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-buffer</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-transport</artifactId>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
@@ -257,14 +242,6 @@
       <artifactId>netconf-mdsal-config</artifactId>
       <classifier>config</classifier>
       <type>xml</type>
-    </dependency>
-    <!-- dependency for opendaylight-karaf-empty for use by testing -->
-    <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>opendaylight-karaf-empty</artifactId>
-      <version>${commons.opendaylight.version}</version>
-      <scope>test</scope>
-      <type>zip</type>
     </dependency>
   </dependencies>
 
