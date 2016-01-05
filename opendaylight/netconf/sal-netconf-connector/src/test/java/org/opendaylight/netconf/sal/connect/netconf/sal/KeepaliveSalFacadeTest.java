@@ -114,7 +114,7 @@ public class KeepaliveSalFacadeTest {
         verify(underlyingSalFacade).onDeviceConnected(
                 any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
 
-        verify(deviceRpc, timeout(15000).atLeast(5)).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+        verify(deviceRpc, timeout(15000).times(5)).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
     }
 
     @Test
