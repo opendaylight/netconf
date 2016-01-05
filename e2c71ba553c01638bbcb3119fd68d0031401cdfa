@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1aa4ed85_a60336b7",
+        "filename": "opendaylight/netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/NetconfServerSessionNegotiatorFactory.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-01-05T13:57:08Z",
+      "side": 1,
+      "message": "if this is intended only to be used by subclasses but not overridden, make it final.",
+      "range": {
+        "startLine": 126,
+        "startChar": 0,
+        "endLine": 128,
+        "endChar": 5
+      },
+      "revId": "e2c71ba553c01638bbcb3119fd68d0031401cdfa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
