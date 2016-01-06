@@ -69,7 +69,7 @@ public final class NetconfSessionPreferences {
     private final Set<QName> moduleBasedCaps;
     private final Set<String> nonModuleCaps;
 
-    private NetconfSessionPreferences(final Set<String> nonModuleCaps, final Set<QName> moduleBasedCaps) {
+    NetconfSessionPreferences(final Set<String> nonModuleCaps, final Set<QName> moduleBasedCaps) {
         this.nonModuleCaps = Preconditions.checkNotNull(nonModuleCaps);
         this.moduleBasedCaps = Preconditions.checkNotNull(moduleBasedCaps);
     }
