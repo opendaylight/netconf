@@ -91,7 +91,8 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                     netconfSessionPreferences);
 
             if(overrideNetconfCapabilities.isPresent()) {
-                netconfSessionPreferences = netconfSessionPreferences.addModuleCaps(overrideNetconfCapabilities.get());
+                netconfSessionPreferences = new NetconfSessionPreferences(netconfSessionPreferences.getNonModuleCaps(), overrideNetconfCapabilities.get().getModuleBasedCaps());
+//                netconfSessionPreferences = netconfSessionPreferences.addModuleCaps(overrideNetconfCapabilities.get());
                 LOG.debug(
                         "{}: Session capabilities overridden, capabilities that will be used: {}",
                         id, netconfSessionPreferences);
