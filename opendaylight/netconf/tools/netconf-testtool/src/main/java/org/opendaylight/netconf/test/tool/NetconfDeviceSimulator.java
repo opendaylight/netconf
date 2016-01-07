@@ -102,7 +102,9 @@ public class NetconfDeviceSimulator implements Closeable {
         this.nioExecutor = nioExecutor;
     }
 
-    private NetconfServerDispatcherImpl createDispatcher(final Set<Capability> capabilities, final boolean exi, final int generateConfigsTimeout, final Optional<File> notificationsFile, final boolean mdSal, final Optional<File> initialConfigXMLFile) {
+    private NetconfServerDispatcherImpl createDispatcher(final Set<Capability> capabilities, final boolean exi, final int generateConfigsTimeout,
+                                                         final Optional<File> notificationsFile, final boolean mdSal, final Optional<File> initialConfigXMLFile,
+                                                         final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
 
         final Set<Capability> transformedCapabilities = Sets.newHashSet(Collections2.transform(capabilities, new Function<Capability, Capability>() {
             @Override
@@ -119,7 +121,7 @@ public class NetconfDeviceSimulator implements Closeable {
         final SessionIdProvider idProvider = new SessionIdProvider();
 
         final AggregatedNetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory = new AggregatedNetconfOperationServiceFactory();
-        final NetconfOperationServiceFactory operationProvider = mdSal ? new MdsalOperationProvider(idProvider, transformedCapabilities, schemaContext) :
+        final NetconfOperationServiceFactory operationProvider = mdSal ? new MdsalOperationProvider(idProvider, transformedCapabilities, schemaContext, sourceProvider) :
             new SimulatedOperationProvider(idProvider, transformedCapabilities, notificationsFile, initialConfigXMLFile);
 
         transformedCapabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0"));
@@ -147,10 +149,17 @@ public class NetconfDeviceSimulator implements Closeable {
     public List<Integer> start(final Main.Params params) {
         LOG.info("Starting {}, {} simulated devices starting on port {}", params.deviceCount, params.ssh ? "SSH" : "TCP", params.startingPort);
 
-        final Set<Capability> capabilities = parseSchemasToModuleCapabilities(params);
+        final SharedSchemaRepository schemaRepo = new SharedSchemaRepository("netconf-simulator");
+        final Set<Capability> capabilities = parseSchemasToModuleCapabilities(params, schemaRepo);
 
         final NetconfServerDispatcherImpl dispatcher = createDispatcher(capabilities, params.exi, params.generateConfigsTimeout,
-                Optional.fromNullable(params.notificationFile), params.mdSal, Optional.fromNullable(params.initialConfigXMLFile));
+                Optional.fromNullable(params.notificationFile), params.mdSal, Optional.fromNullable(params.initialConfigXMLFile),
+                new SchemaSourceProvider<YangTextSchemaSource>() {
+                    @Override
+                    public CheckedFuture<? extends YangTextSchemaSource, SchemaSourceException> getSource(final SourceIdentifier sourceIdentifier) {
+                        return schemaRepo.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class);
+                    }
+                });
 
         int currentPort = params.startingPort;
 
@@ -258,8 +267,7 @@ public class NetconfDeviceSimulator implements Closeable {
         }
     }
 
-    private Set<Capability> parseSchemasToModuleCapabilities(final Main.Params params) {
-        final SharedSchemaRepository consumer = new SharedSchemaRepository("netconf-simulator");
+    private Set<Capability> parseSchemasToModuleCapabilities(final Main.Params params, final SharedSchemaRepository consumer) {
         final Set<SourceIdentifier> loadedSources = Sets.newHashSet();
 
         consumer.registerSchemaSourceListener(TextToASTTransformer.create(consumer, consumer));

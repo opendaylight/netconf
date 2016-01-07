@@ -12,7 +12,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
 
+import com.google.common.util.concurrent.Futures;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -37,6 +40,10 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.opendaylight.controller.cluster.datastore.ConcurrentDOMDataBroker;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeverity;
@@ -65,6 +72,9 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.opendaylight.yangtools.yang.model.parser.api.YangSyntaxErrorException;
+import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.opendaylight.yangtools.yang.parser.builder.impl.BuilderUtils;
 import org.opendaylight.yangtools.yang.parser.impl.YangParserImpl;
 import org.slf4j.Logger;
@@ -116,8 +126,12 @@ public class NetconfMDSalMappingTest {
 
     private TransactionProvider transactionProvider = null;
 
+    @Mock
+    private SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
+
     @Before
     public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
 
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
@@ -138,7 +152,19 @@ public class NetconfMDSalMappingTest {
 
         final ConcurrentDOMDataBroker cdb = new ConcurrentDOMDataBroker(datastores, listenableFutureExecutor);
         this.transactionProvider = new TransactionProvider(cdb, sessionIdForReporting);
-        this.currentSchemaContext = new CurrentSchemaContext(schemaService);
+
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(final InvocationOnMock invocationOnMock) throws Throwable {
+                final SourceIdentifier sId = (SourceIdentifier) invocationOnMock.getArguments()[0];
+                final YangTextSchemaSource yangTextSchemaSource =
+                        YangTextSchemaSource.delegateForByteSource(sId, ByteSource.wrap("module test".getBytes()));
+                return Futures.immediateCheckedFuture(yangTextSchemaSource);
+
+            }
+        }).when(sourceProvider).getSource(any(SourceIdentifier.class));
+
+        this.currentSchemaContext = new CurrentSchemaContext(schemaService, sourceProvider);
 
     }
 
