@@ -19,18 +19,22 @@ import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
+import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 
 public class CurrentSchemaContext implements SchemaContextListener, AutoCloseable {
     final AtomicReference<SchemaContext> currentContext = new AtomicReference<SchemaContext>();
     private final ListenerRegistration<SchemaContextListener> schemaContextListenerListenerRegistration;
     private final Set<CapabilityListener> listeners1 = Collections.synchronizedSet(Sets.<CapabilityListener>newHashSet());
+    private SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider;
 
     public SchemaContext getCurrentContext() {
         Preconditions.checkState(currentContext.get() != null, "Current context not received");
         return currentContext.get();
     }
 
-    public CurrentSchemaContext(final SchemaService schemaService) {
+    public CurrentSchemaContext(final SchemaService schemaService, final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider) {
+        this.rootSchemaSourceProvider = rootSchemaSourceProvider;
         schemaContextListenerListenerRegistration = schemaService.registerSchemaContextListener(this);
     }
 
@@ -38,7 +42,7 @@ public class CurrentSchemaContext implements SchemaContextListener, AutoCloseabl
     public void onGlobalContextUpdated(final SchemaContext schemaContext) {
         currentContext.set(schemaContext);
         // FIXME is notifying all the listeners from this callback wise ?
-        final Set<Capability> addedCaps = MdsalNetconfOperationServiceFactory.transformCapabilities(currentContext.get());
+        final Set<Capability> addedCaps = MdsalNetconfOperationServiceFactory.transformCapabilities(currentContext.get(), rootSchemaSourceProvider);
         for (final CapabilityListener listener : listeners1) {
             listener.onCapabilitiesChanged(addedCaps, Collections.<Capability>emptySet());
         }
@@ -52,7 +56,7 @@ public class CurrentSchemaContext implements SchemaContextListener, AutoCloseabl
     }
 
     public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
-        listener.onCapabilitiesChanged(MdsalNetconfOperationServiceFactory.transformCapabilities(currentContext.get()), Collections.<Capability>emptySet());
+        listener.onCapabilitiesChanged(MdsalNetconfOperationServiceFactory.transformCapabilities(currentContext.get(), rootSchemaSourceProvider), Collections.<Capability>emptySet());
         listeners1.add(listener);
         return new AutoCloseable() {
             @Override

@@ -50,11 +50,11 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -69,6 +69,9 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.parser.api.YangSyntaxErrorException;
+import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.opendaylight.yangtools.yang.parser.builder.impl.BuilderUtils;
 import org.opendaylight.yangtools.yang.parser.impl.YangParserImpl;
 import org.slf4j.Logger;
@@ -151,6 +154,8 @@ public class RuntimeRpcTest {
     private SchemaContextListener listener;
     @Mock
     private ListenerRegistration registration;
+    @Mock
+    private SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
 
     @Before
     public void setUp() throws Exception {
@@ -173,8 +178,19 @@ public class RuntimeRpcTest {
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
 
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(final InvocationOnMock invocationOnMock) throws Throwable {
+                final SourceIdentifier sId = (SourceIdentifier) invocationOnMock.getArguments()[0];
+                final YangTextSchemaSource yangTextSchemaSource =
+                        YangTextSchemaSource.delegateForByteSource(sId, ByteSource.wrap("module test".getBytes()));
+                return Futures.immediateCheckedFuture(yangTextSchemaSource);
+
+            }
+        }).when(sourceProvider).getSource(any(SourceIdentifier.class));
+
         this.schemaContext = parseSchemas(getYangSchemas());
-        this.currentSchemaContext = new CurrentSchemaContext(schemaService);
+        this.currentSchemaContext = new CurrentSchemaContext(schemaService, sourceProvider);
     }
 
     @Test
