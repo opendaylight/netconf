@@ -9,8 +9,6 @@
 package org.opendaylight.controller.config.yang.netconf.mdsal.mapper;
 
 import org.opendaylight.netconf.mdsal.connector.MdsalNetconfOperationServiceFactory;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 
 public class NetconfMdsalMapperModule extends org.opendaylight.controller.config.yang.netconf.mdsal.mapper.AbstractNetconfMdsalMapperModule{
     public NetconfMdsalMapperModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier, org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
@@ -28,12 +26,8 @@ public class NetconfMdsalMapperModule extends org.opendaylight.controller.config
 
     @Override
     public java.lang.AutoCloseable createInstance() {
-        // TODO use concrete schema source provider for YANG text source to avoid generic interface in config subsystem
-        final SchemaSourceProvider<YangTextSchemaSource> sourceProvider =
-                (SchemaSourceProvider<YangTextSchemaSource>) getRootSchemaSourceProviderDependency();
-
         final MdsalNetconfOperationServiceFactory mdsalNetconfOperationServiceFactory =
-            new MdsalNetconfOperationServiceFactory(getRootSchemaServiceDependency(), sourceProvider) {
+            new MdsalNetconfOperationServiceFactory(getRootSchemaServiceDependency(), getRootSchemaSourceProviderDependency()) {
                 @Override
                 public void close() throws Exception {
                     super.close();
