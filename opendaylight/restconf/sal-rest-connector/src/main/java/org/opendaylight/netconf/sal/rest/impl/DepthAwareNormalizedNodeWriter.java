@@ -30,6 +30,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.OrderedLeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
@@ -259,9 +260,12 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
             processedAsCompositeNode = writeChildren(n.getValue());
         }
         else if (node instanceof LeafSetNode) {
-            //covers also OrderedLeafSetNode for which doesn't exist start* method
             final LeafSetNode<?> n = (LeafSetNode<?>) node;
-            writer.startLeafSet(n.getIdentifier(), childSizeHint(n.getValue()));
+            if (node instanceof OrderedLeafSetNode) {
+                writer.startOrderedLeafSet(n.getIdentifier(), childSizeHint(n.getValue()));
+            } else {
+                writer.startLeafSet(n.getIdentifier(), childSizeHint(n.getValue()));
+            }
             currentDepth++;
             processedAsCompositeNode = writeChildren(n.getValue());
             currentDepth--;
