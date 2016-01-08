@@ -241,9 +241,12 @@ public class OrderedNormalizedNodeWriter implements Closeable, Flushable{
             return writeChildren(n.getValue(), dataSchemaNode, true);
         }
         if (node instanceof LeafSetNode) {
-            //covers also OrderedLeafSetNode for which doesn't exist start* method
             final LeafSetNode<?> n = (LeafSetNode<?>) node;
-            writer.startLeafSet(n.getIdentifier(), OrderedNormalizedNodeWriter.childSizeHint(n.getValue()));
+            if (node instanceof OrderedLeafSetNode) {
+                writer.startOrderedLeafSet(n.getIdentifier(), OrderedNormalizedNodeWriter.childSizeHint(n.getValue()));
+            } else {
+                writer.startLeafSet(n.getIdentifier(), OrderedNormalizedNodeWriter.childSizeHint(n.getValue()));
+            }
             return writeChildren(n.getValue(), dataSchemaNode, true);
         }
 
