@@ -10,8 +10,11 @@ package org.opendaylight.netconf.nettyutil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
+import io.netty.channel.DefaultChannelPromise;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.FutureListener;
 import java.io.IOException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.netconf.api.NetconfExiSession;
@@ -63,13 +66,30 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
 
     @Override
     public ChannelFuture sendMessage(final NetconfMessage netconfMessage) {
-        final ChannelFuture future = channel.writeAndFlush(netconfMessage);
-        if (delayedEncoder != null) {
-            replaceMessageEncoder(delayedEncoder);
-            delayedEncoder = null;
-        }
+        // we need to execute all messages from netty thread, in case we are in another thread(Restconf)
+        final DefaultChannelPromise proxyFuture = new DefaultChannelPromise(channel);
+        channel.eventLoop().execute(new Runnable() {
+            @Override
+            public void run() {
+                final ChannelFuture future = channel.writeAndFlush(netconfMessage);
+                future.addListener(new FutureListener<Void>() {
+                    @Override
+                    public void operationComplete(Future<Void> future) throws Exception {
+                        if (future.isSuccess()) {
+                            proxyFuture.setSuccess();
+                        } else {
+                            proxyFuture.setFailure(future.cause());
+                        }
+                    }
+                });
+                if (delayedEncoder != null) {
+                    replaceMessageEncoder(delayedEncoder);
+                    delayedEncoder = null;
+                }
+            }
+        });
 
-        return future;
+        return proxyFuture;
     }
 
     @Override

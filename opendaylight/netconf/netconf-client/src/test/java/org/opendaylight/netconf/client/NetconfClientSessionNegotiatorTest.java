@@ -25,6 +25,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelProgressivePromise;
+import io.netty.channel.EventLoop;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timer;
@@ -36,6 +37,8 @@ import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
@@ -43,8 +46,6 @@ import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 import org.opendaylight.netconf.util.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.util.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
-import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
-import org.opendaylight.netconf.api.NetconfMessage;
 import org.openexi.proc.common.EXIOptions;
 import org.w3c.dom.Document;
 
@@ -62,6 +63,7 @@ public class NetconfClientSessionNegotiatorTest {
         pipeline = mockChannelPipeline();
         future = mockChannelFuture();
         channel = mockChannel();
+        mockEventLoop();
     }
 
     private static ChannelHandler mockChannelHandler() {
@@ -101,6 +103,20 @@ public class NetconfClientSessionNegotiatorTest {
         doReturn(messageDecoder).when(pipeline).replace(anyString(), anyString(), any(NetconfXMLToMessageDecoder.class));
         doReturn(pipeline).when(pipeline).replace(any(ChannelHandler.class), anyString(), any(NetconfClientSession.class));
         return pipeline;
+    }
+
+    private void mockEventLoop() {
+        final EventLoop eventLoop = mock(EventLoop.class);
+        doReturn(eventLoop).when(channel).eventLoop();
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                final Object[] args = invocation.getArguments();
+                final Runnable runnable = (Runnable) args[0];
+                runnable.run();
+                return null;
+            }
+        }).when(eventLoop).execute(any(Runnable.class));
     }
 
     private NetconfClientSessionNegotiator createNetconfClientSessionNegotiator(final Promise<NetconfClientSession> promise,
