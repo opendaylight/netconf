@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.topology;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -20,7 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -75,7 +76,7 @@ import org.opendaylight.yangtools.yang.parser.util.TextToASTTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractNetconfTopology implements NetconfTopology, BindingAwareProvider, Provider{
+public abstract class AbstractNetconfTopology implements NetconfTopology, BindingAwareProvider, Provider {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfTopology.class);
 
@@ -87,9 +88,67 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     private static final long DEFAULT_CONNECTION_TIMEOUT_MILLIS = 20000L;
     private static final BigDecimal DEFAULT_SLEEP_FACTOR = new BigDecimal(1.5);
 
-    private static FilesystemSchemaSourceCache<YangTextSchemaSource> CACHE = null;
-    //keep track of already initialized repositories to avoid adding redundant listeners
-    private static final Set<SchemaRepository> INITIALIZED_SCHEMA_REPOSITORIES = new HashSet<>();
+    // constants related to Schema Cache(s)
+    /**
+     * Filesystem based caches are stored relative to the cache directory.
+     */
+    private static final String CACHE_DIRECTORY = "cache";
+
+    /**
+     * The default cache directory relative to <code>CACHE_DIRECTORY</code>
+     */
+    private static final String DEFAULT_CACHE_DIRECTORY = "schema";
+
+    /**
+     * The qualified schema cache directory <code>cache/schema</code>
+     */
+    private static final String QUALIFIED_DEFAULT_CACHE_DIRECTORY = CACHE_DIRECTORY + File.separator+ DEFAULT_CACHE_DIRECTORY;
+
+    /**
+     * The name for the default schema repository
+     */
+    private static final String DEFAULT_SCHEMA_REPOSITORY_NAME = "sal-netconf-connector";
+
+    /**
+     * The default schema repository in the case that one is not specified.
+     */
+    private static final SharedSchemaRepository DEFAULT_SCHEMA_REPOSITORY =
+            new SharedSchemaRepository(DEFAULT_SCHEMA_REPOSITORY_NAME);
+
+    /**
+     * The default <code>FilesystemSchemaSourceCache</code>, which stores cached files in <code>cache/schema</code>.
+     */
+    private static final FilesystemSchemaSourceCache<YangTextSchemaSource> DEFAULT_CACHE =
+            new FilesystemSchemaSourceCache<>(DEFAULT_SCHEMA_REPOSITORY, YangTextSchemaSource.class,
+                    new File(QUALIFIED_DEFAULT_CACHE_DIRECTORY));
+
+    /**
+     * The default factory for creating <code>SchemaContext</code> instances.
+     */
+    private static final SchemaContextFactory DEFAULT_SCHEMA_CONTEXT_FACTORY =
+            DEFAULT_SCHEMA_REPOSITORY.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
+
+    /**
+     * Keeps track of initialized Schema resources.  A Map is maintained in which the key represents the name
+     * of the schema cache directory, and the value is a corresponding <code>SchemaResourcesDTO</code>.  The
+     * <code>SchemaResourcesDTO</code> is essentially a container that allows for the extraction of the
+     * <code>SchemaRegistry</code> and <code>SchemaContextFactory</code> which should be used for a particular
+     * Netconf mount.  Access to <code>schemaResourcesDTOs</code> should be surrounded by appropriate
+     * synchronization locks.
+     */
+    private static volatile Map<String, NetconfDevice.SchemaResourcesDTO> schemaResourcesDTOs = new HashMap<>();
+
+    // Initializes default constant instances for the case when the default schema repository
+    // directory cache/schema is used.
+    static {
+        schemaResourcesDTOs.put(DEFAULT_CACHE_DIRECTORY,
+                new NetconfDevice.SchemaResourcesDTO(DEFAULT_SCHEMA_REPOSITORY,
+                        DEFAULT_SCHEMA_CONTEXT_FACTORY,
+                        new NetconfStateSchemas.NetconfStateSchemasResolverImpl()));
+        DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(DEFAULT_CACHE);
+        DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(
+                TextToASTTransformer.create(DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY));
+    }
 
     protected final String topologyId;
     private final NetconfClientDispatcher clientDispatcher;
@@ -100,8 +159,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     protected final ThreadPool processingExecutor;
     protected final SharedSchemaRepository sharedSchemaRepository;
 
-    protected SchemaSourceRegistry schemaRegistry = null;
-    protected SchemaContextFactory schemaContextFactory = null;
+    protected SchemaSourceRegistry schemaRegistry = DEFAULT_SCHEMA_REPOSITORY;
+    protected SchemaContextFactory schemaContextFactory = DEFAULT_SCHEMA_CONTEXT_FACTORY;
 
     protected DOMMountPointService mountPointService = null;
     protected DataBroker dataBroker = null;
@@ -119,27 +178,11 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         this.keepaliveExecutor = keepaliveExecutor;
         this.processingExecutor = processingExecutor;
         this.sharedSchemaRepository = schemaRepositoryProvider.getSharedSchemaRepository();
-
-        initFilesystemSchemaSourceCache(sharedSchemaRepository);
     }
 
     protected void registerToSal(BindingAwareProvider baProvider, Provider provider) {
         domBroker.registerProvider(provider);
         bindingAwareBroker.registerProvider(baProvider);
-    }
-
-    private void initFilesystemSchemaSourceCache(SharedSchemaRepository repository) {
-        LOG.warn("Schema repository used: {}", repository.getIdentifier());
-        if (CACHE == null) {
-            CACHE = new FilesystemSchemaSourceCache<>(repository, YangTextSchemaSource.class, new File("cache/schema"));
-        }
-        if (!INITIALIZED_SCHEMA_REPOSITORIES.contains(repository)) {
-            repository.registerSchemaSourceListener(CACHE);
-            repository.registerSchemaSourceListener(TextToASTTransformer.create(repository, repository));
-            INITIALIZED_SCHEMA_REPOSITORIES.add(repository);
-        }
-        setSchemaRegistry(repository);
-        setSchemaContextFactory(repository.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT));
     }
 
     public void setSchemaRegistry(final SchemaSourceRegistry schemaRegistry) {
@@ -237,13 +280,80 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
             salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade, keepaliveExecutor.getExecutor(), keepaliveDelay);
         }
 
-        NetconfDevice.SchemaResourcesDTO schemaResourcesDTO =
-                new NetconfDevice.SchemaResourcesDTO(schemaRegistry, schemaContextFactory, new NetconfStateSchemas.NetconfStateSchemasResolverImpl());
+        // Setup information related to the SchemaRegistry, SchemaResourceFactory, etc.
+        NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = null;
+        final String moduleSchemaCacheDirectory = node.getSchemaCacheDirectory();
+        // Only checks to ensure the String is not empty or null;  further checks related to directory accessibility and file permissions
+        // are handled during the FilesystemScehamSourceCache initialization.
+        if (!Strings.isNullOrEmpty(moduleSchemaCacheDirectory)) {
+            // If a custom schema cache directory is specified, create the backing DTO; otherwise, the SchemaRegistry and
+            // SchemaContextFactory remain the default values.
+            if (!moduleSchemaCacheDirectory.equals(DEFAULT_CACHE_DIRECTORY)) {
+                // Multiple modules may be created at once;  synchronize to avoid issues with data consistency among threads.
+                synchronized(schemaResourcesDTOs) {
+                    // Look for the cached DTO to reuse SchemaRegistry and SchemaContextFactory variables if they already exist
+                    final NetconfDevice.SchemaResourcesDTO dto =
+                            schemaResourcesDTOs.get(moduleSchemaCacheDirectory);
+                    if (dto == null) {
+                        schemaResourcesDTO = createSchemaResourcesDTO(moduleSchemaCacheDirectory, nodeId.getValue());
+                        schemaRegistry.registerSchemaSourceListener(
+                                TextToASTTransformer.create((SchemaRepository) schemaRegistry, schemaRegistry));
+                        schemaResourcesDTOs.put(moduleSchemaCacheDirectory, schemaResourcesDTO);
+                    } else {
+                        setSchemaContextFactory(dto.getSchemaContextFactory());
+                        setSchemaRegistry(dto.getSchemaRegistry());
+                        schemaResourcesDTO = dto;
+                    }
+                }
+                LOG.info("Netconf connector for device {} will use schema cache directory {} instead of {}",
+                        nodeId.getValue(), moduleSchemaCacheDirectory, DEFAULT_CACHE_DIRECTORY);
+            }
+        } else {
+            LOG.warn("schema-cache-directory for {} is null or empty;  using the default {}",
+                    nodeId.getValue(), QUALIFIED_DEFAULT_CACHE_DIRECTORY);
+        }
+
+        if (schemaResourcesDTO == null) {
+            schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(schemaRegistry, schemaContextFactory,
+                    new NetconfStateSchemas.NetconfStateSchemasResolverImpl());
+        }
 
         NetconfDevice device = new NetconfDevice(schemaResourcesDTO, remoteDeviceId, salFacade,
                 processingExecutor.getExecutor(), reconnectOnChangedSchema);
 
         return new NetconfConnectorDTO(new NetconfDeviceCommunicator(remoteDeviceId, device), salFacade);
+    }
+
+    /**
+     * Creates the backing Schema classes for a particular directory.
+     *
+     * @param moduleSchemaCacheDirectory The string directory relative to "cache"
+     * @return A DTO containing the Schema classes for the Netconf mount.
+     */
+    private NetconfDevice.SchemaResourcesDTO createSchemaResourcesDTO(final String moduleSchemaCacheDirectory,
+            final String instanceName) {
+
+        final SharedSchemaRepository repository = new SharedSchemaRepository(instanceName);
+        final SchemaContextFactory schemaContextFactory
+                = repository.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
+        setSchemaRegistry(repository);
+        setSchemaContextFactory(schemaContextFactory);
+        final FilesystemSchemaSourceCache<YangTextSchemaSource> deviceCache =
+                createDeviceFilesystemCache(moduleSchemaCacheDirectory);
+        repository.registerSchemaSourceListener(deviceCache);
+        return new NetconfDevice.SchemaResourcesDTO(repository, schemaContextFactory,
+                new NetconfStateSchemas.NetconfStateSchemasResolverImpl());
+    }
+
+    /**
+     * Creates a <code>FilesystemSchemaSourceCache</code> for the custom schema cache directory.
+     *
+     * @param schemaCacheDirectory The custom cache directory relative to "cache"
+     * @return A <code>FilesystemSchemaSourceCache</code> for the custom schema cache directory
+     */
+    private FilesystemSchemaSourceCache<YangTextSchemaSource> createDeviceFilesystemCache(final String schemaCacheDirectory) {
+        final String relativeSchemaCacheDirectory = CACHE_DIRECTORY + File.separator + schemaCacheDirectory;
+        return new FilesystemSchemaSourceCache<>(schemaRegistry, YangTextSchemaSource.class, new File(relativeSchemaCacheDirectory));
     }
 
     public NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener, NetconfNode node) {
