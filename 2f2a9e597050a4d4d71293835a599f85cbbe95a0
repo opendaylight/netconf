@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da33351e_aa0faee0",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonToPATCHBodyReader.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2016-01-11T09:19:02Z",
+      "side": 1,
+      "message": "You need also o capture targetNode in instance-identifier form (absolute or relative) and edit operation to properly delegate to MD-SAL.",
+      "range": {
+        "startLine": 150,
+        "startChar": 28,
+        "endLine": 150,
+        "endChar": 75
+      },
+      "revId": "2f2a9e597050a4d4d71293835a599f85cbbe95a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da33351e_4a0a62d3",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/PATCHContext.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2016-01-11T09:19:02Z",
+      "side": 1,
+      "message": "Structure does not store paths to data, operation to apply.",
+      "range": {
+        "startLine": 30,
+        "startChar": 11,
+        "endLine": 30,
+        "endChar": 49
+      },
+      "revId": "2f2a9e597050a4d4d71293835a599f85cbbe95a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
