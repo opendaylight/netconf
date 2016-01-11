@@ -57,6 +57,8 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNo
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
+import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,12 +69,14 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
 
     private final Set<Capability> caps;
     private final SchemaContext schemaContext;
+    private SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
 
     public MdsalOperationProvider(final SessionIdProvider idProvider,
                                   final Set<Capability> caps,
-                                  final SchemaContext schemaContext) {
+                                  final SchemaContext schemaContext, final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
         this.caps = caps;
         this.schemaContext = schemaContext;
+        this.sourceProvider = sourceProvider;
     }
 
     @Override
@@ -93,7 +97,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
 
     @Override
     public NetconfOperationService createService(String netconfSessionIdForReporting) {
-        return new MdsalOperationService(Long.parseLong(netconfSessionIdForReporting), schemaContext, caps);
+        return new MdsalOperationService(Long.parseLong(netconfSessionIdForReporting), schemaContext, caps, sourceProvider);
     }
 
     static class MdsalOperationService implements NetconfOperationService {
@@ -102,13 +106,15 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
         private final Set<Capability> caps;
         private final SchemaService schemaService;
         private final DOMDataBroker dataBroker;
+        private SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
 
         public MdsalOperationService(final long currentSessionId,
                                      final SchemaContext schemaContext,
-                                     final Set<Capability> caps) {
+                                     final Set<Capability> caps, final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
             this.currentSessionId = currentSessionId;
             this.schemaContext = schemaContext;
             this.caps = caps;
+            this.sourceProvider = sourceProvider;
             this.schemaService = createSchemaService();
 
             this.dataBroker = createDataStore(schemaService);
@@ -118,7 +124,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
         @Override
         public Set<NetconfOperation> getNetconfOperations() {
             TransactionProvider transactionProvider = new TransactionProvider(dataBroker, String.valueOf(currentSessionId));
-            CurrentSchemaContext currentSchemaContext = new CurrentSchemaContext(schemaService);
+            CurrentSchemaContext currentSchemaContext = new CurrentSchemaContext(schemaService, sourceProvider);
 
             ContainerNode netconf = createNetconfState();
 
