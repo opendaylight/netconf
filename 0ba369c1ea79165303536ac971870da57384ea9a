@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da33351e_caf5d2cc",
+        "filename": "opendaylight/netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSession.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-01-11T09:21:28Z",
+      "side": 1,
+      "message": "why we need to do that with the link to the discussion on netty\u0027s web would be very useful here",
+      "range": {
+        "startLine": 69,
+        "startChar": 14,
+        "endLine": 69,
+        "endChar": 18
+      },
+      "revId": "0ba369c1ea79165303536ac971870da57384ea9a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
