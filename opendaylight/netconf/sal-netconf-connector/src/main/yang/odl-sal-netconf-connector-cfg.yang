@@ -12,12 +12,11 @@ module odl-sal-netconf-connector-cfg {
     import ietf-inet-types {prefix inet; revision-date "2010-09-24";}
 
     description
-        "Service definition for Binding Aware MD-SAL.";
+        "Config definition for Netconf Connector modules";
 
     revision "2015-08-03" {
         description
-            "Add netconf topology from which dependencies are inherited, change
-            existing dependencies to non-mandatory to preserve backwards compatibility";
+            "Non-mandatory keepalive executor";
     }
 
     revision "2013-10-28" {
@@ -91,7 +90,7 @@ module odl-sal-netconf-connector-cfg {
             container binding-registry {
                 uses config:service-ref {
                     refine type {
-                        mandatory false;
+                        mandatory true;
                         config:required-identity md-sal-binding:binding-broker-osgi-registry;
                     }
                 }
@@ -100,7 +99,7 @@ module odl-sal-netconf-connector-cfg {
             container event-executor {
                 uses config:service-ref {
                     refine type {
-                        mandatory false;
+                        mandatory true;
                         config:required-identity netty:netty-event-executor;
                     }
                 }
@@ -109,7 +108,7 @@ module odl-sal-netconf-connector-cfg {
             container processing-executor {
                 uses config:service-ref {
                     refine type {
-                        mandatory false;
+                        mandatory true;
                         config:required-identity th:threadpool;
                     }
                 }
@@ -166,9 +165,9 @@ module odl-sal-netconf-connector-cfg {
             }
 
             container keepalive-executor {
+                presence "Used to override default keepalive-executor instance";
                 uses config:service-ref {
                     refine type {
-                        mandatory false;
                         config:required-identity th:scheduled-threadpool;
                     }
                 }
