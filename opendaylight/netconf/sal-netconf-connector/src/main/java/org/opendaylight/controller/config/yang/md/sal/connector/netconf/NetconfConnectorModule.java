@@ -107,13 +107,6 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         checkNotNull(getBetweenAttemptsTimeoutMillis(), betweenAttemptsTimeoutMillisJmxAttribute);
         checkCondition(getBetweenAttemptsTimeoutMillis() > 0, "must be > 0", betweenAttemptsTimeoutMillisJmxAttribute);
 
-//        if (getNetconfTopology() == null) {
-//            checkNotNull(getDomRegistry(), domRegistryJmxAttribute);
-//            checkNotNull(getClientDispatcher(), clientDispatcherJmxAttribute);
-//            checkNotNull(getBindingRegistry(), bindingRegistryJmxAttribute);
-//            checkNotNull(getProcessingExecutor(), processingExecutorJmxAttribute);
-//        }
-
         // Check username + password in case of ssh
         if(getTcpOnly() == false) {
             checkNotNull(getUsername(), usernameJmxAttribute);
@@ -133,7 +126,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
 
     @Override
     public java.lang.AutoCloseable createInstance() {
-        initDependenciesFromTopology();
+        initDependencies();
         final RemoteDeviceId id = new RemoteDeviceId(getIdentifier(), getSocketAddress());
 
         final ExecutorService globalProcessingExecutor = processingExecutor.getExecutor();
@@ -168,18 +161,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         return new SalConnectorCloseable(listener, salFacade);
     }
 
-    private void initDependenciesFromTopology() {
-//            topology = getNetconfTopologyDependency();
-
-//            domRegistry = topology.getDomRegistryDependency();
-//            clientDispatcher = topology.getNetconfClientDispatcherDependency();
-//            bindingRegistry = topology.getBindingAwareBroker();
-//            processingExecutor = topology.getProcessingExecutorDependency();
-//            keepaliveExecutor = topology.getKeepaliveExecutorDependency();
-//            sharedSchemaRepository = topology.getSharedSchemaRepository().getSharedSchemaRepository();
-//            eventExecutor = topology.getEventExecutorDependency();
-
-//            initFilesystemSchemaSourceCache(sharedSchemaRepository);
+    private void initDependencies() {
         domRegistry = getDomRegistryDependency();
         clientDispatcher = getClientDispatcherDependency();
         bindingRegistry = getBindingRegistryDependency();
@@ -205,7 +187,6 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
             keepaliveExecutor = getKeepaliveExecutorDependency();
         }
 
-        LOG.warn("No topology defined in config, using default-shared-schema-repo");
         if (DEFAULT_SCHEMA_REPOSITORY == null) {
             DEFAULT_SCHEMA_REPOSITORY = new SharedSchemaRepository("default shared schema repo");
         }
