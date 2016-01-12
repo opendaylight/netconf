@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da33351e_af5cd726",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/yang/odl-sal-netconf-connector-cfg.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2016-01-12T19:43:41Z",
+      "side": 1,
+      "message": "I am not sure whether getKeepaliveExecutorDependency() would work with missing type in case when (admittedly perverse) user provides data with name only.\n\nThe approach of making keepalive-executor a presence container (and not changing mandatory-ness of leafs) will guarantee either null or valid service of scheduled-threadpool type.",
+      "range": {
+        "startLine": 170,
+        "startChar": 24,
+        "endLine": 170,
+        "endChar": 40
+      },
+      "revId": "2acbdf88d67cad7e92d8100aa4e368e7088a8a38",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
