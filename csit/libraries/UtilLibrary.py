@@ -1,9 +1,3 @@
-__author__ = "Basheeruddin Ahmed"
-__copyright__ = "Copyright(c) 2014, Cisco Systems, Inc."
-__license__ = "New-style BSD"
-__email__ = "syedbahm@cisco.com"
-
-
 import requests
 from SSHLibrary import SSHLibrary
 
@@ -11,6 +5,13 @@ import robot
 import time
 import re
 import warnings
+
+
+__author__ = "Basheeruddin Ahmed"
+__copyright__ = "Copyright(c) 2014, Cisco Systems, Inc."
+__license__ = "New-style BSD"
+__email__ = "syedbahm@cisco.com"
+
 
 global _cache
 

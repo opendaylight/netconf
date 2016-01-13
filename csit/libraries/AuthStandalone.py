@@ -32,14 +32,14 @@ as URIs not starting with /restconf/ are not supported yet.
 # terms of the Eclipse Public License v1.0 which accompanies this distribution,
 # and is available at http://www.eclipse.org/legal/epl-v10.html
 
+import json
+import requests
+
+
 __author__ = "Vratko Polak"
 __copyright__ = "Copyright(c) 2015, Cisco Systems, Inc."
 __license__ = "Eclipse Public License v1.0"
 __email__ = "vrpolak@cisco.com"
-
-
-import json
-import requests
 
 
 #
