@@ -82,9 +82,10 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     protected static final long DEFAULT_REQUEST_TIMEOUT_MILIS = 60000L;
     protected static final int DEFAULT_KEEPALIVE_DELAY = 0;
     protected static final boolean DEFAULT_RECONNECT_ON_CHANGED_SCHEMA = false;
-    protected static final int DEFAULT_MAX_CONNECTION_ATTEMPTS = 0;
-    protected static final int DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS = 2000;
-    protected static final BigDecimal DEFAULT_SLEEP_FACTOR = new BigDecimal(1.5);
+    private static final int DEFAULT_MAX_CONNECTION_ATTEMPTS = 0;
+    private static final int DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS = 2000;
+    private static final long DEFAULT_CONNECTION_TIMEOUT_MILIS = 20000L;
+    private static final BigDecimal DEFAULT_SLEEP_FACTOR = new BigDecimal(1.5);
 
     private static FilesystemSchemaSourceCache<YangTextSchemaSource> CACHE = null;
     //keep track of already initialized repositories to avoid adding redundant listeners
@@ -249,7 +250,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
 
         //setup default values since default value is not supported yet in mdsal
         // TODO remove this when mdsal starts supporting default values
-        final long clientConnectionTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null ? DEFAULT_REQUEST_TIMEOUT_MILIS : node.getDefaultRequestTimeoutMillis();
+        final long clientConnectionTimeoutMillis = node.getConnectionTimeoutMillis() == null ? DEFAULT_CONNECTION_TIMEOUT_MILIS : node.getConnectionTimeoutMillis();
         final long maxConnectionAttempts = node.getMaxConnectionAttempts() == null ? DEFAULT_MAX_CONNECTION_ATTEMPTS : node.getMaxConnectionAttempts();
         final int betweenAttemptsTimeoutMillis = node.getBetweenAttemptsTimeoutMillis() == null ? DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS : node.getBetweenAttemptsTimeoutMillis();
         final BigDecimal sleepFactor = node.getSleepFactor() == null ? DEFAULT_SLEEP_FACTOR : node.getSleepFactor();
