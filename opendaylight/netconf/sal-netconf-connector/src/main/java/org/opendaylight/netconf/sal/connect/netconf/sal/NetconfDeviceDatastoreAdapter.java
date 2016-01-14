@@ -15,7 +15,10 @@ import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+
 import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.ReadWriteTransaction;
@@ -50,22 +53,11 @@ final class NetconfDeviceDatastoreAdapter implements AutoCloseable {
     private static final Logger logger  = LoggerFactory.getLogger(NetconfDeviceDatastoreAdapter.class);
 
     private final RemoteDeviceId id;
-    private final BindingTransactionChain txChain;
+    private BindingTransactionChain txChain;
 
-    NetconfDeviceDatastoreAdapter(final RemoteDeviceId deviceId, final DataBroker dataService) {
+    NetconfDeviceDatastoreAdapter(final RemoteDeviceId deviceId, final BindingTransactionChain txChain) {
         this.id = Preconditions.checkNotNull(deviceId);
-        this.txChain = Preconditions.checkNotNull(dataService).createTransactionChain(new TransactionChainListener() {
-            @Override
-            public void onTransactionChainFailed(TransactionChain<?, ?> chain, AsyncTransaction<?, ?> transaction, Throwable cause) {
-                logger.error("{}: TransactionChain({}) {} FAILED!", id, chain, transaction.getIdentifier(), cause);
-                throw new IllegalStateException(id + "  TransactionChain(" + chain + ") not committed correctly", cause);
-            }
-
-            @Override
-            public void onTransactionChainSuccessful(TransactionChain<?, ?> chain) {
-                logger.trace("{}: TransactionChain({}) {} SUCCESSFUL", id, chain);
-            }
-        });
+        this.txChain = Preconditions.checkNotNull(txChain);
 
         initDeviceData();
     }
@@ -89,7 +81,12 @@ final class NetconfDeviceDatastoreAdapter implements AutoCloseable {
         transaction.delete(LogicalDatastoreType.OPERATIONAL, id.getBindingPath());
         logger.trace("{}: Close device state transaction {} removing all data ended.", id, transaction.getIdentifier());
 
-        commitTransaction(transaction, "close");
+        try {
+            transaction.submit().get();
+        } catch (InterruptedException | ExecutionException e) {
+            logger.error("{}: Transaction(close) {} FAILED!", id, transaction.getIdentifier(), e);
+            throw new IllegalStateException(id + "  Transaction(close) not committed correctly", e);
+        }
     }
 
     private void initDeviceData() {
@@ -141,7 +138,6 @@ final class NetconfDeviceDatastoreAdapter implements AutoCloseable {
     @Override
     public void close() throws Exception {
         removeDeviceConfigAndState();
-        txChain.close();
     }
 
     public static org.opendaylight.yang.gen.v1.urn.opendaylight.inventory.rev130819.nodes.Node buildDataForDeviceState(
@@ -179,5 +175,9 @@ final class NetconfDeviceDatastoreAdapter implements AutoCloseable {
         nodeBuilder.setKey(id.getBindingKey());
         nodeBuilder.setId(id.getBindingKey().getId());
         return nodeBuilder;
+    }
+
+    public void setTxChain(BindingTransactionChain txChain) {
+        this.txChain = Preconditions.checkNotNull(txChain);
     }
 }
