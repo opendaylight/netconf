@@ -628,12 +628,6 @@ public class NetconfMappingTest extends AbstractConfigTest {
         assertEquals(3 + 3, afterReplace);
     }
 
-    @Test(expected = DocumentedException.class)
-    public void testEx() throws Exception {
-
-        commit();
-    }
-
     @Test
     public void testEx2() throws Exception {
         //check abort before tx creation
