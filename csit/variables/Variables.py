@@ -116,6 +116,14 @@ CONFIG_API = '/restconf/config'
 OPERATIONAL_API = '/restconf/operational'
 MODULES_API = '/restconf/modules'
 
+# NEMO Variables
+PREDEFINE_ROLE_URI = '/restconf/config/nemo-user:user-roles'
+PREDEFINE_NODE_URI = '/restconf/config/nemo-object:node-definitions'
+PREDEFINE_CONNECTION_URI = '/restconf/config/nemo-object:connection-definitions'
+REGISTER_TENANT_URI = '/restconf/operations/nemo-intent:register-user'
+STRUCTURE_INTENT_URI = '/restconf/operations/nemo-intent:structure-style-nemo-update'
+GET_INTENTS_URI = '/retconf/config/intent:intents'
+
 # TOKEN
 AUTH_TOKEN_API = '/oauth2/token'
 REVOKE_TOKEN_API = '/oauth2/revoke'
@@ -177,9 +185,6 @@ SSH_KEY = 'id_rsa'
 CONTROLLER_STOP_TIMEOUT = 120  # Max number of seconds test will wait for a controller to stop
 TOPOLOGY_URL = 'network-topology:network-topology/topology'
 SEND_ACCEPT_XML_HEADERS = {'Content-Type': 'application/xml', 'Accept': 'application/xml'}
-
-# Test deadlines global control
-ENABLE_GLOBAL_TEST_DEADLINES = True
 
 # Deprecated old variables, to be removed once all tests that need them are
 # updated to use the new names.
