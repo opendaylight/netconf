@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a3d3df0_52a695c2",
+        "filename": "opendaylight/netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2016-01-15T14:12:47Z",
+      "side": 1,
+      "message": "Why does the default value trigger a warning?\n\nNot an issue of this Change, just asking.\nBy the way, current CSIT tests always set keepalive-delay to 0.",
+      "range": {
+        "startLine": 236,
+        "startChar": 16,
+        "endLine": 236,
+        "endChar": 20
+      },
+      "revId": "9cb58cc42d98ebb76c6113831ccd3b50d2736987",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_b2aba188",
+        "filename": "opendaylight/netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/impl/ClusteredNetconfTopology.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2016-01-15T14:12:47Z",
+      "side": 1,
+      "message": "(same here)",
+      "range": {
+        "startLine": 157,
+        "startChar": 16,
+        "endLine": 157,
+        "endChar": 20
+      },
+      "revId": "9cb58cc42d98ebb76c6113831ccd3b50d2736987",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
