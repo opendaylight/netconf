@@ -163,6 +163,9 @@ LFM_RPC_API = "/restconf/operations/odl-mappingservice"
 LFM_RPC_API_LI = "/restconf/operations/lfm-mapping-database"
 LFM_SB_RPC_API = "/restconf/operations/odl-lisp-sb"
 
+# Neutron
+NEUTRON_NB_API = '/controller/nb/v2/neutron'
+
 # Other global variables
 # TODO: Move these to more apropriate sections.
 PORT = '8080'
