@@ -89,7 +89,7 @@ public final class NetconfConfigUtil {
         if (address.isPresent() && port.isPresent()) {
             try {
                 return Optional.of(parseAddress(address, port));
-            } catch (final RuntimeException e) {
+            } catch (final IllegalArgumentException | SecurityException e) {
                 LOG.warn("Unable to parse {} netconf address from {}:{}, fallback to default",
                         infixProp, address, port, e);
             }
