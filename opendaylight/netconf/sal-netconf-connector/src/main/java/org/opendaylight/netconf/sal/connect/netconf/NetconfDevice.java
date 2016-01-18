@@ -10,6 +10,7 @@ package org.opendaylight.netconf.sal.connect.netconf;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -437,7 +438,11 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
                     if (t instanceof MissingSchemaSourceException) {
                         final SourceIdentifier missingSource = ((MissingSchemaSourceException) t).getSourceId();
                         LOG.warn("{}: Unable to build schema context, missing source {}, will reattempt without it", id, missingSource);
-                        capabilities.addUnresolvedCapabilities(getQNameFromSourceIdentifiers(Sets.newHashSet(missingSource)), UnavailableCapability.FailureReason.MissingSource);
+                        LOG.debug("{}: Unable to build schema context, missing source {}, will reattempt without it", t);
+                        final Collection<QName> qNameOfMissingSource = getQNameFromSourceIdentifiers(Sets.newHashSet(missingSource));
+                        if (!qNameOfMissingSource.isEmpty()) {
+                            capabilities.addUnresolvedCapabilities(qNameOfMissingSource, UnavailableCapability.FailureReason.MissingSource);
+                        }
                         setUpSchema(stripMissingSource(requiredSources, missingSource));
 
                     // In case resolution error, try only with resolved sources
@@ -447,6 +452,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
                         final Set<SourceIdentifier> unresolvedSources = resolutionException.getUnsatisfiedImports().keySet();
                         capabilities.addUnresolvedCapabilities(getQNameFromSourceIdentifiers(unresolvedSources), UnavailableCapability.FailureReason.UnableToResolve);
                         LOG.warn("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only", id, resolutionException.getUnsatisfiedImports());
+                        LOG.debug("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only", resolutionException);
                         setUpSchema(resolutionException.getResolvedSources());
                     // unknown error, fail
                     } else {
@@ -478,9 +484,9 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
             });
 
             if (qNames.isEmpty()) {
-                LOG.debug("{}: Unable to map any source identfiers to a capability reported by device : {}", id, identifiers);
+                LOG.debug("{}: Unable to map any source identifiers to a capability reported by device : {}", id, identifiers);
             }
-            return qNames;
+            return Collections2.filter(qNames, Predicates.notNull());
         }
 
         private QName getQNameFromSourceIdentifier(final SourceIdentifier identifier) {
@@ -499,7 +505,9 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
                     return qname;
                 }
             }
-            throw new IllegalArgumentException("Unable to map identifier to a devices reported capability: " + identifier + " Available: " + deviceSources.getRequiredSourcesQName());
+            LOG.warn("Unable to map identifier to a devices reported capability: {} Available: {}",identifier, deviceSources.getRequiredSourcesQName());
+            // return null since we cannot find the QName, this capability will be removed from required sources and not reported as unresolved-capability
+            return null;
         }
     }
 }
