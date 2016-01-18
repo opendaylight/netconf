@@ -69,6 +69,11 @@ public class TopologyNodeWriter implements NodeWriter{
 
         this.networkTopologyPath = InstanceIdentifier.builder(NetworkTopology.class).build();
         this.topologyListPath = networkTopologyPath.child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
+
+        // write an empty topology container at the start
+        final WriteTransaction wTx = txChain.newWriteOnlyTransaction();
+        createNetworkTopologyIfNotPresent(wTx);
+        commitTransaction(wTx, "init topology container", new NodeId("topology-netconf"));
     }
 
     @Override
