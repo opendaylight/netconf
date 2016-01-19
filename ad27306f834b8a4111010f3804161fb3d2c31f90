@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a3d3df0_9352d511",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/yang/odl-sal-netconf-connector-cfg.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2016-01-19T18:15:34Z",
+      "side": 1,
+      "message": "This has convoluted rules [0], similar to those concerning a Change attempt which failed and needed a workaround [1].\nBut I guess in this case config subsystem interprets everything as intended.\n\n[0] http://tools.ietf.org/html/rfc6020#section-7.6.1\n[1] https://bugs.opendaylight.org/show_bug.cgi?id\u003d4930#c1",
+      "range": {
+        "startLine": 68,
+        "startChar": 16,
+        "endLine": 68,
+        "endChar": 23
+      },
+      "revId": "ad27306f834b8a4111010f3804161fb3d2c31f90",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
