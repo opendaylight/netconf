@@ -50,6 +50,9 @@ ODL_NETCONF_PASSWORD = 'admin'
 ODL_NETCONF_PROMPT = ']]>]]>'
 ODL_NETCONF_NAMESPACE = 'urn:ietf:params:xml:ns:netconf:base:1.0'
 
+# OpenFlow variables
+ODL_OF_PLUGIN = 'lithium'
+
 # VTN Coordinator Variables
 VTNC = '127.0.0.1'
 VTNCPORT = '8083'
