@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -40,6 +41,7 @@ import org.opendaylight.controller.md.sal.common.api.data.AsyncDataChangeEvent;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -92,7 +94,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
     @Override
     public void onDataChanged(final AsyncDataChangeEvent<YangInstanceIdentifier, NormalizedNode<?, ?>> change) {
         // TODO Auto-generated method stub
-
+        System.out.println("");
         if (!change.getCreatedData().isEmpty() || !change.getUpdatedData().isEmpty()
                 || !change.getRemovedPaths().isEmpty()) {
             final String xml = prepareXmlFrom(change);
@@ -282,10 +284,13 @@ public class ListenerAdapter implements DOMDataChangeListener {
     private void addValuesToDataChangedNotificationEventElement(final Document doc,
             final Element dataChangedNotificationEventElement,
             final AsyncDataChangeEvent<YangInstanceIdentifier, NormalizedNode<?, ?>> change) {
-        addValuesFromDataToElement(doc, change.getCreatedData().keySet(), dataChangedNotificationEventElement,
+
+        addCreatedChangedValuesFromDataToElement(doc, change.getCreatedData().entrySet(),
+                dataChangedNotificationEventElement,
                 Operation.CREATED);
         if (change.getCreatedData().isEmpty()) {
-            addValuesFromDataToElement(doc, change.getUpdatedData().keySet(), dataChangedNotificationEventElement,
+            addCreatedChangedValuesFromDataToElement(doc, change.getUpdatedData().entrySet(),
+                    dataChangedNotificationEventElement,
                     Operation.UPDATED);
         }
         addValuesFromDataToElement(doc, change.getRemovedPaths(), dataChangedNotificationEventElement,
@@ -317,6 +322,18 @@ public class ListenerAdapter implements DOMDataChangeListener {
         }
     }
 
+    private void addCreatedChangedValuesFromDataToElement(final Document doc, final Set<Entry<YangInstanceIdentifier,
+                NormalizedNode<?,?>>> data, final Element element, final Operation operation) {
+        if (data == null || data.isEmpty()) {
+            return;
+        }
+        for (Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> entry : data) {
+            if (!ControllerContext.getInstance().isNodeMixin(entry.getKey())) {
+                final Node node = createCreatedChangedDataChangeEventElement(doc, entry, operation);
+                element.appendChild(node);
+            }
+        }
+    }
 
     /**
      * Creates changed event element from data.
@@ -338,6 +355,25 @@ public class ListenerAdapter implements DOMDataChangeListener {
         final Element operationElement = doc.createElement("operation");
         operationElement.setTextContent(operation.value);
         dataChangeEventElement.appendChild(operationElement);
+
+        return dataChangeEventElement;
+    }
+
+    private Node createCreatedChangedDataChangeEventElement(final Document doc, final Entry<YangInstanceIdentifier,
+            NormalizedNode<?, ?>> entry, final Operation operation) {
+        final Element dataChangeEventElement = doc.createElement("data-change-event");
+        final Element pathElement = doc.createElement("path");
+        addPathAsValueToElement(entry.getKey(), pathElement);
+        dataChangeEventElement.appendChild(pathElement);
+
+        final Element operationElement = doc.createElement("operation");
+        operationElement.setTextContent(operation.value);
+        dataChangeEventElement.appendChild(operationElement);
+
+        final Element dataElement = doc.createElement("data");
+        //TODO: add data to element
+        //addDataAsValueToElement(entry.getValue(), dataElement);
+        dataChangeEventElement.appendChild(dataElement);
 
         return dataChangeEventElement;
     }
