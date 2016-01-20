@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a3d3df0_7feef023",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2016-01-20T15:25:31Z",
+      "side": 1,
+      "message": "Based on instance-identifier you should also provide SchemaPath in order to stream writer serialize data correctly.\n\nIn order to get convert from instance identifier to schema path you could use \n\n   dataContextTree \u003d \nDataSchemaContextTree.from(schemaContext);\n   schemaPath \u003d dataContextTree.getChild(instanceIdentifier).getDataSchemaNode().getSchemaPath();\n\nI suggest creating DataSchemaContextTree only once for event and reuse it in all writes.",
+      "range": {
+        "startLine": 403,
+        "startChar": 91,
+        "endLine": 403,
+        "endChar": 101
+      },
+      "revId": "82c2536887d9b407ac2260039417679e4ed3c29c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
