@@ -10,6 +10,8 @@ package org.opendaylight.netconf.topology.impl;
 
 import akka.actor.ActorContext;
 import akka.actor.ActorRef;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
 import javax.annotation.Nonnull;
@@ -20,6 +22,7 @@ import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeChangeListener;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
+import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker.ProviderContext;
@@ -32,9 +35,16 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.SchemaRepositoryProvider;
 import org.opendaylight.netconf.topology.pipeline.TopologyMountPointFacade.ConnectionStatusListenerRegistration;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyBuilder;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,10 +107,27 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
     public void onSessionInitiated(ProviderContext session) {
         dataBroker = session.getSALService(DataBroker.class);
 
-        LOG.warn("Registering datastore listener");
+        final WriteTransaction wtx = dataBroker.newWriteOnlyTransaction();
+        initTopology(wtx, LogicalDatastoreType.CONFIGURATION);
+        initTopology(wtx, LogicalDatastoreType.OPERATIONAL);
+        Futures.addCallback(wtx.submit(), new FutureCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                LOG.debug("topology initialization successful");
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                LOG.error("Unable to initialize netconf-topology, {}", t);
+            }
+        });
+
+        LOG.debug("Registering datastore listener");
         datastoreListenerRegistration =
                 dataBroker.registerDataTreeChangeListener(
                         new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION, createTopologyId(topologyId).child(Node.class)), this);
+
+
     }
 
     @Override
@@ -127,6 +154,15 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
                     break;
             }
         }
+    }
+
+    private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType) {
+
+        final NetworkTopology networkTopology = new NetworkTopologyBuilder().build();
+        final InstanceIdentifier<NetworkTopology> networkTopologyId = InstanceIdentifier.builder(NetworkTopology.class).build();
+        wtx.merge(datastoreType, networkTopologyId, networkTopology);
+        final Topology topology = new TopologyBuilder().setTopologyId(new TopologyId(topologyId)).build();
+        wtx.merge(datastoreType, networkTopologyId.child(Topology.class, new TopologyKey(new TopologyId(topologyId))), topology);
     }
 
 }
