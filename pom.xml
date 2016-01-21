@@ -46,7 +46,7 @@
         <scala.major.version>2.11</scala.major.version>
         <scala.minor.version>7</scala.minor.version>
         <surefire.version>2.15</surefire.version>
-        <yangtools.version>0.9.0-SNAPSHOT</yangtools.version>
+        <yangtools.version>1.0.0-SNAPSHOT</yangtools.version>
 
         <jmxGeneratorPath>src/main/yang-gen-config</jmxGeneratorPath>
         <salGeneratorPath>src/main/yang-gen-sal</salGeneratorPath>
