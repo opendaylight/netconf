@@ -141,9 +141,10 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
             if (currentDepth < maxDepth) {
                 final LeafSetEntryNode<?> nodeAsLeafList = (LeafSetEntryNode<?>) node;
                 if (writer instanceof NormalizedNodeStreamAttributeWriter) {
-                    ((NormalizedNodeStreamAttributeWriter) writer).leafSetEntryNode(nodeAsLeafList.getValue(), nodeAsLeafList.getAttributes());
+                    ((NormalizedNodeStreamAttributeWriter) writer).leafSetEntryNode(nodeAsLeafList.getNodeType(),
+                        nodeAsLeafList.getValue(), nodeAsLeafList.getAttributes());
                 } else {
-                    writer.leafSetEntryNode(nodeAsLeafList.getValue());
+                    writer.leafSetEntryNode(nodeAsLeafList.getNodeType(), nodeAsLeafList.getValue());
                 }
             }
             return true;
