@@ -176,9 +176,10 @@ public class OrderedNormalizedNodeWriter implements Closeable, Flushable{
         if (node instanceof LeafSetEntryNode) {
             final LeafSetEntryNode<?> nodeAsLeafList = (LeafSetEntryNode<?>)node;
             if(writer instanceof NormalizedNodeStreamAttributeWriter) {
-                ((NormalizedNodeStreamAttributeWriter) writer).leafSetEntryNode(nodeAsLeafList.getValue(), nodeAsLeafList.getAttributes());
+                ((NormalizedNodeStreamAttributeWriter) writer).leafSetEntryNode(nodeAsLeafList.getNodeType(),
+                    nodeAsLeafList.getValue(), nodeAsLeafList.getAttributes());
             } else {
-                writer.leafSetEntryNode(nodeAsLeafList.getValue());
+                writer.leafSetEntryNode(nodeAsLeafList.getNodeType(), nodeAsLeafList.getValue());
             }
             return true;
         } else if (node instanceof LeafNode) {
@@ -259,7 +260,7 @@ public class OrderedNormalizedNodeWriter implements Closeable, Flushable{
     }
 
     //TODO similar code is already present in schemaTracker, unify this when this writer is moved back to yangtools
-    private SchemaNode findParentSchemaOnPath(final SchemaContext schemaContext, final SchemaPath path) {
+    private static SchemaNode findParentSchemaOnPath(final SchemaContext schemaContext, final SchemaPath path) {
         SchemaNode current = Preconditions.checkNotNull(schemaContext);
         for (final QName qname : path.getPathFromRoot()) {
             SchemaNode child;
@@ -297,17 +298,17 @@ public class OrderedNormalizedNodeWriter implements Closeable, Flushable{
     }
 
     //TODO this method is already present in schemaTracker, unify this when this writer is moved back to yangtools
-    private Optional<SchemaNode> tryFindGroupings(final SchemaContext ctx, final QName qname) {
+    private static Optional<SchemaNode> tryFindGroupings(final SchemaContext ctx, final QName qname) {
         return Optional.<SchemaNode> fromNullable(Iterables.find(ctx.getGroupings(), new SchemaNodePredicate(qname), null));
     }
 
     //TODO this method is already present in schemaTracker, unify this when this writer is moved back to yangtools
-    private Optional<SchemaNode> tryFindRpc(final SchemaContext ctx, final QName qname) {
+    private static Optional<SchemaNode> tryFindRpc(final SchemaContext ctx, final QName qname) {
         return Optional.<SchemaNode>fromNullable(Iterables.find(ctx.getOperations(), new SchemaNodePredicate(qname), null));
     }
 
     //TODO this method is already present in schemaTracker, unify this when this writer is moved back to yangtools
-    private Optional<SchemaNode> tryFindNotification(final SchemaContext ctx, final QName qname) {
+    private static Optional<SchemaNode> tryFindNotification(final SchemaContext ctx, final QName qname) {
         return Optional.<SchemaNode>fromNullable(Iterables.find(ctx.getNotifications(), new SchemaNodePredicate(qname), null));
     }
 
