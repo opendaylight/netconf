@@ -29,7 +29,7 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
 
     private static final Logger LOG  = LoggerFactory.getLogger(WriteCandidateRunningTx.class);
 
-    public WriteCandidateRunningTx(final RemoteDeviceId id, final NetconfBaseOps netOps, final boolean rollbackSupport, long requestTimeoutMillis) {
+    public WriteCandidateRunningTx(final RemoteDeviceId id, final NetconfBaseOps netOps, final boolean rollbackSupport, final long requestTimeoutMillis) {
         super(id, netOps, rollbackSupport, requestTimeoutMillis);
     }
 
