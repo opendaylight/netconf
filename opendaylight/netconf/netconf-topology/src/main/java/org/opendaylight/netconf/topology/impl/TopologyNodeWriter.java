@@ -179,15 +179,4 @@ public class TopologyNodeWriter implements NodeWriter{
         return topology
                 .child(Node.class, new NodeKey(new NodeId(key.getNodeId().getValue())));
     }
-
-    private static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier createBIPathForTopology(final String name, final String topologyId) {
-        final YangInstanceIdentifier.InstanceIdentifierBuilder builder = YangInstanceIdentifier.builder();
-        builder
-                .node(NetworkTopology.QNAME)
-                .node(Topology.QNAME)
-                .nodeWithKey(Topology.QNAME, QName.create(Topology.QNAME, "topology-id"), topologyId)
-                .node(Node.QNAME)
-                .nodeWithKey(Node.QNAME, QName.create(Node.QNAME, "node-id"), name);
-        return builder.build();
-    }
 }
