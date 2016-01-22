@@ -72,7 +72,8 @@ public class TopologyNodeWriter implements NodeWriter{
 
         // write an empty topology container at the start
         final WriteTransaction wTx = txChain.newWriteOnlyTransaction();
-        createNetworkTopologyIfNotPresent(wTx);
+        createNetworkTopologyIfNotPresent(wTx, LogicalDatastoreType.OPERATIONAL);
+        createNetworkTopologyIfNotPresent(wTx, LogicalDatastoreType.CONFIGURATION);
         commitTransaction(wTx, "init topology container", new NodeId("topology-netconf"));
     }
 
@@ -82,7 +83,7 @@ public class TopologyNodeWriter implements NodeWriter{
         try {
             final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
 
-            createNetworkTopologyIfNotPresent(writeTx);
+            createNetworkTopologyIfNotPresent(writeTx, LogicalDatastoreType.OPERATIONAL);
             final InstanceIdentifier<Node> path = createBindingPathForTopology(new NodeKey(id), topologyId);
 
             LOG.trace("{}: Init device state transaction {} putting if absent operational data started. Putting data on path {}",
@@ -160,17 +161,17 @@ public class TopologyNodeWriter implements NodeWriter{
         });
     }
 
-    private void createNetworkTopologyIfNotPresent(final WriteTransaction writeTx) {
+    private void createNetworkTopologyIfNotPresent(final WriteTransaction writeTx, final LogicalDatastoreType datastoreType) {
 
         final NetworkTopology networkTopology = new NetworkTopologyBuilder().build();
         LOG.trace("{}: Merging {} container to ensure its presence", topologyId,
                 NetworkTopology.QNAME, writeTx.getIdentifier());
-        writeTx.merge(LogicalDatastoreType.OPERATIONAL, networkTopologyPath, networkTopology);
+        writeTx.merge(datastoreType, networkTopologyPath, networkTopology);
 
         final Topology topology = new TopologyBuilder().setTopologyId(new TopologyId(topologyId)).build();
         LOG.trace("{}: Merging {} container to ensure its presence", topologyId,
                 Topology.QNAME, writeTx.getIdentifier());
-        writeTx.merge(LogicalDatastoreType.OPERATIONAL, topologyListPath, topology);
+        writeTx.merge(datastoreType, topologyListPath, topology);
     }
 
     private static InstanceIdentifier<Node> createBindingPathForTopology(final NodeKey key, final String topologyId) {
