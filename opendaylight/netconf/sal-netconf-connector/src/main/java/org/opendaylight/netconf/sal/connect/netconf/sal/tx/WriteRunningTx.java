@@ -61,11 +61,12 @@ public class WriteRunningTx extends AbstractWriteTx {
     }
 
     private void lock() {
+        final String operation = "Lock running";
         try {
-            invokeBlocking("Lock running", new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
+            invokeBlocking(operation, new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
                 @Override
                 public ListenableFuture<DOMRpcResult> apply(final NetconfBaseOps input) {
-                    return input.lockRunning(new NetconfRpcFutureCallback("Lock running", id));
+                    return perfomRequestWithTimeout(operation, input.lockRunning(new NetconfRpcFutureCallback(operation, id)));
                 }
             });
         } catch (final NetconfDocumentedException e) {
@@ -96,14 +97,14 @@ public class WriteRunningTx extends AbstractWriteTx {
 
     @Override
     public synchronized CheckedFuture<Void, TransactionCommitFailedException> submit() {
-        final ListenableFuture<Void> commmitFutureAsVoid = Futures.transform(commit(), new Function<RpcResult<TransactionStatus>, Void>() {
+        final ListenableFuture<Void> commitFutureAsVoid = Futures.transform(commit(), new Function<RpcResult<TransactionStatus>, Void>() {
             @Override
             public Void apply(final RpcResult<TransactionStatus> input) {
                 return null;
             }
         });
 
-        return Futures.makeChecked(commmitFutureAsVoid, new Function<Exception, TransactionCommitFailedException>() {
+        return Futures.makeChecked(commitFutureAsVoid, new Function<Exception, TransactionCommitFailedException>() {
             @Override
             public TransactionCommitFailedException apply(final Exception input) {
                 return new TransactionCommitFailedException("Submit of transaction " + getIdentifier() + " failed", input);
@@ -119,24 +120,26 @@ public class WriteRunningTx extends AbstractWriteTx {
 
     @Override
     protected void editConfig(final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> defaultOperation) throws NetconfDocumentedException {
-        invokeBlocking("Edit running", new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
+        final String operation = "Edit running";
+        invokeBlocking(operation, new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
             @Override
             public ListenableFuture<DOMRpcResult> apply(final NetconfBaseOps input) {
-                    return defaultOperation.isPresent()
-                            ? input.editConfigRunning(new NetconfRpcFutureCallback("Edit running", id), editStructure, defaultOperation.get(),
-                            rollbackSupport)
-                            : input.editConfigRunning(new NetconfRpcFutureCallback("Edit running", id), editStructure,
-                            rollbackSupport);
+                        return perfomRequestWithTimeout(operation, defaultOperation.isPresent()
+                                ? input.editConfigRunning(new NetconfRpcFutureCallback(operation, id), editStructure, defaultOperation.get(),
+                                rollbackSupport)
+                                : input.editConfigRunning(new NetconfRpcFutureCallback(operation, id), editStructure,
+                                rollbackSupport));
             }
         });
     }
 
     private void unlock() {
+        final String operation = "Unlocking running";
         try {
-            invokeBlocking("Unlocking running", new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
+            invokeBlocking(operation, new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
                 @Override
                 public ListenableFuture<DOMRpcResult> apply(final NetconfBaseOps input) {
-                    return input.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
+                    return perfomRequestWithTimeout(operation, input.unlockRunning(new NetconfRpcFutureCallback(operation, id)));
                 }
             });
         } catch (final NetconfDocumentedException e) {
