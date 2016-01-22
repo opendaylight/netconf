@@ -11,7 +11,6 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RPC_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_URI;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
-
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -27,7 +26,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -138,18 +136,28 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
         // We wrap the notification as a container node in order to reuse the parsers and builders for container node
         final ContainerSchemaNode notificationAsContainerSchemaNode = NetconfMessageTransformUtil.createSchemaForNotification(next);
-        final ContainerNode content = parserFactory.getContainerNodeParser().parse(Collections.singleton(stripped.getValue().getDomElement()),
+
+        final Element element = stripped.getValue().getDomElement();
+        final ContainerNode content;
+        try {
+            content = parserFactory.getContainerNodeParser().parse(Collections.singleton(element),
                 notificationAsContainerSchemaNode);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(String.format("Failed to parse notification %s", element), e);
+        }
         return new NetconfDeviceNotification(content, stripped.getKey());
     }
 
     private static final ThreadLocal<SimpleDateFormat> EVENT_TIME_FORMAT = new ThreadLocal<SimpleDateFormat>() {
+        @Override
         protected SimpleDateFormat initialValue() {
 
             final SimpleDateFormat withMillis = new SimpleDateFormat(
                 NetconfNotification.RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT);
 
             return new SimpleDateFormat(NetconfNotification.RFC3339_DATE_FORMAT_BLUEPRINT) {
+                private static final long serialVersionUID = 1L;
+
                 @Override public Date parse(final String source) throws ParseException {
                     try {
                         return super.parse(source);
@@ -161,7 +169,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             };
         }
 
-        public void set(SimpleDateFormat value) {
+        @Override
+        public void set(final SimpleDateFormat value) {
             throw new UnsupportedOperationException();
         }
     };
@@ -219,7 +228,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                 "Transforming an rpc with input: %s, payload has to be a container, but was: %s", rpcQName, payload);
 
         // Set the path to the input of rpc for the node stream writer
-        rpc = rpc.createChild(QName.cachedReference(QName.create(rpcQName, "input")));
+        rpc = rpc.createChild(QName.create(rpcQName, "input").intern());
         final DOMResult result = prepareDomResultForRpcRequest(rpcQName);
 
         try {
@@ -250,25 +259,22 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         return new DOMResult(elementNS);
     }
 
-    private void writeNormalizedRpc(final ContainerNode normalized, final DOMResult result, final SchemaPath schemaPath, final SchemaContext baseNetconfCtx) throws IOException, XMLStreamException {
-        final OrderedNormalizedNodeWriter normalizedNodeWriter;
-        NormalizedNodeStreamWriter normalizedNodeStreamWriter = null;
-        XMLStreamWriter writer = null;
+    private static void writeNormalizedRpc(final ContainerNode normalized, final DOMResult result,
+            final SchemaPath schemaPath, final SchemaContext baseNetconfCtx) throws IOException, XMLStreamException {
+        final XMLStreamWriter writer = NetconfMessageTransformUtil.XML_FACTORY.createXMLStreamWriter(result);
         try {
-            writer = NetconfMessageTransformUtil.XML_FACTORY.createXMLStreamWriter(result);
-            normalizedNodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(writer, baseNetconfCtx, schemaPath);
-            normalizedNodeWriter = new OrderedNormalizedNodeWriter(normalizedNodeStreamWriter, baseNetconfCtx, schemaPath);
-            Collection<DataContainerChild<?, ?>> value = (Collection) normalized.getValue();
-            normalizedNodeWriter.write(value);
-            normalizedNodeWriter.flush();
+            try (final NormalizedNodeStreamWriter normalizedNodeStreamWriter =
+                    XMLStreamNormalizedNodeStreamWriter.create(writer, baseNetconfCtx, schemaPath)) {
+                try (final OrderedNormalizedNodeWriter normalizedNodeWriter =
+                        new OrderedNormalizedNodeWriter(normalizedNodeStreamWriter, baseNetconfCtx, schemaPath)) {
+                    Collection<DataContainerChild<?, ?>> value = normalized.getValue();
+                    normalizedNodeWriter.write(value);
+                    normalizedNodeWriter.flush();
+                }
+            }
         } finally {
             try {
-                if(normalizedNodeStreamWriter != null) {
-                    normalizedNodeStreamWriter.close();
-                }
-                if(writer != null) {
-                    writer.close();
-                }
+                writer.close();
             } catch (final Exception e) {
                 LOG.warn("Unable to close resource properly", e);
             }
@@ -282,12 +288,17 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         if (NetconfMessageTransformUtil.isDataRetrievalOperation(rpcQName)) {
             final Element xmlData = NetconfMessageTransformUtil.getDataSubtree(message.getDocument());
             final ContainerSchemaNode schemaForDataRead = NetconfMessageTransformUtil.createSchemaForDataRead(schemaContext);
-            final ContainerNode dataNode = parserFactory.getContainerNodeParser().parse(Collections.singleton(xmlData), schemaForDataRead);
+            final ContainerNode dataNode;
+
+            try {
+                dataNode = parserFactory.getContainerNodeParser().parse(Collections.singleton(xmlData), schemaForDataRead);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException(String.format("Failed to parse data response %s", xmlData), e);
+            }
 
             normalizedNode = Builders.containerBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME))
                     .withChild(dataNode).build();
         } else {
-            final Set<Element> documentElement = Collections.singleton(message.getDocument().getDocumentElement());
 
             Map<QName, RpcDefinition> currentMappedRpcs = mappedRpcs;
 
@@ -303,11 +314,18 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
             // In case no input for rpc is defined, we can simply construct the payload here
             if (rpcDefinition.getOutput() == null) {
-                Preconditions.checkArgument(XmlElement.fromDomDocument(message.getDocument()).getOnlyChildElementWithSameNamespaceOptionally("ok").isPresent(),
-                        "Unexpected content in response of rpc: %s, %s", rpcDefinition.getQName(), message);
+                Preconditions.checkArgument(XmlElement.fromDomDocument(
+                    message.getDocument()).getOnlyChildElementWithSameNamespaceOptionally("ok").isPresent(),
+                    "Unexpected content in response of rpc: %s, %s", rpcDefinition.getQName(), message);
                 normalizedNode = null;
             } else {
-                normalizedNode = parserFactory.getContainerNodeParser().parse(documentElement, rpcDefinition.getOutput());
+                final Element element = message.getDocument().getDocumentElement();
+                try {
+                    normalizedNode = parserFactory.getContainerNodeParser().parse(Collections.singleton(element),
+                        rpcDefinition.getOutput());
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException(String.format("Failed to parse RPC response %s", element), e);
+                }
             }
         }
         return new DefaultDOMRpcResult(normalizedNode);
