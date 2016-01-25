@@ -29,7 +29,7 @@ import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.opendaylight.netconf.util.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.NetconfMessage;
 
 public class SimpleNetconfClientSessionListenerTest {
