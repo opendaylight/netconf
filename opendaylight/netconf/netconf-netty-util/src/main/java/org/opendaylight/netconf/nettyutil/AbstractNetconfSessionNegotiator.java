@@ -24,7 +24,7 @@ import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
 import java.util.concurrent.TimeUnit;
 import org.opendaylight.netconf.util.messages.FramingMechanism;
-import org.opendaylight.netconf.util.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSessionListener;
@@ -104,13 +104,12 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     }
 
     private void start() {
-        final NetconfMessage helloMessage = this.sessionPreferences.getHelloMessage();
+        final NetconfHelloMessage helloMessage = this.sessionPreferences.getHelloMessage();
         LOG.debug("Session negotiation started with hello message {} on channel {}", helloMessage, channel);
 
         channel.pipeline().addLast(NAME_OF_EXCEPTION_HANDLER, new ExceptionHandlingInboundChannelHandler());
 
-        // FIXME, make sessionPreferences return HelloMessage, move NetconfHelloMessage to API
-        sendMessage((NetconfHelloMessage)helloMessage);
+        sendMessage(helloMessage);
 
         replaceHelloMessageOutboundHandler();
         changeState(State.OPEN_WAIT);
