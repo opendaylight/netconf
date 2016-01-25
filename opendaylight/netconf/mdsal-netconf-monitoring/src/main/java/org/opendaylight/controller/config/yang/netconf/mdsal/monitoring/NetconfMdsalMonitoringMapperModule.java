@@ -10,12 +10,10 @@ package org.opendaylight.controller.config.yang.netconf.mdsal.monitoring;
 
 import java.util.Collections;
 import java.util.Set;
-import org.opendaylight.controller.config.util.capability.Capability;
-import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
-import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.opendaylight.netconf.monitoring.AbstractNetconfOperationServiceFactory;
 import org.opendaylight.netconf.monitoring.GetSchema;
 
 public class NetconfMdsalMonitoringMapperModule extends org.opendaylight.controller.config.yang.netconf.mdsal.monitoring.AbstractNetconfMdsalMonitoringMapperModule {
@@ -53,42 +51,12 @@ public class NetconfMdsalMonitoringMapperModule extends org.opendaylight.control
 
     }
 
-    // FIXME almost exactly same code as in netconf-monitoring, refactor
-    private static class MdSalMonitoringMapperFactory implements NetconfOperationServiceFactory, AutoCloseable {
-
-        private final NetconfOperationService operationService;
-
-        private static final AutoCloseable AUTO_CLOSEABLE = new AutoCloseable() {
-            @Override
-            public void close() throws Exception {
-                // NOOP
-            }
-        };
+    private static class MdSalMonitoringMapperFactory extends AbstractNetconfOperationServiceFactory {
 
         public MdSalMonitoringMapperFactory(final NetconfOperationService operationService) {
-            this.operationService = operationService;
+            super(operationService);
         }
 
-        @Override
-        public NetconfOperationService createService(final String netconfSessionIdForReporting) {
-            return operationService;
-        }
-
-        @Override
-        public Set<Capability> getCapabilities() {
-            // TODO
-            // No capabilities exposed to prevent clashes with schemas from mdsal-netconf-connector (it exposes all the schemas)
-            // If the schemas exposed by mdsal-netconf-connector are filtered, this class would expose monitoring related models
-            return Collections.emptySet();
-        }
-
-        @Override
-        public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
-            return AUTO_CLOSEABLE;
-        }
-
-        @Override
-        public void close() {}
     }
 
 

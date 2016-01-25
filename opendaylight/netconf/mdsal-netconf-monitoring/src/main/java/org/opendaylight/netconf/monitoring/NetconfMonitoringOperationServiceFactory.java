@@ -8,46 +8,11 @@
 
 package org.opendaylight.netconf.monitoring;
 
-import java.util.Collections;
-import java.util.Set;
-import org.opendaylight.controller.config.util.capability.Capability;
-import org.opendaylight.netconf.api.monitoring.CapabilityListener;
-import org.opendaylight.netconf.mapping.api.NetconfOperationService;
-import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+public class NetconfMonitoringOperationServiceFactory extends AbstractNetconfOperationServiceFactory {
 
-public class NetconfMonitoringOperationServiceFactory implements NetconfOperationServiceFactory, AutoCloseable {
-
-    private final NetconfMonitoringOperationService operationService;
-
-    private static final AutoCloseable AUTO_CLOSEABLE = new AutoCloseable() {
-        @Override
-        public void close() throws Exception {
-            // NOOP
-        }
-    };
 
     public NetconfMonitoringOperationServiceFactory(final NetconfMonitoringOperationService operationService) {
-        this.operationService = operationService;
+        super(operationService);
     }
 
-    @Override
-    public NetconfOperationService createService(final String netconfSessionIdForReporting) {
-        return operationService;
-    }
-
-    @Override
-    public Set<Capability> getCapabilities() {
-        // TODO
-        // No capabilities exposed to prevent clashes with schemas from config-netconf-connector (it exposes all the schemas)
-        // If the schemas exposed by config-netconf-connector are filtered, this class would expose monitoring related models
-        return Collections.emptySet();
-    }
-
-    @Override
-    public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
-        return AUTO_CLOSEABLE;
-    }
-
-    @Override
-    public void close() {}
 }
