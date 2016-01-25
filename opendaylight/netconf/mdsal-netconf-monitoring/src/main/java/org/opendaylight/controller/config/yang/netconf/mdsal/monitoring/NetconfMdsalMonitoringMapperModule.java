@@ -39,25 +39,21 @@ public class NetconfMdsalMonitoringMapperModule extends org.opendaylight.control
         final MonitoringToMdsalWriter monitoringToMdsalWriter = new MonitoringToMdsalWriter(serverMonitoringDependency);
         getBindingAwareBrokerDependency().registerProvider(monitoringToMdsalWriter);
 
-        final MdSalMonitoringMapperFactory mdSalMonitoringMapperFactory = new MdSalMonitoringMapperFactory(new MdsalMonitoringMapper(serverMonitoringDependency)) {
-            @Override
-            public void close() {
-                super.close();
-                monitoringToMdsalWriter.close();
-                getAggregatorDependency().onRemoveNetconfOperationServiceFactory(this);
-            }
-        };
+        final MdSalMonitoringMapperFactory mdSalMonitoringMapperFactory = new MdSalMonitoringMapperFactory(new MdsalMonitoringMapper(serverMonitoringDependency),
+                this, monitoringToMdsalWriter);
 
         getAggregatorDependency().onAddNetconfOperationServiceFactory(mdSalMonitoringMapperFactory);
         return mdSalMonitoringMapperFactory;
 
     }
 
-    // FIXME almost exactly same code as in netconf-monitoring, refactor
     private static class MdSalMonitoringMapperFactory implements NetconfOperationServiceFactory, AutoCloseable {
 
         private final NetconfOperationService operationService;
+        private final NetconfMdsalMonitoringMapperModule module;
+        private final MonitoringToMdsalWriter monitoringToMdsalWriter;
 
+        private static final Set<Capability> CAPABILITIES = Collections.emptySet();
         private static final AutoCloseable AUTO_CLOSEABLE = new AutoCloseable() {
             @Override
             public void close() throws Exception {
@@ -65,8 +61,14 @@ public class NetconfMdsalMonitoringMapperModule extends org.opendaylight.control
             }
         };
 
-        public MdSalMonitoringMapperFactory(final NetconfOperationService operationService) {
+        public MdSalMonitoringMapperFactory(
+                final NetconfOperationService operationService,
+                final NetconfMdsalMonitoringMapperModule module,
+                final MonitoringToMdsalWriter monitoringToMdsalWriter
+        ) {
             this.operationService = operationService;
+            this.module = module;
+            this.monitoringToMdsalWriter = monitoringToMdsalWriter;
         }
 
         @Override
@@ -79,7 +81,7 @@ public class NetconfMdsalMonitoringMapperModule extends org.opendaylight.control
             // TODO
             // No capabilities exposed to prevent clashes with schemas from mdsal-netconf-connector (it exposes all the schemas)
             // If the schemas exposed by mdsal-netconf-connector are filtered, this class would expose monitoring related models
-            return Collections.emptySet();
+            return CAPABILITIES;
         }
 
         @Override
@@ -88,7 +90,11 @@ public class NetconfMdsalMonitoringMapperModule extends org.opendaylight.control
         }
 
         @Override
-        public void close() {}
+        public void close() {
+            monitoringToMdsalWriter.close();
+            module.getAggregatorDependency().onRemoveNetconfOperationServiceFactory(this);
+        }
+
     }
 
 
