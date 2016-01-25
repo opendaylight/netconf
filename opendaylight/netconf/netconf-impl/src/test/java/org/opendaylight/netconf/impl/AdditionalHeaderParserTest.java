@@ -10,7 +10,7 @@ package org.opendaylight.netconf.impl;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.opendaylight.netconf.util.messages.NetconfHelloMessageAdditionalHeader;
+import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 
 public class AdditionalHeaderParserTest {
 

@@ -58,7 +58,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
-import org.opendaylight.netconf.util.messages.NetconfHelloMessageAdditionalHeader;
+import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.netconf.api.NetconfMessage;

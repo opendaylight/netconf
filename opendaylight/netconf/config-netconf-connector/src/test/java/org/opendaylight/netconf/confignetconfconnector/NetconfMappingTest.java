@@ -109,7 +109,7 @@ import org.opendaylight.netconf.impl.osgi.NetconfOperationRouter;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
-import org.opendaylight.netconf.util.messages.NetconfHelloMessageAdditionalHeader;
+import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.config.test.types.rev131127.TestIdentity1;
