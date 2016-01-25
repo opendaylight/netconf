@@ -40,6 +40,11 @@
       <groupId>org.opendaylight.mdsal.model</groupId>
       <artifactId>ietf-yang-types</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>mockito-configuration</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

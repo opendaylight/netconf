@@ -21,7 +21,7 @@ import java.util.List;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.netconf.util.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 
 public class NetconfXMLToHelloMessageDecoderTest {
 
