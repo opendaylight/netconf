@@ -23,38 +23,11 @@ import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class AsyncExecutionStrategy implements ExecutionStrategy {
+class AsyncExecutionStrategy extends AbstractExecutionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(AsyncExecutionStrategy.class);
 
-    private final Parameters params;
-    private final List<NetconfMessage> preparedMessages;
-    private final NetconfDeviceCommunicator sessionListener;
-    private final List<Integer> editBatches;
-    private final int editAmount;
-
     public AsyncExecutionStrategy(final Parameters params, final List<NetconfMessage> editConfigMsgs, final NetconfDeviceCommunicator sessionListener) {
-        this.params = params;
-        this.preparedMessages = editConfigMsgs;
-        this.sessionListener = sessionListener;
-        this.editBatches = countEditBatchSizes(params, editConfigMsgs.size());
-        editAmount = editConfigMsgs.size();
-    }
-
-    private static List<Integer> countEditBatchSizes(final Parameters params, final int amount) {
-        final List<Integer> editBatches = Lists.newArrayList();
-        if (params.editBatchSize != amount) {
-            final int fullBatches = amount / params.editBatchSize;
-            for (int i = 0; i < fullBatches; i++) {
-                editBatches.add(params.editBatchSize);
-            }
-
-            if (amount % params.editBatchSize != 0) {
-                editBatches.add(amount % params.editBatchSize);
-            }
-        } else {
-            editBatches.add(params.editBatchSize);
-        }
-        return editBatches;
+        super(params, editConfigMsgs, sessionListener);
     }
 
     @Override
@@ -63,22 +36,22 @@ class AsyncExecutionStrategy implements ExecutionStrategy {
         final List<ListenableFuture<RpcResult<NetconfMessage>>> futures = Lists.newArrayList();
 
         int batchI = 0;
-        for (final Integer editBatch : editBatches) {
+        for (final Integer editBatch : getEditBatches()) {
             for (int i = 0; i < editBatch; i++) {
-                final int msgId = i + (batchI * params.editBatchSize);
-                final NetconfMessage msg = preparedMessages.get(msgId);
+                final int msgId = i + (batchI * getParams().editBatchSize);
+                final NetconfMessage msg = getPreparedMessages().get(msgId);
                 LOG.debug("Sending message {}", msgId);
                 if(LOG.isDebugEnabled()) {
                     LOG.debug("Sending message {}", XmlUtil.toString(msg.getDocument()));
                 }
                 final ListenableFuture<RpcResult<NetconfMessage>> netconfMessageFuture =
-                        sessionListener.sendRequest(msg, StressClient.EDIT_QNAME);
+                        getSessionListener().sendRequest(msg, StressClient.EDIT_QNAME);
                 futures.add(netconfMessageFuture);
             }
             batchI++;
             LOG.info("Batch {} with size {} sent. Committing", batchI, editBatch);
-            if (params.candidateDatastore) {
-                futures.add(sessionListener.sendRequest(StressClient.COMMIT_MSG, StressClient.COMMIT_QNAME));
+            if (getParams().candidateDatastore) {
+                futures.add(getSessionListener().sendRequest(StressClient.COMMIT_MSG, StressClient.COMMIT_QNAME));
             }
         }
 
@@ -86,7 +59,7 @@ class AsyncExecutionStrategy implements ExecutionStrategy {
         // Wait for every future
         for (final ListenableFuture<RpcResult<NetconfMessage>> future : futures) {
             try {
-                final RpcResult<NetconfMessage> netconfMessageRpcResult = future.get(params.msgTimeout, TimeUnit.SECONDS);
+                final RpcResult<NetconfMessage> netconfMessageRpcResult = future.get(getParams().msgTimeout, TimeUnit.SECONDS);
                 if(netconfMessageRpcResult.isSuccessful()) {
                     responseCounter.incrementAndGet();
                     LOG.debug("Received response {}", responseCounter.get());
@@ -100,7 +73,7 @@ class AsyncExecutionStrategy implements ExecutionStrategy {
             }
         }
 
-        Preconditions.checkState(responseCounter.get() == editAmount + (params.candidateDatastore ? editBatches.size() : 0),
-                "Not all responses were received, only %s from %s", responseCounter.get(), params.editCount + editBatches.size());
+        Preconditions.checkState(responseCounter.get() == getEditAmount() + (getParams().candidateDatastore ? getEditBatches().size() : 0),
+                "Not all responses were received, only %s from %s", responseCounter.get(), getParams().editCount + getEditBatches().size());
     }
 }
