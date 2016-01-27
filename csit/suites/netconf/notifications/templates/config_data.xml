@@ -1,0 +1,5 @@
+<nodes xmlns="urn:opendaylight:inventory">
+  <node>
+    <id>agent-007</id>
+  </node>
+</nodes>
