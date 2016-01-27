@@ -5,13 +5,27 @@
 </target>
 <default-operation>merge</default-operation>
 <config>
-<modules xmlns="urn:opendaylight:params:xml:ns:yang:controller:config">
-<module>
-<type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:threadpool:impl">prefix:threadfactory-naming</type>
-<name>name3</name>
-<name-prefix xmlns="urn:opendaylight:params:xml:ns:yang:controller:threadpool:impl">remote-connector-processing-executor</name-prefix>
-</module>
-</modules>
+<cars xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:sal-clustering-it:car">
+  <car-entry>
+    <id>CARMID</id>
+    <model>Toyota Aurion</model>
+    <manufacturer>Toyota</manufacturer>
+    <year>2006</year>
+    <category>sedan</category>
+  </car-entry>
+</cars>
+<people xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:sal-clustering-it:people">
+  <person>
+    <id>CUSTMID</id>
+    <age>40</age>
+  </person>
+</people>
+<car-people xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:sal-clustering-it:car-people">
+  <car-person>
+    <car-id>CARMID</car-id>
+    <person-id>CUSTMID</person-id>
+  </car-person>
+</car-people>
 </config>
 </edit-config>
 </rpc>

@@ -8,17 +8,20 @@
     </test-option>
     <default-operation>replace</default-operation>
     <config>
-        <modules xmlns="urn:opendaylight:params:xml:ns:yang:controller:config">
-            <module xmlns="urn:opendaylight:params:xml:ns:yang:controller:config">
-                          <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">prefix:sal-netconf-connector</type>
-                          <name>test</name>
-                          <address xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">10.194.132.42</address>
-                          <port xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">4000</port>
-                          <username xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">admin</username>
-                          <password xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">admin</password>
-                          <tcp-only xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">false</tcp-only>
-                        </module>
-        </modules>
+      <cars xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:sal-clustering-it:car">
+        <car-entry>
+          <id>REPLACE</id>
+          <model>Panda</model>
+          <manufacturer>FIAT</manufacturer>
+          <year>2003</year>
+        </car-entry>
+      </cars>
+      <car-people xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:sal-clustering-it:car-people">
+        <car-person>
+          <car-id>REPLACE</car-id>
+          <person-id>CUSTYOUNG</person-id>
+        </car-person>
+      </car-people>
     </config>
 </edit-config>
 </rpc>

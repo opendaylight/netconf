@@ -1,4 +1,4 @@
-<rpc message-id="50" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+<rpc message-id="20" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
 <edit-config>
 <target>
 <candidate/>
@@ -7,23 +7,23 @@
 <config>
 <cars xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:sal-clustering-it:car">
   <car-entry>
-    <id>CARYOUNG</id>
-    <model>Toyota Prius</model>
-    <manufacturer>Toyota</manufacturer>
-    <year>2016</year>
+    <id>OLD001</id>
+    <model>Skoda MB</model>
+    <manufacturer>Skoda Mlada Boleslav</manufacturer>
     <category>sedan</category>
   </car-entry>
 </cars>
 <people xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:sal-clustering-it:people">
   <person>
-    <id>CUSTYOUNG</id>
-    <age>27</age>
+    <id>CUST002</id>
+    <gender>male</gender>
+    <age>28</age>
   </person>
 </people>
 <car-people xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:sal-clustering-it:car-people">
   <car-person>
-    <car-id>CARYOUNG</car-id>
-    <person-id>CUSTYOUNG</person-id>
+    <car-id>OLD001</car-id>
+    <person-id>CUST002</person-id>
   </car-person>
 </car-people>
 </config>
