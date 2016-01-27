@@ -391,7 +391,9 @@ public class ListenerAdapter implements DOMDataChangeListener {
             final DOMResult domResult = writeNormalizedNode((NormalizedNodeContainer<?,?,?>) entry.getValue(), path,
                     schemaContext, dataSchemaContextTree);
             final Node result = doc.importNode(domResult.getNode().getFirstChild(), true);
-            dataChangeEventElement.appendChild(result);
+            final Element dataElement = doc.createElement("data");
+            dataElement.appendChild(result);
+            dataChangeEventElement.appendChild(dataElement);
         } catch (IOException e) {
             LOG.error("Error in writer ", e);
         } catch (XMLStreamException e) {
@@ -406,7 +408,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
             IOException, XMLStreamException {
         final XMLOutputFactory XML_FACTORY = XMLOutputFactory.newFactory();
         final Document doc = XmlDocumentUtils.getDocument();
-        final DOMResult result = new DOMResult(doc, "data");
+        final DOMResult result = new DOMResult(doc);
         NormalizedNodeWriter normalizedNodeWriter = null;
         NormalizedNodeStreamWriter normalizedNodeStreamWriter = null;
         XMLStreamWriter writer = null;
