@@ -1,0 +1,5 @@
+<input xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote">
+  <path xmlns:a="urn:opendaylight:inventory">/a:nodes</path>
+  <datastore xmlns="urn:sal:restconf:event:subscription">CONFIGURATION</datastore>
+  <scope xmlns="urn:sal:restconf:event:subscription">BASE</scope>
+</input>
