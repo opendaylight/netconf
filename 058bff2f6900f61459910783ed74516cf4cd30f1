@@ -22,6 +22,30 @@
       "revId": "058bff2f6900f61459910783ed74516cf4cd30f1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_5d99531e",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2016-01-28T13:38:54Z",
+      "side": 1,
+      "message": "Actually I think it already does - NetconfDocumentedException. However referencing NetconfDocumentedException here doesn\u0027t seem clean as it would tie restconf to a specific broker implementation. I think the underlying problem is that netconf throws unchecked exceptions from write/merge but the transaction interface doesn\u0027t not specify/document that random  runtime exceptions can be thrown. I think netconf violates the API contract in this regard - either it should delay write operation exceptions until submit or we add a specific RuntimeException and declare/document it to be thrown from write/merge/delete.",
+      "parentUuid": "9a3d3df0_da3a8933",
+      "range": {
+        "startLine": 225,
+        "startChar": 14,
+        "endLine": 228,
+        "endChar": 59
+      },
+      "revId": "058bff2f6900f61459910783ed74516cf4cd30f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
