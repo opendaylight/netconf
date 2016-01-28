@@ -12,6 +12,7 @@ module netconf-node-topology {
 
     augment "/nt:network-topology/nt:topology/nt:topology-types" {
         container topology-netconf {
+            presence "Indicates a NETCONF-capable topology";
         }
     }
 
@@ -35,10 +36,12 @@ module netconf-node-topology {
 
         leaf host {
             type inet:host;
+            mandatory true;
         }
 
         leaf port {
             type inet:port-number;
+            default 830;
         }
 
         leaf tcp-only {
@@ -200,6 +203,10 @@ module netconf-node-topology {
         when "../../nt:topology-types/topology-netconf";
         ext:augment-identifier "netconf-node";
 
-        uses netconf-node-fields;
+        container netconf-node {
+            presence "Indicates a NETCONF-enabled node";
+
+            uses netconf-node-fields;
+        }
     }
 }
