@@ -186,6 +186,9 @@ CONTROLLER_STOP_TIMEOUT = 120  # Max number of seconds test will wait for a cont
 TOPOLOGY_URL = 'network-topology:network-topology/topology'
 SEND_ACCEPT_XML_HEADERS = {'Content-Type': 'application/xml', 'Accept': 'application/xml'}
 
+# Test deadlines global control
+ENABLE_GLOBAL_TEST_DEADLINES = True
+
 # Deprecated old variables, to be removed once all tests that need them are
 # updated to use the new names.
 CONTROLLER = ODL_SYSTEM_IP
