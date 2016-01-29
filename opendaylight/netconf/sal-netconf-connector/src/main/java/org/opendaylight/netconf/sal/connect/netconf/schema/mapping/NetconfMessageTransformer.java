@@ -8,9 +8,11 @@
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.EVENT_TIME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RPC_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_URI;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
+
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -44,7 +46,9 @@ import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.netconf.util.OrderedNormalizedNodeWriter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.$YangModuleInfoImpl;
 import org.opendaylight.yangtools.sal.binding.generator.impl.ModuleInfoBackedContext;
+import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -68,6 +72,46 @@ import org.w3c.dom.Element;
 
 public class NetconfMessageTransformer implements MessageTransformer<NetconfMessage> {
 
+    public enum BaseSchema {
+
+        BASE_NETCONF_CTX(
+                Lists.newArrayList(
+                        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl.getInstance()
+                )
+        ),
+        BASE_NETCONF_CTX_WITH_NOTIFICATIONS(
+                Lists.newArrayList(
+                        $YangModuleInfoImpl.getInstance(),
+                        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.$YangModuleInfoImpl.getInstance(),
+                        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl.getInstance(),
+                        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.$YangModuleInfoImpl.getInstance()
+                )
+        );
+
+        private final Map<QName, RpcDefinition> mappedRpcs;
+        private final SchemaContext schemaContext;
+
+        BaseSchema(List<YangModuleInfo> modules) {
+            try {
+                final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
+                moduleInfoBackedContext.addModuleInfos(modules);
+                schemaContext = moduleInfoBackedContext.tryToCreateSchemaContext().get();
+                mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), QNAME_FUNCTION);
+            } catch (final RuntimeException e) {
+                LOG.error("Unable to prepare schema context for base netconf ops", e);
+                throw new ExceptionInInitializerError(e);
+            }
+        }
+
+        private Map<QName, RpcDefinition> getMappedRpcs() {
+            return mappedRpcs;
+        }
+
+        public SchemaContext getSchemaContext() {
+            return schemaContext;
+        }
+    }
+
     public static final String MESSAGE_ID_PREFIX = "m";
 
     private static final Logger LOG= LoggerFactory.getLogger(NetconfMessageTransformer.class);
@@ -86,34 +130,25 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             return QNAME_FUNCTION.apply(notification).withoutRevision();
         }
     };
-    private static final SchemaContext BASE_NETCONF_CTX;
-
-    static {
-        try {
-            final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-            moduleInfoBackedContext.addModuleInfos(
-                    Lists.newArrayList(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl.getInstance()));
-            BASE_NETCONF_CTX = moduleInfoBackedContext.tryToCreateSchemaContext().get();
-        } catch (final RuntimeException e) {
-            LOG.error("Unable to prepare schema context for base netconf ops", e);
-            throw new ExceptionInInitializerError(e);
-        }
-    }
-    private static final Map<QName, RpcDefinition> MAPPED_BASE_RPCS = Maps.uniqueIndex(BASE_NETCONF_CTX.getOperations(), QNAME_FUNCTION);
 
     private final SchemaContext schemaContext;
+    private final BaseSchema baseSchema;
     private final MessageCounter counter;
     private final Map<QName, RpcDefinition> mappedRpcs;
     private final Multimap<QName, NotificationDefinition> mappedNotifications;
     private final DomToNormalizedNodeParserFactory parserFactory;
 
     public NetconfMessageTransformer(final SchemaContext schemaContext, final boolean strictParsing) {
+        this(schemaContext, strictParsing, BaseSchema.BASE_NETCONF_CTX);
+    }
+
+    public NetconfMessageTransformer(final SchemaContext schemaContext, final boolean strictParsing, final BaseSchema baseSchema) {
         this.counter = new MessageCounter();
         this.schemaContext = schemaContext;
         parserFactory = DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, schemaContext, strictParsing);
-
         mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), QNAME_FUNCTION);
         mappedNotifications = Multimaps.index(schemaContext.getNotifications(), QNAME_NOREV_FUNCTION);
+        this.baseSchema = baseSchema;
     }
 
     @Override
@@ -213,9 +248,9 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
         // Determine whether a base netconf operation is being invoked and also check if the device exposed model for base netconf
         // If no, use pre built base netconf operations model
-        final boolean needToUseBaseCtx = mappedRpcs.get(rpcQName) == null && isBaseRpc(rpcQName);
+        final boolean needToUseBaseCtx = mappedRpcs.get(rpcQName) == null && isBaseOrNotificationRpc(rpcQName);
         if(needToUseBaseCtx) {
-            currentMappedRpcs = MAPPED_BASE_RPCS;
+            currentMappedRpcs = baseSchema.getMappedRpcs();
         }
 
         Preconditions.checkNotNull(currentMappedRpcs.get(rpcQName), "Unknown rpc %s, available rpcs: %s", rpcQName, currentMappedRpcs.keySet());
@@ -234,7 +269,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         try {
             // If the schema context for netconf device does not contain model for base netconf operations, use default pre build context with just the base model
             // This way operations like lock/unlock are supported even if the source for base model was not provided
-            writeNormalizedRpc(((ContainerNode) payload), result, rpc, needToUseBaseCtx ? BASE_NETCONF_CTX : schemaContext);
+            SchemaContext ctx = needToUseBaseCtx ? baseSchema.getSchemaContext() : schemaContext;
+            writeNormalizedRpc(((ContainerNode) payload), result, rpc, ctx);
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize " + rpc, e);
         }
@@ -244,8 +280,10 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         return new NetconfMessage(node);
     }
 
-    private static boolean isBaseRpc(final QName rpc) {
-        return rpc.getNamespace().equals(NETCONF_URI);
+    private boolean isBaseOrNotificationRpc(final QName rpc) {
+        return rpc.getNamespace().equals(NETCONF_URI) ||
+                rpc.getNamespace().equals(IETF_NETCONF_NOTIFICATIONS.getNamespace()) ||
+                rpc.getNamespace().equals(NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME.getNamespace());
     }
 
     private DOMResult prepareDomResultForRpcRequest(final QName rpcQName) {
@@ -304,9 +342,9 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
             // Determine whether a base netconf operation is being invoked and also check if the device exposed model for base netconf
             // If no, use pre built base netconf operations model
-            final boolean needToUseBaseCtx = mappedRpcs.get(rpcQName) == null && isBaseRpc(rpcQName);
+            final boolean needToUseBaseCtx = mappedRpcs.get(rpcQName) == null && isBaseOrNotificationRpc(rpcQName);
             if(needToUseBaseCtx) {
-                currentMappedRpcs = MAPPED_BASE_RPCS;
+                currentMappedRpcs = baseSchema.getMappedRpcs();
             }
 
             final RpcDefinition rpcDefinition = currentMappedRpcs.get(rpcQName);

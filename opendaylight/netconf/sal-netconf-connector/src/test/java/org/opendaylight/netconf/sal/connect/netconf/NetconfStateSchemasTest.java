@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Set;
 import org.junit.Test;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -25,6 +26,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.transform.ToNormalizedNo
 import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -32,10 +34,11 @@ public class NetconfStateSchemasTest {
 
     @Test
     public void testCreate() throws Exception {
-        final DataSchemaNode schemasNode = ((ContainerSchemaNode) NetconfDevice.INIT_SCHEMA_CTX.getDataChildByName("netconf-state")).getDataChildByName("schemas");
+        final SchemaContext schemaContext = NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext();
+        final DataSchemaNode schemasNode = ((ContainerSchemaNode) schemaContext.getDataChildByName("netconf-state")).getDataChildByName("schemas");
 
         final Document schemasXml = XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/netconf-state.schemas.payload.xml"));
-        final ToNormalizedNodeParser<Element, ContainerNode, ContainerSchemaNode> containerNodeParser = DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, NetconfDevice.INIT_SCHEMA_CTX, false).getContainerNodeParser();
+        final ToNormalizedNodeParser<Element, ContainerNode, ContainerSchemaNode> containerNodeParser = DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, schemaContext, false).getContainerNodeParser();
         final ContainerNode compositeNodeSchemas = containerNodeParser.parse(Collections.singleton(schemasXml.getDocumentElement()), (ContainerSchemaNode) schemasNode);
         final NetconfStateSchemas schemas = NetconfStateSchemas.create(new RemoteDeviceId("device", new InetSocketAddress(99)), compositeNodeSchemas);
 
