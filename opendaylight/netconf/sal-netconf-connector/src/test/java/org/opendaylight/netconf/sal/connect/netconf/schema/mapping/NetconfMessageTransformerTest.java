@@ -13,6 +13,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_CONTENT;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.GET_SCHEMA_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_CANDIDATE_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME;
@@ -95,6 +97,23 @@ public class NetconfMessageTransformerTest {
 
         assertThat(XmlUtil.toString(netconfMessage.getDocument()), CoreMatchers.containsString("<lock"));
         assertThat(XmlUtil.toString(netconfMessage.getDocument()), CoreMatchers.containsString("<rpc"));
+    }
+
+    @Test
+    public void testCreateSubscriberNotificationSchemaNotPresent() throws Exception {
+        final SchemaContext partialSchema = getSchema(true);
+        final NetconfMessageTransformer transformer = new NetconfMessageTransformer(
+                partialSchema,
+                true,
+                NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS
+        );
+        NetconfMessage netconfMessage = transformer.toRpcRequest(
+                toPath(CREATE_SUBSCRIPTION_RPC_QNAME),
+                CREATE_SUBSCRIPTION_RPC_CONTENT
+        );
+        String documentString = XmlUtil.toString(netconfMessage.getDocument());
+        assertThat(documentString, CoreMatchers.containsString("<create-subscription"));
+        assertThat(documentString, CoreMatchers.containsString("<rpc"));
     }
 
     @Test

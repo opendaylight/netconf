@@ -117,8 +117,12 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     /**
      * Create rpc implementation capable of handling RPC for monitoring and notifications even before the schemas of remote device are downloaded
      */
-    static NetconfDeviceRpc getRpcForInitialization(final NetconfDeviceCommunicator listener) {
-        return new NetconfDeviceRpc(INIT_SCHEMA_CTX, listener, new NetconfMessageTransformer(INIT_SCHEMA_CTX, false));
+    static NetconfDeviceRpc getRpcForInitialization(final NetconfDeviceCommunicator listener, final boolean notificationSupport) {
+        NetconfMessageTransformer.BaseSchema baseSchema = notificationSupport ?
+                NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS :
+                NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX;
+
+        return new NetconfDeviceRpc(INIT_SCHEMA_CTX, listener, new NetconfMessageTransformer(INIT_SCHEMA_CTX, false, baseSchema));
     }
 
 
@@ -145,7 +149,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
         // http://netty.io/wiki/thread-model.html
         LOG.debug("{}: Session to remote device established with {}", id, remoteSessionCapabilities);
 
-        final NetconfDeviceRpc initRpc = getRpcForInitialization(listener);
+        final NetconfDeviceRpc initRpc = getRpcForInitialization(listener, remoteSessionCapabilities.isNotificationsSupported());
         final DeviceSourcesResolver task = new DeviceSourcesResolver(remoteSessionCapabilities, id, stateSchemasResolver, initRpc);
         final ListenableFuture<DeviceSources> sourceResolverFuture = processingExecutor.submit(task);
 
@@ -215,7 +219,11 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     }
 
     protected void handleSalInitializationSuccess(final SchemaContext result, final NetconfSessionPreferences remoteSessionCapabilities, final DOMRpcService deviceRpc) {
-        messageTransformer = new NetconfMessageTransformer(result, true);
+        NetconfMessageTransformer.BaseSchema baseSchema =
+                remoteSessionCapabilities.isNotificationsSupported() ?
+                NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS :
+                NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX;
+        messageTransformer = new NetconfMessageTransformer(result, true, baseSchema);
 
         updateTransformer(messageTransformer);
         // salFacade.onDeviceConnected has to be called before the notification handler is initialized
