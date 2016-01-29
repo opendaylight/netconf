@@ -51,14 +51,16 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
+import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlDocumentUtils;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -388,7 +390,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
         dataChangeEventElement.appendChild(operationElement);
 
         try {
-            final DOMResult domResult = writeNormalizedNode((NormalizedNodeContainer<?,?,?>) entry.getValue(), path,
+            final DOMResult domResult = writeNormalizedNode(entry.getValue(), path,
                     schemaContext, dataSchemaContextTree);
             final Node result = doc.importNode(domResult.getNode().getFirstChild(), true);
             final Element dataElement = doc.createElement("data");
@@ -403,7 +405,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
         return dataChangeEventElement;
     }
 
-    private static DOMResult writeNormalizedNode(final NormalizedNodeContainer<?,?,?> normalized, final
+    private static DOMResult writeNormalizedNode(final NormalizedNode<?,?> normalized, final
         YangInstanceIdentifier path, final SchemaContext context, final DataSchemaContextTree dataSchemaContextTree) throws
             IOException, XMLStreamException {
         final XMLOutputFactory XML_FACTORY = XMLOutputFactory.newFactory();
@@ -412,10 +414,17 @@ public class ListenerAdapter implements DOMDataChangeListener {
         NormalizedNodeWriter normalizedNodeWriter = null;
         NormalizedNodeStreamWriter normalizedNodeStreamWriter = null;
         XMLStreamWriter writer = null;
+        final SchemaPath nodePath;
+
+        if (normalized instanceof MapEntryNode || normalized instanceof UnkeyedListEntryNode) {
+            nodePath = dataSchemaContextTree.getChild(path).getDataSchemaNode().getPath();
+        } else {
+            nodePath = dataSchemaContextTree.getChild(path).getDataSchemaNode().getPath().getParent();
+        }
+
         try {
             writer = XML_FACTORY.createXMLStreamWriter(result);
-            normalizedNodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(writer, context, dataSchemaContextTree
-                    .getChild(path).getDataSchemaNode().getPath().getParent());
+            normalizedNodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(writer, context, nodePath);
             normalizedNodeWriter = NormalizedNodeWriter.forStreamWriter(normalizedNodeStreamWriter);
 
             normalizedNodeWriter.write(normalized);
