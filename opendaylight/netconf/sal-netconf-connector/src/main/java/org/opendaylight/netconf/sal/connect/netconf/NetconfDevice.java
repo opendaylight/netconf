@@ -43,10 +43,8 @@ import org.opendaylight.netconf.sal.connect.netconf.schema.NetconfRemoteSchemaYa
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability;
-import org.opendaylight.yangtools.sal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
@@ -67,26 +65,6 @@ import org.slf4j.LoggerFactory;
 public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDevice.class);
-
-    /**
-     * Initial schema context contains schemas for netconf monitoring and netconf notifications
-     */
-    public static final SchemaContext INIT_SCHEMA_CTX;
-
-    static {
-        try {
-            final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-            moduleInfoBackedContext.addModuleInfos(
-                    Lists.newArrayList(
-                            $YangModuleInfoImpl.getInstance(),
-                            org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.$YangModuleInfoImpl.getInstance(),
-                            org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl.getInstance()));
-            INIT_SCHEMA_CTX = moduleInfoBackedContext.tryToCreateSchemaContext().get();
-        } catch (final RuntimeException e) {
-            LOG.error("Unable to prepare schema context for netconf initialization", e);
-            throw new ExceptionInInitializerError(e);
-        }
-    }
 
     public static final Function<QName, SourceIdentifier> QNAME_TO_SOURCE_ID_FUNCTION = new Function<QName, SourceIdentifier>() {
         @Override
@@ -117,8 +95,12 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     /**
      * Create rpc implementation capable of handling RPC for monitoring and notifications even before the schemas of remote device are downloaded
      */
-    static NetconfDeviceRpc getRpcForInitialization(final NetconfDeviceCommunicator listener) {
-        return new NetconfDeviceRpc(INIT_SCHEMA_CTX, listener, new NetconfMessageTransformer(INIT_SCHEMA_CTX, false));
+    static NetconfDeviceRpc getRpcForInitialization(final NetconfDeviceCommunicator listener, final boolean notificationSupport) {
+        NetconfMessageTransformer.BaseSchema baseSchema = notificationSupport ?
+                NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS :
+                NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX;
+
+        return new NetconfDeviceRpc(baseSchema.getSchemaContext(), listener, new NetconfMessageTransformer(baseSchema.getSchemaContext(), false, baseSchema));
     }
 
 
@@ -145,7 +127,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
         // http://netty.io/wiki/thread-model.html
         LOG.debug("{}: Session to remote device established with {}", id, remoteSessionCapabilities);
 
-        final NetconfDeviceRpc initRpc = getRpcForInitialization(listener);
+        final NetconfDeviceRpc initRpc = getRpcForInitialization(listener, remoteSessionCapabilities.isNotificationsSupported());
         final DeviceSourcesResolver task = new DeviceSourcesResolver(remoteSessionCapabilities, id, stateSchemasResolver, initRpc);
         final ListenableFuture<DeviceSources> sourceResolverFuture = processingExecutor.submit(task);
 
@@ -215,7 +197,11 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     }
 
     protected void handleSalInitializationSuccess(final SchemaContext result, final NetconfSessionPreferences remoteSessionCapabilities, final DOMRpcService deviceRpc) {
-        messageTransformer = new NetconfMessageTransformer(result, true);
+        NetconfMessageTransformer.BaseSchema baseSchema =
+                remoteSessionCapabilities.isNotificationsSupported() ?
+                NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS :
+                NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX;
+        messageTransformer = new NetconfMessageTransformer(result, true, baseSchema);
 
         updateTransformer(messageTransformer);
         // salFacade.onDeviceConnected has to be called before the notification handler is initialized
