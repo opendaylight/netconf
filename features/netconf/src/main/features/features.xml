@@ -113,9 +113,6 @@
 
   <feature name='odl-netconf-ssh' version='${project.version}' description="OpenDaylight :: Netconf Connector :: SSH">
     <feature version='${project.version}'>odl-netconf-tcp</feature>
-    <!-- FIXME: This introduces cycle between projects, which makes version updates
-                harder. Should be moved to different.
-    -->
     <feature version='${project.version}'>odl-aaa-netconf-plugin</feature>
     <bundle>mvn:org.opendaylight.netconf/netconf-ssh/{{VERSION}}</bundle>
   </feature>
