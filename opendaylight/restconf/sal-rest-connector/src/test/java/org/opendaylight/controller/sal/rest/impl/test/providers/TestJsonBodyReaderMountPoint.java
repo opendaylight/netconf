@@ -14,7 +14,9 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.io.InputStream;
+import java.util.Collection;
 
 import javax.ws.rs.core.MediaType;
 
@@ -22,6 +24,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
@@ -63,12 +66,12 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
     }
 
     @BeforeClass
-    public static void initialization() throws NoSuchFieldException,
-            SecurityException {
-        schemaContext = schemaContextLoader("/instanceidentifier/yang",
-                schemaContext);
-        schemaContext = schemaContextLoader("/modules", schemaContext);
-        schemaContext = schemaContextLoader("/invoke-rpc", schemaContext);
+    public static void initialization() throws Exception {
+        Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
+        testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
+        testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
+        schemaContext = TestRestconfUtils.parseYangSources(testFiles);
+
         final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         when(mountInstance.getSchemaContext()).thenReturn(schemaContext);
         final DOMMountPointService mockMountService = mock(DOMMountPointService.class);

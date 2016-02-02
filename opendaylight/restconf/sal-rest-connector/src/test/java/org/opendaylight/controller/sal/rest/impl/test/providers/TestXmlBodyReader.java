@@ -11,13 +11,17 @@ package org.opendaylight.controller.sal.rest.impl.test.providers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import com.google.common.base.Optional;
-import com.google.common.collect.Sets;
+
+import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Collection;
+
 import javax.ws.rs.core.MediaType;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -30,6 +34,9 @@ import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
 
 /**
  * sal-rest-connector
@@ -57,10 +64,11 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
     }
 
     @BeforeClass
-    public static void initialization() throws NoSuchFieldException, SecurityException {
-        schemaContext = schemaContextLoader("/instanceidentifier/yang", schemaContext);
-        schemaContext = schemaContextLoader("/modules", schemaContext);
-        schemaContext = schemaContextLoader("/invoke-rpc", schemaContext);
+    public static void initialization() throws Exception {
+        Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
+        testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
+        testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
+        schemaContext = TestRestconfUtils.parseYangSources(testFiles);
         controllerContext.setSchemas(schemaContext);
     }
 
