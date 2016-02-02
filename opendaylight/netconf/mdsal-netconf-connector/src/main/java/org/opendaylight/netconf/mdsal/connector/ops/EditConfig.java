@@ -23,6 +23,7 @@ import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
@@ -165,6 +166,11 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         try {
             //returns module with newest revision since findModuleByNamespace returns a set of modules and we only need the newest one
             final Module module = schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(new URI(namespace), null);
+            if (module == null) {
+                // no module is present with this namespace
+                throw new NetconfDocumentedException("Unable to find module by namespace: " + namespace,
+                        ErrorType.application, ErrorTag.unknown_namespace, ErrorSeverity.error);
+            }
             DataSchemaNode schemaNode = module.getDataChildByName(element.getName());
             if (schemaNode != null) {
                 dataSchemaNode = Optional.of(module.getDataChildByName(element.getName()));
