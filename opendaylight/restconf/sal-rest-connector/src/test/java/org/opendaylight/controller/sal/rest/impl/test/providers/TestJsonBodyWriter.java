@@ -11,13 +11,16 @@ package org.opendaylight.controller.sal.rest.impl.test.providers;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 
 import javax.ws.rs.core.MediaType;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
@@ -50,12 +53,11 @@ public class TestJsonBodyWriter extends AbstractBodyReaderTest {
     }
 
     @BeforeClass
-    public static void initialization() throws NoSuchFieldException,
-            SecurityException {
-        schemaContext = schemaContextLoader("/instanceidentifier/yang",
-                schemaContext);
-        schemaContext = schemaContextLoader("/modules", schemaContext);
-        schemaContext = schemaContextLoader("/invoke-rpc", schemaContext);
+    public static void initialization() throws Exception {
+        Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
+        testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
+        testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
+        schemaContext = TestRestconfUtils.parseYangSources(testFiles);
         controllerContext.setSchemas(schemaContext);
     }
 
