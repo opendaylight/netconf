@@ -27,4 +27,4 @@ module yang {
 		    type string;
 		}
 	}
-}l
+}
