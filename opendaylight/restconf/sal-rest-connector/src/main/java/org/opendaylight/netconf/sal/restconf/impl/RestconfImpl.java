@@ -601,7 +601,7 @@ public class RestconfImpl implements RestconfService {
 
         RpcDefinition rpc = null;
         if (mountPoint == null) {
-            rpc = controllerContext.getRpcDefinition(identifierDecoded);
+            rpc = controllerContext.getRpcDefinition(identifierDecoded, null);
         } else {
             rpc = findRpc(mountPoint.getSchemaContext(), identifierDecoded);
         }
