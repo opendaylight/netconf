@@ -47,6 +47,12 @@ public final class AsyncSshHandlerReader implements SshFutureListener<IoReadFutu
     @Override
     public synchronized void operationComplete(final IoReadFuture future) {
         if(future.getException() != null) {
+
+            //if asyncout is already set to null by close method, do nothing
+            if(asyncOut == null) {
+                return;
+            }
+
             if(asyncOut.isClosed() || asyncOut.isClosing()) {
                 // Ssh dropped
                 LOG.debug("Ssh session dropped on channel: {}", channelId, future.getException());
