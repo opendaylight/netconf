@@ -13,6 +13,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.HashMap;
@@ -33,13 +35,10 @@ import org.slf4j.LoggerFactory;
  */
 public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AsyncSshHandler.class);
     public static final String SUBSYSTEM = "netconf";
-
     public static final SshClient DEFAULT_CLIENT = SshClient.setUpDefaultClient();
-
     public static final int SSH_DEFAULT_NIO_WORKERS = 8;
-
+    private static final Logger LOG = LoggerFactory.getLogger(AsyncSshHandler.class);
     // Disable default timeouts from mina sshd
     private static final long DEFAULT_TIMEOUT = -1L;
 
@@ -57,6 +56,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
     private final AuthenticationHandler authenticationHandler;
     private final SshClient sshClient;
+    private Future negotiationFuture;
 
     private AsyncSshHandlerReader sshReadAsyncListener;
     private AsyncSshHandlerWriter sshWriteAsyncHandler;
@@ -66,8 +66,9 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private ChannelPromise connectPromise;
 
 
-    public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler) throws IOException {
-        return new AsyncSshHandler(authenticationHandler, DEFAULT_CLIENT);
+    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final SshClient sshClient, final Future negotiationFuture) throws IOException {
+        this(authenticationHandler, sshClient);
+        this.negotiationFuture = negotiationFuture;
     }
 
     /**
@@ -81,6 +82,14 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         this.sshClient = Preconditions.checkNotNull(sshClient);
         // Start just in case
         sshClient.start();
+    }
+
+    public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler) throws IOException {
+        return new AsyncSshHandler(authenticationHandler, DEFAULT_CLIENT);
+    }
+
+    public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler, final Future negotiationFuture) throws IOException {
+        return new AsyncSshHandler(authenticationHandler, DEFAULT_CLIENT, negotiationFuture);
     }
 
     private void startSsh(final ChannelHandlerContext ctx, final SocketAddress address) {
@@ -150,7 +159,9 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private synchronized void handleSshChanelOpened(final ChannelHandlerContext ctx) {
         LOG.trace("SSH subsystem channel opened successfully on channel: {}", ctx.channel());
 
-        connectPromise.setSuccess();
+        if(negotiationFuture == null) {
+            connectPromise.setSuccess();
+        }
 
         // TODO we should also read from error stream and at least log from that
 
@@ -192,6 +203,17 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     public synchronized void connect(final ChannelHandlerContext ctx, final SocketAddress remoteAddress, final SocketAddress localAddress, final ChannelPromise promise) throws Exception {
         LOG.debug("SSH session connecting on channel {}. promise: {} ", ctx.channel(), connectPromise);
         this.connectPromise = promise;
+
+        if(negotiationFuture != null) {
+            //complete connection promise with netconf negotiation future
+            negotiationFuture.addListener(new GenericFutureListener<Future<Object>>() {
+                @Override
+                public void operationComplete(Future future) throws Exception {
+                    if (future.isSuccess())
+                        connectPromise.setSuccess();
+                }
+            });
+        }
         startSsh(ctx, remoteAddress);
     }
 
@@ -215,6 +237,12 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
         if(sshReadAsyncListener != null) {
             sshReadAsyncListener.close();
+        }
+
+        //If connection promise is not already set, it means negotiation failed
+        //we must set connection promise to failure
+        if(!connectPromise.isDone()) {
+            connectPromise.setFailure(new IllegalStateException("Negotiation failed"));
         }
 
         if(session!= null && !session.isClosed() && !session.isClosing()) {
