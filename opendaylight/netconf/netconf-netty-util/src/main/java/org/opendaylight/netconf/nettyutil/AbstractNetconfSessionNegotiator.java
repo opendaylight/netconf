@@ -23,18 +23,18 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
 import java.util.concurrent.TimeUnit;
-import org.opendaylight.netconf.util.messages.FramingMechanism;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfSessionPreferences;
+import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.nettyutil.handler.FramingMechanismHandlerFactory;
 import org.opendaylight.netconf.nettyutil.handler.NetconfChunkAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
+import org.opendaylight.netconf.util.messages.FramingMechanism;
 import org.opendaylight.protocol.framework.AbstractSessionNegotiator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,10 +125,10 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
                         // Do not fail negotiation if promise is done or canceled
                         // It would result in setting result of the promise second time and that throws exception
                         if (isPromiseFinished() == false) {
-                            negotiationFailed(new IllegalStateException("Session was not established after " + timeout));
+                            LOG.warn("Netconf session was not established after {}", connectionTimeoutMillis);
                             changeState(State.FAILED);
 
-                            channel.closeFuture().addListener(new GenericFutureListener<ChannelFuture>() {
+                            channel.close().addListener(new GenericFutureListener<ChannelFuture>() {
                                 @Override
                                 public void operationComplete(final ChannelFuture future) throws Exception {
                                     if(future.isSuccess()) {
