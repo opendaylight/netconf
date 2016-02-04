@@ -83,11 +83,14 @@ public class TransactionProvider implements AutoCloseable{
             future.checkedGet();
         } catch (TransactionCommitFailedException e) {
             LOG.debug("Transaction {} failed on", candidateTransaction, e);
-            throw new DocumentedException("Transaction commit failed on " + e.getMessage() + " " + netconfSessionIdForReporting,
+            final String cause = e.getCause() != null ? (" Cause: " + e.getCause().getMessage()) : "";
+            throw new DocumentedException("Transaction commit failed on " + e.getMessage() + " " + netconfSessionIdForReporting +
+                    cause,
                     ErrorType.application, ErrorTag.operation_failed, ErrorSeverity.error);
+        } finally {
+            allOpenReadWriteTransactions.remove(candidateTransaction);
+            candidateTransaction = null;
         }
-        allOpenReadWriteTransactions.remove(candidateTransaction);
-        candidateTransaction = null;
 
         return true;
     }
