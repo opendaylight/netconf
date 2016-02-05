@@ -12,8 +12,10 @@ import static org.opendaylight.controller.config.api.JmxAttributeValidationExcep
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.google.common.io.Files;
 import io.netty.util.concurrent.EventExecutor;
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
@@ -47,9 +49,11 @@ import org.opendaylight.protocol.framework.ReconnectStrategyFactory;
 import org.opendaylight.protocol.framework.TimedReconnectStrategy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.IpAddress;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
+import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
@@ -285,6 +289,22 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
      */
     private FilesystemSchemaSourceCache<YangTextSchemaSource> createDeviceFilesystemCache(final String schemaCacheDirectory) {
         final String relativeSchemaCacheDirectory = CACHE_DIRECTORY + File.separator + schemaCacheDirectory;
+
+        // Copy all sideloaded schemas in the directory
+        if (userCapabilities.isPresent()) {
+            new File(relativeSchemaCacheDirectory).mkdir();
+            final File defaultCacheDirectory =  new File(QUALIFIED_DEFAULT_CACHE_DIRECTORY);
+            for (QName qname : userCapabilities.get().getModuleBasedCaps()) {
+                final SourceIdentifier sourceIdentifier = new SourceIdentifier(qname.getLocalName(), qname.getFormattedRevision());
+                final File fileSource = FilesystemSchemaSourceCache.sourceIdToFile(sourceIdentifier, defaultCacheDirectory);
+                final File fileDest = new File(relativeSchemaCacheDirectory + File.separator + fileSource.getName());
+                try {
+                    Files.copy(fileSource, fileDest);
+                } catch (IOException e) {
+                    LOG.error("Failed to copy {} in {}", fileSource, relativeSchemaCacheDirectory, e);
+                }
+            }
+        }
         return new FilesystemSchemaSourceCache<>(schemaRegistry, YangTextSchemaSource.class, new File(relativeSchemaCacheDirectory));
     }
 
