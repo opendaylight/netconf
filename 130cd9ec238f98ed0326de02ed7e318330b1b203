@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9a3d3df0_3903a374",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/controller/config/yang/md/sal/connector/netconf/NetconfConnectorModule.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-02-07T18:47:12Z",
+      "side": 1,
+      "message": "Ok",
+      "parentUuid": "9a3d3df0_533da8dd",
+      "revId": "130cd9ec238f98ed0326de02ed7e318330b1b203",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a3d3df0_3340e455",
         "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/controller/config/yang/md/sal/connector/netconf/NetconfConnectorModule.java",
         "patchSetId": 1
@@ -42,6 +60,30 @@
     },
     {
       "key": {
+        "uuid": "9a3d3df0_79f40b87",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/controller/config/yang/md/sal/connector/netconf/NetconfConnectorModule.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-02-07T18:47:12Z",
+      "side": 1,
+      "message": "The reason why we create the directory and add the schemas in there before create the instance of FilesystemSchemaSourceCache is because FilesystemSchemaSourceCache loads the schemas from the dir only once, during the instantiation.",
+      "parentUuid": "9a3d3df0_3340e455",
+      "range": {
+        "startLine": 293,
+        "startChar": 12,
+        "endLine": 293,
+        "endChar": 59
+      },
+      "revId": "130cd9ec238f98ed0326de02ed7e318330b1b203",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a3d3df0_932610cd",
         "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/controller/config/yang/md/sal/connector/netconf/NetconfConnectorModule.java",
         "patchSetId": 1
@@ -53,6 +95,30 @@
       "writtenOn": "2016-02-05T23:35:00Z",
       "side": 1,
       "message": "Replace with QUALIFIED_DEFAULT_CACHE_DIRECTORY.",
+      "range": {
+        "startLine": 294,
+        "startChar": 57,
+        "endLine": 294,
+        "endChar": 115
+      },
+      "revId": "130cd9ec238f98ed0326de02ed7e318330b1b203",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_99f90f83",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/controller/config/yang/md/sal/connector/netconf/NetconfConnectorModule.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-02-07T18:47:12Z",
+      "side": 1,
+      "message": "Ok",
+      "parentUuid": "9a3d3df0_932610cd",
       "range": {
         "startLine": 294,
         "startChar": 57,
