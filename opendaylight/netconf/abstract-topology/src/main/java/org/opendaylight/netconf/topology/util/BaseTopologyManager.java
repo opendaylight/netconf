@@ -603,7 +603,7 @@ public final class BaseTopologyManager
         Futures.addCallback(read, new FutureCallback<Optional<Topology>>() {
             @Override
             public void onSuccess(Optional<Topology> result) {
-                if (result.isPresent()) {
+                if (result.isPresent() && result.get().getNode() != null) {
                     for (final Node node : result.get().getNode()) {
                         final Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> entry = codecRegistry.toNormalizedNode(getNodeIid(topologyId), node);
                         peer.onRemoteNodeCreated(new NormalizedNodeMessage(entry.getKey(), entry.getValue()));

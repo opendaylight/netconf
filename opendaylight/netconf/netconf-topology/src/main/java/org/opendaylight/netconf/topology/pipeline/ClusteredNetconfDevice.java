@@ -59,10 +59,10 @@ public class ClusteredNetconfDevice extends NetconfDevice implements EntityOwner
     private ClusteredDeviceSourcesResolver resolver = null;
 
     public ClusteredNetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
-                                  final ExecutorService globalProcessingExecutor, SchemaRepository schemaRepo, ActorSystem actorSystem, String topologyId, String nodeId,
+                                  final ExecutorService globalProcessingExecutor, final ActorSystem actorSystem, final String topologyId, final String nodeId,
                                   ActorContext cachedContext) {
         super(schemaResourcesDTO, id, salFacade, globalProcessingExecutor);
-        this.schemaRepo = schemaRepo;
+        this.schemaRepo = (SchemaRepository) schemaResourcesDTO.getSchemaRegistry();
         this.actorSystem = actorSystem;
         this.topologyId = topologyId;
         this.nodeId = nodeId;
