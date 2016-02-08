@@ -300,17 +300,13 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
                 // Multiple modules may be created at once;  synchronize to avoid issues with data consistency among threads.
                 synchronized(schemaResourcesDTOs) {
                     // Look for the cached DTO to reuse SchemaRegistry and SchemaContextFactory variables if they already exist
-                    final NetconfDevice.SchemaResourcesDTO dto =
-                            schemaResourcesDTOs.get(moduleSchemaCacheDirectory);
-                    if (dto == null) {
+                    schemaResourcesDTO = schemaResourcesDTOs.get(moduleSchemaCacheDirectory);
+                    if (schemaResourcesDTO == null) {
                         schemaResourcesDTO = createSchemaResourcesDTO(moduleSchemaCacheDirectory, nodeId.getValue());
-                        schemaRegistry.registerSchemaSourceListener(
-                                TextToASTTransformer.create((SchemaRepository) schemaRegistry, schemaRegistry));
+                        schemaResourcesDTO.getSchemaRegistry().registerSchemaSourceListener(
+                                TextToASTTransformer.create((SchemaRepository) schemaResourcesDTO.getSchemaRegistry(), schemaResourcesDTO.getSchemaRegistry())
+                        );
                         schemaResourcesDTOs.put(moduleSchemaCacheDirectory, schemaResourcesDTO);
-                    } else {
-                        setSchemaContextFactory(dto.getSchemaContextFactory());
-                        setSchemaRegistry(dto.getSchemaRegistry());
-                        schemaResourcesDTO = dto;
                     }
                 }
                 LOG.info("Netconf connector for device {} will use schema cache directory {} instead of {}",
@@ -338,7 +334,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     private NetconfDevice.SchemaResourcesDTO createSchemaResourcesDTO(final String moduleSchemaCacheDirectory,
             final String instanceName) {
 
-        final SharedSchemaRepository repository = new SharedSchemaRepository(instanceName);
+        final SharedSchemaRepository repository = new SharedSchemaRepository(moduleSchemaCacheDirectory);
         final SchemaContextFactory schemaContextFactory
                 = repository.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
         setSchemaRegistry(repository);
