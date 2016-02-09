@@ -192,7 +192,6 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
         return ((TopologyMountPointFacade) activeConnectors.get(node).getFacade()).registerConnectionStatusListener(listener);
     }
 
-    @Override
     public Collection<ProviderFunctionality> getProviderFunctionality() {
         return Collections.emptySet();
     }

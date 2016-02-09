@@ -58,13 +58,17 @@ public class ProxyReadOnlyTransaction implements DOMDataReadOnlyTransaction{
             @Override
             public void onComplete(Throwable throwable, Optional<NormalizedNodeMessage> normalizedNodeMessage) throws Throwable {
                 if (throwable == null) {
-                    settableFuture.set(normalizedNodeMessage.transform(new Function<NormalizedNodeMessage, NormalizedNode<?, ?>>() {
-                        @Nullable
-                        @Override
-                        public NormalizedNode<?, ?> apply(NormalizedNodeMessage input) {
-                            return input.getNode();
-                        }
-                    }));
+                    if (normalizedNodeMessage.isPresent()) {
+                        settableFuture.set(normalizedNodeMessage.transform(new Function<NormalizedNodeMessage, NormalizedNode<?, ?>>() {
+                            @Nullable
+                            @Override
+                            public NormalizedNode<?, ?> apply(NormalizedNodeMessage input) {
+                                return input.getNode();
+                            }
+                        }));
+                    } else {
+                        settableFuture.set(Optional.absent());
+                    }
                 } else {
                     settableFuture.setException(throwable);
                 }

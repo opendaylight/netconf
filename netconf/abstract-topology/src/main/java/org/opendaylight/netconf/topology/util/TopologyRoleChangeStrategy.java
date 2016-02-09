@@ -25,17 +25,8 @@ import org.opendaylight.controller.md.sal.common.api.clustering.EntityOwnershipS
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.netconf.topology.NodeListener;
 import org.opendaylight.netconf.topology.RoleChangeStrategy;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.binding.Identifier;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.PathArgument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,9 +94,9 @@ public class TopologyRoleChangeStrategy implements RoleChangeStrategy, Clustered
             LOG.warn("Gained ownership of entity, registering datastore listener");
 
             if (datastoreListenerRegistration == null) {
-                LOG.debug("Listener on path {}", createTopologyId(entityType).child(Node.class).getPathArguments());
+                LOG.debug("Listener on path {}", TopologyUtil.createTopologyListPath(entityType).child(Node.class).getPathArguments());
                 datastoreListenerRegistration = dataBroker.registerDataTreeChangeListener(
-                        new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION, createTopologyId(entityType).child(Node.class)), this);
+                        new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION, TopologyUtil.createTopologyListPath(entityType).child(Node.class)), this);
             }
         } else if (datastoreListenerRegistration != null) {
             LOG.warn("No longer owner of entity, unregistering datastore listener");
@@ -127,39 +118,16 @@ public class TopologyRoleChangeStrategy implements RoleChangeStrategy, Clustered
             switch (rootNode.getModificationType()) {
                 case WRITE:
                     LOG.debug("Data was Created {}, {}", rootNode.getIdentifier(), rootNode.getDataAfter());
-                    ownershipCandidate.onNodeCreated(getNodeId(rootNode.getIdentifier()), rootNode.getDataAfter());
+                    ownershipCandidate.onNodeCreated(TopologyUtil.getNodeId(rootNode.getIdentifier()), rootNode.getDataAfter());
                     break;
                 case SUBTREE_MODIFIED:
                     LOG.debug("Data was Updated {}, {}", rootNode.getIdentifier(), rootNode.getDataAfter());
-                    ownershipCandidate.onNodeUpdated(getNodeId(rootNode.getIdentifier()), rootNode.getDataAfter());
+                    ownershipCandidate.onNodeUpdated(TopologyUtil.getNodeId(rootNode.getIdentifier()), rootNode.getDataAfter());
                     break;
                 case DELETE:
                     LOG.debug("Data was Deleted {}", rootNode.getIdentifier());
-                    ownershipCandidate.onNodeDeleted(getNodeId(rootNode.getIdentifier()));
+                    ownershipCandidate.onNodeDeleted(TopologyUtil.getNodeId(rootNode.getIdentifier()));
             }
         }
-    }
-
-    /**
-     * Determines the Netconf Node Node ID, given the node's instance
-     * identifier.
-     *
-     * @param pathArgument Node's path arument
-     * @return     NodeId for the node
-     */
-    private NodeId getNodeId(final PathArgument pathArgument) {
-        if (pathArgument instanceof InstanceIdentifier.IdentifiableItem<?, ?>) {
-
-            final Identifier key = ((InstanceIdentifier.IdentifiableItem) pathArgument).getKey();
-            if(key instanceof NodeKey) {
-                return ((NodeKey) key).getNodeId();
-            }
-        }
-        throw new IllegalStateException("Unable to create NodeId from: " + pathArgument);
-    }
-
-    private static InstanceIdentifier<Topology> createTopologyId(final String topologyId) {
-        final InstanceIdentifier<NetworkTopology> networkTopology = InstanceIdentifier.create(NetworkTopology.class);
-        return networkTopology.child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
     }
 }
