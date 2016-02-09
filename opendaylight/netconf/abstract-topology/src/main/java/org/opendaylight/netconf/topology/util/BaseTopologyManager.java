@@ -54,9 +54,7 @@ import org.opendaylight.netconf.topology.TopologyManagerCallback.TopologyManager
 import org.opendaylight.netconf.topology.util.messages.CustomIdentifyMessage;
 import org.opendaylight.netconf.topology.util.messages.CustomIdentifyMessageReply;
 import org.opendaylight.netconf.topology.util.messages.NormalizedNodeMessage;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -76,7 +74,6 @@ public final class BaseTopologyManager
         implements TopologyManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseTopologyManager.class);
-    private static final InstanceIdentifier<NetworkTopology> NETWORK_TOPOLOGY_PATH = InstanceIdentifier.builder(NetworkTopology.class).build();
 
     private final KeyedInstanceIdentifier<Topology, TopologyKey> topologyListPath;
 
@@ -98,7 +95,6 @@ public final class BaseTopologyManager
     private final Set<NodeId> created = new HashSet<>();
 
     private final Map<Address, TopologyManager> peers = new HashMap<>();
-    private TopologyManager masterPeer = null;
     private final int id = new Random().nextInt();
 
     private boolean isMaster;
@@ -138,7 +134,7 @@ public final class BaseTopologyManager
         // election has not yet happened
         this.isMaster = isMaster;
 
-        this.topologyListPath = NETWORK_TOPOLOGY_PATH.child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
+        this.topologyListPath = TopologyUtil.createTopologyListPath(topologyId);
 
         LOG.debug("Base manager started ", +id);
     }
@@ -176,7 +172,7 @@ public final class BaseTopologyManager
             // only master should call connect on peers and aggregate futures
             for (TopologyManager topologyManager : peers.values()) {
                 // convert binding into NormalizedNode for transfer
-                final Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> normalizedNodeEntry = codecRegistry.toNormalizedNode(getNodeIid(topologyId), node);
+                final Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> normalizedNodeEntry = codecRegistry.toNormalizedNode(TopologyUtil.createTopologyNodePath(topologyId), node);
 
                 LOG.debug("YangInstanceIdentifier {}", normalizedNodeEntry.getKey());
                 LOG.debug("Value {}", normalizedNodeEntry.getValue());
@@ -266,11 +262,6 @@ public final class BaseTopologyManager
 
         // Trigger update on this slave
         return delegateTopologyHandler.onNodeUpdated(nodeId, node);
-    }
-
-    private static InstanceIdentifier<Node> getNodeIid(final String topologyId) {
-        final InstanceIdentifier<NetworkTopology> networkTopology = InstanceIdentifier.create(NetworkTopology.class);
-        return networkTopology.child(Topology.class, new TopologyKey(new TopologyId(topologyId))).child(Node.class);
     }
 
     @Override
@@ -498,7 +489,7 @@ public final class BaseTopologyManager
         Futures.addCallback(listenableFuture, new FutureCallback<Node>() {
             @Override
             public void onSuccess(Node result) {
-                final Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> entry = codecRegistry.toNormalizedNode(getNodeIid(topologyId), result);
+                final Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> entry = codecRegistry.toNormalizedNode(TopologyUtil.createTopologyNodePath(topologyId), result);
                 promise.success(new NormalizedNodeMessage(entry.getKey(), entry.getValue()));
             }
 
@@ -605,7 +596,7 @@ public final class BaseTopologyManager
             public void onSuccess(Optional<Topology> result) {
                 if (result.isPresent() && result.get().getNode() != null) {
                     for (final Node node : result.get().getNode()) {
-                        final Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> entry = codecRegistry.toNormalizedNode(getNodeIid(topologyId), node);
+                        final Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> entry = codecRegistry.toNormalizedNode(TopologyUtil.createTopologyNodePath(topologyId), node);
                         peer.onRemoteNodeCreated(new NormalizedNodeMessage(entry.getKey(), entry.getValue()));
                         // we dont care about the future from now on since we will be notified by the onConnected event
                     }

@@ -89,6 +89,15 @@ public class ProxyReadOnlyTransactionTest {
         }
     }
 
+    @Test
+    public void testDataOnPathDoesNotExistPathRead() throws ReadFailedException {
+        when(mockedProxyDataBroker.read(any(LogicalDatastoreType.class), any(YangInstanceIdentifier.class)))
+                .thenReturn(Futures.successful(Optional.absent()));
+        CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> readResultFuture =  proxyReadOnlyTx.read(LogicalDatastoreType.CONFIGURATION, path);
+        verify(mockedProxyDataBroker).read(eq(LogicalDatastoreType.CONFIGURATION), eq(path));
+        assertTrue(readResultFuture.isDone());
+        assertTrue(!readResultFuture.checkedGet().isPresent());
+    }
 
     @Test
     public void testFailedExists() {
