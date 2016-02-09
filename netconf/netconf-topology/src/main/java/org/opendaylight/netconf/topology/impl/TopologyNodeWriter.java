@@ -23,6 +23,7 @@ import org.opendaylight.controller.md.sal.common.api.data.TransactionChain;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.netconf.topology.util.NodeWriter;
+import org.opendaylight.netconf.topology.util.TopologyUtil;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -82,7 +83,7 @@ public class TopologyNodeWriter implements NodeWriter{
             final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
 
             createNetworkTopologyIfNotPresent(writeTx, LogicalDatastoreType.OPERATIONAL);
-            final InstanceIdentifier<Node> path = createBindingPathForTopology(new NodeKey(id), topologyId);
+            final InstanceIdentifier<Node> path = TopologyUtil.createTopologyNodeListPath(new NodeKey(id), topologyId);
 
             LOG.trace("{}: Init device state transaction {} putting if absent operational data started. Putting data on path {}",
                     id.getValue(), writeTx.getIdentifier(), path);
@@ -102,7 +103,7 @@ public class TopologyNodeWriter implements NodeWriter{
         try {
             final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
 
-            final InstanceIdentifier<Node> path = createBindingPathForTopology(new NodeKey(id), topologyId);
+            final InstanceIdentifier<Node> path = TopologyUtil.createTopologyNodeListPath(new NodeKey(id), topologyId);
             LOG.trace("{}: Update device state transaction {} merging operational data started. Putting data on path {}",
                     id, writeTx.getIdentifier(), operationalDataNode);
             writeTx.put(LogicalDatastoreType.OPERATIONAL, path, operationalDataNode);
@@ -122,7 +123,7 @@ public class TopologyNodeWriter implements NodeWriter{
         try {
             final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
 
-            final InstanceIdentifier<Node> path = createBindingPathForTopology(new NodeKey(id), topologyId);
+            final InstanceIdentifier<Node> path = TopologyUtil.createTopologyNodeListPath(new NodeKey(id), topologyId);
 
             LOG.trace(
                     "{}: Close device state transaction {} removing all data started. Path: {}",
@@ -170,12 +171,5 @@ public class TopologyNodeWriter implements NodeWriter{
         LOG.trace("{}: Merging {} container to ensure its presence", topologyId,
                 Topology.QNAME, writeTx.getIdentifier());
         writeTx.merge(datastoreType, topologyListPath, topology);
-    }
-
-    private static InstanceIdentifier<Node> createBindingPathForTopology(final NodeKey key, final String topologyId) {
-        final InstanceIdentifier<NetworkTopology> networkTopology = InstanceIdentifier.builder(NetworkTopology.class).build();
-        final KeyedInstanceIdentifier<Topology, TopologyKey> topology = networkTopology.child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
-        return topology
-                .child(Node.class, new NodeKey(new NodeId(key.getNodeId().getValue())));
     }
 }

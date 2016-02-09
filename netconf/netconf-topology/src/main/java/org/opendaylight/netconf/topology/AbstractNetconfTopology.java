@@ -57,16 +57,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
-import org.opendaylight.yangtools.yang.binding.Identifier;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
@@ -302,7 +294,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = null;
         final String moduleSchemaCacheDirectory = node.getSchemaCacheDirectory();
         // Only checks to ensure the String is not empty or null;  further checks related to directory accessibility and file permissions
-        // are handled during the FilesystemScehamSourceCache initialization.
+        // are handled during the FilesystemSchemaSourceCache initialization.
         if (!Strings.isNullOrEmpty(moduleSchemaCacheDirectory)) {
             // If a custom schema cache directory is specified, create the backing DTO; otherwise, the SchemaRegistry and
             // SchemaContextFactory remain the default values.
@@ -312,7 +304,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
                     // Look for the cached DTO to reuse SchemaRegistry and SchemaContextFactory variables if they already exist
                     schemaResourcesDTO = schemaResourcesDTOs.get(moduleSchemaCacheDirectory);
                     if (schemaResourcesDTO == null) {
-                        schemaResourcesDTO = createSchemaResourcesDTO(moduleSchemaCacheDirectory, nodeId.getValue());
+                        schemaResourcesDTO = createSchemaResourcesDTO(moduleSchemaCacheDirectory);
                         schemaResourcesDTO.getSchemaRegistry().registerSchemaSourceListener(
                                 TextToASTTransformer.create((SchemaRepository) schemaResourcesDTO.getSchemaRegistry(), schemaResourcesDTO.getSchemaRegistry())
                         );
@@ -341,9 +333,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
      * @param moduleSchemaCacheDirectory The string directory relative to "cache"
      * @return A DTO containing the Schema classes for the Netconf mount.
      */
-    private NetconfDevice.SchemaResourcesDTO createSchemaResourcesDTO(final String moduleSchemaCacheDirectory,
-            final String instanceName) {
-
+    private NetconfDevice.SchemaResourcesDTO createSchemaResourcesDTO(final String moduleSchemaCacheDirectory) {
         final SharedSchemaRepository repository = new SharedSchemaRepository(moduleSchemaCacheDirectory);
         final SchemaContextFactory schemaContextFactory
                 = repository.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
@@ -412,36 +402,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
 
     @Override
     public void onSessionInitiated(ProviderSession session) {
-        mountPointService = session.getService(DOMMountPointService.class);
+         mountPointService = session.getService(DOMMountPointService.class);
     }
 
     @Override
     public Collection<ProviderFunctionality> getProviderFunctionality() {
         return Collections.emptySet();
-    }
-
-    //TODO this needs to be an util method, since netconf clustering uses this aswell
-    /**
-     * Determines the Netconf Node Node ID, given the node's instance
-     * identifier.
-     *
-     * @param pathArgument Node's path arument
-     * @return     NodeId for the node
-     */
-    protected NodeId getNodeId(final PathArgument pathArgument) {
-        if (pathArgument instanceof InstanceIdentifier.IdentifiableItem<?, ?>) {
-
-            final Identifier key = ((InstanceIdentifier.IdentifiableItem) pathArgument).getKey();
-            if(key instanceof NodeKey) {
-                return ((NodeKey) key).getNodeId();
-            }
-        }
-        throw new IllegalStateException("Unable to create NodeId from: " + pathArgument);
-    }
-
-    protected static InstanceIdentifier<Topology> createTopologyId(final String topologyId) {
-        final InstanceIdentifier<NetworkTopology> networkTopology = InstanceIdentifier.create(NetworkTopology.class);
-        return networkTopology.child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
     }
 
     private InetSocketAddress getSocketAddress(final Host host, int port) {
