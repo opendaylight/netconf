@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a3d3df0_df51b20f",
+        "filename": "opendaylight/netconf/abstract-topology/src/main/java/org/opendaylight/netconf/topology/util/TopologyUtil.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-02-09T14:44:44Z",
+      "side": 1,
+      "message": "util classes should be final with private constructor",
+      "range": {
+        "startLine": 20,
+        "startChar": 13,
+        "endLine": 20,
+        "endChar": 25
+      },
+      "revId": "72580719717906a5c56874165988ed302d51488e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_3f59be36",
+        "filename": "opendaylight/netconf/netconf-topology/src/test/java/org/opendaylight/netconf/topology/impl/NetconfNodeOperationalDataAggregatorTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-02-09T14:44:44Z",
+      "side": 1,
+      "message": "since the exception is created within the test, assertSame could be used instead of string comparison ...",
+      "range": {
+        "startLine": 97,
+        "startChar": 12,
+        "endLine": 97,
+        "endChar": 60
+      },
+      "revId": "72580719717906a5c56874165988ed302d51488e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_df789291",
+        "filename": "opendaylight/netconf/netconf-topology/src/test/java/org/opendaylight/netconf/topology/pipeline/tx/ProxyReadOnlyTransactionTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-02-09T14:44:44Z",
+      "side": 1,
+      "message": "tests like these should be structured like this:\n\ntry{\n  dosomething\n} catch(Exception e) {\n  assertEx\n  return\n}\n\nfail(no exception)",
+      "revId": "72580719717906a5c56874165988ed302d51488e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
