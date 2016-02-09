@@ -13,9 +13,11 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public final class TopologyUtil {
 
@@ -41,8 +43,16 @@ public final class TopologyUtil {
         throw new IllegalStateException("Unable to create NodeId from: " + pathArgument);
     }
 
-    public static InstanceIdentifier<Topology> createTopologyId(final String topologyId) {
+    public static KeyedInstanceIdentifier<Topology, TopologyKey> createTopologyListPath(final String topologyId) {
         final InstanceIdentifier<NetworkTopology> networkTopology = InstanceIdentifier.create(NetworkTopology.class);
         return networkTopology.child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
+    }
+
+    public static InstanceIdentifier<Node> createTopologyNodeListPath(final NodeKey key, final String topologyId) {
+        return createTopologyListPath(topologyId).child(Node.class, new NodeKey(new NodeId(key.getNodeId().getValue())));
+    }
+
+    public static InstanceIdentifier<Node> createTopologyNodePath(final String topologyId) {
+        return createTopologyListPath(topologyId).child(Node.class);
     }
 }
