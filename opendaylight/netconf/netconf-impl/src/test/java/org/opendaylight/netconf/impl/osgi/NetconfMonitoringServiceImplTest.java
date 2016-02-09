@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.impl.osgi;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
 
 import com.google.common.base.Optional;
 import java.net.URI;
@@ -21,8 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.config.util.capability.BasicCapability;
 import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.controller.config.util.capability.YangModuleCapability;
@@ -52,40 +52,47 @@ public class NetconfMonitoringServiceImplTest {
 
     private NetconfMonitoringServiceImpl monitoringService;
 
+    @Mock
+    private Module moduleMock;
+    @Mock
+    private NetconfOperationServiceFactory operationServiceFactoryMock;
+    @Mock
+    private NetconfManagementSession sessionMock;
 
     @Before
     public void setUp() throws Exception {
-        NetconfOperationServiceFactory operationServiceFactoryMock = getMock(NetconfOperationServiceFactory.class);
+        MockitoAnnotations.initMocks(this);
         CAPABILITIES.add(new BasicCapability("urn:ietf:params:netconf:base:1.0"));
         CAPABILITIES.add(new BasicCapability("urn:ietf:params:netconf:base:1.1"));
         CAPABILITIES.add(new BasicCapability("urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&amp;revision=2010-09-24"));
-        Module moduleMock = getMock(Module.class);
-        when(moduleMock.getNamespace()).thenReturn(new URI(TEST_MODULE_NAMESPACE.getValue()));
-        when(moduleMock.getName()).thenReturn(TEST_MODULE_NAME);
-        when(moduleMock.getRevision()).thenReturn(TEST_MODULE_DATE);
-        when(moduleMock.getRevision()).thenReturn(TEST_MODULE_DATE);
+        doReturn(new URI(TEST_MODULE_NAMESPACE.getValue())).when(moduleMock).getNamespace();
+        doReturn(TEST_MODULE_NAME).when(moduleMock).getName();
+        doReturn(TEST_MODULE_DATE).when(moduleMock).getRevision();
+        doReturn(TEST_MODULE_NAME).when(moduleMock).getName();
+
         CAPABILITIES.add(new YangModuleCapability(moduleMock, TEST_MODULE_CONTENT));
-        when(operationServiceFactoryMock.getCapabilities()).thenReturn(CAPABILITIES);
+        doReturn(CAPABILITIES).when(operationServiceFactoryMock).getCapabilities();
+        doReturn(null).when(operationServiceFactoryMock).registerCapabilityListener(any(NetconfMonitoringServiceImpl.class));
 
         monitoringService = new NetconfMonitoringServiceImpl(operationServiceFactoryMock);
         monitoringService.onCapabilitiesChanged(CAPABILITIES, new HashSet<Capability>());
 
+        doReturn(new SessionBuilder().build()).when(sessionMock).toManagementSession();
     }
 
     @Test
     public void testListeners() throws Exception {
         final AtomicInteger stateChanged = new AtomicInteger(0);
-        final NetconfManagementSession session = getSessionMock();
         NetconfMonitoringService.MonitoringListener listener = getMonitoringListener(stateChanged);
         monitoringService.registerListener(listener);
         Assert.assertEquals(1, stateChanged.get());
-        monitoringService.onSessionUp(session);
+        monitoringService.onSessionUp(sessionMock);
         Assert.assertEquals(2, stateChanged.get());
         HashSet<Capability> added = new HashSet<>();
         added.add(new BasicCapability("toAdd"));
         monitoringService.onCapabilitiesChanged(added, new HashSet<Capability>());
         Assert.assertEquals(3, stateChanged.get());
-        monitoringService.onSessionDown(session);
+        monitoringService.onSessionDown(sessionMock);
         Assert.assertEquals(4, stateChanged.get());
     }
 
@@ -120,7 +127,7 @@ public class NetconfMonitoringServiceImplTest {
 
     @Test
     public void testClose() throws Exception {
-        monitoringService.onSessionUp(getSessionMock());
+        monitoringService.onSessionUp(sessionMock);
         Assert.assertFalse(monitoringService.getSessions().getSession().isEmpty());
         Assert.assertFalse(monitoringService.getCapabilities().getCapability().isEmpty());
         monitoringService.close();
@@ -185,18 +192,4 @@ public class NetconfMonitoringServiceImplTest {
         };
     }
 
-    private NetconfManagementSession getSessionMock() {
-        NetconfManagementSession session = getMock(NetconfManagementSession.class);
-        when(session.toManagementSession()).thenReturn(new SessionBuilder().build());
-        return session;
-    }
-
-    private <T> T getMock(Class<T> cls) {
-        return mock(cls, new Answer() {
-            @Override
-            public T answer(InvocationOnMock invocation) throws Throwable {
-                return null;
-            }
-        });
-    }
 }
