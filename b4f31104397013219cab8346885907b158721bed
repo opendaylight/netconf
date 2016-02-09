@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a3d3df0_1ce20803",
+        "filename": "opendaylight/netconf/netconf-topology/src/test/java/org/opendaylight/netconf/topology/pipeline/ClusteredNetconfDeviceCommunicatorTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-02-09T13:17:09Z",
+      "side": 1,
+      "message": "this cast seems unnecessary",
+      "range": {
+        "startLine": 82,
+        "startChar": 96,
+        "endLine": 82,
+        "endChar": 120
+      },
+      "revId": "b4f31104397013219cab8346885907b158721bed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
