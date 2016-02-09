@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.impl.osgi;
 
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
 import java.util.HashSet;
@@ -18,8 +18,8 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.config.util.capability.BasicCapability;
 import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
@@ -31,17 +31,28 @@ public class AggregatedNetconfOperationServiceFactoryTest {
     private Set<Capability> factory1Caps = new HashSet<>();
     private Set<Capability> factory2Caps = new HashSet<>();
 
-    private final CapabilityListener listener1 = mock(CapabilityListener.class);
-    private final CapabilityListener listener2  = mock(CapabilityListener.class);
-    private final NetconfOperationServiceFactory factory1 = getMock(NetconfOperationServiceFactory.class);;
-    private final NetconfOperationServiceFactory factory2 = getMock(NetconfOperationServiceFactory.class);;
-    private final AutoCloseable autoCloseable1 = getMock(AutoCloseable.class);
-    private final AutoCloseable autoCloseable2 = getMock(AutoCloseable.class);
+    @Mock
+    private CapabilityListener listener1;
+    @Mock
+    private CapabilityListener listener2;
+    @Mock
+    private CapabilityListener listener3;
+    @Mock
+    private NetconfOperationServiceFactory factory1;
+    @Mock
+    private NetconfOperationServiceFactory factory2;
+    @Mock
+    private AutoCloseable autoCloseable1;
+    @Mock
+    private AutoCloseable autoCloseable2;
+    @Mock
+    private AutoCloseable autoCloseable3;
 
     private AggregatedNetconfOperationServiceFactory aggregatedFactory;
 
     @Before
     public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
         factory1Caps.add(new BasicCapability("AAA"));
         factory1Caps.add(new BasicCapability("BBB"));
 
@@ -53,14 +64,19 @@ public class AggregatedNetconfOperationServiceFactoryTest {
         aggregatedFactory.registerCapabilityListener(listener1);
         aggregatedFactory.registerCapabilityListener(listener2);
 
-        when(factory1.registerCapabilityListener(listener1)).thenReturn(autoCloseable1);
-        when(factory1.registerCapabilityListener(listener2)).thenReturn(autoCloseable2);
-        when(factory1.getCapabilities()).thenReturn(factory1Caps);
+        doReturn(autoCloseable1).when(factory1).registerCapabilityListener(listener1);
+        doReturn(autoCloseable2).when(factory1).registerCapabilityListener(listener2);
+        doReturn(factory1Caps).when(factory1).getCapabilities();
 
-        when(factory2.registerCapabilityListener(listener1)).thenReturn(autoCloseable1);
-        when(factory2.registerCapabilityListener(listener2)).thenReturn(autoCloseable2);
-        when(factory2.getCapabilities()).thenReturn(factory2Caps);
+        doReturn(autoCloseable1).when(factory2).registerCapabilityListener(listener1);
+        doReturn(autoCloseable2).when(factory2).registerCapabilityListener(listener2);
+        doReturn(factory2Caps).when(factory2).getCapabilities();
 
+        doNothing().when(autoCloseable1).close();
+        doNothing().when(autoCloseable2).close();
+
+        doReturn(autoCloseable3).when(factory1).registerCapabilityListener(listener3);
+        doReturn(autoCloseable3).when(factory2).registerCapabilityListener(listener3);
     }
 
     @Test
@@ -93,11 +109,10 @@ public class AggregatedNetconfOperationServiceFactoryTest {
     public void testRegisterCapabilityListener() throws Exception {
         aggregatedFactory.onAddNetconfOperationServiceFactory(factory1);
         aggregatedFactory.onAddNetconfOperationServiceFactory(factory2);
-        CapabilityListener listener = mock(CapabilityListener.class);
-        aggregatedFactory.registerCapabilityListener(listener);
+        aggregatedFactory.registerCapabilityListener(listener3);
 
-        verify(factory1).registerCapabilityListener(listener);
-        verify(factory2).registerCapabilityListener(listener);
+        verify(factory1).registerCapabilityListener(listener3);
+        verify(factory2).registerCapabilityListener(listener3);
     }
 
     @Test
@@ -109,12 +124,4 @@ public class AggregatedNetconfOperationServiceFactoryTest {
         verify(autoCloseable2, times(2)).close();
     }
 
-    private <T> T getMock(Class<T> cls) {
-        return mock(cls, new Answer() {
-            @Override
-            public T answer(InvocationOnMock invocation) throws Throwable {
-                return null;
-            }
-        });
-    }
 }
