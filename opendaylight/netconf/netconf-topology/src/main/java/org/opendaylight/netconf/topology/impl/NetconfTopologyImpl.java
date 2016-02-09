@@ -35,6 +35,7 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.SchemaRepositoryProvider;
 import org.opendaylight.netconf.topology.pipeline.TopologyMountPointFacade.ConnectionStatusListenerRegistration;
+import org.opendaylight.netconf.topology.util.TopologyUtil;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -125,7 +126,8 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
         LOG.debug("Registering datastore listener");
         datastoreListenerRegistration =
                 dataBroker.registerDataTreeChangeListener(
-                        new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION, createTopologyId(topologyId).child(Node.class)), this);
+                        new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
+                                TopologyUtil.createTopologyListPath(topologyId).child(Node.class)), this);
 
 
     }
@@ -136,21 +138,21 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
             final DataObjectModification<Node> rootNode = change.getRootNode();
             switch (rootNode.getModificationType()) {
                 case SUBTREE_MODIFIED:
-                    LOG.debug("Config for node {} updated", getNodeId(rootNode.getIdentifier()));
-                    disconnectNode(getNodeId(rootNode.getIdentifier()));
-                    connectNode(getNodeId(rootNode.getIdentifier()), rootNode.getDataAfter());
+                    LOG.debug("Config for node {} updated", TopologyUtil.getNodeId(rootNode.getIdentifier()));
+                    disconnectNode(TopologyUtil.getNodeId(rootNode.getIdentifier()));
+                    connectNode(TopologyUtil.getNodeId(rootNode.getIdentifier()), rootNode.getDataAfter());
                     break;
                 case WRITE:
-                    LOG.debug("Config for node {} created", getNodeId(rootNode.getIdentifier()));
-                    if (activeConnectors.containsKey(getNodeId(rootNode.getIdentifier()))) {
-                        LOG.warn("RemoteDevice{{}} was already configured, reconfiguring..", getNodeId(rootNode.getIdentifier()));
-                        disconnectNode(getNodeId(rootNode.getIdentifier()));
+                    LOG.debug("Config for node {} created", TopologyUtil.getNodeId(rootNode.getIdentifier()));
+                    if (activeConnectors.containsKey(TopologyUtil.getNodeId(rootNode.getIdentifier()))) {
+                        LOG.warn("RemoteDevice{{}} was already configured, reconfiguring..", TopologyUtil.getNodeId(rootNode.getIdentifier()));
+                        disconnectNode(TopologyUtil.getNodeId(rootNode.getIdentifier()));
                     }
-                    connectNode(getNodeId(rootNode.getIdentifier()), rootNode.getDataAfter());
+                    connectNode(TopologyUtil.getNodeId(rootNode.getIdentifier()), rootNode.getDataAfter());
                     break;
                 case DELETE:
-                    LOG.debug("Config for node {} deleted", getNodeId(rootNode.getIdentifier()));
-                    disconnectNode(getNodeId(rootNode.getIdentifier()));
+                    LOG.debug("Config for node {} deleted", TopologyUtil.getNodeId(rootNode.getIdentifier()));
+                    disconnectNode(TopologyUtil.getNodeId(rootNode.getIdentifier()));
                     break;
             }
         }
