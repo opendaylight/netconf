@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a3d3df0_fc75a498",
+        "filename": "opendaylight/netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/TransactionProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-02-09T11:58:07Z",
+      "side": 1,
+      "message": "what if there\u0027s no cause ? might result in a NPE ?",
+      "range": {
+        "startLine": 87,
+        "startChar": 33,
+        "endLine": 87,
+        "endChar": 58
+      },
+      "revId": "f79e8ed563e06a51a684f31e2377561a4c83d937",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
