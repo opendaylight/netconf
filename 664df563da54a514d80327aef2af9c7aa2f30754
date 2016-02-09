@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a3d3df0_08364703",
+        "filename": "opendaylight/netconf/mdsal-netconf-monitoring/src/main/java/org/opendaylight/netconf/monitoring/AbstractNetconfOperationServiceFactory.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-02-09T11:36:04Z",
+      "side": 1,
+      "message": "the way this abstract class is used, it would be better off as final. Called SingleNetconfOperationServiceFactory taking operationService and Set\u003cCapability\u003e in constructor + additional constructor for convenience with just operationService and implicit empty Set\u003cCapability\u003e.\n\n... if possible, it is always better to use final class than abstract.",
+      "range": {
+        "startLine": 19,
+        "startChar": 22,
+        "endLine": 19,
+        "endChar": 60
+      },
+      "revId": "664df563da54a514d80327aef2af9c7aa2f30754",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_8821b7b6",
+        "filename": "opendaylight/netconf/mdsal-netconf-monitoring/src/main/java/org/opendaylight/netconf/monitoring/AbstractNetconfOperationServiceFactory.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-02-09T11:36:04Z",
+      "side": 1,
+      "message": "Should be a static constant.",
+      "range": {
+        "startLine": 49,
+        "startChar": 15,
+        "endLine": 49,
+        "endChar": 38
+      },
+      "revId": "664df563da54a514d80327aef2af9c7aa2f30754",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
