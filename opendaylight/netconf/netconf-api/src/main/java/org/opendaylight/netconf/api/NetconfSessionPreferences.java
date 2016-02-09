@@ -8,18 +8,20 @@
 
 package org.opendaylight.netconf.api;
 
+import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+
 public class NetconfSessionPreferences {
 
-    private final NetconfMessage helloMessage;
+    private final NetconfHelloMessage helloMessage;
 
-    public NetconfSessionPreferences(final NetconfMessage helloMessage) {
+    public NetconfSessionPreferences(final NetconfHelloMessage helloMessage) {
         this.helloMessage = helloMessage;
     }
 
     /**
      * @return the helloMessage
      */
-    public NetconfMessage getHelloMessage() {
+    public NetconfHelloMessage getHelloMessage() {
         return this.helloMessage;
     }
 

@@ -8,6 +8,8 @@
 
 package org.opendaylight.netconf.api;
 
+import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+
 /**
  * The only input for the start of a NETCONF session is hello-message.
  */
@@ -15,7 +17,7 @@ public final class NetconfClientSessionPreferences extends NetconfSessionPrefere
 
     private final NetconfMessage startExiMessage;
 
-    public NetconfClientSessionPreferences(final NetconfMessage helloMessage,
+    public NetconfClientSessionPreferences(final NetconfHelloMessage helloMessage,
                                      final NetconfMessage startExiMessage) {
         super(helloMessage);
         this.startExiMessage = startExiMessage;
