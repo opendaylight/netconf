@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a3d3df0_bcbf9cfa",
+        "filename": "opendaylight/netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/client/stress/AbstractExecutionStrategy.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-02-09T12:19:15Z",
+      "side": 1,
+      "message": "This again seems like final would be more appropriate than abstract",
+      "range": {
+        "startLine": 16,
+        "startChar": 15,
+        "endLine": 16,
+        "endChar": 40
+      },
+      "revId": "a3149db360e1e2521db399d4a81fb213ab480528",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
