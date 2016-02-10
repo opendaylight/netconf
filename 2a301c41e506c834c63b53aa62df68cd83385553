@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a3d3df0_467e7b6c",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-02-10T12:44:44Z",
+      "side": 1,
+      "message": "don\u0027t see the point of having 2 methods that perform blocking operation ... invokeBlocking and this",
+      "range": {
+        "startLine": 181,
+        "startChar": 45,
+        "endLine": 181,
+        "endChar": 69
+      },
+      "revId": "2a301c41e506c834c63b53aa62df68cd83385553",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_e686af64",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-02-10T12:44:44Z",
+      "side": 1,
+      "message": "Wrong handling of interruptedException",
+      "range": {
+        "startLine": 184,
+        "startChar": 17,
+        "endLine": 184,
+        "endChar": 37
+      },
+      "revId": "2a301c41e506c834c63b53aa62df68cd83385553",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_e6ed0f27",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-02-10T12:44:44Z",
+      "side": 1,
+      "message": "Why is this different from read ? read returns null, this returns failed future",
+      "range": {
+        "startLine": 188,
+        "startChar": 0,
+        "endLine": 189,
+        "endChar": 99
+      },
+      "revId": "2a301c41e506c834c63b53aa62df68cd83385553",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_86b08344",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/ReadOnlyTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-02-10T12:44:44Z",
+      "side": 1,
+      "message": "Returning null on timeout violates the API contract.\n+ Shouldn\u0027t we do something about the timeout ? e.g. fail and restart the session ?",
+      "range": {
+        "startLine": 123,
+        "startChar": 12,
+        "endLine": 123,
+        "endChar": 24
+      },
+      "revId": "2a301c41e506c834c63b53aa62df68cd83385553",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_26aa57d4",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/ReadOnlyTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-02-10T12:44:44Z",
+      "side": 1,
+      "message": "This makes read operations blocking. Do we want to have all operations blocking ? There are some operations for writes that are blocking, but the intention is to get rid of them (because blocking user/restconf threads for up to requestTimeoutMillis doesn\u0027t seem right)\n\n+ If completely blocking here is a good idea, then the above transformation can be simplified and we can just return immediate future",
+      "range": {
+        "startLine": 122,
+        "startChar": 0,
+        "endLine": 124,
+        "endChar": 9
+      },
+      "revId": "2a301c41e506c834c63b53aa62df68cd83385553",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_c663abda",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/ReadOnlyTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-02-10T12:44:44Z",
+      "side": 1,
+      "message": "InterruptedException cannot be handled this way (same as execution exception)\n\ntake a look at AbstractWriteTx.invokeBlocking() .. it\u0027s almost identical to this one and they should be united.",
+      "range": {
+        "startLine": 168,
+        "startChar": 17,
+        "endLine": 168,
+        "endChar": 37
+      },
+      "revId": "2a301c41e506c834c63b53aa62df68cd83385553",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_a65e6710",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/ReadOnlyTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-02-10T12:44:44Z",
+      "side": 1,
+      "message": "hardcoded operation name\n\n+ not adding exception e to new RuntimeException() makes the log very confusing",
+      "range": {
+        "startLine": 170,
+        "startChar": 47,
+        "endLine": 170,
+        "endChar": 66
+      },
+      "revId": "2a301c41e506c834c63b53aa62df68cd83385553",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
