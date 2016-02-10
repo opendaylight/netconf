@@ -303,11 +303,11 @@ public class ListenerAdapter implements DOMDataChangeListener {
         addCreatedChangedValuesFromDataToElement(doc, change.getCreatedData().entrySet(),
                 dataChangedNotificationEventElement,
                 Operation.CREATED, schemaContext, dataSchemaContextTree);
-        if (change.getCreatedData().isEmpty()) {
-            addCreatedChangedValuesFromDataToElement(doc, change.getUpdatedData().entrySet(),
+
+        addCreatedChangedValuesFromDataToElement(doc, change.getUpdatedData().entrySet(),
                     dataChangedNotificationEventElement,
                     Operation.UPDATED, schemaContext, dataSchemaContextTree);
-        }
+
         addValuesFromDataToElement(doc, change.getRemovedPaths(), dataChangedNotificationEventElement,
                 Operation.DELETED);
     }
