@@ -22,6 +22,29 @@
       "revId": "387deb56195072df82c775b218676f2ba7bf2753",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_b9516110",
+        "filename": "opendaylight/netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandlerReader.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-02-11T16:02:08Z",
+      "side": 1,
+      "message": "maybe putting this out of if(future.getException() !\u003d null), as first check in operationComplete would be even safer.",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 13
+      },
+      "revId": "387deb56195072df82c775b218676f2ba7bf2753",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
