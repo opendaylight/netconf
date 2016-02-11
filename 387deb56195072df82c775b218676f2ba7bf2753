@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a3d3df0_793079e8",
+        "filename": "opendaylight/netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/TcpClientChannelInitializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-02-11T16:00:32Z",
+      "side": 1,
+      "message": "Duplicate",
+      "range": {
+        "startLine": 64,
+        "startChar": 28,
+        "endLine": 70,
+        "endChar": 31
+      },
+      "revId": "387deb56195072df82c775b218676f2ba7bf2753",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
