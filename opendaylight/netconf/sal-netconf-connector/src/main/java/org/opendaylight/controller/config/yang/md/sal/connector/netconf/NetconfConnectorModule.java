@@ -38,7 +38,7 @@ import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.sal.connect.netconf.listener.UserPrefenreces;
+import org.opendaylight.netconf.sal.connect.netconf.listener.UserPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -245,7 +245,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
 
         final NetconfDeviceCommunicator listener = userCapabilities.isPresent() ?
                 new NetconfDeviceCommunicator(id, device,
-                        new UserPrefenreces(userCapabilities.get(), getYangModuleCapabilities().getOverride())):
+                        new UserPreferences(userCapabilities.get(), getYangModuleCapabilities().getOverride())):
                 new NetconfDeviceCommunicator(id, device);
 
         if (shouldSendKeepalive()) {

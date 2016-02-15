@@ -49,7 +49,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceCommunicator.class);
 
     protected final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice;
-    private final Optional<UserPrefenreces> overrideNetconfCapabilities;
+    private final Optional<UserPreferences> overrideNetconfCapabilities;
     protected final RemoteDeviceId id;
     private final Lock sessionLock = new ReentrantLock();
 
@@ -61,17 +61,17 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     private SettableFuture<NetconfDeviceCapabilities> firstConnectionFuture;
 
     public NetconfDeviceCommunicator(final RemoteDeviceId id, final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice,
-            final UserPrefenreces NetconfSessionPreferences) {
+            final UserPreferences NetconfSessionPreferences) {
         this(id, remoteDevice, Optional.of(NetconfSessionPreferences));
     }
 
     public NetconfDeviceCommunicator(final RemoteDeviceId id,
                                      final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice) {
-        this(id, remoteDevice, Optional.<UserPrefenreces>absent());
+        this(id, remoteDevice, Optional.<UserPreferences>absent());
     }
 
     private NetconfDeviceCommunicator(final RemoteDeviceId id, final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice,
-            final Optional<UserPrefenreces> overrideNetconfCapabilities) {
+            final Optional<UserPreferences> overrideNetconfCapabilities) {
         this.id = id;
         this.remoteDevice = remoteDevice;
         this.overrideNetconfCapabilities = overrideNetconfCapabilities;
