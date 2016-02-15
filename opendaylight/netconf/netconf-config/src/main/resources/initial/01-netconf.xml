@@ -101,6 +101,7 @@
   </configuration>
   <required-capabilities>
       <capability>urn:opendaylight:params:xml:ns:yang:controller:config:netconf:client:dispatcher?module=odl-netconfig-client-cfg&amp;revision=2014-04-08</capability>
+      <capability>urn:opendaylight:params:xml:ns:yang:controller:netty:threadgroup?module=threadgroup&amp;revision=2013-11-07</capability>
       <capability>urn:opendaylight:params:xml:ns:yang:controller:threadpool:impl?module=threadpool-impl&amp;revision=2013-04-05</capability>
       <capability>urn:opendaylight:params:xml:ns:yang:controller:threadpool:impl:flexible?module=threadpool-impl-flexible&amp;revision=2013-12-01</capability>
       <capability>urn:opendaylight:params:xml:ns:yang:controller:threadpool:impl:scheduled?module=threadpool-impl-scheduled&amp;revision=2013-12-01</capability>
