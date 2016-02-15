@@ -48,6 +48,12 @@ module netconf-node-topology {
 
         container yang-module-capabilities {
             config true;
+            leaf override {
+                type boolean;
+                default false;
+                description "Whether to override or merge this list of capabilities with capabilities from device";
+            }
+
             leaf-list capability {
                 type string;
                 description "Set a list of capabilities to override capabilities provided in device's hello message.
