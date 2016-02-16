@@ -94,12 +94,6 @@
       <type>xml</type>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.aaa</groupId>
-      <artifactId>features-aaa-shiro</artifactId>
-      <classifier>features</classifier>
-      <type>xml</type>
-    </dependency>
-    <dependency>
       <groupId>org.opendaylight.controller</groupId>
       <artifactId>features-protocol-framework</artifactId>
       <version>${protocol-framework.version}</version>
@@ -108,8 +102,32 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <groupId>org.opendaylight.controller</groupId>
+      <artifactId>features-config</artifactId>
+      <classifier>features</classifier>
+      <type>xml</type>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.controller</groupId>
+      <artifactId>features-config-persister</artifactId>
+      <classifier>features</classifier>
+      <type>xml</type>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.controller</groupId>
+      <artifactId>features-config-netty</artifactId>
+      <classifier>features</classifier>
+      <type>xml</type>
+    </dependency>
+    <dependency>
       <groupId>org.opendaylight.aaa</groupId>
       <artifactId>features-aaa</artifactId>
+      <classifier>features</classifier>
+      <type>xml</type>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.aaa</groupId>
+      <artifactId>features-aaa-shiro</artifactId>
       <classifier>features</classifier>
       <type>xml</type>
     </dependency>
