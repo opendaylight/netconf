@@ -52,6 +52,30 @@ public class NetconfSessionPreferencesTest {
     }
 
     @Test
+    public void testReplace() throws Exception {
+        final List<String> caps1 = Lists.newArrayList(
+                "namespace:1?module=module1&revision=2012-12-12",
+                "namespace:2?module=module2&amp;revision=2012-12-12",
+                "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04",
+                "urn:ietf:params:netconf:base:1.0",
+                "urn:ietf:params:netconf:capability:rollback-on-error:1.0"
+        );
+        final NetconfSessionPreferences sessionCaps1 = NetconfSessionPreferences.fromStrings(caps1);
+        assertCaps(sessionCaps1, 2, 3);
+
+        final List<String> caps2 = Lists.newArrayList(
+                "namespace:3?module=module3&revision=2012-12-12",
+                "namespace:4?module=module4&revision=2012-12-12",
+                "randomNonModuleCap"
+        );
+        final NetconfSessionPreferences sessionCaps2 = NetconfSessionPreferences.fromStrings(caps2);
+        assertCaps(sessionCaps2, 1, 2);
+
+        final NetconfSessionPreferences replaced = sessionCaps1.replaceModuleCaps(sessionCaps2);
+        assertCaps(replaced, 2, 2);
+    }
+
+    @Test
     public void testCapabilityNoRevision() throws Exception {
         final List<String> caps1 = Lists.newArrayList(
                 "namespace:2?module=module2",

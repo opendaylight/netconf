@@ -69,7 +69,7 @@ public final class NetconfSessionPreferences {
     private final Set<QName> moduleBasedCaps;
     private final Set<String> nonModuleCaps;
 
-    private NetconfSessionPreferences(final Set<String> nonModuleCaps, final Set<QName> moduleBasedCaps) {
+    NetconfSessionPreferences(final Set<String> nonModuleCaps, final Set<QName> moduleBasedCaps) {
         this.nonModuleCaps = Preconditions.checkNotNull(nonModuleCaps);
         this.moduleBasedCaps = Preconditions.checkNotNull(moduleBasedCaps);
     }
@@ -124,11 +124,29 @@ public final class NetconfSessionPreferences {
                 || containsNonModuleCapability(NetconfMessageTransformUtil.IETF_NETCONF_MONITORING.getNamespace().toString());
     }
 
+    /**
+     * Merge module-based list of capabilities with current list of module-based capabilities
+     *
+     * @param netconfSessionModuleCapabilities capabilities to merge into this
+     *
+     * @return new instance of preferences with merged module-based capabilities
+     */
     public NetconfSessionPreferences addModuleCaps(final NetconfSessionPreferences netconfSessionModuleCapabilities) {
         final HashSet<QName> mergedCaps = Sets.newHashSetWithExpectedSize(moduleBasedCaps.size() + netconfSessionModuleCapabilities.getModuleBasedCaps().size());
         mergedCaps.addAll(moduleBasedCaps);
         mergedCaps.addAll(netconfSessionModuleCapabilities.getModuleBasedCaps());
         return new NetconfSessionPreferences(getNonModuleCaps(), mergedCaps);
+    }
+
+    /**
+     * Override current list of module-based capabilities
+     *
+     * @param netconfSessionPreferences capabilities to override in this
+     *
+     * @return new instance of preferences with replaced module-based capabilities
+     */
+    public NetconfSessionPreferences replaceModuleCaps(final NetconfSessionPreferences netconfSessionPreferences) {
+        return new NetconfSessionPreferences(getNonModuleCaps(), netconfSessionPreferences.getModuleBasedCaps());
     }
 
     public static NetconfSessionPreferences fromNetconfSession(final NetconfClientSession session) {
