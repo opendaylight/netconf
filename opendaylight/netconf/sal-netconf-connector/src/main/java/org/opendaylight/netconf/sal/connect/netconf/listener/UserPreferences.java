@@ -12,12 +12,12 @@ import javax.annotation.Nonnull;
 /**
  * DTO with user capabilities to override or merge with device specific capabilities
  */
-public class UserPrefenreces {
+public class UserPreferences {
 
     private final NetconfSessionPreferences sessionPreferences;
     private final boolean override;
 
-    public UserPrefenreces(@Nonnull final NetconfSessionPreferences sessionPreferences, boolean override) {
+    public UserPreferences(@Nonnull final NetconfSessionPreferences sessionPreferences, boolean override) {
         this.sessionPreferences = sessionPreferences;
         this.override = override;
     }
@@ -32,7 +32,7 @@ public class UserPrefenreces {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("UserPrefenreces{");
+        final StringBuffer sb = new StringBuffer("UserPreferences{");
         sb.append("sessionPreferences=").append(sessionPreferences);
         sb.append(", override=").append(override);
         sb.append('}');
