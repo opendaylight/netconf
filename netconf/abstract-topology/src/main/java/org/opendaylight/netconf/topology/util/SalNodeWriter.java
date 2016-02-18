@@ -8,13 +8,18 @@
 
 package org.opendaylight.netconf.topology.util;
 
+import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import javax.annotation.Nonnull;
+import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
+import org.opendaylight.controller.md.sal.common.api.data.AsyncTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionChain;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -26,32 +31,43 @@ public final class SalNodeWriter implements NodeWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(SalNodeWriter.class);
 
-    private final DataBroker dataBroker;
     private final String topologyId;
 
+    private final BindingTransactionChain transactionChain;
     public SalNodeWriter(final DataBroker dataBroker, final String topologyId) {
-        this.dataBroker = dataBroker;
         this.topologyId = topologyId;
+        this.transactionChain = Preconditions.checkNotNull(dataBroker).createTransactionChain(new TransactionChainListener() {
+            @Override
+            public void onTransactionChainFailed(TransactionChain<?, ?> transactionChain, AsyncTransaction<?, ?> transaction, Throwable cause) {
+                LOG.error("{}: TransactionChain({}) {} FAILED!", transactionChain,
+                        transaction.getIdentifier(), cause);
+                throw new IllegalStateException("Abstract topology writer TransactionChain(" + transactionChain + ") not committed correctly", cause);
+            }
+
+            @Override
+            public void onTransactionChainSuccessful(TransactionChain<?, ?> transactionChain) {
+                LOG.trace("Abstract topology writer TransactionChain({}) SUCCESSFUL", transactionChain);
+            }
+        });
     }
 
-    //FIXME change to txChains
     @Override public void init(@Nonnull final NodeId id, @Nonnull final Node operationalDataNode) {
         // put into Datastore
-        final WriteTransaction wTx = dataBroker.newWriteOnlyTransaction();
+        final WriteTransaction wTx = transactionChain.newWriteOnlyTransaction();
         wTx.put(LogicalDatastoreType.OPERATIONAL, TopologyUtil.createTopologyNodeListPath(new NodeKey(id), topologyId), operationalDataNode);
         commitTransaction(wTx, id, "init");
     }
 
     @Override public void update(@Nonnull final NodeId id, @Nonnull final Node operationalDataNode) {
         // merge
-        final WriteTransaction wTx = dataBroker.newWriteOnlyTransaction();
+        final WriteTransaction wTx = transactionChain.newWriteOnlyTransaction();
         wTx.put(LogicalDatastoreType.OPERATIONAL, TopologyUtil.createTopologyNodeListPath(new NodeKey(id), topologyId), operationalDataNode);
         commitTransaction(wTx, id, "update");
     }
 
     @Override public void delete(@Nonnull final NodeId id) {
         // delete
-        final WriteTransaction wTx = dataBroker.newWriteOnlyTransaction();
+        final WriteTransaction wTx = transactionChain.newWriteOnlyTransaction();
         wTx.delete(LogicalDatastoreType.OPERATIONAL, TopologyUtil.createTopologyNodeListPath(new NodeKey(id), topologyId));
         commitTransaction(wTx, id, "delete");
     }
