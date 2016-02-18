@@ -1,26 +1,30 @@
 /*
- * Copyright (c) 2015 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.controller.messagebus.eventsources.netconf;
+package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.opendaylight.controller.md.sal.binding.api.BindingService;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.MountPoint;
@@ -28,15 +32,17 @@ import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
+import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationPublishService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.api.DOMService;
+import org.opendaylight.controller.messagebus.app.util.TopicDOMNotification;
 import org.opendaylight.controller.sal.binding.api.RpcConsumerRegistry;
-import org.opendaylight.netconf.messagebus.eventsources.netconf.NetconfEventSource;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventaggregator.rev141202.NotificationPattern;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventaggregator.rev141202.TopicId;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.JoinTopicInput;
+import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.JoinTopicInputBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.NotificationsService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
@@ -44,7 +50,9 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -55,6 +63,8 @@ public class NetconfEventSourceTest {
     DOMMountPoint domMountPointMock;
     MountPoint mountPointMock;
     JoinTopicInput joinTopicInputMock;
+    DOMNotificationPublishService domNotificationPublishServiceMock;
+    DOMNotification notification;
 
     @Before
     public void setUp() throws Exception {
@@ -62,11 +72,24 @@ public class NetconfEventSourceTest {
         streamMap.put("uriStr1", "string2");
         domMountPointMock = mock(DOMMountPoint.class);
         mountPointMock = mock(MountPoint.class);
-        DOMNotificationPublishService domNotificationPublishServiceMock = mock(DOMNotificationPublishService.class);
+        domNotificationPublishServiceMock = mock(DOMNotificationPublishService.class);
         RpcConsumerRegistry rpcConsumerRegistryMock = mock(RpcConsumerRegistry.class);
         Optional<BindingService> onlyOptionalMock = (Optional<BindingService>) mock(Optional.class);
         NotificationsService notificationsServiceMock = mock(NotificationsService.class);
         doReturn(notificationsServiceMock).when(rpcConsumerRegistryMock).getRpcService(NotificationsService.class);
+
+        final NotificationDefinition notificationDefinitionMock = getNotificationDefinitionMock("urn:cisco:params:xml:ns:yang:messagebus:eventsource", "2014-12-02", "event-source-status");
+        Set<NotificationDefinition> notifications = Collections.singleton(notificationDefinitionMock);
+        ContainerNode node = Builders.containerBuilder()
+                .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(QName.create("notification-namespace", "2016-02-17", "name")))
+                .build();
+        notification = mock(DOMNotification.class);
+        doReturn(node).when(notification).getBody();
+        doReturn(notificationDefinitionMock.getPath()).when(notification).getType();
+        SchemaContext schema = mock(SchemaContext.class);
+        doReturn(notifications).when(schema).getNotifications();
+        doReturn(schema).when(domMountPointMock).getSchemaContext();
+        doReturn(Optional.of(mock(DOMNotificationService.class))).when(domMountPointMock).getService(DOMNotificationService.class);
 
         Optional<DataBroker> optionalMpDataBroker = (Optional<DataBroker>) mock(Optional.class);
         DataBroker mpDataBroker = mock(DataBroker.class);
@@ -96,6 +119,23 @@ public class NetconfEventSourceTest {
     public void joinTopicTest() throws Exception{
         joinTopicTestHelper();
         assertNotNull("JoinTopic return value has not been created correctly.", netconfEventSource.joinTopic(joinTopicInputMock));
+    }
+
+    @Test
+    public void testOnNotification() throws Exception {
+        final JoinTopicInput topic1 = new JoinTopicInputBuilder()
+                .setTopicId(TopicId.getDefaultInstance("topic1"))
+                .setNotificationPattern(NotificationPattern.getDefaultInstance(".*"))
+                .build();
+        netconfEventSource.joinTopic(topic1);
+
+
+        ArgumentCaptor<DOMNotification> captor = ArgumentCaptor.forClass(DOMNotification.class);
+        netconfEventSource.onNotification(notification);
+        verify(domNotificationPublishServiceMock).putNotification(captor.capture());
+        final TopicDOMNotification value = (TopicDOMNotification) captor.getValue();
+        final Object actualTopicId = value.getBody().getChild(new YangInstanceIdentifier.NodeIdentifier(QName.create("urn:cisco:params:xml:ns:yang:messagebus:eventaggregator", "2014-12-02", "topic-id"))).get().getValue();
+        Assert.assertEquals(topic1.getTopicId(), actualTopicId);
     }
 
     private void joinTopicTestHelper() throws Exception{
@@ -135,6 +175,14 @@ public class NetconfEventSourceTest {
         CheckedFuture checkedFutureMock = mock(CheckedFuture.class);
         doReturn(checkedFutureMock).when(domRpcServiceMock).invokeRpc(any(SchemaPath.class), any(ContainerNode.class));
 
+    }
+
+    private NotificationDefinition getNotificationDefinitionMock(String namespace, String revision, String name) {
+        NotificationDefinition notification = mock(NotificationDefinition.class);
+        final QName qName = QName.create(namespace, revision, name);
+        doReturn(qName).when(notification).getQName();
+        doReturn(SchemaPath.create(true, qName)).when(notification).getPath();
+        return notification;
     }
 
 }
