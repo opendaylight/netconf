@@ -14,17 +14,17 @@
     <parent>
       <groupId>org.opendaylight.odlparent</groupId>
       <artifactId>odlparent-lite</artifactId>
-      <version>1.6.0-Beryllium</version>
+      <version>1.6.1-SNAPSHOT</version>
       <relativePath/>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-artifacts</artifactId>
-    <version>1.0.0-Beryllium</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
-        <mdsal.version>1.3.0-Beryllium</mdsal.version>
+        <mdsal.version>1.3.1-SNAPSHOT</mdsal.version>
     </properties>
 
     <dependencyManagement>
