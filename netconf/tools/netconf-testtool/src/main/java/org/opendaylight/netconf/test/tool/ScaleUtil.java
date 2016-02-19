@@ -9,14 +9,12 @@
 package org.opendaylight.netconf.test.tool;
 
 import ch.qos.logback.classic.Level;
-import com.google.common.base.Charsets;
 import com.google.common.base.Stopwatch;
 import com.google.common.io.CharStreams;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig.Builder;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +32,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
-import org.opendaylight.netconf.test.tool.Main.Params;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +51,7 @@ public class ScaleUtil {
     private static final Semaphore semaphore = new Semaphore(0);
 
     public static void main(final String[] args) {
-        final Params params = parseArgs(args, Params.getParser());
+        final TesttoolParameters params = TesttoolParameters.parseArgs(args, TesttoolParameters.getParser());
 
         root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(params.debug ? Level.DEBUG : Level.INFO);
@@ -133,7 +130,7 @@ public class ScaleUtil {
         }
     }
 
-    private static void cleanup(final Runtime runtime, final Params params) {
+    private static void cleanup(final Runtime runtime, final TesttoolParameters params) {
         try {
             stopKaraf(runtime, params);
             deleteFolder(new File(params.distroFolder.getAbsoluteFile() + "/data"));
@@ -144,7 +141,7 @@ public class ScaleUtil {
         }
     }
 
-    private static void stopKaraf(final Runtime runtime, final Params params) throws IOException, InterruptedException {
+    private static void stopKaraf(final Runtime runtime, final TesttoolParameters params) throws IOException, InterruptedException {
         root.info("Stopping karaf and sleeping for 10 sec..");
         String controllerPid = "";
         do {
@@ -174,8 +171,8 @@ public class ScaleUtil {
         folder.delete();
     }
 
-    private static Params parseArgs(final String[] args, final ArgumentParser parser) {
-        final Params parameters = new Params();
+    private static TesttoolParameters parseArgs(final String[] args, final ArgumentParser parser) {
+        final TesttoolParameters parameters = new TesttoolParameters();
         try {
             parser.parseArgs(args, parameters);
             return parameters;
