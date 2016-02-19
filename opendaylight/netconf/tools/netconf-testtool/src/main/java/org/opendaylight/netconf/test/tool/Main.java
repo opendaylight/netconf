@@ -8,9 +8,7 @@
 
 package org.opendaylight.netconf.test.tool;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-
 import ch.qos.logback.classic.Level;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
@@ -23,14 +21,14 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import net.sourceforge.argparse4j.ArgumentParsers;
-import net.sourceforge.argparse4j.annotation.Arg;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.ArgumentParserException;
+
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.slf4j.Logger;
@@ -41,159 +39,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+
 public final class Main {
 
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
-    public static class Params {
-
-        @Arg(dest = "schemas-dir")
-        public File schemasDir;
-
-        @Arg(dest = "devices-count")
-        public int deviceCount;
-
-        @Arg(dest = "devices-per-port")
-        public int devicesPerPort;
-
-        @Arg(dest = "starting-port")
-        public int startingPort;
-
-        @Arg(dest = "generate-config-connection-timeout")
-        public int generateConfigsTimeout;
-
-        @Arg(dest = "generate-config-address")
-        public String generateConfigsAddress;
-
-        @Arg(dest = "distro-folder")
-        public File distroFolder;
-
-        @Arg(dest = "generate-configs-batch-size")
-        public int generateConfigBatchSize;
-
-        @Arg(dest = "ssh")
-        public boolean ssh;
-
-        @Arg(dest = "exi")
-        public boolean exi;
-
-        @Arg(dest = "debug")
-        public boolean debug;
-
-        @Arg(dest = "notification-file")
-        public File notificationFile;
-
-        @Arg(dest = "md-sal")
-        public boolean mdSal;
-
-        @Arg(dest = "initial-config-xml-file")
-        public File initialConfigXMLFile;
-
-        static ArgumentParser getParser() {
-            final ArgumentParser parser = ArgumentParsers.newArgumentParser("netconf testool");
-
-            parser.description("Netconf device simulator. Detailed info can be found at https://wiki.opendaylight.org/view/OpenDaylight_Controller:Netconf:Testtool#Building_testtool");
-
-            parser.addArgument("--device-count")
-                    .type(Integer.class)
-                    .setDefault(1)
-                    .help("Number of simulated netconf devices to spin. This is the number of actual ports open for the devices.")
-                    .dest("devices-count");
-
-            parser.addArgument("--devices-per-port")
-                    .type(Integer.class)
-                    .setDefault(1)
-                    .help("Amount of config files generated per port to spoof more devices then are actually running")
-                    .dest("devices-per-port");
-
-            parser.addArgument("--schemas-dir")
-                    .type(File.class)
-                    .help("Directory containing yang schemas to describe simulated devices. Some schemas e.g. netconf monitoring and inet types are included by default")
-                    .dest("schemas-dir");
-
-            parser.addArgument("--notification-file")
-                    .type(File.class)
-                    .help("Xml file containing notifications that should be sent to clients after create subscription is called")
-                    .dest("notification-file");
-
-            parser.addArgument("--initial-config-xml-file")
-                    .type(File.class)
-                    .help("Xml file containing initial simulatted configuration to be returned via get-config rpc")
-                    .dest("initial-config-xml-file");
-
-            parser.addArgument("--starting-port")
-                    .type(Integer.class)
-                    .setDefault(17830)
-                    .help("First port for simulated device. Each other device will have previous+1 port number")
-                    .dest("starting-port");
-
-            parser.addArgument("--generate-config-connection-timeout")
-                    .type(Integer.class)
-                    .setDefault((int)TimeUnit.MINUTES.toMillis(30))
-                    .help("Timeout to be generated in initial config files")
-                    .dest("generate-config-connection-timeout");
-
-            parser.addArgument("--generate-config-address")
-                    .type(String.class)
-                    .setDefault("127.0.0.1")
-                    .help("Address to be placed in generated configs")
-                    .dest("generate-config-address");
-
-            parser.addArgument("--generate-configs-batch-size")
-                    .type(Integer.class)
-                    .setDefault(4000)
-                    .help("Number of connector configs per generated file")
-                    .dest("generate-configs-batch-size");
-
-            parser.addArgument("--distribution-folder")
-                    .type(File.class)
-                    .help("Directory where the karaf distribution for controller is located")
-                    .dest("distro-folder");
-
-            parser.addArgument("--ssh")
-                    .type(Boolean.class)
-                    .setDefault(true)
-                    .help("Whether to use ssh for transport or just pure tcp")
-                    .dest("ssh");
-
-            parser.addArgument("--exi")
-                    .type(Boolean.class)
-                    .setDefault(true)
-                    .help("Whether to use exi to transport xml content")
-                    .dest("exi");
-
-            parser.addArgument("--debug")
-                    .type(Boolean.class)
-                    .setDefault(false)
-                    .help("Whether to use debug log level instead of INFO")
-                    .dest("debug");
-
-            parser.addArgument("--md-sal")
-                    .type(Boolean.class)
-                    .setDefault(false)
-                    .help("Whether to use md-sal datastore instead of default simulated datastore.")
-                    .dest("md-sal");
-
-            return parser;
-        }
-
-        void validate() {
-            checkArgument(deviceCount > 0, "Device count has to be > 0");
-            checkArgument(startingPort > 1023, "Starting port has to be > 1023");
-            checkArgument(devicesPerPort > 0, "Atleast one device per port needed");
-
-            if(schemasDir != null) {
-                checkArgument(schemasDir.exists(), "Schemas dir has to exist");
-                checkArgument(schemasDir.isDirectory(), "Schemas dir has to be a directory");
-                checkArgument(schemasDir.canRead(), "Schemas dir has to be readable");
-            }
-        }
-    }
-
-    public static void main(final String[] args) {
-        final Params params = parseArgs(args, Params.getParser());
+        public static void main(final String[] args) {
+        final MainParameters params = MainParameters.parseArgs(args, MainParameters.getParser());
         params.validate();
-
         final ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(params.debug ? Level.DEBUG : Level.INFO);
 
@@ -204,6 +57,15 @@ public final class Main {
                 LOG.error("Failed to start any simulated devices, exiting...");
                 System.exit(1);
             }
+            final ArrayList<ArrayList<Execution.DestToPayload>> allThreadsPayloads = params.getThreadsPayloads(openDevices);
+            final ArrayList<Execution> executor = new ArrayList<>();
+            for (ArrayList<Execution.DestToPayload> payloads : allThreadsPayloads) {
+                executor.add(new Execution(params, payloads));
+            }
+
+            final ExecutorService executorService = Executors.newFixedThreadPool(1);
+            executorService.invokeAll(executor,20,TimeUnit.SECONDS);
+
             if(params.distroFolder != null) {
                 final ConfigGenerator configGenerator = new ConfigGenerator(params.distroFolder, openDevices);
                 final List<File> generated = configGenerator.generate(
@@ -212,6 +74,7 @@ public final class Main {
                         params.devicesPerPort);
                 configGenerator.updateFeatureFile(generated);
                 configGenerator.changeLoadOrder();
+
             }
         } catch (final Exception e) {
             LOG.error("Unhandled exception", e);
@@ -229,18 +92,7 @@ public final class Main {
         }
     }
 
-    private static Params parseArgs(final String[] args, final ArgumentParser parser) {
-        final Params opt = new Params();
-        try {
-            parser.parseArgs(args, opt);
-            return opt;
-        } catch (final ArgumentParserException e) {
-            parser.handleError(e);
-        }
 
-        System.exit(1);
-        return null;
-    }
 
     private static class ConfigGenerator {
         public static final String NETCONF_CONNECTOR_XML = "/99-netconf-connector-simulated.xml";
