@@ -3,41 +3,41 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.opendaylight.netconf</groupId>
-    <artifactId>netconf-subsystem</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <groupId>org.opendaylight.controller</groupId>
+    <artifactId>config-parent</artifactId>
+    <version>0.5.0-SNAPSHOT</version>
+    <relativePath/>
   </parent>
-  <artifactId>netconf-mapping-api</artifactId>
 
-  <packaging>bundle</packaging>
+  <groupId>org.opendaylight.netconf</groupId>
+  <artifactId>netconf-mapping-api</artifactId>
+  <version>1.1.0-SNAPSHOT</version>
   <name>${project.artifactId}</name>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.opendaylight.netconf</groupId>
+        <artifactId>netconf-subsystem</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-api</artifactId>
     </dependency>
-      <dependency>
-          <groupId>org.opendaylight.controller</groupId>
-          <artifactId>config-manager-facade-xml</artifactId>
-      </dependency>
-
+    <dependency>
+      <groupId>org.opendaylight.controller</groupId>
+      <artifactId>config-manager-facade-xml</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-      </plugin>
-        <plugin>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-maven-plugin</artifactId>
-        </plugin>
-    </plugins>
-  </build>
 </project>
