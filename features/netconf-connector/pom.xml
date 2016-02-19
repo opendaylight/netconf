@@ -31,7 +31,6 @@
     <netconf.version>1.1.0-SNAPSHOT</netconf.version>
     <netconf.connector.version>1.4.0-SNAPSHOT</netconf.connector.version>
     <yangtools.version>1.0.0-SNAPSHOT</yangtools.version>
-    <surefire.version>2.15</surefire.version>
 
     <features.file>features.xml</features.file>
     <config.configfile.directory>etc/opendaylight/karaf</config.configfile.directory>
@@ -109,10 +108,6 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-connector-config</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>abstract-topology</artifactId>
     </dependency>
     <dependency>
@@ -155,17 +150,8 @@
       <type>xml</type>
       <classifier>config</classifier>
     </dependency>
-
-    <!--FIXME BUG-2195 When running single feature tests for netconf connector, features including ssh proxy server always fail (this behavior does not appear when running karaf distro directly)-->
-    <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>opendaylight-karaf-empty</artifactId>
-      <version>${commons.opendaylight.version}</version>
-      <scope>test</scope>
-      <type>zip</type>
-    </dependency>
-
   </dependencies>
+
   <scm>
     <connection>scm:git:http://git.opendaylight.org/gerrit/controller.git</connection>
     <developerConnection>scm:git:ssh://git.opendaylight.org:29418/controller.git</developerConnection>
