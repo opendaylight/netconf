@@ -4,8 +4,9 @@
 
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
-        <artifactId>odlparent</artifactId>
+        <artifactId>odlparent-lite</artifactId>
         <version>1.7.0-SNAPSHOT</version>
+        <relativePath/>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
@@ -23,13 +24,8 @@
     </modules>
 
     <properties>
-        <aaa.version>0.4.0-SNAPSHOT</aaa.version>
-        <akka.version>2.3.14</akka.version>
-        <commons.logback_settings.version>0.3.0-SNAPSHOT</commons.logback_settings.version>
-        <commons.opendaylight.version>1.7.0-SNAPSHOT</commons.opendaylight.version>
         <config.version>0.5.0-SNAPSHOT</config.version>
         <config.configfile.directory>etc/opendaylight/karaf</config.configfile.directory>
-        <exi.nagasena.version>0000.0002.0053.0</exi.nagasena.version>
         <features.test.version>1.7.0-SNAPSHOT</features.test.version>
         <ietf-inet-types.version>2010.09.24.9-SNAPSHOT</ietf-inet-types.version>
         <ietf-restconf.version>2013.10.19.9-SNAPSHOT</ietf-restconf.version>
@@ -41,10 +37,6 @@
         <controller.mdsal.version>1.4.0-SNAPSHOT</controller.mdsal.version>
         <netconf.version>1.1.0-SNAPSHOT</netconf.version>
         <restconf.version>1.4.0-SNAPSHOT</restconf.version>
-        <protocol-framework.version>0.8.0-SNAPSHOT</protocol-framework.version>
-        <sshd-core.version>0.14.0</sshd-core.version>
-        <scala.major.version>2.11</scala.major.version>
-        <scala.minor.version>7</scala.minor.version>
         <surefire.version>2.15</surefire.version>
         <yangtools.version>1.0.0-SNAPSHOT</yangtools.version>
 
@@ -80,7 +72,7 @@
         <dependency>
           <groupId>org.opendaylight.aaa</groupId>
           <artifactId>aaa-artifacts</artifactId>
-          <version>${aaa.version}</version>
+          <version>0.4.0-SNAPSHOT</version>
           <type>pom</type>
           <scope>import</scope>
         </dependency>
