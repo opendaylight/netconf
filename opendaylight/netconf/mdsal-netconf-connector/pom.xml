@@ -3,15 +3,48 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.opendaylight.netconf</groupId>
-    <artifactId>netconf-subsystem</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <groupId>org.opendaylight.controller</groupId>
+    <artifactId>config-parent</artifactId>
+    <version>0.5.0-SNAPSHOT</version>
+    <relativePath/>
   </parent>
+
+  <groupId>org.opendaylight.netconf</groupId>
   <artifactId>mdsal-netconf-connector</artifactId>
-  <packaging>bundle</packaging>
+  <version>1.1.0-SNAPSHOT</version>
   <name>${project.artifactId}</name>
+  <packaging>bundle</packaging>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.opendaylight.netconf</groupId>
+        <artifactId>netconf-subsystem</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-data-impl</artifactId>
+
+      <!-- FIXME: this should not be necessary and it hurts shareability -->
+      <exclusions>
+          <exclusion>
+              <groupId>org.opendaylight.yangtools</groupId>
+              <artifactId>object-cache-api</artifactId>
+          </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>object-cache-noop</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-api</artifactId>
@@ -32,32 +65,14 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-data-impl</artifactId>
-      <exclusions>
-          <exclusion>
-              <groupId>org.opendaylight.yangtools</groupId>
-              <artifactId>object-cache-api</artifactId>
-          </exclusion>
-      </exclusions>
 
-    </dependency>
-      <dependency>
-          <groupId>org.opendaylight.yangtools</groupId>
-          <artifactId>object-cache-noop</artifactId>
-      </dependency>
-      <dependency>
+    <dependency>
       <groupId>org.opendaylight.controller</groupId>
       <artifactId>sal-core-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.controller</groupId>
       <artifactId>sal-dom-config</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>commons.logback_settings</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
@@ -101,23 +116,4 @@
           <scope>test</scope>
       </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Import-Package>*</Import-Package>
-          </instructions>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.opendaylight.yangtools</groupId>
-        <artifactId>yang-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-
 </project>
