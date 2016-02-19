@@ -284,8 +284,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
     }
 
     private List<SchemaPath> getMatchingNotifications(NotificationPattern notificationPattern) {
-        // FIXME: default language should already be regex
-        final String regex = Util.wildcardToRegex(notificationPattern.getValue());
+        final String regex = notificationPattern.getValue();
 
         final Pattern pattern = Pattern.compile(regex);
         List<SchemaPath> availableNotifications = getAvailableNotifications();
