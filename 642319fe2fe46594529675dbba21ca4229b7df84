@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a3d3df0_cd155ee6",
+        "filename": "opendaylight/netconf/messagebus-netconf/src/test/java/org/opendaylight/controller/messagebus/eventsources/netconf/NetconfEventSourceTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-02-19T13:29:27Z",
+      "side": 1,
+      "message": "all the tests in this package should have be a part of org.opendaylight.netconf package otherwise we\u0027ll have incorrect coverage report. Please also move other tests in this package to org.opendaylight.netconf",
+      "range": {
+        "startLine": 8,
+        "startChar": 25,
+        "endLine": 8,
+        "endChar": 35
+      },
+      "revId": "642319fe2fe46594529675dbba21ca4229b7df84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
