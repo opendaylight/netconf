@@ -31,7 +31,6 @@
     <netconf.version>1.1.0-SNAPSHOT</netconf.version>
     <netconf.connector.version>1.4.0-SNAPSHOT</netconf.connector.version>
     <yangtools.version>1.0.0-SNAPSHOT</yangtools.version>
-    <surefire.version>2.15</surefire.version>
 
     <features.file>features.xml</features.file>
     <config.configfile.directory>etc/opendaylight/karaf</config.configfile.directory>

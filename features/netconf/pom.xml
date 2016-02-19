@@ -7,7 +7,7 @@
     <version>1.7.0-SNAPSHOT</version>
     <relativePath/>
   </parent>
-  <!-- FIXME: Convert to features-parent -->
+
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>features-netconf</artifactId>
   <version>1.1.0-SNAPSHOT</version>
@@ -18,7 +18,6 @@
     <commons.opendaylight.version>1.7.0-SNAPSHOT</commons.opendaylight.version>
     <controller.mdsal.version>1.4.0-SNAPSHOT</controller.mdsal.version>
     <config.version>0.5.0-SNAPSHOT</config.version>
-    <exi.nagasena.version>0000.0002.0053.0</exi.nagasena.version>
     <features.test.version>1.7.0-SNAPSHOT</features.test.version>
     <mdsal.model.version>0.9.0-SNAPSHOT</mdsal.model.version>
     <netconf.version>1.1.0-SNAPSHOT</netconf.version>
@@ -26,7 +25,6 @@
     <yangtools.version>1.0.0-SNAPSHOT</yangtools.version>
     <sshd-core.version>0.14.0</sshd-core.version>
 
-    <features.file>features.xml</features.file>
     <config.configfile.directory>etc/opendaylight/karaf</config.configfile.directory>
     <config.netconf.client.configfile>01-netconf.xml</config.netconf.client.configfile>
     <config.netconf.mdsal.configfile>08-mdsal-netconf.xml</config.netconf.mdsal.configfile>
@@ -141,10 +139,6 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-config</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>netconf-auth</artifactId>
     </dependency>
     <dependency>
@@ -208,16 +202,6 @@
       <artifactId>netconf-netty-util</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.sshd</groupId>
-      <artifactId>sshd-core</artifactId>
-      <version>${sshd-core.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>openexi</groupId>
-      <artifactId>nagasena</artifactId>
-      <version>${exi.nagasena.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-jdk15on</artifactId>
     </dependency>
@@ -232,14 +216,12 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-config</artifactId>
-      <version>${netconf.version}</version>
       <type>xml</type>
       <classifier>config</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-connector-config</artifactId>
-      <version>${netconf.version}</version>
       <type>xml</type>
       <classifier>config</classifier>
     </dependency>
