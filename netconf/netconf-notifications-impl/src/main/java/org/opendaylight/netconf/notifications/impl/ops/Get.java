@@ -15,11 +15,12 @@ import javax.xml.transform.dom.DOMResult;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlMappingConstants;
-import org.opendaylight.netconf.util.mapping.AbstractNetconfOperation;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
+import org.opendaylight.netconf.util.NetconfUtil;
+import org.opendaylight.netconf.util.mapping.AbstractNetconfOperation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.NetconfBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
@@ -68,7 +69,7 @@ public class Get extends AbstractNetconfOperation implements AutoCloseable {
         final DOMResult result = new DOMResult(getPlaceholder(partialResponse));
 
         try {
-            NotificationsTransformUtil.writeNormalizedNode(normalized, result, SchemaPath.ROOT);
+            NetconfUtil.writeNormalizedNode(normalized, result, SchemaPath.ROOT, NotificationsTransformUtil.NOTIFICATIONS_SCHEMA_CTX);
         } catch (final XMLStreamException | IOException e) {
             throw new IllegalStateException("Unable to serialize " + netconfSubtree, e);
         }
