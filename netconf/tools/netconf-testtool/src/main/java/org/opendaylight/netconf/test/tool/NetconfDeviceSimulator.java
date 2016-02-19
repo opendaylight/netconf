@@ -146,7 +146,7 @@ public class NetconfDeviceSimulator implements Closeable {
         return new NetconfServerDispatcherImpl(serverChannelInitializer, nettyThreadgroup, nettyThreadgroup);
     }
 
-    public List<Integer> start(final Main.Params params) {
+    public List<Integer> start(final TesttoolParameters params) {
         LOG.info("Starting {}, {} simulated devices starting on port {}", params.deviceCount, params.ssh ? "SSH" : "TCP", params.startingPort);
 
         final SharedSchemaRepository schemaRepo = new SharedSchemaRepository("netconf-simulator");
@@ -267,7 +267,7 @@ public class NetconfDeviceSimulator implements Closeable {
         }
     }
 
-    private Set<Capability> parseSchemasToModuleCapabilities(final Main.Params params, final SharedSchemaRepository consumer) {
+    private Set<Capability> parseSchemasToModuleCapabilities(final TesttoolParameters params, final SharedSchemaRepository consumer) {
         final Set<SourceIdentifier> loadedSources = Sets.newHashSet();
 
         consumer.registerSchemaSourceListener(TextToASTTransformer.create(consumer, consumer));
