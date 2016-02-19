@@ -12,10 +12,12 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import org.opendaylight.controller.cluster.datastore.node.utils.stream.NormalizedNodeInputStreamReader;
-import org.opendaylight.controller.cluster.datastore.node.utils.stream.NormalizedNodeOutputStreamWriter;
+import org.opendaylight.controller.cluster.datastore.node.utils.stream.NormalizedNodeDataInput;
+import org.opendaylight.controller.cluster.datastore.node.utils.stream.NormalizedNodeDataOutput;
+import org.opendaylight.controller.cluster.datastore.node.utils.stream.NormalizedNodeInputOutput;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 
 public class NormalizedNodeMessage implements Externalizable{
@@ -42,19 +44,19 @@ public class NormalizedNodeMessage implements Externalizable{
     }
 
     @Override
-    public void writeExternal(ObjectOutput out) throws IOException {
-        final NormalizedNodeOutputStreamWriter streamWriter = new NormalizedNodeOutputStreamWriter(out);
-        final NormalizedNodeWriter normalizedNodeWriter = NormalizedNodeWriter.forStreamWriter(streamWriter);
+    public void writeExternal(final ObjectOutput out) throws IOException {
+        final NormalizedNodeDataOutput dataOutput = NormalizedNodeInputOutput.newDataOutput(out);
+        final NormalizedNodeWriter normalizedNodeWriter = NormalizedNodeWriter.forStreamWriter((NormalizedNodeStreamWriter) dataOutput);
 
-        streamWriter.writeYangInstanceIdentifier(identifier);
+        dataOutput.writeYangInstanceIdentifier(identifier);
         normalizedNodeWriter.write(node);
     }
 
     @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        final NormalizedNodeInputStreamReader streamReader = new NormalizedNodeInputStreamReader(in);
+    public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
+        final NormalizedNodeDataInput dataInput = NormalizedNodeInputOutput.newDataInput(in);
 
-        identifier = streamReader.readYangInstanceIdentifier();
-        node = streamReader.readNormalizedNode();
+        identifier = dataInput.readYangInstanceIdentifier();
+        node = dataInput.readNormalizedNode();
     }
 }
