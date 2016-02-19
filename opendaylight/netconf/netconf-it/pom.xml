@@ -10,6 +10,7 @@
 
   <artifactId>netconf-it</artifactId>
   <name>${project.artifactId}</name>
+  <packaging>jar</packaging>
 
   <dependencies>
     <dependency>
