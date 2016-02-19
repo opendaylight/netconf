@@ -17,12 +17,11 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import javassist.ClassPool;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.notifications.NetconfNotification;
+import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yangtools.binding.data.codec.gen.impl.StreamWriterGenerator;
@@ -31,10 +30,6 @@ import org.opendaylight.yangtools.sal.binding.generator.impl.ModuleInfoBackedCon
 import org.opendaylight.yangtools.sal.binding.generator.util.BindingRuntimeContext;
 import org.opendaylight.yangtools.sal.binding.generator.util.JavassistUtils;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.data.impl.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -50,14 +45,11 @@ public final class NotificationsTransformUtil {
 
     static final SchemaContext NOTIFICATIONS_SCHEMA_CTX;
     static final BindingNormalizedNodeCodecRegistry CODEC_REGISTRY;
-    static final XMLOutputFactory XML_FACTORY;
     static final RpcDefinition CREATE_SUBSCRIPTION_RPC;
 
     static final SchemaPath CAPABILITY_CHANGE_SCHEMA_PATH = SchemaPath.create(true, NetconfCapabilityChange.QNAME);
 
     static {
-        XML_FACTORY = XMLOutputFactory.newFactory();
-        XML_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
 
         final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
         moduleInfoBackedContext.addModuleInfos(Collections.singletonList($YangModuleInfoImpl.getInstance()));
@@ -99,7 +91,7 @@ public final class NotificationsTransformUtil {
         final ContainerNode containerNode = CODEC_REGISTRY.toNormalizedNodeNotification(capabilityChange);
         final DOMResult result = new DOMResult(XmlUtil.newDocument());
         try {
-            writeNormalizedNode(containerNode, result, CAPABILITY_CHANGE_SCHEMA_PATH);
+            NetconfUtil.writeNormalizedNode(containerNode, result, CAPABILITY_CHANGE_SCHEMA_PATH, NOTIFICATIONS_SCHEMA_CTX);
         } catch (final XMLStreamException| IOException e) {
             throw new IllegalStateException("Unable to serialize " + capabilityChange, e);
         }
@@ -107,35 +99,6 @@ public final class NotificationsTransformUtil {
         return eventTime.isPresent() ?
                 new NetconfNotification(node, eventTime.get()):
                 new NetconfNotification(node);
-    }
-
-    static void writeNormalizedNode(final NormalizedNode<?, ?> normalized, final DOMResult result, final SchemaPath schemaPath) throws IOException, XMLStreamException {
-        NormalizedNodeWriter normalizedNodeWriter = null;
-        NormalizedNodeStreamWriter normalizedNodeStreamWriter = null;
-        XMLStreamWriter writer = null;
-        try {
-            writer = XML_FACTORY.createXMLStreamWriter(result);
-            normalizedNodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(writer, NOTIFICATIONS_SCHEMA_CTX, schemaPath);
-            normalizedNodeWriter = NormalizedNodeWriter.forStreamWriter(normalizedNodeStreamWriter);
-
-            normalizedNodeWriter.write(normalized);
-
-            normalizedNodeWriter.flush();
-        } finally {
-            try {
-                if(normalizedNodeWriter != null) {
-                    normalizedNodeWriter.close();
-                }
-                if(normalizedNodeStreamWriter != null) {
-                    normalizedNodeStreamWriter.close();
-                }
-                if(writer != null) {
-                    writer.close();
-                }
-            } catch (final Exception e) {
-                LOG.warn("Unable to close resource properly", e);
-            }
-        }
     }
 
 }
