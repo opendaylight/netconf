@@ -10,13 +10,43 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.opendaylight.netconf</groupId>
-        <artifactId>restconf-parent</artifactId>
-        <version>1.4.0-SNAPSHOT</version>
+        <groupId>org.opendaylight.odlparent</groupId>
+        <artifactId>odlparent</artifactId>
+        <version>1.7.0-SNAPSHOT</version>
+        <relativePath/>
     </parent>
 
+    <groupId>org.opendaylight.netconf</groupId>
     <artifactId>sal-rest-docgen-maven</artifactId>
+    <version>1.4.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>restconf-artifacts</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>netconf-parent</artifactId>
+                <version>1.1.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-core</artifactId>
+                <version>3.2.5</version>
+                <scope>provided</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -24,18 +54,16 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>sal-rest-docgen</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-maven-plugin-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sal-rest-docgen</artifactId>
         </dependency>
     </dependencies>
 </project>
