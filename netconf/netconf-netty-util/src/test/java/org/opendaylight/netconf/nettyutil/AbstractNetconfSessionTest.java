@@ -42,8 +42,8 @@ import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
+import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
-import org.openexi.proc.common.EXIOptions;
 
 public class AbstractNetconfSessionTest {
 
@@ -142,7 +142,7 @@ public class AbstractNetconfSessionTest {
         TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, 1L);
         testingNetconfSession = spy(testingNetconfSession);
 
-        testingNetconfSession.startExiCommunication(NetconfStartExiMessage.create(new EXIOptions(), "4"));
+        testingNetconfSession.startExiCommunication(NetconfStartExiMessage.create(EXIParameters.empty(), "4"));
         verify(testingNetconfSession).addExiHandlers(any(ByteToMessageDecoder.class), any(MessageToByteEncoder.class));
     }
 

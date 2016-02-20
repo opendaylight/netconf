@@ -11,6 +11,9 @@ package org.opendaylight.netconf.client;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
+import com.siemens.ct.exi.CodingMode;
+import com.siemens.ct.exi.FidelityOptions;
+import com.siemens.ct.exi.exceptions.UnsupportedOption;
 import io.netty.channel.Channel;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
@@ -21,13 +24,11 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 import org.opendaylight.protocol.framework.SessionListenerFactory;
 import org.opendaylight.protocol.framework.SessionNegotiator;
 import org.opendaylight.protocol.framework.SessionNegotiatorFactory;
-import org.openexi.proc.common.AlignmentType;
-import org.openexi.proc.common.EXIOptions;
-import org.openexi.proc.common.EXIOptionsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,25 +53,24 @@ public class NetconfClientSessionNegotiatorFactory implements SessionNegotiatorF
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfClientSessionNegotiatorFactory.class);
     private static final String START_EXI_MESSAGE_ID = "default-start-exi";
-    private static final EXIOptions DEFAULT_OPTIONS;
+    private static final EXIParameters DEFAULT_OPTIONS;
 
     private final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader;
     private final long connectionTimeoutMillis;
     private final Timer timer;
-    private final EXIOptions options;
+    private final EXIParameters options;
 
     static {
-        final EXIOptions opts = new EXIOptions();
+        final FidelityOptions fidelity = FidelityOptions.createDefault();
         try {
-            opts.setPreserveDTD(true);
-            opts.setPreserveNS(true);
-            opts.setPreserveLexicalValues(true);
-            opts.setAlignmentType(AlignmentType.byteAligned);
-        } catch (EXIOptionsException e) {
-            throw new ExceptionInInitializerError(e);
+            fidelity.setFidelity(FidelityOptions.FEATURE_DTD, true);
+            fidelity.setFidelity(FidelityOptions.FEATURE_LEXICAL_VALUE, true);
+            fidelity.setFidelity(FidelityOptions.FEATURE_PREFIX, true);
+        } catch (UnsupportedOption e) {
+            LOG.warn("Failed to set fidelity options, continuing", e);
         }
 
-        DEFAULT_OPTIONS = opts;
+        DEFAULT_OPTIONS = new EXIParameters(CodingMode.BYTE_PACKED, fidelity);
     }
 
     private final Set<String> clientCapabilities;
@@ -90,13 +90,13 @@ public class NetconfClientSessionNegotiatorFactory implements SessionNegotiatorF
 
     public NetconfClientSessionNegotiatorFactory(final Timer timer,
                                                  final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
-                                                 final long connectionTimeoutMillis, final EXIOptions exiOptions) {
+                                                 final long connectionTimeoutMillis, final EXIParameters exiOptions) {
         this(timer, additionalHeader, connectionTimeoutMillis, exiOptions, EXI_CLIENT_CAPABILITIES);
     }
 
     public NetconfClientSessionNegotiatorFactory(final Timer timer,
                                                  final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
-                                                 final long connectionTimeoutMillis, final EXIOptions exiOptions,
+                                                 final long connectionTimeoutMillis, final EXIParameters exiOptions,
                                                  final Set<String> capabilities) {
         this.timer = Preconditions.checkNotNull(timer);
         this.additionalHeader = additionalHeader;
