@@ -18,6 +18,7 @@ import io.netty.util.concurrent.GenericFutureListener;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.HashMap;
+import java.util.Map;
 import org.apache.sshd.ClientChannel;
 import org.apache.sshd.ClientSession;
 import org.apache.sshd.SshClient;
@@ -34,29 +35,32 @@ import org.slf4j.LoggerFactory;
  * Netty SSH handler class. Acts as interface between Netty and SSH library.
  */
 public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
+    private static final Logger LOG = LoggerFactory.getLogger(AsyncSshHandler.class);
 
     public static final String SUBSYSTEM = "netconf";
-    public static final SshClient DEFAULT_CLIENT = SshClient.setUpDefaultClient();
+
     public static final int SSH_DEFAULT_NIO_WORKERS = 8;
-    private static final Logger LOG = LoggerFactory.getLogger(AsyncSshHandler.class);
     // Disable default timeouts from mina sshd
     private static final long DEFAULT_TIMEOUT = -1L;
 
+    public static final SshClient DEFAULT_CLIENT;
     static {
-        DEFAULT_CLIENT.setProperties(new HashMap<String, String>(){
-            {
-                put(SshClient.AUTH_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
-                put(SshClient.IDLE_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
-            }
-        });
+        final Map<String, String> props = new HashMap<>();
+        props.put(SshClient.AUTH_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
+        props.put(SshClient.IDLE_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
+
+        final SshClient c = SshClient.setUpDefaultClient();
+
+        c.setProperties(props);
         // TODO make configurable, or somehow reuse netty threadpool
-        DEFAULT_CLIENT.setNioWorkers(SSH_DEFAULT_NIO_WORKERS);
-        DEFAULT_CLIENT.start();
+        c.setNioWorkers(SSH_DEFAULT_NIO_WORKERS);
+        c.start();
+        DEFAULT_CLIENT = c;
     }
 
     private final AuthenticationHandler authenticationHandler;
     private final SshClient sshClient;
-    private Future negotiationFuture;
+    private Future<?> negotiationFuture;
 
     private AsyncSshHandlerReader sshReadAsyncListener;
     private AsyncSshHandlerWriter sshWriteAsyncHandler;
@@ -66,8 +70,8 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private ChannelPromise connectPromise;
     private GenericFutureListener negotiationFutureListener;
 
-
-    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final SshClient sshClient, final Future negotiationFuture) throws IOException {
+    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final SshClient sshClient,
+            final Future<?> negotiationFuture) throws IOException {
         this(authenticationHandler, sshClient);
         this.negotiationFuture = negotiationFuture;
     }
@@ -99,7 +103,8 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
      * @return
      * @throws IOException
      */
-    public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler, final Future negotiationFuture) throws IOException {
+    public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler,
+            final Future<?> negotiationFuture) throws IOException {
         return new AsyncSshHandler(authenticationHandler, DEFAULT_CLIENT, negotiationFuture);
     }
 
@@ -218,11 +223,12 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
         if(negotiationFuture != null) {
 
-            negotiationFutureListener = new GenericFutureListener<Future<Object>>() {
+            negotiationFutureListener = new GenericFutureListener<Future<?>>() {
                 @Override
-                public void operationComplete(Future future) throws Exception {
-                    if (future.isSuccess())
+                public void operationComplete(final Future<?> future) {
+                    if (future.isSuccess()) {
                         connectPromise.setSuccess();
+                    }
                 }
             };
             //complete connection promise with netconf negotiation future

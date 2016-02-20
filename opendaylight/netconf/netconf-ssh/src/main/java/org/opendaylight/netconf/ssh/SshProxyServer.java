@@ -8,7 +8,7 @@
 
 package org.opendaylight.netconf.ssh;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
 import java.nio.channels.AsynchronousChannelGroup;
@@ -35,7 +35,6 @@ import org.apache.sshd.common.io.nio2.Nio2Acceptor;
 import org.apache.sshd.common.io.nio2.Nio2Connector;
 import org.apache.sshd.common.io.nio2.Nio2ServiceFactoryFactory;
 import org.apache.sshd.common.util.CloseableUtils;
-import org.apache.sshd.server.Command;
 import org.apache.sshd.server.PasswordAuthenticator;
 import org.apache.sshd.server.ServerFactoryManager;
 import org.apache.sshd.server.session.ServerSession;
@@ -88,19 +87,17 @@ public class SshProxyServer implements AutoCloseable {
 
         final RemoteNetconfCommand.NetconfCommandFactory netconfCommandFactory =
                 new RemoteNetconfCommand.NetconfCommandFactory(clientGroup, sshProxyServerConfiguration.getLocalAddress());
-        sshServer.setSubsystemFactories(Lists.<NamedFactory<Command>>newArrayList(netconfCommandFactory));
+        sshServer.setSubsystemFactories(ImmutableList.of(netconfCommandFactory));
         sshServer.start();
     }
 
     private static Map<String, String> getProperties(final SshProxyServerConfiguration sshProxyServerConfiguration) {
-        return new HashMap<String, String>()
-        {
-            {
-                put(ServerFactoryManager.IDLE_TIMEOUT, String.valueOf(sshProxyServerConfiguration.getIdleTimeout()));
-                // TODO make auth timeout configurable on its own
-                put(ServerFactoryManager.AUTH_TIMEOUT, String.valueOf(sshProxyServerConfiguration.getIdleTimeout()));
-            }
-        };
+        final Map<String, String> ret = new HashMap<>();
+        ret.put(ServerFactoryManager.IDLE_TIMEOUT, String.valueOf(sshProxyServerConfiguration.getIdleTimeout()));
+        // TODO make auth timeout configurable on its own
+        ret.put(ServerFactoryManager.AUTH_TIMEOUT, String.valueOf(sshProxyServerConfiguration.getIdleTimeout()));
+
+        return ret;
     }
 
     @Override
@@ -131,10 +128,12 @@ public class SshProxyServer implements AutoCloseable {
             }
         }
 
+        @Override
         public IoConnector createConnector(final IoHandler handler) {
             return new Nio2Connector(manager, handler, group);
         }
 
+        @Override
         public IoAcceptor createAcceptor(final IoHandler handler) {
             return new Nio2Acceptor(manager, handler, group);
         }

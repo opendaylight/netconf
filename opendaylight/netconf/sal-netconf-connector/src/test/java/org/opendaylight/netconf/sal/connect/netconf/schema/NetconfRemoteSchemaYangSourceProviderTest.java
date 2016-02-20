@@ -7,16 +7,16 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.schema;
 
-import static org.mockito.Mockito.any;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
-import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
 import java.net.InetSocketAddress;
 import java.util.Collections;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMSource;
 import org.junit.Assert;
 import org.junit.Before;
@@ -73,14 +73,14 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
         );
     }
 
-    private static NormalizedNode getNode() {
+    private static NormalizedNode<?, ?> getNode() throws ParserConfigurationException {
         final YangInstanceIdentifier.NodeIdentifier id = YangInstanceIdentifier.NodeIdentifier.create(
                 QName.create("urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring", "2010-10-04", "output")
         );
         final YangInstanceIdentifier.NodeIdentifier childId = YangInstanceIdentifier.NodeIdentifier.create(
                 QName.create("urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring", "2010-10-04", "data")
         );
-        Document xmlDoc = new DocumentImpl();
+        Document xmlDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         Element root = xmlDoc.createElement("data");
         root.setTextContent("module test {}");
         final DOMSource v = new DOMSource(root);
