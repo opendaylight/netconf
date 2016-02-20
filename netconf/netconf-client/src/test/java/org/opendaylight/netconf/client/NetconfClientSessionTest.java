@@ -12,7 +12,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
-
 import com.google.common.collect.Lists;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -26,7 +25,7 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToEXIEncoder;
-import org.openexi.proc.common.EXIOptions;
+import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 
 public class NetconfClientSessionTest {
 
@@ -47,7 +46,7 @@ public class NetconfClientSessionTest {
         long sessId = 20L;
         Collection<String> caps = Lists.newArrayList("cap1", "cap2");
 
-        NetconfEXICodec codec = new NetconfEXICodec(new EXIOptions());
+        NetconfEXICodec codec = NetconfEXICodec.forParameters(EXIParameters.empty());
         ChannelPipeline pipeline = mock(ChannelPipeline.class);
 
         Mockito.doReturn(pipeline).when(channel).pipeline();

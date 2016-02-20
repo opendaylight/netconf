@@ -19,7 +19,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import io.netty.channel.Channel;
@@ -50,10 +49,10 @@ import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
+import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
-import org.openexi.proc.common.EXIOptions;
 import org.w3c.dom.Document;
 
 public class NetconfClientSessionNegotiatorTest {
@@ -117,7 +116,7 @@ public class NetconfClientSessionNegotiatorTest {
         doReturn(eventLoop).when(channel).eventLoop();
         doAnswer(new Answer<Void>() {
             @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
+            public Void answer(final InvocationOnMock invocation) throws Throwable {
                 final Object[] args = invocation.getArguments();
                 final Runnable runnable = (Runnable) args[0];
                 runnable.run();
@@ -153,7 +152,7 @@ public class NetconfClientSessionNegotiatorTest {
 
     @Test
     public void testNetconfClientSessionNegotiator() throws Exception {
-        Promise promise = mock(Promise.class);
+        Promise<NetconfClientSession> promise = mock(Promise.class);
         doReturn(promise).when(promise).setSuccess(anyObject());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
 
@@ -166,9 +165,8 @@ public class NetconfClientSessionNegotiatorTest {
 
     @Test
     public void testNetconfClientSessionNegotiatorWithEXI() throws Exception {
-        Promise promise = mock(Promise.class);
-        EXIOptions exiOptions = new EXIOptions();
-        NetconfStartExiMessage exiMessage = NetconfStartExiMessage.create(exiOptions, "msg-id");
+        Promise<NetconfClientSession> promise = mock(Promise.class);
+        NetconfStartExiMessage exiMessage = NetconfStartExiMessage.create(EXIParameters.empty(), "msg-id");
         doReturn(promise).when(promise).setSuccess(anyObject());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, exiMessage);
 
