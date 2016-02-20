@@ -20,7 +20,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
-
 import com.google.common.base.Optional;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -41,10 +40,10 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
-import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
-import org.openexi.proc.common.EXIOptions;
+import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
+import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 
 public class AbstractNetconfSessionTest {
 
@@ -81,7 +80,7 @@ public class AbstractNetconfSessionTest {
         doReturn(eventLoop).when(channel).eventLoop();
         doAnswer(new Answer<Void>() {
             @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
+            public Void answer(final InvocationOnMock invocation) throws Throwable {
                 final Object[] args = invocation.getArguments();
                 final Runnable runnable = (Runnable) args[0];
                 runnable.run();
@@ -138,7 +137,7 @@ public class AbstractNetconfSessionTest {
         TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, 1L);
         testingNetconfSession = spy(testingNetconfSession);
 
-        testingNetconfSession.startExiCommunication(NetconfStartExiMessage.create(new EXIOptions(), "4"));
+        testingNetconfSession.startExiCommunication(NetconfStartExiMessage.create(EXIParameters.empty(), "4"));
         verify(testingNetconfSession).addExiHandlers(any(ByteToMessageDecoder.class), any(MessageToByteEncoder.class));
     }
 
