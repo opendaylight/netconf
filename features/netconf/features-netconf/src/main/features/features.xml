@@ -81,10 +81,13 @@
     <feature version='${project.version}'>odl-netconf-util</feature>
     <feature version='[4.0.30,5.0.0)'>odl-netty</feature>
     <bundle>mvn:org.opendaylight.netconf/netconf-netty-util/{{VERSION}}</bundle>
+    <bundle>wrap:mvn:xml-apis/xml-apis/1.4.01</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/{{VERSION}}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/{{VERSION}}</bundle>
-    <bundle>mvn:org.apache.sshd/sshd-core/{{VERSION}}</bundle>
-    <bundle>wrap:mvn:openexi/nagasena/{{VERSION}}</bundle>
+    <bundle>mvn:com.siemens.ct.exi/exificient/{{VERSION}}</bundle>
+    <bundle>mvn:com.siemens.ct.exi/exificient-core/{{VERSION}}</bundle>
+    <bundle>wrap:mvn:com.siemens.ct.exi/exificient-grammars/{{VERSION}}</bundle>
+    <bundle>wrap:mvn:xerces/xercesImpl/{{VERSION}}</bundle>
   </feature>
 
   <feature name='odl-netconf-client' version='${project.version}' description="OpenDaylight :: Netconf :: Client">

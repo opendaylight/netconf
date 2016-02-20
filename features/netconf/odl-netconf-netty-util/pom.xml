@@ -75,5 +75,10 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.siemens.ct.exi</groupId>
+            <artifactId>exificient</artifactId>
+            <version>0.9.7-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>
