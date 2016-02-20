@@ -15,19 +15,17 @@ import io.netty.channel.Channel;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.util.Set;
-import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
+import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 import org.opendaylight.protocol.framework.SessionListenerFactory;
 import org.opendaylight.protocol.framework.SessionNegotiator;
 import org.opendaylight.protocol.framework.SessionNegotiatorFactory;
-import org.openexi.proc.common.AlignmentType;
-import org.openexi.proc.common.EXIOptions;
-import org.openexi.proc.common.EXIOptionsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,15 +49,15 @@ public class NetconfClientSessionNegotiatorFactory implements SessionNegotiatorF
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfClientSessionNegotiatorFactory.class);
     private static final String START_EXI_MESSAGE_ID = "default-start-exi";
-    private static final EXIOptions DEFAULT_OPTIONS;
+    private static final EXIParameters DEFAULT_OPTIONS;
 
     private final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader;
     private final long connectionTimeoutMillis;
     private final Timer timer;
-    private final EXIOptions options;
+    private final EXIParameters options;
 
     static {
-        final EXIOptions opts = new EXIOptions();
+        final EXIParameters opts = new EXIOptions();
         try {
             opts.setPreserveDTD(true);
             opts.setPreserveNS(true);
@@ -89,13 +87,13 @@ public class NetconfClientSessionNegotiatorFactory implements SessionNegotiatorF
 
     public NetconfClientSessionNegotiatorFactory(final Timer timer,
                                                  final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
-                                                 final long connectionTimeoutMillis, final EXIOptions exiOptions) {
+                                                 final long connectionTimeoutMillis, final EXIParameters exiOptions) {
         this(timer, additionalHeader, connectionTimeoutMillis, exiOptions, EXI_CLIENT_CAPABILITIES);
     }
 
     public NetconfClientSessionNegotiatorFactory(final Timer timer,
                                                  final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
-                                                 final long connectionTimeoutMillis, final EXIOptions exiOptions, final Set<String> capabilities) {
+                                                 final long connectionTimeoutMillis, final EXIParameters exiOptions, final Set<String> capabilities) {
         this.timer = Preconditions.checkNotNull(timer);
         this.additionalHeader = additionalHeader;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
