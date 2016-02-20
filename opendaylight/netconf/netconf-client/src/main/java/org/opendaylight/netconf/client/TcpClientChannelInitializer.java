@@ -31,33 +31,34 @@ class TcpClientChannelInitializer extends AbstractChannelInitializer<NetconfClie
     }
 
     @Override
-    public void initialize(final Channel ch, Promise<NetconfClientSession> promise) {
-        final Future negotiationFuture = promise;
+    public void initialize(final Channel ch, final Promise<NetconfClientSession> promise) {
+        final Future<NetconfClientSession> negotiationFuture = promise;
 
         //We have to add this channel outbound handler to channel pipeline, in order
         //to get notifications from netconf negotiatior. Set connection promise to
         //success only after successful negotiation.
         ch.pipeline().addFirst(new ChannelOutboundHandlerAdapter() {
             ChannelPromise connectPromise;
-            GenericFutureListener negotiationFutureListener;
+            GenericFutureListener<Future<NetconfClientSession>> negotiationFutureListener;
 
             @Override
-            public void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress,
+            public void connect(final ChannelHandlerContext ctx, final SocketAddress remoteAddress, final SocketAddress localAddress,
                                 final ChannelPromise channelPromise) throws Exception {
                 connectPromise = channelPromise;
                 ChannelPromise tcpConnectFuture = new DefaultChannelPromise(ch);
 
-                negotiationFutureListener = new GenericFutureListener<Future<Object>>() {
+                negotiationFutureListener = new GenericFutureListener<Future<NetconfClientSession>>() {
                     @Override
-                    public void operationComplete(Future future) throws Exception {
-                        if (future.isSuccess())
+                    public void operationComplete(final Future<NetconfClientSession> future) throws Exception {
+                        if (future.isSuccess()) {
                             connectPromise.setSuccess();
+                        }
                     }
                 };
 
                 tcpConnectFuture.addListener(new GenericFutureListener<Future<? super Void>>() {
                     @Override
-                    public void operationComplete(Future<? super Void> future) throws Exception {
+                    public void operationComplete(final Future<? super Void> future) throws Exception {
                         if(future.isSuccess()) {
                             //complete connection promise with netconf negotiation future
                             negotiationFuture.addListener(negotiationFutureListener);
@@ -70,7 +71,7 @@ class TcpClientChannelInitializer extends AbstractChannelInitializer<NetconfClie
             }
 
             @Override
-            public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+            public void disconnect(final ChannelHandlerContext ctx, final ChannelPromise promise) throws Exception {
                 // If we have already succeeded and the session was dropped after, we need to fire inactive to notify reconnect logic
                 if(connectPromise.isSuccess()) {
                     ctx.fireChannelInactive();

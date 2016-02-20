@@ -13,7 +13,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
-
 import com.google.common.collect.Sets;
 import java.io.InputStream;
 import java.util.Collections;
@@ -72,7 +71,7 @@ public class NetconfToRpcRequestTest {
         messageTransformer = new NetconfMessageTransformer(cfgCtx, true);
     }
 
-    private LeafNode<Object> buildLeaf(final QName running, final Object value) {
+    private static LeafNode<Object> buildLeaf(final QName running, final Object value) {
         return Builders.leafBuilder().withNodeIdentifier(toId(running)).withValue(value).build();
     }
 
