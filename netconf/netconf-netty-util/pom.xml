@@ -41,14 +41,9 @@
       </dependency>
 
       <dependency>
-        <groupId>openexi</groupId>
-        <artifactId>nagasena</artifactId>
-        <version>0000.0002.0062.0</version>
-      </dependency>
-      <dependency>
-        <groupId>openexi</groupId>
-        <artifactId>nagasena-rta</artifactId>
-        <version>0000.0002.0062.0</version>
+        <groupId>com.siemens.ct.exi</groupId>
+        <artifactId>exificient</artifactId>
+        <version>0.9.6</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -89,12 +84,13 @@
       <version>0.14.0</version>
     </dependency>
     <dependency>
-      <groupId>openexi</groupId>
-      <artifactId>nagasena</artifactId>
+      <groupId>com.siemens.ct.exi</groupId>
+      <artifactId>exificient</artifactId>
     </dependency>
     <dependency>
-      <groupId>openexi</groupId>
-      <artifactId>nagasena-rta</artifactId>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis</artifactId>
+      <version>1.4.01</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -112,6 +108,21 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Embed-Dependency>exificient;inline=true</Embed-Dependency>
+
+            <!-- Order of these is important -->
+            <Embed-Dependency>xercesImpl;inline=true</Embed-Dependency>
+            <Embed-Dependency>xml-apis;inline=true</Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
+          </instructions>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
