@@ -41,14 +41,9 @@
       </dependency>
 
       <dependency>
-        <groupId>openexi</groupId>
-        <artifactId>nagasena</artifactId>
-        <version>0000.0002.0053.0</version>
-      </dependency>
-      <dependency>
-        <groupId>openexi</groupId>
-        <artifactId>nagasena-rta</artifactId>
-        <version>0000.0002.0053.0</version>
+        <groupId>com.siemens.ct.exi</groupId>
+        <artifactId>exificient</artifactId>
+        <version>0.9.7-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -89,12 +84,8 @@
       <version>0.14.0</version>
     </dependency>
     <dependency>
-      <groupId>openexi</groupId>
-      <artifactId>nagasena</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>openexi</groupId>
-      <artifactId>nagasena-rta</artifactId>
+      <groupId>com.siemens.ct.exi</groupId>
+      <artifactId>exificient</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
