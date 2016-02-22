@@ -32,6 +32,9 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Topic registration for notification stream.
+ */
 public class StreamNotificationTopicRegistration extends NotificationTopicRegistration {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamNotificationTopicRegistration.class);
@@ -53,6 +56,12 @@ public class StreamNotificationTopicRegistration extends NotificationTopicRegist
     private ConcurrentHashMap<SchemaPath, ListenerRegistration<NetconfEventSource>> notificationRegistrationMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<SchemaPath, ArrayList<TopicId>> notificationTopicMap = new ConcurrentHashMap<>();
 
+    /**
+     * Creates registration to notification stream.
+     * @param stream stream
+     * @param notificationPrefix notifications namespace
+     * @param netconfEventSource event source
+     */
     public StreamNotificationTopicRegistration(final Stream stream, final String notificationPrefix,
         NetconfEventSource netconfEventSource) {
         super(NotificationSourceType.NetconfDeviceStream, stream.getName().getValue(), notificationPrefix);
@@ -66,6 +75,9 @@ public class StreamNotificationTopicRegistration extends NotificationTopicRegist
         LOG.info("StreamNotificationTopicRegistration initialized for {}", getStreamName());
     }
 
+    /**
+     * Subscribes to notification stream associated with this registration.
+     */
     void activateNotificationSource() {
         if (isActive() == false) {
             LOG.info("Stream {} is not active on node {}. Will subscribe.", this.getStreamName(), this.nodeId);
@@ -87,6 +99,10 @@ public class StreamNotificationTopicRegistration extends NotificationTopicRegist
         }
     }
 
+    /**
+     * Subscribes to notification stream associated with this registration. If replay is supported, notifications from last
+     * received event time will be requested.
+     */
     void reActivateNotificationSource() {
         if (isActive()) {
             LOG.info("Stream {} is reactivating on node {}.", this.getStreamName(), this.nodeId);
