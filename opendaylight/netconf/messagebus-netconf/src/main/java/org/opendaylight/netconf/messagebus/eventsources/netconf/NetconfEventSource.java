@@ -73,6 +73,10 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+/**
+ * NetconfEventSource serves as proxy between nodes and messagebus. Subscribers can join topic stream from this source.
+ * Then they will receive notifications that matches pattern specified by topic.
+ */
 public class NetconfEventSource implements EventSource, DOMNotificationListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfEventSource.class);
@@ -96,6 +100,14 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
     private final Map<String, String> urnPrefixToStreamMap; // key = urnPrefix, value = StreamName
     private final List<NotificationTopicRegistration> notificationTopicRegistrationList = new ArrayList<>();
 
+    /**
+     * Creates new NetconfEventSource for node. Topic notifications will be published via provided {@link DOMNotificationPublishService}
+     * @param node node
+     * @param streamMap netconf streams from device
+     * @param netconfMount
+     * @param mountPoint
+     * @param publishService publish service
+     */
     public NetconfEventSource(final Node node, final Map<String, String> streamMap, final DOMMountPoint netconfMount,
         final MountPoint mountPoint, final DOMNotificationPublishService publishService) {
         this.netconfMount = Preconditions.checkNotNull(netconfMount);
@@ -283,6 +295,11 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
         }
     }
 
+    /**
+     * Returns all available notification paths that matches given pattern.
+     * @param notificationPattern pattern
+     * @return notification paths
+     */
     private List<SchemaPath> getMatchingNotifications(NotificationPattern notificationPattern) {
         final String regex = notificationPattern.getValue();
 

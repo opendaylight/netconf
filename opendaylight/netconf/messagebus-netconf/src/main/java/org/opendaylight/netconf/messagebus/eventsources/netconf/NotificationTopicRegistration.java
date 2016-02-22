@@ -13,6 +13,9 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Notification topic registration.
+ */
 public abstract class NotificationTopicRegistration implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NotificationTopicRegistration.class);
@@ -57,6 +60,11 @@ public abstract class NotificationTopicRegistration implements AutoCloseable {
         return notificationUrnPrefix;
     }
 
+    /**
+     * Checks, if notification is from namespace belonging to this registration.
+     * @param notificationPath path
+     * @return true, if notification belongs to registration namespace
+     */
     public boolean checkNotificationPath(SchemaPath notificationPath) {
         if (notificationPath == null) {
             return false;
@@ -73,10 +81,26 @@ public abstract class NotificationTopicRegistration implements AutoCloseable {
 
     abstract void reActivateNotificationSource();
 
+    /**
+     * Registers associated event source notification to topic.
+     * @param notificationPath notification path
+     * @param topicId topic id
+     * @return true, if successful
+     */
     abstract boolean registerNotificationTopic(SchemaPath notificationPath, TopicId topicId);
 
+    /**
+     * Registers associated event source notification to topic.
+     * @param topicId topic id
+     * @return true, if successful
+     */
     abstract void unRegisterNotificationTopic(TopicId topicId);
 
+    /**
+     * Returns registered topics for given path.
+     * @param notificationPath path
+     * @return topicIds
+     */
     abstract ArrayList<TopicId> getNotificationTopicIds(SchemaPath notificationPath);
 
     public boolean isReplaySupported() {

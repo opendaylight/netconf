@@ -36,6 +36,10 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * NetconfEventSourceManager implements DataChangeListener. On topology changes, it manages creation,
+ * updating and removing registrations of event sources.
+ */
 public final class NetconfEventSourceManager implements DataChangeListener, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfEventSourceManager.class);
