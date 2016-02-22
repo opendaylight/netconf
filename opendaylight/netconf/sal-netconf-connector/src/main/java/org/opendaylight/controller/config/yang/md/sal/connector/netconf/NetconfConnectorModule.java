@@ -358,6 +358,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         .withConnectStrategyFactory(sf)
         .withSessionListener(listener)
         .build();
+        // Add tls here
     }
 
     private static final class SalConnectorCloseable implements AutoCloseable {

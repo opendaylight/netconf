@@ -46,6 +46,13 @@ module netconf-node-topology {
             type boolean;
         }
 
+        leaf tls {
+            config true;
+            type boolean;
+            default false;
+            description "This is preferred way for connection over TCP and SSH";
+        }
+
         container yang-module-capabilities {
             config true;
             leaf override {

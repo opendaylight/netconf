@@ -109,6 +109,6 @@ public class NetconfClientConfiguration {
     }
 
     public static enum NetconfClientProtocol {
-        TCP, SSH
+        TCP, SSH, TLS
     }
 }

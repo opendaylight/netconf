@@ -54,6 +54,8 @@ public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClien
             return createReconnectingTcpClient(clientConfiguration);
         case SSH:
             return createReconnectingSshClient(clientConfiguration);
+        case TLS:
+            // Here start implementation for TLS.
         default:
             throw new IllegalArgumentException("Unknown client protocol " + clientConfiguration.getProtocol());
         }
