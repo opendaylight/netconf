@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.topology;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.FutureCallback;
@@ -20,6 +21,7 @@ import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -44,6 +46,7 @@ import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
+import org.opendaylight.netconf.sal.connect.netconf.listener.UserPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.pipeline.TopologyMountPointFacade.ConnectionStatusListenerRegistration;
@@ -284,7 +287,14 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         final NetconfDevice device = new NetconfDevice(schemaResourcesDTO, remoteDeviceId, salFacade,
                 processingExecutor.getExecutor(), reconnectOnChangedSchema);
 
-        return new NetconfConnectorDTO(new NetconfDeviceCommunicator(remoteDeviceId, device), salFacade);
+        final Optional<NetconfSessionPreferences> userCapabilities = getUserCapabilities(node);
+
+        return new NetconfConnectorDTO(
+                userCapabilities.isPresent() ?
+                        new NetconfDeviceCommunicator(
+                                remoteDeviceId, device, new UserPreferences(userCapabilities.get(), node.getYangModuleCapabilities().isOverride())):
+                        new NetconfDeviceCommunicator(remoteDeviceId, device)
+                , salFacade);
     }
 
     protected NetconfDevice.SchemaResourcesDTO setupSchemaCacheDTO(final NodeId nodeId, final NetconfNode node) {
@@ -442,6 +452,24 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
             final String ip = ipAddress.getIpv4Address() != null ? ipAddress.getIpv4Address().getValue() : ipAddress.getIpv6Address().getValue();
             return new InetSocketAddress(ip, port);
         }
+    }
+
+    private Optional<NetconfSessionPreferences> getUserCapabilities(final NetconfNode node) {
+        if(node.getYangModuleCapabilities() == null) {
+            return Optional.absent();
+        }
+
+        final List<String> capabilities = node.getYangModuleCapabilities().getCapability();
+        if(capabilities == null || capabilities.isEmpty()) {
+            return Optional.absent();
+        }
+
+        final NetconfSessionPreferences parsedOverrideCapabilities = NetconfSessionPreferences.fromStrings(capabilities);
+        Preconditions.checkState(parsedOverrideCapabilities.getNonModuleCaps().isEmpty(), "Capabilities to override can " +
+                "only contain module based capabilities, non-module capabilities will be retrieved from the device," +
+                " configured non-module capabilities: " + parsedOverrideCapabilities.getNonModuleCaps());
+
+        return Optional.of(parsedOverrideCapabilities);
     }
 
     private static final class TimedReconnectStrategyFactory implements ReconnectStrategyFactory {
