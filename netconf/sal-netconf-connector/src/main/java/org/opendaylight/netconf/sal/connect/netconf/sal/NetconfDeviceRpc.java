@@ -40,7 +40,6 @@ public final class NetconfDeviceRpc implements DOMRpcService {
     private static final Function<RpcDefinition, DOMRpcIdentifier> RPC_TO_RPC_IDENTIFIER = new Function<RpcDefinition, DOMRpcIdentifier>() {
         @Override
         public DOMRpcIdentifier apply(final RpcDefinition input) {
-            // TODO add support for routed rpcs ... is it necessary in this case ?
             return DOMRpcIdentifier.create(input.getPath());
         }
     };
