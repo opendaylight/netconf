@@ -1,0 +1,7 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: Tony Tkacik <ttkacik@cisco.com>
+Submitted-by: Tony Tkacik <ttkacik@cisco.com>
+Submitted-at: Tue, 23 Feb 2016 10:05:34 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/34667
+Project: netconf
+Branch: refs/heads/stable/beryllium
