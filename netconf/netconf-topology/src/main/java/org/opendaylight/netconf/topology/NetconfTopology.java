@@ -19,7 +19,6 @@ import org.opendaylight.netconf.topology.pipeline.TopologyMountPointFacade.Conne
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 
-// TODO maybe rename to NetconfTopologyDispatcher?
 public interface NetconfTopology {
 
     String getTopologyId();

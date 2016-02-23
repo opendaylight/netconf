@@ -137,8 +137,7 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
     @Override
     protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId,
                                                            final NetconfNode node) {
-        //setup default values since default value is not supported yet in mdsal
-        // TODO remove this when mdsal starts supporting default values
+        //setup default values since default value is not supported in mdsal
         final Long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null ? DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
         final Long keepaliveDelay = node.getKeepaliveDelay() == null ? DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay();
         final Boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null ? DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
