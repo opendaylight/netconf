@@ -254,8 +254,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
 
     protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId,
                                                          final NetconfNode node) {
-        //setup default values since default value is not supported yet in mdsal
-        // TODO remove this when mdsal starts supporting default values
+        //setup default values since default value is not supported in mdsal
         final Long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null ? DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
         final Long keepaliveDelay = node.getKeepaliveDelay() == null ? DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay();
         final Boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null ? DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
@@ -359,8 +358,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
 
     public NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener, NetconfNode node) {
 
-        //setup default values since default value is not supported yet in mdsal
-        // TODO remove this when mdsal starts supporting default values
+        //setup default values since default value is not supported in mdsal
         final long clientConnectionTimeoutMillis = node.getConnectionTimeoutMillis() == null ? DEFAULT_CONNECTION_TIMEOUT_MILLIS : node.getConnectionTimeoutMillis();
         final long maxConnectionAttempts = node.getMaxConnectionAttempts() == null ? DEFAULT_MAX_CONNECTION_ATTEMPTS : node.getMaxConnectionAttempts();
         final int betweenAttemptsTimeoutMillis = node.getBetweenAttemptsTimeoutMillis() == null ? DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS : node.getBetweenAttemptsTimeoutMillis();
