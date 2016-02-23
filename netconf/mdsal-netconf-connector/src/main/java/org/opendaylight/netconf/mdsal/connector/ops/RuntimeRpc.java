@@ -36,13 +36,13 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
-import org.opendaylight.netconf.util.OrderedNormalizedNodeWriter;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XMLStreamNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.DomUtils;
 import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -211,7 +211,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         final NormalizedNodeStreamWriter nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
                 schemaContext.getCurrentContext(), rpcOutputPath);
 
-        final OrderedNormalizedNodeWriter nnWriter = new OrderedNormalizedNodeWriter(nnStreamWriter, schemaContext.getCurrentContext(), rpcOutputPath);
+        final SchemaOrderedNormalizedNodeWriter nnWriter = new SchemaOrderedNormalizedNodeWriter(nnStreamWriter, schemaContext.getCurrentContext(), rpcOutputPath);
 
         writeRootElement(xmlWriter, nnWriter, (ContainerNode) data);
         try {
@@ -232,7 +232,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         }
     }
 
-    private void writeRootElement(final XMLStreamWriter xmlWriter, final OrderedNormalizedNodeWriter nnWriter, final ContainerNode data) {
+    private void writeRootElement(final XMLStreamWriter xmlWriter, final SchemaOrderedNormalizedNodeWriter nnWriter, final ContainerNode data) {
         try {
             Collection<DataContainerChild<?, ?>> value = (Collection) data.getValue();
             nnWriter.write(value);
