@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a3d3df0_e3f6615c",
+        "filename": "netconf/netconf-topology/src/test/java/org/opendaylight/netconf/topology/AbstractNetconfTopologyTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-02-24T13:43:33Z",
+      "side": 1,
+      "message": "NetconfClientDispatcher.createReconnectingClient() returns Future\u003cVoid\u003e, any reason to add capabilities to this future? Seems like Void should be fine here. Also add the generic type to the future to prevent warnings.",
+      "range": {
+        "startLine": 99,
+        "startChar": 8,
+        "endLine": 99,
+        "endChar": 110
+      },
+      "revId": "b46e0eb0faf8b1a0703cce9f5f7a75023b93dd04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
