@@ -158,7 +158,8 @@ public class NetconfTopologyImplTest {
         when(newNode.getModificationType()).thenReturn(DataObjectModification.ModificationType.WRITE);
 
         InstanceIdentifier.PathArgument pa = null;
-        for (InstanceIdentifier.PathArgument p : TopologyUtil.createTopologyId(TOPOLOGY_ID).child(Node.class, new NodeKey(NODE_ID)).getPathArguments()) {
+
+        for (InstanceIdentifier.PathArgument p : TopologyUtil.createTopologyListPath(TOPOLOGY_ID).child(Node.class, new NodeKey(NODE_ID)).getPathArguments()) {
             pa = p;
         }
 

@@ -37,11 +37,7 @@ public final class BaseNodeManager implements NodeManager {
     private static final Logger LOG = LoggerFactory.getLogger(BaseNodeManager.class);
 
     private final String nodeId;
-    private final String topologyId;
-    private final ActorSystem actorSystem;
-
-    private boolean isMaster = false;
-    private NodeManagerCallback delegate;
+    private final NodeManagerCallback delegate;
 
     private BaseNodeManager(final String nodeId,
                             final String topologyId,
@@ -50,8 +46,6 @@ public final class BaseNodeManager implements NodeManager {
                             final RoleChangeStrategy roleChangeStrategy) {
         LOG.debug("Creating BaseNodeManager, id: {}, {}", topologyId, nodeId );
         this.nodeId = nodeId;
-        this.topologyId = topologyId;
-        this.actorSystem = actorSystem;
         this.delegate = delegateFactory.create(nodeId, topologyId, actorSystem);
         // if we want to override the place election happens,
         // we need to override this with noop election strategy and implement election in callback
@@ -97,7 +91,6 @@ public final class BaseNodeManager implements NodeManager {
                 (roleChangeDTO.wasOwner() ? "master" : "slave"),
                 (roleChangeDTO.isOwner() ? "master" : "slave"));
 
-        isMaster = roleChangeDTO.isOwner();
         delegate.onRoleChanged(roleChangeDTO);
     }
 

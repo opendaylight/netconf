@@ -16,14 +16,9 @@ import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,33 +29,30 @@ public final class SalNodeWriter implements NodeWriter {
     private final DataBroker dataBroker;
     private final String topologyId;
 
-    private final InstanceIdentifier<Topology> topologyListPath;
-
     public SalNodeWriter(final DataBroker dataBroker, final String topologyId) {
         this.dataBroker = dataBroker;
         this.topologyId = topologyId;
-        this.topologyListPath = createTopologyId(this.topologyId);
     }
 
     //FIXME change to txChains
     @Override public void init(@Nonnull final NodeId id, @Nonnull final Node operationalDataNode) {
         // put into Datastore
         final WriteTransaction wTx = dataBroker.newWriteOnlyTransaction();
-        wTx.put(LogicalDatastoreType.OPERATIONAL, createBindingPathForTopology(id), operationalDataNode);
+        wTx.put(LogicalDatastoreType.OPERATIONAL, TopologyUtil.createTopologyNodeListPath(new NodeKey(id), topologyId), operationalDataNode);
         commitTransaction(wTx, id, "init");
     }
 
     @Override public void update(@Nonnull final NodeId id, @Nonnull final Node operationalDataNode) {
         // merge
         final WriteTransaction wTx = dataBroker.newWriteOnlyTransaction();
-        wTx.put(LogicalDatastoreType.OPERATIONAL, createBindingPathForTopology(id), operationalDataNode);
+        wTx.put(LogicalDatastoreType.OPERATIONAL, TopologyUtil.createTopologyNodeListPath(new NodeKey(id), topologyId), operationalDataNode);
         commitTransaction(wTx, id, "update");
     }
 
     @Override public void delete(@Nonnull final NodeId id) {
         // delete
         final WriteTransaction wTx = dataBroker.newWriteOnlyTransaction();
-        wTx.delete(LogicalDatastoreType.OPERATIONAL, createBindingPathForTopology(id));
+        wTx.delete(LogicalDatastoreType.OPERATIONAL, TopologyUtil.createTopologyNodeListPath(new NodeKey(id), topologyId));
         commitTransaction(wTx, id, "delete");
     }
 
@@ -83,14 +75,5 @@ public final class SalNodeWriter implements NodeWriter {
                 throw new IllegalStateException(id + "  Transaction(" + txType + ") not committed correctly", t);
             }
         });
-    }
-
-    private InstanceIdentifier<Node> createBindingPathForTopology(final NodeId id) {
-        return topologyListPath.child(Node.class, new NodeKey(id));
-    }
-
-    private InstanceIdentifier<Topology> createTopologyId(final String topologyId) {
-        final InstanceIdentifier<NetworkTopology> networkTopology = InstanceIdentifier.create(NetworkTopology.class);
-        return networkTopology.child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
     }
 }
