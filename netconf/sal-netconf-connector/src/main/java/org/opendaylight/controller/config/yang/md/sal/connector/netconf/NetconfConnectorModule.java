@@ -47,10 +47,14 @@ import org.opendaylight.protocol.framework.ReconnectStrategyFactory;
 import org.opendaylight.protocol.framework.TimedReconnectStrategy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.IpAddress;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
+import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
@@ -225,6 +229,12 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
                         setSchemaContextFactory(dto.getSchemaContextFactory());
                         setSchemaRegistry(dto.getSchemaRegistry());
                         schemaResourcesDTO = dto;
+                    }
+                    if (userCapabilities.isPresent()) {
+                        for (QName qname : userCapabilities.get().getModuleBasedCaps()) {
+                            final SourceIdentifier sourceIdentifier = new SourceIdentifier(qname.getLocalName(), qname.getFormattedRevision());
+                            dto.getSchemaRegistry().registerSchemaSource(DEFAULT_CACHE, PotentialSchemaSource.create(sourceIdentifier, YangTextSchemaSource.class, PotentialSchemaSource.Costs.LOCAL_IO.getValue() + 1));
+                        }
                     }
                 }
                 LOG.info("Netconf connector for device {} will use schema cache directory {} instead of {}",
