@@ -14,16 +14,18 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
+import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSession;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
-import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.DomainName;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.NetconfTcp;
@@ -42,10 +44,11 @@ import org.slf4j.LoggerFactory;
 public final class NetconfServerSession extends AbstractNetconfSession<NetconfServerSession, NetconfServerSessionListener> implements NetconfManagementSession {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSession.class);
+    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
     private final NetconfHelloMessageAdditionalHeader header;
 
-    private Date loginTime;
+    private ZonedDateTime loginTime;
     private long inRpcSuccess, inRpcFail, outRpcError;
     private volatile boolean delayedClose;
 
@@ -59,7 +62,7 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
     @Override
     protected void sessionUp() {
         Preconditions.checkState(loginTime == null, "Session is already up");
-        this.loginTime = new Date();
+        this.loginTime = Instant.now().atZone(ZoneId.systemDefault());
         super.sessionUp();
     }
 
@@ -98,8 +101,6 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
         outRpcError++;
     }
 
-    public static final String ISO_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
-
     private static final String dateTimePatternString = DateAndTime.PATTERN_CONSTANTS.get(0);
     private static final Pattern dateTimePattern = Pattern.compile(dateTimePatternString);
 
@@ -111,7 +112,7 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
         builder.setSourceHost(new Host(new DomainName(header.getAddress())));
 
         Preconditions.checkState(DateAndTime.PATTERN_CONSTANTS.size() == 1);
-        String formattedDateTime = formatDateTime(loginTime);
+        String formattedDateTime = dateFormatter.format(loginTime);
 
         Matcher matcher = dateTimePattern.matcher(formattedDateTime);
         Preconditions.checkState(matcher.matches(), "Formatted datetime %s does not match pattern %s", formattedDateTime, dateTimePattern);
@@ -144,12 +145,6 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
         default:
             throw new IllegalArgumentException("Unknown transport type " + transport);
         }
-    }
-
-    private static String formatDateTime(final Date loginTime) {
-        // FIXME: thread-local cache?
-        SimpleDateFormat dateFormat = new SimpleDateFormat(ISO_DATE_FORMAT);
-        return dateFormat.format(loginTime);
     }
 
     @Override
