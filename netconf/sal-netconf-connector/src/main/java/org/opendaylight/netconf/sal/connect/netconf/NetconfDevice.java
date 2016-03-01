@@ -87,11 +87,6 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     // Message transformer is constructed once the schemas are available
     private MessageTransformer<NetconfMessage> messageTransformer;
 
-    public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
-                         final ExecutorService globalProcessingExecutor) {
-        this(schemaResourcesDTO, id, salFacade, globalProcessingExecutor, false);
-    }
-
     /**
      * Create rpc implementation capable of handling RPC for monitoring and notifications even before the schemas of remote device are downloaded
      */
@@ -103,9 +98,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
         return new NetconfDeviceRpc(baseSchema.getSchemaContext(), listener, new NetconfMessageTransformer(baseSchema.getSchemaContext(), false, baseSchema));
     }
 
-
-    // FIXME reduce parameters
-    public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
+    protected NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
                          final ExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange) {
         this.id = id;
         this.reconnectOnSchemasChange = reconnectOnSchemasChange;

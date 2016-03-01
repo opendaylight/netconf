@@ -23,6 +23,7 @@ import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceBuilder;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemas.NetconfStateSchemasResolverImpl;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -83,8 +84,12 @@ public class NetconfDeviceConnectionManager implements Closeable {
         repository.registerSchemaSourceListener(cache);
         repository.registerSchemaSourceListener(TextToASTTransformer.create(repository, repository));
 
-        device = new NetconfDevice(new SchemaResourcesDTO(repository, schemaContextFactory, new NetconfStateSchemasResolverImpl()),
-                deviceId, handler, executor, true);
+        device = new NetconfDeviceBuilder(true)
+                .setSchemaResourcesDTO(new SchemaResourcesDTO(repository, schemaContextFactory, new NetconfStateSchemasResolverImpl()))
+                .setGlobalProcessingExecutor(executor)
+                .setId(deviceId)
+                .setSalFacade(handler)
+                .build();
         listener = new NetconfDeviceCommunicator(deviceId, device);
         configBuilder.withSessionListener(listener);
         listener.initializeRemoteConnection(netconfClientDispatcher, configBuilder.build());
