@@ -23,8 +23,7 @@
 
   <feature name='odl-netconf-api' version='${project.version}' description="OpenDaylight :: Netconf :: API">
     <feature version='${protocol-framework.version}'>odl-protocol-framework</feature>
-    <!-- FIXME: Reference YANGTools via feateure instead of bundles -->
-    <bundle>mvn:org.opendaylight.yangtools/yang-model-api/{{VERSION}}</bundle>
+    <feature version='${yangtools.version}'>odl-yangtools-yang-data</feature>
     <bundle>mvn:org.opendaylight.controller/config-util/{{VERSION}}</bundle>
     <bundle>mvn:org.opendaylight.netconf/netconf-api/{{VERSION}}</bundle>
     <bundle>mvn:org.opendaylight.netconf/netconf-auth/{{VERSION}}</bundle>
@@ -45,8 +44,7 @@
 
   <feature name='odl-netconf-util' version='${project.version}'>
     <feature version='${project.version}'>odl-netconf-mapping-api</feature>
-    <bundle>mvn:org.opendaylight.yangtools/yang-model-api/{{VERSION}}</bundle>
-    <bundle>mvn:org.opendaylight.yangtools/yang-data-api/{{VERSION}}</bundle>
+    <feature version='${yangtools.version}'>odl-yangtools-yang-data</feature>
     <bundle>mvn:org.opendaylight.netconf/netconf-util/{{VERSION}}</bundle>
   </feature>
 
