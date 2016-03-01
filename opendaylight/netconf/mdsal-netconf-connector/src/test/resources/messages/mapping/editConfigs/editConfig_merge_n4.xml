@@ -14,14 +14,10 @@
         <test-option>
             set
         </test-option>
-        <default-operation>none</default-operation>
         <config>
-            <mapping-nodes xmlns="urn:opendaylight:mdsal:mapping:test" >
-                <mapping-node>
-                    <id>node1-put</id>
-                    <content>put content</content>
-                </mapping-node>
-            </mapping-nodes>
+            <top-list xmlns="urn:opendaylight:mdsal:mapping:test">
+                <id>1</id>
+            </top-list>
         </config>
     </edit-config>
 </rpc>

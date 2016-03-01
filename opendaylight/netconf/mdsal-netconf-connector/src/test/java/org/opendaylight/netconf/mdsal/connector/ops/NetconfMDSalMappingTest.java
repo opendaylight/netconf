@@ -15,6 +15,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 
+import com.google.common.io.ByteSource;
 import com.google.common.util.concurrent.Futures;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +27,6 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -34,7 +34,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -83,8 +82,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import com.google.common.io.ByteSource;
 
 public class NetconfMDSalMappingTest {
 
@@ -242,6 +239,37 @@ public class NetconfMDSalMappingTest {
 
         deleteDatastore();
 
+    }
+
+    @Test
+    public void testListParentAutoCreation() throws Exception {
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_n2.xml"), RPC_REPLY_OK);
+        verifyResponse(commit(), RPC_REPLY_OK);
+        getConfigRunning();
+        deleteDatastore();
+
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_n3.xml"), RPC_REPLY_OK);
+        verifyResponse(commit(), RPC_REPLY_OK);
+        getConfigRunning();
+        deleteDatastore();
+
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_n4.xml"), RPC_REPLY_OK);
+        verifyResponse(commit(), RPC_REPLY_OK);
+        getConfigRunning();
+        deleteDatastore();
+
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_n5.xml"), RPC_REPLY_OK);
+        verifyResponse(commit(), RPC_REPLY_OK);
+        getConfigRunning();
+        deleteDatastore();
+
+        // The last test should fail because the netconf edit tries to create nested list entry without touching the
+        // parent structure (indicated by NONE operation). So the edit should fail. However thanks to our auto-create
+        // list parent mechanics, parent structure will be created.
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_n6.xml"), RPC_REPLY_OK);
+        verifyResponse(commit(), RPC_REPLY_OK);
+        getConfigRunning();
+        deleteDatastore();
     }
 
     @Test

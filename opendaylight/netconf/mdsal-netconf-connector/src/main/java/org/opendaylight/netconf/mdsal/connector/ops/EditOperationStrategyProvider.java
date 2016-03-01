@@ -29,6 +29,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.AttributesBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.transform.base.parser.ExtensibleParser;
@@ -95,22 +96,49 @@ class EditOperationStrategyProvider extends DomToNormalizedNodeParserFactory.Bui
     }
 
     private static class NetconfOperationCollectionStrategy<N extends NormalizedNode<YangInstanceIdentifier.NodeIdentifier, ?>> implements ExtensibleParser.BuildingStrategy<YangInstanceIdentifier.NodeIdentifier, N> {
-        private final DataTreeChangeTracker changeTracker;
+        private final DataTreeChangeTracker dataTreeChangeTracker;
 
         public NetconfOperationCollectionStrategy(final DataTreeChangeTracker changeTracker) {
-            this.changeTracker = changeTracker;
+            this.dataTreeChangeTracker = changeTracker;
         }
 
         @Nullable
         @Override
         public N build(final NormalizedNodeBuilder<YangInstanceIdentifier.NodeIdentifier, ?, N> builder) {
-            changeTracker.popPath();
-            return builder.build();
+            final N node = builder.build();
+
+            // Try to auto create list-parent, mixin nodes to prevent exception from data tree
+
+            // Not under DELETE/REMOVE subtree
+            if (dataTreeChangeTracker.getDeleteOperationTracker() == 0 &&
+                dataTreeChangeTracker.getRemoveOperationTracker() == 0) {
+
+                // Artificial list-parent, mixin, empty node
+                final NormalizedNode<?, ?> mixinParent = getEmptyCollectionParent(node);
+
+                // Make sure to merge list-parent, mixin empty node to prevent missing parent node ex
+                dataTreeChangeTracker.addDataTreeChange(new DataTreeChangeTracker.DataTreeChange(
+                            mixinParent, ModifyAction.MERGE, new ArrayList<>(dataTreeChangeTracker.getCurrentPath())));
+            }
+
+            dataTreeChangeTracker.popPath();
+            return node;
+        }
+
+        private NormalizedNode<?, ?> getEmptyCollectionParent(final N node) {
+            if(node instanceof OrderedMapNode) {
+                return Builders.orderedMapBuilder().withNodeIdentifier(node.getIdentifier()).build();
+            } else if(node instanceof MapNode) {
+                return Builders.mapBuilder().withNodeIdentifier(node.getIdentifier()).build();
+            }
+
+            throw new IllegalArgumentException("Unexpected node type " + node.getClass() +
+                " while auto creating list like mixin node");
         }
 
         @Override
         public void prepareAttributes(final Map<QName, String> attributes, final NormalizedNodeBuilder<YangInstanceIdentifier.NodeIdentifier, ?, N> containerBuilder) {
-            changeTracker.pushPath(containerBuilder.build().getIdentifier());
+            dataTreeChangeTracker.pushPath(containerBuilder.build().getIdentifier());
         }
     }
 
