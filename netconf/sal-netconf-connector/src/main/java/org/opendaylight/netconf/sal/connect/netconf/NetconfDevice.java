@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
@@ -87,11 +86,6 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     // Message transformer is constructed once the schemas are available
     private MessageTransformer<NetconfMessage> messageTransformer;
 
-    public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
-                         final ExecutorService globalProcessingExecutor) {
-        this(schemaResourcesDTO, id, salFacade, globalProcessingExecutor, false);
-    }
-
     /**
      * Create rpc implementation capable of handling RPC for monitoring and notifications even before the schemas of remote device are downloaded
      */
@@ -103,18 +97,24 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
         return new NetconfDeviceRpc(baseSchema.getSchemaContext(), listener, new NetconfMessageTransformer(baseSchema.getSchemaContext(), false, baseSchema));
     }
 
+    public NetconfDevice(final NetconfDeviceBuilder build) {
+        validation(build);
+        this.id = build.id;
+        this.reconnectOnSchemasChange = build.reconnectOnSchemasChange;
+        this.schemaRegistry = build.schemaResourcesDTO.getSchemaRegistry();
+        this.schemaContextFactory = build.schemaResourcesDTO.getSchemaContextFactory();
+        this.salFacade = build.salFacade;
+        this.stateSchemasResolver = build.schemaResourcesDTO.getStateSchemasResolver();
+        this.processingExecutor = MoreExecutors.listeningDecorator(build.globalProcessingExecutor);
+        this.notificationHandler = new NotificationHandler(build.salFacade, build.id);
+    }
 
-    // FIXME reduce parameters
-    public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
-                         final ExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange) {
-        this.id = id;
-        this.reconnectOnSchemasChange = reconnectOnSchemasChange;
-        this.schemaRegistry = schemaResourcesDTO.getSchemaRegistry();
-        this.schemaContextFactory = schemaResourcesDTO.getSchemaContextFactory();
-        this.salFacade = salFacade;
-        this.stateSchemasResolver = schemaResourcesDTO.getStateSchemasResolver();
-        this.processingExecutor = MoreExecutors.listeningDecorator(globalProcessingExecutor);
-        this.notificationHandler = new NotificationHandler(salFacade, id);
+    private void validation(final NetconfDeviceBuilder build)
+    {
+        Preconditions.checkNotNull(build.id, "RemoteDeviceId is not initialized");
+        Preconditions.checkNotNull(build.salFacade, "RemoteDeviceHandler is not initialized");
+        Preconditions.checkNotNull(build.globalProcessingExecutor, "ExecutorService is not initialized");
+        Preconditions.checkNotNull(build.schemaResourcesDTO, "SchemaResourceDTO is not initialized");
     }
 
     @Override
