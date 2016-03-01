@@ -35,6 +35,7 @@ import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurati
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceBuilder;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -251,8 +252,13 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
                     new NetconfStateSchemas.NetconfStateSchemasResolverImpl());
         }
 
-        final NetconfDevice device =
-                new NetconfDevice(schemaResourcesDTO, id, salFacade, globalProcessingExecutor, getReconnectOnChangedSchema());
+        final NetconfDevice device = new NetconfDeviceBuilder()
+                .setReconnectOnSchemasChange(getReconnectOnChangedSchema())
+                .setSchemaResourcesDTO(schemaResourcesDTO)
+                .setGlobalProcessingExecutor(globalProcessingExecutor)
+                .setId(id)
+                .setSalFacade(salFacade)
+                .build();
 
         final NetconfDeviceCommunicator listener = userCapabilities.isPresent() ?
                 new NetconfDeviceCommunicator(id, device,
