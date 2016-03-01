@@ -5,6 +5,15 @@ module config {
 
     revision "2015-02-26";
 
+    list top-list {
+        key "id";
+
+        leaf id {
+            type string;
+        }
+    }
+
+
     container mapping-nodes {
 
         list multiple-keys {
@@ -30,7 +39,7 @@ module config {
                 type string;
             }
         }
-        
+
         list mapping-node{
             key "id";
             leaf id {
