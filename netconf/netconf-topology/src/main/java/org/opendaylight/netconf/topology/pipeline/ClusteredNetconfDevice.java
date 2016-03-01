@@ -27,6 +27,7 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceBuilder;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -62,7 +63,7 @@ public class ClusteredNetconfDevice extends NetconfDevice implements EntityOwner
     public ClusteredNetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
                                   final ExecutorService globalProcessingExecutor, final ActorSystem actorSystem, final String topologyId, final String nodeId,
                                   ActorContext cachedContext) {
-        super(schemaResourcesDTO, id, salFacade, globalProcessingExecutor);
+        super(schemaResourcesDTO, id, salFacade, globalProcessingExecutor, false);
         this.schemaRepo = (SchemaRepository) schemaResourcesDTO.getSchemaRegistry();
         this.actorSystem = actorSystem;
         this.topologyId = topologyId;

@@ -42,6 +42,7 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.Authenticat
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceBuilder;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
@@ -70,7 +71,8 @@ import org.opendaylight.yangtools.yang.parser.util.TextToASTTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractNetconfTopology implements NetconfTopology, BindingAwareProvider, Provider {
+public abstract class
+AbstractNetconfTopology implements NetconfTopology, BindingAwareProvider, Provider {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfTopology.class);
 
@@ -275,8 +277,13 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
 
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = setupSchemaCacheDTO(nodeId, node);
 
-        final NetconfDevice device = new NetconfDevice(schemaResourcesDTO, remoteDeviceId, salFacade,
-                processingExecutor.getExecutor(), reconnectOnChangedSchema);
+        final NetconfDevice device = new NetconfDeviceBuilder()
+                .setReconnectOnSchemasChange(reconnectOnChangedSchema)
+                .setSchemaResourcesDTO(schemaResourcesDTO)
+                .setGlobalProcessingExecutor(processingExecutor.getExecutor())
+                .setId(remoteDeviceId)
+                .setSalFacade(salFacade)
+                .build();
 
         final Optional<NetconfSessionPreferences> userCapabilities = getUserCapabilities(node);
 
