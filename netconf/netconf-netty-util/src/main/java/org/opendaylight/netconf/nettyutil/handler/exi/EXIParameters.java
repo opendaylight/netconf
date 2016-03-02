@@ -12,10 +12,10 @@ import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.openexi.proc.common.AlignmentType;
 import org.openexi.proc.common.EXIOptions;
 import org.openexi.proc.common.EXIOptionsException;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public final class EXIParameters {
     private static final String EXI_PARAMETER_ALIGNMENT = "alignment";
@@ -66,20 +66,22 @@ public final class EXIParameters {
             options.setAlignmentType(AlignmentType.bitPacked);
         }
 
-        if (root.getElementsByTagName(EXI_PARAMETER_FIDELITY).getLength() > 0) {
-            if (root.getElementsByTagName(EXI_FIDELITY_DTD).getLength() > 0) {
+        final NodeList fidelityElements = root.getElementsByTagName(EXI_PARAMETER_FIDELITY);
+        if (fidelityElements.getLength() > 0) {
+            final Element fidelityElement = (Element) fidelityElements.item(0);
+            if (fidelityElement.getElementsByTagName(EXI_FIDELITY_DTD).getLength() > 0) {
                 options.setPreserveDTD(true);
             }
-            if (root.getElementsByTagName(EXI_FIDELITY_LEXICAL_VALUES).getLength() > 0) {
+            if (fidelityElement.getElementsByTagName(EXI_FIDELITY_LEXICAL_VALUES).getLength() > 0) {
                 options.setPreserveLexicalValues(true);
             }
-            if (root.getElementsByTagName(EXI_FIDELITY_COMMENTS).getLength() > 0) {
+            if (fidelityElement.getElementsByTagName(EXI_FIDELITY_COMMENTS).getLength() > 0) {
                 options.setPreserveComments(true);
             }
-            if (root.getElementsByTagName(EXI_FIDELITY_PIS).getLength() > 0) {
+            if (fidelityElement.getElementsByTagName(EXI_FIDELITY_PIS).getLength() > 0) {
                 options.setPreservePIs(true);
             }
-            if (root.getElementsByTagName(EXI_FIDELITY_PREFIXES).getLength() > 0) {
+            if (fidelityElement.getElementsByTagName(EXI_FIDELITY_PREFIXES).getLength() > 0) {
                 options.setPreserveNS(true);
             }
         }
