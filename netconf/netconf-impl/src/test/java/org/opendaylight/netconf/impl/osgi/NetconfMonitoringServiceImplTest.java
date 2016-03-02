@@ -13,6 +13,7 @@ import static org.mockito.Mockito.doReturn;
 import com.google.common.base.Optional;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -46,7 +47,13 @@ public class NetconfMonitoringServiceImplTest {
     private static final String TEST_MODULE_REV = "1970-01-01";
     private static final  Uri TEST_MODULE_NAMESPACE = new Uri("testModuleNamespace");
     private static final String TEST_MODULE_NAME = "testModule";
-    private static final Date TEST_MODULE_DATE = new Date(0);
+    private static final Date TEST_MODULE_DATE;
+
+    static {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(1970, Calendar.JANUARY, 1);
+        TEST_MODULE_DATE = calendar.getTime();
+    }
 
     private final Set<Capability> CAPABILITIES = new HashSet<>();
 
