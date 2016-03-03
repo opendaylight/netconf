@@ -13,16 +13,23 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.net.URI;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
+import org.opendaylight.controller.config.util.xml.DocumentedException;
+import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.EditContent;
@@ -295,4 +302,60 @@ public class NetconfMessageTransformUtil {
         return SchemaPath.create(true, rpc);
     }
 
+    private static final ThreadLocal<SimpleDateFormat> EVENT_TIME_FORMAT = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected SimpleDateFormat initialValue() {
+
+            final SimpleDateFormat withMillis = new SimpleDateFormat(
+                    NetconfNotification.RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT);
+
+            return new SimpleDateFormat(NetconfNotification.RFC3339_DATE_FORMAT_BLUEPRINT) {
+                private static final long serialVersionUID = 1L;
+
+                @Override public Date parse(final String source) throws ParseException {
+                    try {
+                        return super.parse(source);
+                    } catch (ParseException e) {
+                        // In case of failure, try to parse with milliseconds
+                        return withMillis.parse(source);
+                    }
+                }
+            };
+        }
+
+        @Override
+        public void set(final SimpleDateFormat value) {
+            throw new UnsupportedOperationException();
+        }
+    };
+
+    public static Map.Entry<Date, XmlElement> stripNotification(final NetconfMessage message) {
+        final XmlElement xmlElement = XmlElement.fromDomDocument(message.getDocument());
+        final List<XmlElement> childElements = xmlElement.getChildElements();
+        Preconditions.checkArgument(childElements.size() == 2, "Unable to parse notification %s, unexpected format.\nExpected 2 childElements," +
+                " actual childElements size is %s", message, childElements.size());
+
+        final XmlElement eventTimeElement;
+        final XmlElement notificationElement;
+
+        if (childElements.get(0).getName().equals(EVENT_TIME)) {
+            eventTimeElement = childElements.get(0);
+            notificationElement = childElements.get(1);
+        }
+        else if(childElements.get(1).getName().equals(EVENT_TIME)) {
+            eventTimeElement = childElements.get(1);
+            notificationElement = childElements.get(0);
+        } else {
+            throw new IllegalArgumentException("Notification payload does not contain " + EVENT_TIME + " " + message);
+        }
+
+        try {
+            return new AbstractMap.SimpleEntry<>(EVENT_TIME_FORMAT.get().parse(eventTimeElement.getTextContent()), notificationElement);
+        } catch (DocumentedException e) {
+            throw new IllegalArgumentException("Notification payload does not contain " + EVENT_TIME + " " + message);
+        } catch (ParseException e) {
+            LOG.warn("Unable to parse event time from {}. Setting time to {}", eventTimeElement, NetconfNotification.UNKNOWN_EVENT_TIME, e);
+            return new AbstractMap.SimpleEntry<>(NetconfNotification.UNKNOWN_EVENT_TIME, notificationElement);
+        }
+    }
 }

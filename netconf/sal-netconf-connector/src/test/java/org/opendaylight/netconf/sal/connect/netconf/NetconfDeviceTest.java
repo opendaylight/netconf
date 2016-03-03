@@ -205,7 +205,7 @@ public class NetconfDeviceTest {
 
         final DOMRpcService deviceRpc = mock(DOMRpcService.class);
 
-        device.handleSalInitializationSuccess(NetconfToNotificationTest.getNotificationSchemaContext(getClass()), sessionCaps, deviceRpc);
+        device.handleSalInitializationSuccess(NetconfToNotificationTest.getNotificationSchemaContext(getClass(), false), sessionCaps, deviceRpc);
 
         verify(facade, timeout(10000).times(2)).onNotification(any(DOMNotification.class));
 
