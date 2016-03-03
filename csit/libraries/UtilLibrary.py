@@ -69,11 +69,11 @@ def post(url, userId, password, data):
     if password is None:
         password = 'admin'
 
-    print("post request with url "+url)
-    print("post request with data "+data)
+    print("post request with url " + url)
+    print("post request with data " + data)
     headers = {}
     headers['Content-Type'] = 'application/json'
-    # headers['Accept']= 'application/xml'
+    # headers['Accept'] = 'application/xml'
     session = _cache.switch("CLUSTERING_POST")
     resp = session.post(url, data.encode('utf-8'), headers=headers, auth=(userId, password))
 
@@ -91,7 +91,7 @@ def delete(url, userId='admin', password='admin'):
         "Use the Robot RequestsLibrary rather than this. See DatastoreCRUD.robot for examples",
         DeprecationWarning
     )
-    print("delete all resources belonging to url"+url)
+    print("delete all resources belonging to url" + url)
     session = _cache.switch("CLUSTERING_DELETE")
     resp = session.delete(url, auth=(userId, password))  # noqa
 
@@ -148,7 +148,7 @@ def wait_for_controller_up(ip, port="8181"):
 def startAllControllers(username, password, karafhome, port, *ips):
     # Start all controllers
     for ip in ips:
-        execute_ssh_command(ip, username, password, karafhome+"/bin/start")
+        execute_ssh_command(ip, username, password, karafhome + "/bin/start")
 
     # Wait for all of them to be up
     for ip in ips:
@@ -170,7 +170,7 @@ def stopcontroller(ip, username, password, karafhome):
 
 
 def executeStopController(ip, username, password, karafhome):
-    execute_ssh_command(ip, username, password, karafhome+"/bin/stop")
+    execute_ssh_command(ip, username, password, karafhome + "/bin/stop")
 
 
 def stopAllControllers(username, password, karafhome, *ips):
@@ -224,7 +224,7 @@ def isolate_controller(controllers, username, password, isolated):
     :param isolated: Number (starting at one) of the controller to be isolated.
     :return: If successful, returns "pass", otherwise returns the last failed IPTables text.
     """
-    isolated_controller = controllers[isolated-1]
+    isolated_controller = controllers[isolated - 1]
     for controller in controllers:
         if controller != isolated_controller:
             base_str = 'sudo iptables -I OUTPUT -p all --source '
@@ -256,7 +256,7 @@ def rejoin_controller(controllers, username, password, isolated):
     :param isolated: Number (starting at one) of the isolated controller isolated.
     :return: If successful, returns "pass", otherwise returns the last failed IPTables text.
     """
-    isolated_controller = controllers[isolated-1]
+    isolated_controller = controllers[isolated - 1]
     for controller in controllers:
         if controller != isolated_controller:
             base_str = 'sudo iptables -D OUTPUT -p all --source '
