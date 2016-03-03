@@ -26,7 +26,6 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.opendaylight.aaa.api.AuthenticationException;
 import org.opendaylight.aaa.api.Claim;
-import org.opendaylight.aaa.api.CredentialAuth;
 import org.opendaylight.aaa.api.PasswordCredentials;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -37,7 +36,7 @@ import org.osgi.framework.ServiceReference;
 public class CredentialServiceAuthProviderTest {
 
     @Mock
-    private CredentialAuth<PasswordCredentials> credAuth;
+    private PasswordCredentialAuth credAuth;
     @Mock
     private BundleContext ctx;
 
