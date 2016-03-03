@@ -37,8 +37,6 @@ public class NetconfDeviceNotificationService implements DOMNotificationService 
             listeners.put(type, listener);
         }
 
-        // FIXME this should invoke create-subscription rpc on the remote device for a given notification
-
         return new ListenerRegistration<T>() {
             @Override
             public void close() {
