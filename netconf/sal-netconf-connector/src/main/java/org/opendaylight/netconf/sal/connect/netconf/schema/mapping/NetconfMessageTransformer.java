@@ -7,11 +7,7 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.EVENT_TIME;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RPC_QNAME;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_URI;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.*;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
@@ -22,7 +18,6 @@ import com.google.common.collect.Multimaps;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -32,7 +27,6 @@ import javax.annotation.Nonnull;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
-import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.MissingNameSpaceException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
@@ -64,6 +58,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.effective.NotificationEffectiveStatementImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -160,16 +155,12 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         } catch (final MissingNameSpaceException e) {
             throw new IllegalArgumentException("Unable to parse notification " + message + ", cannot find namespace", e);
         }
-
         final Collection<NotificationDefinition> notificationDefinitions = mappedNotifications.get(notificationNoRev);
         Preconditions.checkArgument(notificationDefinitions.size() > 0,
                 "Unable to parse notification %s, unknown notification. Available notifications: %s", notificationDefinitions, mappedNotifications.keySet());
 
-        // FIXME if multiple revisions for same notifications are present, we should pick the most recent. Or ?
-        // We should probably just put the most recent notification versions into our map. We can expect that the device sends the data according to the latest available revision of a model.
-        final NotificationDefinition next = notificationDefinitions.iterator().next();
+        final NotificationDefinition next = ((NotificationDefinition) (notificationDefinitions.toArray())[notificationDefinitions.size()-1]);
 
-        // We wrap the notification as a container node in order to reuse the parsers and builders for container node
         final ContainerSchemaNode notificationAsContainerSchemaNode = NetconfMessageTransformUtil.createSchemaForNotification(next);
 
         final Element element = stripped.getValue().getDomElement();
@@ -181,63 +172,6 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             throw new IllegalArgumentException(String.format("Failed to parse notification %s", element), e);
         }
         return new NetconfDeviceNotification(content, stripped.getKey());
-    }
-
-    private static final ThreadLocal<SimpleDateFormat> EVENT_TIME_FORMAT = new ThreadLocal<SimpleDateFormat>() {
-        @Override
-        protected SimpleDateFormat initialValue() {
-
-            final SimpleDateFormat withMillis = new SimpleDateFormat(
-                NetconfNotification.RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT);
-
-            return new SimpleDateFormat(NetconfNotification.RFC3339_DATE_FORMAT_BLUEPRINT) {
-                private static final long serialVersionUID = 1L;
-
-                @Override public Date parse(final String source) throws ParseException {
-                    try {
-                        return super.parse(source);
-                    } catch (ParseException e) {
-                        // In case of failure, try to parse with milliseconds
-                        return withMillis.parse(source);
-                    }
-                }
-            };
-        }
-
-        @Override
-        public void set(final SimpleDateFormat value) {
-            throw new UnsupportedOperationException();
-        }
-    };
-
-    // FIXME move somewhere to util
-    private static Map.Entry<Date, XmlElement> stripNotification(final NetconfMessage message) {
-        final XmlElement xmlElement = XmlElement.fromDomDocument(message.getDocument());
-        final List<XmlElement> childElements = xmlElement.getChildElements();
-        Preconditions.checkArgument(childElements.size() == 2, "Unable to parse notification %s, unexpected format", message);
-
-        final XmlElement eventTimeElement;
-        final XmlElement notificationElement;
-
-        if (childElements.get(0).getName().equals(EVENT_TIME)) {
-            eventTimeElement = childElements.get(0);
-            notificationElement = childElements.get(1);
-        }
-        else if(childElements.get(1).getName().equals(EVENT_TIME)) {
-            eventTimeElement = childElements.get(1);
-            notificationElement = childElements.get(0);
-        } else {
-            throw new IllegalArgumentException("Notification payload does not contain " + EVENT_TIME + " " + message);
-        }
-
-        try {
-            return new AbstractMap.SimpleEntry<>(EVENT_TIME_FORMAT.get().parse(eventTimeElement.getTextContent()), notificationElement);
-        } catch (DocumentedException e) {
-            throw new IllegalArgumentException("Notification payload does not contain " + EVENT_TIME + " " + message);
-        } catch (ParseException e) {
-            LOG.warn("Unable to parse event time from {}. Setting time to {}", eventTimeElement, NetconfNotification.UNKNOWN_EVENT_TIME, e);
-            return new AbstractMap.SimpleEntry<>(NetconfNotification.UNKNOWN_EVENT_TIME, notificationElement);
-        }
     }
 
     @Override
