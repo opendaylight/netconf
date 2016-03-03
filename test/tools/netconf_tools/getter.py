@@ -171,7 +171,7 @@ while request_count > 0:
     if len(responses) > 0:
         result = responses.popleft()
         if result[0] is None:
-            print "ERROR|" + result[1]+"|"
+            print "ERROR|" + result[1] + "|"
             break
         runtime = "%5.3f|%5.3f|%5.3f" % result[1]
         print "%03d|%s|%s|" % (result[0], runtime, result[2])
