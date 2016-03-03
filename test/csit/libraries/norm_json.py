@@ -18,7 +18,7 @@ __license__ = "Eclipse Public License v1.0"
 __email__ = "vrpolak@cisco.com"
 
 
-# Internal details.
+# Internal details; look down below for Robot Keywords.
 
 
 class _Hsfl(list):
@@ -93,23 +93,12 @@ class _Decoder(_json.JSONDecoder):
         self.scan_once = _json.scanner.py_make_scanner(self)
 
 
-# Robot Keywords.
+# Robot Keywords; look above for internal details.
 
 
 def loads_sorted(text, strict=False):
-    """
-    Return Python object with sorted arrays and dictionary keys.
-
-    If strict is true, raise exception on parse error.
-    If strict is not true, return string with error message.
-    """
-    try:
-        object_decoded = _json.loads(text, cls=_Decoder, object_hook=_Hsfod)
-    except ValueError as err:
-        if strict:
-            raise err
-        else:
-            return str(err) + '\n' + text
+    """Return Python object with sorted arrays and dictionary keys."""
+    object_decoded = _json.loads(text, cls=_Decoder, object_hook=_Hsfod)
     return object_decoded
 
 
@@ -126,7 +115,19 @@ def dumps_indented(obj, indent=1):
 
 
 def normalize_json_text(text, strict=False, indent=1):  # pylint likes lowercase
-    """Return sorted indented JSON string, or an error message string."""
-    object_decoded = loads_sorted(text, strict=strict)
+    """
+    Attempt to return sorted indented JSON string.
+
+    If parse error happens:
+    If strict is true, raise the exception.
+    If strict is not true, return original text with error message.
+    """
+    try:
+        object_decoded = loads_sorted(text)
+    except ValueError as err:
+        if strict:
+            raise err
+        else:
+            return str(err) + '\n' + text
     pretty_json = dumps_indented(object_decoded, indent=indent)
     return pretty_json
