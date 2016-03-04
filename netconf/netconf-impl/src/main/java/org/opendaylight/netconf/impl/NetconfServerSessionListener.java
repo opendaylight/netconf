@@ -89,9 +89,9 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
             LOG.debug("Responding with message {}", message);
             session.sendMessage(message);
         } catch (final RuntimeException e) {
-            // TODO: should send generic error or close session?
             LOG.error("Unexpected exception", e);
             session.onIncommingRpcFail();
+            session.close();
             throw new IllegalStateException("Unable to process incoming message " + netconfMessage, e);
         } catch (DocumentedException e) {
             LOG.trace("Error occurred while processing message",e);
