@@ -125,8 +125,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
              * Severity: error Error-info: <bad-element> : name of the
              * unexpected element Description: An unexpected element is present.
              */
-            // TODO add message to error info
-            throw new DocumentedException("Unknown tag " + rootNode.getNodeName(),
+            throw new DocumentedException("Unknown tag " + rootNode.getNodeName() + " in message:\n" + netconfMessage,
                     DocumentedException.ErrorType.protocol, DocumentedException.ErrorTag.unknown_element,
                     DocumentedException.ErrorSeverity.error, ImmutableMap.of("bad-element",
                             rootNode.getNodeName()));
