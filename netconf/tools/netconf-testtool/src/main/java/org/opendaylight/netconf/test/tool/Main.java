@@ -242,7 +242,7 @@ public final class Main {
         return null;
     }
 
-    private static class ConfigGenerator {
+    static class ConfigGenerator {
         public static final String NETCONF_CONNECTOR_XML = "/99-netconf-connector-simulated.xml";
         public static final String SIM_DEVICE_SUFFIX = "-sim-device";
 
