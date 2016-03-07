@@ -13,6 +13,7 @@ import static org.mockito.Mockito.doReturn;
 import com.google.common.base.Optional;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -38,26 +40,40 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
+import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
 public class NetconfMonitoringServiceImplTest {
 
     private static final String TEST_MODULE_CONTENT = "content";
+    private static final String TEST_MODULE_CONTENT2 = "content2";
     private static final String TEST_MODULE_REV = "1970-01-01";
+    private static final String TEST_MODULE_REV2 = "1970-01-02";
     private static final  Uri TEST_MODULE_NAMESPACE = new Uri("testModuleNamespace");
     private static final String TEST_MODULE_NAME = "testModule";
-    private static final Date TEST_MODULE_DATE = new Date(0);
+    private static Date TEST_MODULE_DATE;
+    private static Date TEST_MODULE_DATE2;
+
+    private YangModuleCapability moduleCapability1;
+    private YangModuleCapability moduleCapability2;
 
     private final Set<Capability> CAPABILITIES = new HashSet<>();
 
     private NetconfMonitoringServiceImpl monitoringService;
-
     @Mock
     private Module moduleMock;
+    @Mock
+    private Module moduleMock2;
     @Mock
     private NetconfOperationServiceFactory operationServiceFactoryMock;
     @Mock
     private NetconfManagementSession sessionMock;
+
+    @BeforeClass
+    public static void suiteSetUp() throws Exception {
+        TEST_MODULE_DATE = SimpleDateFormatUtil.getRevisionFormat().parse(TEST_MODULE_REV);
+        TEST_MODULE_DATE2= SimpleDateFormatUtil.getRevisionFormat().parse(TEST_MODULE_REV2);
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -68,14 +84,22 @@ public class NetconfMonitoringServiceImplTest {
         doReturn(new URI(TEST_MODULE_NAMESPACE.getValue())).when(moduleMock).getNamespace();
         doReturn(TEST_MODULE_NAME).when(moduleMock).getName();
         doReturn(TEST_MODULE_DATE).when(moduleMock).getRevision();
-        doReturn(TEST_MODULE_NAME).when(moduleMock).getName();
 
-        CAPABILITIES.add(new YangModuleCapability(moduleMock, TEST_MODULE_CONTENT));
+        moduleCapability1 = new YangModuleCapability(moduleMock, TEST_MODULE_CONTENT);
+        CAPABILITIES.add(moduleCapability1);
+
+        doReturn(new URI(TEST_MODULE_NAMESPACE.getValue())).when(moduleMock2).getNamespace();
+        doReturn(TEST_MODULE_NAME).when(moduleMock2).getName();
+        doReturn(TEST_MODULE_DATE2).when(moduleMock2).getRevision();
+
+        moduleCapability2 = new YangModuleCapability(moduleMock2, TEST_MODULE_CONTENT2);
+        CAPABILITIES.add(moduleCapability2);
+
         doReturn(CAPABILITIES).when(operationServiceFactoryMock).getCapabilities();
         doReturn(null).when(operationServiceFactoryMock).registerCapabilityListener(any(NetconfMonitoringServiceImpl.class));
 
         monitoringService = new NetconfMonitoringServiceImpl(operationServiceFactoryMock);
-        monitoringService.onCapabilitiesChanged(CAPABILITIES, new HashSet<Capability>());
+        monitoringService.onCapabilitiesChanged(CAPABILITIES, Collections.emptySet());
 
         doReturn(new SessionBuilder().build()).when(sessionMock).toManagementSession();
     }
@@ -108,9 +132,16 @@ public class NetconfMonitoringServiceImplTest {
 
     @Test
     public void testGetSchemaForCapability() throws Exception {
-        String schema = monitoringService.getSchemaForCapability(TEST_MODULE_NAME, Optional.of(TEST_MODULE_REV));
+        //test multiple revisions of the same capability
+        final String schema = monitoringService.getSchemaForCapability(TEST_MODULE_NAME, Optional.of(TEST_MODULE_REV));
         Assert.assertEquals(TEST_MODULE_CONTENT, schema);
-
+        final String schema2 = monitoringService.getSchemaForCapability(TEST_MODULE_NAME, Optional.of(TEST_MODULE_REV2));
+        Assert.assertEquals(TEST_MODULE_CONTENT2, schema2);
+        //remove one revision
+        monitoringService.onCapabilitiesChanged(Collections.emptySet(), Collections.singleton(moduleCapability1));
+        //only one revision present
+        final String schema3 = monitoringService.getSchemaForCapability(TEST_MODULE_NAME, Optional.absent());
+        Assert.assertEquals(TEST_MODULE_CONTENT2, schema3);
     }
 
     @Test
