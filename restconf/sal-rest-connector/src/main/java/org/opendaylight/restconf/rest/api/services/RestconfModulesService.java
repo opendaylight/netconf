@@ -1,0 +1,66 @@
+/*
+ * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+package org.opendaylight.restconf.rest.api.services;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
+import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.restconf.Draft09;
+import org.opendaylight.restconf.utils.RestconfConstants;
+
+/**
+ * Service provides information about the YANG modules and submodules.
+ */
+public interface RestconfModulesService {
+
+    /**
+     * Get identifiers for the YANG data model modules supported by the server.
+     *
+     * @param uriInfo
+     * @return {@link NormalizedNodeContext}
+     */
+    @GET
+    @Path("data/ietf-yang-library:modules")
+    @Produces({ Draft09.MediaTypes.API + RestconfConstants.JSON, Draft09.MediaTypes.API + RestconfConstants.XML,
+            MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public NormalizedNodeContext getModules(@Context UriInfo uriInfo);
+
+    /**
+     * Valid only for mount points. Get identifiers for the YANG data model
+     * modules supported by the specific mount point.
+     *
+     * @param identifier
+     * @param uriInfo
+     * @return {@link NormalizedNodeContext}
+     */
+    @GET
+    @Path("data/ietf-yang-library:modules/{identifier:.+}")
+    @Produces({ Draft09.MediaTypes.API + RestconfConstants.JSON, Draft09.MediaTypes.API + RestconfConstants.XML,
+            MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public NormalizedNodeContext getModules(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
+
+    /**
+     * Get entry for each YANG data model module supported by the server. There
+     * must be an instance of this list for every YANG module that is used by
+     * the server.
+     *
+     * @param identifier
+     * @param uriInfo
+     * @return {@link NormalizedNodeContext}
+     */
+    @GET
+    @Path("data/ietf-yang-library:modules/module/{identifier:.+}")
+    @Produces({ Draft09.MediaTypes.API + RestconfConstants.JSON, Draft09.MediaTypes.API + RestconfConstants.XML,
+            MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public NormalizedNodeContext getModule(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
+}
