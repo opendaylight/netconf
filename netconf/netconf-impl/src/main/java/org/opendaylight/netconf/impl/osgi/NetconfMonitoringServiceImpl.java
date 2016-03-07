@@ -73,6 +73,7 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
     private final Set<NetconfManagementSession> sessions = new HashSet<>();
     private final NetconfOperationServiceFactory netconfOperationProvider;
     private final Map<Uri, Capability> capabilities = new HashMap<>();
+    private final Map<String, Map<String, String>> mappedModulesToRevisionToSchema = Maps.newHashMap();
 
     private final Set<MonitoringListener> listeners = Sets.newHashSet();
     private volatile BaseNotificationPublisherRegistration notificationPublisher;
@@ -117,33 +118,9 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
     @Override
     public synchronized String getSchemaForCapability(final String moduleName, final Optional<String> revision) {
 
-        // FIXME not effective at all
-
-        Map<String, Map<String, String>> mappedModulesToRevisionToSchema = Maps.newHashMap();
-
-        final Collection<Capability> caps = capabilities.values();
-
-        for (Capability cap : caps) {
-            if (!cap.getModuleName().isPresent()
-                    || !cap.getRevision().isPresent()
-                    || !cap.getCapabilitySchema().isPresent()){
-                continue;
-            }
-
-            final String currentModuleName = cap.getModuleName().get();
-            Map<String, String> revisionMap = mappedModulesToRevisionToSchema.get(currentModuleName);
-            if (revisionMap == null) {
-                revisionMap = Maps.newHashMap();
-                mappedModulesToRevisionToSchema.put(currentModuleName, revisionMap);
-            }
-
-            String currentRevision = cap.getRevision().get();
-            revisionMap.put(currentRevision, cap.getCapabilitySchema().get());
-        }
-
         Map<String, String> revisionMapRequest = mappedModulesToRevisionToSchema.get(moduleName);
         Preconditions.checkState(revisionMapRequest != null, "Capability for module %s not present, " + ""
-                + "available modules : %s", moduleName, Collections2.transform(caps, CAPABILITY_TO_URI));
+                + "available modules : %s", moduleName, Collections2.transform(capabilities.values(), CAPABILITY_TO_URI));
 
         if (revision.isPresent()) {
             String schema = revisionMapRequest.get(revision.get());
@@ -159,6 +136,42 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
                     revisionMapRequest.keySet());
             return revisionMapRequest.values().iterator().next();
         }
+    }
+
+    private synchronized void updateCapabilityToSchemaMap(final Set<Capability> added, final Set<Capability> removed) {
+        for (final Capability cap : added) {
+            if (!isValidModuleCapability(cap)){
+                continue;
+            }
+
+            final String currentModuleName = cap.getModuleName().get();
+            Map<String, String> revisionMap = mappedModulesToRevisionToSchema.get(currentModuleName);
+            if (revisionMap == null) {
+                revisionMap = Maps.newHashMap();
+                mappedModulesToRevisionToSchema.put(currentModuleName, revisionMap);
+            }
+
+            final String currentRevision = cap.getRevision().get();
+            revisionMap.put(currentRevision, cap.getCapabilitySchema().get());
+        }
+        for (final Capability cap : removed) {
+            if (!isValidModuleCapability(cap)){
+                continue;
+            }
+            final Map<String, String> revisionMap = mappedModulesToRevisionToSchema.get(cap.getModuleName().get());
+            if (revisionMap != null) {
+                revisionMap.remove(cap.getRevision().get());
+                if (revisionMap.isEmpty()) {
+                    mappedModulesToRevisionToSchema.remove(cap.getModuleName().get());
+                }
+            }
+        }
+    }
+
+    private boolean isValidModuleCapability(Capability cap) {
+        return cap.getModuleName().isPresent()
+                && cap.getRevision().isPresent()
+                && cap.getCapabilitySchema().isPresent();
     }
 
     @Override
@@ -250,6 +263,7 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
     public void onCapabilitiesChanged(Set<Capability> added, Set<Capability> removed) {
         onCapabilitiesAdded(added);
         onCapabilitiesRemoved(removed);
+        updateCapabilityToSchemaMap(added, removed);
         notifyListeners();
 
         // publish notification to notification collector about changed capabilities
