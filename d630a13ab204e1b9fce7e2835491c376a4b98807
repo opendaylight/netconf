@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a3d3df0_7a113051",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonToPATCHBodyReader.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-03-07T09:42:51Z",
+      "side": 1,
+      "message": "should return RuntimeException",
+      "revId": "d630a13ab204e1b9fce7e2835491c376a4b98807",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_3a0cc83a",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonToPATCHBodyReader.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-03-07T09:42:51Z",
+      "side": 1,
+      "message": "Duplicate LOG.debug() -- move to common path.",
+      "revId": "d630a13ab204e1b9fce7e2835491c376a4b98807",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_da1cbc6c",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonToPATCHBodyReader.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-03-07T09:42:51Z",
+      "side": 1,
+      "message": "throw propagateExceptionAs();",
+      "revId": "d630a13ab204e1b9fce7e2835491c376a4b98807",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_ba173844",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonToPATCHBodyReader.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-03-07T09:42:51Z",
+      "side": 1,
+      "message": "use a constant CharMatcher.is(\u0027/\u0027)\nand then CharMatcher.removeFrom()",
+      "revId": "d630a13ab204e1b9fce7e2835491c376a4b98807",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_1a2aa47e",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonToPATCHBodyReader.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-03-07T09:42:51Z",
+      "side": 1,
+      "message": "move parentheses same line",
+      "revId": "d630a13ab204e1b9fce7e2835491c376a4b98807",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_fa2c209b",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonToPATCHBodyReader.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-03-07T09:42:51Z",
+      "side": 1,
+      "message": "switch (name) {\ncase \"edit\":\n...\n}",
+      "revId": "d630a13ab204e1b9fce7e2835491c376a4b98807",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_da331cf4",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlToPATCHBodyReader.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-03-07T09:42:51Z",
+      "side": 1,
+      "message": "throw new IllegalStateException(\"Failed to initialized XML parser\", e)",
+      "revId": "d630a13ab204e1b9fce7e2835491c376a4b98807",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_ba2e188a",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlToPATCHBodyReader.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-03-07T09:42:51Z",
+      "side": 1,
+      "message": "CharMatcher + replaceFrom",
+      "revId": "d630a13ab204e1b9fce7e2835491c376a4b98807",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_1a51040f",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-03-07T09:42:51Z",
+      "side": 1,
+      "message": "do not use string concat in logging -- also cleanup all touched files",
+      "revId": "d630a13ab204e1b9fce7e2835491c376a4b98807",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_fa538014",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/PATCHContext.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-03-07T09:42:51Z",
+      "side": 1,
+      "message": "can these be null?",
+      "revId": "d630a13ab204e1b9fce7e2835491c376a4b98807",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_5a570c02",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/PATCHEntity.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-03-07T09:42:51Z",
+      "side": 1,
+      "message": "can these be null?",
+      "revId": "d630a13ab204e1b9fce7e2835491c376a4b98807",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
