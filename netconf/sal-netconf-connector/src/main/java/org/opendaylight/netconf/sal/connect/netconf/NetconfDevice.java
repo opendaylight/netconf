@@ -143,7 +143,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
             }
 
             private void setUpSchema(final DeviceSources result) {
-                processingExecutor.submit(new RecursiveSchemaSetup(result, remoteSessionCapabilities, listener));
+                processingExecutor.submit(new SchemaSetup(result, remoteSessionCapabilities, listener));
             }
 
             @Override
@@ -372,13 +372,13 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     /**
      * Schema builder that tries to build schema context from provided sources or biggest subset of it.
      */
-    private final class RecursiveSchemaSetup implements Runnable {
+    private final class SchemaSetup implements Runnable {
         private final DeviceSources deviceSources;
         private final NetconfSessionPreferences remoteSessionCapabilities;
         private final RemoteDeviceCommunicator<NetconfMessage> listener;
         private final NetconfDeviceCapabilities capabilities;
 
-        public RecursiveSchemaSetup(final DeviceSources deviceSources, final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceCommunicator<NetconfMessage> listener) {
+        public SchemaSetup(final DeviceSources deviceSources, final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceCommunicator<NetconfMessage> listener) {
             this.deviceSources = deviceSources;
             this.remoteSessionCapabilities = remoteSessionCapabilities;
             this.listener = listener;
@@ -391,37 +391,23 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
         }
 
         /**
-         * Recursively build schema context, in case of success or final failure notify device
+         * Build schema context, in case of success or final failure notify device
          */
-        // FIXME reimplement without recursion
-        private void setUpSchema(final Collection<SourceIdentifier> requiredSources) {
-            LOG.trace("{}: Trying to build schema context from {}", id, requiredSources);
-
-            // If no more sources, fail
-            if(requiredSources.isEmpty()) {
-                final IllegalStateException cause = new IllegalStateException(id + ": No more sources for schema context");
-                handleSalInitializationFailure(cause, listener);
-                salFacade.onDeviceFailed(cause);
-                return;
-            }
-
-            final CheckedFuture<SchemaContext, SchemaResolutionException> schemaBuilderFuture = schemaContextFactory.createSchemaContext(requiredSources);
-
-            final FutureCallback<SchemaContext> RecursiveSchemaBuilderCallback = new FutureCallback<SchemaContext>() {
-
-                @Override
-                public void onSuccess(final SchemaContext result) {
+        private void setUpSchema(Collection<SourceIdentifier> requiredSources) {
+            while (!requiredSources.isEmpty()) {
+                LOG.trace("{}: Trying to build schema context from {}", id, requiredSources);
+                try {
+                    final CheckedFuture<SchemaContext, SchemaResolutionException> schemaBuilderFuture = schemaContextFactory.createSchemaContext(requiredSources);
+                    final SchemaContext result = schemaBuilderFuture.checkedGet();
                     LOG.debug("{}: Schema context built successfully from {}", id, requiredSources);
                     final Collection<QName> filteredQNames = Sets.difference(deviceSources.getRequiredSourcesQName(), capabilities.getUnresolvedCapabilites().keySet());
                     capabilities.addCapabilities(filteredQNames);
                     capabilities.addNonModuleBasedCapabilities(remoteSessionCapabilities.getNonModuleCaps());
                     handleSalInitializationSuccess(result, remoteSessionCapabilities, getDeviceSpecificRpc(result));
-                }
-
-                @Override
-                public void onFailure(final Throwable t) {
-                    // In case source missing, try without it
-                    if (t instanceof MissingSchemaSourceException) {
+                    return;
+                } catch (Throwable t) {
+                    if (t instanceof MissingSchemaSourceException){
+                        // In case source missing, try without it
                         final SourceIdentifier missingSource = ((MissingSchemaSourceException) t).getSourceId();
                         LOG.warn("{}: Unable to build schema context, missing source {}, will reattempt without it", id, missingSource);
                         LOG.debug("{}: Unable to build schema context, missing source {}, will reattempt without it", t);
@@ -429,26 +415,28 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
                         if (!qNameOfMissingSource.isEmpty()) {
                             capabilities.addUnresolvedCapabilities(qNameOfMissingSource, UnavailableCapability.FailureReason.MissingSource);
                         }
-                        setUpSchema(stripMissingSource(requiredSources, missingSource));
-
-                    // In case resolution error, try only with resolved sources
+                        requiredSources = stripMissingSource(requiredSources, missingSource);
                     } else if (t instanceof SchemaResolutionException) {
-                        // TODO check for infinite loop
-                        final SchemaResolutionException resolutionException = (SchemaResolutionException) t;
+                        // In case resolution error, try only with resolved sources
+                        SchemaResolutionException resolutionException = (SchemaResolutionException) t;
                         final Set<SourceIdentifier> unresolvedSources = resolutionException.getUnsatisfiedImports().keySet();
                         capabilities.addUnresolvedCapabilities(getQNameFromSourceIdentifiers(unresolvedSources), UnavailableCapability.FailureReason.UnableToResolve);
                         LOG.warn("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only", id, resolutionException.getUnsatisfiedImports());
                         LOG.debug("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only", resolutionException);
-                        setUpSchema(resolutionException.getResolvedSources());
-                    // unknown error, fail
+                        requiredSources = resolutionException.getResolvedSources();
                     } else {
+                        // unknown error, fail
                         handleSalInitializationFailure(t, listener);
+                        return;
                     }
                 }
-            };
-
-            Futures.addCallback(schemaBuilderFuture, RecursiveSchemaBuilderCallback);
+            }
+            // No more sources, fail
+            final IllegalStateException cause = new IllegalStateException(id + ": No more sources for schema context");
+            handleSalInitializationFailure(cause, listener);
+            salFacade.onDeviceFailed(cause);
         }
+
 
         protected NetconfDeviceRpc getDeviceSpecificRpc(final SchemaContext result) {
             return new NetconfDeviceRpc(result, listener, new NetconfMessageTransformer(result, true));
