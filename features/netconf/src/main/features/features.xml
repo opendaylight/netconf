@@ -112,6 +112,10 @@
     <bundle>mvn:org.opendaylight.netconf/netconf-notifications-impl/{{VERSION}}</bundle>
   </feature>
 
+  <feature name='odl-netconf-tls' version='${project.version}' description="OpenDaylight :: Netconf Connector :: TLS">
+    <bundle>mvn:org.opendaylight.netconf/netconf-tls/{{VERSION}}</bundle>
+  </feature>
+
   <feature name='odl-netconf-ssh' version='${project.version}' description="OpenDaylight :: Netconf Connector :: SSH">
     <feature version='${project.version}'>odl-netconf-tcp</feature>
     <feature version='${project.version}'>odl-aaa-netconf-plugin</feature>
