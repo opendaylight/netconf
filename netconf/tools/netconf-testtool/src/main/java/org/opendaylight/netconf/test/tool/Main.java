@@ -74,6 +74,9 @@ public final class Main {
         @Arg(dest = "ssh")
         public boolean ssh;
 
+        @Arg(dest = "tls")
+        public boolean tls;
+
         @Arg(dest = "exi")
         public boolean exi;
 
@@ -155,6 +158,12 @@ public final class Main {
                     .setDefault(true)
                     .help("Whether to use ssh for transport or just pure tcp")
                     .dest("ssh");
+
+            parser.addArgument("--tls")
+                    .type(Boolean.class)
+                    .setDefault(false)
+                    .help("Whether to use tls for transport or use ssh")
+                    .dest("tls");
 
             parser.addArgument("--exi")
                     .type(Boolean.class)

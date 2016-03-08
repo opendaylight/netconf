@@ -147,7 +147,7 @@ public class NetconfDeviceSimulator implements Closeable {
     }
 
     public List<Integer> start(final Main.Params params) {
-        LOG.info("Starting {}, {} simulated devices starting on port {}", params.deviceCount, params.ssh ? "SSH" : "TCP", params.startingPort);
+        LOG.info("Starting {}, {} simulated devices starting on port {}", params.deviceCount, params.tls ? "TLS" : params.ssh ? "SSH" : "TCP", params.startingPort);
 
         final SharedSchemaRepository schemaRepo = new SharedSchemaRepository("netconf-simulator");
         final Set<Capability> capabilities = parseSchemasToModuleCapabilities(params, schemaRepo);
@@ -176,55 +176,70 @@ public class NetconfDeviceSimulator implements Closeable {
             final InetSocketAddress address = getAddress(currentPort);
 
             final ChannelFuture server;
-            if(params.ssh) {
-                final InetSocketAddress bindingAddress = InetSocketAddress.createUnresolved("0.0.0.0", currentPort);
+
+            if(params.tls) {
+                LOG.debug("configure the tls server");
+                // create local tcp server and tls proxy server
+                // so the communication will happen in following way :
+                // client <-------> tls proxy server <-----> netconf tcp server
                 final LocalAddress tcpLocalAddress = new LocalAddress(address.toString());
 
+                // initialized the netconf tcp server
                 server = dispatcher.createLocalServer(tcpLocalAddress);
-                try {
-                    final SshProxyServer sshServer = new SshProxyServer(minaTimerExecutor, nettyThreadgroup, nioExecutor);
-                    sshServer.bind(getSshConfiguration(bindingAddress, tcpLocalAddress, keyPairProvider));
-                    sshWrappers.add(sshServer);
-                } catch (final BindException e) {
-                    LOG.warn("Cannot start simulated device on {}, port already in use. Skipping.", address);
-                    // Close local server and continue
-                    server.cancel(true);
-                    if(server.isDone()) {
-                        server.channel().close();
-                    }
-                    continue;
-                } catch (final IOException e) {
-                    LOG.warn("Cannot start simulated device on {} due to IOException.", address, e);
-                    break;
-                } finally {
-                    currentPort++;
-                }
 
-                try {
-                    server.get();
-                } catch (final InterruptedException e) {
-                    throw new RuntimeException(e);
-                } catch (final ExecutionException e) {
-                    LOG.warn("Cannot start ssh simulated device on {}, skipping", address, e);
-                    continue;
-                }
-
-                LOG.debug("Simulated SSH device started on {}", address);
+                // initialize the tls proxy server
 
             } else {
-                server = dispatcher.createServer(address);
-                currentPort++;
+                if(params.ssh) {
+                    final InetSocketAddress bindingAddress = InetSocketAddress.createUnresolved("0.0.0.0", currentPort);
+                    final LocalAddress tcpLocalAddress = new LocalAddress(address.toString());
 
-                try {
-                    server.get();
-                } catch (final InterruptedException e) {
-                    throw new RuntimeException(e);
-                } catch (final ExecutionException e) {
-                    LOG.warn("Cannot start tcp simulated device on {}, skipping", address, e);
-                    continue;
+                    server = dispatcher.createLocalServer(tcpLocalAddress);
+                    try {
+                        final SshProxyServer sshServer = new SshProxyServer(minaTimerExecutor, nettyThreadgroup, nioExecutor);
+                        sshServer.bind(getSshConfiguration(bindingAddress, tcpLocalAddress, keyPairProvider));
+                        sshWrappers.add(sshServer);
+                    } catch (final BindException e) {
+                        LOG.warn("Cannot start simulated device on {}, port already in use. Skipping.", address);
+                        // Close local server and continue
+                        server.cancel(true);
+                        if(server.isDone()) {
+                            server.channel().close();
+                        }
+                        continue;
+                    } catch (final IOException e) {
+                        LOG.warn("Cannot start simulated device on {} due to IOException.", address, e);
+                        break;
+                    } finally {
+                        currentPort++;
+                    }
+
+                    try {
+                        server.get();
+                    } catch (final InterruptedException e) {
+                        throw new RuntimeException(e);
+                    } catch (final ExecutionException e) {
+                        LOG.warn("Cannot start ssh simulated device on {}, skipping", address, e);
+                        continue;
+                    }
+
+                    LOG.debug("Simulated SSH device started on {}", address);
+
+                } else {
+                    server = dispatcher.createServer(address);
+                    currentPort++;
+
+                    try {
+                        server.get();
+                    } catch (final InterruptedException e) {
+                        throw new RuntimeException(e);
+                    } catch (final ExecutionException e) {
+                        LOG.warn("Cannot start tcp simulated device on {}, skipping", address, e);
+                        continue;
+                    }
+
+                    LOG.debug("Simulated TCP device started on {}", address);
                 }
-
-                LOG.debug("Simulated TCP device started on {}", address);
             }
 
             devicesChannels.add(server.channel());
