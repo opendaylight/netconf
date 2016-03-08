@@ -7,8 +7,6 @@
  */
 
  /**
- * Utility classes for remote connectors e.g. netconf connector
- *
- * TODO extract into separate bundle when another connector is implemented e.g. restconf connector
+ * Utility classes for netconf connector
  */
 package org.opendaylight.netconf.sal.connect.util;
