@@ -30,7 +30,7 @@
 
     <properties>
         <!-- FIXME: should be inherited from odlparent -->
-        <akka.version>2.3.14</akka.version>
+        <akka.version>2.4.1</akka.version>
         <scala.major.version>2.11</scala.major.version>
         <scala.minor.version>7</scala.minor.version>
     </properties>
