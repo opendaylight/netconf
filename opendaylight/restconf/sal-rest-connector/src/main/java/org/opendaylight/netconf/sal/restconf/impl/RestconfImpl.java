@@ -97,7 +97,7 @@ import org.opendaylight.yangtools.yang.parser.builder.api.GroupingBuilder;
 import org.opendaylight.yangtools.yang.parser.builder.impl.ContainerSchemaNodeBuilder;
 import org.opendaylight.yangtools.yang.parser.builder.impl.LeafSchemaNodeBuilder;
 import org.opendaylight.yangtools.yang.parser.builder.impl.ModuleBuilder;
-import org.opendaylight.yangtools.yang.parser.impl.YangParserImpl;
+import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.effective.EffectiveSchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -370,10 +370,7 @@ public class RestconfImpl implements RestconfService {
         }
 
         final Set<Module> fakeRpcModules = Collections.singleton(restConfModuleBuilder.build());
-
-        final YangParserImpl yangParser = new YangParserImpl();
-        final SchemaContext fakeSchemaCx = yangParser.resolveSchemaContext(fakeRpcModules);
-
+        final SchemaContext fakeSchemaCx = EffectiveSchemaContext.resolveSchemaContext(fakeRpcModules);
         final InstanceIdentifierContext<?> fakeIICx = new InstanceIdentifierContext<>(null, operContainerSchemaNode, mountPoint, fakeSchemaCx);
 
         return new NormalizedNodeContext(fakeIICx, operContainerNode.build());
