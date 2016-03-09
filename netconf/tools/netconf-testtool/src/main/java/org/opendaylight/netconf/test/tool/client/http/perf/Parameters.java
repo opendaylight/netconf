@@ -53,6 +53,9 @@ public class Parameters {
     @Arg(dest = "auth")
     public ArrayList<String> auth;
 
+    @Arg(dest = "timeout")
+    public int timeout;
+
     static ArgumentParser getParser() {
         final ArgumentParser parser = ArgumentParsers.newArgumentParser("netconf stress client");
 
@@ -121,6 +124,12 @@ public class Parameters {
                 .nargs(2)
                 .help("Username and password for HTTP basic authentication in order username password.")
                 .dest("auth");
+
+        parser.addArgument("--timeout")
+                .type(Integer.class)
+                .setDefault(5)
+                .help("Maximum time in minutes to wait for finishing all requests.")
+                .dest("timeout");
 
         return parser;
     }
