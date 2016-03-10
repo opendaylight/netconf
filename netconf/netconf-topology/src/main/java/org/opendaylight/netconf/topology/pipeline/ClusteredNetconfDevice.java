@@ -33,6 +33,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPrefe
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.util.NetconfTopologyPathCreator;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.ModuleIdentifier;
@@ -97,7 +98,7 @@ public class ClusteredNetconfDevice extends NetconfDevice implements EntityOwner
                             public MasterSourceProviderImpl create() throws Exception {
                                 return new MasterSourceProviderImpl(schemaRepo, sourceIds, actorSystem, topologyId, nodeId);
                             }
-                        }), "masterSourceProvider");
+                        }), NetconfTopologyPathCreator.MASTER_SOURCE_PROVIDER);
     }
 
     @Override
@@ -126,8 +127,7 @@ public class ClusteredNetconfDevice extends NetconfDevice implements EntityOwner
                             public ClusteredDeviceSourcesResolverImpl create() throws Exception {
                                 return new ClusteredDeviceSourcesResolverImpl(topologyId, nodeId, actorSystem, schemaRegistry, sourceRegistrations);
                             }
-                        }), "clusteredDeviceSourcesResolver");
-
+                        }), NetconfTopologyPathCreator.CLUSTERED_DEVICE_SOURCES_RESOLVER);
 
         final FutureCallback<SchemaContext> schemaContextFuture = new FutureCallback<SchemaContext>() {
             @Override

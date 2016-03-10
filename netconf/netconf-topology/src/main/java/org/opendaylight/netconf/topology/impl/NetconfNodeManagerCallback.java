@@ -47,6 +47,7 @@ import org.opendaylight.netconf.topology.util.BaseNodeManager;
 import org.opendaylight.netconf.topology.util.BaseTopologyManager;
 import org.opendaylight.netconf.topology.util.messages.AnnounceMasterMountPoint;
 import org.opendaylight.netconf.topology.util.messages.AnnounceMasterMountPointDown;
+import org.opendaylight.netconf.util.NetconfTopologyPathCreator;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
@@ -126,7 +127,8 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
         this.topologyDispatcher = (ClusteredNetconfTopology) topologyDispatcher;
         this.roleChangeStrategy = roleChangeStrategy;
 
-        final Future<ActorRef> topologyRefFuture = actorSystem.actorSelection("/user/" + topologyId).resolveOne(FiniteDuration.create(10L, TimeUnit.SECONDS));
+        final NetconfTopologyPathCreator pathCreator = new NetconfTopologyPathCreator(topologyId);
+        final Future<ActorRef> topologyRefFuture = actorSystem.actorSelection(pathCreator.build()).resolveOne(FiniteDuration.create(10L, TimeUnit.SECONDS));
         topologyRefFuture.onComplete(new OnComplete<ActorRef>() {
             @Override
             public void onComplete(Throwable throwable, ActorRef actorRef) throws Throwable {
@@ -140,7 +142,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
             }
         }, actorSystem.dispatcher());
 
-        final Future<ActorRef> nodeRefFuture = actorSystem.actorSelection("/user/" + topologyId + "/" + nodeId).resolveOne(FiniteDuration.create(10L, TimeUnit.SECONDS));
+        final Future<ActorRef> nodeRefFuture = actorSystem.actorSelection(pathCreator.withSuffix(nodeId).build()).resolveOne(FiniteDuration.create(10L, TimeUnit.SECONDS));
         nodeRefFuture.onComplete(new OnComplete<ActorRef>() {
             @Override
             public void onComplete(Throwable throwable, ActorRef actorRef) throws Throwable {

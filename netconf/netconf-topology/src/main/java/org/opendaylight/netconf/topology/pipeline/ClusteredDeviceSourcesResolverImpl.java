@@ -30,6 +30,7 @@ import org.opendaylight.controller.cluster.schema.provider.impl.RemoteSchemaProv
 import org.opendaylight.netconf.topology.pipeline.messages.AnnounceClusteredDeviceSourcesResolverUp;
 import org.opendaylight.netconf.topology.pipeline.messages.AnnounceMasterOnSameNodeUp;
 import org.opendaylight.netconf.topology.pipeline.messages.AnnounceMasterSourceProviderUp;
+import org.opendaylight.netconf.util.NetconfTopologyPathCreator;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -71,7 +72,8 @@ public class ClusteredDeviceSourcesResolverImpl implements ClusteredDeviceSource
         Cluster cluster = Cluster.get(actorSystem);
         for(Member node : cluster.state().getMembers()) {
             if(!node.address().equals(cluster.selfAddress())) {
-                final String path = node.address() + "/user/" + topologyId + "/" + nodeId + "/masterSourceProvider";
+                final NetconfTopologyPathCreator pathCreator = new NetconfTopologyPathCreator(node.address().toString(), topologyId);
+                final String path = pathCreator.withSuffix(nodeId).withSuffix(NetconfTopologyPathCreator.MASTER_SOURCE_PROVIDER).build();
                 actorSystem.actorSelection(path).tell(new AnnounceClusteredDeviceSourcesResolverUp(), TypedActor.context().self());
             }
         }
