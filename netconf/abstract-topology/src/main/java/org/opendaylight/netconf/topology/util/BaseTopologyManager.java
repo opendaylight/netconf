@@ -54,6 +54,7 @@ import org.opendaylight.netconf.topology.TopologyManagerCallback.TopologyManager
 import org.opendaylight.netconf.topology.util.messages.CustomIdentifyMessage;
 import org.opendaylight.netconf.topology.util.messages.CustomIdentifyMessageReply;
 import org.opendaylight.netconf.topology.util.messages.NormalizedNodeMessage;
+import org.opendaylight.netconf.util.NetconfTopologyPathCreator;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
@@ -507,7 +508,8 @@ public final class BaseTopologyManager
                 return;
             }
 
-            final String path = member.address() + PATH + topologyId;
+            final NetconfTopologyPathCreator pathCreator = new NetconfTopologyPathCreator(member.address().toString(), topologyId);
+            final String path = pathCreator.build();
             LOG.debug("Actor at :{} is resolving topology actor for path {}", clusterExtension.selfAddress(), path);
 
             // first send basic identify message in case our messages have not been loaded through osgi yet to prevent crashing akka.
@@ -535,14 +537,15 @@ public final class BaseTopologyManager
             if (member.address().equals(clusterExtension.selfAddress())) {
                 return;
             }
-
-            final String path = member.address() + PATH + topologyId;
+            final NetconfTopologyPathCreator pathCreator = new NetconfTopologyPathCreator(member.address().toString(), topologyId);
+            final String path = pathCreator.build();
             LOG.debug("Actor at :{} is resolving topology actor for path {}", clusterExtension.selfAddress(), path);
 
             clusterExtension.system().actorSelection(path).tell(new Identify(member.address()), TypedActor.context().self());
         } else if (message instanceof ActorIdentity) {
             LOG.debug("Received ActorIdentity message", message);
-            final String path = ((ActorIdentity) message).correlationId() + PATH + topologyId;
+            final NetconfTopologyPathCreator pathCreator = new NetconfTopologyPathCreator(((ActorIdentity) message).correlationId().toString(), topologyId);
+            final String path = pathCreator.build();
             if (((ActorIdentity) message).getRef() == null) {
                 LOG.debug("ActorIdentity has null actor ref, retrying..", message);
                 final ActorRef self = TypedActor.context().self();
