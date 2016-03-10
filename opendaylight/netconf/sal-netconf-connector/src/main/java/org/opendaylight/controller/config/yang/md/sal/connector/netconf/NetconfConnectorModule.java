@@ -226,6 +226,12 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
                         setSchemaRegistry(dto.getSchemaRegistry());
                         schemaResourcesDTO = dto;
                     }
+                    if (userCapabilities.isPresent()) {
+                        for (QName qname : userCapabilities.get().getModuleBasedCaps()) {
+                            final SourceIdentifier sourceIdentifier = new SourceIdentifier(qname.getLocalName(), qname.getFormattedRevision());
+                            dto.getSchemaRegistry().registerSchemaSource(DEFAULT_CACHE, PotentialSchemaSource.create(sourceIdentifier, YangTextSchemaSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue()));
+                        }
+                    }
                 }
                 LOG.info("Netconf connector for device {} will use schema cache directory {} instead of {}",
                         instanceName, moduleSchemaCacheDirectory, DEFAULT_CACHE_DIRECTORY);
