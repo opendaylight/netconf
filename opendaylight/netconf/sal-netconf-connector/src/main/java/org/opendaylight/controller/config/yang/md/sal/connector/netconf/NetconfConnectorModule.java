@@ -47,10 +47,13 @@ import org.opendaylight.protocol.framework.ReconnectStrategyFactory;
 import org.opendaylight.protocol.framework.TimedReconnectStrategy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.IpAddress;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
+import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
@@ -104,6 +107,8 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
      */
     private static final SchemaContextFactory DEFAULT_SCHEMA_CONTEXT_FACTORY =
             DEFAULT_SCHEMA_REPOSITORY.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
+
+    private static final int LOCAL_IO_FALLBACK_COST = PotentialSchemaSource.Costs.LOCAL_IO.getValue() + 1;
 
     /**
      * Keeps track of initialized Schema resources.  A Map is maintained in which the key represents the name
@@ -192,14 +197,14 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         final ExecutorService globalProcessingExecutor = processingExecutor.getExecutor();
 
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade
-                = new NetconfDeviceSalFacade(id, domRegistry, bindingRegistry, getDefaultRequestTimeoutMillis());
+                = new NetconfDeviceSalFacade(id, domRegistry, bindingRegistry);
 
         final Long keepaliveDelay = getKeepaliveDelay();
         if (shouldSendKeepalive()) {
             // Keepalive executor is optional for now and a default instance is supported
             final ScheduledExecutorService executor = keepaliveExecutor == null ? DEFAULT_KEEPALIVE_EXECUTOR : keepaliveExecutor.getExecutor();
 
-            salFacade = new KeepaliveSalFacade(id, salFacade, executor, keepaliveDelay);
+            salFacade = new KeepaliveSalFacade(id, salFacade, executor, keepaliveDelay, getDefaultRequestTimeoutMillis());
         }
 
         // Setup information related to the SchemaRegistry, SchemaResourceFactory, etc.
@@ -225,6 +230,12 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
                         setSchemaContextFactory(dto.getSchemaContextFactory());
                         setSchemaRegistry(dto.getSchemaRegistry());
                         schemaResourcesDTO = dto;
+                    }
+                    if (userCapabilities.isPresent()) {
+                        for (QName qname : userCapabilities.get().getModuleBasedCaps()) {
+                            final SourceIdentifier sourceIdentifier = new SourceIdentifier(qname.getLocalName(), qname.getFormattedRevision());
+                            dto.getSchemaRegistry().registerSchemaSource(DEFAULT_CACHE, PotentialSchemaSource.create(sourceIdentifier, YangTextSchemaSource.class, LOCAL_IO_FALLBACK_COST));
+                        }
                     }
                 }
                 LOG.info("Netconf connector for device {} will use schema cache directory {} instead of {}",
