@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a3d3df0_91fb2d46",
+        "filename": "opendaylight/netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/client/http/perf/Parameters.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-11T13:01:37Z",
+      "side": 1,
+      "message": "Probably should add validation for this parameter so we don\u0027t have people trying to input negative values",
+      "range": {
+        "startLine": 128,
+        "startChar": 7,
+        "endLine": 132,
+        "endChar": 33
+      },
+      "revId": "fcfbcc7fd320fc809e6548d0de16c3192b4fad74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
