@@ -12,10 +12,9 @@ import java.io.IOException;
 import org.apache.sshd.ClientSession;
 import org.apache.sshd.client.future.AuthFuture;
 
-//TODO checkstyle reports imports only used in javadoc as not used, readd link to AsyncSshHandler once this is no longer the case
 /**
  * Class Providing username/password authentication option to
- * AsyncSshHandler
+ * {@link org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler}
  */
 public class LoginPassword extends AuthenticationHandler {
     private final String username;
