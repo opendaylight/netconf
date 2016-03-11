@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.test.tool.client.http.perf;
 
-
 import com.google.common.base.Charsets;
 import com.google.common.base.Stopwatch;
 import com.google.common.io.Files;
@@ -102,7 +101,7 @@ public class RestPerfClient {
                 }
                 destBuilder.append(suffixBuilder);
 
-                payloads.add(new DestToPayload(destBuilder.toString(), prepareMessage(i, j, editContentString)));
+                payloads.add(new DestToPayload(destBuilder.toString(), prepareMessage(i, j, editContentString, devicePort)));
             }
             allThreadsPayloads.add(payloads);
         }
@@ -119,7 +118,7 @@ public class RestPerfClient {
                 suffixBuilder.replace(suffixBuilder.indexOf(DEVICE_PORT_KEY), suffixBuilder.indexOf(DEVICE_PORT_KEY) + DEVICE_PORT_KEY.length(), devicePort + "");
             }
             destBuilder.append(suffixBuilder);
-            payloads.add(new DestToPayload(destBuilder.toString(), prepareMessage(threadAmount - 1, requestsPerThread + i, editContentString)));
+            payloads.add(new DestToPayload(destBuilder.toString(), prepareMessage(threadAmount - 1, requestsPerThread + i, editContentString, devicePort)));
         }
 
         final ArrayList<PerfClientCallable> callables = new ArrayList<>();
@@ -177,11 +176,15 @@ public class RestPerfClient {
         return null;
     }
 
-    private static String prepareMessage(final int idi, final int idj, final String editContentString) {
+    private static String prepareMessage(final int idi, final int idj, final String editContentString, final int devicePort) {
         StringBuilder messageBuilder = new StringBuilder(editContentString);
         if (editContentString.contains(PEER_KEY)) {
             messageBuilder.replace(messageBuilder.indexOf(PEER_KEY), messageBuilder.indexOf(PEER_KEY) + PEER_KEY.length(), Integer.toString(idi))
                     .replace(messageBuilder.indexOf(INT_LEAF_KEY), messageBuilder.indexOf(INT_LEAF_KEY) + INT_LEAF_KEY.length(), Integer.toString(idj));
+        }
+
+        if (messageBuilder.indexOf(DEVICE_PORT_KEY) != -1) {
+            messageBuilder.replace(messageBuilder.indexOf(DEVICE_PORT_KEY), messageBuilder.indexOf(DEVICE_PORT_KEY) + DEVICE_PORT_KEY.length(), Integer.toString(devicePort));
         }
 
         int idx = messageBuilder.indexOf(PHYS_ADDR_PLACEHOLDER);
