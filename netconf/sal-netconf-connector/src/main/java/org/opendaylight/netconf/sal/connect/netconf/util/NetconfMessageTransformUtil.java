@@ -17,14 +17,13 @@ import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.EditContent;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
@@ -40,9 +39,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.data.impl.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeAttrBuilder;
@@ -60,12 +56,6 @@ public class NetconfMessageTransformUtil {
     private static final Logger LOG= LoggerFactory.getLogger(NetconfMessageTransformUtil.class);
 
     public static final String MESSAGE_ID_ATTR = "message-id";
-    public static final XMLOutputFactory XML_FACTORY;
-
-    static {
-        XML_FACTORY = XMLOutputFactory.newFactory();
-        XML_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
-    }
 
     public static final QName CREATE_SUBSCRIPTION_RPC_QNAME = QName.cachedReference(QName.create(CreateSubscriptionInput.QNAME, "create-subscription"));
     private static final String SUBTREE = "subtree";
@@ -168,7 +158,7 @@ public class NetconfMessageTransformUtil {
         element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(), "subtree");
 
         try {
-            writeNormalizedNode(filterContent, new DOMResult(element), SchemaPath.ROOT, ctx);
+            NetconfUtil.writeNormalizedNode(filterContent, new DOMResult(element), SchemaPath.ROOT, ctx);
         } catch (IOException | XMLStreamException e) {
             throw new IllegalStateException("Unable to serialize filter element for path " + identifier, e);
         }
@@ -291,7 +281,7 @@ public class NetconfMessageTransformUtil {
 
         final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_CONFIG_QNAME.getLocalName(), Optional.of(NETCONF_CONFIG_QNAME.getNamespace().toString()));
         try {
-            writeNormalizedNode(configContent, new DOMResult(element), SchemaPath.ROOT, ctx);
+            NetconfUtil.writeNormalizedNode(configContent, new DOMResult(element), SchemaPath.ROOT, ctx);
         } catch (IOException | XMLStreamException e) {
             throw new IllegalStateException("Unable to serialize edit config content element for path " + dataPath, e);
         }
@@ -305,34 +295,4 @@ public class NetconfMessageTransformUtil {
         return SchemaPath.create(true, rpc);
     }
 
-    // FIXME similar code is in netconf-notifications-impl , DRY
-    public static void writeNormalizedNode(final NormalizedNode<?, ?> normalized, final DOMResult result, final SchemaPath schemaPath, final SchemaContext context)
-            throws IOException, XMLStreamException {
-        NormalizedNodeWriter normalizedNodeWriter = null;
-        NormalizedNodeStreamWriter normalizedNodeStreamWriter = null;
-        XMLStreamWriter writer = null;
-        try {
-            writer = XML_FACTORY.createXMLStreamWriter(result);
-            normalizedNodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(writer, context, schemaPath);
-            normalizedNodeWriter = NormalizedNodeWriter.forStreamWriter(normalizedNodeStreamWriter);
-
-            normalizedNodeWriter.write(normalized);
-
-            normalizedNodeWriter.flush();
-        } finally {
-            try {
-                if(normalizedNodeWriter != null) {
-                    normalizedNodeWriter.close();
-                }
-                if(normalizedNodeStreamWriter != null) {
-                    normalizedNodeStreamWriter.close();
-                }
-                if(writer != null) {
-                    writer.close();
-                }
-            } catch (final Exception e) {
-                LOG.warn("Unable to close resource properly", e);
-            }
-        }
-    }
 }

@@ -45,6 +45,7 @@ import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
+import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yangtools.sal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -299,7 +300,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     private static void writeNormalizedRpc(final ContainerNode normalized, final DOMResult result,
             final SchemaPath schemaPath, final SchemaContext baseNetconfCtx) throws IOException, XMLStreamException {
-        final XMLStreamWriter writer = NetconfMessageTransformUtil.XML_FACTORY.createXMLStreamWriter(result);
+        final XMLStreamWriter writer = NetconfUtil.XML_FACTORY.createXMLStreamWriter(result);
         try {
             try (final NormalizedNodeStreamWriter normalizedNodeStreamWriter =
                     XMLStreamNormalizedNodeStreamWriter.create(writer, baseNetconfCtx, schemaPath)) {
