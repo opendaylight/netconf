@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import javanet.staxutils.IndentingXMLStreamWriter;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -30,6 +29,8 @@ import org.opendaylight.netconf.sal.rest.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.restconf.Draft11;
+import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -40,10 +41,13 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import javanet.staxutils.IndentingXMLStreamWriter;
 
 @Provider
 @Produces({ Draft02.MediaTypes.API + RestconfService.XML, Draft02.MediaTypes.DATA + RestconfService.XML,
-        Draft02.MediaTypes.OPERATION + RestconfService.XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+        Draft02.MediaTypes.OPERATION + RestconfService.XML,
+        Draft11.MediaTypes.API + RestconfConstants.XML, Draft11.MediaTypes.DATA + RestconfConstants.XML,
+        Draft11.MediaTypes.OPERATION + RestconfConstants.XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<NormalizedNodeContext> {
 
     private static final XMLOutputFactory XML_FACTORY;
@@ -86,8 +90,8 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
         } catch (final FactoryConfigurationError e) {
             throw new IllegalStateException(e);
         }
-        NormalizedNode<?, ?> data = t.getData();
-        SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
+        final NormalizedNode<?, ?> data = t.getData();
+        final SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
 
 
 
@@ -95,8 +99,8 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
 
     }
 
-    private void writeNormalizedNode(XMLStreamWriter xmlWriter, SchemaPath schemaPath, InstanceIdentifierContext<?>
-            pathContext, NormalizedNode<?, ?> data, Optional<Integer> depth) throws IOException {
+    private void writeNormalizedNode(final XMLStreamWriter xmlWriter, final SchemaPath schemaPath, final InstanceIdentifierContext<?>
+            pathContext, NormalizedNode<?, ?> data, final Optional<Integer> depth) throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
         final SchemaContext schemaCtx = pathContext.getSchemaContext();
         if (SchemaPath.ROOT.equals(schemaPath)) {
@@ -118,9 +122,9 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
         nnWriter.flush();
     }
 
-    private RestconfNormalizedNodeWriter createNormalizedNodeWriter(XMLStreamWriter xmlWriter,
-                                                                        SchemaContext schemaContext, SchemaPath schemaPath, Optional<Integer> depth) {
-        NormalizedNodeStreamWriter xmlStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, schemaContext, schemaPath);
+    private RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
+                                                                        final SchemaContext schemaContext, final SchemaPath schemaPath, final Optional<Integer> depth) {
+        final NormalizedNodeStreamWriter xmlStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, schemaContext, schemaPath);
         if (depth.isPresent()) {
             return DepthAwareNormalizedNodeWriter.forStreamWriter(xmlStreamWriter, depth.get());
         } else {
@@ -135,7 +139,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             final QName name = data.getNodeType();
             xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, name.getLocalName(), name.getNamespace().toString());
             xmlWriter.writeDefaultNamespace(name.getNamespace().toString());
-            for(NormalizedNode<?,?> child : data.getValue()) {
+            for(final NormalizedNode<?,?> child : data.getValue()) {
                 nnWriter.write(child);
             }
             nnWriter.flush();
