@@ -27,6 +27,8 @@ import org.opendaylight.netconf.sal.rest.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.restconf.Draft11;
+import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -45,7 +47,9 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 @Provider
 @Produces({ Draft02.MediaTypes.API + RestconfService.JSON, Draft02.MediaTypes.DATA + RestconfService.JSON,
-    Draft02.MediaTypes.OPERATION + RestconfService.JSON, MediaType.APPLICATION_JSON })
+        Draft02.MediaTypes.OPERATION + RestconfService.JSON,
+        Draft11.MediaTypes.API + RestconfConstants.JSON, Draft11.MediaTypes.DATA + RestconfConstants.JSON,
+        Draft11.MediaTypes.OPERATION + RestconfConstants.JSON, MediaType.APPLICATION_JSON })
 public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<NormalizedNodeContext> {
 
     private static final int DEFAULT_INDENT_SPACES_NUM = 2;
@@ -64,7 +68,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
     public void writeTo(final NormalizedNodeContext t, final Class<?> type, final Type genericType, final Annotation[] annotations,
             final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream)
                     throws IOException, WebApplicationException {
-        NormalizedNode<?, ?> data = t.getData();
+        final NormalizedNode<?, ?> data = t.getData();
         if (data == null) {
             return;
         }
@@ -72,7 +76,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         @SuppressWarnings("unchecked")
         final InstanceIdentifierContext<SchemaNode> context = (InstanceIdentifierContext<SchemaNode>) t.getInstanceIdentifierContext();
 
-        SchemaPath path = context.getSchemaNode().getPath();
+        final SchemaPath path = context.getSchemaNode().getPath();
         final JsonWriter jsonWriter = createJsonWriter(entityStream, t.getWriterParameters().isPrettyPrint());
         jsonWriter.beginObject();
         writeNormalizedNode(jsonWriter,path,context,data, t.getWriterParameters().getDepth());
@@ -80,8 +84,8 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         jsonWriter.flush();
     }
 
-    private void writeNormalizedNode(JsonWriter jsonWriter, SchemaPath path,
-            InstanceIdentifierContext<SchemaNode> context, NormalizedNode<?, ?> data, Optional<Integer> depth) throws
+    private void writeNormalizedNode(final JsonWriter jsonWriter, SchemaPath path,
+            final InstanceIdentifierContext<SchemaNode> context, NormalizedNode<?, ?> data, final Optional<Integer> depth) throws
             IOException {
         final RestconfNormalizedNodeWriter nnWriter;
         if (SchemaPath.ROOT.equals(path)) {
@@ -121,7 +125,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
     }
 
     private RestconfNormalizedNodeWriter createNormalizedNodeWriter(final InstanceIdentifierContext<SchemaNode> context,
-            final SchemaPath path, final JsonWriter jsonWriter, Optional<Integer> depth) {
+            final SchemaPath path, final JsonWriter jsonWriter, final Optional<Integer> depth) {
 
         final SchemaNode schema = context.getSchemaNode();
         final JSONCodecFactory codecs = getCodecFactory(context);
@@ -144,7 +148,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         }
     }
 
-    private JsonWriter createJsonWriter(final OutputStream entityStream, boolean prettyPrint) {
+    private JsonWriter createJsonWriter(final OutputStream entityStream, final boolean prettyPrint) {
         if (prettyPrint) {
             return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, Charsets.UTF_8),
                     DEFAULT_INDENT_SPACES_NUM);
