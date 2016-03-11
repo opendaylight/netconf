@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.utils;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -43,6 +44,29 @@ public class RestSchemaControllerUtil {
         return instantiatedDataNodeContainers;
     }
 
+    public static boolean isInstantiatedDataSchema(final DataSchemaNode node) {
+        return (node instanceof LeafSchemaNode) || (node instanceof LeafListSchemaNode)
+                || (node instanceof ContainerSchemaNode) || (node instanceof ListSchemaNode)
+                || (node instanceof AnyXmlSchemaNode);
+    }
+
+    public static DataSchemaNode findInstanceDataChildByNameAndNamespace(final DataNodeContainer container,
+            final String name, final URI namespace) {
+        Preconditions.<URI> checkNotNull(namespace);
+
+        final List<DataSchemaNode> potentialSchemaNodes = findInstanceDataChildrenByName(container, name);
+
+        final Predicate<DataSchemaNode> filter = new Predicate<DataSchemaNode>() {
+            @Override
+            public boolean apply(final DataSchemaNode node) {
+                return Objects.equal(node.getQName().getNamespace(), namespace);
+            }
+        };
+
+        final Iterable<DataSchemaNode> result = Iterables.filter(potentialSchemaNodes, filter);
+        return Iterables.getFirst(result, null);
+    }
+
     private static final Function<ChoiceSchemaNode, Set<ChoiceCaseNode>> CHOICE_FUNCTION = new Function<ChoiceSchemaNode, Set<ChoiceCaseNode>>() {
         @Override
         public Set<ChoiceCaseNode> apply(final ChoiceSchemaNode node) {
@@ -76,11 +100,5 @@ public class RestSchemaControllerUtil {
         for (final ChoiceCaseNode caze : allCases) {
             collectInstanceDataNodeContainers(potentialSchemaNodes, caze, name);
         }
-    }
-
-    public static boolean isInstantiatedDataSchema(final DataSchemaNode node) {
-        return (node instanceof LeafSchemaNode) || (node instanceof LeafListSchemaNode)
-                || (node instanceof ContainerSchemaNode) || (node instanceof ListSchemaNode)
-                || (node instanceof AnyXmlSchemaNode);
     }
 }
