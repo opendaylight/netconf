@@ -7,8 +7,6 @@
  */
 
 /**
- * General API for remote connectors e.g. netconf connector
- *
- * TODO extract into separate bundle when another connector is implemented e.g. restconf connector
+ * API for netconf connector
  */
 package org.opendaylight.netconf.sal.connect.api;
