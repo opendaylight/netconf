@@ -211,6 +211,17 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
         return delegate.getAvailableStreams(uriInfo);
     }
 
+    @Override
+    public PATCHStatusContext patchConfigurationData(final String identifier, final PATCHContext payload, final UriInfo
+            uriInfo) {
+        return delegate.patchConfigurationData(identifier, payload, uriInfo);
+    }
+
+    @Override
+    public PATCHStatusContext patchConfigurationData(final PATCHContext payload, final UriInfo uriInfo) {
+        return delegate.patchConfigurationData(payload, uriInfo);
+    }
+
     public BigInteger getConfigDelete() {
         return BigInteger.valueOf(configDelete.get());
     }
