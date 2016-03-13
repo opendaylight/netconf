@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a3d3df0_c67b3879",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonToPATCHBodyReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-13T22:49:51Z",
+      "side": 1,
+      "message": "Clean this up if it\u0027s not used in a follow up patch",
+      "range": {
+        "startLine": 141,
+        "startChar": 24,
+        "endLine": 145,
+        "endChar": 27
+      },
+      "revId": "cdea09e3a7291fe759a992671b2c6c2dac52cd43",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
