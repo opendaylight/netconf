@@ -462,6 +462,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         }
 
         final NetconfSessionPreferences parsedOverrideCapabilities = NetconfSessionPreferences.fromStrings(capabilities);
+
         LOG.warn("Capabilities to override can only contain module based capabilities, non-module capabilities will be retrieved from the device," +
                         " configured non-module capabilities: " + parsedOverrideCapabilities.getNonModuleCaps());
         if (parsedOverrideCapabilities.getModuleBasedCaps() !=null && !parsedOverrideCapabilities.getModuleBasedCaps().isEmpty()){

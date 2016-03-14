@@ -168,6 +168,7 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
         final NetconfDevice device = new ClusteredNetconfDevice(schemaResourcesDTO, remoteDeviceId, salFacade,
                 processingExecutor.getExecutor(), actorSystem, topologyId, nodeId.getValue(), TypedActor.context());
         Optional<UserPrefenreces> netconfSessionPreferences = getSessionPrefFromUserCapabilities(node);
+
         if(netconfSessionPreferences.isPresent()){
             return new NetconfConnectorDTO(new ClusteredNetconfDeviceCommunicator(remoteDeviceId, device, netconfSessionPreferences.get(), entityOwnershipService), salFacade);
         }
