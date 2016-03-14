@@ -454,7 +454,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         }
     }
 
-    private Optional<NetconfSessionPreferences> getUserCapabilities(final NetconfNode node) {
+    protected Optional<NetconfSessionPreferences> getUserCapabilities(final NetconfNode node) {
         if(node.getYangModuleCapabilities() == null) {
             return Optional.absent();
         }
