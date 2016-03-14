@@ -33,6 +33,8 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.DefaultChannelPromise;
+import io.netty.channel.EventLoop;
+import io.netty.util.concurrent.Future;
 import java.io.IOException;
 import java.net.SocketAddress;
 import org.apache.sshd.ClientChannel;
@@ -75,6 +77,8 @@ public class AsyncSshHandlerTest {
     private SocketAddress remoteAddress;
     @Mock
     private SocketAddress localAddress;
+    @Mock
+    private EventLoop eventLoop;
 
     private AsyncSshHandler asyncSshHandler;
 
@@ -91,6 +95,7 @@ public class AsyncSshHandlerTest {
         stubSshClient();
         stubChannel();
         stubCtx();
+        stubEventLoop();
         stubRemoteAddress();
 
         promise = getMockedPromise();
@@ -150,6 +155,11 @@ public class AsyncSshHandlerTest {
 
     private void stubChannel() {
         doReturn("channel").when(channel).toString();
+        doReturn(eventLoop).when(channel).eventLoop();
+    }
+
+    private void stubEventLoop() {
+        doReturn(mock(Future.class)).when(eventLoop).shutdownGracefully();
     }
 
     private void stubSshClient() {
