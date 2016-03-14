@@ -287,6 +287,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             LOG.warn("Unable to cleanup all resources for channel: {}. Ignoring.", ctx.channel(), e);
         }
 
+        ctx.channel().eventLoop().shutdownGracefully();
         channel = null;
         promise.setSuccess();
         LOG.debug("SSH session closed on channel: {}", ctx.channel());
