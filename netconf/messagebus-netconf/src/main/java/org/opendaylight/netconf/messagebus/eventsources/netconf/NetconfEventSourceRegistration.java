@@ -40,7 +40,6 @@ public class NetconfEventSourceRegistration implements AutoCloseable {
     private static final String NotificationCapabilityPrefix = "(urn:ietf:params:xml:ns:netconf:notification";
 
     private final Node node;
-    private final InstanceIdentifier<?> instanceIdent;
     private final NetconfEventSourceManager netconfEventSourceManager;
     private ConnectionStatus currentNetconfConnStatus;
     private EventSourceRegistration<NetconfEventSource> eventSourceRegistration;
@@ -50,11 +49,10 @@ public class NetconfEventSourceRegistration implements AutoCloseable {
         Preconditions.checkNotNull(instanceIdent);
         Preconditions.checkNotNull(node);
         Preconditions.checkNotNull(netconfEventSourceManager);
-        if (isEventSource(node) == false) {
+        if (!isEventSource(node)) {
             return null;
         }
-        NetconfEventSourceRegistration nesr = new NetconfEventSourceRegistration(instanceIdent, node,
-            netconfEventSourceManager);
+        NetconfEventSourceRegistration nesr = new NetconfEventSourceRegistration(node, netconfEventSourceManager);
         nesr.updateStatus();
         LOG.debug("NetconfEventSourceRegistration for node {} has been initialized...", node.getNodeId().getValue());
         return nesr;
@@ -81,16 +79,11 @@ public class NetconfEventSourceRegistration implements AutoCloseable {
         return false;
     }
 
-    private NetconfEventSourceRegistration(final InstanceIdentifier<?> instanceIdent, final Node node,
-        final NetconfEventSourceManager netconfEventSourceManager) {
-        this.instanceIdent = instanceIdent;
+    private NetconfEventSourceRegistration(final Node node, final NetconfEventSourceManager netconfEventSourceManager) {
         this.node = node;
         this.netconfEventSourceManager = netconfEventSourceManager;
         this.eventSourceRegistration = null;
-    }
-
-    public Node getNode() {
-        return node;
+        this.currentNetconfConnStatus = ConnectionStatus.Connecting;
     }
 
     Optional<EventSourceRegistration<NetconfEventSource>> getEventSourceRegistration() {
@@ -111,61 +104,49 @@ public class NetconfEventSourceRegistration implements AutoCloseable {
     }
 
     private boolean checkConnectionStatusType(ConnectionStatus status) {
-        if (status == ConnectionStatus.Connected || status == ConnectionStatus.Connecting
-            || status == ConnectionStatus.UnableToConnect) {
-            return true;
-        }
-        return false;
+        return status == ConnectionStatus.Connected || status == ConnectionStatus.Connecting
+                || status == ConnectionStatus.UnableToConnect;
     }
 
     private void changeStatus(ConnectionStatus newStatus) {
         Preconditions.checkNotNull(newStatus);
-        if (checkConnectionStatusType(newStatus) == false) {
+        Preconditions.checkState(this.currentNetconfConnStatus != null);
+        if (!checkConnectionStatusType(newStatus)) {
             throw new IllegalStateException("Unknown new Netconf Connection Status");
         }
-        if (this.currentNetconfConnStatus == null) {
-            if (newStatus == ConnectionStatus.Connected) {
-                registrationEventSource();
-            }
-        } else if (this.currentNetconfConnStatus == ConnectionStatus.Connecting) {
-            if (newStatus == ConnectionStatus.Connected) {
-                if (this.eventSourceRegistration == null) {
-                    registrationEventSource();
-                } else {
-                    // reactivate stream on registered event source (invoke publish notification about connection)
-                    this.eventSourceRegistration.getInstance().reActivateStreams();
+        switch (this.currentNetconfConnStatus) {
+            case Connecting:
+            case UnableToConnect:
+                if (newStatus == ConnectionStatus.Connected) {
+                    if (this.eventSourceRegistration == null) {
+                        registrationEventSource();
+                    } else {
+                        // reactivate stream on registered event source (invoke publish notification about connection)
+                        this.eventSourceRegistration.getInstance().reActivateStreams();
+                    }
                 }
-            }
-        } else if (this.currentNetconfConnStatus == ConnectionStatus.Connected) {
-
-            if (newStatus == ConnectionStatus.Connecting || newStatus == ConnectionStatus.UnableToConnect) {
-                // deactivate streams on registered event source (invoke publish notification about connection)
-                this.eventSourceRegistration.getInstance().deActivateStreams();
-            }
-        } else if (this.currentNetconfConnStatus == ConnectionStatus.UnableToConnect) {
-            if (newStatus == ConnectionStatus.Connected) {
-                if (this.eventSourceRegistration == null) {
-                    registrationEventSource();
-                } else {
-                    // reactivate stream on registered event source (invoke publish notification about connection)
-                    this.eventSourceRegistration.getInstance().reActivateStreams();
+                break;
+            case Connected:
+                if (newStatus == ConnectionStatus.Connecting || newStatus == ConnectionStatus.UnableToConnect) {
+                    // deactivate streams on registered event source (invoke publish notification about connection)
+                    this.eventSourceRegistration.getInstance().deActivateStreams();
                 }
-            }
-        } else {
-            throw new IllegalStateException("Unknown current Netconf Connection Status");
+                break;
+            default:
+                throw new IllegalStateException("Unknown current Netconf Connection Status");
         }
         this.currentNetconfConnStatus = newStatus;
     }
 
     private void registrationEventSource() {
-        final Optional<MountPoint> mountPoint = netconfEventSourceManager.getMountPointService()
-            .getMountPoint(instanceIdent);
         final Optional<DOMMountPoint> domMountPoint = netconfEventSourceManager.getDomMounts()
             .getMountPoint(domMountPath(node.getNodeId()));
         EventSourceRegistration<NetconfEventSource> registration = null;
-        if (domMountPoint.isPresent() && mountPoint.isPresent()) {
-            final NetconfEventSource netconfEventSource = new NetconfEventSource(node,
-                netconfEventSourceManager.getStreamMap(), domMountPoint.get(), mountPoint.get(),
+        if (domMountPoint.isPresent()/* && mountPoint.isPresent()*/) {
+            NetconfEventSourceMount mount = new NetconfEventSourceMount(node, domMountPoint.get());
+            final NetconfEventSource netconfEventSource = new NetconfEventSource(
+                netconfEventSourceManager.getStreamMap(),
+                    mount,
                 netconfEventSourceManager.getPublishService());
             registration = netconfEventSourceManager.getEventSourceRegistry().registerEventSource(netconfEventSource);
             LOG.info("Event source {} has been registered", node.getNodeId().getValue());

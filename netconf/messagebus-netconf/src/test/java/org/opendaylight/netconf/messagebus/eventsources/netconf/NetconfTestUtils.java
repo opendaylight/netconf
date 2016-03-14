@@ -9,7 +9,9 @@ package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
 import com.google.common.base.Optional;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.StreamsBuilder;
@@ -32,6 +34,13 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
 
 public final class NetconfTestUtils {
 
@@ -82,6 +91,30 @@ public final class NetconfTestUtils {
         streamList.add(stream);
         Streams streams = new StreamsBuilder().setStream(streamList).build();
         return Optional.of(streams);
+    }
+
+    public static NormalizedNode<?, ?> getStreamsNode(String... streamName) {
+        QName nameNode = QName.create(Stream.QNAME, "name");
+        Set<MapEntryNode> streamSet = new HashSet<>();
+        for (String s : streamName) {
+            MapEntryNode stream = Builders.mapEntryBuilder()
+                    .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifierWithPredicates(Stream.QNAME, nameNode, s))
+                    .withChild(Builders.leafBuilder()
+                            .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(nameNode))
+                            .withValue(s)
+                            .build())
+                    .build();
+            streamSet.add(stream);
+        }
+
+        CollectionNodeBuilder<MapEntryNode, MapNode> streams = Builders.mapBuilder().withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(Stream.QNAME));
+        for (MapEntryNode mapEntryNode : streamSet) {
+            streams.withChild(mapEntryNode);
+        }
+        return Builders.containerBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(Streams.QNAME))
+                .withChild(streams.build())
+                .build();
     }
 
 }

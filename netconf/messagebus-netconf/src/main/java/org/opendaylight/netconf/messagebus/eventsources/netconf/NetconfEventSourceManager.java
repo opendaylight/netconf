@@ -52,7 +52,6 @@ public final class NetconfEventSourceManager implements DataChangeListener, Auto
     private final ConcurrentHashMap<InstanceIdentifier<?>, NetconfEventSourceRegistration> registrationMap = new ConcurrentHashMap<>();
     private final DOMNotificationPublishService publishService;
     private final DOMMountPointService domMounts;
-    private final MountPointService mountPointService;
     private ListenerRegistration<DataChangeListener> listenerRegistration;
     private final EventSourceRegistry eventSourceRegistry;
 
@@ -76,12 +75,10 @@ public final class NetconfEventSourceManager implements DataChangeListener, Auto
 
         Preconditions.checkNotNull(domPublish);
         Preconditions.checkNotNull(domMount);
-        Preconditions.checkNotNull(bindingMount);
         Preconditions.checkNotNull(eventSourceRegistry);
         Preconditions.checkNotNull(namespaceMapping);
         this.streamMap = namespaceToStreamMapping(namespaceMapping);
         this.domMounts = domMount;
-        this.mountPointService = bindingMount;
         this.publishService = domPublish;
         this.eventSourceRegistry = eventSourceRegistry;
     }
@@ -130,7 +127,7 @@ public final class NetconfEventSourceManager implements DataChangeListener, Auto
 
     private void nodeCreated(final InstanceIdentifier<?> key, final Node node) {
         Preconditions.checkNotNull(key);
-        if (validateNode(node) == false) {
+        if (!validateNode(node)) {
             LOG.warn("NodeCreated event : Node [{}] is null or not valid.", key.toString());
             return;
         }
@@ -146,7 +143,7 @@ public final class NetconfEventSourceManager implements DataChangeListener, Auto
 
     private void nodeUpdated(final InstanceIdentifier<?> key, final Node node) {
         Preconditions.checkNotNull(key);
-        if (validateNode(node) == false) {
+        if (!validateNode(node)) {
             LOG.warn("NodeUpdated event : Node [{}] is null or not valid.", key.toString());
             return;
         }
@@ -190,10 +187,6 @@ public final class NetconfEventSourceManager implements DataChangeListener, Auto
 
     EventSourceRegistry getEventSourceRegistry() {
         return eventSourceRegistry;
-    }
-
-    MountPointService getMountPointService() {
-        return mountPointService;
     }
 
     private boolean isNetconfNode(final Node node) {

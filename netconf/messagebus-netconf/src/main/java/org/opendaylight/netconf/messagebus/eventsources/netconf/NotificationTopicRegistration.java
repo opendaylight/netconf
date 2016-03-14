@@ -7,7 +7,11 @@
  */
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
-import java.util.ArrayList;
+import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
+import java.util.Date;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventaggregator.rev141202.TopicId;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
@@ -16,13 +20,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Notification topic registration.
  */
-public abstract class NotificationTopicRegistration implements AutoCloseable {
+abstract class NotificationTopicRegistration implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NotificationTopicRegistration.class);
 
     public enum NotificationSourceType {
         NetconfDeviceStream,
-        ConnectionStatusChange;
+        ConnectionStatusChange
     }
 
     private boolean active;
@@ -30,6 +34,8 @@ public abstract class NotificationTopicRegistration implements AutoCloseable {
     private final String sourceName;
     private final String notificationUrnPrefix;
     private boolean replaySupported;
+    private Date lastEventTime;
+    protected final ConcurrentHashMap<SchemaPath, Set<TopicId>> notificationTopicMap = new ConcurrentHashMap<>();
 
     protected NotificationTopicRegistration(NotificationSourceType notificationSourceType, String sourceName,
         String notificationUrnPrefix) {
@@ -61,11 +67,21 @@ public abstract class NotificationTopicRegistration implements AutoCloseable {
     }
 
     /**
+     * Returns registered topics for given notification path.
+     * @param notificationPath path
+     * @return topicIds
+     */
+    Set<TopicId> getTopicsForNotification(SchemaPath notificationPath) {
+        final Set<TopicId> topicIds = notificationTopicMap.get(notificationPath);
+        return topicIds != null ? topicIds : Sets.newHashSet();
+    }
+
+    /**
      * Checks, if notification is from namespace belonging to this registration.
      * @param notificationPath path
      * @return true, if notification belongs to registration namespace
      */
-    public boolean checkNotificationPath(SchemaPath notificationPath) {
+    boolean checkNotificationPath(SchemaPath notificationPath) {
         if (notificationPath == null) {
             return false;
         }
@@ -73,6 +89,14 @@ public abstract class NotificationTopicRegistration implements AutoCloseable {
         LOG.debug("CheckNotification - name space {} - NotificationUrnPrefix {}", nameSpace,
             getNotificationUrnPrefix());
         return nameSpace.startsWith(getNotificationUrnPrefix());
+    }
+
+    Optional<Date> getLastEventTime() {
+        return Optional.fromNullable(lastEventTime);
+    }
+
+    void setLastEventTime(Date lastEventTime) {
+        this.lastEventTime = lastEventTime;
     }
 
     abstract void activateNotificationSource();
@@ -95,13 +119,6 @@ public abstract class NotificationTopicRegistration implements AutoCloseable {
      * @return true, if successful
      */
     abstract void unRegisterNotificationTopic(TopicId topicId);
-
-    /**
-     * Returns registered topics for given path.
-     * @param notificationPath path
-     * @return topicIds
-     */
-    abstract ArrayList<TopicId> getNotificationTopicIds(SchemaPath notificationPath);
 
     public boolean isReplaySupported() {
         return replaySupported;

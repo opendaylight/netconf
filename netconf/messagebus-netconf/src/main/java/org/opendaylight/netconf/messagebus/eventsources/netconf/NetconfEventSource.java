@@ -10,12 +10,17 @@ package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
 import static com.google.common.util.concurrent.Futures.immediateFuture;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -23,21 +28,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.MountPoint;
-import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMEvent;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationPublishService;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.messagebus.app.util.TopicDOMNotification;
 import org.opendaylight.controller.messagebus.app.util.Util;
 import org.opendaylight.controller.messagebus.spi.EventSource;
@@ -50,13 +50,8 @@ import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.even
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.JoinTopicOutput;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.JoinTopicOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.JoinTopicStatus;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.Stream;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -75,7 +70,7 @@ import org.w3c.dom.Element;
 
 /**
  * NetconfEventSource serves as proxy between nodes and messagebus. Subscribers can join topic stream from this source.
- * Then they will receive notifications that matches pattern specified by topic.
+ * Then they will receive notifications from device that matches pattern specified by topic.
  */
 public class NetconfEventSource implements EventSource, DOMNotificationListener {
 
@@ -90,89 +85,72 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
         QName.create(TopicNotification.QNAME, "payload"));
     private static final String ConnectionNotificationSourceName = "ConnectionNotificationSource";
 
-    private final String nodeId;
-    private final Node node;
-
-    private final DOMMountPoint netconfMount;
-    private final MountPoint mountPoint;
     private final DOMNotificationPublishService domPublish;
 
     private final Map<String, String> urnPrefixToStreamMap; // key = urnPrefix, value = StreamName
-    private final List<NotificationTopicRegistration> notificationTopicRegistrationList = new ArrayList<>();
+
+    /**
+     * Map notification uri -> registrations
+     */
+    private final Multimap<String, NotificationTopicRegistration>
+            notificationTopicRegistrations = Multimaps.synchronizedListMultimap(ArrayListMultimap.create());
+    private final NetconfEventSourceMount mount;
 
     /**
      * Creates new NetconfEventSource for node. Topic notifications will be published via provided {@link DOMNotificationPublishService}
-     * @param node node
      * @param streamMap netconf streams from device
-     * @param netconfMount
-     * @param mountPoint
      * @param publishService publish service
      */
-    public NetconfEventSource(final Node node, final Map<String, String> streamMap, final DOMMountPoint netconfMount,
-        final MountPoint mountPoint, final DOMNotificationPublishService publishService) {
-        this.netconfMount = Preconditions.checkNotNull(netconfMount);
-        this.mountPoint = Preconditions.checkNotNull(mountPoint);
-        this.node = Preconditions.checkNotNull(node);
+    public NetconfEventSource(final Map<String, String> streamMap, NetconfEventSourceMount mount, final DOMNotificationPublishService publishService) {
+        this.mount = mount;
         this.urnPrefixToStreamMap = Preconditions.checkNotNull(streamMap);
         this.domPublish = Preconditions.checkNotNull(publishService);
-        this.nodeId = node.getNodeId().getValue();
         this.initializeNotificationTopicRegistrationList();
 
-        LOG.info("NetconfEventSource [{}] created.", this.nodeId);
+        LOG.info("NetconfEventSource [{}] created.", mount.getNodeId());
     }
 
+    /**
+     * Creates {@link ConnectionNotificationTopicRegistration} for connection. Also creates
+     * {@link StreamNotificationTopicRegistration} for every prefix and available stream as defined in config file.
+     */
     private void initializeNotificationTopicRegistrationList() {
-        notificationTopicRegistrationList
-            .add(new ConnectionNotificationTopicRegistration(ConnectionNotificationSourceName, this));
-        Optional<Map<String, Stream>> streamMap = getAvailableStreams();
-        if (streamMap.isPresent()) {
-            LOG.debug("Stream configuration compare...");
-            for (String urnPrefix : this.urnPrefixToStreamMap.keySet()) {
-                final String streamName = this.urnPrefixToStreamMap.get(urnPrefix);
-                LOG.debug("urnPrefix: {} streamName: {}", urnPrefix, streamName);
-                if (streamMap.get().containsKey(streamName)) {
-                    LOG.debug("Stream containig on device");
-                    notificationTopicRegistrationList
-                        .add(new StreamNotificationTopicRegistration(streamMap.get().get(streamName), urnPrefix, this));
-                }
+        final ConnectionNotificationTopicRegistration cntr = new ConnectionNotificationTopicRegistration(ConnectionNotificationSourceName, this);
+        notificationTopicRegistrations
+            .put(cntr.getNotificationUrnPrefix(), cntr);
+        Map<String, Stream> availableStreams = getAvailableStreams();
+        LOG.debug("Stream configuration compare...");
+        for (String urnPrefix : this.urnPrefixToStreamMap.keySet()) {
+            final String streamName = this.urnPrefixToStreamMap.get(urnPrefix);
+            LOG.debug("urnPrefix: {} streamName: {}", urnPrefix, streamName);
+            if (availableStreams.containsKey(streamName)) {
+                LOG.debug("Stream containig on device");
+                notificationTopicRegistrations
+                    .put(urnPrefix, new StreamNotificationTopicRegistration(availableStreams.get(streamName), urnPrefix, this));
             }
         }
     }
 
-    private Optional<Map<String, Stream>> getAvailableStreams() {
-
-        Map<String, Stream> streamMap = null;
-        InstanceIdentifier<Streams> pathStream = InstanceIdentifier.builder(Netconf.class).child(Streams.class).build();
-        Optional<DataBroker> dataBroker = this.mountPoint.getService(DataBroker.class);
-
-        if (dataBroker.isPresent()) {
-            LOG.debug("GET Available streams ...");
-            ReadOnlyTransaction tx = dataBroker.get().newReadOnlyTransaction();
-            CheckedFuture<Optional<Streams>, ReadFailedException> checkFeature = tx
-                .read(LogicalDatastoreType.OPERATIONAL, pathStream);
-
-            try {
-                Optional<Streams> streams = checkFeature.checkedGet();
-                if (streams.isPresent()) {
-                    streamMap = new HashMap<>();
-                    for (Stream stream : streams.get().getStream()) {
-                        LOG.debug("*** find stream {}", stream.getName().getValue());
-                        streamMap.put(stream.getName().getValue(), stream);
-                    }
+    private Map<String, Stream> getAvailableStreams() {
+        Map<String, Stream> streamMap = new HashMap<>();
+        final List<Stream> availableStreams;
+        try {
+            availableStreams = mount.getAvailableStreams();
+            streamMap = Maps.uniqueIndex(availableStreams, new Function<Stream, String>() {
+                @Nullable
+                @Override
+                public String apply(@Nullable Stream input) {
+                    return input.getName().getValue();
                 }
-            } catch (ReadFailedException e) {
-                LOG.warn("Can not read streams for node {}", this.nodeId);
-            }
-
-        } else {
-            LOG.warn("No databroker on node {}", this.nodeId);
+            });
+        } catch (ReadFailedException e) {
+            LOG.warn("Can not read streams for node {}", mount.getNodeId());
         }
-
-        return Optional.fromNullable(streamMap);
+        return streamMap;
     }
 
     @Override public Future<RpcResult<JoinTopicOutput>> joinTopic(final JoinTopicInput input) {
-        LOG.debug("Join topic {} on {}", input.getTopicId().getValue(), this.nodeId);
+        LOG.debug("Join topic {} on {}", input.getTopicId().getValue(), mount.getNodeId());
         final NotificationPattern notificationPattern = input.getNotificationPattern();
         final List<SchemaPath> matchingNotifications = getMatchingNotifications(notificationPattern);
         return registerTopic(input.getTopicId(), matchingNotifications);
@@ -180,7 +158,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
     }
 
     @Override public Future<RpcResult<Void>> disJoinTopic(DisJoinTopicInput input) {
-        for (NotificationTopicRegistration reg : notificationTopicRegistrationList) {
+        for (NotificationTopicRegistration reg : notificationTopicRegistrations.values()) {
             reg.unRegisterNotificationTopic(input.getTopicId());
         }
         return Util.resultRpcSuccessFor((Void) null);
@@ -188,53 +166,42 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
 
     private synchronized Future<RpcResult<JoinTopicOutput>> registerTopic(final TopicId topicId,
         final List<SchemaPath> notificationsToSubscribe) {
+        Preconditions.checkNotNull(notificationsToSubscribe);
         LOG.debug("Join topic {} - register", topicId);
         JoinTopicStatus joinTopicStatus = JoinTopicStatus.Down;
-        if (notificationsToSubscribe != null && notificationsToSubscribe.isEmpty() == false) {
-            LOG.debug("Notifications to subscribe has found - count {}", notificationsToSubscribe.size());
-            final Optional<DOMNotificationService> notifyService = getDOMMountPoint()
-                .getService(DOMNotificationService.class);
-            if (notifyService.isPresent()) {
-                int registeredNotificationCount = 0;
-                for (SchemaPath schemaNotification : notificationsToSubscribe) {
-                    for (NotificationTopicRegistration reg : notificationTopicRegistrationList) {
-                        LOG.debug("Try notification registratio {} on SchemaPathNotification {}", reg.getSourceName(),
-                            schemaNotification.getLastComponent().getLocalName());
-                        if (reg.checkNotificationPath(schemaNotification)) {
-                            LOG.info("Source of notification {} is activating, TopicId {}", reg.getSourceName(),
-                                topicId.getValue());
-                            boolean regSuccess = reg.registerNotificationTopic(schemaNotification, topicId);
-                            if (regSuccess) {
-                                registeredNotificationCount = registeredNotificationCount + 1;
-                            }
-                        }
-                    }
-                }
-                if (registeredNotificationCount > 0) {
-                    joinTopicStatus = JoinTopicStatus.Up;
-                }
-            } else {
-                LOG.warn("NO DOMNotification service on node {}", this.nodeId);
-            }
-        } else {
-            LOG.debug("Notifications to subscribe has NOT found");
-        }
 
+        LOG.debug("Notifications to subscribe has found - count {}", notificationsToSubscribe.size());
+        int registeredNotificationCount = 0;
+        for (SchemaPath schemaPath : notificationsToSubscribe) {
+            final Collection<NotificationTopicRegistration> topicRegistrations =
+                    notificationTopicRegistrations.get(schemaPath.getLastComponent().getNamespace().toString());
+            for (NotificationTopicRegistration reg : topicRegistrations) {
+                LOG.info("Source of notification {} is activating, TopicId {}", reg.getSourceName(),
+                        topicId.getValue());
+                boolean regSuccess = reg.registerNotificationTopic(schemaPath, topicId);
+                if (regSuccess) {
+                    registeredNotificationCount = registeredNotificationCount + 1;
+                }
+            }
+        }
+        if (registeredNotificationCount > 0) {
+            joinTopicStatus = JoinTopicStatus.Up;
+        }
         final JoinTopicOutput output = new JoinTopicOutputBuilder().setStatus(joinTopicStatus).build();
         return immediateFuture(RpcResultBuilder.success(output).build());
 
     }
 
     public void reActivateStreams() {
-        for (NotificationTopicRegistration reg : notificationTopicRegistrationList) {
-            LOG.info("Source of notification {} is reactivating on node {}", reg.getSourceName(), this.nodeId);
+        for (NotificationTopicRegistration reg : notificationTopicRegistrations.values()) {
+            LOG.info("Source of notification {} is reactivating on node {}", reg.getSourceName(), mount.getNodeId());
             reg.reActivateNotificationSource();
         }
     }
 
     public void deActivateStreams() {
-        for (NotificationTopicRegistration reg : notificationTopicRegistrationList) {
-            LOG.info("Source of notification {} is deactivating on node {}", reg.getSourceName(), this.nodeId);
+        for (NotificationTopicRegistration reg : notificationTopicRegistrations.values()) {
+            LOG.info("Source of notification {} is deactivating on node {}", reg.getSourceName(), mount.getNodeId());
             reg.deActivateNotificationSource();
         }
     }
@@ -245,21 +212,14 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
         if (notification instanceof DOMEvent) {
             notificationEventTime = ((DOMEvent) notification).getEventTime();
         }
-        for (NotificationTopicRegistration notifReg : notificationTopicRegistrationList) {
-            ArrayList<TopicId> topicIdsForNotification = notifReg.getNotificationTopicIds(notificationPath);
-            if (topicIdsForNotification != null && topicIdsForNotification.isEmpty() == false) {
-
-                if (notifReg instanceof StreamNotificationTopicRegistration) {
-                    StreamNotificationTopicRegistration streamReg = (StreamNotificationTopicRegistration) notifReg;
-                    streamReg.setLastEventTime(notificationEventTime);
-                }
-
-                for (TopicId topicId : topicIdsForNotification) {
-                    publishNotification(notification, topicId);
-                    LOG.debug("Notification {} has been published for TopicId {}", notification.getType(),
-                        topicId.getValue());
-                }
-
+        final String namespace = notification.getType().getLastComponent().getNamespace().toString();
+        for (NotificationTopicRegistration notifReg : notificationTopicRegistrations.get(namespace)) {
+            notifReg.setLastEventTime(notificationEventTime);
+            Set<TopicId> topicIdsForNotification = notifReg.getTopicsForNotification(notificationPath);
+            for (TopicId topicId : topicIdsForNotification) {
+                publishNotification(notification, topicId);
+                LOG.debug("Notification {} has been published for TopicId {}", notification.getType(),
+                    topicId.getValue());
             }
         }
     }
@@ -267,7 +227,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
     private void publishNotification(final DOMNotification notification, TopicId topicId) {
         final ContainerNode topicNotification = Builders.containerBuilder().withNodeIdentifier(TOPIC_NOTIFICATION_ARG)
             .withChild(ImmutableNodes.leafNode(TOPIC_ID_ARG, topicId))
-            .withChild(ImmutableNodes.leafNode(EVENT_SOURCE_ARG, this.nodeId)).withChild(encapsulate(notification))
+            .withChild(ImmutableNodes.leafNode(EVENT_SOURCE_ARG, mount.getNodeId())).withChild(encapsulate(notification))
             .build();
         try {
             domPublish.putNotification(new TopicDOMNotification(topicNotification));
@@ -284,7 +244,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
 
         final DOMResult result = new DOMResult(element);
 
-        final SchemaContext context = getDOMMountPoint().getSchemaContext();
+        final SchemaContext context = mount.getSchemaContext();
         final SchemaPath schemaPath = body.getType();
         try {
             NetconfMessageTransformUtil.writeNormalizedNode(body.getBody(), result, schemaPath, context);
@@ -305,20 +265,17 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
 
         final Pattern pattern = Pattern.compile(regex);
         List<SchemaPath> availableNotifications = getAvailableNotifications();
-        if (availableNotifications == null || availableNotifications.isEmpty()) {
-            return null;
-        }
         return Util.expandQname(availableNotifications, pattern);
     }
 
     @Override public void close() throws Exception {
-        for (NotificationTopicRegistration streamReg : notificationTopicRegistrationList) {
+        for (NotificationTopicRegistration streamReg : notificationTopicRegistrations.values()) {
             streamReg.close();
         }
     }
 
     @Override public NodeKey getSourceNodeKey() {
-        return getNode().getKey();
+        return mount.getNode().getKey();
     }
 
     @Override public List<SchemaPath> getAvailableNotifications() {
@@ -327,8 +284,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
         // add Event Source Connection status notification
         availNotifList.add(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH);
 
-        // FIXME: use SchemaContextListener to get changes asynchronously
-        final Set<NotificationDefinition> availableNotifications = getDOMMountPoint().getSchemaContext()
+        final Set<NotificationDefinition> availableNotifications = mount.getSchemaContext()
             .getNotifications();
         // add all known notifications from netconf device
         for (final NotificationDefinition nd : availableNotifications) {
@@ -337,20 +293,8 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
         return availNotifList;
     }
 
-    public Node getNode() {
-        return node;
-    }
-
-    DOMMountPoint getDOMMountPoint() {
-        return netconfMount;
-    }
-
-    MountPoint getMountPoint() {
-        return mountPoint;
-    }
-
-    NetconfNode getNetconfNode() {
-        return node.getAugmentation(NetconfNode.class);
+    NetconfEventSourceMount getMount() {
+        return mount;
     }
 
 }
