@@ -146,6 +146,31 @@
       <version>1.2</version>
     </dependency>
 
+    <!-- New restconf impl -->
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-servlet</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>javax.ws.rs-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.persistence</groupId>
+      <artifactId>persistence-api</artifactId>
+      <version>1.0.2</version>
+    </dependency>
+
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.glassfish.jersey.test-framework.providers</groupId>
@@ -187,7 +212,19 @@
               org.opendaylight.netconf.sal.restconf.impl,
               org.opendaylight.netconf.md.sal.rest.common.*,
               org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.rest.connector.rev140724.*,
-              javax.annotation
+              org.opendaylight.restconf.*,
+              org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.rest.connector.rev160311.*,
+              javax.annotation,
+              org.glassfish.*,
+              javax.annotation.security,
+              javax.inject,
+              javax.persistence,
+              javax.persistence.spi,
+              javax.validation,
+              javax.validation.*,
+              javax.ws.rs.*,
+              jersey.repackaged.*,
+              org.aopalliance.*
             </Private-Package>
             <Import-Package>
               *,
