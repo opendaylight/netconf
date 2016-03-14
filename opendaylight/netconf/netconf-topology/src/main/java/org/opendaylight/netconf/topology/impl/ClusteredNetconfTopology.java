@@ -15,13 +15,18 @@ import akka.actor.TypedActor;
 import akka.actor.TypedActorExtension;
 import akka.actor.TypedProps;
 import akka.japi.Creator;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+
 import io.netty.util.concurrent.EventExecutor;
+
 import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Collections;
+
 import javassist.ClassPool;
+
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -34,6 +39,7 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
+import org.opendaylight.netconf.sal.connect.netconf.listener.UserPrefenreces;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.AbstractNetconfTopology;
@@ -161,7 +167,10 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
 
         final NetconfDevice device = new ClusteredNetconfDevice(schemaResourcesDTO, remoteDeviceId, salFacade,
                 processingExecutor.getExecutor(), actorSystem, topologyId, nodeId.getValue(), TypedActor.context());
-
+        Optional<UserPrefenreces> netconfSessionPreferences = getSessionPrefFromUserCapabilities(node);
+        if(netconfSessionPreferences.isPresent()){
+            return new NetconfConnectorDTO(new ClusteredNetconfDeviceCommunicator(remoteDeviceId, device, netconfSessionPreferences.get(), entityOwnershipService), salFacade);
+        }
         return new NetconfConnectorDTO(new ClusteredNetconfDeviceCommunicator(remoteDeviceId, device, entityOwnershipService), salFacade);
     }
 
