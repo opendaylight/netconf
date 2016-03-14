@@ -8,19 +8,24 @@
 
 package org.opendaylight.netconf.topology;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+
 import io.netty.util.concurrent.EventExecutor;
+
 import java.io.File;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -44,6 +49,7 @@ import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
+import org.opendaylight.netconf.sal.connect.netconf.listener.UserPrefenreces;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.pipeline.TopologyMountPointFacade.ConnectionStatusListenerRegistration;
@@ -432,6 +438,25 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     protected static InstanceIdentifier<Topology> createTopologyId(final String topologyId) {
         final InstanceIdentifier<NetworkTopology> networkTopology = InstanceIdentifier.create(NetworkTopology.class);
         return networkTopology.child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
+    }
+
+    protected Optional<UserPrefenreces> getSessionPrefFromUserCapabilities(NetconfNode node) {
+        if(node.getYangModuleCapabilities() == null) {
+            return Optional.absent();
+        }
+
+        final List<String> capabilities = node.getYangModuleCapabilities().getCapability();
+        if(capabilities == null || capabilities.isEmpty()) {
+            return Optional.absent();
+        }
+
+        final NetconfSessionPreferences parsedOverrideCapabilities = NetconfSessionPreferences.fromStrings(capabilities);
+        LOG.warn("Capabilities to override can only contain module based capabilities, non-module capabilities will be retrieved from the device," +
+                        " configured non-module capabilities: " + parsedOverrideCapabilities.getNonModuleCaps());
+        if (parsedOverrideCapabilities.getModuleBasedCaps() !=null && !parsedOverrideCapabilities.getModuleBasedCaps().isEmpty()){
+            return Optional.of(new UserPrefenreces(parsedOverrideCapabilities, true));
+        }
+        return Optional.absent();
     }
 
     private InetSocketAddress getSocketAddress(final Host host, int port) {
