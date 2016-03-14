@@ -36,19 +36,18 @@ import org.opendaylight.netconf.sal.restconf.impl.PATCHEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
-import org.opendaylight.yangtools.yang.data.util.AbstractStringInstanceIdentifierCodec;
+import org.opendaylight.yangtools.yang.data.util.AbstractModuleStringInstanceIdentifierCodec;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,36 +136,27 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider 
                     break;
                 case BEGIN_OBJECT:
                     if (inEdit && operation != null & target != null & inValue) {
-                        //let's do the stuff - find out target node
-//                      StringInstanceIdentifierCodec codec = new StringInstanceIdentifierCodec(path
-//                               .getSchemaContext());
-//                        if (path.getInstanceIdentifier().toString().equals("/")) {
-//                        final YangInstanceIdentifier deserialized = codec.deserialize(target);
-//                        }
-                        DataSchemaNode targetNode = ((DataNodeContainer)(path.getSchemaNode())).getDataChildByName
-                                (target.replace("/", ""));
-                        if (targetNode == null) {
-                            LOG.debug("Target node {} not found in path {} ", target, path.getSchemaNode());
-                            throw new RestconfDocumentedException("Error parsing input", ErrorType.PROTOCOL,
-                                    ErrorTag.MALFORMED_MESSAGE);
-                        } else {
+                        StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(path
+                              .getSchemaContext());
 
-                            final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
-                            final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+                        YangInstanceIdentifier targetII = codec.deserialize(codec.serialize(path
+                                .getInstanceIdentifier()) + target);
+                        SchemaNode targetSchemaNode = SchemaContextUtil.findDataSchemaNode(path.getSchemaContext(),
+                                codec.getDataContextTree().getChild(targetII).getDataSchemaNode().getPath()
+                                        .getParent());
 
-                            //keep on parsing json from place where target points
-                            final JsonParserStream jsonParser = JsonParserStream.create(writer, path.getSchemaContext(),
-                                    path.getSchemaNode());
-                            jsonParser.parse(in);
+                        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+                        final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
-                            final YangInstanceIdentifier targetII = path.getInstanceIdentifier().node(targetNode.getQName());
-                            resultCollection.add(new PATCHEntity(editId, operation, targetII, resultHolder.getResult
-                                    ()));
-                            inValue = false;
+                        //keep on parsing json from place where target points
+                        final JsonParserStream jsonParser = JsonParserStream.create(writer, path.getSchemaContext(),
+                                targetSchemaNode);
+                        jsonParser.parse(in);
+                        resultCollection.add(new PATCHEntity(editId, operation, targetII.getParent(), resultHolder.getResult()));
+                        inValue = false;
 
-                            operation = null;
-                            target = null;
-                        }
+                        operation = null;
+                        target = null;
                         in.endObject();
                     } else {
                         in.beginObject();
@@ -207,14 +197,19 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider 
         return ImmutableList.copyOf(resultCollection);
     }
 
-    private class StringInstanceIdentifierCodec extends AbstractStringInstanceIdentifierCodec {
+    private class StringModuleInstanceIdentifierCodec extends AbstractModuleStringInstanceIdentifierCodec {
 
         private final DataSchemaContextTree dataContextTree;
         private final SchemaContext context;
 
-        StringInstanceIdentifierCodec(SchemaContext context) {
+        StringModuleInstanceIdentifierCodec(SchemaContext context) {
             this.context = Preconditions.checkNotNull(context);
             this.dataContextTree = DataSchemaContextTree.from(context);
+        }
+
+        @Override
+        protected Module moduleForPrefix(@Nonnull String prefix) {
+            return context.findModuleByName(prefix, null);
         }
 
         @Nonnull
@@ -229,12 +224,5 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider 
             final Module module = context.findModuleByNamespaceAndRevision(namespace, null);
             return module == null ? null : module.getName();
         }
-
-        @Nullable
-        @Override
-        protected QName createQName(@Nonnull String prefix, @Nonnull String localName) {
-            throw new UnsupportedOperationException("Not implemented");
-        }
-
     }
 }
