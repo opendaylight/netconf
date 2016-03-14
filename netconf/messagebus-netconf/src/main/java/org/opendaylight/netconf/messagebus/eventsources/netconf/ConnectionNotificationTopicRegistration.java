@@ -11,7 +11,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 /**
  * Topic registration on event-source-status-notification.
  */
-public class ConnectionNotificationTopicRegistration extends NotificationTopicRegistration {
+class ConnectionNotificationTopicRegistration extends NotificationTopicRegistration {
 
     private static final Logger LOG = LoggerFactory.getLogger(ConnectionNotificationTopicRegistration.class);
 
@@ -48,7 +48,6 @@ public class ConnectionNotificationTopicRegistration extends NotificationTopicRe
     private static final String XMLNS_URI = "http://www.w3.org/2000/xmlns/";
 
     private final DOMNotificationListener domNotificationListener;
-    private ConcurrentHashMap<SchemaPath, ArrayList<TopicId>> notificationTopicMap = new ConcurrentHashMap<>();
 
     public ConnectionNotificationTopicRegistration(String SourceName, DOMNotificationListener domNotificationListener) {
         super(NotificationSourceType.ConnectionStatusChange, SourceName,
@@ -84,31 +83,20 @@ public class ConnectionNotificationTopicRegistration extends NotificationTopicRe
     }
 
     @Override boolean registerNotificationTopic(SchemaPath notificationPath, TopicId topicId) {
-        if (checkNotificationPath(notificationPath) == false) {
+        if (!checkNotificationPath(notificationPath)) {
             LOG.debug("Bad SchemaPath for notification try to register");
             return false;
         }
-        ArrayList<TopicId> topicIds = getNotificationTopicIds(notificationPath);
-        if (topicIds == null) {
-            topicIds = new ArrayList<>();
-            topicIds.add(topicId);
-        } else {
-            if (topicIds.contains(topicId) == false) {
-                topicIds.add(topicId);
-            }
-        }
+        Set<TopicId> topicIds = getTopicsForNotification(notificationPath);
+        topicIds.add(topicId);
         notificationTopicMap.put(notificationPath, topicIds);
         return true;
-    }
-
-    @Override ArrayList<TopicId> getNotificationTopicIds(SchemaPath notificationPath) {
-        return notificationTopicMap.get(notificationPath);
     }
 
     @Override synchronized void unRegisterNotificationTopic(TopicId topicId) {
         List<SchemaPath> notificationPathToRemove = new ArrayList<>();
         for (SchemaPath notifKey : notificationTopicMap.keySet()) {
-            ArrayList<TopicId> topicList = notificationTopicMap.get(notifKey);
+            Set<TopicId> topicList = notificationTopicMap.get(notifKey);
             if (topicList != null) {
                 topicList.remove(topicId);
                 if (topicList.isEmpty()) {

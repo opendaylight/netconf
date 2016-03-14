@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verify;
 
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.Futures;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,18 +27,19 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.config.yang.messagebus.netconf.NamespaceToStream;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.MountPoint;
 import org.opendaylight.controller.md.sal.binding.api.MountPointService;
-import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataChangeEvent;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationPublishService;
+import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.messagebus.spi.EventSource;
-import org.opendaylight.controller.messagebus.spi.EventSourceRegistration;
 import org.opendaylight.controller.messagebus.spi.EventSourceRegistry;
 import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
@@ -48,6 +50,7 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 public class NetconfEventSourceManagerTest {
 
@@ -68,7 +71,6 @@ public class NetconfEventSourceManagerTest {
         DataBroker dataBrokerMock = mock(DataBroker.class);
         DOMNotificationPublishService domNotificationPublishServiceMock = mock(DOMNotificationPublishService.class);
         domMountPointServiceMock = mock(DOMMountPointService.class);
-        mountPointServiceMock = mock(MountPointService.class);
         eventSourceTopologyMock = mock(EventSourceRegistry.class);
         rpcProviderRegistryMock = mock(RpcProviderRegistry.class);
         eventSourceRegistry = mock(EventSourceRegistry.class);
@@ -78,36 +80,20 @@ public class NetconfEventSourceManagerTest {
         doReturn(listenerRegistrationMock).when(dataBrokerMock).registerDataChangeListener(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class), any(NetconfEventSourceManager.class), eq(
             AsyncDataBroker.DataChangeScope.SUBTREE));
 
-        Optional<DOMMountPoint> optionalDomMountServiceMock = (Optional<DOMMountPoint>) mock(Optional.class);
-        doReturn(true).when(optionalDomMountServiceMock).isPresent();
-        doReturn(optionalDomMountServiceMock).when(domMountPointServiceMock).getMountPoint((YangInstanceIdentifier)notNull());
-
         DOMMountPoint domMountPointMock = mock(DOMMountPoint.class);
-        doReturn(domMountPointMock).when(optionalDomMountServiceMock).get();
+        Optional<DOMMountPoint> optionalDomMountServiceMock = Optional.of(domMountPointMock);
+        doReturn(optionalDomMountServiceMock).when(domMountPointServiceMock).getMountPoint((YangInstanceIdentifier)notNull());
+        DOMDataBroker mpDataBroker = mock(DOMDataBroker.class);
+        doReturn(Optional.of(mpDataBroker)).when(domMountPointMock).getService(DOMDataBroker.class);
+        doReturn(Optional.of(mock(DOMRpcService.class))).when(domMountPointMock).getService(DOMRpcService.class);
+        doReturn(Optional.of(mock(DOMNotificationService.class))).when(domMountPointMock).getService(DOMNotificationService.class);
 
-
-        Optional optionalBindingMountMock = mock(Optional.class);
-        doReturn(true).when(optionalBindingMountMock).isPresent();
-
-        MountPoint mountPointMock = mock(MountPoint.class);
-        doReturn(optionalBindingMountMock).when(mountPointServiceMock).getMountPoint(any(InstanceIdentifier.class));
-        doReturn(mountPointMock).when(optionalBindingMountMock).get();
-
-        Optional optionalMpDataBroker = mock(Optional.class);
-        DataBroker mpDataBroker = mock(DataBroker.class);
-        doReturn(optionalMpDataBroker).when(mountPointMock).getService(DataBroker.class);
-        doReturn(true).when(optionalMpDataBroker).isPresent();
-        doReturn(mpDataBroker).when(optionalMpDataBroker).get();
-
-        ReadOnlyTransaction rtx = mock(ReadOnlyTransaction.class);
+        DOMDataReadOnlyTransaction rtx = mock(DOMDataReadOnlyTransaction.class);
         doReturn(rtx).when(mpDataBroker).newReadOnlyTransaction();
-        CheckedFuture<Optional<Streams>, ReadFailedException> checkFeature = (CheckedFuture<Optional<Streams>, ReadFailedException>)mock(CheckedFuture.class);
-        InstanceIdentifier<Streams> pathStream = InstanceIdentifier.builder(Netconf.class).child(Streams.class).build();
-        doReturn(checkFeature).when(rtx).read(LogicalDatastoreType.OPERATIONAL, pathStream);
-        Optional<Streams> avStreams = NetconfTestUtils.getAvailableStream("stream01", true);
-        doReturn(avStreams).when(checkFeature).checkedGet();
+        CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> checkFeature = Futures.immediateCheckedFuture(Optional.of(NetconfTestUtils.getStreamsNode("stream-1")));
 
-        EventSourceRegistration esrMock = mock(EventSourceRegistration.class);
+        YangInstanceIdentifier pathStream = YangInstanceIdentifier.builder().node(Netconf.QNAME).node(Streams.QNAME).build();
+        doReturn(checkFeature).when(rtx).read(LogicalDatastoreType.OPERATIONAL, pathStream);
 
         netconfEventSourceManager =
                 NetconfEventSourceManager
