@@ -11,8 +11,8 @@ package org.opendaylight.netconf.messagebus.eventsources.netconf;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.mockito.Mockito.verify;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 import javax.xml.transform.dom.DOMSource;
 import org.junit.Assert;
 import org.junit.Before;
@@ -71,12 +71,12 @@ public class ConnectionNotificationTopicRegistrationTest {
         final TopicId topic1 = registerTopic("topic1");
         final TopicId topic2 = registerTopic("topic2");
         final TopicId topic3 = registerTopic("topic3");
-        final ArrayList<TopicId> notificationTopicIds = registration.getNotificationTopicIds(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH);
+        final Set<TopicId> notificationTopicIds = registration.getTopicsForNotification(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH);
         Assert.assertNotNull(notificationTopicIds);
         Assert.assertThat(notificationTopicIds, hasItems(topic1, topic2, topic3));
 
         registration.unRegisterNotificationTopic(topic3);
-        final ArrayList<TopicId> afterUnregister = registration.getNotificationTopicIds(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH);
+        final Set<TopicId> afterUnregister = registration.getTopicsForNotification(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH);
         Assert.assertNotNull(afterUnregister);
         Assert.assertThat(afterUnregister, hasItems(topic1, topic2));
         Assert.assertFalse(afterUnregister.contains(topic3));
