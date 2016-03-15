@@ -144,8 +144,7 @@ public class Parameters {
         Preconditions.checkArgument(editContent.canRead(), "Edit content file is unreadable");
 
         Preconditions.checkArgument(destination.startsWith("/"), "Destination should start with a '/'");
-
-        // TODO validate
+        Preconditions.checkArgument(threadAmount > 0, "Parameter thread-amount must be greater than 0");
     }
 
     public InetSocketAddress getInetAddress() {
