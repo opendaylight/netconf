@@ -13,11 +13,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.Collections;
 import java.util.Set;
-import org.opendaylight.controller.md.sal.binding.api.DataChangeListener;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataChangeEvent;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Uri;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
@@ -31,11 +29,12 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
  * Listens on capabilities changes in data store and publishes them to base
  * netconf notification stream listener.
  */
-final class BaseCapabilityChangeNotificationPublisher implements DataChangeListener, AutoCloseable {
+final class BaseCapabilityChangeNotificationPublisher extends BaseNotificationPublisher<Capabilities> {
 
     private final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
 
     public BaseCapabilityChangeNotificationPublisher(BaseNotificationPublisherRegistration baseNotificationPublisherRegistration) {
+        super(Capabilities.class);
         this.baseNotificationPublisherRegistration = baseNotificationPublisherRegistration;
     }
 
@@ -49,7 +48,7 @@ final class BaseCapabilityChangeNotificationPublisher implements DataChangeListe
         netconfCapabilityChangeBuilder.setChangedBy(new ChangedByBuilder().setServerOrUser(new ServerBuilder().setServer(true).build()).build());
 
         if (!change.getCreatedData().isEmpty()) {
-            final InstanceIdentifier capabilitiesIdentifier = InstanceIdentifier.create(NetconfState.class).child(Capabilities.class).builder().build();
+            final InstanceIdentifier<Capabilities> capabilitiesIdentifier = getInstanceIdentifier();
             Preconditions.checkArgument(change.getCreatedData().get(capabilitiesIdentifier) instanceof Capabilities);
             netconfCapabilityChangeBuilder.setAddedCapability(((Capabilities) change.getCreatedData().get(capabilitiesIdentifier)).getCapability());
             netconfCapabilityChangeBuilder.setDeletedCapability(Collections.<Uri>emptyList());
