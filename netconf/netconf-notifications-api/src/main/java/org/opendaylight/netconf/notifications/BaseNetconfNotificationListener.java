@@ -9,6 +9,8 @@
 package org.opendaylight.netconf.notifications;
 
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionEnd;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionStart;
 
 
 /**
@@ -22,6 +24,17 @@ public interface BaseNetconfNotificationListener {
      * Callback used to notify about a change in used capabilities
      */
     void onCapabilityChanged(final NetconfCapabilityChange capabilityChange);
+
+    /**
+     * Callback used to notify about netconf session start
+     */
+    void onSessionStarted(NetconfSessionStart start);
+
+    /**
+     * Callback used to notify about netconf session end
+     */
+    void onSessionEnded(NetconfSessionEnd end);
+
 
     // TODO add other base notifications
 

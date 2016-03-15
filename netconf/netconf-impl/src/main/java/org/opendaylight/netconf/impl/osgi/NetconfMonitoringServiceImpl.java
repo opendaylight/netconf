@@ -19,21 +19,19 @@ import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.config.util.capability.BasicCapability;
 import org.opendaylight.controller.config.util.capability.Capability;
-import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
-import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Uri;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfStateBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.CapabilitiesBuilder;
@@ -88,7 +86,7 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
         LOG.debug("Session {} up", session);
         Preconditions.checkState(!sessions.contains(session), "Session %s was already added", session);
         sessions.add(session);
-        notifyListeners();
+        notifySessionUp(session);
     }
 
     @Override
@@ -96,7 +94,7 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
         LOG.debug("Session {} down", session);
         Preconditions.checkState(sessions.contains(session), "Session %s not present", session);
         sessions.remove(session);
-        notifyListeners();
+        notifySessionDown(session);
     }
 
     @Override
@@ -182,21 +180,14 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
     @Override
     public synchronized AutoCloseable registerListener(final MonitoringListener listener) {
         listeners.add(listener);
-        listener.onStateChanged(getCurrentNetconfState());
+        listener.onCapabilitiesChanged(getCapabilities());
+        listener.onSchemasChanged(getSchemas());
         return new AutoCloseable() {
             @Override
             public void close() throws Exception {
                 listeners.remove(listener);
             }
         };
-    }
-
-    private NetconfState getCurrentNetconfState() {
-        return new NetconfStateBuilder()
-                .setCapabilities(getCapabilities())
-                .setSchemas(getSchemas())
-                .setSessions(getSessions())
-                .build();
     }
 
     private static Schemas transformSchemas(final Set<Capability> caps) {
@@ -264,11 +255,32 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
         onCapabilitiesAdded(added);
         onCapabilitiesRemoved(removed);
         updateCapabilityToSchemaMap(added, removed);
-        notifyListeners();
+        notifyCapabilityChanged(getCapabilities());
 
         // publish notification to notification collector about changed capabilities
         if (notificationPublisher != null) {
             notificationPublisher.onCapabilityChanged(computeDiff(added, removed));
+        }
+    }
+
+    private void notifyCapabilityChanged(Capabilities capabilities) {
+        for (MonitoringListener listener : listeners) {
+            listener.onCapabilitiesChanged(capabilities);
+            listener.onSchemasChanged(getSchemas());
+        }
+    }
+
+    private void notifySessionUp(NetconfManagementSession managementSession) {
+        Session session = SESSION_FUNCTION.apply(managementSession);
+        for (MonitoringListener listener : listeners) {
+            listener.onSessionStarted(session);
+        }
+    }
+
+    private void notifySessionDown(NetconfManagementSession managementSession) {
+        Session session = SESSION_FUNCTION.apply(managementSession);
+        for (MonitoringListener listener : listeners) {
+            listener.onSessionEnded(session);
         }
     }
 
@@ -286,12 +298,6 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
     private synchronized void onCapabilitiesAdded(final Set<Capability> addedCaps) {
         // FIXME howto check for duplicates
         this.capabilities.putAll(Maps.uniqueIndex(setupCapabilities(addedCaps), CAPABILITY_TO_URI));
-    }
-
-    private void notifyListeners() {
-        for (final MonitoringListener listener : listeners) {
-            listener.onStateChanged(getCurrentNetconfState());
-        }
     }
 
     private synchronized void onCapabilitiesRemoved(final Set<Capability> addedCaps) {
