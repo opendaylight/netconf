@@ -101,6 +101,9 @@ public class TesttoolParameters {
     @Arg(dest = "time-out")
     public long timeOut;
 
+    @Arg(dest = "ip")
+    public String ip;
+
     static ArgumentParser getParser() {
         final ArgumentParser parser = ArgumentParsers.newArgumentParser("netconf testtool");
 
@@ -118,7 +121,8 @@ public class TesttoolParameters {
         parser.addArgument("--thread-amount")
                 .type(Integer.class)
                 .setDefault(1)
-                .dest("thread-amount");
+                .dest("thread-amount")
+                .help("The number of threads to use for configuring devices.");
 
         parser.addArgument("--throttle")
                 .type(Integer.class)
@@ -225,6 +229,14 @@ public class TesttoolParameters {
                 .setDefault(20)
                 .help("the maximum time in seconds for executing each PUT request")
                 .dest("time-out");
+
+        parser.addArgument("-ip")
+                .type(String.class)
+                .setDefault("0.0.0.0")
+                .help("Ip address which will be used for creating a socket address." +
+                        "It can either be a machine name, such as " +
+                        "java.sun.com, or a textual representation of its IP address.")
+                .dest("ip");
 
         return parser;
     }
