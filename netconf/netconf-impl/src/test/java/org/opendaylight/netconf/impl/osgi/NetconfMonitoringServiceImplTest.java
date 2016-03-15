@@ -8,7 +8,10 @@
 package org.opendaylight.netconf.impl.osgi;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.google.common.base.Optional;
 import java.net.URI;
@@ -18,11 +21,11 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.config.util.capability.BasicCapability;
@@ -32,12 +35,13 @@ import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Uri;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.CapabilitiesBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
@@ -56,10 +60,15 @@ public class NetconfMonitoringServiceImplTest {
 
     private YangModuleCapability moduleCapability1;
     private YangModuleCapability moduleCapability2;
+    private static final Session SESSION = new SessionBuilder()
+            .setSessionId(1L)
+            .setSourceHost(new Host("0.0.0.0".toCharArray()))
+            .setUsername("admin")
+            .build();
+    private int capabilitiesSize;
 
     private final Set<Capability> CAPABILITIES = new HashSet<>();
 
-    private NetconfMonitoringServiceImpl monitoringService;
     @Mock
     private Module moduleMock;
     @Mock
@@ -68,6 +77,12 @@ public class NetconfMonitoringServiceImplTest {
     private NetconfOperationServiceFactory operationServiceFactoryMock;
     @Mock
     private NetconfManagementSession sessionMock;
+    @Mock
+    private NetconfMonitoringService.MonitoringListener listener;
+    @Mock
+    private BaseNotificationPublisherRegistration notificationPublisher;
+
+    private NetconfMonitoringServiceImpl monitoringService;
 
     @BeforeClass
     public static void suiteSetUp() throws Exception {
@@ -78,9 +93,7 @@ public class NetconfMonitoringServiceImplTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        CAPABILITIES.add(new BasicCapability("urn:ietf:params:netconf:base:1.0"));
-        CAPABILITIES.add(new BasicCapability("urn:ietf:params:netconf:base:1.1"));
-        CAPABILITIES.add(new BasicCapability("urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&amp;revision=2010-09-24"));
+
         doReturn(new URI(TEST_MODULE_NAMESPACE.getValue())).when(moduleMock).getNamespace();
         doReturn(TEST_MODULE_NAME).when(moduleMock).getName();
         doReturn(TEST_MODULE_DATE).when(moduleMock).getRevision();
@@ -93,29 +106,42 @@ public class NetconfMonitoringServiceImplTest {
         doReturn(TEST_MODULE_DATE2).when(moduleMock2).getRevision();
         moduleCapability2 = new YangModuleCapability(moduleMock2, TEST_MODULE_CONTENT2);
 
+        CAPABILITIES.add(new BasicCapability("urn:ietf:params:netconf:base:1.0"));
+        CAPABILITIES.add(new BasicCapability("urn:ietf:params:netconf:base:1.1"));
+        CAPABILITIES.add(new BasicCapability("urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&amp;revision=2010-09-24"));
+
         doReturn(CAPABILITIES).when(operationServiceFactoryMock).getCapabilities();
         doReturn(null).when(operationServiceFactoryMock).registerCapabilityListener(any(NetconfMonitoringServiceImpl.class));
 
+        doReturn(SESSION).when(sessionMock).toManagementSession();
+        doNothing().when(listener).onCapabilitiesChanged(any());
+        doNothing().when(listener).onSchemasChanged(any());
+        doNothing().when(listener).onSessionStarted(any());
+        doNothing().when(listener).onSessionEnded(any());
+
+        doNothing().when(notificationPublisher).onCapabilityChanged(any());
+        doNothing().when(notificationPublisher).onSessionStarted(any());
+        doNothing().when(notificationPublisher).onSessionEnded(any());
+
         monitoringService = new NetconfMonitoringServiceImpl(operationServiceFactoryMock);
         monitoringService.onCapabilitiesChanged(CAPABILITIES, Collections.emptySet());
-
-        doReturn(new SessionBuilder().build()).when(sessionMock).toManagementSession();
+        monitoringService.setNotificationPublisher(notificationPublisher);
+        monitoringService.registerListener(listener);
+        capabilitiesSize = monitoringService.getCapabilities().getCapability().size();
     }
 
     @Test
     public void testListeners() throws Exception {
-        final AtomicInteger stateChanged = new AtomicInteger(0);
-        NetconfMonitoringService.MonitoringListener listener = getMonitoringListener(stateChanged);
-        monitoringService.registerListener(listener);
-        Assert.assertEquals(1, stateChanged.get());
         monitoringService.onSessionUp(sessionMock);
-        Assert.assertEquals(2, stateChanged.get());
         HashSet<Capability> added = new HashSet<>();
         added.add(new BasicCapability("toAdd"));
-        monitoringService.onCapabilitiesChanged(added, new HashSet<Capability>());
-        Assert.assertEquals(3, stateChanged.get());
+        monitoringService.onCapabilitiesChanged(added, Collections.emptySet());
         monitoringService.onSessionDown(sessionMock);
-        Assert.assertEquals(4, stateChanged.get());
+        verify(listener).onSessionStarted(any());
+        verify(listener).onSessionEnded(any());
+        //onCapabilitiesChanged and onSchemasChanged are invoked also after listener registration
+        verify(listener, times(2)).onCapabilitiesChanged(any());
+        verify(listener, times(2)).onSchemasChanged(any());
     }
 
     @Test
@@ -125,7 +151,6 @@ public class NetconfMonitoringServiceImplTest {
         Assert.assertEquals(TEST_MODULE_NAMESPACE, schema.getNamespace());
         Assert.assertEquals(TEST_MODULE_NAME, schema.getIdentifier());
         Assert.assertEquals(TEST_MODULE_REV, schema.getVersion());
-
     }
 
     @Test
@@ -150,6 +175,7 @@ public class NetconfMonitoringServiceImplTest {
         for (Capability capability : CAPABILITIES) {
             exp.add(new Uri(capability.getCapabilityUri()));
         }
+        //candidate is added by monitoring service automatically
         exp.add(0, new Uri("urn:ietf:params:netconf:capability:candidate:1.0"));
         Capabilities expected = new CapabilitiesBuilder().setCapability(exp).build();
         Assert.assertEquals(new HashSet<>(expected.getCapability()), new HashSet<>(actual.getCapability()));
@@ -167,59 +193,60 @@ public class NetconfMonitoringServiceImplTest {
 
     @Test
     public void testOnCapabilitiesChanged() throws Exception {
-        final List<String> actualCapabilities = new ArrayList<>();
-        monitoringService.registerListener(new NetconfMonitoringService.MonitoringListener() {
-            @Override
-            public void onStateChanged(NetconfState state) {
-                List<Uri> capability = state.getCapabilities().getCapability();
-                for (Uri uri : capability) {
-                    actualCapabilities.add(uri.getValue());
-                }
-            }
-        });
-        HashSet<Capability> testCaps = new HashSet<>();
-        String capUri = "test";
+        final String capUri = "test";
+        final Uri uri = new Uri(capUri);
+        final HashSet<Capability> testCaps = new HashSet<>();
         testCaps.add(new BasicCapability(capUri));
-        monitoringService.onCapabilitiesChanged(testCaps, new HashSet<Capability>());
-        Assert.assertTrue(actualCapabilities.contains(capUri));
-        actualCapabilities.clear();
-        monitoringService.onCapabilitiesChanged(new HashSet<Capability>(), testCaps);
-        Assert.assertFalse(actualCapabilities.contains(capUri));
+        final ArgumentCaptor<NetconfCapabilityChange> capabilityChangeCaptor = ArgumentCaptor.forClass(NetconfCapabilityChange.class);
+        final ArgumentCaptor<Capabilities> monitoringListenerCaptor = ArgumentCaptor.forClass(Capabilities.class);
+        //add capability
+        monitoringService.onCapabilitiesChanged(testCaps, Collections.emptySet());
+        //remove capability
+        monitoringService.onCapabilitiesChanged(Collections.emptySet(), testCaps);
+
+        verify(listener, times(3)).onCapabilitiesChanged((monitoringListenerCaptor.capture()));
+        verify(notificationPublisher, times(2)).onCapabilityChanged(capabilityChangeCaptor.capture());
+
+        //verify listener calls
+        final List<Capabilities> listenerValues = monitoringListenerCaptor.getAllValues();
+        final List<Uri> afterRegisterState = listenerValues.get(0).getCapability();
+        final List<Uri> afterAddState = listenerValues.get(1).getCapability();
+        final List<Uri> afterRemoveState = listenerValues.get(2).getCapability();
+
+        Assert.assertEquals(capabilitiesSize, afterRegisterState.size());
+        Assert.assertEquals(capabilitiesSize + 1, afterAddState.size());
+        Assert.assertEquals(capabilitiesSize, afterRemoveState.size());
+        Assert.assertFalse(afterRegisterState.contains(uri));
+        Assert.assertTrue(afterAddState.contains(uri));
+        Assert.assertFalse(afterRemoveState.contains(uri));
+
+        //verify notification publication
+        final List<NetconfCapabilityChange> publisherValues = capabilityChangeCaptor.getAllValues();
+        final NetconfCapabilityChange afterAdd = publisherValues.get(0);
+        final NetconfCapabilityChange afterRemove = publisherValues.get(1);
+
+        Assert.assertEquals(Collections.singleton(uri), new HashSet<>(afterAdd.getAddedCapability()));
+        Assert.assertEquals(Collections.emptySet(), new HashSet<>(afterAdd.getDeletedCapability()));
+        Assert.assertEquals(Collections.singleton(uri), new HashSet<>(afterRemove.getDeletedCapability()));
+        Assert.assertEquals(Collections.emptySet(), new HashSet<>(afterRemove.getAddedCapability()));
     }
 
     @Test
-    public void testonCapabilitiesChanged() throws Exception {
-        final String toAdd = "toAdd";
-        final String toRemove = "toRemove";
-        monitoringService.setNotificationPublisher(new BaseNotificationPublisherRegistration() {
-            @Override
-            public void onCapabilityChanged(NetconfCapabilityChange capabilityChange) {
-                Assert.assertEquals(1, capabilityChange.getAddedCapability().size());
+    public void testOnSessionUpAndDown() throws Exception {
+        monitoringService.onSessionUp(sessionMock);
+        ArgumentCaptor<Session> sessionUpCaptor = ArgumentCaptor.forClass(Session.class);
+        verify(listener).onSessionStarted(sessionUpCaptor.capture());
+        final Session sesionUp = sessionUpCaptor.getValue();
+        Assert.assertEquals(SESSION.getSessionId(), sesionUp.getSessionId());
+        Assert.assertEquals(SESSION.getSourceHost(), sesionUp.getSourceHost());
+        Assert.assertEquals(SESSION.getUsername(), sesionUp.getUsername());
 
-                Assert.assertEquals(toAdd, capabilityChange.getAddedCapability().get(0).getValue());
-                Assert.assertEquals(1, capabilityChange.getDeletedCapability().size());
-                Assert.assertEquals(toRemove, capabilityChange.getDeletedCapability().get(0).getValue());
-            }
-
-            @Override
-            public void close() {
-
-            }
-        });
-        Set<Capability> removed = new HashSet<>();
-        removed.add(new BasicCapability(toRemove));
-        Set<Capability> added = new HashSet<>();
-        added.add(new BasicCapability(toAdd));
-        monitoringService.onCapabilitiesChanged(added, removed);
+        monitoringService.onSessionDown(sessionMock);
+        ArgumentCaptor<Session> sessionDownCaptor = ArgumentCaptor.forClass(Session.class);
+        verify(listener).onSessionEnded(sessionDownCaptor.capture());
+        final Session sessionDown = sessionDownCaptor.getValue();
+        Assert.assertEquals(SESSION.getSessionId(), sessionDown.getSessionId());
+        Assert.assertEquals(SESSION.getSourceHost(), sessionDown.getSourceHost());
+        Assert.assertEquals(SESSION.getUsername(), sessionDown.getUsername());
     }
-
-    private NetconfMonitoringService.MonitoringListener getMonitoringListener(final AtomicInteger stateChanged) {
-        return new NetconfMonitoringService.MonitoringListener() {
-            @Override
-            public void onStateChanged(NetconfState state) {
-                stateChanged.incrementAndGet();
-            }
-        };
-    }
-
 }
