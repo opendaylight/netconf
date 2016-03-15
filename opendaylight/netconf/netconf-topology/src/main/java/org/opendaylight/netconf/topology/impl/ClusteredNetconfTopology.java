@@ -8,20 +8,14 @@
 
 package org.opendaylight.netconf.topology.impl;
 
-import akka.actor.ActorContext;
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.TypedActor;
-import akka.actor.TypedActorExtension;
-import akka.actor.TypedProps;
-import akka.japi.Creator;
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import io.netty.util.concurrent.EventExecutor;
+
 import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Collections;
+
 import javassist.ClassPool;
+
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -34,6 +28,7 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
+import org.opendaylight.netconf.sal.connect.netconf.listener.UserPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.AbstractNetconfTopology;
@@ -66,6 +61,17 @@ import org.opendaylight.yangtools.sal.binding.generator.util.JavassistUtils;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import akka.actor.ActorContext;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.TypedActor;
+import akka.actor.TypedActorExtension;
+import akka.actor.TypedProps;
+import akka.japi.Creator;
+
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 
 public class ClusteredNetconfTopology extends AbstractNetconfTopology implements AutoCloseable {
 
@@ -162,7 +168,14 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
         final NetconfDevice device = new ClusteredNetconfDevice(schemaResourcesDTO, remoteDeviceId, salFacade,
                 processingExecutor.getExecutor(), actorSystem, topologyId, nodeId.getValue(), TypedActor.context());
 
-        return new NetconfConnectorDTO(new ClusteredNetconfDeviceCommunicator(remoteDeviceId, device, entityOwnershipService), salFacade);
+        final Optional<NetconfSessionPreferences> userCapabilities = getUserCapabilities(node);
+
+        return new NetconfConnectorDTO(
+                userCapabilities.isPresent() ?
+                        new ClusteredNetconfDeviceCommunicator(
+                                remoteDeviceId, device, new UserPreferences(userCapabilities.get(), node.getYangModuleCapabilities().isOverride()), entityOwnershipService):
+                        new ClusteredNetconfDeviceCommunicator(remoteDeviceId, device,entityOwnershipService)
+                , salFacade);
     }
 
     @Override

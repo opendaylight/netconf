@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.topology.pipeline;
 
 import java.util.ArrayList;
+
 import org.opendaylight.controller.md.sal.common.api.clustering.EntityOwnershipListenerRegistration;
 import org.opendaylight.controller.md.sal.common.api.clustering.EntityOwnershipService;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -17,6 +18,7 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
+import org.opendaylight.netconf.sal.connect.netconf.listener.UserPreferences;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 
 public class ClusteredNetconfDeviceCommunicator extends NetconfDeviceCommunicator {
@@ -25,6 +27,11 @@ public class ClusteredNetconfDeviceCommunicator extends NetconfDeviceCommunicato
 
     private final ArrayList<NetconfClientSessionListener> netconfClientSessionListeners = new ArrayList<>();
     private EntityOwnershipListenerRegistration ownershipListenerRegistration = null;
+
+    public ClusteredNetconfDeviceCommunicator(RemoteDeviceId id, NetconfDevice remoteDevice, UserPreferences netconfSessionPreferences, EntityOwnershipService ownershipService) {
+        super(id, remoteDevice, netconfSessionPreferences);
+        this.ownershipService = ownershipService;
+    }
 
     public ClusteredNetconfDeviceCommunicator(RemoteDeviceId id, NetconfDevice remoteDevice, EntityOwnershipService ownershipService) {
         super(id, remoteDevice);
