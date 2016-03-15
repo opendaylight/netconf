@@ -18,15 +18,15 @@ import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.net.SocketAddress;
 import java.util.Set;
-import org.opendaylight.netconf.mapping.api.NetconfOperationService;
-import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfServerSessionPreferences;
+import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.impl.osgi.NetconfOperationRouter;
 import org.opendaylight.netconf.impl.osgi.NetconfOperationRouterImpl;
+import org.opendaylight.netconf.mapping.api.NetconfOperationService;
+import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.protocol.framework.SessionListenerFactory;
 import org.opendaylight.protocol.framework.SessionNegotiator;
 import org.opendaylight.protocol.framework.SessionNegotiatorFactory;
@@ -52,23 +52,23 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSessionNegotiatorFactory.class);
     private final Set<String> baseCapabilities;
 
-    // TODO too many params, refactor
-    public NetconfServerSessionNegotiatorFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
-                                                 final SessionIdProvider idProvider, final long connectionTimeoutMillis,
-                                                 final NetconfMonitoringService monitoringService) {
-        this(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis, monitoringService, DEFAULT_BASE_CAPABILITIES);
+    public NetconfServerSessionNegotiatorFactory(final NetconfServerSessionNegotiatorFactoryBuilder builder) {
+        validate(builder);
+        this.timer = builder.timer;
+        this.aggregatedOpService = builder.aggregatedOpService;
+        this.idProvider = builder.idProvider;
+        this.connectionTimeoutMillis = builder.connectionTimeoutMillis;
+        this.monitoringService = builder.monitoringService;
+        this.baseCapabilities = validateBaseCapabilities(builder.baseCapabilities == null ? DEFAULT_BASE_CAPABILITIES : builder.baseCapabilities);
     }
 
-    // TODO too many params, refactor
-    public NetconfServerSessionNegotiatorFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
-                                                 final SessionIdProvider idProvider, final long connectionTimeoutMillis,
-                                                 final NetconfMonitoringService monitoringService, final Set<String> baseCapabilities) {
-        this.timer = timer;
-        this.aggregatedOpService = netconfOperationProvider;
-        this.idProvider = idProvider;
-        this.connectionTimeoutMillis = connectionTimeoutMillis;
-        this.monitoringService = monitoringService;
-        this.baseCapabilities = validateBaseCapabilities(baseCapabilities);
+    private void validate(final NetconfServerSessionNegotiatorFactoryBuilder builder)
+    {
+        Preconditions.checkNotNull(builder.timer, "timer not initialized");
+        Preconditions.checkNotNull(builder.aggregatedOpService, "NetconfOperationServiceFactory not initialized");
+        Preconditions.checkNotNull(builder.idProvider, "SessionIdProvider not initialized");
+        Preconditions.checkArgument(builder.connectionTimeoutMillis > 0, "connection time out <=0");
+        Preconditions.checkNotNull(builder.monitoringService, "NetconfMonitoringService not initialized");
     }
 
     private static ImmutableSet<String> validateBaseCapabilities(final Set<String> baseCapabilities) {
@@ -86,7 +86,6 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
     }
 
     /**
-     *
      * @param defunctSessionListenerFactory will not be taken into account as session listener factory can
      *                                      only be created after snapshot is opened, thus this method constructs
      *                                      proper session listener factory.
