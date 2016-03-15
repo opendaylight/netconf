@@ -14,15 +14,16 @@ import io.netty.util.HashedWheelTimer;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.concurrent.TimeUnit;
-import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
-import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
-import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
-import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.impl.NetconfServerDispatcherImpl;
 import org.opendaylight.netconf.impl.NetconfServerDispatcherImpl.ServerChannelInitializer;
 import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory;
+import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactoryBuilder;
 import org.opendaylight.netconf.impl.SessionIdProvider;
+import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
+import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
+import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
+import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -44,7 +45,7 @@ public class NetconfImplActivator implements BundleActivator {
     private BaseNotificationPublisherRegistration listenerReg;
 
     @Override
-    public void start(final BundleContext context)  {
+    public void start(final BundleContext context) {
         try {
             AggregatedNetconfOperationServiceFactory factoriesListener = new AggregatedNetconfOperationServiceFactory();
             startOperationServiceFactoryTracker(context, factoriesListener);
@@ -55,8 +56,13 @@ public class NetconfImplActivator implements BundleActivator {
 
             final NetconfMonitoringServiceImpl monitoringService = startMonitoringService(context, factoriesListener);
 
-            NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new NetconfServerSessionNegotiatorFactory(
-                    timer, factoriesListener, idProvider, connectionTimeoutMillis, monitoringService);
+            NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new NetconfServerSessionNegotiatorFactoryBuilder()
+                    .setAggregatedOpService(factoriesListener)
+                    .setTimer(timer)
+                    .setIdProvider(idProvider)
+                    .setMonitoringService(monitoringService)
+                    .setConnectionTimeoutMillis(connectionTimeoutMillis)
+                    .build();
 
             eventLoopGroup = new NioEventLoopGroup();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -9,6 +9,7 @@
 package org.opendaylight.controller.config.yang.config.netconf.northbound.impl;
 
 import org.opendaylight.controller.config.api.JmxAttributeValidationException;
+import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactoryBuilder;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.impl.NetconfServerDispatcherImpl;
@@ -16,12 +17,12 @@ import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.impl.SessionIdProvider;
 import org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
 
-public class NetconfServerDispatcherModule extends org.opendaylight.controller.config.yang.config.netconf.northbound.impl.AbstractNetconfServerDispatcherModule {
+public class NetconfServerDispatcherModule extends AbstractNetconfServerDispatcherModule {
     public NetconfServerDispatcherModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier, org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
         super(identifier, dependencyResolver);
     }
 
-    public NetconfServerDispatcherModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier, org.opendaylight.controller.config.api.DependencyResolver dependencyResolver, org.opendaylight.controller.config.yang.config.netconf.northbound.impl.NetconfServerDispatcherModule oldModule, java.lang.AutoCloseable oldInstance) {
+    public NetconfServerDispatcherModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier, org.opendaylight.controller.config.api.DependencyResolver dependencyResolver, NetconfServerDispatcherModule oldModule, AutoCloseable oldInstance) {
         super(identifier, dependencyResolver, oldModule, oldInstance);
     }
 
@@ -31,12 +32,18 @@ public class NetconfServerDispatcherModule extends org.opendaylight.controller.c
     }
 
     @Override
-    public java.lang.AutoCloseable createInstance() {
+    public AutoCloseable createInstance() {
 
         final AggregatedNetconfOperationServiceFactory aggregatedOpProvider = getAggregatedOpProvider();
         final NetconfMonitoringService monitoringService = getServerMonitorDependency();
-        final NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new NetconfServerSessionNegotiatorFactory(
-                getTimerDependency(), aggregatedOpProvider, new SessionIdProvider(), getConnectionTimeoutMillis(), monitoringService);
+
+        final NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new NetconfServerSessionNegotiatorFactoryBuilder()
+                .setAggregatedOpService(aggregatedOpProvider)
+                .setTimer(getTimerDependency())
+                .setIdProvider(new SessionIdProvider())
+                .setMonitoringService(monitoringService)
+                .setConnectionTimeoutMillis(getConnectionTimeoutMillis())
+                .build();
         final NetconfServerDispatcherImpl.ServerChannelInitializer serverChannelInitializer = new NetconfServerDispatcherImpl.ServerChannelInitializer(
                 serverNegotiatorFactory);
 
