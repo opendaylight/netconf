@@ -24,6 +24,7 @@ import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.xml.sax.SAXException;
 
 public class NotificationsTransformUtilTest {
@@ -48,7 +49,7 @@ public class NotificationsTransformUtilTest {
         netconfCapabilityChangeBuilder.setDeletedCapability(Lists.newArrayList(new Uri("uri4"), new Uri("uri3")));
 
         final NetconfCapabilityChange capabilityChange = netconfCapabilityChangeBuilder.build();
-        final NetconfNotification transform = NotificationsTransformUtil.transform(capabilityChange, DATE);
+        final NetconfNotification transform = NotificationsTransformUtil.transform(capabilityChange, DATE, SchemaPath.create(true, NetconfCapabilityChange.QNAME));
 
         final String serialized = XmlUtil.toString(transform.getDocument());
 
