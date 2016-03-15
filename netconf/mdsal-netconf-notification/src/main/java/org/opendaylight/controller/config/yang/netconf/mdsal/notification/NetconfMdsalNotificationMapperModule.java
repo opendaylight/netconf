@@ -8,14 +8,10 @@
 
 package org.opendaylight.controller.config.yang.netconf.mdsal.notification;
 
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.netconf.mdsal.notification.NetconfNotificationOperationServiceFactory;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NetconfMdsalNotificationMapperModule extends org.opendaylight.controller.config.yang.netconf.mdsal.notification.AbstractNetconfMdsalNotificationMapperModule {
     public NetconfMdsalNotificationMapperModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier, org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
@@ -37,11 +33,15 @@ public class NetconfMdsalNotificationMapperModule extends org.opendaylight.contr
 
         final NotificationToMdsalWriter notificationToMdsalWriter = new NotificationToMdsalWriter(notificationCollector);
         getBindingAwareBrokerDependency().registerProvider(notificationToMdsalWriter);
+        final DataBroker dataBroker = getDataBrokerDependency();
 
-        InstanceIdentifier capabilitiesIdentifier = InstanceIdentifier.create(NetconfState.class).child(Capabilities.class).builder().build();
+        final OperationalDatastoreListener capabilityNotificationProducer =
+                new CapabilityChangeNotificationProducer(notificationCollector.registerBaseNotificationPublisher());
+        final ListenerRegistration capabilityChangeListenerRegistration = capabilityNotificationProducer.registerOnChanges(dataBroker);
 
-        final ListenerRegistration capabilityChangeListenerRegistration = getDataBrokerDependency().registerDataChangeListener(LogicalDatastoreType.OPERATIONAL, capabilitiesIdentifier,
-                new BaseCapabilityChangeNotificationPublisher(notificationCollector.registerBaseNotificationPublisher()), AsyncDataBroker.DataChangeScope.SUBTREE);
+        final OperationalDatastoreListener sessionNotificationProducer =
+                new SessionNotificationProducer(notificationCollector.registerBaseNotificationPublisher());
+        final ListenerRegistration sessionListenerRegistration = sessionNotificationProducer.registerOnChanges(dataBroker);
 
         final NetconfNotificationOperationServiceFactory netconfNotificationOperationServiceFactory =
             new NetconfNotificationOperationServiceFactory(getNotificationRegistryDependency()) {
@@ -50,6 +50,7 @@ public class NetconfMdsalNotificationMapperModule extends org.opendaylight.contr
                     super.close();
                     notificationToMdsalWriter.close();
                     capabilityChangeListenerRegistration.close();
+                    sessionListenerRegistration.close();
                     getAggregatorDependency().onRemoveNetconfOperationServiceFactory(this);
                 }
             };

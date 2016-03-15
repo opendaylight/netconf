@@ -23,12 +23,12 @@ import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.$YangModuleInfoImpl;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yangtools.binding.data.codec.gen.impl.StreamWriterGenerator;
 import org.opendaylight.yangtools.binding.data.codec.impl.BindingNormalizedNodeCodecRegistry;
 import org.opendaylight.yangtools.sal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.yangtools.sal.binding.generator.util.BindingRuntimeContext;
 import org.opendaylight.yangtools.sal.binding.generator.util.JavassistUtils;
+import org.opendaylight.yangtools.yang.binding.Notification;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -46,8 +46,6 @@ public final class NotificationsTransformUtil {
     static final SchemaContext NOTIFICATIONS_SCHEMA_CTX;
     static final BindingNormalizedNodeCodecRegistry CODEC_REGISTRY;
     static final RpcDefinition CREATE_SUBSCRIPTION_RPC;
-
-    static final SchemaPath CAPABILITY_CHANGE_SCHEMA_PATH = SchemaPath.create(true, NetconfCapabilityChange.QNAME);
 
     static {
 
@@ -79,21 +77,21 @@ public final class NotificationsTransformUtil {
     /**
      * Transform base notification for capabilities into NetconfNotification
      */
-    public static NetconfNotification transform(final NetconfCapabilityChange capabilityChange) {
-        return transform(capabilityChange, Optional.<Date>absent());
+    public static NetconfNotification transform(final Notification notification, SchemaPath path) {
+        return transform(notification, Optional.<Date>absent(), path);
     }
 
-    public static NetconfNotification transform(final NetconfCapabilityChange capabilityChange, final Date eventTime) {
-        return transform(capabilityChange, Optional.fromNullable(eventTime));
+    public static NetconfNotification transform(final Notification notification, final Date eventTime, SchemaPath path) {
+        return transform(notification, Optional.fromNullable(eventTime), path);
     }
 
-    private static NetconfNotification transform(final NetconfCapabilityChange capabilityChange, final Optional<Date> eventTime) {
-        final ContainerNode containerNode = CODEC_REGISTRY.toNormalizedNodeNotification(capabilityChange);
+    private static NetconfNotification transform(final Notification notification, final Optional<Date> eventTime, SchemaPath path) {
+        final ContainerNode containerNode = CODEC_REGISTRY.toNormalizedNodeNotification(notification);
         final DOMResult result = new DOMResult(XmlUtil.newDocument());
         try {
-            NetconfUtil.writeNormalizedNode(containerNode, result, CAPABILITY_CHANGE_SCHEMA_PATH, NOTIFICATIONS_SCHEMA_CTX);
+            NetconfUtil.writeNormalizedNode(containerNode, result, path, NOTIFICATIONS_SCHEMA_CTX);
         } catch (final XMLStreamException| IOException e) {
-            throw new IllegalStateException("Unable to serialize " + capabilityChange, e);
+            throw new IllegalStateException("Unable to serialize " + notification, e);
         }
         final Document node = (Document) result.getNode();
         return eventTime.isPresent() ?
