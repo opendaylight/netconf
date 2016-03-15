@@ -32,6 +32,17 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+    <filter>
+        <filter-name>DynamicFilterChain</filter-name>
+        <filter-class>org.opendaylight.aaa.filterchain.filters.CustomFilterAdapter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>DynamicFilterChain</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
     <servlet-mapping>
         <servlet-name>JAXRSRestconf</servlet-name>
         <url-pattern>/*</url-pattern>
