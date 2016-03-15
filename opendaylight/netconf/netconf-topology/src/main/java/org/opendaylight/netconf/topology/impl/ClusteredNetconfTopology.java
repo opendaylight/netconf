@@ -157,25 +157,33 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
 
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade =
                 createSalFacade(remoteDeviceId, domBroker, bindingAwareBroker, defaultRequestTimeoutMillis);
-
+        KeepaliveSalFacade keepaliveSalFacade = null;
         if (keepaliveDelay > 0) {
             LOG.warn("Adding keepalive facade, for device {}", nodeId);
-            salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade, keepaliveExecutor.getExecutor(), keepaliveDelay);
+            keepaliveSalFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade, keepaliveExecutor.getExecutor(), keepaliveDelay);
         }
 
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = setupSchemaCacheDTO(nodeId, node);
 
-        final NetconfDevice device = new ClusteredNetconfDevice(schemaResourcesDTO, remoteDeviceId, salFacade,
+        final NetconfDevice device = new ClusteredNetconfDevice(schemaResourcesDTO, remoteDeviceId, (keepaliveSalFacade != null ? keepaliveSalFacade:salFacade),
                 processingExecutor.getExecutor(), actorSystem, topologyId, nodeId.getValue(), TypedActor.context());
 
         final Optional<NetconfSessionPreferences> userCapabilities = getUserCapabilities(node);
 
-        return new NetconfConnectorDTO(
-                userCapabilities.isPresent() ?
-                        new ClusteredNetconfDeviceCommunicator(
-                                remoteDeviceId, device, new UserPreferences(userCapabilities.get(), node.getYangModuleCapabilities().isOverride()), entityOwnershipService):
-                        new ClusteredNetconfDeviceCommunicator(remoteDeviceId, device,entityOwnershipService)
-                , salFacade);
+        ClusteredNetconfDeviceCommunicator communicator = null;
+
+        if (userCapabilities.isPresent()) {
+            communicator = new ClusteredNetconfDeviceCommunicator(
+                    remoteDeviceId, device, new UserPreferences(userCapabilities.get(), node.getYangModuleCapabilities().isOverride()), entityOwnershipService);
+        } else {
+            communicator = new ClusteredNetconfDeviceCommunicator(remoteDeviceId, device,entityOwnershipService);
+        }
+
+        if (keepaliveDelay > 0) {
+            keepaliveSalFacade.setListener(communicator);
+        }
+
+        return new NetconfConnectorDTO(communicator, salFacade);
     }
 
     @Override
