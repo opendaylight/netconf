@@ -89,6 +89,12 @@ public final class Main {
         @Arg(dest = "initial-config-xml-file")
         public File initialConfigXMLFile;
 
+        @Arg(dest = "thread-amount")
+        public int threadAmount;
+
+        @Arg(dest = "ip")
+        public String ip;
+
         static ArgumentParser getParser() {
             final ArgumentParser parser = ArgumentParsers.newArgumentParser("netconf testool");
 
@@ -174,6 +180,20 @@ public final class Main {
                     .help("Whether to use md-sal datastore instead of default simulated datastore.")
                     .dest("md-sal");
 
+            parser.addArgument("--thread-amount")
+                    .type(Integer.class)
+                    .setDefault(1)
+                    .dest("thread-amount")
+                    .help("The number of threads to use for configuring devices.");
+
+            parser.addArgument("-ip")
+                    .type(String.class)
+                    .setDefault("0.0.0.0")
+                    .help("Ip address which will be used for creating a socket address." +
+                          "It can either be a machine name, such as " +
+                          "java.sun.com, or a textual representation of its IP address.")
+                    .dest("ip");
+
             return parser;
         }
 
@@ -197,7 +217,7 @@ public final class Main {
         final ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(params.debug ? Level.DEBUG : Level.INFO);
 
-        final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator();
+        final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator(params.threadAmount);
         try {
             final List<Integer> openDevices = netconfDeviceSimulator.start(params);
             if (openDevices.size() == 0) {
