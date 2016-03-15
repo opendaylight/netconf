@@ -88,11 +88,10 @@ public class NetconfDeviceSimulator implements Closeable {
 
     private boolean sendFakeSchema = false;
 
-    public NetconfDeviceSimulator() {
-        // TODO make pool size configurable
+    public NetconfDeviceSimulator(final int ThreadPoolSize) {
         this(new NioEventLoopGroup(), new HashedWheelTimer(),
-                Executors.newScheduledThreadPool(8, new ThreadFactoryBuilder().setNameFormat("netconf-ssh-server-mina-timers-%d").build()),
-                ThreadUtils.newFixedThreadPool("netconf-ssh-server-nio-group", 8));
+                Executors.newScheduledThreadPool(ThreadPoolSize, new ThreadFactoryBuilder().setNameFormat("netconf-ssh-server-mina-timers-%d").build()),
+                ThreadUtils.newFixedThreadPool("netconf-ssh-server-nio-group", ThreadPoolSize));
     }
 
     private NetconfDeviceSimulator(final NioEventLoopGroup eventExecutors, final HashedWheelTimer hashedWheelTimer, final ScheduledExecutorService minaTimerExecutor, final ExecutorService nioExecutor) {
@@ -122,7 +121,7 @@ public class NetconfDeviceSimulator implements Closeable {
 
         final AggregatedNetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory = new AggregatedNetconfOperationServiceFactory();
         final NetconfOperationServiceFactory operationProvider = mdSal ? new MdsalOperationProvider(idProvider, transformedCapabilities, schemaContext, sourceProvider) :
-            new SimulatedOperationProvider(idProvider, transformedCapabilities, notificationsFile, initialConfigXMLFile);
+                new SimulatedOperationProvider(idProvider, transformedCapabilities, notificationsFile, initialConfigXMLFile);
 
         transformedCapabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0"));
 
@@ -173,7 +172,7 @@ public class NetconfDeviceSimulator implements Closeable {
                 LOG.warn("Port cannot be greater than 65535, stopping further attempts.");
                 break;
             }
-            final InetSocketAddress address = getAddress(currentPort);
+            final InetSocketAddress address = getAddress(params.ip, currentPort);
 
             final ChannelFuture server;
             if(params.ssh) {
@@ -361,10 +360,9 @@ public class NetconfDeviceSimulator implements Closeable {
         }, PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
     }
 
-    private static InetSocketAddress getAddress(final int port) {
+    private static InetSocketAddress getAddress(final String ip, final int port) {
         try {
-            // TODO make address configurable
-            return new InetSocketAddress(Inet4Address.getByName("0.0.0.0"), port);
+            return new InetSocketAddress(Inet4Address.getByName(ip), port);
         } catch (final UnknownHostException e) {
             throw new RuntimeException(e);
         }

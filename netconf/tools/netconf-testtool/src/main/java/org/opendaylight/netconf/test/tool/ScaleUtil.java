@@ -65,7 +65,7 @@ public class ScaleUtil {
         while (true) {
             root.warn("Starting scale test with {} devices", params.deviceCount);
             timeoutGuardFuture = executor.schedule(new TimeoutGuard(), timeout, TimeUnit.MINUTES);
-            final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator();
+            final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator(params.threadAmount);
             try {
                 final List<Integer> openDevices = netconfDeviceSimulator.start(params);
                 if (openDevices.size() == 0) {
