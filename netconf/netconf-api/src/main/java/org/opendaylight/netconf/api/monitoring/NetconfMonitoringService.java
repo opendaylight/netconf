@@ -8,10 +8,10 @@
 package org.opendaylight.netconf.api.monitoring;
 
 import com.google.common.base.Optional;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 
 public interface NetconfMonitoringService extends CapabilityListener, SessionListener {
 
@@ -31,8 +31,28 @@ public interface NetconfMonitoringService extends CapabilityListener, SessionLis
     AutoCloseable registerListener(MonitoringListener listener);
 
     interface MonitoringListener {
+        /**
+         * Callback used to notify about netconf session start
+         * @param session started session
+         */
+        void onSessionStarted(Session session);
 
-        // TODO more granular updates would make sense
-        void onStateChanged(NetconfState state);
+        /**
+         * Callback used to notify about netconf session end
+         * @param session ended session
+         */
+        void onSessionEnded(Session session);
+
+        /**
+         * Callback used to notify about a change in used capabilities
+         * @param capabilities actual capabilities
+         */
+        void onCapabilitiesChanged(Capabilities capabilities);
+
+        /**
+         * Callback used to notify about a change in used schemas
+         * @param schemas actual schemas
+         */
+        void onSchemasChanged(Schemas schemas);
     }
 }

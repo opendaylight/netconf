@@ -23,7 +23,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataChangeEvent;
+import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
+import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
@@ -36,46 +37,50 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BaseCapabilityChangeNotificationPublisherTest {
+public class CapabilityChangeNotificationProducerTest {
 
     @Mock
     private BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
+    private CapabilityChangeNotificationProducer capabilityChangeNotificationProducer;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         doNothing().when(baseNotificationPublisherRegistration).onCapabilityChanged(any(NetconfCapabilityChange.class));
+        capabilityChangeNotificationProducer = new CapabilityChangeNotificationProducer(baseNotificationPublisherRegistration);
     }
 
     @Test
-    public void testOnDataChanged() {
-        final BaseCapabilityChangeNotificationPublisher baseCapabilityChangeNotificationPublisher =
-                new BaseCapabilityChangeNotificationPublisher(baseNotificationPublisherRegistration);
+    public void testOnDataChangedCreate() {
         final InstanceIdentifier capabilitiesIdentifier = InstanceIdentifier.create(NetconfState.class).child(Capabilities.class).builder().build();
         final List<Uri> newCapabilitiesList = Lists.newArrayList(new Uri("newCapability"), new Uri("createdCapability"));
-
-        AsyncDataChangeEvent<InstanceIdentifier<?>, DataObject> capabilitiesChange = mock(AsyncDataChangeEvent.class);
         Capabilities newCapabilities = new CapabilitiesBuilder().setCapability(newCapabilitiesList).build();
         Map<InstanceIdentifier<?>, DataObject> createdData = Maps.newHashMap();
         createdData.put(capabilitiesIdentifier, newCapabilities);
-        doReturn(createdData).when(capabilitiesChange).getCreatedData();
-        baseCapabilityChangeNotificationPublisher.onDataChanged(capabilitiesChange);
+        verifyDataTreeChange(null, newCapabilities, changedCapabilitesFrom(newCapabilitiesList, Collections.<Uri>emptyList()));
+    }
 
-        verify(baseNotificationPublisherRegistration).onCapabilityChanged(changedCapabilitesFrom(newCapabilitiesList, Collections.<Uri>emptyList()));
-
+    @Test
+    public void testOnDataChangedUpdate() {
         final List<Uri> originalCapabilitiesList = Lists.newArrayList(new Uri("originalCapability"), new Uri("anotherOriginalCapability"));
         final List<Uri> updatedCapabilitiesList = Lists.newArrayList(new Uri("originalCapability"), new Uri("newCapability"));
-
         Capabilities originalCapabilities = new CapabilitiesBuilder().setCapability(originalCapabilitiesList).build();
         Capabilities updatedCapabilities = new CapabilitiesBuilder().setCapability(updatedCapabilitiesList).build();
-
-        doReturn(Collections.emptyMap()).when(capabilitiesChange).getCreatedData();
-        doReturn(originalCapabilities).when(capabilitiesChange).getOriginalSubtree();
-        doReturn(updatedCapabilities).when(capabilitiesChange).getUpdatedSubtree();
-        baseCapabilityChangeNotificationPublisher.onDataChanged(capabilitiesChange);
-
-        verify(baseNotificationPublisherRegistration).onCapabilityChanged(changedCapabilitesFrom(
+        verifyDataTreeChange(originalCapabilities, updatedCapabilities, changedCapabilitesFrom(
                 Lists.newArrayList(new Uri("newCapability")), Lists.newArrayList(new Uri("anotherOriginalCapability"))));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void verifyDataTreeChange(Capabilities originalCapabilities, Capabilities updatedCapabilities,
+                                      NetconfCapabilityChange expectedChange) {
+        final DataTreeModification<Capabilities> treeChange2 = mock(DataTreeModification.class);
+        final DataObjectModification<Capabilities> objectChange2 = mock(DataObjectModification.class);
+        doReturn(DataObjectModification.ModificationType.WRITE).when(objectChange2).getModificationType();
+        doReturn(objectChange2).when(treeChange2).getRootNode();
+        doReturn(originalCapabilities).when(objectChange2).getDataBefore();
+        doReturn(updatedCapabilities).when(objectChange2).getDataAfter();
+        capabilityChangeNotificationProducer.onDataTreeChanged(Collections.singleton(treeChange2));
+        verify(baseNotificationPublisherRegistration).onCapabilityChanged(expectedChange);
     }
 
     private NetconfCapabilityChange changedCapabilitesFrom(List<Uri> added, List<Uri> deleted) {
