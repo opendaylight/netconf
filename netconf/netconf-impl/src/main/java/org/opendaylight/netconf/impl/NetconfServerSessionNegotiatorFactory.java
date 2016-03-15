@@ -18,15 +18,15 @@ import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.net.SocketAddress;
 import java.util.Set;
-import org.opendaylight.netconf.mapping.api.NetconfOperationService;
-import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfServerSessionPreferences;
+import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.impl.osgi.NetconfOperationRouter;
 import org.opendaylight.netconf.impl.osgi.NetconfOperationRouterImpl;
+import org.opendaylight.netconf.mapping.api.NetconfOperationService;
+import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.protocol.framework.SessionListenerFactory;
 import org.opendaylight.protocol.framework.SessionNegotiator;
 import org.opendaylight.protocol.framework.SessionNegotiatorFactory;
@@ -52,15 +52,7 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSessionNegotiatorFactory.class);
     private final Set<String> baseCapabilities;
 
-    // TODO too many params, refactor
-    public NetconfServerSessionNegotiatorFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
-                                                 final SessionIdProvider idProvider, final long connectionTimeoutMillis,
-                                                 final NetconfMonitoringService monitoringService) {
-        this(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis, monitoringService, DEFAULT_BASE_CAPABILITIES);
-    }
-
-    // TODO too many params, refactor
-    public NetconfServerSessionNegotiatorFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
+    protected NetconfServerSessionNegotiatorFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
                                                  final SessionIdProvider idProvider, final long connectionTimeoutMillis,
                                                  final NetconfMonitoringService monitoringService, final Set<String> baseCapabilities) {
         this.timer = timer;
@@ -68,8 +60,9 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
         this.idProvider = idProvider;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.monitoringService = monitoringService;
-        this.baseCapabilities = validateBaseCapabilities(baseCapabilities);
+        this.baseCapabilities = validateBaseCapabilities(baseCapabilities == null ? DEFAULT_BASE_CAPABILITIES : baseCapabilities);
     }
+
 
     private static ImmutableSet<String> validateBaseCapabilities(final Set<String> baseCapabilities) {
         // Check base capabilities to be supported by the server
@@ -86,7 +79,6 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
     }
 
     /**
-     *
      * @param defunctSessionListenerFactory will not be taken into account as session listener factory can
      *                                      only be created after snapshot is opened, thus this method constructs
      *                                      proper session listener factory.
