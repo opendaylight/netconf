@@ -25,12 +25,12 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
+import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
+import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
 import org.opendaylight.protocol.framework.NeverReconnectStrategy;
 
 
@@ -47,21 +47,21 @@ public class TestingNetconfClient implements Closeable {
     private final long sessionId;
 
     public TestingNetconfClient(String clientLabel,
-                                 NetconfClientDispatcher netconfClientDispatcher, final NetconfClientConfiguration config) throws InterruptedException {
+                                NetconfClientDispatcher netconfClientDispatcher, final NetconfClientConfiguration config) throws InterruptedException {
         this.label = clientLabel;
         sessionListener = config.getSessionListener();
         Future<NetconfClientSession> clientFuture = netconfClientDispatcher.createClient(config);
-        clientSession = get(clientFuture);//TODO: make static
+        clientSession = get(clientFuture);
         this.sessionId = clientSession.getSessionId();
     }
 
-    private NetconfClientSession get(Future<NetconfClientSession> clientFuture) throws InterruptedException {
+    private static NetconfClientSession get(Future<NetconfClientSession> clientFuture) throws InterruptedException {
         try {
             return clientFuture.get();
         } catch (CancellationException e) {
-            throw new RuntimeException("Cancelling " + this, e);
+            throw new RuntimeException("Cancelling " + TestingNetconfClient.class.getSimpleName(), e);
         } catch (ExecutionException e) {
-            throw new IllegalStateException("Unable to create " + this, e);
+            throw new IllegalStateException("Unable to create " + TestingNetconfClient.class.getSimpleName(), e);
         }
     }
 
