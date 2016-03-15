@@ -27,7 +27,13 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfStateBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.CapabilitiesBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.SchemasBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class MonitoringToMdsalWriterTest {
@@ -72,12 +78,50 @@ public class MonitoringToMdsalWriterTest {
     }
 
     @Test
-    public void testOnStateChanged() throws Exception {
+    public void testOnCapabilityChanged() throws Exception {
+        final InstanceIdentifier<Capabilities> capabilitiesId = InstanceIdentifier.create(NetconfState.class).child(Capabilities.class);
         writer.onSessionInitiated(context);
-        final NetconfState state = new NetconfStateBuilder().build();
-        writer.onStateChanged(state);
+        final Capabilities capabilities = new CapabilitiesBuilder().build();
+        writer.onCapabilitiesChanged(capabilities);
         InOrder inOrder = inOrder(writeTransaction);
-        inOrder.verify(writeTransaction).put(LogicalDatastoreType.OPERATIONAL, INSTANCE_IDENTIFIER, state);
+        inOrder.verify(writeTransaction).put(LogicalDatastoreType.OPERATIONAL, capabilitiesId, capabilities);
+        inOrder.verify(writeTransaction).submit();
+    }
+
+    @Test
+    public void testOnSchemasChanged() throws Exception {
+        final InstanceIdentifier<Schemas> schemasId = InstanceIdentifier.create(NetconfState.class).child(Schemas.class);
+        writer.onSessionInitiated(context);
+        final Schemas schemas = new SchemasBuilder().build();
+        writer.onSchemasChanged(schemas);
+        InOrder inOrder = inOrder(writeTransaction);
+        inOrder.verify(writeTransaction).put(LogicalDatastoreType.OPERATIONAL, schemasId, schemas);
+        inOrder.verify(writeTransaction).submit();
+    }
+
+    @Test
+    public void testOnSessionStart() throws Exception {
+        Session session = new SessionBuilder()
+                .setSessionId(1L)
+                .build();
+        final InstanceIdentifier<Session> id = InstanceIdentifier.create(NetconfState.class).child(Sessions.class).child(Session.class, session.getKey());
+        writer.onSessionInitiated(context);
+        writer.onSessionStarted(session);
+        InOrder inOrder = inOrder(writeTransaction);
+        inOrder.verify(writeTransaction).put(LogicalDatastoreType.OPERATIONAL, id, session);
+        inOrder.verify(writeTransaction).submit();
+    }
+
+    @Test
+    public void testOnSessionEnd() throws Exception {
+        Session session = new SessionBuilder()
+                .setSessionId(1L)
+                .build();
+        final InstanceIdentifier<Session> id = InstanceIdentifier.create(NetconfState.class).child(Sessions.class).child(Session.class, session.getKey());
+        writer.onSessionInitiated(context);
+        writer.onSessionEnded(session);
+        InOrder inOrder = inOrder(writeTransaction);
+        inOrder.verify(writeTransaction).delete(LogicalDatastoreType.OPERATIONAL, id);
         inOrder.verify(writeTransaction).submit();
     }
 
