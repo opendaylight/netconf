@@ -1,0 +1,83 @@
+/*
+ * Copyright (c) 2015 Cisco Systems, Inc. and others.  All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+
+package org.opendaylight.controller.config.yang.netconf.mdsal.notification;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+import javax.annotation.Nonnull;
+import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
+import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
+import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Uri;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.ChangedByBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.changed.by.server.or.user.ServerBuilder;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+
+
+/**
+ * Listens on capabilities changes in data store and publishes them to base
+ * netconf notification stream listener.
+ */
+final class CapabilityChangeNotificationProducer extends OperationalDatastoreListener<Capabilities> {
+
+    private static final InstanceIdentifier<Capabilities> CAPABILITIES_INSTANCE_IDENTIFIER =
+            InstanceIdentifier.create(NetconfState.class).child(Capabilities.class);
+    private final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
+
+    public CapabilityChangeNotificationProducer(BaseNotificationPublisherRegistration baseNotificationPublisherRegistration) {
+        super(CAPABILITIES_INSTANCE_IDENTIFIER);
+        this.baseNotificationPublisherRegistration = baseNotificationPublisherRegistration;
+    }
+
+    @Override
+    public void onDataTreeChanged(@Nonnull Collection<DataTreeModification<Capabilities>> changes) {
+        for (DataTreeModification<Capabilities> change : changes) {
+            final DataObjectModification<Capabilities> rootNode = change.getRootNode();
+            final DataObjectModification.ModificationType modificationType = rootNode.getModificationType();
+            switch (modificationType) {
+                case WRITE: {
+                    final Capabilities dataAfter = rootNode.getDataAfter();
+                    final Capabilities dataBefore = rootNode.getDataBefore();
+                    final Set<Uri> before = dataBefore != null ? ImmutableSet.copyOf(dataBefore.getCapability()) : Collections.emptySet();
+                    final Set<Uri> after = dataAfter != null ? ImmutableSet.copyOf(dataAfter.getCapability()) : Collections.emptySet();
+                    final Set<Uri> added = Sets.difference(after, before);
+                    final Set<Uri> removed = Sets.difference(before, after);
+                    publishNotification(added, removed);
+                    break;
+                }
+                case DELETE: {
+                    final Capabilities dataBeforeDelete = rootNode.getDataBefore();
+                    if (dataBeforeDelete != null) {
+                        final Set<Uri> removed = ImmutableSet.copyOf(dataBeforeDelete.getCapability());
+                        publishNotification(Collections.emptySet(), removed);
+                    }
+                    break;
+                }
+            }
+        }
+
+    }
+
+    private void publishNotification(Set<Uri> added, Set<Uri> removed) {
+        final NetconfCapabilityChangeBuilder netconfCapabilityChangeBuilder = new NetconfCapabilityChangeBuilder();
+        netconfCapabilityChangeBuilder.setChangedBy(new ChangedByBuilder().setServerOrUser(new ServerBuilder().setServer(true).build()).build());
+        netconfCapabilityChangeBuilder.setAddedCapability(ImmutableList.copyOf(added));
+        netconfCapabilityChangeBuilder.setDeletedCapability(ImmutableList.copyOf(removed));
+        // TODO modified should be computed ... but why ?
+        netconfCapabilityChangeBuilder.setModifiedCapability(Collections.<Uri>emptyList());
+        baseNotificationPublisherRegistration.onCapabilityChanged(netconfCapabilityChangeBuilder.build());
+    }
+}
