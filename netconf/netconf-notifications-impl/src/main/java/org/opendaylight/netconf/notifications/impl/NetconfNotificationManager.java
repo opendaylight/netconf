@@ -36,6 +36,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.r
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.StreamBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.StreamKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionEnd;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionStart;
+import org.opendaylight.yangtools.yang.binding.Notification;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -244,6 +248,10 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
 
     private static class BaseNotificationPublisherReg implements BaseNotificationPublisherRegistration {
 
+        static final SchemaPath CAPABILITY_CHANGE_SCHEMA_PATH = SchemaPath.create(true, NetconfCapabilityChange.QNAME);
+        static final SchemaPath SESSION_START_PATH = SchemaPath.create(true, NetconfSessionStart.QNAME);
+        static final SchemaPath SESSION_END_PATH = SchemaPath.create(true, NetconfSessionEnd.QNAME);
+
         private final NotificationPublisherRegistration baseRegistration;
 
         public BaseNotificationPublisherReg(final NotificationPublisherRegistration baseRegistration) {
@@ -255,14 +263,23 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
             baseRegistration.close();
         }
 
-        private static NetconfNotification serializeNotification(final NetconfCapabilityChange capabilityChange) {
-            return NotificationsTransformUtil.transform(capabilityChange);
+        private static NetconfNotification serializeNotification(final Notification notification, SchemaPath path) {
+            return NotificationsTransformUtil.transform(notification, path);
         }
 
         @Override
         public void onCapabilityChanged(final NetconfCapabilityChange capabilityChange) {
-            baseRegistration.onNotification(BASE_STREAM_NAME, serializeNotification(capabilityChange));
-//            baseRegistration.onNotification(BASE_STREAM_NAME, serializeNotification(computeDiff(removed, added)));
+            baseRegistration.onNotification(BASE_STREAM_NAME, serializeNotification(capabilityChange, CAPABILITY_CHANGE_SCHEMA_PATH));
+        }
+
+        @Override
+        public void onSessionStarted(NetconfSessionStart start) {
+            baseRegistration.onNotification(BASE_STREAM_NAME, serializeNotification(start, SESSION_START_PATH));
+        }
+
+        @Override
+        public void onSessionEnded(NetconfSessionEnd end) {
+            baseRegistration.onNotification(BASE_STREAM_NAME, serializeNotification(end, SESSION_END_PATH));
         }
     }
 
