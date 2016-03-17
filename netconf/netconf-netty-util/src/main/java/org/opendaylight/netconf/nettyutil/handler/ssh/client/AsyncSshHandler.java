@@ -85,8 +85,6 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final SshClient sshClient) throws IOException {
         this.authenticationHandler = Preconditions.checkNotNull(authenticationHandler);
         this.sshClient = Preconditions.checkNotNull(sshClient);
-        // Start just in case
-        sshClient.start();
     }
 
     public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler) throws IOException {
