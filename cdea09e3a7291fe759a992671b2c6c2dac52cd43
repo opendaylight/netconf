@@ -39,6 +39,24 @@
       "revId": "cdea09e3a7291fe759a992671b2c6c2dac52cd43",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a42497e_c4f832c7",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/yang/instance-identifier-patch-module.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-03-17T08:05:16Z",
+      "side": 1,
+      "message": "you are right, I will delete it",
+      "parentUuid": "9a3d3df0_af56c003",
+      "revId": "cdea09e3a7291fe759a992671b2c6c2dac52cd43",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
