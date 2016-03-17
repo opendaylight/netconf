@@ -7,179 +7,153 @@
  */
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.base.Optional;
-import com.google.common.util.concurrent.CheckedFuture;
-import java.net.URI;
-import java.util.Collections;
+import com.google.common.util.concurrent.Futures;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.opendaylight.controller.md.sal.binding.api.BindingService;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.MountPoint;
-import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationPublishService;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.md.sal.dom.api.DOMService;
 import org.opendaylight.controller.messagebus.app.util.TopicDOMNotification;
-import org.opendaylight.controller.sal.binding.api.RpcConsumerRegistry;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventaggregator.rev141202.NotificationPattern;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventaggregator.rev141202.TopicId;
+import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventaggregator.rev141202.TopicNotification;
+import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.DisJoinTopicInput;
+import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.DisJoinTopicInputBuilder;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.JoinTopicInput;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.JoinTopicInputBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.NotificationsService;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.Stream;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.StreamBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 public class NetconfEventSourceTest {
 
+
+    private static final SchemaPath notification1Path = SchemaPath.create(true, QName.create("ns1", "1970-01-15", "not1"));
+    private static final SchemaPath notification2Path = SchemaPath.create(true, QName.create("ns2", "1980-02-18", "not2"));
+
     NetconfEventSource netconfEventSource;
-    DOMMountPoint domMountPointMock;
-    MountPoint mountPointMock;
-    JoinTopicInput joinTopicInputMock;
+
+    @Mock
     DOMNotificationPublishService domNotificationPublishServiceMock;
-    DOMNotification notification;
+    @Mock
+    DOMNotification matchnigNotification;
+    @Mock
+    DOMNotification nonMachtingNotification;
+    @Mock
+    NetconfEventSourceMount mount;
 
     @Before
     public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+        //init notification mocks
+        doReturn(notification1Path).when(matchnigNotification).getType();
+        doReturn(notification2Path).when(nonMachtingNotification).getType();
+        DataContainerNodeAttrBuilder<YangInstanceIdentifier.NodeIdentifier, ContainerNode> body = Builders.containerBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("ns1", "1970-01-15", "not1data")));
+        doReturn(body.build()).when(matchnigNotification).getBody();
+        //init schema context mock
+        Set<NotificationDefinition> notifications = new HashSet<>();
+        notifications.add(getNotificationDefinitionMock(notification1Path.getLastComponent()));
+        notifications.add(getNotificationDefinitionMock(notification2Path.getLastComponent()));
+        SchemaContext schemaContext = mock(SchemaContext.class);
+        doReturn(notifications).when(schemaContext).getNotifications();
+        //init mount point mock
+        List<Stream> streams = new ArrayList<>();
+        streams.add(createStream("stream-1"));
+        streams.add(createStream("stream-2"));
+        doReturn(streams).when(mount).getAvailableStreams();
+        doReturn(schemaContext).when(mount).getSchemaContext();
+        doReturn(Futures.immediateCheckedFuture(null)).when(mount).invokeCreateSubscription(any(), any());
+        doReturn(Futures.immediateCheckedFuture(null)).when(mount).invokeCreateSubscription(any());
+        doReturn(mock(ListenerRegistration.class)).when(mount).registerNotificationListener(any(), any());
+        final Node nodeId1 = NetconfTestUtils.getNetconfNode("NodeId1", "node.test.local", ConnectionStatus.Connected, NetconfTestUtils.notification_capability_prefix);
+        doReturn(nodeId1).when(mount).getNode();
+
         Map<String, String> streamMap = new HashMap<>();
-        streamMap.put("uriStr1", "string2");
-        domMountPointMock = mock(DOMMountPoint.class);
-        mountPointMock = mock(MountPoint.class);
-        domNotificationPublishServiceMock = mock(DOMNotificationPublishService.class);
-        RpcConsumerRegistry rpcConsumerRegistryMock = mock(RpcConsumerRegistry.class);
-        Optional<BindingService> onlyOptionalMock = (Optional<BindingService>) mock(Optional.class);
-        NotificationsService notificationsServiceMock = mock(NotificationsService.class);
-        doReturn(notificationsServiceMock).when(rpcConsumerRegistryMock).getRpcService(NotificationsService.class);
-
-        final NotificationDefinition notificationDefinitionMock = getNotificationDefinitionMock("urn:cisco:params:xml:ns:yang:messagebus:eventsource", "2014-12-02", "event-source-status");
-        Set<NotificationDefinition> notifications = Collections.singleton(notificationDefinitionMock);
-        ContainerNode node = Builders.containerBuilder()
-                .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(QName.create("notification-namespace", "2016-02-17", "name")))
-                .build();
-        notification = mock(DOMNotification.class);
-        doReturn(node).when(notification).getBody();
-        doReturn(notificationDefinitionMock.getPath()).when(notification).getType();
-        SchemaContext schema = mock(SchemaContext.class);
-        doReturn(notifications).when(schema).getNotifications();
-        doReturn(schema).when(domMountPointMock).getSchemaContext();
-        doReturn(Optional.of(mock(DOMNotificationService.class))).when(domMountPointMock).getService(DOMNotificationService.class);
-
-        Optional<DataBroker> optionalMpDataBroker = (Optional<DataBroker>) mock(Optional.class);
-        DataBroker mpDataBroker = mock(DataBroker.class);
-        doReturn(optionalMpDataBroker).when(mountPointMock).getService(DataBroker.class);
-        doReturn(true).when(optionalMpDataBroker).isPresent();
-        doReturn(mpDataBroker).when(optionalMpDataBroker).get();
-
-        ReadOnlyTransaction rtx = mock(ReadOnlyTransaction.class);
-        doReturn(rtx).when(mpDataBroker).newReadOnlyTransaction();
-        CheckedFuture<Optional<Streams>, ReadFailedException> checkFeature = (CheckedFuture<Optional<Streams>, ReadFailedException>)mock(CheckedFuture.class);
-        InstanceIdentifier<Streams> pathStream = InstanceIdentifier.builder(Netconf.class).child(Streams.class).build();
-        doReturn(checkFeature).when(rtx).read(LogicalDatastoreType.OPERATIONAL, pathStream);
-        Optional<Streams> avStreams = NetconfTestUtils.getAvailableStream("stream01", true);
-        doReturn(avStreams).when(checkFeature).checkedGet();
-
+        streamMap.put(notification1Path.getLastComponent().getNamespace().toString(), "stream-1");
         netconfEventSource = new NetconfEventSource(
-                NetconfTestUtils.getNetconfNode("NodeId1", "node.test.local", ConnectionStatus.Connected,
-                    NetconfTestUtils.notification_capability_prefix),
                 streamMap,
-                domMountPointMock,
-                mountPointMock ,
+                mount,
                 domNotificationPublishServiceMock);
 
     }
 
     @Test
-    public void joinTopicTest() throws Exception{
-        joinTopicTestHelper();
-        assertNotNull("JoinTopic return value has not been created correctly.", netconfEventSource.joinTopic(joinTopicInputMock));
-    }
-
-    @Test
-    public void testOnNotification() throws Exception {
+    public void testJoinTopicOnNotification() throws Exception {
         final JoinTopicInput topic1 = new JoinTopicInputBuilder()
                 .setTopicId(TopicId.getDefaultInstance("topic1"))
-                .setNotificationPattern(NotificationPattern.getDefaultInstance(".*"))
+                .setNotificationPattern(NotificationPattern.getDefaultInstance(".*ns1"))
                 .build();
         netconfEventSource.joinTopic(topic1);
 
-
         ArgumentCaptor<DOMNotification> captor = ArgumentCaptor.forClass(DOMNotification.class);
-        netconfEventSource.onNotification(notification);
+        //handle notification matching topic namespace
+        netconfEventSource.onNotification(matchnigNotification);
+        //handle notification that does not match topic namespace
+        netconfEventSource.onNotification(nonMachtingNotification);
+        //only matching notification should be published
         verify(domNotificationPublishServiceMock).putNotification(captor.capture());
         final TopicDOMNotification value = (TopicDOMNotification) captor.getValue();
-        final Object actualTopicId = value.getBody().getChild(new YangInstanceIdentifier.NodeIdentifier(QName.create("urn:cisco:params:xml:ns:yang:messagebus:eventaggregator", "2014-12-02", "topic-id"))).get().getValue();
+        final QName qname = TopicNotification.QNAME;
+        final YangInstanceIdentifier.NodeIdentifier topicIdNode =
+                new YangInstanceIdentifier.NodeIdentifier(QName.create(qname.getNamespace().toString(), qname.getFormattedRevision(), "topic-id"));
+        final Object actualTopicId = value.getBody().getChild(topicIdNode).get().getValue();
         Assert.assertEquals(topic1.getTopicId(), actualTopicId);
     }
 
-    private void joinTopicTestHelper() throws Exception{
-        joinTopicInputMock = mock(JoinTopicInput.class);
-        TopicId topicId = new TopicId("topicID007");
-        doReturn(topicId).when(joinTopicInputMock).getTopicId();
-        NotificationPattern notificationPatternMock = mock(NotificationPattern.class);
-        doReturn(notificationPatternMock).when(joinTopicInputMock).getNotificationPattern();
-        doReturn("uriStr1").when(notificationPatternMock).getValue();
+    @Test
+    public void testDisjoinTopicOnNotification() throws Exception {
+        final TopicId topicId = TopicId.getDefaultInstance("topic1");
+        final JoinTopicInput topic1 = new JoinTopicInputBuilder()
+                .setTopicId(topicId)
+                .setNotificationPattern(NotificationPattern.getDefaultInstance(".*ns1"))
+                .build();
+        netconfEventSource.joinTopic(topic1);
 
-        SchemaContext schemaContextMock = mock(SchemaContext.class);
-        doReturn(schemaContextMock).when(domMountPointMock).getSchemaContext();
-        Set<NotificationDefinition> notificationDefinitionSet = new HashSet<>();
-        NotificationDefinition notificationDefinitionMock = mock(NotificationDefinition.class);
-        notificationDefinitionSet.add(notificationDefinitionMock);
-
-        URI uri = new URI("uriStr1");
-        QName qName = new QName(uri, "localName1");
-        org.opendaylight.yangtools.yang.model.api.SchemaPath schemaPath = SchemaPath.create(true, qName);
-        doReturn(notificationDefinitionSet).when(schemaContextMock).getNotifications();
-        doReturn(schemaPath).when(notificationDefinitionMock).getPath();
-
-        Optional<DOMNotificationService> domNotificationServiceOptionalMock = (Optional<DOMNotificationService>) mock(Optional.class);
-        doReturn(domNotificationServiceOptionalMock).when(domMountPointMock).getService(DOMNotificationService.class);
-        doReturn(true).when(domNotificationServiceOptionalMock).isPresent();
-
-        DOMNotificationService domNotificationServiceMock = mock(DOMNotificationService.class);
-        doReturn(domNotificationServiceMock).when(domNotificationServiceOptionalMock).get();
-        ListenerRegistration<NetconfEventSource> listenerRegistrationMock = (ListenerRegistration<NetconfEventSource>)mock(ListenerRegistration.class);
-        doReturn(listenerRegistrationMock).when(domNotificationServiceMock).registerNotificationListener(any(NetconfEventSource.class), any(SchemaPath.class));
-
-        Optional<DOMService> optionalMock = (Optional<DOMService>) mock(Optional.class);
-        doReturn(optionalMock).when(domMountPointMock).getService(DOMRpcService.class);
-        doReturn(true).when(optionalMock).isPresent();
-        DOMRpcService domRpcServiceMock = mock(DOMRpcService.class);
-        doReturn(domRpcServiceMock).when(optionalMock).get();
-        CheckedFuture checkedFutureMock = mock(CheckedFuture.class);
-        doReturn(checkedFutureMock).when(domRpcServiceMock).invokeRpc(any(SchemaPath.class), any(ContainerNode.class));
-
+        //handle notification matching topic namespace
+        netconfEventSource.onNotification(matchnigNotification);
+        //disjoin topic
+        DisJoinTopicInput disjoinTopic = new DisJoinTopicInputBuilder().setTopicId(topicId).build();
+        netconfEventSource.disJoinTopic(disjoinTopic);
+        netconfEventSource.onNotification(matchnigNotification);
+        //topic notification published only once before disjoin
+        verify(domNotificationPublishServiceMock, only()).putNotification(any());
     }
 
-    private NotificationDefinition getNotificationDefinitionMock(String namespace, String revision, String name) {
+    private Stream createStream(String name) {
+        return new StreamBuilder()
+                .setName(new StreamNameType(name))
+                .setReplaySupport(true)
+                .build();
+    }
+
+    private NotificationDefinition getNotificationDefinitionMock(QName qName) {
         NotificationDefinition notification = mock(NotificationDefinition.class);
-        final QName qName = QName.create(namespace, revision, name);
         doReturn(qName).when(notification).getQName();
         doReturn(SchemaPath.create(true, qName)).when(notification).getPath();
         return notification;
