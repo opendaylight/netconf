@@ -55,7 +55,8 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation implem
         operationElement.checkName(CREATE_SUBSCRIPTION);
         operationElement.checkNamespace(CreateSubscriptionInput.QNAME.getNamespace().toString());
         // FIXME reimplement using CODEC_REGISTRY and parse everything into generated class instance
-        // Waiting ofr https://git.opendaylight.org/gerrit/#/c/13763/
+        // Binding doesn't support anyxml nodes yet, so filter could not be retrieved
+        // xml -> normalized node -> CreateSubscriptionInput conversion could be slower than current approach
 
         // FIXME filter could be supported same way as netconf server filters get and get-config results
         final Optional<XmlElement> filter = operationElement.getOnlyChildElementWithSameNamespaceOptionally("filter");

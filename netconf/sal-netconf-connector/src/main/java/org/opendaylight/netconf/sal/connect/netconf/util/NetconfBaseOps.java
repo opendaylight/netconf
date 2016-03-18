@@ -157,7 +157,6 @@ public final class NetconfBaseOps {
 
         final ListenableFuture<DOMRpcResult> future;
         if (isFilterPresent(filterPath)) {
-            // FIXME the source node has to be wrapped in a choice
             final DataContainerChild<?, ?> node = toFilterStructure(filterPath.get(), schemaContext);
             future = rpc.invokeRpc(toPath(NETCONF_GET_CONFIG_QNAME),
                             NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME, getSourceNode(datastore), node));

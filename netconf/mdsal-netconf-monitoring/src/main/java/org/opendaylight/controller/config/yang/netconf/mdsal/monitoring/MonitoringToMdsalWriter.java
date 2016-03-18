@@ -59,8 +59,6 @@ final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMonitoringS
         Preconditions.checkState(dataBroker != null);
         final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
         tx.put(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(NetconfState.class), state);
-        // FIXME first attempt (right after we register to binding broker) always fails
-        // Is it due to the fact that we are writing from the onSessionInitiated callback ?
         try {
             tx.submit().checkedGet();
             LOG.debug("Netconf state updated successfully");
