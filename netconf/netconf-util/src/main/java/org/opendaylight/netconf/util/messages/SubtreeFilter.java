@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.impl;
+package org.opendaylight.netconf.util.messages;
 
 import com.google.common.base.Optional;
 import java.io.IOException;
@@ -14,8 +14,8 @@ import java.util.Map;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.netconf.util.mapping.AbstractNetconfOperation.OperationNameAndNamespace;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.util.mapping.AbstractNetconfOperation.OperationNameAndNamespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
@@ -30,7 +30,7 @@ import org.xml.sax.SAXException;
 public class SubtreeFilter {
     private static final Logger LOG = LoggerFactory.getLogger(SubtreeFilter.class);
 
-    static Document applySubtreeFilter(Document requestDocument, Document rpcReply) throws DocumentedException {
+    public static Document applyRpcSubtreeFilter(Document requestDocument, Document rpcReply) throws DocumentedException {
         OperationNameAndNamespace operationNameAndNamespace = new OperationNameAndNamespace(requestDocument);
         if (XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0.equals(operationNameAndNamespace.getNamespace()) &&
                 XmlNetconfConstants.GET.equals(operationNameAndNamespace.getOperationName()) ||
@@ -43,16 +43,9 @@ public class SubtreeFilter {
                 return rpcReply;
             }
 
-            // FIXME: rpcReply document must be reread otherwise some nodes do not inherit namespaces. (services/service)
-            try {
-                rpcReply = XmlUtil.readXmlToDocument(XmlUtil.toString(rpcReply, true));
-            } catch (SAXException | IOException e) {
-                LOG.error("Cannot transform document", e);
-                throw new DocumentedException("Cannot transform document" + e);
-            }
+            rpcReply = reReadDocument(rpcReply);
             XmlElement filter = maybeFilter.get();
-            if ("subtree".equals(filter.getAttribute("type"))||
-                    "subtree".equals(filter.getAttribute("type", XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0))) {
+            if (isSupported(filter)) {
 
                 // do
                 return filtered(maybeFilter.get(), rpcReply);
@@ -60,6 +53,68 @@ public class SubtreeFilter {
         }
 
         return rpcReply; // return identical document
+    }
+
+    /**
+     * Filters notification content. If filter type isn't of type "subtree", returns unchanged notification content.
+     * If no match is found, absent is returned.
+     * @param filter filter
+     * @param notification notification
+     * @return document containing filtered notification content
+     * @throws DocumentedException
+     */
+    public static Optional<Document> applySubtreeNotificationFilter(XmlElement filter, Document notification) throws DocumentedException {
+        notification = reReadDocument(notification);
+        removeEventTimeNode(notification);
+        if (isSupported(filter)) {
+            return Optional.fromNullable(filteredNotification(filter, notification));
+        }
+        return Optional.of(extractNotificationContent(notification));
+    }
+
+    private static Document reReadDocument(Document notification) throws DocumentedException {
+        // FIXME: rpcReply document must be reread otherwise some nodes do not inherit namespaces. (services/service)
+        try {
+            notification = XmlUtil.readXmlToDocument(XmlUtil.toString(notification, true));
+        } catch (SAXException | IOException e) {
+            LOG.error("Cannot transform document", e);
+            throw new DocumentedException("Cannot transform document" + e);
+        }
+        return notification;
+    }
+
+    private static void removeEventTimeNode(Document document) {
+        final Node eventTimeNode = document.getDocumentElement().getElementsByTagNameNS(
+                XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0, XmlNetconfConstants.EVENT_TIME).item(0);
+        document.getDocumentElement().removeChild(eventTimeNode);
+    }
+
+    private static boolean isSupported(XmlElement filter) {
+        return "subtree".equals(filter.getAttribute("type"))||
+                "subtree".equals(filter.getAttribute("type", XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
+    }
+
+    private static Document extractNotificationContent(Document notification) throws DocumentedException {
+        XmlElement root = XmlElement.fromDomElement(notification.getDocumentElement());
+        XmlElement content = root.getOnlyChildElement();
+        notification.removeChild(root.getDomElement());
+        notification.appendChild(content.getDomElement());
+        return notification;
+    }
+
+    private static Document filteredNotification(XmlElement filter, Document originalNotification) throws DocumentedException {
+        Document result = XmlUtil.newDocument();
+        XmlElement dataSrc = XmlElement.fromDomDocument(originalNotification);
+        Element dataDst = (Element) result.importNode(dataSrc.getDomElement(), false);
+        for (XmlElement filterChild : filter.getChildElements()) {
+            addSubtree2(filterChild, dataSrc.getOnlyChildElement(), XmlElement.fromDomElement(dataDst));
+        }
+        if(dataDst.getFirstChild() != null) {
+            result.appendChild(dataDst.getFirstChild());
+            return result;
+        } else {
+            return null;
+        }
     }
 
     private static Document filtered(XmlElement filter, Document originalReplyDocument) throws DocumentedException {

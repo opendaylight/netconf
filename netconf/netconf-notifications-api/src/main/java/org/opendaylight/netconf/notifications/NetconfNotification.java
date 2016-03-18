@@ -34,6 +34,8 @@ public final class NetconfNotification extends NetconfMessage {
      */
     public static final Date UNKNOWN_EVENT_TIME = new Date(0);
 
+    private final Date eventTime;
+
     /**
      * Create new notification and capture the timestamp in the constructor
      */
@@ -46,6 +48,14 @@ public final class NetconfNotification extends NetconfMessage {
      */
     public NetconfNotification(final Document notificationContent, final Date eventTime) {
         super(wrapNotification(notificationContent, eventTime));
+        this.eventTime = eventTime;
+    }
+
+    /**
+     * @return notification event time
+     */
+    public Date getEventTime() {
+        return eventTime;
     }
 
     private static Document wrapNotification(final Document notificationContent, final Date eventTime) {
