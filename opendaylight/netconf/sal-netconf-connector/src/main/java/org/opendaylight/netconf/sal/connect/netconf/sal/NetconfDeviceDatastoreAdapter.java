@@ -64,7 +64,7 @@ final class NetconfDeviceDatastoreAdapter implements AutoCloseable {
 
         final ReadWriteTransaction transaction = txChain.newReadWriteTransaction();
         logger.trace("{}: Update device state transaction {} merging operational data started.", id, transaction.getIdentifier());
-        transaction.put(LogicalDatastoreType.OPERATIONAL, id.getBindingPath(), data);
+        transaction.merge(LogicalDatastoreType.OPERATIONAL, id.getBindingPath(), data);
         logger.trace("{}: Update device state transaction {} merging operational data ended.", id, transaction.getIdentifier());
 
         commitTransaction(transaction, "update");
