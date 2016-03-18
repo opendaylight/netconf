@@ -128,7 +128,7 @@ final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         LOG.trace(
                 "{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
-        writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath(), data);
+        writeTx.merge(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath(), data);
         LOG.trace(
                 "{}: Update device state transaction {} merging operational data ended.",
                 id, writeTx.getIdentifier());
