@@ -5,7 +5,9 @@ module netconf-northbound-notification {
 
     import config { prefix config; revision-date 2013-04-05; }
 
-    description "TODO";
+    description
+        "This module contains the base YANG definitions for
+         netconf northbound notifications API";
 
     revision "2015-08-06" {
             description "Initial revision.";

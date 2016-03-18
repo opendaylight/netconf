@@ -6,7 +6,9 @@ module netconf-northbound-notification-impl {
     import config { prefix config; revision-date 2013-04-05; }
     import netconf-northbound-notification { prefix nnn; revision-date 2015-08-06; }
 
-    description "TODO";
+    description
+        "This module contains the base YANG definitions for
+         netconf northbound notifications implementation";
 
     revision "2015-08-07"{
         description "Initial revision.";
