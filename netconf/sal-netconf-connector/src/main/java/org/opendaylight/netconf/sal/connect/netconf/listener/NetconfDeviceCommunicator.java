@@ -118,7 +118,6 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
      * reconnecting strategy runs out of reconnection attempts
      */
     public ListenableFuture<NetconfDeviceCapabilities> initializeRemoteConnection(final NetconfClientDispatcher dispatcher, final NetconfClientConfiguration config) {
-        // TODO 2313 extract listener from configuration
         if(config instanceof NetconfReconnectingClientConfiguration) {
             initFuture = dispatcher.createReconnectingClient((NetconfReconnectingClientConfiguration) config);
         } else {

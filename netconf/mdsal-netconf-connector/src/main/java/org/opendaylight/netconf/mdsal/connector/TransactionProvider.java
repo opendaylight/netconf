@@ -23,7 +23,6 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//TODO make a global TransactionProvider for all Netconf sessions instead of each session having one.
 public class TransactionProvider implements AutoCloseable{
 
     private static final Logger LOG = LoggerFactory.getLogger(TransactionProvider.class);

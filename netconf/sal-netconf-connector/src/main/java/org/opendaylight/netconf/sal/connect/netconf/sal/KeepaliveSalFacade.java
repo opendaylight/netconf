@@ -223,7 +223,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
 
         @Override
         public void onFailure(@Nonnull final Throwable t) {
-            // User/Application RPC failed (The RPC did not reach the remote device or .. TODO what other reasons could cause this ?)
+            // User/Application RPC failed (The RPC did not reach the remote device.
             // There is no point in keeping this session. Reconnect.
             LOG.warn("{}: Rpc failure detected. Reconnecting netconf session", id, t);
             reconnect();

@@ -210,8 +210,6 @@ public final class BaseTopologyManager
                     // If the combined connection attempt failed, set the node to connection failed
                     LOG.debug("Futures aggregation failed");
                     naSalNodeWriter.update(nodeId, delegateTopologyHandler.getFailedState(nodeId, node));
-                    // FIXME disconnect those which succeeded
-                    // just issue a delete on delegateTopologyHandler that gets handled on lower level
                 }
             }, TypedActor.context().dispatcher());
 
@@ -299,7 +297,7 @@ public final class BaseTopologyManager
 
                 @Override
                 public void onFailure(final Throwable t) {
-                    // FIXME unable to disconnect all the connections, what do we do now ?
+
                 }
             });
 
@@ -373,8 +371,6 @@ public final class BaseTopologyManager
                     // If the combined connection attempt failed, set the node to connection failed
                     LOG.debug("Futures aggregation failed");
                     naSalNodeWriter.update(nodeId, delegateTopologyHandler.getFailedState(nodeId, null));
-                    // FIXME disconnect those which succeeded
-                    // just issue a delete on delegateTopologyHandler that gets handled on lower level
                 }
             });
             return;
