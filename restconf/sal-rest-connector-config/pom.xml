@@ -42,6 +42,11 @@
                   <classifier>config</classifier>
                 </artifact>
                 <artifact>
+                  <file>${project.build.directory}/classes/initial/10-odl-restconf-conn.xml</file>
+                  <type>xml</type>
+                  <classifier>configrest</classifier>
+                </artifact>
+                <artifact>
                   <file>${project.build.directory}/classes/initial/10-restconf-service.xml</file>
                   <type>xml</type>
                   <classifier>configrestconfservice</classifier>
