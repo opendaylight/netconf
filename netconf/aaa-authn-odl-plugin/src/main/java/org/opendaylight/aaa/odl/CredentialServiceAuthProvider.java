@@ -10,6 +10,7 @@ package org.opendaylight.aaa.odl;
 import java.util.Map;
 import org.opendaylight.aaa.api.AuthenticationException;
 import org.opendaylight.aaa.api.Claim;
+import org.opendaylight.aaa.api.CredentialAuth;
 import org.opendaylight.aaa.api.PasswordCredentials;
 import org.opendaylight.netconf.auth.AuthProvider;
 import org.osgi.framework.BundleContext;
@@ -31,34 +32,36 @@ public final class CredentialServiceAuthProvider implements AuthProvider, AutoCl
      */
     public static volatile Map.Entry<BundleContext, CredentialServiceAuthProvider> INSTANCE;
 
-    private volatile PasswordCredentialAuth nullableCredService;
-    private final ServiceTracker<PasswordCredentialAuth, PasswordCredentialAuth> listenerTracker;
+    // FIXME CredentialAuth is generic and it causes warnings during compilation
+    // Maybe there should be a PasswordCredentialAuth implements CredentialAuth<PasswordCredentials>
+    private volatile CredentialAuth<PasswordCredentials> nullableCredService;
+    private final ServiceTracker<CredentialAuth, CredentialAuth> listenerTracker;
 
     public CredentialServiceAuthProvider(final BundleContext bundleContext) {
 
-        final ServiceTrackerCustomizer<PasswordCredentialAuth, PasswordCredentialAuth> customizer = new ServiceTrackerCustomizer<PasswordCredentialAuth, PasswordCredentialAuth>() {
+        final ServiceTrackerCustomizer<CredentialAuth, CredentialAuth> customizer = new ServiceTrackerCustomizer<CredentialAuth, CredentialAuth>() {
             @Override
-            public PasswordCredentialAuth addingService(final ServiceReference<PasswordCredentialAuth> reference) {
+            public CredentialAuth addingService(final ServiceReference<CredentialAuth> reference) {
                 logger.trace("Credential service {} added", reference);
-                nullableCredService =  bundleContext.getService(reference);
+                nullableCredService = bundleContext.getService(reference);
                 return nullableCredService;
             }
 
             @Override
-            public void modifiedService(final ServiceReference<PasswordCredentialAuth> reference, final PasswordCredentialAuth service) {
+            public void modifiedService(final ServiceReference<CredentialAuth> reference, final CredentialAuth service) {
                 logger.trace("Replacing modified Credential service {}", reference);
                 nullableCredService = service;
             }
 
             @Override
-            public void removedService(final ServiceReference<PasswordCredentialAuth> reference, final PasswordCredentialAuth service) {
+            public void removedService(final ServiceReference<CredentialAuth> reference, final CredentialAuth service) {
                 logger.trace("Removing Credential service {}. This AuthProvider will fail to authenticate every time", reference);
                 synchronized (CredentialServiceAuthProvider.this) {
                     nullableCredService = null;
                 }
             }
         };
-        listenerTracker = new ServiceTracker<>(bundleContext, PasswordCredentialAuth.class, customizer);
+        listenerTracker = new ServiceTracker<>(bundleContext, CredentialAuth.class, customizer);
         listenerTracker.open();
     }
 
