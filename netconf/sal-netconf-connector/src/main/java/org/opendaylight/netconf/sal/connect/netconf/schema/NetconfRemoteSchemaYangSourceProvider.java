@@ -129,16 +129,6 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
 
         final CheckedFuture<YangTextSchemaSource, SchemaSourceException> checked = Futures.makeChecked(transformed, MAPPER);
 
-        // / FIXME remove this get, it is only present to wait until source is retrieved
-        // (goal is to limit concurrent schema download, since NetconfDevice listener does not handle concurrent messages properly)
-        // TODO retest this
-        try {
-            LOG.trace("{}: Blocking for {}", id, sourceIdentifier);
-            checked.checkedGet();
-        } catch (final SchemaSourceException e) {
-            return Futures.immediateFailedCheckedFuture(e);
-        }
-
         return checked;
     }
 
