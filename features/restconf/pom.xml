@@ -32,6 +32,7 @@
     <features.file>features.xml</features.file>
     <config.configfile.directory>etc/opendaylight/karaf</config.configfile.directory>
     <config.restconf.configfile>10-rest-connector.xml</config.restconf.configfile>
+    <config.odl.restconf.configfile>10-odl-restconf-conn.xml</config.odl.restconf.configfile>
     <config.restconf.service.configfile>10-restconf-service.xml</config.restconf.service.configfile>
   </properties>
 
@@ -131,13 +132,19 @@
       <type>xml</type>
       <classifier>config</classifier>
     </dependency>
-
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>sal-rest-connector-config</artifactId>
       <version>${restconf.version}</version>
       <type>xml</type>
       <classifier>configrestconfservice</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>sal-rest-connector-config</artifactId>
+      <version>${restconf.version}</version>
+      <type>xml</type>
+      <classifier>configrest</classifier>
     </dependency>
 
     <dependency>
