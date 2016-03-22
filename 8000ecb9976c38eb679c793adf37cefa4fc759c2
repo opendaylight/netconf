@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a3f45e8_63403657",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/client/http/perf/RestPerfClient.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2016-03-22T15:59:48Z",
+      "side": 1,
+      "message": "SECONDS would be more user friendly.",
+      "range": {
+        "startLine": 135,
+        "startChar": 113,
+        "endLine": 135,
+        "endChar": 120
+      },
+      "revId": "8000ecb9976c38eb679c793adf37cefa4fc759c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
