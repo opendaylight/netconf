@@ -53,6 +53,7 @@
     <module>yanglib</module>
     <module>models</module>
     <module>tools</module>
+    <module>netconf-console</module>
 
     <module>netconf-artifacts</module>
   </modules>
