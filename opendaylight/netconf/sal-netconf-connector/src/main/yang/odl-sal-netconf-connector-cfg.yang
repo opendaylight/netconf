@@ -177,6 +177,15 @@ module odl-sal-netconf-connector-cfg {
                              If a value less than 1 is provided, no keepalives will be sent";
             }
 
+            leaf sequentially-send-request {
+                description "If true, the netconf device communicator will send requests to the device sequentially. That is,
+                             only after the communicator receives the response of the request, it will send the next request
+                             to the device.
+                             And if false, the communicator will send requests to the device concurrently.";
+                type boolean;
+                default true;
+            }
+
             container keepalive-executor {
                 uses config:service-ref {
                     refine type {
