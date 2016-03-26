@@ -59,6 +59,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
     private Future<?> initFuture;
     private SettableFuture<NetconfDeviceCapabilities> firstConnectionFuture;
+    private boolean sequentiallySendRequest;
 
     public NetconfDeviceCommunicator(final RemoteDeviceId id, final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice,
             final UserPreferences NetconfSessionPreferences) {
@@ -76,6 +77,26 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         this.remoteDevice = remoteDevice;
         this.overrideNetconfCapabilities = overrideNetconfCapabilities;
         this.firstConnectionFuture = SettableFuture.create();
+        this.sequentiallySendRequest = true;
+    }
+
+    public NetconfDeviceCommunicator(final RemoteDeviceId id, final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice,
+                                     final UserPreferences NetconfSessionPreferences, final boolean sendRequest) {
+        this(id, remoteDevice, Optional.of(NetconfSessionPreferences), sendRequest);
+    }
+
+    public NetconfDeviceCommunicator(final RemoteDeviceId id,
+                                     final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice, final boolean sendRequest) {
+        this(id, remoteDevice, Optional.<UserPreferences>absent(), sendRequest);
+    }
+
+    private NetconfDeviceCommunicator(final RemoteDeviceId id, final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice,
+                                      final Optional<UserPreferences> overrideNetconfCapabilities, final boolean sendRequest) {
+        this.id = id;
+        this.remoteDevice = remoteDevice;
+        this.overrideNetconfCapabilities = overrideNetconfCapabilities;
+        this.firstConnectionFuture = SettableFuture.create();
+        this.sequentiallySendRequest = sendRequest;
     }
 
     @Override
@@ -191,8 +212,8 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     }
 
     private RpcResult<NetconfMessage> createSessionDownRpcResult() {
-        return createErrorRpcResult( RpcError.ErrorType.TRANSPORT,
-                             String.format( "The netconf session to %1$s is disconnected", id.getName() ) );
+        return createErrorRpcResult(RpcError.ErrorType.TRANSPORT,
+                String.format("The netconf session to %1$s is disconnected", id.getName()));
     }
 
     private RpcResult<NetconfMessage> createErrorRpcResult( RpcError.ErrorType errorType, String message ) {
@@ -248,51 +269,70 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                 requests.poll();
             } else {
                 request = null;
-                LOG.warn("{}: Ignoring unsolicited message {}", id,
-                        msgToS(message));
+                LOG.warn("{}: Ignoring unsolicited message {}", id, msgToS(message));
             }
-        }
-        finally {
+        } finally {
             sessionLock.unlock();
         }
 
-        if( request != null ) {
-
+        if (request != null) {
             LOG.debug("{}: Message received {}", id, message);
-
-            if(LOG.isTraceEnabled()) {
-                LOG.trace( "{}: Matched request: {} to response: {}", id, msgToS( request.request ), msgToS( message ) );
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("{}: Matched request: {} to response: {}", id, msgToS(request.request), msgToS(message));
             }
 
             try {
-                NetconfMessageTransformUtil.checkValidReply( request.request, message );
+                NetconfMessageTransformUtil.checkValidReply(request.request, message);
             } catch (final NetconfDocumentedException e) {
-                LOG.warn(
-                        "{}: Invalid request-reply match, reply message contains different message-id, request: {}, response: {}",
-                        id, msgToS(request.request), msgToS(message), e);
+                LOG.warn("{}: Invalid request-reply match, reply message contains different message-id, request: {}," +
+                                " response: {}", id, msgToS(request.request), msgToS(message), e);
+                request.future.set(RpcResultBuilder.<NetconfMessage>failed()
+                        .withRpcError(NetconfMessageTransformUtil.toRpcError(e)).build());
 
-                request.future.set( RpcResultBuilder.<NetconfMessage>failed()
-                        .withRpcError( NetconfMessageTransformUtil.toRpcError( e ) ).build() );
-
-                //recursively processing message to eventually find matching request
-                processMessage(message);
-
-                return;
+                if (sequentiallySendRequest == false) {
+                    //recursively processing message to eventually find matching request
+                    processMessage(message);
+                    return;
+                }
             }
 
             try {
                 NetconfMessageTransformUtil.checkSuccessReply(message);
-            } catch(final NetconfDocumentedException e) {
-                LOG.warn(
-                        "{}: Error reply from remote device, request: {}, response: {}",
+                request.future.set(RpcResultBuilder.success(message).build());
+            } catch (final NetconfDocumentedException e) {
+                LOG.warn("{}: Error reply from remote device, request: {}, response: {}",
                         id, msgToS(request.request), msgToS(message), e);
+                request.future.set(RpcResultBuilder.<NetconfMessage>failed()
+                        .withRpcError(NetconfMessageTransformUtil.toRpcError(e)).build());
+            } finally {
+                if (sequentiallySendRequest == true) {
+                    sessionLock.lock();
+                    final Request req = requests.peek();
+                    sessionLock.unlock();
+                    if (req != null) {
+                        session.sendMessage(req.request).addListener(new FutureListener<Void>() {
+                            @Override
+                            public void operationComplete(final Future<Void> future) throws Exception {
+                                if (!future.isSuccess()) {
+                                    // We expect that a session down will occur at this point
+                                    LOG.debug("{}: Failed to send request {}", id, XmlUtil.toString(req.request.getDocument()),
+                                            future.cause());
 
-                request.future.set( RpcResultBuilder.<NetconfMessage>failed()
-                        .withRpcError( NetconfMessageTransformUtil.toRpcError( e ) ).build() );
-                return;
+                                    if (future.cause() != null) {
+                                        req.future.set(createErrorRpcResult(RpcError.ErrorType.TRANSPORT,
+                                                future.cause().getLocalizedMessage()));
+                                    } else {
+                                        req.future.set(createSessionDownRpcResult()); // assume session is down
+                                    }
+                                    req.future.setException(future.cause());
+                                } else {
+                                    LOG.trace("Finished sending request {}", req.request);
+                                }
+                            }
+                        });
+                    }
+                }
             }
-
-            request.future.set( RpcResultBuilder.success( message ).build() );
         }
     }
 
@@ -304,50 +344,55 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     public ListenableFuture<RpcResult<NetconfMessage>> sendRequest(final NetconfMessage message, final QName rpc) {
         sessionLock.lock();
         try {
-            return sendRequestWithLock( message, rpc );
+            return sendRequestWithLock(message, rpc);
         } finally {
             sessionLock.unlock();
         }
     }
 
     private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithLock(
-                                               final NetconfMessage message, final QName rpc) {
-        if(LOG.isTraceEnabled()) {
+            final NetconfMessage message, final QName rpc) {
+        if (LOG.isTraceEnabled()) {
             LOG.trace("{}: Sending message {}", id, msgToS(message));
         }
 
         if (session == null) {
-            LOG.warn("{}: Session is disconnected, failing RPC request {}",
-                    id, message);
-            return Futures.immediateFuture( createSessionDownRpcResult() );
+            LOG.warn("{}: Session is disconnected, failing RPC request {}", id, message);
+            return Futures.immediateFuture(createSessionDownRpcResult());
         }
 
-        final Request req = new Request( new UncancellableFuture<RpcResult<NetconfMessage>>(true),
-                                         message );
+        final Request req = new Request(new UncancellableFuture<RpcResult<NetconfMessage>>(true), message);
         requests.add(req);
 
-        session.sendMessage(req.request).addListener(new FutureListener<Void>() {
-            @Override
-            public void operationComplete(final Future<Void> future) throws Exception {
-                if( !future.isSuccess() ) {
-                    // We expect that a session down will occur at this point
-                    LOG.debug("{}: Failed to send request {}", id,
-                            XmlUtil.toString(req.request.getDocument()),
-                            future.cause());
+        /*
+         * If sequentiallySendRequest is true, the communicator will send requests sequentially. So when the size of
+         * requests is one, the communicator will send the first request, and then after the communicator receives the
+         * response of the request, it will send the next request.
+         * If sequentiallySendRequest is false, the communicator will send requests concurrently.
+         */
+        if ((sequentiallySendRequest == true && requests.size() == 1) ||
+                (sequentiallySendRequest == false)) {
+            session.sendMessage(req.request).addListener(new FutureListener<Void>() {
+                @Override
+                public void operationComplete(final Future<Void> future) throws Exception {
+                    if (!future.isSuccess()) {
+                        // We expect that a session down will occur at this point
+                        LOG.debug("{}: Failed to send request {}", id, XmlUtil.toString(req.request.getDocument()),
+                                future.cause());
 
-                    if( future.cause() != null ) {
-                        req.future.set( createErrorRpcResult( RpcError.ErrorType.TRANSPORT,
-                                                              future.cause().getLocalizedMessage() ) );
+                        if (future.cause() != null) {
+                            req.future.set(createErrorRpcResult(RpcError.ErrorType.TRANSPORT,
+                                    future.cause().getLocalizedMessage()));
+                        } else {
+                            req.future.set(createSessionDownRpcResult()); // assume session is down
+                        }
+                        req.future.setException(future.cause());
                     } else {
-                        req.future.set( createSessionDownRpcResult() ); // assume session is down
+                        LOG.trace("Finished sending request {}", req.request);
                     }
-                    req.future.setException( future.cause() );
                 }
-                else {
-                    LOG.trace("Finished sending request {}", req.request);
-                }
-            }
-        });
+            });
+        }
 
         return req.future;
     }

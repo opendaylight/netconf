@@ -142,6 +142,7 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
         final Long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null ? DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
         final Long keepaliveDelay = node.getKeepaliveDelay() == null ? DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay();
         final Boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null ? DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
+        final Boolean sequentiallySendRequest = node.isSequentiallySendRequest() == null ? DEFAULT_SEQUENTIALLY_SEND_REQUEST : node.isSequentiallySendRequest();
 
         IpAddress ipAddress = node.getHost().getIpAddress();
         InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null ?
@@ -162,7 +163,7 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
         final NetconfDevice device = new ClusteredNetconfDevice(schemaResourcesDTO, remoteDeviceId, salFacade,
                 processingExecutor.getExecutor(), actorSystem, topologyId, nodeId.getValue(), TypedActor.context());
 
-        return new NetconfConnectorDTO(new ClusteredNetconfDeviceCommunicator(remoteDeviceId, device, entityOwnershipService), salFacade);
+        return new NetconfConnectorDTO(new ClusteredNetconfDeviceCommunicator(remoteDeviceId, device, entityOwnershipService, sequentiallySendRequest), salFacade);
     }
 
     @Override

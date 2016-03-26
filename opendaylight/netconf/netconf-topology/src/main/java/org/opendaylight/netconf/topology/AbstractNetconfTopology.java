@@ -85,6 +85,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     protected static final long DEFAULT_REQUEST_TIMEOUT_MILLIS = 60000L;
     protected static final int DEFAULT_KEEPALIVE_DELAY = 0;
     protected static final boolean DEFAULT_RECONNECT_ON_CHANGED_SCHEMA = false;
+    protected static final boolean DEFAULT_SEQUENTIALLY_SEND_REQUEST = true;
     private static final int DEFAULT_MAX_CONNECTION_ATTEMPTS = 0;
     private static final int DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS = 2000;
     private static final long DEFAULT_CONNECTION_TIMEOUT_MILLIS = 20000L;
@@ -267,6 +268,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         final Long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null ? DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
         final Long keepaliveDelay = node.getKeepaliveDelay() == null ? DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay();
         final Boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null ? DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
+        final Boolean sequentiallySendRequest = node.isSequentiallySendRequest() == null ? DEFAULT_SEQUENTIALLY_SEND_REQUEST : node.isSequentiallySendRequest();
 
         IpAddress ipAddress = node.getHost().getIpAddress();
         InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null ?
@@ -292,8 +294,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         return new NetconfConnectorDTO(
                 userCapabilities.isPresent() ?
                         new NetconfDeviceCommunicator(
-                                remoteDeviceId, device, new UserPreferences(userCapabilities.get(), node.getYangModuleCapabilities().isOverride())):
-                        new NetconfDeviceCommunicator(remoteDeviceId, device)
+                                remoteDeviceId, device, new UserPreferences(userCapabilities.get(), node.getYangModuleCapabilities().isOverride()), sequentiallySendRequest):
+                        new NetconfDeviceCommunicator(remoteDeviceId, device, sequentiallySendRequest)
                 , salFacade);
     }
 

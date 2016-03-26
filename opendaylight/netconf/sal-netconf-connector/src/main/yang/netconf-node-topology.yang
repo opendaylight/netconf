@@ -113,6 +113,16 @@ module netconf-node-topology {
             description "Netconf connector sends keepalive RPCs while the session is idle, this delay specifies the delay between keepalive RPC in seconds
                          If a value <1 is provided, no keepalives will be sent";
         }
+
+        leaf sequentially-send-request {
+            description "If true, the netconf device communicator will send requests to the device sequentially. That is,
+                         only after the communicator receives the response of the request, it will send the next request
+                         to the device.
+                         If false, the communicator will send requests to the device concurrently.";
+            config true;
+            type boolean;
+            default true;
+        }
     }
 
     grouping netconf-node-connection-status {

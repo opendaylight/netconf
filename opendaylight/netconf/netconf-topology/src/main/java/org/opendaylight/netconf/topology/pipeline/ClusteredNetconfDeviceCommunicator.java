@@ -31,6 +31,12 @@ public class ClusteredNetconfDeviceCommunicator extends NetconfDeviceCommunicato
         this.ownershipService = ownershipService;
     }
 
+    public ClusteredNetconfDeviceCommunicator(RemoteDeviceId id, NetconfDevice remoteDevice,
+                                              EntityOwnershipService ownershipService, boolean sendRequest) {
+        super(id, remoteDevice, sendRequest);
+        this.ownershipService = ownershipService;
+    }
+
     @Override
     public void onMessage(NetconfClientSession session, NetconfMessage message) {
         super.onMessage(session, message);
