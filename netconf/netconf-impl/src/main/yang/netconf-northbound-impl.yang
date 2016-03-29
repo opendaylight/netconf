@@ -9,6 +9,7 @@ module netconf-northbound-impl {
     import netconf-northbound-mapper { prefix nnm; revision-date 2015-01-14; }
     import netconf-northbound { prefix nn; revision-date 2015-01-14; }
     import netty {prefix netty; }
+    import threadpool {prefix th;}
 
     description
         "This module contains the base YANG definitions for
@@ -105,6 +106,23 @@ module netconf-northbound-impl {
                         config:required-identity nnm:netconf-northbound-mapper;
                     }
                 }
+            }
+            container scheduled-threadpool {
+                uses config:service-ref {
+                    refine type {
+                        mandatory false;
+                        config:required-identity th:scheduled-threadpool;
+                    }
+                    refine name {
+                        mandatory false;
+                    }
+                }
+                description "Dedicated to updating netconf-state/sessions subtree on session change.";
+            }
+            leaf monitoring-update-interval {
+                description "Specifies interval in seconds after which session stats are updated. If zero, stats won't be updated.";
+                type uint32;
+                default 0;
             }
 
         }

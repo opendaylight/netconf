@@ -47,7 +47,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
-public class NetconfMonitoringServiceImplTest {
+public class NetconfCapabilityMonitoringServiceTest {
 
     private static final String TEST_MODULE_CONTENT = "content";
     private static final String TEST_MODULE_CONTENT2 = "content2";
@@ -78,11 +78,11 @@ public class NetconfMonitoringServiceImplTest {
     @Mock
     private NetconfManagementSession sessionMock;
     @Mock
-    private NetconfMonitoringService.MonitoringListener listener;
+    private NetconfMonitoringService.CapabilitiesListener listener;
     @Mock
     private BaseNotificationPublisherRegistration notificationPublisher;
 
-    private NetconfMonitoringServiceImpl monitoringService;
+    private NetconfCapabilityMonitoringService monitoringService;
 
     @BeforeClass
     public static void suiteSetUp() throws Exception {
@@ -111,19 +111,17 @@ public class NetconfMonitoringServiceImplTest {
         CAPABILITIES.add(new BasicCapability("urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&amp;revision=2010-09-24"));
 
         doReturn(CAPABILITIES).when(operationServiceFactoryMock).getCapabilities();
-        doReturn(null).when(operationServiceFactoryMock).registerCapabilityListener(any(NetconfMonitoringServiceImpl.class));
+        doReturn(null).when(operationServiceFactoryMock).registerCapabilityListener(any(NetconfCapabilityMonitoringService.class));
 
         doReturn(SESSION).when(sessionMock).toManagementSession();
         doNothing().when(listener).onCapabilitiesChanged(any());
         doNothing().when(listener).onSchemasChanged(any());
-        doNothing().when(listener).onSessionStarted(any());
-        doNothing().when(listener).onSessionEnded(any());
 
         doNothing().when(notificationPublisher).onCapabilityChanged(any());
         doNothing().when(notificationPublisher).onSessionStarted(any());
         doNothing().when(notificationPublisher).onSessionEnded(any());
 
-        monitoringService = new NetconfMonitoringServiceImpl(operationServiceFactoryMock);
+        monitoringService = new NetconfCapabilityMonitoringService(operationServiceFactoryMock);
         monitoringService.onCapabilitiesChanged(CAPABILITIES, Collections.emptySet());
         monitoringService.setNotificationPublisher(notificationPublisher);
         monitoringService.registerListener(listener);
@@ -132,13 +130,9 @@ public class NetconfMonitoringServiceImplTest {
 
     @Test
     public void testListeners() throws Exception {
-        monitoringService.onSessionUp(sessionMock);
         HashSet<Capability> added = new HashSet<>();
         added.add(new BasicCapability("toAdd"));
         monitoringService.onCapabilitiesChanged(added, Collections.emptySet());
-        monitoringService.onSessionDown(sessionMock);
-        verify(listener).onSessionStarted(any());
-        verify(listener).onSessionEnded(any());
         //onCapabilitiesChanged and onSchemasChanged are invoked also after listener registration
         verify(listener, times(2)).onCapabilitiesChanged(any());
         verify(listener, times(2)).onSchemasChanged(any());
@@ -183,11 +177,8 @@ public class NetconfMonitoringServiceImplTest {
 
     @Test
     public void testClose() throws Exception {
-        monitoringService.onSessionUp(sessionMock);
-        Assert.assertFalse(monitoringService.getSessions().getSession().isEmpty());
         Assert.assertFalse(monitoringService.getCapabilities().getCapability().isEmpty());
         monitoringService.close();
-        Assert.assertTrue(monitoringService.getSessions().getSession().isEmpty());
         Assert.assertTrue(monitoringService.getCapabilities().getCapability().isEmpty());
     }
 
@@ -231,22 +222,4 @@ public class NetconfMonitoringServiceImplTest {
         Assert.assertEquals(Collections.emptySet(), new HashSet<>(afterRemove.getAddedCapability()));
     }
 
-    @Test
-    public void testOnSessionUpAndDown() throws Exception {
-        monitoringService.onSessionUp(sessionMock);
-        ArgumentCaptor<Session> sessionUpCaptor = ArgumentCaptor.forClass(Session.class);
-        verify(listener).onSessionStarted(sessionUpCaptor.capture());
-        final Session sesionUp = sessionUpCaptor.getValue();
-        Assert.assertEquals(SESSION.getSessionId(), sesionUp.getSessionId());
-        Assert.assertEquals(SESSION.getSourceHost(), sesionUp.getSourceHost());
-        Assert.assertEquals(SESSION.getUsername(), sesionUp.getUsername());
-
-        monitoringService.onSessionDown(sessionMock);
-        ArgumentCaptor<Session> sessionDownCaptor = ArgumentCaptor.forClass(Session.class);
-        verify(listener).onSessionEnded(sessionDownCaptor.capture());
-        final Session sessionDown = sessionDownCaptor.getValue();
-        Assert.assertEquals(SESSION.getSessionId(), sessionDown.getSessionId());
-        Assert.assertEquals(SESSION.getSourceHost(), sessionDown.getSourceHost());
-        Assert.assertEquals(SESSION.getUsername(), sessionDown.getUsername());
-    }
 }
