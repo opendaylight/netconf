@@ -58,10 +58,11 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
     public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                                final BindingAwareBroker bindingAwareBroker, final Broker domBroker,
                                final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
-                               final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider) {
+                               final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
+                               final int rpcMessageLimit) {
         super(topologyId, clientDispatcher,
                 bindingAwareBroker, domBroker, eventExecutor,
-                keepaliveExecutor, processingExecutor, schemaRepositoryProvider);
+                keepaliveExecutor, processingExecutor, schemaRepositoryProvider, rpcMessageLimit);
         registerToSal(this, this);
     }
 
