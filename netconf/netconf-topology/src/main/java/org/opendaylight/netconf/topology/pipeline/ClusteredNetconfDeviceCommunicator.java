@@ -26,8 +26,8 @@ public class ClusteredNetconfDeviceCommunicator extends NetconfDeviceCommunicato
     private final ArrayList<NetconfClientSessionListener> netconfClientSessionListeners = new ArrayList<>();
     private EntityOwnershipListenerRegistration ownershipListenerRegistration = null;
 
-    public ClusteredNetconfDeviceCommunicator(RemoteDeviceId id, NetconfDevice remoteDevice, EntityOwnershipService ownershipService) {
-        super(id, remoteDevice);
+    public ClusteredNetconfDeviceCommunicator(RemoteDeviceId id, NetconfDevice remoteDevice, EntityOwnershipService ownershipService, final int rpcMessageLimit) {
+        super(id, remoteDevice, rpcMessageLimit);
         this.ownershipService = ownershipService;
     }
 
