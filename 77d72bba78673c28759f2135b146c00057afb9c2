@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a4c51b2_e2b56232",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-29T10:49:19Z",
+      "side": 1,
+      "message": "You cannot just change the put to merge, when device goes from Connected -\u003e Connecting there will be old capabilities reported when there should be none.",
+      "range": {
+        "startLine": 131,
+        "startChar": 16,
+        "endLine": 131,
+        "endChar": 21
+      },
+      "revId": "77d72bba78673c28759f2135b146c00057afb9c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
