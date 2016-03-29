@@ -47,6 +47,7 @@ public class NetconfDeviceConnectionManager implements Closeable {
     private final NetconfClientDispatcherImpl netconfClientDispatcher;
 
     private static final String CACHE = "cache/schema";
+    private static final int RPC_LIMIT = 10;
 
     // Connection
     private NetconfDeviceConnectionHandler handler;
@@ -85,7 +86,7 @@ public class NetconfDeviceConnectionManager implements Closeable {
 
         device = new NetconfDevice(new SchemaResourcesDTO(repository, schemaContextFactory, new NetconfStateSchemasResolverImpl()),
                 deviceId, handler, executor, true);
-        listener = new NetconfDeviceCommunicator(deviceId, device);
+        listener = new NetconfDeviceCommunicator(deviceId, device, RPC_LIMIT);
         configBuilder.withSessionListener(listener);
         listener.initializeRemoteConnection(netconfClientDispatcher, configBuilder.build());
     }

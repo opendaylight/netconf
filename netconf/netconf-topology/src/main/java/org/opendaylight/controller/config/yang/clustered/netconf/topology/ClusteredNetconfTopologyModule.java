@@ -8,6 +8,8 @@
 
 package org.opendaylight.controller.config.yang.clustered.netconf.topology;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import org.opendaylight.netconf.topology.impl.ClusteredNetconfTopology;
 
 public class ClusteredNetconfTopologyModule extends org.opendaylight.controller.config.yang.clustered.netconf.topology.AbstractClusteredNetconfTopologyModule {
@@ -22,6 +24,7 @@ public class ClusteredNetconfTopologyModule extends org.opendaylight.controller.
     @Override
     public void customValidation() {
         // add custom validation form module attributes here.
+        checkArgument(getConcurrentRpcLimit() > 0, "The limit of concurrent messages must be greater than zero");
     }
 
     @Override
@@ -35,7 +38,8 @@ public class ClusteredNetconfTopologyModule extends org.opendaylight.controller.
                 getProcessingExecutorDependency(),
                 getSharedSchemaRepositoryDependency(),
                 getActorSystemProviderServiceDependency().getActorSystem(),
-                getEntityOwnershipServiceDependency());
+                getEntityOwnershipServiceDependency(),
+                getConcurrentRpcLimit());
     }
 
 }
