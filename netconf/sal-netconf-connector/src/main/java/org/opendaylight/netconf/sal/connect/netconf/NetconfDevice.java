@@ -143,7 +143,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
             }
 
             private void setUpSchema(final DeviceSources result) {
-                processingExecutor.submit(new SchemaSetup(result, remoteSessionCapabilities, listener));
+                processingExecutor.submit(new RecursiveSchemaSetup(result, remoteSessionCapabilities, listener));
             }
 
             @Override
@@ -372,13 +372,13 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     /**
      * Schema builder that tries to build schema context from provided sources or biggest subset of it.
      */
-    private final class SchemaSetup implements Runnable {
+    private final class RecursiveSchemaSetup implements Runnable {
         private final DeviceSources deviceSources;
         private final NetconfSessionPreferences remoteSessionCapabilities;
         private final RemoteDeviceCommunicator<NetconfMessage> listener;
         private final NetconfDeviceCapabilities capabilities;
 
-        public SchemaSetup(final DeviceSources deviceSources, final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceCommunicator<NetconfMessage> listener) {
+        public RecursiveSchemaSetup(final DeviceSources deviceSources, final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceCommunicator<NetconfMessage> listener) {
             this.deviceSources = deviceSources;
             this.remoteSessionCapabilities = remoteSessionCapabilities;
             this.listener = listener;
@@ -391,7 +391,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
         }
 
         /**
-         * Build schema context, in case of success or final failure notify device
+         * Recursively build schema context, in case of success or final failure notify device
          */
         private void setUpSchema(Collection<SourceIdentifier> requiredSources) {
             while (!requiredSources.isEmpty()) {
@@ -406,7 +406,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
                     handleSalInitializationSuccess(result, remoteSessionCapabilities, getDeviceSpecificRpc(result));
                     return;
                 } catch (Throwable t) {
-                    if (t instanceof MissingSchemaSourceException){
+                    if (t instanceof MissingSchemaSourceException) {
                         // In case source missing, try without it
                         final SourceIdentifier missingSource = ((MissingSchemaSourceException) t).getSourceId();
                         LOG.warn("{}: Unable to build schema context, missing source {}, will reattempt without it", id, missingSource);
@@ -433,10 +433,10 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
             }
             // No more sources, fail
             final IllegalStateException cause = new IllegalStateException(id + ": No more sources for schema context");
+
             handleSalInitializationFailure(cause, listener);
             salFacade.onDeviceFailed(cause);
         }
-
 
         protected NetconfDeviceRpc getDeviceSpecificRpc(final SchemaContext result) {
             return new NetconfDeviceRpc(result, listener, new NetconfMessageTransformer(result, true));

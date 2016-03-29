@@ -85,7 +85,7 @@ public class NetconfDeviceConnectionManager implements Closeable {
 
         device = new NetconfDevice(new SchemaResourcesDTO(repository, schemaContextFactory, new NetconfStateSchemasResolverImpl()),
                 deviceId, handler, executor, true);
-        listener = new NetconfDeviceCommunicator(deviceId, device);
+        listener = new NetconfDeviceCommunicator(deviceId, device, 10);
         configBuilder.withSessionListener(listener);
         listener.initializeRemoteConnection(netconfClientDispatcher, configBuilder.build());
     }
