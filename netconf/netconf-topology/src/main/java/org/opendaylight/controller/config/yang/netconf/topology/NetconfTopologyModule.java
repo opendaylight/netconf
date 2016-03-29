@@ -8,6 +8,8 @@
 
 package org.opendaylight.controller.config.yang.netconf.topology;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import org.opendaylight.netconf.topology.impl.NetconfTopologyImpl;
 
 public class NetconfTopologyModule extends org.opendaylight.controller.config.yang.netconf.topology.AbstractNetconfTopologyModule {
@@ -23,13 +25,14 @@ public class NetconfTopologyModule extends org.opendaylight.controller.config.ya
     public void customValidation() {
         // add custom validation form module attributes here.
         this.getClientDispatcherDependency();
+        checkArgument(getConcurrentRpcLimit() > 0, "The limit of concurrent messages must be greater than zero");
     }
 
     @Override
     public AutoCloseable createInstance() {
         return new NetconfTopologyImpl(getTopologyId(), getClientDispatcherDependency(), getBindingRegistryDependency(),
                 getDomRegistryDependency(), getEventExecutorDependency(), getKeepaliveExecutorDependency(),
-                getProcessingExecutorDependency(), getSharedSchemaRepositoryDependency());
+                getProcessingExecutorDependency(), getSharedSchemaRepositoryDependency(), getConcurrentRpcLimit());
     }
 
 }

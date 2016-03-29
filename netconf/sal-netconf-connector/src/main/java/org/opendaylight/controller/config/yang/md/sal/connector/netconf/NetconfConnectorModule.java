@@ -7,6 +7,7 @@
  */
 package org.opendaylight.controller.config.yang.md.sal.connector.netconf;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.opendaylight.controller.config.api.JmxAttributeValidationException.checkCondition;
 import static org.opendaylight.controller.config.api.JmxAttributeValidationException.checkNotNull;
 
@@ -179,6 +180,8 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
             checkNotNull(getPassword(), passwordJmxAttribute);
         }
 
+        checkArgument(getConcurrentRpcLimit() > 0, "The limit of concurrent messages must be greater than zero");
+
         userCapabilities = getUserCapabilities();
     }
 
@@ -262,8 +265,8 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
 
         final NetconfDeviceCommunicator listener = userCapabilities.isPresent() ?
                 new NetconfDeviceCommunicator(id, device,
-                        new UserPreferences(userCapabilities.get(), getYangModuleCapabilities().getOverride())):
-                new NetconfDeviceCommunicator(id, device);
+                        new UserPreferences(userCapabilities.get(), getYangModuleCapabilities().getOverride()), getConcurrentRpcLimit()):
+                new NetconfDeviceCommunicator(id, device, getConcurrentRpcLimit());
 
         if (shouldSendKeepalive()) {
             ((KeepaliveSalFacade) salFacade).setListener(listener);
