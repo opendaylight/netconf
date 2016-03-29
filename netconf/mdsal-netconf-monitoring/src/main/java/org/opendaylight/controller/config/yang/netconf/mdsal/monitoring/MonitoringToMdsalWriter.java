@@ -11,6 +11,8 @@ package org.opendaylight.controller.config.yang.netconf.mdsal.monitoring;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import java.util.Collection;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
@@ -23,12 +25,15 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMonitoringService.MonitoringListener, BindingAwareProvider {
+/**
+ * Writes netconf server state changes received from NetconfMonitoringService to netconf-state datastore subtree.
+ */
+final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMonitoringService.CapabilitiesListener,
+        NetconfMonitoringService.SessionsListener, BindingAwareProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(MonitoringToMdsalWriter.class);
 
@@ -48,43 +53,49 @@ final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMonitoringS
 
     @Override
     public void close() {
-        deleteFromDatastore(InstanceIdentifier.create(NetconfState.class));
+        runTransaction((tx) -> tx.delete(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(NetconfState.class)));
     }
 
     @Override
     public void onSessionStarted(Session session) {
         final InstanceIdentifier<Session> sessionPath =
                 SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.getKey());
-        putToDatastore(sessionPath, session);
+        runTransaction((tx) -> tx.put(LogicalDatastoreType.OPERATIONAL, sessionPath, session));
     }
 
     @Override
     public void onSessionEnded(Session session) {
         final InstanceIdentifier<Session> sessionPath =
                 SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.getKey());
-        deleteFromDatastore(sessionPath);
+        runTransaction((tx) -> tx.delete(LogicalDatastoreType.OPERATIONAL, sessionPath));
+    }
+
+    @Override
+    public void onSessionsUpdated(Collection<Session> sessions) {
+        runTransaction((tx) -> updateSessions(tx, sessions));
     }
 
     @Override
     public void onCapabilitiesChanged(Capabilities capabilities) {
-        putToDatastore(CAPABILITIES_INSTANCE_IDENTIFIER, capabilities);
+        runTransaction((tx) -> tx.put(LogicalDatastoreType.OPERATIONAL, CAPABILITIES_INSTANCE_IDENTIFIER, capabilities));
     }
 
     @Override
     public void onSchemasChanged(Schemas schemas) {
-        putToDatastore(SCHEMAS_INSTANCE_IDENTIFIER, schemas);
+        runTransaction((tx) -> tx.put(LogicalDatastoreType.OPERATIONAL, SCHEMAS_INSTANCE_IDENTIFIER, schemas));
     }
 
     @Override
     public void onSessionInitiated(final BindingAwareBroker.ProviderContext providerContext) {
         dataBroker = providerContext.getSALService(DataBroker.class);
-        serverMonitoringDependency.registerListener(this);
+        serverMonitoringDependency.registerCapabilitiesListener(this);
+        serverMonitoringDependency.registerSessionsListener(this);
     }
 
-    private <T extends DataObject> void putToDatastore(InstanceIdentifier<T> path, T value) {
+    private void runTransaction(Consumer<WriteTransaction> txUser) {
         Preconditions.checkState(dataBroker != null);
         final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
-        tx.put(LogicalDatastoreType.OPERATIONAL, path, value);
+        txUser.accept(tx);
         Futures.addCallback(tx.submit(), new FutureCallback<Void>() {
             @Override
             public void onSuccess(@Nullable Void result) {
@@ -98,20 +109,11 @@ final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMonitoringS
         });
     }
 
-    private <T extends DataObject> void deleteFromDatastore(InstanceIdentifier<T> path) {
-        Preconditions.checkState(dataBroker != null);
-        final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
-        tx.delete(LogicalDatastoreType.OPERATIONAL, path);
-        Futures.addCallback(tx.submit(), new FutureCallback<Void>() {
-            @Override
-            public void onSuccess(@Nullable Void result) {
-                LOG.debug("Netconf state updated successfully");
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                LOG.warn("Unable to update netconf state", t);
-            }
-        });
+    private static void updateSessions(WriteTransaction tx, Collection<Session> sessions) {
+        for (Session session : sessions) {
+            final InstanceIdentifier<Session> sessionPath =
+                    SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.getKey());
+            tx.put(LogicalDatastoreType.OPERATIONAL, sessionPath, session);
+        }
     }
 }

@@ -12,7 +12,23 @@ package org.opendaylight.netconf.api.monitoring;
  * Created by mmarsale on 13.2.2015.
  */
 public interface SessionListener {
+
+    /**
+     * Callback used to notify about netconf session start
+     * @param session started session
+     */
     void onSessionUp(NetconfManagementSession session);
 
+    /**
+     * Callback used to notify about netconf session end
+     * @param session ended session
+     */
     void onSessionDown(NetconfManagementSession session);
+
+    /**
+     * Callback used to notify about activity in netconf session, like
+     * rpc or notification
+     * @param event session event, contains session and type of event
+     */
+    void onSessionEvent(SessionEvent event);
 }
