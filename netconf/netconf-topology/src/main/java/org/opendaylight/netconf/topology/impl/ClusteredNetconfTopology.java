@@ -76,15 +76,16 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
     private final ActorSystem actorSystem;
     private final EntityOwnershipService entityOwnershipService;
     private TopologyManager topologyManager;
+    private final int rpcMessageLimit;
 
     public ClusteredNetconfTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                                final BindingAwareBroker bindingAwareBroker, final Broker domBroker,
                                final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
                                final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
-                               final ActorSystem actorSystem, final EntityOwnershipService entityOwnershipService) {
+                               final ActorSystem actorSystem, final EntityOwnershipService entityOwnershipService, final int rpcMessageLimit) {
         super(topologyId, clientDispatcher,
                 bindingAwareBroker, domBroker, eventExecutor,
-                keepaliveExecutor, processingExecutor, schemaRepositoryProvider);
+                keepaliveExecutor, processingExecutor, schemaRepositoryProvider, rpcMessageLimit);
 
         final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
         moduleInfoBackedContext.addModuleInfos(Collections.singletonList($YangModuleInfoImpl.getInstance()));
@@ -98,6 +99,7 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
 
         this.actorSystem = actorSystem;
         this.entityOwnershipService = entityOwnershipService;
+        this.rpcMessageLimit = rpcMessageLimit;
         registerToSal(this, this);
         LOG.warn("Clustered netconf topo started");
     }
@@ -161,7 +163,7 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
         final NetconfDevice device = new ClusteredNetconfDevice(schemaResourcesDTO, remoteDeviceId, salFacade,
                 processingExecutor.getExecutor(), actorSystem, topologyId, nodeId.getValue(), TypedActor.context());
 
-        return new NetconfConnectorDTO(new ClusteredNetconfDeviceCommunicator(remoteDeviceId, device, entityOwnershipService), salFacade);
+        return new NetconfConnectorDTO(new ClusteredNetconfDeviceCommunicator(remoteDeviceId, device, entityOwnershipService, rpcMessageLimit), salFacade);
     }
 
     @Override

@@ -57,7 +57,7 @@ public class ClusteredNetconfDeviceCommunicatorTest {
         doReturn(ownershipListenerRegistration).when(ownershipService).registerListener(
                 "netconf-node/" + REMOTE_DEVICE_ID.getName(), remoteDevice);
 
-        communicator = new ClusteredNetconfDeviceCommunicator(REMOTE_DEVICE_ID, remoteDevice, ownershipService);
+        communicator = new ClusteredNetconfDeviceCommunicator(REMOTE_DEVICE_ID, remoteDevice, ownershipService, 10);
         communicator.registerNetconfClientSessionListener(listener1);
         communicator.registerNetconfClientSessionListener(listener2);
     }
