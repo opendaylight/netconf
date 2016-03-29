@@ -89,6 +89,11 @@
                   <type xmlns:dom="urn:opendaylight:params:xml:ns:yang:controller:netconf:north:mapper">dom:netconf-northbound-mapper</type>
                   <name>mapper-aggregator</name>
               </aggregator>
+              <scheduled-threadpool xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound:impl">
+                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:threadpool">prefix:threadpool</type>
+                  <name>global-netconf-ssh-scheduled-executor</name>
+              </scheduled-threadpool>
+              <monitoring-update-interval xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound:impl">6</monitoring-update-interval>
           </module>
 
           <module>

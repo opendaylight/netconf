@@ -14,13 +14,11 @@ import static org.mockito.Mockito.mock;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
-import java.util.Set;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
-import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.api.monitoring.SessionListener;
 import org.opendaylight.netconf.monitoring.xml.model.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.DomainName;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Host;
@@ -49,23 +47,13 @@ public class JaxBSerializerTest {
         final NetconfMonitoringService service = new NetconfMonitoringService() {
 
             @Override
-            public void onCapabilitiesChanged(Set<Capability> added, Set<Capability> removed) {
-
-            }
-
-            @Override
-            public void onSessionUp(final NetconfManagementSession session) {
-
-            }
-
-            @Override
-            public void onSessionDown(final NetconfManagementSession session) {
-
-            }
-
-            @Override
             public Sessions getSessions() {
                 return new SessionsBuilder().setSession(Lists.newArrayList(getMockSession(NetconfTcp.class), getMockSession(NetconfSsh.class))).build();
+            }
+
+            @Override
+            public SessionListener getSessionListener() {
+                return null;
             }
 
             @Override
@@ -84,7 +72,17 @@ public class JaxBSerializerTest {
             }
 
             @Override
-            public AutoCloseable registerListener(final MonitoringListener listener) {
+            public AutoCloseable registerCapabilitiesListener(final CapabilitiesListener listener) {
+                return new AutoCloseable() {
+                    @Override
+                    public void close() throws Exception {
+                        // NOOP
+                    }
+                };
+            }
+
+            @Override
+            public AutoCloseable registerSessionsListener(SessionsListener listener) {
                 return new AutoCloseable() {
                     @Override
                     public void close() throws Exception {
