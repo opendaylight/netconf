@@ -40,6 +40,12 @@ module netconf-topology {
                 type string;
             }
 
+            leaf concurrent-rpc-limit{
+                type uint16;
+                default 10;
+                description "limit of concurrent messages that can be send before replay messages are received";
+            }
+
             container dom-registry {
                 uses config:service-ref {
                     refine type {

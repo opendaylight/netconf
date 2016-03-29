@@ -245,8 +245,8 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
 
         final NetconfDeviceCommunicator listener = userCapabilities.isPresent() ?
                 new NetconfDeviceCommunicator(id, device,
-                        new UserPreferences(userCapabilities.get(), getYangModuleCapabilities().getOverride())):
-                new NetconfDeviceCommunicator(id, device);
+                        new UserPreferences(userCapabilities.get(), getYangModuleCapabilities().getOverride()), getConcurrentRpcLimit()):
+                new NetconfDeviceCommunicator(id, device, getConcurrentRpcLimit());
 
         if (shouldSendKeepalive()) {
             ((KeepaliveSalFacade) salFacade).setListener(listener);

@@ -273,7 +273,7 @@ public class AbstractNetconfTopologyTest {
                                                  EventExecutor eventExecutor, ScheduledThreadPool keepaliveExecutor,
                                                  ThreadPool processingExecutor,
                                                  SchemaRepositoryProvider schemaRepositoryProvider) {
-            super(topologyId, clientDispatcher, bindingAwareBroker, domBroker, eventExecutor, keepaliveExecutor, processingExecutor, schemaRepositoryProvider);
+            super(topologyId, clientDispatcher, bindingAwareBroker, domBroker, eventExecutor, keepaliveExecutor, processingExecutor, schemaRepositoryProvider, 10);
             salFacade = mock(RemoteDeviceHandler.class);
         }
 
