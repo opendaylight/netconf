@@ -196,6 +196,7 @@
               org.opendaylight.aaa.shiro.filters,
               org.opendaylight.aaa.shiro.realm,
               org.opendaylight.aaa.shiro.web.env,
+              org.opendaylight.aaa.filterchain.filters,
               org.apache.shiro.web.env
             </Import-Package>
             <Embed-Dependency>stax-utils</Embed-Dependency>
