@@ -20,6 +20,7 @@ import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.opendaylight.controller.config.util.xml.XmlElement;
@@ -53,7 +54,9 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     protected final RemoteDeviceId id;
     private final Lock sessionLock = new ReentrantLock();
 
-    // TODO implement concurrent message limit
+    private final Semaphore semaphore;
+    private final int concurentRpcMsgs;
+
     private final Queue<Request> requests = new ArrayDeque<>();
     private NetconfClientSession session;
 
@@ -61,21 +64,24 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     private SettableFuture<NetconfDeviceCapabilities> firstConnectionFuture;
 
     public NetconfDeviceCommunicator(final RemoteDeviceId id, final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice,
-            final UserPreferences NetconfSessionPreferences) {
-        this(id, remoteDevice, Optional.of(NetconfSessionPreferences));
+            final UserPreferences NetconfSessionPreferences, final int rpcMessageLimit) {
+        this(id, remoteDevice, Optional.of(NetconfSessionPreferences), rpcMessageLimit);
     }
 
     public NetconfDeviceCommunicator(final RemoteDeviceId id,
-                                     final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice) {
-        this(id, remoteDevice, Optional.<UserPreferences>absent());
+                                     final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice,
+                                     final int rpcMessageLimit) {
+        this(id, remoteDevice, Optional.<UserPreferences>absent(), rpcMessageLimit);
     }
 
     private NetconfDeviceCommunicator(final RemoteDeviceId id, final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice,
-            final Optional<UserPreferences> overrideNetconfCapabilities) {
+                                      final Optional<UserPreferences> overrideNetconfCapabilities, final int rpcMessageLimit) {
+        this.concurentRpcMsgs = rpcMessageLimit;
         this.id = id;
         this.remoteDevice = remoteDevice;
         this.overrideNetconfCapabilities = overrideNetconfCapabilities;
         this.firstConnectionFuture = SettableFuture.create();
+        this.semaphore = rpcMessageLimit > 0 ? new Semaphore(rpcMessageLimit) : null;
     }
 
     @Override
@@ -245,6 +251,11 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             request = requests.peek();
             if (request != null && request.future.isUncancellable()) {
                 requests.poll();
+                // we have just removed one request from the queue
+                // we can also release one permit
+                if(semaphore != null) {
+                    semaphore.release();
+                }
             } else {
                 request = null;
                 LOG.warn("{}: Ignoring unsolicited message {}", id,
@@ -302,8 +313,17 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     @Override
     public ListenableFuture<RpcResult<NetconfMessage>> sendRequest(final NetconfMessage message, final QName rpc) {
         sessionLock.lock();
+
+        if (semaphore != null && !semaphore.tryAcquire()) {
+            LOG.warn("Limit of concurrent rpc messages was reached (limit :" +
+                    concurentRpcMsgs + "). Rpc reply message is needed. Discarding request of Netconf device with id" + id.getName());
+            sessionLock.unlock();
+            return Futures.immediateFailedFuture(new NetconfDocumentedException("Limit of rpc messages was reached (Limit :" +
+                    concurentRpcMsgs + ") waiting for emptying the queue of Netconf device with id" + id.getName()));
+        }
+
         try {
-            return sendRequestWithLock( message, rpc );
+            return sendRequestWithLock(message, rpc);
         } finally {
             sessionLock.unlock();
         }
