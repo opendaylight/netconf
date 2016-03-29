@@ -7,6 +7,7 @@
  */
 package org.opendaylight.controller.config.yang.md.sal.connector.netconf;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.opendaylight.controller.config.api.JmxAttributeValidationException.checkCondition;
 import static org.opendaylight.controller.config.api.JmxAttributeValidationException.checkNotNull;
 
@@ -294,10 +295,14 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
                 .setSalFacade(salFacade)
                 .build();
 
+        if (getConcurrentRpcLimit() < 1) {
+            LOG.info("Concurrent rpc limit is smaller than 1, no limit will be enforced for device {}", id);
+        }
+
         final NetconfDeviceCommunicator listener = userCapabilities.isPresent() ?
                 new NetconfDeviceCommunicator(id, device,
-                        new UserPreferences(userCapabilities.get(), getYangModuleCapabilities().getOverride())):
-                new NetconfDeviceCommunicator(id, device);
+                        new UserPreferences(userCapabilities.get(), getYangModuleCapabilities().getOverride()), getConcurrentRpcLimit()):
+                new NetconfDeviceCommunicator(id, device, getConcurrentRpcLimit());
 
         if (shouldSendKeepalive()) {
             ((KeepaliveSalFacade) salFacade).setListener(listener);

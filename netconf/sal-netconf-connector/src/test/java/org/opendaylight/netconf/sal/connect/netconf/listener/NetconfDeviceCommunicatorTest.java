@@ -11,6 +11,7 @@ package org.opendaylight.netconf.sal.connect.netconf.listener;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
@@ -37,6 +38,7 @@ import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import java.io.ByteArrayInputStream;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.UUID;
@@ -84,7 +86,7 @@ public class NetconfDeviceCommunicatorTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks( this );
 
-        communicator = new NetconfDeviceCommunicator( new RemoteDeviceId( "test", InetSocketAddress.createUnresolved("localhost", 22)), mockDevice);
+        communicator = new NetconfDeviceCommunicator( new RemoteDeviceId( "test", InetSocketAddress.createUnresolved("localhost", 22)), mockDevice, 10);
     }
 
     void setupSession() {
@@ -95,11 +97,11 @@ public class NetconfDeviceCommunicatorTest {
     }
 
     private ListenableFuture<RpcResult<NetconfMessage>> sendRequest() throws Exception {
-        return sendRequest( UUID.randomUUID().toString() );
+        return sendRequest( UUID.randomUUID().toString(), true );
     }
 
     @SuppressWarnings("unchecked")
-    private ListenableFuture<RpcResult<NetconfMessage>> sendRequest( final String messageID ) throws Exception {
+    private ListenableFuture<RpcResult<NetconfMessage>> sendRequest( final String messageID, final boolean doLastTest ) throws Exception {
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         Element element = doc.createElement( "request" );
         element.setAttribute( "message-id", messageID );
@@ -113,8 +115,9 @@ public class NetconfDeviceCommunicatorTest {
 
         ListenableFuture<RpcResult<NetconfMessage>> resultFuture =
                                       communicator.sendRequest( message, QName.create( "mock rpc" ) );
-
-        assertNotNull( "ListenableFuture is null", resultFuture );
+        if(doLastTest) {
+            assertNotNull("ListenableFuture is null", resultFuture);
+        }
         return resultFuture;
     }
 
@@ -301,13 +304,13 @@ public class NetconfDeviceCommunicatorTest {
         setupSession();
 
         String messageID1 = UUID.randomUUID().toString();
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture1 = sendRequest( messageID1 );
+        ListenableFuture<RpcResult<NetconfMessage>> resultFuture1 = sendRequest( messageID1, true );
 
         String messageID2 = UUID.randomUUID().toString();
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture2 = sendRequest( messageID2 );
+        ListenableFuture<RpcResult<NetconfMessage>> resultFuture2 = sendRequest( messageID2, true );
 
         String messageID3 = UUID.randomUUID().toString();
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture3 = sendRequest( messageID3 );
+        ListenableFuture<RpcResult<NetconfMessage>> resultFuture3 = sendRequest( messageID3, true );
 
         //response messages 1,2 are omitted
         communicator.onMessage( mockSession, createSuccessResponseMessage( messageID3 ) );
@@ -320,10 +323,10 @@ public class NetconfDeviceCommunicatorTest {
         setupSession();
 
         String messageID1 = UUID.randomUUID().toString();
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture1 = sendRequest( messageID1 );
+        ListenableFuture<RpcResult<NetconfMessage>> resultFuture1 = sendRequest( messageID1, true );
 
         String messageID2 = UUID.randomUUID().toString();
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture2 = sendRequest( messageID2 );
+        ListenableFuture<RpcResult<NetconfMessage>> resultFuture2 = sendRequest( messageID2, true );
 
         communicator.onMessage( mockSession, createSuccessResponseMessage( messageID1 ) );
         communicator.onMessage( mockSession, createSuccessResponseMessage( messageID2 ) );
@@ -337,7 +340,7 @@ public class NetconfDeviceCommunicatorTest {
         setupSession();
 
         String messageID = UUID.randomUUID().toString();
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest( messageID );
+        ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest( messageID, true );
 
         communicator.onMessage( mockSession, createErrorResponseMessage( messageID ) );
 
@@ -381,7 +384,7 @@ public class NetconfDeviceCommunicatorTest {
         final EventLoopGroup group = new NioEventLoopGroup();
         final Timer time = new HashedWheelTimer();
         try {
-            final NetconfDeviceCommunicator listener = new NetconfDeviceCommunicator(new RemoteDeviceId("test", InetSocketAddress.createUnresolved("localhost", 22)), device);
+            final NetconfDeviceCommunicator listener = new NetconfDeviceCommunicator(new RemoteDeviceId("test", InetSocketAddress.createUnresolved("localhost", 22)), device, 10);
             final NetconfReconnectingClientConfiguration cfg = NetconfReconnectingClientConfigurationBuilder.create()
                     .withAddress(new InetSocketAddress("localhost", 65000))
                     .withReconnectStrategy(reconnectStrategy)
@@ -411,7 +414,7 @@ public class NetconfDeviceCommunicatorTest {
         setupSession();
 
         String messageID = UUID.randomUUID().toString();
-        ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest( messageID );
+        ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest( messageID, true );
 
         communicator.onMessage( mockSession, createSuccessResponseMessage( UUID.randomUUID().toString() ) );
 
@@ -426,6 +429,27 @@ public class NetconfDeviceCommunicatorTest {
                       errorInfo.contains( "actual-message-id" ) );
         assertEquals( "Error info contains \"expected-message-id\"", true,
                       errorInfo.contains( "expected-message-id" ) );
+    }
+
+    @Test
+    public void testConcurrentMessageLimit() throws Exception {
+        setupSession();
+        ArrayList<String> messageID = new ArrayList<>();
+
+        for (int i = 0; i < 10; i++) {
+            messageID.add(UUID.randomUUID().toString());
+            ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest(messageID.get(i), false);
+            assertEquals("ListenableFuture is null", true, resultFuture instanceof UncancellableFuture);
+        }
+
+        final String notWorkingMessageID = UUID.randomUUID().toString();
+        ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest(notWorkingMessageID, false);
+        assertEquals("ListenableFuture is null", false, resultFuture instanceof UncancellableFuture);
+
+        communicator.onMessage(mockSession, createSuccessResponseMessage(messageID.get(0)));
+
+        resultFuture = sendRequest(messageID.get(0), false);
+        assertNotNull("ListenableFuture is null", resultFuture);
     }
 
     private static NetconfMessage createErrorResponseMessage( final String messageID ) throws Exception {
