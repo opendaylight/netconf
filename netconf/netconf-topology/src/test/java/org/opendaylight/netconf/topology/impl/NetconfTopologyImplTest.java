@@ -207,7 +207,7 @@ public class NetconfTopologyImplTest {
     public static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
 
         public TestingNetconfTopologyImpl(String topologyId, NetconfClientDispatcher clientDispatcher, BindingAwareBroker bindingAwareBroker, Broker domBroker, EventExecutor eventExecutor, ScheduledThreadPool keepaliveExecutor, ThreadPool processingExecutor, SchemaRepositoryProvider schemaRepositoryProvider) {
-            super(topologyId, clientDispatcher, bindingAwareBroker, domBroker, eventExecutor, keepaliveExecutor, processingExecutor, schemaRepositoryProvider);
+            super(topologyId, clientDispatcher, bindingAwareBroker, domBroker, eventExecutor, keepaliveExecutor, processingExecutor, schemaRepositoryProvider, 10);
         }
 
         @Override

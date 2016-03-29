@@ -20,6 +20,7 @@
           <username xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">admin</username>
           <password xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">admin</password>
           <tcp-only xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">false</tcp-only>
+          <concurrent-rpc-limit xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">10</concurrent-rpc-limit>
           <reconnect-on-changed-schema xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">true</reconnect-on-changed-schema>
           <event-executor xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">
             <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netty">prefix:netty-event-executor</type>
