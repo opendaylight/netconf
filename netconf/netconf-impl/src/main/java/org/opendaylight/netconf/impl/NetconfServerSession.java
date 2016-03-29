@@ -29,6 +29,7 @@ import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSession;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
+import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Ipv4Address;
@@ -52,15 +53,17 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
     private final NetconfHelloMessageAdditionalHeader header;
+    private final NetconfServerSessionListener sessionListener;
 
     private ZonedDateTime loginTime;
-    private long inRpcSuccess, inRpcFail, outRpcError;
+    private long inRpcSuccess, inRpcFail, outRpcError, outNotification;
     private volatile boolean delayedClose;
 
     public NetconfServerSession(final NetconfServerSessionListener sessionListener, final Channel channel, final long sessionId,
             final NetconfHelloMessageAdditionalHeader header) {
         super(sessionListener, channel, sessionId);
         this.header = header;
+        this.sessionListener = sessionListener;
         LOG.debug("Session {} created", toString());
     }
 
@@ -82,6 +85,10 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
     @Override
     public ChannelFuture sendMessage(final NetconfMessage netconfMessage) {
         final ChannelFuture channelFuture = super.sendMessage(netconfMessage);
+        if (netconfMessage instanceof NetconfNotification) {
+            outNotification++;
+            sessionListener.onNotification(this, (NetconfNotification) netconfMessage);
+        }
         // delayed close was set, close after the message was sent
         if(delayedClose) {
             channelFuture.addListener(new ChannelFutureListener() {
@@ -137,7 +144,7 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
         builder.setUsername(header.getUserName());
         builder.setTransport(getTransportForString(header.getTransport()));
 
-        builder.setOutNotifications(new ZeroBasedCounter32(0L));
+        builder.setOutNotifications(new ZeroBasedCounter32(outNotification));
 
         builder.setKey(new SessionKey(getSessionId()));
 
