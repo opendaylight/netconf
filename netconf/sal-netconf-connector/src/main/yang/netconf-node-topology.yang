@@ -113,6 +113,14 @@ module netconf-node-topology {
             description "Netconf connector sends keepalive RPCs while the session is idle, this delay specifies the delay between keepalive RPC in seconds
                          If a value <1 is provided, no keepalives will be sent";
         }
+
+        leaf concurrent-rpc-limit {
+            config true;
+            type uint16;
+            default 0;
+            description "Limit of concurrent messages that can be send before reply messages are received.
+                         If value <1 is provided, no limit will be enforced";
+        }
     }
 
     grouping netconf-node-connection-status {
