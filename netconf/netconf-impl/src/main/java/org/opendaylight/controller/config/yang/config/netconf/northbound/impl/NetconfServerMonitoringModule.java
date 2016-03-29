@@ -8,6 +8,7 @@
 
 package org.opendaylight.controller.config.yang.config.netconf.northbound.impl;
 
+import com.google.common.base.Optional;
 import org.opendaylight.netconf.impl.osgi.NetconfMonitoringServiceImpl;
 
 public class NetconfServerMonitoringModule extends org.opendaylight.controller.config.yang.config.netconf.northbound.impl.AbstractNetconfServerMonitoringModule {
@@ -26,7 +27,9 @@ public class NetconfServerMonitoringModule extends org.opendaylight.controller.c
 
     @Override
     public java.lang.AutoCloseable createInstance() {
-        return new NetconfMonitoringServiceImpl(getAggregatorDependency());
+        return new NetconfMonitoringServiceImpl(getAggregatorDependency(),
+                Optional.fromNullable(getScheduledThreadpoolDependency()),
+                getMonitoringUpdateInterval());
     }
 
 }

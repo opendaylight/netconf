@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -7,305 +7,75 @@
  */
 package org.opendaylight.netconf.impl.osgi;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.annotation.Nonnull;
-import org.opendaylight.controller.config.util.capability.BasicCapability;
-import org.opendaylight.controller.config.util.capability.Capability;
-import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
+import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.api.monitoring.SessionListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Uri;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.CapabilitiesBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.SchemasBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.SessionsBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.SchemaBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.SchemaKey;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.ChangedByBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.changed.by.server.or.user.ServerBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, AutoCloseable {
 
-    private static final Schema.Location NETCONF_LOCATION = new Schema.Location(Schema.Location.Enumeration.NETCONF);
-    private static final List<Schema.Location> NETCONF_LOCATIONS = ImmutableList.of(NETCONF_LOCATION);
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfMonitoringServiceImpl.class);
-    private static final Function<NetconfManagementSession, Session> SESSION_FUNCTION = new Function<NetconfManagementSession, Session>() {
-        @Override
-        public Session apply(@Nonnull final NetconfManagementSession input) {
-            return input.toManagementSession();
-        }
-    };
-    private static final Function<Capability, Uri> CAPABILITY_TO_URI = new Function<Capability, Uri>() {
-        @Override
-        public Uri apply(final Capability input) {
-            return new Uri(input.getCapabilityUri());
-        }
-    };
+    private final NetconfCapabilityMonitoringService capabilityMonitoring;
+    private final NetconfSessionMonitoringService sessionMonitoring;
 
-    private final Set<NetconfManagementSession> sessions = new HashSet<>();
-    private final NetconfOperationServiceFactory netconfOperationProvider;
-    private final Map<Uri, Capability> capabilities = new HashMap<>();
-    private final Map<String, Map<String, String>> mappedModulesToRevisionToSchema = Maps.newHashMap();
+    public NetconfMonitoringServiceImpl(NetconfOperationServiceFactory opProvider) {
+        this(opProvider, Optional.absent(), 0);
+    }
 
-    private final Set<MonitoringListener> listeners = Sets.newHashSet();
-    private volatile BaseNotificationPublisherRegistration notificationPublisher;
+    public NetconfMonitoringServiceImpl(NetconfOperationServiceFactory opProvider,
+                                        Optional<ScheduledThreadPool> threadPool,
+                                        long updateInterval) {
+        this.capabilityMonitoring = new NetconfCapabilityMonitoringService(opProvider);
+        this.sessionMonitoring = new NetconfSessionMonitoringService(threadPool, updateInterval);
 
-    public NetconfMonitoringServiceImpl(final NetconfOperationServiceFactory netconfOperationProvider) {
-        this.netconfOperationProvider = netconfOperationProvider;
-        netconfOperationProvider.registerCapabilityListener(this);
     }
 
     @Override
-    public synchronized void onSessionUp(final NetconfManagementSession session) {
-        LOG.debug("Session {} up", session);
-        Preconditions.checkState(!sessions.contains(session), "Session %s was already added", session);
-        sessions.add(session);
-        notifySessionUp(session);
+    public Sessions getSessions() {
+        return sessionMonitoring.getSessions();
     }
 
     @Override
-    public synchronized void onSessionDown(final NetconfManagementSession session) {
-        LOG.debug("Session {} down", session);
-        Preconditions.checkState(sessions.contains(session), "Session %s not present", session);
-        sessions.remove(session);
-        notifySessionDown(session);
+    public SessionListener getSessionListener() {
+        return sessionMonitoring;
     }
 
     @Override
-    public synchronized Sessions getSessions() {
-        return new SessionsBuilder().setSession(ImmutableList.copyOf(Collections2.transform(sessions, SESSION_FUNCTION))).build();
+    public Schemas getSchemas() {
+        return capabilityMonitoring.getSchemas();
     }
 
     @Override
-    public synchronized Schemas getSchemas() {
-        try {
-            return transformSchemas(netconfOperationProvider.getCapabilities());
-        } catch (final RuntimeException e) {
-            throw e;
-        } catch (final Exception e) {
-            throw new IllegalStateException("Exception while closing", e);
-        }
+    public String getSchemaForCapability(String moduleName, Optional<String> revision) {
+        return capabilityMonitoring.getSchemaForModuleRevision(moduleName, revision);
     }
 
     @Override
-    public synchronized String getSchemaForCapability(final String moduleName, final Optional<String> revision) {
-
-        Map<String, String> revisionMapRequest = mappedModulesToRevisionToSchema.get(moduleName);
-        Preconditions.checkState(revisionMapRequest != null, "Capability for module %s not present, " + ""
-                + "available modules : %s", moduleName, Collections2.transform(capabilities.values(), CAPABILITY_TO_URI));
-
-        if (revision.isPresent()) {
-            String schema = revisionMapRequest.get(revision.get());
-
-            Preconditions.checkState(schema != null,
-                    "Capability for module %s:%s not present, available revisions for module: %s", moduleName,
-                    revision.get(), revisionMapRequest.keySet());
-
-            return schema;
-        } else {
-            Preconditions.checkState(revisionMapRequest.size() == 1,
-                    "Expected 1 capability for module %s, available revisions : %s", moduleName,
-                    revisionMapRequest.keySet());
-            return revisionMapRequest.values().iterator().next();
-        }
-    }
-
-    private synchronized void updateCapabilityToSchemaMap(final Set<Capability> added, final Set<Capability> removed) {
-        for (final Capability cap : added) {
-            if (!isValidModuleCapability(cap)){
-                continue;
-            }
-
-            final String currentModuleName = cap.getModuleName().get();
-            Map<String, String> revisionMap = mappedModulesToRevisionToSchema.get(currentModuleName);
-            if (revisionMap == null) {
-                revisionMap = Maps.newHashMap();
-                mappedModulesToRevisionToSchema.put(currentModuleName, revisionMap);
-            }
-
-            final String currentRevision = cap.getRevision().get();
-            revisionMap.put(currentRevision, cap.getCapabilitySchema().get());
-        }
-        for (final Capability cap : removed) {
-            if (!isValidModuleCapability(cap)){
-                continue;
-            }
-            final Map<String, String> revisionMap = mappedModulesToRevisionToSchema.get(cap.getModuleName().get());
-            if (revisionMap != null) {
-                revisionMap.remove(cap.getRevision().get());
-                if (revisionMap.isEmpty()) {
-                    mappedModulesToRevisionToSchema.remove(cap.getModuleName().get());
-                }
-            }
-        }
-    }
-
-    private boolean isValidModuleCapability(Capability cap) {
-        return cap.getModuleName().isPresent()
-                && cap.getRevision().isPresent()
-                && cap.getCapabilitySchema().isPresent();
+    public Capabilities getCapabilities() {
+        return capabilityMonitoring.getCapabilities();
     }
 
     @Override
-    public synchronized Capabilities getCapabilities() {
-        return new CapabilitiesBuilder().setCapability(Lists.newArrayList(capabilities.keySet())).build();
+    public AutoCloseable registerCapabilitiesListener(CapabilitiesListener listener) {
+        return capabilityMonitoring.registerListener(listener);
     }
 
     @Override
-    public synchronized AutoCloseable registerListener(final MonitoringListener listener) {
-        listeners.add(listener);
-        listener.onCapabilitiesChanged(getCapabilities());
-        listener.onSchemasChanged(getSchemas());
-        return new AutoCloseable() {
-            @Override
-            public void close() throws Exception {
-                listeners.remove(listener);
-            }
-        };
+    public AutoCloseable registerSessionsListener(SessionsListener listener) {
+        return sessionMonitoring.registerListener(listener);
     }
 
-    private static Schemas transformSchemas(final Set<Capability> caps) {
-        final List<Schema> schemas = new ArrayList<>(caps.size());
-        for (final Capability cap : caps) {
-            if (cap.getCapabilitySchema().isPresent()) {
-                final SchemaBuilder builder = new SchemaBuilder();
-                Preconditions.checkState(cap.getModuleNamespace().isPresent());
-                builder.setNamespace(new Uri(cap.getModuleNamespace().get()));
-
-                Preconditions.checkState(cap.getRevision().isPresent());
-                final String version = cap.getRevision().get();
-                builder.setVersion(version);
-
-                Preconditions.checkState(cap.getModuleName().isPresent());
-                final String identifier = cap.getModuleName().get();
-                builder.setIdentifier(identifier);
-
-                builder.setFormat(Yang.class);
-
-                builder.setLocation(transformLocations(cap.getLocation()));
-
-                builder.setKey(new SchemaKey(Yang.class, identifier, version));
-
-                schemas.add(builder.build());
-            }
-        }
-
-        return new SchemasBuilder().setSchema(schemas).build();
-    }
-
-    private static List<Schema.Location> transformLocations(final Collection<String> locations) {
-        if (locations.isEmpty()) {
-            return NETCONF_LOCATIONS;
-        }
-
-        final Builder<Schema.Location> b = ImmutableList.builder();
-        b.add(NETCONF_LOCATION);
-
-        for (final String location : locations) {
-            b.add(new Schema.Location(new Uri(location)));
-        }
-
-        return b.build();
-    }
-
-    public static Set<Capability> setupCapabilities(final Set<Capability> caps) {
-        Set<Capability> capabilities = new HashSet<>(caps);
-        capabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0"));
-        // TODO rollback on error not supported EditConfigXmlParser:100
-        // [RFC6241] 8.5.  Rollback-on-Error Capability
-        // capabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:rollback-on-error:1.0"));
-        return capabilities;
+    public void setNotificationPublisher(BaseNotificationPublisherRegistration notificationPublisher) {
+        this.capabilityMonitoring.setNotificationPublisher(notificationPublisher);
     }
 
     @Override
-    public synchronized void close() throws Exception {
-        listeners.clear();
-        sessions.clear();
-        capabilities.clear();
-    }
-
-    @Override
-    public void onCapabilitiesChanged(Set<Capability> added, Set<Capability> removed) {
-        onCapabilitiesAdded(added);
-        onCapabilitiesRemoved(removed);
-        updateCapabilityToSchemaMap(added, removed);
-        notifyCapabilityChanged(getCapabilities());
-
-        // publish notification to notification collector about changed capabilities
-        if (notificationPublisher != null) {
-            notificationPublisher.onCapabilityChanged(computeDiff(added, removed));
-        }
-    }
-
-    private void notifyCapabilityChanged(Capabilities capabilities) {
-        for (MonitoringListener listener : listeners) {
-            listener.onCapabilitiesChanged(capabilities);
-            listener.onSchemasChanged(getSchemas());
-        }
-    }
-
-    private void notifySessionUp(NetconfManagementSession managementSession) {
-        Session session = SESSION_FUNCTION.apply(managementSession);
-        for (MonitoringListener listener : listeners) {
-            listener.onSessionStarted(session);
-        }
-    }
-
-    private void notifySessionDown(NetconfManagementSession managementSession) {
-        Session session = SESSION_FUNCTION.apply(managementSession);
-        for (MonitoringListener listener : listeners) {
-            listener.onSessionEnded(session);
-        }
-    }
-
-    static NetconfCapabilityChange computeDiff(final Set<Capability> added, final Set<Capability> removed) {
-        final NetconfCapabilityChangeBuilder netconfCapabilityChangeBuilder = new NetconfCapabilityChangeBuilder();
-        netconfCapabilityChangeBuilder.setChangedBy(new ChangedByBuilder().setServerOrUser(new ServerBuilder().setServer(true).build()).build());
-        netconfCapabilityChangeBuilder.setDeletedCapability(Lists.newArrayList(Collections2.transform(removed, CAPABILITY_TO_URI)));
-        netconfCapabilityChangeBuilder.setAddedCapability(Lists.newArrayList(Collections2.transform(added, CAPABILITY_TO_URI)));
-        // TODO modified should be computed ... but why ?
-        netconfCapabilityChangeBuilder.setModifiedCapability(Collections.<Uri>emptyList());
-        return netconfCapabilityChangeBuilder.build();
-    }
-
-
-    private synchronized void onCapabilitiesAdded(final Set<Capability> addedCaps) {
-        this.capabilities.putAll(Maps.uniqueIndex(setupCapabilities(addedCaps), CAPABILITY_TO_URI));
-    }
-
-    private synchronized void onCapabilitiesRemoved(final Set<Capability> addedCaps) {
-        for (final Capability addedCap : addedCaps) {
-            capabilities.remove(CAPABILITY_TO_URI.apply(addedCap));
-        }
-    }
-
-    public void setNotificationPublisher(final BaseNotificationPublisherRegistration notificationPublisher) {
-        this.notificationPublisher = notificationPublisher;
+    public void close() throws Exception {
+        capabilityMonitoring.close();
+        sessionMonitoring.close();
     }
 }

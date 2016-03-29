@@ -46,7 +46,7 @@ public class SessionNotificationProducer extends OperationalDatastoreListener<Se
             switch (modificationType) {
                 case WRITE:
                     final Session created = rootNode.getDataAfter();
-                    if (created != null) {
+                    if (created != null && rootNode.getDataBefore() == null) {
                         publishStartedSession(created);
                     }
                     break;
