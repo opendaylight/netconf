@@ -63,6 +63,14 @@ module odl-sal-netconf-connector-cfg {
                 type string;
             }
 
+            leaf concurrent-rpc-limit {
+                type uint16 {
+                    range "1..max";
+                }
+                mandatory true;
+                description "limit of concurrent messages that can be send before reply messages are received";
+            }
+
             leaf schema-cache-directory {
                 type string;
                 default "schema";

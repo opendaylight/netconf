@@ -35,7 +35,8 @@ public class ClusteredNetconfTopologyModule extends org.opendaylight.controller.
                 getProcessingExecutorDependency(),
                 getSharedSchemaRepositoryDependency(),
                 getActorSystemProviderServiceDependency().getActorSystem(),
-                getEntityOwnershipServiceDependency());
+                getEntityOwnershipServiceDependency(),
+                getConcurrentRpcLimit());
     }
 
 }
