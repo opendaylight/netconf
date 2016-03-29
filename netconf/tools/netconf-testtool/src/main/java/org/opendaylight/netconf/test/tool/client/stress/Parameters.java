@@ -67,6 +67,9 @@ public class Parameters {
     @Arg(dest = "thread-amount")
     public int threadAmount;
 
+    @Arg(dest = "concurrent-message-limit")
+    public int concurrentMessageLimit;
+
     static ArgumentParser getParser() {
         final ArgumentParser parser = ArgumentParsers.newArgumentParser("netconf stress client");
 
@@ -163,6 +166,12 @@ public class Parameters {
                 .setDefault(1)
                 .dest("thread-amount");
 
+        parser.addArgument("--concurrent-message-limit")
+                .type(Integer.class)
+                .setDefault(10)
+                .help("Number of rpc messages that can be sent before receiving reply on them.")
+                .dest("concurrent-message-limit");
+
         // TODO add get-config option instead of edit + commit
         // TODO different edit config content
 
@@ -181,6 +190,7 @@ public class Parameters {
         Preconditions.checkArgument(editContent.exists(), "Edit content file missing");
         Preconditions.checkArgument(editContent.isDirectory() == false, "Edit content file is a dir");
         Preconditions.checkArgument(editContent.canRead(), "Edit content file is unreadable");
+        Preconditions.checkArgument(concurrentMessageLimit > 0, "The limit of concurrent messages must be greater than zero");
         // TODO validate
     }
 
