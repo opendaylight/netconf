@@ -16,6 +16,9 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.util.concurrent.Futures;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -55,7 +58,8 @@ public class MonitoringToMdsalWriterTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        doReturn(null).when(monitoring).registerListener(any());
+        doReturn(null).when(monitoring).registerCapabilitiesListener(any());
+        doReturn(null).when(monitoring).registerSessionsListener(any());
 
         doReturn(dataBroker).when(context).getSALService(DataBroker.class);
 
@@ -126,8 +130,29 @@ public class MonitoringToMdsalWriterTest {
     }
 
     @Test
+    public void testOnSessionsUpdated() throws Exception {
+        Session session1 = new SessionBuilder()
+                .setSessionId(1L)
+                .build();
+        Session session2 = new SessionBuilder()
+                .setSessionId(2L)
+                .build();
+        List<Session> sessions = new ArrayList<>();
+        sessions.add(session1);
+        sessions.add(session2);
+        final InstanceIdentifier<Session> id1 = InstanceIdentifier.create(NetconfState.class).child(Sessions.class).child(Session.class, session1.getKey());
+        final InstanceIdentifier<Session> id2 = InstanceIdentifier.create(NetconfState.class).child(Sessions.class).child(Session.class, session2.getKey());
+        writer.onSessionInitiated(context);
+        writer.onSessionsUpdated(sessions);
+        InOrder inOrder = inOrder(writeTransaction);
+        inOrder.verify(writeTransaction).put(LogicalDatastoreType.OPERATIONAL, id1, session1);
+        inOrder.verify(writeTransaction).put(LogicalDatastoreType.OPERATIONAL, id2, session2);
+        inOrder.verify(writeTransaction).submit();
+    }
+
+    @Test
     public void testOnSessionInitiated() throws Exception {
         writer.onSessionInitiated(context);
-        verify(monitoring).registerListener(writer);
+        verify(monitoring).registerCapabilitiesListener(writer);
     }
 }

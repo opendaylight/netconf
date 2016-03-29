@@ -15,4 +15,6 @@ public interface SessionListener {
     void onSessionUp(NetconfManagementSession session);
 
     void onSessionDown(NetconfManagementSession session);
+
+    void onSessionEvent(SessionEvent event);
 }
