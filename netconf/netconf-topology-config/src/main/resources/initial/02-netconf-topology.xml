@@ -15,6 +15,7 @@
                     <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:topology">prefix:netconf-topology-impl</type>
                     <name>default-netconf-topology</name>
                     <topology-id xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:topology">topology-netconf</topology-id>
+                    <concurrent-rpc-limit xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:topology">10</concurrent-rpc-limit>
                     <event-executor xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:topology">
                         <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netty">prefix:netty-event-executor</type>
                         <name>global-event-executor</name>

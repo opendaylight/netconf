@@ -144,6 +144,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
                 TextToASTTransformer.create(DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY));
     }
 
+    private final int rpcMessageLimit;
     protected final String topologyId;
     private final NetconfClientDispatcher clientDispatcher;
     protected final BindingAwareBroker bindingAwareBroker;
@@ -163,7 +164,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     protected AbstractNetconfTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                                       final BindingAwareBroker bindingAwareBroker, final Broker domBroker,
                                       final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
-                                      final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider) {
+                                      final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
+                                      final int rpcMessageLimit) {
         this.topologyId = topologyId;
         this.clientDispatcher = clientDispatcher;
         this.bindingAwareBroker = bindingAwareBroker;
@@ -172,6 +174,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         this.keepaliveExecutor = keepaliveExecutor;
         this.processingExecutor = processingExecutor;
         this.sharedSchemaRepository = schemaRepositoryProvider.getSharedSchemaRepository();
+        this.rpcMessageLimit = rpcMessageLimit;
     }
 
     protected void registerToSal(BindingAwareProvider baProvider, Provider provider) {
@@ -283,9 +286,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         return new NetconfConnectorDTO(
                 userCapabilities.isPresent() ?
                         new NetconfDeviceCommunicator(
-                                remoteDeviceId, device, new UserPreferences(userCapabilities.get(), node.getYangModuleCapabilities().isOverride())):
-                        new NetconfDeviceCommunicator(remoteDeviceId, device)
-                , salFacade);
+                                remoteDeviceId, device, new UserPreferences(userCapabilities.get(), node.getYangModuleCapabilities().isOverride()), rpcMessageLimit):
+                        new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit), salFacade);
     }
 
     protected NetconfDevice.SchemaResourcesDTO setupSchemaCacheDTO(final NodeId nodeId, final NetconfNode node) {
