@@ -8,14 +8,17 @@
 package org.opendaylight.netconf.api.monitoring;
 
 import com.google.common.base.Optional;
+import java.util.Collection;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 
-public interface NetconfMonitoringService extends CapabilityListener, SessionListener {
+public interface NetconfMonitoringService {
 
     Sessions getSessions();
+
+    SessionListener getSessionListener();
 
     Schemas getSchemas();
 
@@ -24,13 +27,35 @@ public interface NetconfMonitoringService extends CapabilityListener, SessionLis
     Capabilities getCapabilities();
 
     /**
-     * Allows push based state information transfer. After the listener is registered, current state is pushed to the listener.
+     * Allows push based capabilities information transfer. After the listener is registered, current state is pushed to the listener.
      * @param listener Monitoring listener
      * @return listener registration
      */
-    AutoCloseable registerListener(MonitoringListener listener);
+    AutoCloseable registerCapabilitiesListener(CapabilitiesListener listener);
 
-    interface MonitoringListener {
+    /**
+     * Allows push based sessions information transfer.
+     * @param listener Monitoring listener
+     * @return listener registration
+     */
+    AutoCloseable registerSessionsListener(SessionsListener listener);
+
+    interface CapabilitiesListener {
+
+        /**
+         * Callback used to notify about a change in used capabilities
+         * @param capabilities actual capabilities
+         */
+        void onCapabilitiesChanged(Capabilities capabilities);
+
+        /**
+         * Callback used to notify about a change in used schemas
+         * @param schemas actual schemas
+         */
+        void onSchemasChanged(Schemas schemas);
+    }
+
+    interface SessionsListener {
         /**
          * Callback used to notify about netconf session start
          * @param session started session
@@ -44,15 +69,11 @@ public interface NetconfMonitoringService extends CapabilityListener, SessionLis
         void onSessionEnded(Session session);
 
         /**
-         * Callback used to notify about a change in used capabilities
-         * @param capabilities actual capabilities
+         * Callback used to notify about activity in netconf session, like
+         * rpc or notification
+         * @param sessions updated sessions
          */
-        void onCapabilitiesChanged(Capabilities capabilities);
+        void onSessionsUpdated(Collection<Session> sessions);
 
-        /**
-         * Callback used to notify about a change in used schemas
-         * @param schemas actual schemas
-         */
-        void onSchemasChanged(Schemas schemas);
     }
 }
