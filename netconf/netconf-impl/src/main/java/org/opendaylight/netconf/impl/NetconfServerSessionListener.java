@@ -13,14 +13,17 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.netconf.util.messages.SendErrorExceptionUtil;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.api.monitoring.SessionEvent;
+import org.opendaylight.netconf.api.monitoring.SessionListener;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.impl.osgi.NetconfOperationRouter;
 import org.opendaylight.netconf.util.messages.SubtreeFilter;
+import org.opendaylight.netconf.notifications.NetconfNotification;
+import org.opendaylight.netconf.util.messages.SendErrorExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -30,22 +33,20 @@ import org.w3c.dom.Node;
 public class NetconfServerSessionListener implements NetconfSessionListener<NetconfServerSession> {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSessionListener.class);
-    private final NetconfMonitoringService monitoringService;
+    private final SessionListener monitoringSessionListener;
     private final NetconfOperationRouter operationRouter;
     private final AutoCloseable onSessionDownCloseable;
 
     public NetconfServerSessionListener(final NetconfOperationRouter operationRouter, final NetconfMonitoringService monitoringService,
                                         final AutoCloseable onSessionDownCloseable) {
         this.operationRouter = operationRouter;
-        this.monitoringService = monitoringService;
+        this.monitoringSessionListener = monitoringService.getSessionListener();
         this.onSessionDownCloseable = onSessionDownCloseable;
     }
 
     @Override
     public void onSessionUp(final NetconfServerSession netconfNetconfServerSession) {
-        monitoringService.onSessionUp(netconfNetconfServerSession);
-        // FIXME monitoring service should be also notified about all the other changes to netconf session (from ietf-netconf-monitoring point of view)
-        // This means also notifying after every message is processed
+        monitoringSessionListener.onSessionUp(netconfNetconfServerSession);
     }
 
     @Override
@@ -55,7 +56,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
     }
 
     public void onDown(final NetconfServerSession netconfNetconfServerSession) {
-        monitoringService.onSessionDown(netconfNetconfServerSession);
+        monitoringSessionListener.onSessionDown(netconfNetconfServerSession);
 
         try {
             operationRouter.close();
@@ -87,17 +88,25 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
                     session);
             LOG.debug("Responding with message {}", message);
             session.sendMessage(message);
+            monitoringSessionListener.onSessionEvent(SessionEvent.inRpcSuccess(session));
         } catch (final RuntimeException e) {
             // TODO: should send generic error or close session?
             LOG.error("Unexpected exception", e);
             session.onIncommingRpcFail();
+            monitoringSessionListener.onSessionEvent(SessionEvent.inRpcFail(session));
             throw new IllegalStateException("Unable to process incoming message " + netconfMessage, e);
         } catch (DocumentedException e) {
             LOG.trace("Error occurred while processing message",e);
             session.onOutgoingRpcError();
             session.onIncommingRpcFail();
+            monitoringSessionListener.onSessionEvent(SessionEvent.inRpcFail(session));
+            monitoringSessionListener.onSessionEvent(SessionEvent.outRpcError(session));
             SendErrorExceptionUtil.sendErrorMessage(session, e, netconfMessage);
         }
+    }
+
+    public void onNotification(final NetconfServerSession session, final NetconfNotification notification) {
+        monitoringSessionListener.onSessionEvent(SessionEvent.notification(session));
     }
 
     private NetconfMessage processDocument(final NetconfMessage netconfMessage, final NetconfServerSession session)
