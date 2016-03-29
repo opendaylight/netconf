@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a4c51b2_250ab4d2",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/controller/config/yang/md/sal/connector/netconf/NetconfConnectorModule.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-29T14:47:03Z",
+      "side": 1,
+      "message": "I\u0027ve thought about this a bit more, with this we will have 2 schemas with REMOTE_IO value(remote schema from device and local fallback) and we would have no way of determining which one is used. We should use a value thats between LOCAL_IO or REMOTE_IO or submit a patch to yt that would add a LOCAL_IO_FALLBACK value.",
+      "range": {
+        "startLine": 236,
+        "startChar": 163,
+        "endLine": 236,
+        "endChar": 211
+      },
+      "revId": "e2cbb92dade89c82b50444076f018b5ace5eafc8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
