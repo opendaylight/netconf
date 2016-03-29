@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<netconf-session-end xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-notifications">
+    <username>admin</username>
+    <session-id>2</session-id>
+    <source-host>127.0.0.1</source-host>
+</netconf-session-end>

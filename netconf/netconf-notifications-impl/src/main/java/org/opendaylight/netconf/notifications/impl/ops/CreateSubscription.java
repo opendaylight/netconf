@@ -11,6 +11,7 @@ package org.opendaylight.netconf.notifications.impl.ops;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import java.util.Date;
 import java.util.List;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
@@ -24,6 +25,7 @@ import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
 import org.opendaylight.netconf.notifications.NotificationListenerRegistration;
 import org.opendaylight.netconf.notifications.impl.NetconfNotificationManager;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
+import org.opendaylight.netconf.util.messages.SubtreeFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.slf4j.Logger;
@@ -58,9 +60,7 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation implem
         // Binding doesn't support anyxml nodes yet, so filter could not be retrieved
         // xml -> normalized node -> CreateSubscriptionInput conversion could be slower than current approach
 
-        // FIXME filter could be supported same way as netconf server filters get and get-config results
         final Optional<XmlElement> filter = operationElement.getOnlyChildElementWithSameNamespaceOptionally("filter");
-        Preconditions.checkArgument(filter.isPresent() == false, "Filter element not yet supported");
 
         // Replay not supported
         final Optional<XmlElement> startTime = operationElement.getOnlyChildElementWithSameNamespaceOptionally("startTime");
@@ -79,7 +79,7 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation implem
         }
 
         final NotificationListenerRegistration notificationListenerRegistration =
-                notifications.registerNotificationListener(streamNameType, new NotificationSubscription(netconfSession));
+                notifications.registerNotificationListener(streamNameType, new NotificationSubscription(netconfSession, filter));
         subscriptions.add(notificationListenerRegistration);
 
         return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
@@ -116,14 +116,29 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation implem
 
     private static class NotificationSubscription implements NetconfNotificationListener {
         private final NetconfSession currentSession;
+        private final Optional<XmlElement> filter;
 
-        public NotificationSubscription(final NetconfSession currentSession) {
+        public NotificationSubscription(final NetconfSession currentSession, final Optional<XmlElement> filter) {
             this.currentSession = currentSession;
+            this.filter = filter;
         }
 
         @Override
         public void onNotification(final StreamNameType stream, final NetconfNotification notification) {
-            currentSession.sendMessage(notification);
+            if (filter.isPresent()) {
+                try {
+                    final Optional<Document> filtered = SubtreeFilter.applySubtreeNotificationFilter(this.filter.get(), notification.getDocument());
+                    if (filtered.isPresent()) {
+                        final Date eventTime = notification.getEventTime();
+                        currentSession.sendMessage(new NetconfNotification(filtered.get(), eventTime));
+                    }
+                } catch (DocumentedException e) {
+                    LOG.warn(e.toString());
+                    currentSession.sendMessage(notification);
+                }
+            } else {
+                currentSession.sendMessage(notification);
+            }
         }
     }
 }
