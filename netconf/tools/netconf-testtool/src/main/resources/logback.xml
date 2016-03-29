@@ -18,17 +18,21 @@
         <appender-ref ref="STDOUT"/>
     </root>
 
-    <appender name="RESULTS-FILE" class="ch.qos.logback.core.FileAppender">
-        <file>scale-results.log</file>
-        <append>true</append>
-        <encoder>
-          <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
+    <if condition='property("log_file_name").contains("scale-util.log")'>
+        <then>
+            <appender name="RESULTS-FILE" class="ch.qos.logback.core.FileAppender">
+                <file>${log_file_name}</file>
+                <append>true</append>
+                <encoder>
+                    <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+                </encoder>
+            </appender>
 
-    <logger name="results" level="DEBUG" additivity="false">
-       <appender-ref ref="RESULTS-FILE"/>
-    </logger>
+            <logger name="results" level="DEBUG" additivity="false">
+                <appender-ref ref="RESULTS-FILE"/>
+            </logger>
+        </then>
+    </if>
 
     <logger name="com.ning.http.client" level="WARN"/>
 </configuration>

@@ -9,6 +9,10 @@
 package org.opendaylight.netconf.test.tool;
 
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.util.ContextInitializer;
+import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.util.StatusPrinter;
 import com.google.common.base.Stopwatch;
 import com.google.common.io.CharStreams;
 import com.ning.http.client.AsyncHttpClient;
@@ -36,8 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ScaleUtil {
-
-    private static final Logger RESULTS_LOG = LoggerFactory.getLogger("results");
+    private static Logger RESULTS_LOG ;
     private static final ScheduledExecutorService executor = new LoggingWrapperExecutor(4);
 
     private static final int deviceStep = 1000;
@@ -53,8 +56,7 @@ public class ScaleUtil {
     public static void main(final String[] args) {
         final TesttoolParameters params = TesttoolParameters.parseArgs(args, TesttoolParameters.getParser());
 
-        root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        root.setLevel(params.debug ? Level.DEBUG : Level.INFO);
+        setUpLoggers(params);
 
         // cleanup at the start in case controller was already running
         final Runtime runtime = Runtime.getRuntime();
@@ -128,6 +130,14 @@ public class ScaleUtil {
 
             cleanup(runtime, params);
         }
+    }
+
+    private static void setUpLoggers(final TesttoolParameters params) {
+        System.setProperty("log_file_name", "scale-util.log");
+
+        root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        root.setLevel(params.debug ? Level.DEBUG : Level.INFO);
+        RESULTS_LOG = LoggerFactory.getLogger("results");
     }
 
     private static void cleanup(final Runtime runtime, final TesttoolParameters params) {
