@@ -62,6 +62,7 @@ import com.google.common.collect.Iterables;
 public class RestSchemaControllerImpl implements RestSchemaController {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestSchemaControllerImpl.class);
+    private static final RestSchemaControllerImpl INSTANCE = new RestSchemaControllerImpl();
     private static final Splitter SLASH_SPLITTER = Splitter.on('/');
     private static final String URI_ENCODING_CHAR_SET = "ISO-8859-1";
     private static final String NULL_VALUE = "null";
@@ -76,6 +77,14 @@ public class RestSchemaControllerImpl implements RestSchemaController {
             return Draft09.RestConfModule.RESTCONF_GROUPING_SCHEMA_NODE.equals(input.getQName().getLocalName());
         }
     };
+
+    private RestSchemaControllerImpl() {
+
+    }
+
+    public static RestSchemaControllerImpl getInstance() {
+        return RestSchemaControllerImpl.INSTANCE;
+    }
 
     private final AtomicReference<Map<QName, RpcDefinition>> qnameToRpc = new AtomicReference<>(
             Collections.<QName, RpcDefinition> emptyMap());
@@ -191,8 +200,10 @@ public class RestSchemaControllerImpl implements RestSchemaController {
 
     @Override
     public Module findModuleByNameAndRevision(final QName module) {
-        // TODO Auto-generated method stub
-        return null;
+        checkPreconditions();
+        Preconditions.checkArgument((module != null) && (module.getLocalName() != null) && (module.getRevision() != null));
+
+        return this.globalSchema.findModuleByName(module.getLocalName(), module.getRevision());
     }
 
     @Override
