@@ -191,8 +191,10 @@ public class RestSchemaControllerImpl implements RestSchemaController {
 
     @Override
     public Module findModuleByNameAndRevision(final QName module) {
-        // TODO Auto-generated method stub
-        return null;
+        checkPreconditions();
+        Preconditions.checkArgument((module != null) && (module.getLocalName() != null) && (module.getRevision() != null));
+
+        return this.globalSchema.findModuleByName(module.getLocalName(), module.getRevision());
     }
 
     @Override
