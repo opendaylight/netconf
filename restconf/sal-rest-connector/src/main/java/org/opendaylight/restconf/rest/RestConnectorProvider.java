@@ -14,7 +14,6 @@ import org.opendaylight.controller.sal.core.api.Provider;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
 import org.opendaylight.restconf.rest.api.connector.RestConnector;
-import org.opendaylight.restconf.rest.api.connector.RestSchemaController;
 import org.opendaylight.restconf.rest.impl.connector.RestSchemaControllerImpl;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.PortNumber;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
@@ -40,9 +39,9 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
     public void onSessionInitiated(final ProviderSession session) {
         LOG.debug("REST_CONNECTOR_BUNDLE: BUNDLE IS STARTING");
         final SchemaService schemaService = Preconditions.checkNotNull(session.getService(SchemaService.class));
-        final RestSchemaController restSchemaController = new RestSchemaControllerImpl();
-        restSchemaController.setGlobalSchema(schemaService.getGlobalContext());
-        this.registerSchemaContextListener = schemaService.registerSchemaContextListener(restSchemaController);
+        RestSchemaControllerImpl.getInstance().setGlobalSchema(schemaService.getGlobalContext());
+        this.registerSchemaContextListener = schemaService
+                .registerSchemaContextListener(RestSchemaControllerImpl.getInstance());
     }
 
     @Override
