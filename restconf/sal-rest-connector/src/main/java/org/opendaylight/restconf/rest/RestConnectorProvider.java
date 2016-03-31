@@ -15,10 +15,12 @@ import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
 import org.opendaylight.restconf.rest.api.connector.RestConnector;
 import org.opendaylight.restconf.rest.api.connector.RestSchemaController;
-import org.opendaylight.restconf.rest.impl.connector.RestSchemaControllerImpl;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.PortNumber;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
@@ -38,11 +40,17 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
 
     @Override
     public void onSessionInitiated(final ProviderSession session) {
-        LOG.debug("REST_CONNECTOR_BUNDLE: BUNDLE IS STARTING");
         final SchemaService schemaService = Preconditions.checkNotNull(session.getService(SchemaService.class));
-        final RestSchemaController restSchemaController = new RestSchemaControllerImpl();
-        restSchemaController.setGlobalSchema(schemaService.getGlobalContext());
-        this.registerSchemaContextListener = schemaService.registerSchemaContextListener(restSchemaController);
+
+        final BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
+        final ServiceReference<?> serviceReference = bundleContext
+                .getServiceReference(RestconfApplicationService.class.getName());
+        final RestconfApplication restSchemaController = (RestconfApplication) bundleContext
+                .getService(serviceReference);
+        final RestSchemaController restConnector = restSchemaController.getRestConnector();
+        restConnector.setGlobalSchema(schemaService.getGlobalContext());
+
+        this.registerSchemaContextListener = schemaService.registerSchemaContextListener(restConnector);
     }
 
     @Override
