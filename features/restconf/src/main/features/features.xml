@@ -37,9 +37,6 @@
         <bundle>mvn:com.google.code.gson/gson/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.yangtools/yang-data-codec-gson/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.yangtools/yang-model-export/{{VERSION}}</bundle>
-        <bundle>mvn:com.sun.jersey/jersey-core/{{VERSION}}</bundle>
-        <bundle>mvn:com.sun.jersey/jersey-server/{{VERSION}}</bundle>
-        <bundle>mvn:com.sun.jersey/jersey-servlet/{{VERSION}}</bundle>
         <configfile finalname="${config.configfile.directory}/${config.restconf.configfile}">mvn:org.opendaylight.netconf/sal-rest-connector-config/{{VERSION}}/xml/config</configfile>
         <configfile finalname="${config.configfile.directory}/${config.restconf.service.configfile}">mvn:org.opendaylight.netconf/sal-rest-connector-config/{{VERSION}}/xml/configrestconfservice</configfile>
     </feature>
