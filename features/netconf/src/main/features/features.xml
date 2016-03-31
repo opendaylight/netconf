@@ -8,10 +8,7 @@
   <repository>mvn:org.opendaylight.controller/features-config/{{VERSION}}/xml/features</repository>
   <repository>mvn:org.opendaylight.controller/features-config-persister/{{VERSION}}/xml/features</repository>
   <repository>mvn:org.opendaylight.controller/features-config-netty/{{VERSION}}/xml/features</repository>
-  <!-- FIXME: This introduces cycle between projects, which makes version updates
-              harder. Should be moved to different.
-      -->
-  <repository>mvn:org.opendaylight.aaa/features-aaa/${aaa.version}/xml/features</repository>
+  <repository>mvn:org.opendaylight.aaa/features-aaa-shiro/${aaa.version}/xml/features</repository>
 
   <feature name='odl-netconf-all' version='${project.version}' description="OpenDaylight :: Netconf :: All">
     <feature version='${project.version}'>odl-netconf-api</feature>
@@ -147,7 +144,7 @@
            version='${project.version}'>
     <feature version='${config.version}'>odl-config-api</feature>
     <bundle>mvn:org.opendaylight.netconf/netconf-auth/{{VERSION}}</bundle>
-    <feature version='${aaa.version}'>odl-aaa-authn</feature>
+    <feature version='${aaa.version}'>odl-aaa-shiro</feature>
     <bundle>mvn:org.opendaylight.netconf/aaa-authn-odl-plugin/{{VERSION}}</bundle>
   </feature>
 
@@ -156,7 +153,7 @@
            version='${project.version}'>
     <feature version='${config.version}'>odl-config-api</feature>
     <bundle>mvn:org.opendaylight.netconf/netconf-auth/{{VERSION}}</bundle>
-    <feature version='${aaa.version}'>odl-aaa-authn-no-cluster</feature>
+    <feature version='${aaa.version}'>odl-aaa-shiro</feature>
     <bundle>mvn:org.opendaylight.netconf/aaa-authn-odl-plugin/{{VERSION}}</bundle>
   </feature>
 </features>
