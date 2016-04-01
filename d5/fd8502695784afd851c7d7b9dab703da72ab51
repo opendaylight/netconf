@@ -1,0 +1,7 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: Tomas Cere <tcere@cisco.com>
+Submitted-by: Tomas Cere <tcere@cisco.com>
+Submitted-at: Fri, 01 Apr 2016 08:17:21 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/36969
+Project: netconf
+Branch: refs/heads/stable/beryllium
