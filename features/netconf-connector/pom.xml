@@ -21,7 +21,6 @@
   <packaging>jar</packaging>
 
   <properties>
-    <aaa.version>0.4.0-SNAPSHOT</aaa.version>
     <commons.opendaylight.version>1.7.0-SNAPSHOT</commons.opendaylight.version>
     <controller.mdsal.version>1.4.0-SNAPSHOT</controller.mdsal.version>
     <config.version>0.5.0-SNAPSHOT</config.version>
@@ -78,13 +77,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>features-netconf</artifactId>
-      <classifier>features</classifier>
-      <type>xml</type>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.aaa</groupId>
-      <artifactId>features-aaa</artifactId>
-      <version>${aaa.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
     </dependency>
