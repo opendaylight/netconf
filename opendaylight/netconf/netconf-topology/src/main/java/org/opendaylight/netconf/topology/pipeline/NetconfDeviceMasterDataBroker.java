@@ -57,9 +57,9 @@ public class NetconfDeviceMasterDataBroker implements ProxyNetconfDeviceDataBrok
 
     public NetconfDeviceMasterDataBroker(final ActorSystem actorSystem, final RemoteDeviceId id,
                                          final SchemaContext schemaContext, final DOMRpcService rpc,
-                                         final NetconfSessionPreferences netconfSessionPreferences, final long requestTimeoutMillis) {
+                                         final NetconfSessionPreferences netconfSessionPreferences) {
         this.id = id;
-        delegateBroker = new NetconfDeviceDataBroker(id, schemaContext, rpc, netconfSessionPreferences, requestTimeoutMillis);
+        delegateBroker = new NetconfDeviceDataBroker(id, schemaContext, rpc, netconfSessionPreferences);
         this.actorSystem = actorSystem;
 
         // only ever need 1 readTx since it doesnt need to be closed
