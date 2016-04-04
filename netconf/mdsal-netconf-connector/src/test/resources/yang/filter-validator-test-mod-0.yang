@@ -1,0 +1,31 @@
+module filter-validator-test-mod-0 {
+    namespace "urn:dummy:mod-0";
+    prefix "mod-0";
+    revision "2016-03-01";
+    container mainroot {
+        leaf maincontent {
+            mandatory true;
+            type string;
+        }
+        list choiceList {
+            key name;
+            leaf name {
+                type string;
+            }
+            choice v {
+                case a {
+                    leaf choice-leaf {
+                        type string;
+                    }
+                }
+                case b {
+                    container choice-cont {
+                        leaf content {
+                            type string;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

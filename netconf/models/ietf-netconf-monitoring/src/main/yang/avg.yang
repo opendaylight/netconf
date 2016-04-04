@@ -1,0 +1,18 @@
+module avg {
+    namespace "urn:dummy:aug";
+    prefix "mod-0";
+    //revision "2016-03-31";
+
+    import module-0 {
+        prefix mod-0;
+        revision-date "2016-03-01";
+    }
+
+    augment "/mod-0:mainroot" {
+        leaf augmented-leaf {
+                type string;
+
+        }
+    }
+
+}

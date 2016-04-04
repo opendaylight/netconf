@@ -1,0 +1,14 @@
+module filter-validator-test-augment {
+    namespace "urn:dummy:aug";
+    prefix "aug-0";
+    revision "1999-08-17";
+    import filter-validator-test-mod-0 {
+        prefix mod-0;
+        revision-date "2016-03-01";
+    }
+    augment "/mod-0:mainroot" {
+        leaf augmented-leaf {
+                type string;
+        }
+    }
+}
