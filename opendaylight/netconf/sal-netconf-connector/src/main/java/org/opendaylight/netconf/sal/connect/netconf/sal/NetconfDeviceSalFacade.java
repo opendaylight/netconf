@@ -30,14 +30,12 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
 
     private final RemoteDeviceId id;
     private final NetconfDeviceSalProvider salProvider;
-    private final long defaultRequestTimeoutMillis;
 
     private final List<AutoCloseable> salRegistrations = Lists.newArrayList();
 
-    public NetconfDeviceSalFacade(final RemoteDeviceId id, final Broker domBroker, final BindingAwareBroker bindingBroker, long defaultRequestTimeoutMillis) {
+    public NetconfDeviceSalFacade(final RemoteDeviceId id, final Broker domBroker, final BindingAwareBroker bindingBroker) {
         this.id = id;
         this.salProvider = new NetconfDeviceSalProvider(id);
-        this.defaultRequestTimeoutMillis = defaultRequestTimeoutMillis;
         registerToSal(domBroker, bindingBroker);
     }
 
@@ -55,7 +53,7 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
     public synchronized void onDeviceConnected(final SchemaContext schemaContext,
                                                final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc) {
 
-        final DOMDataBroker domBroker = new NetconfDeviceDataBroker(id, schemaContext, deviceRpc, netconfSessionPreferences, defaultRequestTimeoutMillis);
+        final DOMDataBroker domBroker = new NetconfDeviceDataBroker(id, schemaContext, deviceRpc, netconfSessionPreferences);
 
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
 

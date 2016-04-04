@@ -29,8 +29,8 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
 
     private static final Logger LOG  = LoggerFactory.getLogger(WriteCandidateRunningTx.class);
 
-    public WriteCandidateRunningTx(final RemoteDeviceId id, final NetconfBaseOps netOps, final boolean rollbackSupport, final long requestTimeoutMillis) {
-        super(id, netOps, rollbackSupport, requestTimeoutMillis);
+    public WriteCandidateRunningTx(final RemoteDeviceId id, final NetconfBaseOps netOps, final boolean rollbackSupport) {
+        super(id, netOps, rollbackSupport);
     }
 
     @Override
@@ -46,13 +46,11 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
     }
 
     private void lockRunning() {
-        final String operation = "Lock Running";
         try {
-            invokeBlocking(operation, new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
+            invokeBlocking("Lock running", new Function<NetconfBaseOps, ListenableFuture<DOMRpcResult>>() {
                 @Override
                 public ListenableFuture<DOMRpcResult> apply(final NetconfBaseOps input) {
-                    return perfomRequestWithTimeout(operation, input.lockRunning(new NetconfRpcFutureCallback(operation, id)));
-
+                    return input.lockRunning(new NetconfRpcFutureCallback("Lock running", id));
                 }
             });
         } catch (final NetconfDocumentedException e) {
