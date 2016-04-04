@@ -48,7 +48,7 @@ public class TopologyMountPointFacadeTest {
 
         MockitoAnnotations.initMocks(this);
 
-        mountPointFacade = new TopologyMountPointFacade(TOPOLOGY_ID, REMOTE_DEVICE_ID, domBroker, bindingBroker, 1L);
+        mountPointFacade = new TopologyMountPointFacade(TOPOLOGY_ID, REMOTE_DEVICE_ID, domBroker, bindingBroker);
 
         mountPointFacade.registerConnectionStatusListener(connectionStatusListener1);
         mountPointFacade.registerConnectionStatusListener(connectionStatusListener2);
