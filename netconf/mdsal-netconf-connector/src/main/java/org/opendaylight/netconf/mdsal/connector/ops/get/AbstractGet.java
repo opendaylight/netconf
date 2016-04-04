@@ -13,11 +13,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Collections;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -36,18 +32,11 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.DomUtils;
-import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
@@ -63,10 +52,12 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
     protected static final String FILTER = "filter";
     static final YangInstanceIdentifier ROOT = YangInstanceIdentifier.builder().build();
     protected final CurrentSchemaContext schemaContext;
+    private final FilterContentValidator validator;
 
     public AbstractGet(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext) {
         super(netconfSessionIdForReporting);
         this.schemaContext = schemaContext;
+        this.validator = new FilterContentValidator(schemaContext);
     }
 
     private static final XMLOutputFactory XML_OUTPUT_FACTORY;
@@ -128,26 +119,6 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         }
     }
 
-    private DataSchemaNode getSchemaNodeFromNamespace(final XmlElement element) throws DocumentedException {
-
-        try {
-            final Module module = schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(new URI(element.getNamespace()), null);
-            DataSchemaNode dataSchemaNode = module.getDataChildByName(element.getName());
-            if (dataSchemaNode != null) {
-                return dataSchemaNode;
-            }
-        } catch (URISyntaxException e) {
-            LOG.debug("Error during parsing of element namespace, this should not happen since namespace of an xml " +
-                    "element is valid and if the xml was parsed then the URI should be as well");
-            throw new IllegalArgumentException("Unable to parse element namespace, this should not happen since " +
-                    "namespace of an xml element is valid and if the xml was parsed then the URI should be as well");
-        }
-        throw new DocumentedException("Unable to find node with namespace: " + element.getNamespace() + "in schema context: " + schemaContext.getCurrentContext().toString(),
-                ErrorType.application,
-                ErrorTag.unknown_namespace,
-                ErrorSeverity.error);
-    }
-
     protected Element serializeNodeWithParentStructure(Document document, YangInstanceIdentifier dataRoot, NormalizedNode node) {
         if (!dataRoot.equals(ROOT)) {
             return (Element) transformNormalizedNode(document,
@@ -186,37 +157,7 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         }
 
         XmlElement element = filterElement.getOnlyChildElement();
-        DataSchemaNode schemaNode = getSchemaNodeFromNamespace(element);
-
-        return getReadPointFromNode(YangInstanceIdentifier.builder().build(), filterToNormalizedNode(element, schemaNode));
-    }
-
-    private YangInstanceIdentifier getReadPointFromNode(final YangInstanceIdentifier pathArg, final NormalizedNode nNode) {
-        final YangInstanceIdentifier path = pathArg.node(nNode.getIdentifier());
-        if (nNode instanceof DataContainerNode) {
-            DataContainerNode node = (DataContainerNode) nNode;
-            if (node.getValue().size() == 1) {
-                return getReadPointFromNode(path, (NormalizedNode) Lists.newArrayList(node.getValue()).get(0));
-            }
-        }
-        return path;
-    }
-
-    private NormalizedNode filterToNormalizedNode(XmlElement element, DataSchemaNode schemaNode) throws DocumentedException {
-        DomToNormalizedNodeParserFactory parserFactory = DomToNormalizedNodeParserFactory
-                .getInstance(DomUtils.defaultValueCodecProvider(), schemaContext.getCurrentContext());
-
-        final NormalizedNode parsedNode;
-
-        if (schemaNode instanceof ContainerSchemaNode) {
-            parsedNode = parserFactory.getContainerNodeParser().parse(Collections.singletonList(element.getDomElement()), (ContainerSchemaNode) schemaNode);
-        } else if (schemaNode instanceof ListSchemaNode) {
-            parsedNode = parserFactory.getMapNodeParser().parse(Collections.singletonList(element.getDomElement()), (ListSchemaNode) schemaNode);
-        } else {
-            throw new DocumentedException("Schema node of the top level element is not an instance of container or list",
-                    ErrorType.application, ErrorTag.unknown_element, ErrorSeverity.error);
-        }
-        return parsedNode;
+        return validator.validate(element);
     }
 
     protected static final class GetConfigExecution {

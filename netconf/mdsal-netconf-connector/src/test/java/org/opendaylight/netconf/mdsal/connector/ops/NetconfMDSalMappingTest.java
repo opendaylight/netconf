@@ -15,6 +15,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 
+import com.google.common.io.ByteSource;
 import com.google.common.util.concurrent.Futures;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,11 +23,9 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -34,7 +33,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -67,7 +65,6 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
@@ -83,8 +80,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import com.google.common.io.ByteSource;
 
 public class NetconfMDSalMappingTest {
 
@@ -107,7 +102,7 @@ public class NetconfMDSalMappingTest {
     private static final QName INNER_CHOICE_TEXT = QName.create("urn:opendaylight:mdsal:mapping:test", "2015-02-26", "text");
 
     private static final YangInstanceIdentifier AUGMENTED_CONTAINER_IN_MODULES =
-            YangInstanceIdentifier.builder().node(TOP).node(MODULES).build().node(new AugmentationIdentifier(Collections.singleton(AUGMENTED_CONTAINER)));
+            YangInstanceIdentifier.builder().node(TOP).node(MODULES).build();
 
     private static Document RPC_REPLY_OK = null;
 
@@ -493,19 +488,18 @@ public class NetconfMDSalMappingTest {
         verifyResponse(edit("messages/mapping/editConfigs/editConfig-filtering-setup.xml"), RPC_REPLY_OK);
         verifyResponse(commit(), RPC_REPLY_OK);
 
-        //TODO uncomment these tests once we can parse KeyedListNode as a selection node, currently you cannot use a KeyedList as a selection node in filter
-//        verifyFilterIdentifier("messages/mapping/filters/get-filter-alluser.xml",
-//                YangInstanceIdentifier.builder().node(TOP).node(USERS).node(USER).build());
+        verifyFilterIdentifier("messages/mapping/filters/get-filter-alluser.xml",
+                YangInstanceIdentifier.builder().node(TOP).node(USERS).node(USER).build());
         verifyFilterIdentifier("messages/mapping/filters/get-filter-company-info.xml",
                 YangInstanceIdentifier.builder().node(TOP).node(USERS).node(USER).build());
         verifyFilterIdentifier("messages/mapping/filters/get-filter-modules-and-admin.xml",
                 YangInstanceIdentifier.builder().node(TOP).build());
         verifyFilterIdentifier("messages/mapping/filters/get-filter-only-names-types.xml",
                 YangInstanceIdentifier.builder().node(TOP).node(USERS).node(USER).build());
-//        verifyFilterIdentifier("messages/mapping/filters/get-filter-specific-module-type-and-user.xml",
-//                YangInstanceIdentifier.builder().node(TOP).build());
-//        verifyFilterIdentifier("messages/mapping/filters/get-filter-superuser.xml",
-//                YangInstanceIdentifier.builder().node(TOP).node(USERS).node(USER).build());
+        verifyFilterIdentifier("messages/mapping/filters/get-filter-specific-module-type-and-user.xml",
+                YangInstanceIdentifier.builder().node(TOP).build());
+        verifyFilterIdentifier("messages/mapping/filters/get-filter-superuser.xml",
+                YangInstanceIdentifier.builder().node(TOP).node(USERS).node(USER).build());
         verifyFilterIdentifier("messages/mapping/filters/get-filter-users.xml",
                 YangInstanceIdentifier.builder().node(TOP).node(USERS).build());
 
@@ -535,10 +529,10 @@ public class NetconfMDSalMappingTest {
         //verifyResponse(edit("messages/mapping/editConfigs/editConfig-filtering-setup2.xml"), RPC_REPLY_OK);
         //verifyResponse(commit(), RPC_REPLY_OK);
 
-//        verifyFilterIdentifier("messages/mapping/filters/get-filter-augmented-case-inner-choice.xml",
-//                YangInstanceIdentifier.builder().node(TOP).node(CHOICE_NODE).node(CHOICE_WRAPPER).build());
-//        verifyFilterIdentifier("messages/mapping/filters/get-filter-augmented-case-inner-case.xml",
-//                YangInstanceIdentifier.builder().node(TOP).node(CHOICE_NODE).node(CHOICE_WRAPPER).node(INNER_CHOICE).node(INNER_CHOICE_TEXT).build());
+        verifyFilterIdentifier("messages/mapping/filters/get-filter-augmented-case-inner-choice.xml",
+                YangInstanceIdentifier.builder().node(TOP).node(CHOICE_NODE).node(CHOICE_WRAPPER).build());
+        verifyFilterIdentifier("messages/mapping/filters/get-filter-augmented-case-inner-case.xml",
+                YangInstanceIdentifier.builder().node(TOP).node(CHOICE_NODE).node(CHOICE_WRAPPER).node(INNER_CHOICE).node(INNER_CHOICE_TEXT).build());
 
 //        verifyResponse(getConfigWithFilter("messages/mapping/filters/get-filter-augmented-string.xml"),
 //                XmlFileLoader.xmlFileToDocument("messages/mapping/filters/response-augmented-string.xml"));
@@ -556,7 +550,7 @@ public class NetconfMDSalMappingTest {
         TestingGetConfig getConfig = new TestingGetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
         Document request = XmlFileLoader.xmlFileToDocument(resource);
         YangInstanceIdentifier iid = getConfig.getInstanceIdentifierFromDocument(request);
-        assertTrue(iid.equals(identifier));
+        assertEquals(identifier, iid);
     }
 
     private class TestingGetConfig extends GetConfig{
