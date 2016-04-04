@@ -192,14 +192,14 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         final ExecutorService globalProcessingExecutor = processingExecutor.getExecutor();
 
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade
-                = new NetconfDeviceSalFacade(id, domRegistry, bindingRegistry, getDefaultRequestTimeoutMillis());
+                = new NetconfDeviceSalFacade(id, domRegistry, bindingRegistry);
 
         final Long keepaliveDelay = getKeepaliveDelay();
         if (shouldSendKeepalive()) {
             // Keepalive executor is optional for now and a default instance is supported
             final ScheduledExecutorService executor = keepaliveExecutor == null ? DEFAULT_KEEPALIVE_EXECUTOR : keepaliveExecutor.getExecutor();
 
-            salFacade = new KeepaliveSalFacade(id, salFacade, executor, keepaliveDelay);
+            salFacade = new KeepaliveSalFacade(id, salFacade, executor, keepaliveDelay, getDefaultRequestTimeoutMillis());
         }
 
         // Setup information related to the SchemaRegistry, SchemaResourceFactory, etc.
