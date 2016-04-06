@@ -30,6 +30,14 @@ public class NetconfNotificationOperationService implements NetconfOperationServ
 
     @Override
     public void close() {
-
+        for (NetconfOperation netconfOperation : netconfOperations) {
+            if (netconfOperation instanceof AutoCloseable) {
+                try {
+                    ((AutoCloseable) netconfOperation).close();
+                } catch (Exception e) {
+                    throw new IllegalStateException("Exception while closing " + netconfOperation, e);
+                }
+            }
+        }
     }
 }
