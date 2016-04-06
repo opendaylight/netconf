@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.api.messages;
 
 import com.google.common.base.Preconditions;
+import com.google.common.net.InetAddresses;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -90,11 +91,10 @@ public class NetconfHelloMessageAdditionalHeader {
         return sb.toString();
     }
 
-    // TODO IPv6
     private static final Pattern PATTERN = Pattern
-            .compile("\\[(?<username>[^;]+);(?<address>[0-9\\.]+)[:/](?<port>[0-9]+);(?<transport>[a-z]+)[^\\]]+\\]");
+            .compile("\\[(?<username>[^;]+);(?<address>.+)[:/](?<port>[0-9]+);(?<transport>[a-z]+)[^\\]]+\\]");
     private static final Pattern CUSTOM_HEADER_PATTERN = Pattern
-            .compile("\\[(?<username>[^;]+);(?<address>[0-9\\.]+)[:/](?<port>[0-9]+);(?<transport>[a-z]+);(?<sessionIdentifier>[a-z]+)[^\\]]+\\]");
+            .compile("\\[(?<username>[^;]+);(?<address>.+)[:/](?<port>[0-9]+);(?<transport>[a-z]+);(?<sessionIdentifier>[a-z]+)[^\\]]+\\]");
 
     /**
      * Parse additional header from a formatted string
@@ -108,6 +108,7 @@ public class NetconfHelloMessageAdditionalHeader {
 
         String username = matcher.group("username");
         String address = matcher.group("address");
+        Preconditions.checkArgument(InetAddresses.isInetAddress(address));
         String port = matcher.group("port");
         String transport = matcher.group("transport");
         String sessionIdentifier = "client";
