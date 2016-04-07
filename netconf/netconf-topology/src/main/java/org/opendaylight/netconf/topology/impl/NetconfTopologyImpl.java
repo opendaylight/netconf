@@ -80,8 +80,8 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
     }
 
     @Override
-    protected RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(RemoteDeviceId id, Broker domBroker, BindingAwareBroker bindingBroker, long defaultRequestTimeoutMillis) {
-        return new NetconfDeviceSalFacade(id, domBroker, bindingAwareBroker, defaultRequestTimeoutMillis);
+    protected RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(RemoteDeviceId id, Broker domBroker, BindingAwareBroker bindingBroker) {
+        return new NetconfDeviceSalFacade(id, domBroker, bindingAwareBroker);
     }
 
     @Override

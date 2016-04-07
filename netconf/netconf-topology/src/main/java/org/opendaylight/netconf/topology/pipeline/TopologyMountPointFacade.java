@@ -43,7 +43,6 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
     private final RemoteDeviceId id;
     private final Broker domBroker;
     private final BindingAwareBroker bindingBroker;
-    private final long defaultRequestTimeoutMillis;
 
     private SchemaContext remoteSchemaContext = null;
     private NetconfSessionPreferences netconfSessionPreferences = null;
@@ -58,13 +57,11 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
     public TopologyMountPointFacade(final String topologyId,
                                     final RemoteDeviceId id,
                                     final Broker domBroker,
-                                    final BindingAwareBroker bindingBroker,
-                                    long defaultRequestTimeoutMillis) {
+                                    final BindingAwareBroker bindingBroker) {
         this.topologyId = topologyId;
         this.id = id;
         this.domBroker = domBroker;
         this.bindingBroker = bindingBroker;
-        this.defaultRequestTimeoutMillis = defaultRequestTimeoutMillis;
         this.salProvider = new ClusteredNetconfDeviceMountInstanceProxy(id);
         registerToSal(domBroker);
     }
@@ -124,7 +121,7 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
         deviceDataBroker = TypedActor.get(context).typedActorOf(new TypedProps<>(ProxyNetconfDeviceDataBroker.class, new Creator<NetconfDeviceMasterDataBroker>() {
             @Override
             public NetconfDeviceMasterDataBroker create() throws Exception {
-                return new NetconfDeviceMasterDataBroker(actorSystem, id, remoteSchemaContext, deviceRpc, netconfSessionPreferences, defaultRequestTimeoutMillis);
+                return new NetconfDeviceMasterDataBroker(actorSystem, id, remoteSchemaContext, deviceRpc, netconfSessionPreferences);
             }
         }), MOUNT_POINT);
         LOG.debug("Master data broker registered on path {}", TypedActor.get(actorSystem).getActorRefFor(deviceDataBroker).path());

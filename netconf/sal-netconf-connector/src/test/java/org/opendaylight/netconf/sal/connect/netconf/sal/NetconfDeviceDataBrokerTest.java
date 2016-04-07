@@ -103,7 +103,7 @@ public class NetconfDeviceDataBrokerTest {
     private NetconfDeviceDataBroker getDataBroker(String... caps) {
         NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(Arrays.asList(caps));
         final RemoteDeviceId id = new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
-        return new NetconfDeviceDataBroker(id, schemaContext, rpcService, prefs, 1000);
+        return new NetconfDeviceDataBroker(id, schemaContext, rpcService, prefs);
     }
 
 }
