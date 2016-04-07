@@ -15,12 +15,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import com.google.common.base.Charsets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
+import java.nio.ByteBuffer;
 import java.util.Queue;
 import org.junit.Before;
 import org.junit.Test;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.FramingMechanismHandlerFactory;
 import org.opendaylight.netconf.nettyutil.handler.NetconfChunkAggregator;
@@ -29,9 +32,7 @@ import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
 import org.opendaylight.netconf.util.messages.FramingMechanism;
 import org.opendaylight.netconf.util.messages.NetconfMessageConstants;
-import org.opendaylight.netconf.util.messages.NetconfMessageHeader;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
-import org.opendaylight.netconf.api.NetconfMessage;
 
 public class MessageParserTest {
 
@@ -78,8 +79,7 @@ public class MessageParserTest {
             byte[] header = new byte[String.valueOf(exptHeaderLength).length()
                     + NetconfMessageConstants.MIN_HEADER_LENGTH - 1];
             recievedOutbound.getBytes(0, header);
-            NetconfMessageHeader messageHeader = NetconfMessageHeader.fromBytes(header);
-            assertEquals(exptHeaderLength, messageHeader.getLength());
+            assertEquals(exptHeaderLength, getHeaderLength(header));
 
             testChunkChannel.writeInbound(recievedOutbound);
         }
@@ -107,5 +107,11 @@ public class MessageParserTest {
         NetconfMessage receivedMessage = (NetconfMessage) testChunkChannel.readInbound();
         assertNotNull(receivedMessage);
         assertXMLEqual(this.msg.getDocument(), receivedMessage.getDocument());
+    }
+
+    private static long getHeaderLength(byte[] bytes) {
+        byte[] HEADER_START = new byte[] { (byte) 0x0a, (byte) 0x23 };
+        return Long.parseLong(Charsets.US_ASCII.decode(
+                ByteBuffer.wrap(bytes, HEADER_START.length, bytes.length - HEADER_START.length - 1)).toString());
     }
 }
