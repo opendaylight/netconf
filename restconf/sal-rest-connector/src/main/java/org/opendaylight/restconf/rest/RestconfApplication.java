@@ -17,9 +17,18 @@ import org.opendaylight.restconf.rest.providers.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.restconf.rest.providers.NormalizedNodeXmlBodyWriter;
 import org.opendaylight.restconf.rest.providers.schema.SchemaYangBodyWriter;
 import org.opendaylight.restconf.rest.providers.schema.SchemaYinBodyWriter;
+import org.osgi.framework.FrameworkUtil;
 import com.google.common.collect.ImmutableSet;
 
-public class RestconfApplication extends Application {
+public class RestconfApplication extends Application implements RestconfApplicationService {
+
+    private final RestSchemaController restSchemaController;
+
+    public RestconfApplication() {
+        this.restSchemaController = new RestSchemaControllerImpl();
+        FrameworkUtil.getBundle(getClass()).getBundleContext().registerService(RestconfApplicationService.class.getName(),
+                this, null);
+    }
 
     @Override
     public Set<Class<?>> getClasses() {
@@ -31,9 +40,13 @@ public class RestconfApplication extends Application {
     @Override
     public Set<Object> getSingletons() {
         final Set<Object> singletons = new HashSet<>();
-        final RestSchemaController restSchemaControllerImpl = RestSchemaControllerImpl.getInstance();
-        singletons.add(restSchemaControllerImpl);
-        singletons.add(new ServicesWrapperImpl(restSchemaControllerImpl));
+        singletons.add(this.restSchemaController);
+        singletons.add(new ServicesWrapperImpl(this.restSchemaController));
         return singletons;
+    }
+
+    @Override
+    public RestSchemaController getRestConnector() {
+        return this.restSchemaController;
     }
 }
