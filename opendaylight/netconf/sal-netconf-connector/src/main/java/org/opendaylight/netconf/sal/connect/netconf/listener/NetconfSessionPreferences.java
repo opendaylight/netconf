@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -82,6 +83,18 @@ public final class NetconfSessionPreferences {
         return nonModuleCaps;
     }
 
+    // allows partial matches - assuming parameters are in the same order
+    public boolean containsPartialNonModuleCapability(final String capability) {
+        final Iterator<String> iterator = nonModuleCaps.iterator();
+        while(iterator.hasNext()) {
+            if (iterator.next().startsWith(capability)) {
+                LOG.trace("capability {} partially matches {}", capability, nonModuleCaps);
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean containsNonModuleCapability(final String capability) {
         return nonModuleCaps.contains(capability);
     }
@@ -115,13 +128,13 @@ public final class NetconfSessionPreferences {
     }
 
     public boolean isNotificationsSupported() {
-        return containsNonModuleCapability(NetconfMessageTransformUtil.NETCONF_NOTIFICATONS_URI.toString())
+        return containsPartialNonModuleCapability(NetconfMessageTransformUtil.NETCONF_NOTIFICATONS_URI.toString())
                 || containsModuleCapability(NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS);
     }
 
     public boolean isMonitoringSupported() {
         return containsModuleCapability(NetconfMessageTransformUtil.IETF_NETCONF_MONITORING)
-                || containsNonModuleCapability(NetconfMessageTransformUtil.IETF_NETCONF_MONITORING.getNamespace().toString());
+                || containsPartialNonModuleCapability(NetconfMessageTransformUtil.IETF_NETCONF_MONITORING.getNamespace().toString());
     }
 
     /**
