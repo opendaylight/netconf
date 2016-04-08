@@ -114,13 +114,51 @@ def dumps_indented(obj, indent=1):
     return pretty_json + '\n'  # to avoid diff "no newline" warning line
 
 
-def normalize_json_text(text, strict=False, indent=1):  # pylint likes lowercase
+def sort_bits(obj, keys_with_bits=[]):
+    """
+    Rearrange string values of list bits names in alphabetical order.
+
+    This function looks at dict items with known keys.
+    If the value is string, space-separated names are sorted.
+    This function is recursive over dicts and lists.
+    Current implementation performs re-arranging in-place (to save memory),
+    so it is not required to store the return value.
+
+    The intended usage is for composite objects which contain
+    OrderedDict elements. The implementation makes sure that ordering
+    (dictated by keys) is preserved. Support for generic dicts is an added value.
+
+    Sadly, dict (at least in Python 2.7) does not have __updatevalue__(key) method
+    which would guarantee iteritems() is not affected when value is updated.
+    Current "obj[key] = value" implementation is safe for dict and OrderedDict,
+    but it may be not safe for other subclasses of dict.
+
+    TODO: Should this docstring include links to support dict and OrderedDict safety?
+    """
+    if isinstance(obj, dict):
+        for key, value in obj.iteritems():
+            # Unicode is not str and vice versa, isinstance has to check for both.
+            # Luckily, "in" recognizes equivalent strings in different encodings.
+            # Type "bytes" is added for Python 3 compatibility.
+            if key in keys_with_bits and isinstance(value, (unicode, str, bytes)):
+                obj[key] = " ".join(sorted(value.split(" ")))
+            else:
+                sort_bits(value, keys_with_bits)
+    # A string is not a list, so there is no risk of recursion over characters.
+    elif isinstance(obj, list):
+        for item in obj:
+            sort_bits(item, keys_with_bits)
+    return obj
+
+
+def normalize_json_text(text, strict=False, indent=1, keys_with_bits=[]):
     """
     Attempt to return sorted indented JSON string.
 
     If parse error happens:
     If strict is true, raise the exception.
     If strict is not true, return original text with error message.
+    If keys_with_bits is non-empty, run sort_bits on intermediate Python object.
     """
     try:
         object_decoded = loads_sorted(text)
@@ -129,5 +167,7 @@ def normalize_json_text(text, strict=False, indent=1):  # pylint likes lowercase
             raise err
         else:
             return str(err) + '\n' + text
+    if keys_with_bits:
+        sort_bits(object_decoded, keys_with_bits)
     pretty_json = dumps_indented(object_decoded, indent=indent)
     return pretty_json
