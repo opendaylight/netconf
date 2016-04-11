@@ -130,30 +130,37 @@ public class RestPerfClient {
         final ExecutorService executorService = Executors.newFixedThreadPool(threadAmount);
 
         LOG.info("Starting performance test");
+        boolean allThreadsCompleted = true;
         final Stopwatch started = Stopwatch.createStarted();
         try {
             final List<Future<Void>> futures = executorService.invokeAll(callables, parameters.timeout, TimeUnit.MINUTES);
             for (int i = 0; i < futures.size(); i++) {
                 Future<Void> future = futures.get(i);
                 if (future.isCancelled()) {
+                    allThreadsCompleted = false;
                     LOG.info("{}. thread timed out.", i + 1);
                 } else {
                     try {
                         future.get();
                     } catch (final ExecutionException e) {
+                        allThreadsCompleted = false;
                         LOG.info("{}. thread failed.", i + 1, e);
                     }
                 }
             }
         } catch (final InterruptedException e) {
+            allThreadsCompleted = false;
             LOG.warn("Unable to execute requests", e);
         }
         executorService.shutdownNow();
         started.stop();
 
         LOG.info("FINISHED. Execution time: {}", started);
-        LOG.info("Requests per second: {}", (parameters.editCount * 1000.0 / started.elapsed(TimeUnit.MILLISECONDS)));
-
+        // If some threads failed or timed out, skip calculation of requests per second value
+        // and do not log it
+        if(allThreadsCompleted) {
+            LOG.info("Requests per second: {}", (parameters.editCount * 1000.0 / started.elapsed(TimeUnit.MILLISECONDS)));
+        }
         System.exit(0);
     }
 
