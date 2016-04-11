@@ -1,0 +1,49 @@
+= Restconf
+
+== Terminology
+
+REST :: Architectural style consisting of a coordinated set of architectural constraints applied to components, connectors, and data elements, within a distributed hypermedia system
+
+RESTful :: Web service based on REST, communicating with remote servers and databases
+
+== Parts of Restconf
+
+Parts distribution of Restconf
+
+=== Draft restconf-netconf-09
+
+This draft defines used media types and modules.
+
+Media types supports JSON and XML.
+
+.Media types
+|=========================
+|API| application/yang.api
+|Datastore|application/yang.datastore
+|Data|application/yang.data
+|Operation|application/yang.operation
+|Patch|application/yang.patch
+|Patch|application/yang.patch-status
+|Errors|application/yang.errors
+.2+.^|Schema|application/yang
+|application/yin
+|=========================
+
+In modules, we do not support yang 1.1 so we do not use yang for patch module for now.
+
+.Modules
+|=========================
+|RestconfModule|ietf-restconf @ 2015-10-18.yang
+|MonitoringModule|ietf-restconf-monitoring @ 2015-06-19.yang
+|=========================
+
+.UML Draft09
+[uml,file="draft09-uml.png"]
+--
+class Draft09
+class MediaTypes
+class RestconfModule
+
+Draft09 <|-- MediaTypes
+Draft09 <|-- RestconfModule
+--
