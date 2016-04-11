@@ -9,12 +9,15 @@
 package org.opendaylight.netconf.sal.rest.impl;
 
 import com.google.common.base.Preconditions;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaRetrievalService;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
+import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 
 public class RestconfCompositeWrapper implements RestconfService, SchemaRetrievalService {
 
@@ -105,6 +108,16 @@ public class RestconfCompositeWrapper implements RestconfService, SchemaRetrieva
     @Override
     public NormalizedNodeContext getAvailableStreams(final UriInfo uriInfo) {
         return restconf.getAvailableStreams(uriInfo);
+    }
+
+    @Override
+    public PATCHStatusContext patchConfigurationData(final String identifier, PATCHContext payload, UriInfo uriInfo) {
+        return restconf.patchConfigurationData(identifier, payload, uriInfo);
+    }
+
+    @Override
+    public PATCHStatusContext patchConfigurationData(final PATCHContext context, final UriInfo uriInfo) {
+        return restconf.patchConfigurationData(context, uriInfo);
     }
 
     @Override
