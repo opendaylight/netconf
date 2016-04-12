@@ -171,6 +171,16 @@
       <version>${restconf.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ietf-restconf-20160316</artifactId>
+      <version>${restconf.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ietf-restconf-monitoring-20160316</artifactId>
+      <version>${restconf.version}</version>
+    </dependency>
   </dependencies>
   <scm>
     <connection>scm:git:http://git.opendaylight.org/gerrit/controller.git</connection>
