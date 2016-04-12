@@ -96,11 +96,6 @@
       </dependency>
       <dependency>
           <groupId>org.opendaylight.controller</groupId>
-          <artifactId>sal-broker-impl</artifactId>
-          <scope>test</scope>
-      </dependency>
-      <dependency>
-          <groupId>org.opendaylight.controller</groupId>
           <artifactId>sal-distributed-datastore</artifactId>
           <scope>test</scope>
       </dependency>
