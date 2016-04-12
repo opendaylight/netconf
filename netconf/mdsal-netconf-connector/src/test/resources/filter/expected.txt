@@ -1,0 +1,8 @@
+error=org.opendaylight.controller.config.util.xml.DocumentedException
+success=/(urn:dummy:mod-0?revision=2016-03-01)mainroot
+success=/(urn:dummy:mod-0?revision=2016-03-01)mainroot/choiceList
+success=/(urn:dummy:mod-0?revision=2016-03-01)mainroot/maincontent
+success=/(urn:dummy:mod-0?revision=2016-03-01)mainroot/choiceList
+success=/(urn:dummy:mod-0?revision=2016-03-01)mainroot
+success=/(urn:dummy:mod-0?revision=2016-03-01)mainroot/(urn:dummy:aug?revision=1999-08-17)augmented-leaf
+error=org.opendaylight.controller.config.util.xml.DocumentedException
