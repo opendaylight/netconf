@@ -19,7 +19,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 public class SchemaLocationBuilder {
 
     public static Location getDefaultInstance(final String defaultValue) {
-        throw new java.lang.UnsupportedOperationException("Not yet implemented");
+        return LocationBuilder.getDefaultInstance(defaultValue);
     }
 
 }
