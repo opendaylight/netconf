@@ -33,6 +33,8 @@
         <!-- presently we need sal-remote to be listed BEFORE sal-rest-connector because sal-rest-connector
              has a yang file which augments a yang file in sal-remote, and order seems to matter -->
         <bundle>mvn:org.opendaylight.controller/sal-remote/{{VERSION}}</bundle>
+        <bundle>mvn:org.opendaylight.netconf/ietf-restconf-20160316/{{VERSION}}</bundle>
+        <bundle>mvn:org.opendaylight.netconf/ietf-restconf-monitoring-20160316/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.netconf/sal-rest-connector/{{VERSION}}</bundle>
         <bundle>mvn:com.google.code.gson/gson/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.yangtools/yang-data-codec-gson/{{VERSION}}</bundle>
