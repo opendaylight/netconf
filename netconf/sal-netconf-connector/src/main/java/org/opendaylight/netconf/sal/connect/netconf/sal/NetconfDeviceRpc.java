@@ -67,7 +67,6 @@ public final class NetconfDeviceRpc implements DOMRpcService {
                 if (input.isSuccessful()) {
                     return transformer.toRpcResult(input.getResult(), type);
                 } else {
-                    // TODO check whether the listener sets errors properly
                     return new DefaultDOMRpcResult(input.getErrors());
                 }
             }
@@ -77,7 +76,6 @@ public final class NetconfDeviceRpc implements DOMRpcService {
             @Nullable
             @Override
             public DOMRpcException apply(@Nullable final Exception e) {
-                // FIXME what other possible exceptions are there ?
                 return new DOMRpcImplementationNotAvailableException(e, "Unable to invoke rpc %s", type);
             }
         });
