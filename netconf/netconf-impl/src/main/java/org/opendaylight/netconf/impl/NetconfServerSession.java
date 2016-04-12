@@ -9,11 +9,14 @@
 package org.opendaylight.netconf.impl;
 
 import com.google.common.base.Preconditions;
+import com.google.common.net.InetAddresses;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -26,8 +29,10 @@ import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSession;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.DomainName;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Host;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.IpAddress;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Ipv4Address;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Ipv6Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.NetconfTcp;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.Session1;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.Session1Builder;
@@ -109,7 +114,14 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
         SessionBuilder builder = new SessionBuilder();
 
         builder.setSessionId(getSessionId());
-        builder.setSourceHost(new Host(new DomainName(header.getAddress())));
+        IpAddress address;
+        InetAddress address1 = InetAddresses.forString(header.getAddress());
+        if (address1 instanceof Inet4Address) {
+            address = new IpAddress(new Ipv4Address(header.getAddress()));
+        } else {
+            address = new IpAddress(new Ipv6Address(header.getAddress()));
+        }
+        builder.setSourceHost(new Host(address));
 
         Preconditions.checkState(DateAndTime.PATTERN_CONSTANTS.size() == 1);
         String formattedDateTime = dateFormatter.format(loginTime);

@@ -11,6 +11,7 @@ import com.google.common.base.Joiner;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.opendaylight.netconf.monitoring.MonitoringConstants;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.Session1;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -38,7 +39,12 @@ final class MonitoringSession {
 
     @XmlElement(name = "source-host")
     public String getSourceHost() {
-        return managementSession.getSourceHost().getDomainName().getValue();
+        final IpAddress ipAddress = managementSession.getSourceHost().getIpAddress();
+        if (ipAddress.getIpv4Address() != null) {
+            return ipAddress.getIpv4Address().getValue();
+        } else {
+            return ipAddress.getIpv6Address().getValue();
+        }
     }
 
     @XmlElement(name = "login-time")

@@ -12,28 +12,26 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
-import java.util.Set;
 import org.hamcrest.CoreMatchers;
+import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.controller.config.util.capability.Capability;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.monitoring.xml.model.NetconfState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.DomainName;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Host;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.IpAddress;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Ipv4Address;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Ipv6Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.NetconfTcp;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.Session1;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfSsh;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Transport;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.SchemasBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.SessionsBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.SchemaKey;
@@ -43,59 +41,44 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 
 public class JaxBSerializerTest {
 
+    private static final String IPV4 = "192.168.1.1";
+    private static final String IPV6 = "FE80:0000:0000:0000:0202:B3FF:FE1E:8329";
+    private static final String SESSION_XML = "<session>" +
+            "<session-id>1</session-id>" +
+            "<in-bad-rpcs>0</in-bad-rpcs>" +
+            "<in-rpcs>0</in-rpcs>" +
+            "<login-time>2010-10-10T12:32:32Z</login-time>" +
+            "<out-notifications>0</out-notifications>" +
+            "<out-rpc-errors>0</out-rpc-errors>" +
+            "<ncme:session-identifier>client</ncme:session-identifier>" +
+            "<source-host>%s</source-host>" +
+            "<transport>ncme:netconf-tcp</transport>" +
+            "<username>username</username>" +
+            "</session>";
+
+    @Mock
+    private NetconfMonitoringService monitoringService;
+
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+        doReturn(new SessionsBuilder().setSession(Lists.newArrayList(
+                getMockIPv4Session(NetconfTcp.class),
+                getMockIPv4Session(NetconfSsh.class),
+                getMockIPv6Session(NetconfTcp.class),
+                getMockIPv6Session(NetconfSsh.class)
+        )).build())
+                .when(monitoringService).getSessions();
+        doReturn(new SchemasBuilder().setSchema(Lists.newArrayList(getMockSchema("id", "v1", Yang.class), getMockSchema("id2", "", Yang.class))).build())
+                .when(monitoringService).getSchemas();
+    }
+
     @Test
     public void testSerialization() throws Exception {
 
-        final NetconfMonitoringService service = new NetconfMonitoringService() {
-
-            @Override
-            public void onCapabilitiesChanged(Set<Capability> added, Set<Capability> removed) {
-
-            }
-
-            @Override
-            public void onSessionUp(final NetconfManagementSession session) {
-
-            }
-
-            @Override
-            public void onSessionDown(final NetconfManagementSession session) {
-
-            }
-
-            @Override
-            public Sessions getSessions() {
-                return new SessionsBuilder().setSession(Lists.newArrayList(getMockSession(NetconfTcp.class), getMockSession(NetconfSsh.class))).build();
-            }
-
-            @Override
-            public Schemas getSchemas() {
-                return new SchemasBuilder().setSchema(Lists.newArrayList(getMockSchema("id", "v1", Yang.class), getMockSchema("id2", "", Yang.class))).build();
-            }
-
-            @Override
-            public String getSchemaForCapability(final String moduleName, final Optional<String> revision) {
-                return null;
-            }
-
-            @Override
-            public Capabilities getCapabilities() {
-                return null;
-            }
-
-            @Override
-            public AutoCloseable registerListener(final MonitoringListener listener) {
-                return new AutoCloseable() {
-                    @Override
-                    public void close() throws Exception {
-                        // NOOP
-                    }
-                };
-            }
-        };
-        final NetconfState model = new NetconfState(service);
+        final NetconfState model = new NetconfState(monitoringService);
         final String xml = XmlUtil.toString(new JaxBSerializer().toXml(model)).replaceAll("\\s", "");
-
+        System.out.println(xml);
         assertThat(xml, CoreMatchers.containsString(
                 "<schema>" +
                 "<format>yang</format>" +
@@ -106,18 +89,9 @@ public class JaxBSerializerTest {
                 "</schema>"));
 
         assertThat(xml, CoreMatchers.containsString(
-                "<session>" +
-                "<session-id>1</session-id>" +
-                "<in-bad-rpcs>0</in-bad-rpcs>" +
-                "<in-rpcs>0</in-rpcs>" +
-                "<login-time>2010-10-10T12:32:32Z</login-time>" +
-                "<out-notifications>0</out-notifications>" +
-                "<out-rpc-errors>0</out-rpc-errors>" +
-                "<ncme:session-identifier>client</ncme:session-identifier>" +
-                "<source-host>192.168.1.1</source-host>" +
-                "<transport>ncme:netconf-tcp</transport>" +
-                "<username>username</username>" +
-                "</session>"));
+                String.format(SESSION_XML, IPV4)));
+        assertThat(xml, CoreMatchers.containsString(
+                String.format(SESSION_XML, IPV6)));
     }
 
     private Schema getMockSchema(final String id, final String version, final Class<Yang> format) {
@@ -132,13 +106,24 @@ public class JaxBSerializerTest {
         return mock;
     }
 
+    private Session getMockIPv4Session(final Class<? extends Transport> transportType) {
+        final Session mocked = getMockSession(transportType);
+        doReturn(new Host(new IpAddress(new Ipv4Address(IPV4)))).when(mocked).getSourceHost();
+        return mocked;
+    }
+
+    private Session getMockIPv6Session(final Class<? extends Transport> transportType) {
+        final Session mocked = getMockSession(transportType);
+        doReturn(new Host(new IpAddress(new Ipv6Address(IPV6)))).when(mocked).getSourceHost();
+        return mocked;
+    }
+
     private Session getMockSession(final Class<? extends Transport> transportType) {
         final Session mocked = mock(Session.class);
         final Session1 mockedSession1 = mock(Session1.class);
         doReturn("client").when(mockedSession1).getSessionIdentifier();
         doReturn(1L).when(mocked).getSessionId();
         doReturn(new DateAndTime("2010-10-10T12:32:32Z")).when(mocked).getLoginTime();
-        doReturn(new Host(new DomainName("192.168.1.1"))).when(mocked).getSourceHost();
         doReturn(new ZeroBasedCounter32(0L)).when(mocked).getInBadRpcs();
         doReturn(new ZeroBasedCounter32(0L)).when(mocked).getInRpcs();
         doReturn(new ZeroBasedCounter32(0L)).when(mocked).getOutNotifications();
