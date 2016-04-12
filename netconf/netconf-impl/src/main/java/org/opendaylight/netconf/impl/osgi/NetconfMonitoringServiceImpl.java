@@ -284,7 +284,6 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
 
 
     private synchronized void onCapabilitiesAdded(final Set<Capability> addedCaps) {
-        // FIXME howto check for duplicates
         this.capabilities.putAll(Maps.uniqueIndex(setupCapabilities(addedCaps), CAPABILITY_TO_URI));
     }
 

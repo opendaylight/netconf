@@ -202,7 +202,6 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         return document;
     }
 
-    //TODO move all occurences of this method in mdsal netconf(and xml factories) to a utility class
     private Node transformNormalizedNode(final Document document, final NormalizedNode<?, ?> data, final SchemaPath rpcOutputPath) {
         final DOMResult result = new DOMResult(document.createElement(XmlMappingConstants.RPC_REPLY_KEY));
 
