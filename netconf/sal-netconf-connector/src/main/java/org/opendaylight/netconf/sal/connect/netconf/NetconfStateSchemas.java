@@ -110,6 +110,8 @@ public final class NetconfStateSchemas {
      */
     private static NetconfStateSchemas create(final NetconfDeviceRpc deviceRpc, final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id) {
         if(remoteSessionCapabilities.isMonitoringSupported() == false) {
+            // TODO - need to search for get-schema support, not just ietf-netconf-monitoring support
+            // issue might be a deviation to ietf-netconf-monitoring where get-schema is unsupported...
             LOG.warn("{}: Netconf monitoring not supported on device, cannot detect provided schemas", id);
             return EMPTY;
         }
