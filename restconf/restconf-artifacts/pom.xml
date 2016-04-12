@@ -46,6 +46,16 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>ietf-restconf-20160316</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ietf-restconf-monitoring-20160316</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>features-restconf</artifactId>
                 <version>${project.version}</version>
                 <classifier>features</classifier>
