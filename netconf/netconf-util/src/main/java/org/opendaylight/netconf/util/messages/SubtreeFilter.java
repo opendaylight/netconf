@@ -42,8 +42,6 @@ public class SubtreeFilter {
             if (!maybeFilter.isPresent()) {
                 return rpcReply;
             }
-
-            rpcReply = reReadDocument(rpcReply);
             XmlElement filter = maybeFilter.get();
             if (isSupported(filter)) {
 
@@ -64,23 +62,11 @@ public class SubtreeFilter {
      * @throws DocumentedException
      */
     public static Optional<Document> applySubtreeNotificationFilter(XmlElement filter, Document notification) throws DocumentedException {
-        notification = reReadDocument(notification);
         removeEventTimeNode(notification);
         if (isSupported(filter)) {
             return Optional.fromNullable(filteredNotification(filter, notification));
         }
         return Optional.of(extractNotificationContent(notification));
-    }
-
-    private static Document reReadDocument(Document notification) throws DocumentedException {
-        // FIXME: rpcReply document must be reread otherwise some nodes do not inherit namespaces. (services/service)
-        try {
-            notification = XmlUtil.readXmlToDocument(XmlUtil.toString(notification, true));
-        } catch (SAXException | IOException e) {
-            LOG.error("Cannot transform document", e);
-            throw new DocumentedException("Cannot transform document" + e);
-        }
-        return notification;
     }
 
     private static void removeEventTimeNode(Document document) {
