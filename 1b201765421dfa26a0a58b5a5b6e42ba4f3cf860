@@ -22,6 +22,52 @@
       "revId": "1b201765421dfa26a0a58b5a5b6e42ba4f3cf860",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a494da4_ddcd9e88",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlToPATCHBodyReader.java",
+        "patchSetId": 48
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2016-04-13T14:08:14Z",
+      "side": 1,
+      "message": "This does not allow for:\n\u0027If the \"target\" leaf contains a single forward slash \"/\", \nthen the target data node is the target resource data node.\u0027\n\nThat is the last sentence of https://tools.ietf.org/html/draft-ietf-netconf-yang-patch-08#section-2.4\n\nBasically, this implementation only allows for relative path expressions of depth 1, not for depth 0, or 2 and more.",
+      "range": {
+        "startLine": 130,
+        "startChar": 90,
+        "endLine": 130,
+        "endChar": 109
+      },
+      "revId": "1b201765421dfa26a0a58b5a5b6e42ba4f3cf860",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a494da4_7db9eae8",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlToPATCHBodyReader.java",
+        "patchSetId": 48
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2016-04-13T14:08:14Z",
+      "side": 1,
+      "message": "targetNode\n\nFor example, schemaNode corresponding to \"car:cars\" is a container, but target string \"/car-entry\" (or \"/car-entry/car-1\", not sure which is more appropriate here) points to a list (or a list item), so targetNode is an instance of ListSchemaNode and the cast on line 149 fails.",
+      "range": {
+        "startLine": 147,
+        "startChar": 20,
+        "endLine": 147,
+        "endChar": 30
+      },
+      "revId": "1b201765421dfa26a0a58b5a5b6e42ba4f3cf860",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
