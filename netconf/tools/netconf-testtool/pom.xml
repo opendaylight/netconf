@@ -153,6 +153,11 @@
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>mdsal-netconf-connector</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.features</groupId>
+            <artifactId>org.apache.karaf.features.core</artifactId>
+            <version>3.0.3</version>
+        </dependency>
     </dependencies>
 
     <build>
