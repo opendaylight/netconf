@@ -20,6 +20,8 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,15 +34,25 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import org.opendaylight.controller.config.util.xml.XmlElement;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.sax.SAXSource;
+import org.apache.karaf.features.internal.model.ConfigFile;
+import org.apache.karaf.features.internal.model.Feature;
+import org.apache.karaf.features.internal.model.Features;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLFilterImpl;
 
 
 public final class Main {
@@ -208,54 +220,50 @@ public final class Main {
         }
 
 
-        public void updateFeatureFile(final List<File> generated) {
-            // TODO karaf core contains jaxb for feature files, use that for
-            // modification
-            try {
-                for (final File featureFile : ncFeatureFiles) {
-                    final Document document = XmlUtil.readXmlToDocument(Files
-                            .toString(featureFile, Charsets.UTF_8));
-                    final NodeList childNodes = document.getDocumentElement().getChildNodes();
+        public void updateFeatureFile(final List<File> generated) throws RuntimeException {
+            for (final File fileFeatures : ncFeatureFiles) {
 
-                    for (int i = 0; i < childNodes.getLength(); i++) {
-                        final Node item = childNodes.item(i);
-                        if (item instanceof Element == false) {
-                            continue;
-                        }
-                        if (item.getLocalName().equals("feature") == false) {
-                            continue;
-                        }
+                try {
+                    final JAXBContext jaxbContext = JAXBContext.newInstance(Features.class);
+                    final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-                        if (NETCONF_CONNECTOR_ALL_FEATURE
-                                .equals(((Element) item).getAttribute("name"))) {
-                            final Element ncAllFeatureDefinition = (Element) item;
-                            // Clean previous generated files
-                            for (final XmlElement configfile : XmlElement
-                                    .fromDomElement(ncAllFeatureDefinition)
-                                    .getChildElements("configfile")) {
-                                ncAllFeatureDefinition.removeChild(configfile.getDomElement());
-                            }
-                            for (final File file : generated) {
-                                final Element configfile = document.createElement("configfile");
-                                configfile.setTextContent("file:"
-                                        + ETC_OPENDAYLIGHT_KARAF_PATH
-                                        + file.getName());
-                                configfile.setAttribute(
-                                        "finalname",
-                                        ETC_OPENDAYLIGHT_KARAF_PATH
-                                                + file.getName());
-                                ncAllFeatureDefinition.appendChild(configfile);
+                    updateNamespace(fileFeatures, unmarshaller, jaxbContext);
+
+                    final Features f = (Features)unmarshaller.unmarshal(fileFeatures);
+                    for (Feature feature : f.getFeature()) {
+                        if (NETCONF_CONNECTOR_ALL_FEATURE.equals(feature.getName())) {
+
+                            if (feature.getConfigfile().isEmpty()) {
+                                feature.getConfigfile().add(new ConfigFile());}
+
+                            for (ConfigFile cf : feature.getConfigfile()) {
+                                for (File gen: generated) {
+                                    cf.setFinalname(ETC_OPENDAYLIGHT_KARAF_PATH
+                                            + gen.getName());
+                                    cf.setLocation("file:"
+                                            + ETC_OPENDAYLIGHT_KARAF_PATH
+                                            + gen.getName());
+                                }
                             }
                         }
                     }
 
-                    Files.write(XmlUtil.toString(document), featureFile, Charsets.UTF_8);
-                    LOG.info("Feature file {} updated", featureFile);
+                    try {
+                        Marshaller m = jaxbContext.createMarshaller();
+                        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+                        m.marshal(f, fileFeatures);
+
+                        LOG.info("Feature file {} updated", fileFeatures);
+
+                    } catch (JAXBException e) {
+                        throw new RuntimeException(e);
+                    }
+                } catch (JAXBException e1) {
+                    throw new RuntimeException(e1);
+                } catch (Throwable throwable) {
+                    throw new RuntimeException(throwable);
                 }
-            } catch (final IOException e) {
-                throw new RuntimeException("Unable to load features file as a resource");
-            } catch (final SAXException e) {
-                throw new RuntimeException("Unable to parse features file");
+
             }
         }
 
@@ -308,5 +316,38 @@ public final class Main {
                 throw new RuntimeException("Unable to rewrite features file " + loadOrderCfgFile, e);
             }
         }
+
+        public class XMLNamespaceFilter extends XMLFilterImpl {
+            public XMLNamespaceFilter(XMLReader arg0) {
+                super(arg0);
+            }
+            @Override
+            public void startElement(String uri, String localName,
+                                     String qName, Attributes attributes)
+                    throws SAXException {
+                super.startElement("http://karaf.apache.org/xmlns/features/v1.2.1", localName, qName,
+                        attributes);
+            }
+        }
+
+
+
+        public void updateNamespace (File fl, final Unmarshaller unmarshaller, final JAXBContext jaxbContext) throws Throwable {
+
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            XMLReader reader = factory.newSAXParser().getXMLReader();
+
+            XMLFilterImpl xmlFilter = new XMLNamespaceFilter(reader);
+            reader.setContentHandler(unmarshaller.getUnmarshallerHandler());
+            InputStream inStream = new FileInputStream(new File(fl.getPath()));
+            SAXSource source = new SAXSource(xmlFilter, new InputSource(inStream));
+
+            JAXBElement rootElement = unmarshaller.unmarshal(source, Features.class);
+
+            Marshaller m = jaxbContext.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            m.marshal(rootElement, fl);
+        }
+
     }
 }
