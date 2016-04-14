@@ -20,6 +20,9 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,15 +35,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import org.opendaylight.controller.config.util.xml.XmlElement;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
+import javax.xml.bind.JAXBException;
+import org.apache.karaf.features.internal.model.ConfigFile;
+import org.apache.karaf.features.internal.model.Feature;
+import org.apache.karaf.features.internal.model.Features;
+import org.apache.karaf.features.internal.model.JaxbUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 
 public final class Main {
@@ -209,53 +210,33 @@ public final class Main {
 
 
         public void updateFeatureFile(final List<File> generated) {
-            // TODO karaf core contains jaxb for feature files, use that for
-            // modification
-            try {
-                for (final File featureFile : ncFeatureFiles) {
-                    final Document document = XmlUtil.readXmlToDocument(Files
-                            .toString(featureFile, Charsets.UTF_8));
-                    final NodeList childNodes = document.getDocumentElement().getChildNodes();
+            for (final File fileFeatures : ncFeatureFiles) {
+                try {
+                    final Features f =  JaxbUtil.unmarshal(new FileInputStream(fileFeatures), false);
 
-                    for (int i = 0; i < childNodes.getLength(); i++) {
-                        final Node item = childNodes.item(i);
-                        if (item instanceof Element == false) {
-                            continue;
-                        }
-                        if (item.getLocalName().equals("feature") == false) {
-                            continue;
-                        }
+                    for (final Feature feature : f.getFeature()) {
+                        if (NETCONF_CONNECTOR_ALL_FEATURE.equals(feature.getName())) {
+                            //Clean all previously generated configFiles
+                            feature.getConfigfile().clear();
 
-                        if (NETCONF_CONNECTOR_ALL_FEATURE
-                                .equals(((Element) item).getAttribute("name"))) {
-                            final Element ncAllFeatureDefinition = (Element) item;
-                            // Clean previous generated files
-                            for (final XmlElement configfile : XmlElement
-                                    .fromDomElement(ncAllFeatureDefinition)
-                                    .getChildElements("configfile")) {
-                                ncAllFeatureDefinition.removeChild(configfile.getDomElement());
-                            }
-                            for (final File file : generated) {
-                                final Element configfile = document.createElement("configfile");
-                                configfile.setTextContent("file:"
-                                        + ETC_OPENDAYLIGHT_KARAF_PATH
-                                        + file.getName());
-                                configfile.setAttribute(
-                                        "finalname",
-                                        ETC_OPENDAYLIGHT_KARAF_PATH
-                                                + file.getName());
-                                ncAllFeatureDefinition.appendChild(configfile);
+                            //Create new configFiles
+                            for (final File gen : generated) {
+                                final ConfigFile cf = new ConfigFile();
+
+                                final String generatedName = ETC_OPENDAYLIGHT_KARAF_PATH + gen.getName();
+
+                                cf.setFinalname(generatedName);
+                                cf.setLocation("file:" + generatedName);
+
+                                feature.getConfigfile().add(cf);
+                                }
                             }
                         }
-                    }
-
-                    Files.write(XmlUtil.toString(document), featureFile, Charsets.UTF_8);
-                    LOG.info("Feature file {} updated", featureFile);
+                    JaxbUtil.marshal(f, new FileWriter(fileFeatures));
+                    LOG.info("Feature file {} updated", fileFeatures);
+                } catch (JAXBException | IOException e) {
+                    throw new RuntimeException(e);
                 }
-            } catch (final IOException e) {
-                throw new RuntimeException("Unable to load features file as a resource");
-            } catch (final SAXException e) {
-                throw new RuntimeException("Unable to parse features file");
             }
         }
 
