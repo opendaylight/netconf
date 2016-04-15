@@ -1,0 +1,14 @@
+<hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <capabilities>
+        <capability>urn:ietf:params:xml:ns:yang:ietf-yang-types?module=ietf-yang-types&amp;revision=2010-09-24</capability>
+        <capability>urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04</capability>
+        <capability>urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring-extension?module=ietf-netconf-monitoring-extension&amp;revision=2013-12-10</capability>
+        <capability>urn:ietf:params:netconf:capability:exi:1.0</capability>
+        <capability>http://example.com/system?module=empolyees&amp;revision=2007-06-09</capability>
+        <capability>urn:ietf:params:netconf:capability:candidate:1.0</capability>
+        <capability>urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&amp;revision=2010-09-24</capability>
+        <capability>urn:ietf:params:netconf:base:1.1</capability>
+        <capability>urn:ietf:params:netconf:base:1.0</capability>
+    </capabilities>
+    <session-id>1</session-id>
+</hello>
