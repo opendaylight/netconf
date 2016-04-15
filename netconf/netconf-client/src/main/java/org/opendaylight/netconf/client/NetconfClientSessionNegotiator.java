@@ -9,7 +9,10 @@
 package org.opendaylight.netconf.client;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableSet;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -17,20 +20,20 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
-import java.util.Collection;
+import java.util.Set;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
-import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
-import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
-import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
-import org.opendaylight.netconf.util.xml.XMLNetconfUtil;
 import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
+import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
+import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
+import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
+import org.opendaylight.netconf.util.xml.XMLNetconfUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -49,6 +52,14 @@ public class NetconfClientSessionNegotiator extends
             .compileXPath("/hello/session-id");
 
     private static final String EXI_1_0_CAPABILITY_MARKER = "exi:1.0";
+
+    private static LoadingCache<Integer, Set<String>> cache = CacheBuilder.newBuilder().weakValues().build(new CacheLoader<Integer, Set<String>>() {
+        @Override
+        public Set<String> load(Integer key) throws Exception {
+            return null;
+        }
+    });
+
 
     protected NetconfClientSessionNegotiator(final NetconfClientSessionPreferences sessionPreferences,
                                              final Promise<NetconfClientSession> promise,
@@ -134,14 +145,25 @@ public class NetconfClientSessionNegotiator extends
 
     @Override
     protected NetconfClientSession getSession(final NetconfClientSessionListener sessionListener, final Channel channel,
-            final NetconfHelloMessage message) throws NetconfDocumentedException {
-        long sessionId = extractSessionId(message.getDocument());
+                                              final NetconfHelloMessage message) throws NetconfDocumentedException {
+        final long sessionId = extractSessionId(message.getDocument());
 
         // Copy here is important: it disconnects the strings from the document
-        Collection<String> capabilities = ImmutableList.copyOf(NetconfMessageUtil.extractCapabilitiesFromHello(message.getDocument()));
+        Set<String> capabilities = ImmutableSet.copyOf(NetconfMessageUtil.extractCapabilitiesFromHello(message.getDocument()));
 
-        // FIXME: scalability: we could instantiate a cache to share the same collections
+        capabilities = getCached(capabilities);
+
         return new NetconfClientSession(sessionListener, channel, sessionId, capabilities);
+    }
+
+    protected Set<String> getCached(final Set<String> capabilities) {
+        final Set<String> cached = cache.getIfPresent(capabilities.hashCode());
+        if (cached != null) {
+            return cached;
+        } else {
+            cache.put(capabilities.hashCode(), capabilities);
+            return capabilities;
+        }
     }
 
     /**
