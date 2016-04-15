@@ -17,7 +17,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.io.CharStreams;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
@@ -31,13 +34,24 @@ import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
@@ -45,9 +59,11 @@ import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
+import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.openexi.proc.common.EXIOptions;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 public class NetconfClientSessionNegotiatorTest {
 
@@ -131,6 +147,14 @@ public class NetconfClientSessionNegotiatorTest {
         return new NetconfClientSessionNegotiator(preferences, promise, channel, timer, sessionListener, timeout);
     }
 
+    private Set<String> CreateCapabilities(String name) throws Exception {
+        InputStream stream = NetconfClientSessionNegotiatorTest.class.getResourceAsStream(name);
+        Document doc = XmlUtil.readXmlToDocument(stream);
+        NetconfHelloMessage hello = new NetconfHelloMessage(doc);
+
+        return ImmutableSet.copyOf(NetconfMessageUtil.extractCapabilitiesFromHello(hello.getDocument()));
+    }
+
     @Test
     public void testNetconfClientSessionNegotiator() throws Exception {
         Promise promise = mock(Promise.class);
@@ -175,4 +199,26 @@ public class NetconfClientSessionNegotiatorTest {
         // two calls for exiMessage, 2 for hello message
         verify(pipeline, times(4)).replace(anyString(), anyString(), any(ChannelHandler.class));
     }
+
+    @Test
+    public void testNetconfClientSessionNegotiatorGetCached() throws Exception {
+        Promise promise = mock(Promise.class);
+        doReturn(promise).when(promise).setSuccess(anyObject());
+        NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
+
+        Set<String> set1 = CreateCapabilities("/helloMessage2.xml");
+        Set<String> set2 = CreateCapabilities("/helloMessage1.xml");
+        Set<String> set3 = CreateCapabilities("/helloMessage3.xml");
+
+        final Set<String> cachedS1 = negotiator.getCached(set1);
+        final Set<String> cachedS2 = negotiator.getCached(set2);
+        final Set<String> cachedS3 = negotiator.getCached(set3);
+
+        assert cachedS1 == set1;
+        assert cachedS3 == set1;
+        assert cachedS3 != set3;
+        assert cachedS3.equals(set3);
+        assert cachedS2 == set2;
+    }
+
 }
