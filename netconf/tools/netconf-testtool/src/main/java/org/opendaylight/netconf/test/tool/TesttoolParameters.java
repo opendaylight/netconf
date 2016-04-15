@@ -306,7 +306,7 @@ public class TesttoolParameters {
                 messageBuilder.replace(messageBuilder.indexOf(PORT_KEY), messageBuilder.indexOf(PORT_KEY) + PORT_KEY.length(), Integer.toString(openDevice));
         }
         if (editContentString.contains(SSH)) {
-            messageBuilder.replace(messageBuilder.indexOf(SSH), messageBuilder.indexOf(SSH) + SSH.length(), Boolean.toString(ssh));
+            messageBuilder.replace(messageBuilder.indexOf(SSH), messageBuilder.indexOf(SSH) + SSH.length(), Boolean.toString(!ssh));
         }
         return messageBuilder.toString();
     }
