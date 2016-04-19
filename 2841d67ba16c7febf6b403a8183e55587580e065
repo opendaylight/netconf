@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_e98c2182",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/Main.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-19T07:32:12Z",
+      "side": 1,
+      "message": "Clear previous config files and replace them with generated, as stated in comment // Clean previous generated files in original version of this class",
+      "range": {
+        "startLine": 221,
+        "startChar": 28,
+        "endLine": 222,
+        "endChar": 79
+      },
+      "revId": "2841d67ba16c7febf6b403a8183e55587580e065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_09907594",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/Main.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-19T07:32:12Z",
+      "side": 1,
+      "message": "You just call setFinalname() and setLocation() on the same object in loop here. You should iterate over generated list and create new ConfigFile for each item.",
+      "range": {
+        "startLine": 225,
+        "startChar": 31,
+        "endLine": 230,
+        "endChar": 62
+      },
+      "revId": "2841d67ba16c7febf6b403a8183e55587580e065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
