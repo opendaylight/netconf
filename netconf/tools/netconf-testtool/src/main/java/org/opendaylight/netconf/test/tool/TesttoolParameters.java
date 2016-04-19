@@ -32,7 +32,7 @@ public class TesttoolParameters {
 
     private static final String HOST_KEY = "{HOST}";
     private static final String PORT_KEY = "{PORT}";
-    private static final String SSH = "{SSH}";
+    private static final String TCP_ONLY = "{TCP_ONLY}";
     private static final String ADDRESS_PORT = "{ADDRESS:PORT}";
     private static final String dest = "http://{ADDRESS:PORT}/restconf/config/network-topology:network-topology/topology/topology-netconf/";
 
@@ -373,8 +373,8 @@ public class TesttoolParameters {
             while (messageBuilder.indexOf(PORT_KEY) != -1)
                 messageBuilder.replace(messageBuilder.indexOf(PORT_KEY), messageBuilder.indexOf(PORT_KEY) + PORT_KEY.length(), Integer.toString(openDevice));
         }
-        if (editContentString.contains(SSH)) {
-            messageBuilder.replace(messageBuilder.indexOf(SSH), messageBuilder.indexOf(SSH) + SSH.length(), Boolean.toString(ssh));
+        if (editContentString.contains(TCP_ONLY)) {
+            messageBuilder.replace(messageBuilder.indexOf(TCP_ONLY), messageBuilder.indexOf(TCP_ONLY) + TCP_ONLY.length(), Boolean.toString(!ssh));
         }
         return messageBuilder.toString();
     }
