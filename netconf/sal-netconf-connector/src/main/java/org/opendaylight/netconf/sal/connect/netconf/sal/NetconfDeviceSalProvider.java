@@ -38,7 +38,6 @@ public class NetconfDeviceSalProvider implements AutoCloseable, Provider, Bindin
     private static final Logger logger = LoggerFactory.getLogger(NetconfDeviceSalProvider.class);
 
     private final RemoteDeviceId id;
-    private volatile NetconfDeviceDatastoreAdapter datastoreAdapter;
     private MountInstance mountInstance;
 
     private volatile NetconfDeviceTopologyAdapter topologyDatastoreAdapter;
@@ -71,12 +70,6 @@ public class NetconfDeviceSalProvider implements AutoCloseable, Provider, Bindin
         return mountInstance;
     }
 
-    public NetconfDeviceDatastoreAdapter getDatastoreAdapter() {
-        Preconditions.checkState(datastoreAdapter != null,
-                "%s: Sal provider %s was not initialized by sal. Cannot get datastore adapter", id);
-        return datastoreAdapter;
-    }
-
     public NetconfDeviceTopologyAdapter getTopologyDatastoreAdapter() {
         Preconditions.checkState(topologyDatastoreAdapter != null,
                 "%s: Sal provider %s was not initialized by sal. Cannot get topology datastore adapter", id);
@@ -105,14 +98,12 @@ public class NetconfDeviceSalProvider implements AutoCloseable, Provider, Bindin
         this.dataBroker = session.getSALService(DataBroker.class);
         txChain = Preconditions.checkNotNull(dataBroker).createTransactionChain(transactionChainListener);
 
-        datastoreAdapter = new NetconfDeviceDatastoreAdapter(id, txChain);
         topologyDatastoreAdapter = new NetconfDeviceTopologyAdapter(id, txChain);
     }
 
     private void resetTransactionChainForAdapaters() {
         txChain = Preconditions.checkNotNull(dataBroker).createTransactionChain(transactionChainListener);
 
-        datastoreAdapter.setTxChain(txChain);
         topologyDatastoreAdapter.setTxChain(txChain);
 
         logger.trace("{}: Resetting TransactionChain {}", id, txChain);
@@ -121,8 +112,6 @@ public class NetconfDeviceSalProvider implements AutoCloseable, Provider, Bindin
 
     public void close() throws Exception {
         mountInstance.close();
-        datastoreAdapter.close();
-        datastoreAdapter = null;
         topologyDatastoreAdapter.close();
         topologyDatastoreAdapter = null;
         txChain.close();
@@ -132,7 +121,6 @@ public class NetconfDeviceSalProvider implements AutoCloseable, Provider, Bindin
 
         private DOMMountPointService mountService;
         private final RemoteDeviceId id;
-        private ObjectRegistration<DOMMountPoint> registration;
         private NetconfDeviceNotificationService notificationService;
 
         private ObjectRegistration<DOMMountPoint> topologyRegistration;
@@ -140,44 +128,6 @@ public class NetconfDeviceSalProvider implements AutoCloseable, Provider, Bindin
         public MountInstance(final DOMMountPointService mountService, final RemoteDeviceId id) {
             this.mountService = Preconditions.checkNotNull(mountService);
             this.id = Preconditions.checkNotNull(id);
-        }
-
-        @Deprecated
-        synchronized void onDeviceConnected(final SchemaContext initialCtx,
-                                            final DOMDataBroker broker, final DOMRpcService rpc,
-                                            final NetconfDeviceNotificationService notificationService) {
-
-            Preconditions.checkNotNull(mountService, "Closed");
-            Preconditions.checkState(registration == null, "Already initialized");
-
-            final DOMMountPointService.DOMMountPointBuilder mountBuilder = mountService.createMountPoint(id.getPath());
-            mountBuilder.addInitialSchemaContext(initialCtx);
-
-            mountBuilder.addService(DOMDataBroker.class, broker);
-            mountBuilder.addService(DOMRpcService.class, rpc);
-            mountBuilder.addService(DOMNotificationService.class, notificationService);
-            this.notificationService = notificationService;
-
-            registration = mountBuilder.register();
-            logger.debug("{}: Mountpoint exposed into MD-SAL {}", id, registration);
-        }
-
-        @Deprecated
-        synchronized void onDeviceDisconnected() {
-            if(registration == null) {
-                logger.trace("{}: Not removing mountpoint from MD-SAL, mountpoint was not registered yet", id);
-                return;
-            }
-
-            try {
-                registration.close();
-            } catch (final Exception e) {
-                // Only log and ignore
-                logger.warn("Unable to unregister mount instance for {}. Ignoring exception", id.getPath(), e);
-            } finally {
-                logger.debug("{}: Mountpoint removed from MD-SAL {}", id, registration);
-                registration = null;
-            }
         }
 
         public synchronized void onTopologyDeviceConnected(final SchemaContext initialCtx,
@@ -193,6 +143,7 @@ public class NetconfDeviceSalProvider implements AutoCloseable, Provider, Bindin
             mountBuilder.addService(DOMDataBroker.class, broker);
             mountBuilder.addService(DOMRpcService.class, rpc);
             mountBuilder.addService(DOMNotificationService.class, notificationService);
+            this.notificationService = notificationService;
 
             topologyRegistration = mountBuilder.register();
             logger.debug("{}: TOPOLOGY Mountpoint exposed into MD-SAL {}", id, topologyRegistration);
@@ -218,7 +169,6 @@ public class NetconfDeviceSalProvider implements AutoCloseable, Provider, Bindin
 
         @Override
         public synchronized void close() throws Exception {
-            onDeviceDisconnected();
             onTopologyDeviceDisconnected();
             mountService = null;
         }

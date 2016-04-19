@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import com.google.common.collect.Lists;
-import java.util.Collections;
 import java.util.List;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
@@ -19,7 +18,6 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,24 +55,19 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
 
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
 
-        salProvider.getMountInstance().onDeviceConnected(schemaContext, domBroker, deviceRpc, notificationService);
-        salProvider.getDatastoreAdapter().updateDeviceState(true, netconfSessionPreferences.getModuleBasedCaps());
         salProvider.getMountInstance().onTopologyDeviceConnected(schemaContext, domBroker, deviceRpc, notificationService);
         salProvider.getTopologyDatastoreAdapter().updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
     }
 
     @Override
     public synchronized void onDeviceDisconnected() {
-        salProvider.getDatastoreAdapter().updateDeviceState(false, Collections.<QName>emptySet());
         salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, new NetconfDeviceCapabilities());
-        salProvider.getMountInstance().onDeviceDisconnected();
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
     }
 
     @Override
     public synchronized void onDeviceFailed(final Throwable throwable) {
         salProvider.getTopologyDatastoreAdapter().setDeviceAsFailed(throwable);
-        salProvider.getMountInstance().onDeviceDisconnected();
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
     }
 
