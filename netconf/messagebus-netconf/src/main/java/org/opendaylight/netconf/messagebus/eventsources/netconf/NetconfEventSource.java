@@ -237,7 +237,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
     }
 
     private AnyXmlNode encapsulate(final DOMNotification body) {
-        // FIXME: Introduce something like AnyXmlWithNormalizedNodeData in Yangtools
+        // FIXME: Introduce something like YangModeledAnyXmlNode in Yangtools
         final Document doc = XmlUtil.newDocument();
         final Optional<String> namespace = Optional.of(PAYLOAD_ARG.getNodeType().getNamespace().toString());
         final Element element = XmlUtil.createElement(doc, "payload", namespace);

@@ -65,7 +65,6 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     private final Timer timer;
     private final long connectionTimeoutMillis;
 
-    // TODO shrink constructor
     protected AbstractNetconfSessionNegotiator(final P sessionPreferences, final Promise<S> promise, final Channel channel, final Timer timer,
             final L sessionListener, final long connectionTimeoutMillis) {
         super(promise, channel);

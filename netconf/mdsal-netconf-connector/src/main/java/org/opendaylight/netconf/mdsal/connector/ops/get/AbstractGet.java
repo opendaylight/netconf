@@ -102,7 +102,6 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         return SchemaPath.create(Iterables.transform(dataRoot.getPathArguments(), PATH_ARG_TO_QNAME), dataRoot.equals(ROOT));
     }
 
-    // TODO this code is located in Restconf already
     private void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter, final ContainerNode data) {
         try {
             if (data.getNodeType().equals(SchemaContext.NAME)) {

@@ -82,8 +82,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
         try {
 
             Preconditions.checkState(operationRouter != null, "Cannot handle message, session up was not yet received");
-            // FIXME: there is no validation since the document may contain yang
-            // schemas
+            // there is no validation since the document may contain yang schemas
             final NetconfMessage message = processDocument(netconfMessage,
                     session);
             LOG.debug("Responding with message {}", message);
