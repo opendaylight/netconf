@@ -45,6 +45,52 @@
       "revId": "2841d67ba16c7febf6b403a8183e55587580e065",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_e9ba6109",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/Main.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-19T07:42:22Z",
+      "side": 1,
+      "message": "JaxbUtil can be used also for marshalling",
+      "range": {
+        "startLine": 234,
+        "startChar": 20,
+        "endLine": 236,
+        "endChar": 47
+      },
+      "revId": "2841d67ba16c7febf6b403a8183e55587580e065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_8941250e",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/Main.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-19T07:42:22Z",
+      "side": 1,
+      "message": "Catch more specific Exception - JAXBException",
+      "range": {
+        "startLine": 240,
+        "startChar": 25,
+        "endLine": 240,
+        "endChar": 44
+      },
+      "revId": "2841d67ba16c7febf6b403a8183e55587580e065",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
