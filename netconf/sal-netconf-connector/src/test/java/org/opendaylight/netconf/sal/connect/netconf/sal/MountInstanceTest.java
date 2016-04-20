@@ -67,27 +67,6 @@ public class MountInstanceTest {
         mountInstance = new NetconfDeviceSalProvider.MountInstance(service, new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830)));
     }
 
-    @Test
-    public void testOnDeviceConnected() throws Exception {
-        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, broker, rpcService, notificationService);
-        verify(mountPointBuilder).addInitialSchemaContext(SCHEMA_CONTEXT);
-        verify(mountPointBuilder).addService(DOMDataBroker.class, broker);
-        verify(mountPointBuilder).addService(DOMRpcService.class, rpcService);
-        verify(mountPointBuilder).addService(DOMNotificationService.class, notificationService);
-    }
-
-    @Test
-    public void testOnDeviceDisconnected() throws Exception {
-        mountInstance.onDeviceConnected(SCHEMA_CONTEXT, broker, rpcService, notificationService);
-        mountInstance.onDeviceDisconnected();
-        verify(registration).close();
-        try {
-            mountInstance.onDeviceConnected(SCHEMA_CONTEXT, broker, rpcService, notificationService);
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-            Assert.fail("Registration still present after disconnect ");
-        }
-    }
 
     @Test
     public void testOnTopologyDeviceConnected() throws Exception {
