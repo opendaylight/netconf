@@ -7,8 +7,15 @@
  */
 package org.opendaylight.netconf.sal.rest.api;
 
+import org.opendaylight.restconf.Draft11;
 import org.opendaylight.yangtools.yang.common.QName;
 
+/**
+ * @deprecated Do not use old implementation of restconf draft. It is replaced
+ *             by {@link Draft11}.
+ *
+ */
+@Deprecated
 public class Draft02 {
     public static interface MediaTypes {
         String API = "application/yang.api";
