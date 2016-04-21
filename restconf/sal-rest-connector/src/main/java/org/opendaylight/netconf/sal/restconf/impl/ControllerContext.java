@@ -596,7 +596,13 @@ public class ControllerContext implements SchemaContextListener {
             targetNode = findInstanceDataChildByNameAndNamespace(parentNode, nodeName, module.getNamespace());
 
             if (targetNode == null && parentNode instanceof Module) {
-                final RpcDefinition rpc = ControllerContext.getInstance().getRpcDefinition(head, module.getRevision());
+                final RpcDefinition rpc;
+                if (mountPoint == null) {
+                    rpc = ControllerContext.getInstance().getRpcDefinition(head, module.getRevision());
+                } else {
+                    final String rpcName = toNodeName(head);
+                    rpc = ControllerContext.getInstance().getRpcDefinition(module, rpcName);
+                }
                 if (rpc != null) {
                     return new InstanceIdentifierContext<RpcDefinition>(builder.build(), rpc, mountPoint,
                             mountPoint != null ? mountPoint.getSchemaContext() : globalSchema);
@@ -827,6 +833,16 @@ public class ControllerContext implements SchemaContextListener {
     public RpcDefinition getRpcDefinition(final String name, final Date revisionDate) {
         final QName validName = toQName(name, revisionDate);
         return validName == null ? null : qnameToRpc.get().get(validName);
+    }
+
+    private RpcDefinition getRpcDefinition(final Module module, final String rpcName) {
+        QName rpcQName = QName.create(module.getQNameModule(), rpcName);
+        for (RpcDefinition rpcDefinition : module.getRpcs()) {
+            if (rpcQName.equals(rpcDefinition.getQName())) {
+                return rpcDefinition;
+            }
+        }
+        return null;
     }
 
     @Override
