@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_e6d0c3f9",
+        "filename": "netconf/tools/netconf-testtool/pom.xml",
+        "patchSetId": 15
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-21T10:43:24Z",
+      "side": 1,
+      "message": "Unnecessary dependencies",
+      "range": {
+        "startLine": 156,
+        "startChar": 8,
+        "endLine": 165,
+        "endChar": 21
+      },
+      "revId": "d154dd7ccf13c873a467baa503c39e2ee7dd922f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
