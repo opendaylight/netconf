@@ -26,6 +26,9 @@ import org.opendaylight.netconf.sal.rest.impl.PATCH;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
+import org.opendaylight.restconf.rest.api.services.RestconfModulesService;
+import org.opendaylight.restconf.rest.api.services.RestconfOperationsService;
+import org.opendaylight.restconf.rest.api.services.RestconfStreamsService;
 
 /**
  * The URI hierarchy for the RESTCONF resources consists of an entry point container, 4 top-level resources, and 1
@@ -58,30 +61,55 @@ public interface RestconfService {
     @GET
     public Object getRoot();
 
+    /**
+     * @deprecated do not use this method. It is replaced by
+     *             {@link RestconfModulesService#getModules(UriInfo)}
+     */
+    @Deprecated
     @GET
     @Path("/modules")
     @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public NormalizedNodeContext getModules(@Context UriInfo uriInfo);
 
+    /**
+     * @deprecated do not use this method. It is replaced by
+     *             {@link RestconfModulesService#getModules(String, UriInfo)}
+     */
+    @Deprecated
     @GET
     @Path("/modules/{identifier:.+}")
     @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public NormalizedNodeContext getModules(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 
+    /**
+     * @deprecated do not use this method. It is replaced by
+     *             {@link RestconfModulesService#getModule(String, UriInfo)}
+     */
+    @Deprecated
     @GET
     @Path("/modules/module/{identifier:.+}")
     @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public NormalizedNodeContext getModule(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 
+    /**
+     * @deprecated do not use this method. It is replaced by
+     *             {@link RestconfOperationsService#getOperations(UriInfo)}
+     */
+    @Deprecated
     @GET
     @Path("/operations")
     @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public NormalizedNodeContext getOperations(@Context UriInfo uriInfo);
 
+    /**
+     * @deprecated do not use this method. It is replaced by
+     *             {@link RestconfOperationsService#getOperations(String, UriInfo)}
+     */
+    @Deprecated
     @GET
     @Path("/operations/{identifier:.+}")
     @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
@@ -149,6 +177,11 @@ public interface RestconfService {
     @Path("/streams/stream/{identifier:.+}")
     public Response subscribeToStream(@Encoded @PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 
+    /**
+     * @deprecated do not use this method. It is replaced by
+     *             {@link RestconfStreamsService#getAvailableStreams(UriInfo)}
+     */
+    @Deprecated
     @GET
     @Path("/streams")
     @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
