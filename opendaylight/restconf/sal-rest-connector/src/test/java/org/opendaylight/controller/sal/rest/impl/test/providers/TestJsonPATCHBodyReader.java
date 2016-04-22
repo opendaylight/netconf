@@ -51,4 +51,17 @@ public class TestJsonPATCHBodyReader extends AbstractBodyReaderTest {
                 .readFrom(null, null, null, mediaType, null, inputStream);
         checkPATCHContext(returnValue);
     }
+
+    @Test
+    public void modulePATCHCreateAndDeleteTest() throws Exception {
+        final String uri = "instance-identifier-patch-module:patch-cont/my-list1/leaf1";
+        mockBodyReader(uri, jsonPATCHBodyReader, false);
+
+        final InputStream inputStream = TestJsonBodyReader.class
+                .getResourceAsStream("/instanceidentifier/json/jsonPATCHdataCreateAndDelete.json");
+
+        final PATCHContext returnValue = jsonPATCHBodyReader
+                .readFrom(null, null, null, mediaType, null, inputStream);
+        checkPATCHContext(returnValue);
+    }
 }
