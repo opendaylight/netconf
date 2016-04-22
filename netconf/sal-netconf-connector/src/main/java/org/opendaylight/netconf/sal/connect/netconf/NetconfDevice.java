@@ -407,23 +407,17 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
                     return;
                 } catch (Throwable t) {
                     if (t instanceof MissingSchemaSourceException){
-                        // In case source missing, try without it
-                        final SourceIdentifier missingSource = ((MissingSchemaSourceException) t).getSourceId();
-                        LOG.warn("{}: Unable to build schema context, missing source {}, will reattempt without it", id, missingSource);
-                        LOG.debug("{}: Unable to build schema context, missing source {}, will reattempt without it", t);
-                        final Collection<QName> qNameOfMissingSource = getQNameFromSourceIdentifiers(Sets.newHashSet(missingSource));
-                        if (!qNameOfMissingSource.isEmpty()) {
-                            capabilities.addUnresolvedCapabilities(qNameOfMissingSource, UnavailableCapability.FailureReason.MissingSource);
-                        }
-                        requiredSources = stripMissingSource(requiredSources, missingSource);
+                        requiredSources = handleMissingSchemaSourceException(requiredSources, (MissingSchemaSourceException) t);
                     } else if (t instanceof SchemaResolutionException) {
-                        // In case resolution error, try only with resolved sources
-                        SchemaResolutionException resolutionException = (SchemaResolutionException) t;
-                        final Set<SourceIdentifier> unresolvedSources = resolutionException.getUnsatisfiedImports().keySet();
-                        capabilities.addUnresolvedCapabilities(getQNameFromSourceIdentifiers(unresolvedSources), UnavailableCapability.FailureReason.UnableToResolve);
-                        LOG.warn("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only", id, resolutionException.getUnsatisfiedImports());
-                        LOG.debug("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only", resolutionException);
-                        requiredSources = resolutionException.getResolvedSources();
+                        // FIXME do not wrap MissingSchemaSourceException in a
+                        // SchemaResolutionException. Somewhere this exception
+                        // is wrapped thus the instanceod isn't seeing the root
+                        // the cause of the exception.
+                        if (t.getCause() instanceof MissingSchemaSourceException) {
+                            requiredSources = handleMissingSchemaSourceException(requiredSources, (MissingSchemaSourceException) t.getCause());
+                            continue;
+                        }
+                        requiredSources = handleSchemaResolutionException(requiredSources, (SchemaResolutionException) t);
                     } else {
                         // unknown error, fail
                         handleSalInitializationFailure(t, listener);
@@ -437,6 +431,26 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
             salFacade.onDeviceFailed(cause);
         }
 
+        private Collection<SourceIdentifier> handleMissingSchemaSourceException(Collection<SourceIdentifier> requiredSources, final MissingSchemaSourceException t) {
+            // In case source missing, try without it
+            final SourceIdentifier missingSource = t.getSourceId();
+            LOG.warn("{}: Unable to build schema context, missing source {}, will reattempt without it", id, missingSource);
+            LOG.debug("{}: Unable to build schema context, missing source {}, will reattempt without it", t);
+            final Collection<QName> qNameOfMissingSource = getQNameFromSourceIdentifiers(Sets.newHashSet(missingSource));
+            if (!qNameOfMissingSource.isEmpty()) {
+                capabilities.addUnresolvedCapabilities(qNameOfMissingSource, UnavailableCapability.FailureReason.MissingSource);
+            }
+            return stripMissingSource(requiredSources, missingSource);
+        }
+
+        private Collection<SourceIdentifier> handleSchemaResolutionException(Collection<SourceIdentifier> requiredSources, final SchemaResolutionException resolutionException) {
+            // In case resolution error, try only with resolved sources
+            final Set<SourceIdentifier> unresolvedSources = resolutionException.getUnsatisfiedImports().keySet();
+            capabilities.addUnresolvedCapabilities(getQNameFromSourceIdentifiers(unresolvedSources), UnavailableCapability.FailureReason.UnableToResolve);
+            LOG.warn("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only", id, resolutionException.getUnsatisfiedImports());
+            LOG.debug("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only", resolutionException);
+            return resolutionException.getResolvedSources();
+        }
 
         protected NetconfDeviceRpc getDeviceSpecificRpc(final SchemaContext result) {
             return new NetconfDeviceRpc(result, listener, new NetconfMessageTransformer(result, true));
