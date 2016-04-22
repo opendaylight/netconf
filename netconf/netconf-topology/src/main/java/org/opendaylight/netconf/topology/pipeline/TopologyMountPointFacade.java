@@ -29,6 +29,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificatio
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.util.messages.AnnounceMasterMountPoint;
 import org.opendaylight.netconf.topology.util.messages.AnnounceMasterMountPointDown;
+import org.opendaylight.netconf.util.NetconfTopologyPathCreator;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,7 +132,8 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
         final ActorRef deviceDataBrokerRef = TypedActor.get(actorSystem).getActorRefFor(deviceDataBroker);
         for (final Member member : members) {
             if (!member.address().equals(cluster.selfAddress())) {
-                final String path = member.address() + "/user/" + topologyId + "/" + id.getName();
+                final NetconfTopologyPathCreator pathCreator = new NetconfTopologyPathCreator(member.address().toString(),topologyId);
+                final String path = pathCreator.withSuffix(id.getName()).build();
                 actorSystem.actorSelection(path).tell(new AnnounceMasterMountPoint(), deviceDataBrokerRef);
             }
         }
@@ -163,7 +165,9 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
                 if (member.address().equals(Cluster.get(actorSystem).selfAddress())) {
                     continue;
                 }
-                actorSystem.actorSelection(member.address() + "/user/" + topologyId + "/" + id.getName()).tell(new AnnounceMasterMountPointDown(), null);
+                final NetconfTopologyPathCreator pathCreator = new NetconfTopologyPathCreator(member.address().toString(), topologyId);
+                final String path = pathCreator.withSuffix(id.getName()).build();
+                actorSystem.actorSelection(path).tell(new AnnounceMasterMountPointDown(), null);
             }
             TypedActor.get(actorSystem).stop(deviceDataBroker);
             deviceDataBroker = null;

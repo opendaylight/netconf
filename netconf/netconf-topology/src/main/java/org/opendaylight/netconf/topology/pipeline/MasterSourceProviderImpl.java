@@ -18,6 +18,7 @@ import org.opendaylight.controller.cluster.schema.provider.impl.RemoteYangTextSo
 import org.opendaylight.netconf.topology.pipeline.messages.AnnounceClusteredDeviceSourcesResolverUp;
 import org.opendaylight.netconf.topology.pipeline.messages.AnnounceMasterOnSameNodeUp;
 import org.opendaylight.netconf.topology.pipeline.messages.AnnounceMasterSourceProviderUp;
+import org.opendaylight.netconf.util.NetconfTopologyPathCreator;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.slf4j.Logger;
@@ -53,7 +54,8 @@ public class MasterSourceProviderImpl extends RemoteYangTextSourceProviderImpl
         cluster.join(cluster.selfAddress());
         LOG.debug("Notifying members master schema source provider is up.");
         for(Member node : cluster.state().getMembers()) {
-            final String path = node.address() + "/user/" + topologyId + "/" + nodeId + "/clusteredDeviceSourcesResolver";
+            final NetconfTopologyPathCreator pathCreator = new NetconfTopologyPathCreator(node.address().toString(),topologyId);
+            final String path = pathCreator.withSuffix(nodeId).withSuffix(NetconfTopologyPathCreator.CLUSTERED_DEVICE_SOURCES_RESOLVER).build();
             if(node.address().equals(cluster.selfAddress())) {
                 actorSystem.actorSelection(path).tell(new AnnounceMasterOnSameNodeUp(), TypedActor.context().self());
                 actorSystem.actorSelection(path).tell(PoisonPill.getInstance(), TypedActor.context().self());
