@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_2eef31b2",
+        "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/BaseNotificationPublisher.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-22T05:41:06Z",
+      "side": 1,
+      "message": "This class was commited by mistake, please see reply to the other comment.",
+      "parentUuid": "fa57193c_083fc526",
+      "range": {
+        "startLine": 22,
+        "startChar": 94,
+        "endLine": 22,
+        "endChar": 107
+      },
+      "revId": "5fd07ff4b7bdfc600689f966b4d5781c07f3d89b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_a83a1934",
         "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/OperationalDatastoreListener.java",
         "patchSetId": 12
@@ -36,6 +60,30 @@
       "writtenOn": "2016-04-21T14:51:28Z",
       "side": 1,
       "message": "this class looks a lot like BaseNotificationPublisher, wondering if they could be only one abstract class for that.",
+      "range": {
+        "startLine": 22,
+        "startChar": 15,
+        "endLine": 22,
+        "endChar": 43
+      },
+      "revId": "5fd07ff4b7bdfc600689f966b4d5781c07f3d89b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_2ed8d11c",
+        "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/OperationalDatastoreListener.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-22T05:41:06Z",
+      "side": 1,
+      "message": "Yes, I wanted to give it more meaningful name, so I renamed BaseNotificationPublisher to OperationalDatastoreListener. During commiting, I made a mistake and forgot to delete old class. Thanks for pointing that.",
+      "parentUuid": "fa57193c_a83a1934",
       "range": {
         "startLine": 22,
         "startChar": 15,
