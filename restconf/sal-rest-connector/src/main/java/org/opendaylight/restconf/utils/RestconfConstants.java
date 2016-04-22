@@ -7,6 +7,9 @@
  */
 package org.opendaylight.restconf.utils;
 
+import java.text.SimpleDateFormat;
+import com.google.common.base.Splitter;
+
 /**
  * Util class for Restconf constants.
  *
@@ -15,8 +18,10 @@ public class RestconfConstants {
 
     public static final String XML = "+xml";
     public static final String JSON = "+json";
-
+    public static final String MOUNT = "yang-ext:mount";
     public static final String IDENTIFIER = "identifier";
+    public static final SimpleDateFormat REVISION_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    public static final Splitter SLASH_SPLITTER = Splitter.on("/");
 
     private RestconfConstants() {
         throw new UnsupportedOperationException("Util class");
