@@ -18,6 +18,7 @@
     <modules>
         <module>netconf</module>
         <module>restconf</module>
+        <module>distributed-tx</module>
 
         <module>features</module>
         <module>karaf</module>
