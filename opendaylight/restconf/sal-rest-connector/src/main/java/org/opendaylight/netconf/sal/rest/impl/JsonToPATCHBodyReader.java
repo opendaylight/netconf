@@ -32,6 +32,7 @@ import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
+import org.opendaylight.netconf.sal.restconf.impl.PATCHEditOperation;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
@@ -109,14 +110,13 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider 
         return new PATCHContext(path, resultList, patchId);
     }
 
-    private List<PATCHEntity> read(final JsonReader in, InstanceIdentifierContext path) throws
-            IOException {
-
+    private List<PATCHEntity> read(final JsonReader in, InstanceIdentifierContext path) throws IOException {
         boolean inEdit = false;
         boolean inValue = false;
         String operation = null;
         String target = null;
         String editId = null;
+
         List<PATCHEntity> resultCollection = new ArrayList<>();
 
         while (in.hasNext()) {
@@ -135,38 +135,12 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider 
                     in.beginArray();
                     break;
                 case BEGIN_OBJECT:
-                    if (inEdit && operation != null & target != null & inValue) {
-                        StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(path
-                              .getSchemaContext());
-
-                        YangInstanceIdentifier targetII = codec.deserialize(codec.serialize(path
-                                .getInstanceIdentifier()) + target);
-                        SchemaNode targetSchemaNode = SchemaContextUtil.findDataSchemaNode(path.getSchemaContext(),
-                                codec.getDataContextTree().getChild(targetII).getDataSchemaNode().getPath()
-                                        .getParent());
-
-                        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
-                        final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-
-                        //keep on parsing json from place where target points
-                        final JsonParserStream jsonParser = JsonParserStream.create(writer, path.getSchemaContext(),
-                                targetSchemaNode);
-                        jsonParser.parse(in);
-                        resultCollection.add(new PATCHEntity(editId, operation, targetII.getParent(), resultHolder.getResult()));
-                        inValue = false;
-
-                        operation = null;
-                        target = null;
-                        in.endObject();
-                    } else {
-                        in.beginObject();
-                    }
+                    in.beginObject();
                     break;
                 case END_DOCUMENT:
                     break;
                 case NAME:
                     final String name = in.nextName();
-
                     switch (name) {
                         case "edit" : inEdit = true;
                             break;
@@ -185,16 +159,87 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider 
                 case END_OBJECT:
                     in.endObject();
                     break;
-            case END_ARRAY:
-                in.endArray();
+                case END_ARRAY:
+                    in.endArray();
                 break;
 
-            default:
+                default:
                 break;
+            }
+
+            if (inEdit && operation != null && target != null && checkInValue(operation, inValue)) {
+                StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(path
+                        .getSchemaContext());
+
+                YangInstanceIdentifier targetII = codec.deserialize(codec.serialize(path
+                        .getInstanceIdentifier()) + target);
+
+                if (isPatchOperationsWithValue(operation)) {
+                    SchemaNode targetSchemaNode = SchemaContextUtil.findDataSchemaNode(path.getSchemaContext(),
+                            codec.getDataContextTree().getChild(targetII).getDataSchemaNode().getPath()
+                                    .getParent());
+
+                    final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+                    final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+
+                    //keep on parsing json from place where target points
+                    final JsonParserStream jsonParser = JsonParserStream.create(writer, path.getSchemaContext(),
+                            targetSchemaNode);
+                    jsonParser.parse(in);
+
+                    resultCollection.add(new PATCHEntity(editId, operation, targetII.getParent(), resultHolder.getResult()));
+
+                    // end object expected
+                    in.endObject();
+                } else {
+                    resultCollection.add(new PATCHEntity(editId, operation, targetII.getParent()));
+                }
+
+                // invalidate this operation
+                operation = null;
+                target = null;
+                inValue = false;
             }
         }
 
         return ImmutableList.copyOf(resultCollection);
+    }
+
+    private boolean checkInValue(final String operation, final boolean inValue) throws IOException {
+        if (operation == null) {
+            return false;
+        }
+
+        if (isPatchOperationsWithValue(operation)) {
+            if (inValue) {
+                return true;
+            } else {
+                //throw new IOException("Value node missing.");
+                return false;
+            }
+        }
+
+        if (!isPatchOperationsWithValue(operation)) {
+            if (!inValue) {
+                return true;
+            } else {
+                throw new IOException("value node not allowed.");
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isPatchOperationsWithValue(final String operation) {
+        switch (PATCHEditOperation.valueOf(operation.toUpperCase())) {
+            case CREATE:
+            case MERGE:
+            case REPLACE:
+            case INSERT:
+                return true;
+            default:
+                return false;
+        }
     }
 
     private class StringModuleInstanceIdentifierCodec extends AbstractModuleStringInstanceIdentifierCodec {
