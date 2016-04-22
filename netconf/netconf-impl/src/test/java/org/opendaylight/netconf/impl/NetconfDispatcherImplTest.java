@@ -33,8 +33,14 @@ public class NetconfDispatcherImplTest {
 
         SessionIdProvider idProvider = new SessionIdProvider();
         hashedWheelTimer = new HashedWheelTimer();
-        NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new NetconfServerSessionNegotiatorFactory(
-                hashedWheelTimer, factoriesListener, idProvider, 5000, ConcurrentClientsTest.createMockedMonitoringService());
+
+        NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new NetconfServerSessionNegotiatorFactoryBuilder()
+                .setAggregatedOpService(factoriesListener)
+                .setTimer(hashedWheelTimer)
+                .setIdProvider(idProvider)
+                .setMonitoringService(ConcurrentClientsTest.createMockedMonitoringService())
+                .setConnectionTimeoutMillis(5000)
+                .build();
 
         NetconfServerDispatcherImpl.ServerChannelInitializer serverChannelInitializer = new NetconfServerDispatcherImpl.ServerChannelInitializer(serverNegotiatorFactory);
 
