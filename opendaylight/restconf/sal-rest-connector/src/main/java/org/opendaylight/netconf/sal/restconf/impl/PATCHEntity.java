@@ -27,6 +27,13 @@ public class PATCHEntity {
         this.node = Preconditions.checkNotNull(node);
     }
 
+    public PATCHEntity(final String editId, final String operation, final YangInstanceIdentifier targetNode) {
+        this.editId = Preconditions.checkNotNull(editId);
+        this.operation = Preconditions.checkNotNull(operation);
+        this.targetNode = Preconditions.checkNotNull(targetNode);
+        this.node = null;
+    }
+
     public String getOperation() {
         return operation;
     }
