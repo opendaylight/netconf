@@ -1,0 +1,19 @@
+module distributed-tx-api {
+    yang-version 1;
+    namespace "urn:opendaylight:params:xml:ns:yang:distributed-tx-api";
+    prefix "distributed-tx-api";
+
+    import config { prefix config; revision-date 2013-04-05; }
+
+    description
+        "Service definition for distributed-tx project";
+
+    revision "2015-01-05" {
+        description "Initial revision of distributed-tx model";
+    }
+
+    identity dtx-provider {
+        base config:service-type;
+        config:java-class "org.opendaylight.distributed.tx.api.DTxProvider";
+    }
+}
