@@ -12,7 +12,13 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import org.opendaylight.restconf.rest.api.services.schema.RestconfSchemaService;
 
+/**
+ * @deprecated do not use this api. It is replaced by
+ *             {@link RestconfSchemaService}
+ */
+@Deprecated
 @Beta
 public interface SchemaRetrievalService {
 
