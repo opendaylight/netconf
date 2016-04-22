@@ -46,6 +46,7 @@
     <module>tools</module>
 
     <module>netconf-artifacts</module>
+    <module>distributed-tx</module>
   </modules>
 
   <dependencyManagement>
