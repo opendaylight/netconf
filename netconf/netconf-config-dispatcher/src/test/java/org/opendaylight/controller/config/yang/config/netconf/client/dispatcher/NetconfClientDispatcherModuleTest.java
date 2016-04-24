@@ -8,11 +8,20 @@
 
 package org.opendaylight.controller.config.yang.config.netconf.client.dispatcher;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.contains;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
 import javax.management.ObjectName;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.opendaylight.controller.config.api.ConflictingVersionException;
 import org.opendaylight.controller.config.api.ValidationException;
 import org.opendaylight.controller.config.api.jmx.CommitStatus;
@@ -22,6 +31,11 @@ import org.opendaylight.controller.config.util.ConfigTransactionJMXClient;
 import org.opendaylight.controller.config.yang.netty.threadgroup.NettyThreadgroupModuleFactory;
 import org.opendaylight.controller.config.yang.netty.threadgroup.NettyThreadgroupModuleMXBean;
 import org.opendaylight.controller.config.yang.netty.timer.HashedWheelTimerModuleFactory;
+import org.osgi.framework.Filter;
+import org.osgi.framework.ServiceListener;
+import org.osgi.framework.ServiceReference;
+import io.netty.channel.EventLoopGroup;
+import io.netty.util.Timer;
 
 public class NetconfClientDispatcherModuleTest extends AbstractConfigTest{
 
@@ -29,11 +43,32 @@ public class NetconfClientDispatcherModuleTest extends AbstractConfigTest{
     private final String instanceName = "dispatch";
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         factory = new NetconfClientDispatcherModuleFactory();
         super.initConfigTransactionManagerImpl(new HardcodedModuleFactoriesResolver(mockedContext,factory,
                 new NettyThreadgroupModuleFactory(),
                 new HashedWheelTimerModuleFactory()));
+
+        doAnswer(new Answer<Filter>() {
+            @Override
+            public Filter answer(InvocationOnMock invocation) {
+                String str = invocation.getArgumentAt(0, String.class);
+                Filter mockFilter = mock(Filter.class);
+                doReturn(str).when(mockFilter).toString();
+                return mockFilter;
+            }
+        }).when(mockedContext).createFilter(anyString());
+        doNothing().when(mockedContext).addServiceListener(any(ServiceListener.class), anyString());
+
+        setupMockService(EventLoopGroup.class);
+        setupMockService(Timer.class);
+    }
+
+    private void setupMockService(Class<?> serviceInterface) throws Exception {
+        ServiceReference<?> mockServiceRef = mock(ServiceReference.class);
+        doReturn(new ServiceReference[]{mockServiceRef}).when(mockedContext).
+                getServiceReferences(anyString(), contains(serviceInterface.getName()));
+        doReturn(mock(serviceInterface)).when(mockedContext).getService(mockServiceRef);
     }
 
     @Test
