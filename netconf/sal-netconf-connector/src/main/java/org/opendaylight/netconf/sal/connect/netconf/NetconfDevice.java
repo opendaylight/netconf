@@ -378,6 +378,8 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
         private final RemoteDeviceCommunicator<NetconfMessage> listener;
         private final NetconfDeviceCapabilities capabilities;
 
+        private boolean isLast = false;
+
         public SchemaSetup(final DeviceSources deviceSources, final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceCommunicator<NetconfMessage> listener) {
             this.deviceSources = deviceSources;
             this.remoteSessionCapabilities = remoteSessionCapabilities;
@@ -394,7 +396,14 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
          * Build schema context, in case of success or final failure notify device
          */
         private void setUpSchema(Collection<SourceIdentifier> requiredSources) {
-            while (!requiredSources.isEmpty()) {
+            while (!requiredSources.isEmpty() && !isLast) {
+                // This is to make sure we don't fail the initialization if the
+                // last item in the list triggered an MissingSchemaSourceException.
+                // As the catch will trim the list, the list will be empty thus not retrying.
+                // So we add this mechanism to retry one more time even if the list is empty.
+                if (requiredSources.isEmpty()) {
+                    isLast = true;
+                }
                 LOG.trace("{}: Trying to build schema context from {}", id, requiredSources);
                 try {
                     final CheckedFuture<SchemaContext, SchemaResolutionException> schemaBuilderFuture = schemaContextFactory.createSchemaContext(requiredSources);
@@ -404,15 +413,15 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
                     capabilities.addCapabilities(filteredQNames);
                     capabilities.addNonModuleBasedCapabilities(remoteSessionCapabilities.getNonModuleCaps());
                     handleSalInitializationSuccess(result, remoteSessionCapabilities, getDeviceSpecificRpc(result));
+                    isLast = true;
                     return;
                 } catch (Throwable t) {
                     if (t instanceof MissingSchemaSourceException){
                         requiredSources = handleMissingSchemaSourceException(requiredSources, (MissingSchemaSourceException) t);
                     } else if (t instanceof SchemaResolutionException) {
-                        // FIXME do not wrap MissingSchemaSourceException in a
-                        // SchemaResolutionException. Somewhere this exception
-                        // is wrapped thus the instanceod isn't seeing the root
-                        // the cause of the exception.
+                        // schemaBuilderFuture.checkedGet() throws only SchemaResolutionException
+                        // that might be wrapping a MissingSchemaSourceException so we need to look
+                        // at the cause of the exception to make sure we don't misinterpret it.
                         if (t.getCause() instanceof MissingSchemaSourceException) {
                             requiredSources = handleMissingSchemaSourceException(requiredSources, (MissingSchemaSourceException) t.getCause());
                             continue;
