@@ -401,6 +401,30 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_340017aa",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-27T12:33:27Z",
+      "side": 1,
+      "message": "Ok my bad, I haven\u0027t looked at the builder but I was wondering it has the setCapabilitySchema, as this is provided by the Capability.",
+      "parentUuid": "fa57193c_99883e24",
+      "range": {
+        "startLine": 174,
+        "startChar": 16,
+        "endLine": 174,
+        "endChar": 23
+      },
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_8330cb57",
         "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
         "patchSetId": 4
@@ -530,6 +554,30 @@
       "side": 1,
       "message": "Modified capability is defined in ietf-netconf-notifications.yang - base capability uri remains unchanged, but parameters, e.g. revision change. I\u0027m not sure, if such situation can happen in md-sal netconf, but this comment was present in NetconfMonitoringServiceImpl before I\u0027ve splited it to NetconfSessionMonitoringService and NetconfCapabilitiesMonitoringService, so I left it as it was.",
       "parentUuid": "fa57193c_431d13bd",
+      "range": {
+        "startLine": 244,
+        "startChar": 0,
+        "endLine": 245,
+        "endChar": 91
+      },
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_541aeb17",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-27T12:33:27Z",
+      "side": 1,
+      "message": "Ok understood.",
+      "parentUuid": "fa57193c_99ddde17",
       "range": {
         "startLine": 244,
         "startChar": 0,
