@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_d9263668",
+        "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/monitoring/NetconfMonitoringService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-27T08:41:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa57193c_43eeb3ed",
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_c3b923eb",
         "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/monitoring/NetconfMonitoringService.java",
         "patchSetId": 4
@@ -30,6 +48,30 @@
       "writtenOn": "2016-04-26T14:18:35Z",
       "side": 1,
       "message": "resulting capabilities might be more accurate",
+      "range": {
+        "startLine": 47,
+        "startChar": 31,
+        "endLine": 47,
+        "endChar": 37
+      },
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_b92b822f",
+        "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/monitoring/NetconfMonitoringService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-27T08:41:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa57193c_c3b923eb",
       "range": {
         "startLine": 47,
         "startChar": 31,
@@ -65,6 +107,30 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_1920ae48",
+        "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/monitoring/NetconfMonitoringService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-27T08:41:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa57193c_23ce1f84",
+      "range": {
+        "startLine": 53,
+        "startChar": 26,
+        "endLine": 53,
+        "endChar": 32
+      },
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_03cb1b73",
         "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/monitoring/NetconfMonitoringService.java",
         "patchSetId": 4
@@ -76,6 +142,30 @@
       "writtenOn": "2016-04-26T14:18:35Z",
       "side": 1,
       "message": "wondering why this API is for sessions whereas the two others are for session.",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 61
+      },
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_99a15eac",
+        "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/monitoring/NetconfMonitoringService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-27T08:41:51Z",
+      "side": 1,
+      "message": "The point is to notify about session activity like successful rpcs, failed rpcs etc. Because of performance reasons it can\u0027t notify after every rpc, so it notifies at regular time intervals and send whole batches of sessions with changed stats. I updated javadoc, hope it is clearer now.",
+      "parentUuid": "fa57193c_03cb1b73",
       "range": {
         "startLine": 71,
         "startChar": 0,
@@ -105,6 +195,24 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_19954e40",
+        "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/monitoring/SessionListener.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-27T08:41:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa57193c_43c5135a",
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_237c5f20",
         "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
         "patchSetId": 4
@@ -116,6 +224,30 @@
       "writtenOn": "2016-04-26T14:18:35Z",
       "side": 1,
       "message": "shouldn\u0027t it be getSchemaForRevision ?",
+      "range": {
+        "startLine": 83,
+        "startChar": 31,
+        "endLine": 83,
+        "endChar": 53
+      },
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_f9917a53",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-27T08:41:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa57193c_237c5f20",
       "range": {
         "startLine": 83,
         "startChar": 31,
@@ -151,6 +283,30 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_599fc65f",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-27T08:41:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa57193c_03a03b8f",
+      "range": {
+        "startLine": 98,
+        "startChar": 0,
+        "endLine": 101,
+        "endChar": 65
+      },
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_23f8df7b",
         "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
         "patchSetId": 4
@@ -162,6 +318,30 @@
       "writtenOn": "2016-04-26T14:18:35Z",
       "side": 1,
       "message": "instead of the preconditions here, maybe you could use the isValidModuleCapability function defined above",
+      "range": {
+        "startLine": 163,
+        "startChar": 16,
+        "endLine": 163,
+        "endChar": 79
+      },
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_399c9269",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-27T08:41:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa57193c_23f8df7b",
       "range": {
         "startLine": 163,
         "startChar": 16,
@@ -197,6 +377,30 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_99883e24",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-27T08:41:51Z",
+      "side": 1,
+      "message": "I\u0027m not sure what do you mean. Builder doesn\u0027t have such method.",
+      "parentUuid": "fa57193c_c303e371",
+      "range": {
+        "startLine": 174,
+        "startChar": 16,
+        "endLine": 174,
+        "endChar": 23
+      },
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_8330cb57",
         "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
         "patchSetId": 4
@@ -208,6 +412,30 @@
       "writtenOn": "2016-04-26T14:18:35Z",
       "side": 1,
       "message": "could this be hold in a constant?",
+      "range": {
+        "startLine": 204,
+        "startChar": 45,
+        "endLine": 204,
+        "endChar": 95
+      },
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_798d6a31",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-27T08:41:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa57193c_8330cb57",
       "range": {
         "startLine": 204,
         "startChar": 45,
@@ -243,6 +471,30 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_39aad270",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-27T08:41:51Z",
+      "side": 1,
+      "message": "You\u0027re right, I\u0027ve added synchronization to AutoCloseable in registerListener.",
+      "parentUuid": "fa57193c_033cbb2e",
+      "range": {
+        "startLine": 213,
+        "startChar": 8,
+        "endLine": 213,
+        "endChar": 26
+      },
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_431d13bd",
         "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
         "patchSetId": 4
@@ -254,6 +506,30 @@
       "writtenOn": "2016-04-26T14:18:35Z",
       "side": 1,
       "message": "I don\u0027t see how a capability can be modified because if the schema is changing you would have a new revision.\nI might be missing something as well",
+      "range": {
+        "startLine": 244,
+        "startChar": 0,
+        "endLine": 245,
+        "endChar": 91
+      },
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_99ddde17",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-27T08:41:51Z",
+      "side": 1,
+      "message": "Modified capability is defined in ietf-netconf-notifications.yang - base capability uri remains unchanged, but parameters, e.g. revision change. I\u0027m not sure, if such situation can happen in md-sal netconf, but this comment was present in NetconfMonitoringServiceImpl before I\u0027ve splited it to NetconfSessionMonitoringService and NetconfCapabilitiesMonitoringService, so I left it as it was.",
+      "parentUuid": "fa57193c_431d13bd",
       "range": {
         "startLine": 244,
         "startChar": 0,
@@ -289,6 +565,30 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_79e28ad6",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-27T08:41:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa57193c_e38387ca",
+      "range": {
+        "startLine": 254,
+        "startChar": 61,
+        "endLine": 254,
+        "endChar": 70
+      },
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_a3c7cf11",
         "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfSessionMonitoringService.java",
         "patchSetId": 4
@@ -300,6 +600,30 @@
       "writtenOn": "2016-04-26T14:18:35Z",
       "side": 1,
       "message": "wouldn\u0027t it be more convenient to not have it in an Optional",
+      "range": {
+        "startLine": 45,
+        "startChar": 18,
+        "endLine": 45,
+        "endChar": 26
+      },
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_b9ec22c9",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfSessionMonitoringService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-27T08:41:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa57193c_a3c7cf11",
       "range": {
         "startLine": 45,
         "startChar": 18,
@@ -329,6 +653,24 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_19d1cefb",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfSessionMonitoringService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-27T08:41:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa57193c_c3d643c5",
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_23dbbfee",
         "filename": "netconf/netconf-impl/src/main/yang/netconf-northbound-impl.yang",
         "patchSetId": 4
@@ -340,6 +682,30 @@
       "writtenOn": "2016-04-26T14:18:35Z",
       "side": 1,
       "message": "it this necessary?",
+      "range": {
+        "startLine": 116,
+        "startChar": 0,
+        "endLine": 118,
+        "endChar": 21
+      },
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_f9cdfa5e",
+        "filename": "netconf/netconf-impl/src/main/yang/netconf-northbound-impl.yang",
+        "patchSetId": 4
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-27T08:41:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa57193c_23dbbfee",
       "range": {
         "startLine": 116,
         "startChar": 0,
@@ -375,6 +741,30 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_59db461b",
+        "filename": "netconf/netconf-impl/src/main/yang/netconf-northbound-impl.yang",
+        "patchSetId": 4
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-27T08:41:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa57193c_63e5b7a7",
+      "range": {
+        "startLine": 120,
+        "startChar": 42,
+        "endLine": 120,
+        "endChar": 50
+      },
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_43f9934c",
         "filename": "netconf/netconf-mdsal-config/src/main/resources/initial/08-netconf-mdsal.xml",
         "patchSetId": 4
@@ -386,6 +776,30 @@
       "writtenOn": "2016-04-26T14:18:35Z",
       "side": 1,
       "message": "is there any reasoning behind this 6 seconds value?",
+      "range": {
+        "startLine": 96,
+        "startChar": 128,
+        "endLine": 96,
+        "endChar": 129
+      },
+      "revId": "60b101f6cb71e177e56d7e9877ae276b3f60043f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_7930ca56",
+        "filename": "netconf/netconf-mdsal-config/src/main/resources/initial/08-netconf-mdsal.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-27T08:41:51Z",
+      "side": 1,
+      "message": "No, it\u0027s just default value.",
+      "parentUuid": "fa57193c_43f9934c",
       "range": {
         "startLine": 96,
         "startChar": 128,
