@@ -21,15 +21,28 @@ final class StringModuleInstanceIdentifierCodec extends AbstractModuleStringInst
 
     private final DataSchemaContextTree dataContextTree;
     private final SchemaContext context;
+    private final String defaultPrefix;
 
     StringModuleInstanceIdentifierCodec(SchemaContext context) {
         this.context = Preconditions.checkNotNull(context);
         this.dataContextTree = DataSchemaContextTree.from(context);
+        this.defaultPrefix = "";
     }
+
+    StringModuleInstanceIdentifierCodec(SchemaContext context, @Nonnull String defaultPrefix) {
+        this.context = Preconditions.checkNotNull(context);
+        this.dataContextTree = DataSchemaContextTree.from(context);
+        this.defaultPrefix = defaultPrefix;
+    }
+
 
     @Override
     protected Module moduleForPrefix(@Nonnull String prefix) {
-        return context.findModuleByName(prefix, null);
+        if (prefix.isEmpty() && !this.defaultPrefix.isEmpty()) {
+            return context.findModuleByName(this.defaultPrefix, null);
+        } else {
+            return context.findModuleByName(prefix, null);
+        }
     }
 
     @Nonnull
