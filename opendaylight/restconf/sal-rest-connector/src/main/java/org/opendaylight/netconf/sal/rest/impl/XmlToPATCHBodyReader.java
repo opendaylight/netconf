@@ -8,13 +8,16 @@
 
 package org.opendaylight.netconf.sal.rest.impl;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -25,30 +28,35 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.opendaylight.netconf.sal.rest.api.Draft02.MediaTypes;
+import org.opendaylight.netconf.sal.rest.api.RestconfService;
+import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
+import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
+import org.opendaylight.netconf.sal.restconf.impl.PATCHEditOperation;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHEntity;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlUtils;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.opendaylight.netconf.sal.rest.api.Draft02.MediaTypes;
-import org.opendaylight.netconf.sal.rest.api.RestconfService;
-import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
-import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlUtils;
-import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 
 @Provider
 @Consumes({MediaTypes.PATCH + RestconfService.XML})
@@ -117,47 +125,121 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
         final List<PATCHEntity> resultCollection = new ArrayList<>();
         final String patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
         final NodeList editNodes = doc.getElementsByTagName("edit");
-        final DataSchemaNode schemaNode = (DataSchemaNode) pathContext.getSchemaNode();
         final DomToNormalizedNodeParserFactory parserFactory =
                 DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER,
                         pathContext.getSchemaContext());
 
         for (int i = 0; i < editNodes.getLength(); i++) {
-            Element element = (Element) editNodes.item(i);
+            DataSchemaNode schemaNode = (DataSchemaNode) pathContext.getSchemaNode();
+            final Element element = (Element) editNodes.item(i);
             final String operation = element.getElementsByTagName("operation").item(0).getFirstChild().getNodeValue();
             final String editId = element.getElementsByTagName("edit-id").item(0).getFirstChild().getNodeValue();
-            final String target = element.getElementsByTagName("target").item(0).getFirstChild().getNodeValue();
-            DataSchemaNode targetNode = ((DataNodeContainer)(pathContext.getSchemaNode())).getDataChildByName
-                    (target.replace("/", ""));
-            if (targetNode == null) {
-                LOG.debug("Target node {} not found in path {} ", target, pathContext.getSchemaNode());
-                throw new RestconfDocumentedException("Error parsing input", ErrorType.PROTOCOL,
-                        ErrorTag.MALFORMED_MESSAGE);
-            } else {
-                final YangInstanceIdentifier targetII = pathContext.getInstanceIdentifier().node(targetNode.getQName());
+            final String target = element.getElementsByTagName("target").item(0).getFirstChild().getNodeValue()
+                    .replaceFirst("/", "");
+
+            // read value if operation requires it
+            Element value = null;
+            if (PATCHEditOperation.isPatchOperationWithValue(operation)) {
                 final NodeList valueNodes = element.getElementsByTagName("value").item(0).getChildNodes();
-                Element value = null;
+
                 for (int j = 0; j < valueNodes.getLength(); j++) {
                     if (valueNodes.item(j) instanceof Element) {
                         value = (Element) valueNodes.item(j);
                         break;
                     }
                 }
-                NormalizedNode<?, ?> parsed = null;
-                if (schemaNode instanceof ContainerSchemaNode) {
-                    parsed = parserFactory.getContainerNodeParser().parse(Collections.singletonList(value),
-                            (ContainerSchemaNode) targetNode);
-                } else if (schemaNode instanceof ListSchemaNode) {
-                    NormalizedNode<?, ?> parsedValue = parserFactory.getMapEntryNodeParser().parse(Collections
-                            .singletonList(value), (ListSchemaNode) targetNode);
-                    parsed = ImmutableNodes.mapNodeBuilder().withNodeIdentifier(new NodeIdentifier
-                            (targetNode.getQName())).withChild((MapEntryNode) parsedValue).build();
-                }
+            }
 
-                resultCollection.add(new PATCHEntity(editId, operation, targetII, parsed));
+            // get namespace according to schema node from path context or value
+            String namespace = (value == null) ?
+                    schemaNode.getQName().getNamespace().toString() : value.getNamespaceURI();
+
+            // find module
+            Module module = pathContext.getSchemaContext().findModuleByNamespace(
+                    URI.create(namespace)).iterator().next();
+
+            // initialize codec + set default prefix
+            StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
+                    pathContext.getSchemaContext());
+            codec.setDefaultPrefix(module.getName());
+
+            final YangInstanceIdentifier targetII = codec.deserialize(codec.serialize(pathContext
+                    .getInstanceIdentifier()) + prepareNonCondXpath(schemaNode, target, value, namespace, module
+                    .getQNameModule().getFormattedRevision()));
+
+            // move schemaNode and get targetNode
+            schemaNode = (DataSchemaNode) SchemaContextUtil.findDataSchemaNode(pathContext.getSchemaContext(),
+                    codec.getDataContextTree().getChild(targetII).getDataSchemaNode().getPath());
+
+            SchemaNode targetNode = SchemaContextUtil.findDataSchemaNode(pathContext.getSchemaContext(),
+                    codec.getDataContextTree().getChild(targetII).getDataSchemaNode().getPath().getParent());
+
+            if (targetNode == null) {
+                LOG.debug("Target node {} not found in path {} ", target, pathContext.getSchemaNode());
+                throw new RestconfDocumentedException("Error parsing input", ErrorType.PROTOCOL,
+                        ErrorTag.MALFORMED_MESSAGE);
+            } else {
+                if (PATCHEditOperation.isPatchOperationWithValue(operation)) {
+                    NormalizedNode<?, ?> parsed = null;
+                    if (schemaNode instanceof ContainerSchemaNode) {
+                        parsed = parserFactory.getContainerNodeParser().parse(Collections.singletonList(value),
+                                (ContainerSchemaNode) schemaNode);
+                    } else if (schemaNode instanceof ListSchemaNode) {
+                        NormalizedNode<?, ?> parsedValue = parserFactory.getMapEntryNodeParser().parse(Collections
+                                .singletonList(value), (ListSchemaNode) schemaNode);
+                        parsed = ImmutableNodes.mapNodeBuilder().withNodeIdentifier(new NodeIdentifier
+                                (targetNode.getQName())).withChild((MapEntryNode) parsedValue).build();
+                    }
+
+                    resultCollection.add(new PATCHEntity(editId, operation, targetII.getParent(), parsed));
+                } else {
+                    resultCollection.add(new PATCHEntity(editId, operation, targetII));
+                }
             }
         }
 
         return new PATCHContext(pathContext, ImmutableList.copyOf(resultCollection), patchId);
+    }
+
+    private String prepareNonCondXpath(final DataSchemaNode schemaNode, final String target, final Element value,
+                                       final String namespace, String revision) {
+        Iterator<String> args = Splitter.on("/").split(target.substring(target.indexOf(':') + 1))
+                .iterator();
+
+        StringBuffer nonCondXpath = new StringBuffer();
+        SchemaNode childNode = schemaNode;
+
+        while (args.hasNext()) {
+            String s = args.next();
+            nonCondXpath.append("/" + s);
+            childNode = ((DataNodeContainer) childNode).getDataChildByName(QName.create(namespace, revision, s));
+
+            if (childNode instanceof ListSchemaNode && args.hasNext()) {
+                createKeyForListFromPath(nonCondXpath, ((ListSchemaNode) childNode).getKeyDefinition().iterator()
+                        .next().getLocalName(), args.next());
+            }
+        }
+
+        if (childNode instanceof ListSchemaNode && value != null) {
+            completeTargetForList(nonCondXpath, ((ListSchemaNode) childNode).getKeyDefinition().iterator()
+                    .next().getLocalName(), value);
+        }
+
+        return nonCondXpath.toString();
+    }
+
+    private void completeTargetForList(final StringBuffer nonCondXpath, final String key, final Element value) {
+        createKeyForListFromPath(nonCondXpath, key, value.getElementsByTagName(key).item(0)
+                .getFirstChild().getNodeValue());
+    }
+
+    private void createKeyForListFromPath(final StringBuffer nonCondXpath, final String key, final String keyValue) {
+        nonCondXpath.append(
+                "["
+                + key
+                + "="
+                + "'" + keyValue + "'"
+                + "]"
+        );
     }
 }
