@@ -1,0 +1,9 @@
+<yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+    <patch-id>test-patch</patch-id>
+    <comment>Test patch with missing value node for create operation</comment>
+    <edit>
+        <edit-id>edit1</edit-id>
+        <operation>create</operation>
+        <target>/my-list2</target>
+    </edit>
+</yang-patch>
