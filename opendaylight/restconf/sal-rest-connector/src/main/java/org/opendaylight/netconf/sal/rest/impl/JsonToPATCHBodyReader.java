@@ -313,8 +313,8 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider 
     private PATCHEntity prepareEditOperation(@Nonnull final PatchEdit edit) {
         if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
                 && checkDataPresence(edit.getOperation(), (edit.getData() != null))) {
-            if (isPatchOperationWithValue(edit.getOperation())) {
-                return new PATCHEntity(edit.getId(), edit.getOperation(), edit.getTarget().getParent(), edit.getData());
+            if (PATCHEditOperation.isPatchOperationWithValue(edit.getOperation())) {
+                return new PATCHEntity(edit.getId(), edit.getOperation(), edit.getTarget(), edit.getData());
             } else {
                 return new PATCHEntity(edit.getId(), edit.getOperation(), edit.getTarget());
             }
@@ -331,7 +331,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider 
      * allow it, false otherwise
      */
     private boolean checkDataPresence(@Nonnull final String operation, final boolean hasData) {
-        if (isPatchOperationWithValue(operation)) {
+        if (PATCHEditOperation.isPatchOperationWithValue(operation)) {
             if (hasData) {
                 return true;
             } else {
@@ -343,23 +343,6 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider 
             } else {
                 return false;
             }
-        }
-    }
-
-    /**
-     * Check if operation requires data to be specified
-     * @param operation Name of the operation to be checked
-     * @return true if operation requires data, false otherwise
-     */
-    private boolean isPatchOperationWithValue(@Nonnull final String operation) {
-        switch (PATCHEditOperation.valueOf(operation.toUpperCase())) {
-            case CREATE:
-            case MERGE:
-            case REPLACE:
-            case INSERT:
-                return true;
-            default:
-                return false;
         }
     }
 
