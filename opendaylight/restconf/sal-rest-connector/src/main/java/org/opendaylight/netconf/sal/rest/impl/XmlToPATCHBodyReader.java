@@ -144,10 +144,10 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                     }
                 }
                 NormalizedNode<?, ?> parsed = null;
-                if (schemaNode instanceof ContainerSchemaNode) {
+                if (targetNode instanceof ContainerSchemaNode) {
                     parsed = parserFactory.getContainerNodeParser().parse(Collections.singletonList(value),
                             (ContainerSchemaNode) targetNode);
-                } else if (schemaNode instanceof ListSchemaNode) {
+                } else if (targetNode instanceof ListSchemaNode) {
                     NormalizedNode<?, ?> parsedValue = parserFactory.getMapEntryNodeParser().parse(Collections
                             .singletonList(value), (ListSchemaNode) targetNode);
                     parsed = ImmutableNodes.mapNodeBuilder().withNodeIdentifier(new NodeIdentifier
