@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_0a8967eb",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-29T12:40:49Z",
+      "side": 1,
+      "message": "the more I think about it, the less this make sense. Is it possible to have an empty schemaContext?",
+      "range": {
+        "startLine": 400,
+        "startChar": 0,
+        "endLine": 406,
+        "endChar": 17
+      },
+      "revId": "cef0c9ff6eac7e93716b2bd3e83ddb89d9699659",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
