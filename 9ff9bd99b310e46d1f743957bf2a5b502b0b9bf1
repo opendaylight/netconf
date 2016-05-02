@@ -25,6 +25,52 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_d009e096",
+        "filename": "netconf/distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-05-02T08:36:07Z",
+      "side": 1,
+      "message": "I don\u0027t see any input parameter which would point to the node you want to rollback, wont\u0027t this just rollback the entire dtx?",
+      "range": {
+        "startLine": 226,
+        "startChar": 26,
+        "endLine": 226,
+        "endChar": 40
+      },
+      "revId": "9ff9bd99b310e46d1f743957bf2a5b502b0b9bf1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_f004e47f",
+        "filename": "netconf/distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-05-02T08:36:07Z",
+      "side": 1,
+      "message": "I think you meant to put rollback here.",
+      "range": {
+        "startLine": 226,
+        "startChar": 7,
+        "endLine": 226,
+        "endChar": 13
+      },
+      "revId": "9ff9bd99b310e46d1f743957bf2a5b502b0b9bf1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_b076ec3c",
         "filename": "netconf/distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTxProvider.java",
         "patchSetId": 1
