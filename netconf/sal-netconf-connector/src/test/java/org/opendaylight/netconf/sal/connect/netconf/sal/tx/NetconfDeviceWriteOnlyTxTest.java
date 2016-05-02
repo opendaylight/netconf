@@ -33,7 +33,7 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -128,7 +128,7 @@ public class NetconfDeviceWriteOnlyTxTest {
                 .doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("Failed tx")))
                 .when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
-        final WriteRunningTx tx = new WriteRunningTx(id, new NetconfBaseOps(rpc, NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext()),
+        final WriteRunningTx tx = new WriteRunningTx(id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext()),
                 false);
         try {
             tx.delete(LogicalDatastoreType.CONFIGURATION, yangIId);

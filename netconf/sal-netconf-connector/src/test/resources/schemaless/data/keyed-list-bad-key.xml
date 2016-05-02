@@ -1,0 +1,4 @@
+<user xmlns="http://example.com/schema/1.2/config">
+    <key>k1</key>
+    <name>fred</name>
+</user>

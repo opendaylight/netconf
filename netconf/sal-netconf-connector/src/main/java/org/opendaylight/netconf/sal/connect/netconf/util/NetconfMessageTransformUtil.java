@@ -271,7 +271,7 @@ public class NetconfMessageTransformUtil {
         return Builders.containerBuilder().withNodeIdentifier(toId(name)).withValue(ImmutableList.copyOf(node)).build();
     }
 
-    public static DataContainerChild<?, ?> createEditConfigStructure(final SchemaContext ctx, final YangInstanceIdentifier dataPath,
+    public static AnyXmlNode createEditConfigAnyxml(final SchemaContext ctx, final YangInstanceIdentifier dataPath,
                                                                      final Optional<ModifyAction> operation, final Optional<NormalizedNode<?, ?>> lastChildOverride) {
         final NormalizedNode<?, ?> configContent;
 
@@ -294,8 +294,13 @@ public class NetconfMessageTransformUtil {
         }
         final DOMSource value = new DOMSource(element);
 
-        return Builders.choiceBuilder().withNodeIdentifier(toId(EditContent.QNAME)).withChild(
-                Builders.anyXmlBuilder().withNodeIdentifier(toId(NETCONF_CONFIG_QNAME)).withValue(value).build()).build();
+        return Builders.anyXmlBuilder().withNodeIdentifier(toId(NETCONF_CONFIG_QNAME)).withValue(value).build();
+    }
+
+    public static DataContainerChild<?, ?> createEditConfigStructure(final SchemaContext ctx, final YangInstanceIdentifier dataPath,
+                                                                     final Optional<ModifyAction> operation, final Optional<NormalizedNode<?, ?>> lastChildOverride) {
+        return Builders.choiceBuilder().withNodeIdentifier(toId(EditContent.QNAME))
+                .withChild(createEditConfigAnyxml(ctx, dataPath, operation, lastChildOverride)).build();
     }
 
     public static SchemaPath toPath(final QName rpc) {
