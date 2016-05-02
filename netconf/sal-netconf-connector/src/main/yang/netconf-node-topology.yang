@@ -46,6 +46,11 @@ module netconf-node-topology {
             type boolean;
         }
 
+        leaf schemaless {
+            type boolean;
+            default false;
+        }
+
         container yang-module-capabilities {
             config true;
             leaf override {

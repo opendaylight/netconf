@@ -111,6 +111,7 @@ public class AbstractNetconfTopologyTest {
                 .setReconnectOnChangedSchema(true)
                 .setDefaultRequestTimeoutMillis(1000L)
                 .setBetweenAttemptsTimeoutMillis(100)
+                .setSchemaless(false)
                 .build();
 
         AbstractNetconfTopology.NetconfConnectorDTO connectorDTO = topology.createDeviceCommunicator(NODE_ID, testingNode);
@@ -126,6 +127,7 @@ public class AbstractNetconfTopologyTest {
                 .setDefaultRequestTimeoutMillis(1000L)
                 .setBetweenAttemptsTimeoutMillis(100)
                 .setKeepaliveDelay(1L)
+                .setSchemaless(false)
                 .build();
 
         AbstractNetconfTopology.NetconfConnectorDTO connectorDTO = topology.createDeviceCommunicator(NODE_ID, testingNode);
@@ -222,6 +224,7 @@ public class AbstractNetconfTopologyTest {
                 .setBetweenAttemptsTimeoutMillis(100)
                 .setKeepaliveDelay(1000L)
                 .setTcpOnly(true)
+                .setSchemaless(false)
                 .setCredentials(new LoginPasswordBuilder().setUsername("testuser").setPassword("testpassword").build())
                 .build();
         Node nd = mock(Node.class);
@@ -240,6 +243,7 @@ public class AbstractNetconfTopologyTest {
                 .setBetweenAttemptsTimeoutMillis(100)
                 .setKeepaliveDelay(1000L)
                 .setTcpOnly(true)
+                .setSchemaless(false)
                 .setCredentials(new LoginPasswordBuilder().setUsername("testuser").setPassword("testpassword").build())
                 .build();
         Node nd = mock(Node.class);
