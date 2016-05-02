@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_5079502e",
+        "filename": "netconf/distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTXLogicalTXProviderType.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-05-02T08:05:24Z",
+      "side": 1,
+      "message": "This is SPI related.\n\n+ Im not sure this enum is needed. Different providers should just implement 1 interface and Dtx should access them using this interface. Wiring/configuration will be performed by config subsystem \u003d This enum here makes it really difficult to introduce new provider (this enum will also have to be udpated)",
+      "range": {
+        "startLine": 13,
+        "startChar": 12,
+        "endLine": 13,
+        "endChar": 36
+      },
+      "revId": "9ff9bd99b310e46d1f743957bf2a5b502b0b9bf1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_b076ec3c",
+        "filename": "netconf/distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTxProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-05-02T08:05:24Z",
+      "side": 1,
+      "message": "Should be netconf agnostic",
+      "range": {
+        "startLine": 23,
+        "startChar": 53,
+        "endLine": 23,
+        "endChar": 60
+      },
+      "revId": "9ff9bd99b310e46d1f743957bf2a5b502b0b9bf1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_1088781e",
+        "filename": "netconf/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 84
+      },
+      "writtenOn": "2016-05-02T08:05:24Z",
+      "side": 1,
+      "message": "I\u0027d put the distributed tx folder under root ... not under netconf.\n\nThis dtx framework should be netconf (or any other protocol agnostic) since it only uses MD-SAL APIs so it does not need to be under netconf.",
+      "range": {
+        "startLine": 49,
+        "startChar": 11,
+        "endLine": 49,
+        "endChar": 26
+      },
+      "revId": "9ff9bd99b310e46d1f743957bf2a5b502b0b9bf1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
