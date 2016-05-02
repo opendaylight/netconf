@@ -104,7 +104,7 @@ public class NetconfMessageTransformerTest {
         final NetconfMessageTransformer transformer = new NetconfMessageTransformer(
                 partialSchema,
                 true,
-                NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS
+                BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS
         );
         NetconfMessage netconfMessage = transformer.toRpcRequest(
                 toPath(CREATE_SUBSCRIPTION_RPC_QNAME),
@@ -246,7 +246,7 @@ public class NetconfMessageTransformerTest {
         final MapEntryNode schemaNode = Builders.mapEntryBuilder().withNodeIdentifier(identifierWithPredicates).withValue(values).build();
 
         final YangInstanceIdentifier id = YangInstanceIdentifier.builder().node(NetconfState.QNAME).node(Schemas.QNAME).node(Schema.QNAME).nodeWithKey(Schema.QNAME, keys).build();
-        final DataContainerChild<?, ?> editConfigStructure = createEditConfigStructure(NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext(), id, Optional.<ModifyAction>absent(), Optional.<NormalizedNode<?, ?>>fromNullable(schemaNode));
+        final DataContainerChild<?, ?> editConfigStructure = createEditConfigStructure(BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext(), id, Optional.<ModifyAction>absent(), Optional.<NormalizedNode<?, ?>>fromNullable(schemaNode));
 
         final DataContainerChild<?, ?> target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_QNAME);
 

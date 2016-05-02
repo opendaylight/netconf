@@ -1,0 +1,9 @@
+<filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <top xmlns="http://example.com/schema/1.2/config">
+        <users>
+            <user>
+                <key>k1</key>
+            </user>
+        </users>
+    </top>
+</filter>
