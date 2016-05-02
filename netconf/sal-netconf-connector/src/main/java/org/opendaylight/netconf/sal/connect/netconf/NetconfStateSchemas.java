@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutionException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
-import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
@@ -81,7 +81,7 @@ public final class NetconfStateSchemas {
     private static final ContainerNode GET_SCHEMAS_RPC;
     static {
         final DataContainerChild<?, ?> filter = NetconfMessageTransformUtil.toFilterStructure(STATE_SCHEMAS_IDENTIFIER,
-                NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext());
+                BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext());
         GET_SCHEMAS_RPC
                 = Builders.containerBuilder().withNodeIdentifier(toId(NETCONF_GET_QNAME)).withChild(filter).build();
     }

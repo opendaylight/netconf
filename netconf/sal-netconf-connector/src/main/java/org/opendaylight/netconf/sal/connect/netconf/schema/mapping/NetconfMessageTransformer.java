@@ -8,13 +8,11 @@
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RPC_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_URI;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -23,15 +21,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import org.opendaylight.controller.config.util.xml.MissingNameSpaceException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.dom.api.DOMEvent;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
@@ -40,19 +35,12 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
-import org.opendaylight.netconf.util.NetconfUtil;
-import org.opendaylight.yangtools.sal.binding.generator.impl.ModuleInfoBackedContext;
-import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlUtils;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
@@ -67,51 +55,7 @@ import org.w3c.dom.Element;
 
 public class NetconfMessageTransformer implements MessageTransformer<NetconfMessage> {
 
-    public enum BaseSchema {
-
-        BASE_NETCONF_CTX(
-                Lists.newArrayList(
-                        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl.getInstance(),
-                        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.$YangModuleInfoImpl.getInstance()
-                )
-        ),
-        BASE_NETCONF_CTX_WITH_NOTIFICATIONS(
-                Lists.newArrayList(
-                        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.$YangModuleInfoImpl.getInstance(),
-                        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.$YangModuleInfoImpl.getInstance(),
-                        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl.getInstance(),
-                        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.$YangModuleInfoImpl.getInstance()
-                )
-        );
-
-        private final Map<QName, RpcDefinition> mappedRpcs;
-        private final SchemaContext schemaContext;
-
-        BaseSchema(List<YangModuleInfo> modules) {
-            try {
-                final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-                moduleInfoBackedContext.addModuleInfos(modules);
-                schemaContext = moduleInfoBackedContext.tryToCreateSchemaContext().get();
-                mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), QNAME_FUNCTION);
-            } catch (final RuntimeException e) {
-                LOG.error("Unable to prepare schema context for base netconf ops", e);
-                throw new ExceptionInInitializerError(e);
-            }
-        }
-
-        private Map<QName, RpcDefinition> getMappedRpcs() {
-            return mappedRpcs;
-        }
-
-        public SchemaContext getSchemaContext() {
-            return schemaContext;
-        }
-    }
-
-    public static final String MESSAGE_ID_PREFIX = "m";
-
-    private static final Logger LOG= LoggerFactory.getLogger(NetconfMessageTransformer.class);
-
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformer.class);
 
     private static final Function<SchemaNode, QName> QNAME_FUNCTION = new Function<SchemaNode, QName>() {
         @Override
@@ -196,7 +140,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
         Preconditions.checkNotNull(currentMappedRpcs.get(rpcQName), "Unknown rpc %s, available rpcs: %s", rpcQName, currentMappedRpcs.keySet());
         if(currentMappedRpcs.get(rpcQName).getInput() == null) {
-            return new NetconfMessage(prepareDomResultForRpcRequest(rpcQName).getNode().getOwnerDocument());
+            return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpcQName, counter).getNode().getOwnerDocument());
         }
 
         Preconditions.checkNotNull(payload, "Transforming an rpc with input: %s, payload cannot be null", rpcQName);
@@ -205,13 +149,13 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
         // Set the path to the input of rpc for the node stream writer
         rpc = rpc.createChild(QName.create(rpcQName, "input").intern());
-        final DOMResult result = prepareDomResultForRpcRequest(rpcQName);
+        final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpcQName, counter);
 
         try {
             // If the schema context for netconf device does not contain model for base netconf operations, use default pre build context with just the base model
             // This way operations like lock/unlock are supported even if the source for base model was not provided
             SchemaContext ctx = needToUseBaseCtx ? baseSchema.getSchemaContext() : schemaContext;
-            writeNormalizedRpc(((ContainerNode) payload), result, rpc, ctx);
+            NetconfMessageTransformUtil.writeNormalizedRpc(((ContainerNode) payload), result, rpc, ctx);
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize " + rpc, e);
         }
@@ -227,38 +171,6 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                 rpc.getNamespace().equals(NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME.getNamespace());
     }
 
-    private DOMResult prepareDomResultForRpcRequest(final QName rpcQName) {
-        final Document document = XmlUtil.newDocument();
-        final Element rpcNS = document.createElementNS(NETCONF_RPC_QNAME.getNamespace().toString(), NETCONF_RPC_QNAME.getLocalName());
-        // set msg id
-        rpcNS.setAttribute(NetconfMessageTransformUtil.MESSAGE_ID_ATTR, counter.getNewMessageId(MESSAGE_ID_PREFIX));
-        final Element elementNS = document.createElementNS(rpcQName.getNamespace().toString(), rpcQName.getLocalName());
-        rpcNS.appendChild(elementNS);
-        document.appendChild(rpcNS);
-        return new DOMResult(elementNS);
-    }
-
-    private static void writeNormalizedRpc(final ContainerNode normalized, final DOMResult result,
-            final SchemaPath schemaPath, final SchemaContext baseNetconfCtx) throws IOException, XMLStreamException {
-        final XMLStreamWriter writer = NetconfUtil.XML_FACTORY.createXMLStreamWriter(result);
-        try {
-            try (final NormalizedNodeStreamWriter normalizedNodeStreamWriter =
-                    XMLStreamNormalizedNodeStreamWriter.create(writer, baseNetconfCtx, schemaPath)) {
-                try (final SchemaOrderedNormalizedNodeWriter normalizedNodeWriter =
-                        new SchemaOrderedNormalizedNodeWriter(normalizedNodeStreamWriter, baseNetconfCtx, schemaPath)) {
-                    Collection<DataContainerChild<?, ?>> value = normalized.getValue();
-                    normalizedNodeWriter.write(value);
-                    normalizedNodeWriter.flush();
-                }
-            }
-        } finally {
-            try {
-                writer.close();
-            } catch (final Exception e) {
-                LOG.warn("Unable to close resource properly", e);
-            }
-        }
-    }
 
     @Override
     public synchronized DOMRpcResult toRpcResult(final NetconfMessage message, final SchemaPath rpc) {
