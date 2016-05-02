@@ -40,6 +40,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommun
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.NetconfRemoteSchemaYangSourceProvider;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -91,9 +92,9 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
      * Create rpc implementation capable of handling RPC for monitoring and notifications even before the schemas of remote device are downloaded
      */
     static NetconfDeviceRpc getRpcForInitialization(final NetconfDeviceCommunicator listener, final boolean notificationSupport) {
-        NetconfMessageTransformer.BaseSchema baseSchema = notificationSupport ?
-                NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS :
-                NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX;
+        BaseSchema baseSchema = notificationSupport ?
+                BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS :
+                BaseSchema.BASE_NETCONF_CTX;
 
         return new NetconfDeviceRpc(baseSchema.getSchemaContext(), listener, new NetconfMessageTransformer(baseSchema.getSchemaContext(), false, baseSchema));
     }
@@ -190,10 +191,10 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     }
 
     protected void handleSalInitializationSuccess(final SchemaContext result, final NetconfSessionPreferences remoteSessionCapabilities, final DOMRpcService deviceRpc) {
-        NetconfMessageTransformer.BaseSchema baseSchema =
+        BaseSchema baseSchema =
                 remoteSessionCapabilities.isNotificationsSupported() ?
-                NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS :
-                NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX;
+                BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS :
+                BaseSchema.BASE_NETCONF_CTX;
         messageTransformer = new NetconfMessageTransformer(result, true, baseSchema);
 
         updateTransformer(messageTransformer);

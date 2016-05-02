@@ -1,0 +1,9 @@
+<data operation="replace" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <top xmlns="http://example.com/schema/1.2/config">
+        <users>
+            <user>
+                <name>fred</name>
+            </user>
+        </users>
+    </top>
+</data>
