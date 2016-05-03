@@ -10,10 +10,12 @@ package org.opendaylight.restconf.rest;
 import com.google.common.base.Preconditions;
 import java.util.Collection;
 import java.util.Collections;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.core.api.Broker.ProviderSession;
 import org.opendaylight.controller.sal.core.api.Provider;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.netconf.sal.rest.api.RestConnector;
+import org.opendaylight.restconf.rest.api.schema.context.SchemaContextHandler;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.osgi.framework.BundleContext;
@@ -34,7 +36,9 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         final RestconfApplication restApp = getObjectFromBundleContext(RestconfApplication.class,
                 RestconfApplicationService.class.getName());
         Preconditions.checkNotNull(restApp, "RestconfApplication service doesn't exist.");
-        this.listenerRegistration = schemaService.registerSchemaContextListener(restApp.getSchemaContextHandler());
+        final SchemaContextHandler schemaContextHandler = restApp.getSchemaContextHandler();
+        schemaContextHandler.setDomMountPointService(session.getService(DOMMountPointService.class));
+        this.listenerRegistration = schemaService.registerSchemaContextListener(schemaContextHandler);
     }
 
     private <T> T getObjectFromBundleContext(final Class<T> type, final String serviceRefName) {
