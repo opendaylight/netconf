@@ -7,7 +7,9 @@
  */
 package org.opendaylight.restconf.rest;
 
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.rest.api.schema.context.SchemaContextHandler;
+import org.opendaylight.restconf.rest.handlers.api.DOMMountPointServiceHandler;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.osgi.framework.BundleContext;
 
@@ -25,4 +27,12 @@ public interface RestconfApplicationService {
      * @return {@link SchemaContextHandler}
      */
     SchemaContextHandler getSchemaContextHandler();
+
+    /**
+     * Get {@link DOMMountPointServiceHandler} via service. Actually use by
+     * {@link RestConnectorProvider} to set {@link DOMMountPointService}.
+     *
+     * @return {@link DOMMountPointServiceHandler}
+     */
+    DOMMountPointServiceHandler getDOMMountPointServiceHandler();
 }
