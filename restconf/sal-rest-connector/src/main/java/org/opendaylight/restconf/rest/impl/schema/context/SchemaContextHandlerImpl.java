@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.rest.impl.schema.context;
 
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.rest.api.schema.context.SchemaContextHandler;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
@@ -17,6 +18,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 public class SchemaContextHandlerImpl implements SchemaContextHandler {
 
     private SchemaContext context;
+    private DOMMountPointService domMountPointService;
 
     @Override
     public void onGlobalContextUpdated(final SchemaContext context) {
@@ -27,5 +29,15 @@ public class SchemaContextHandlerImpl implements SchemaContextHandler {
     @Override
     public SchemaContext getSchemaContext() {
         return this.context;
+    }
+
+    @Override
+    public DOMMountPointService getDomMointPointService() {
+        return this.domMountPointService;
+    }
+
+    @Override
+    public void setDomMountPointService(final DOMMountPointService domMountPointService) {
+        this.domMountPointService = domMountPointService;
     }
 }
