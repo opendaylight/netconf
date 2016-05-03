@@ -1,0 +1,20 @@
+module distributed-tx-spi {
+    yang-version 1;
+    namespace "urn:opendaylight:params:xml:ns:yang:distributed-tx:spi";
+    prefix "distributed-tx-spi";
+
+    import config { prefix config; revision-date 2013-04-05; }
+
+    description
+        "Service definition for distributed-tx project";
+
+    revision "2014-12-10" {
+        description
+            "Initial revision";
+    }
+
+    identity tx-provider {
+        base config:service-type;
+        config:java-class "org.opendaylight.distributed.tx.spi.TxProvider";
+    }
+}
