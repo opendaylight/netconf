@@ -144,6 +144,14 @@
     <bundle>mvn:org.opendaylight.netconf/aaa-authn-odl-plugin/{{VERSION}}</bundle>
   </feature>
 
+  <feature name='odl-yanglib' description='OpenDaylight :: Yanglib' version='${project.version}'>
+    <feature version='1.4.0-SNAPSHOT'>odl-restconf</feature>
+    <bundle>mvn:org.opendaylight.netconf/yanglib/{{VERSION}}</bundle>
+    <configfile finalname='${config.configfile.directory}/${config.yanglib.configfile}'>
+      mvn:org.opendaylight.netconf/yanglib-config/{{VERSION}}/xml/config
+    </configfile>
+  </feature>
+
   <feature name='odl-aaa-netconf-plugin-no-cluster'
            description='OpenDaylight :: AAA :: ODL NETCONF Plugin - NO CLUSTER'
            version='${project.version}'>

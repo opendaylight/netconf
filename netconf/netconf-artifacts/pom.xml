@@ -206,6 +206,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>yanglib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-notifications-api</artifactId>
                 <version>${project.version}</version>
@@ -237,6 +243,13 @@
                 <artifactId>netconf-topology-config</artifactId>
                 <version>${project.version}</version>
                 <classifier>clustered-config</classifier>
+                <type>xml</type>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>yanglib-config</artifactId>
+                <version>${project.version}</version>
+                <classifier>config</classifier>
                 <type>xml</type>
             </dependency>
             <dependency>

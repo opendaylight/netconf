@@ -42,6 +42,8 @@
     <module>netconf-topology-config</module>
     <module>sal-netconf-connector</module>
     <module>messagebus-netconf</module>
+    <module>yanglib</module>
+    <module>yanglib-config</module>
     <module>models</module>
     <module>tools</module>
 
