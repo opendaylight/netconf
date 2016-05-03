@@ -1,0 +1,56 @@
+module yanglib {
+    yang-version 1;
+    namespace "urn:opendaylight:params:xml:ns:yang:controller:yanglib:impl";
+    prefix "yanglib";
+
+    import config { prefix config; revision-date 2013-04-05; }
+    import opendaylight-md-sal-binding { prefix md-sal-binding; revision-date 2013-10-28;}
+
+    description
+        "Service definition for yanglib project";
+
+    revision "2014-12-10" {
+        description
+            "Initial revision";
+    }
+
+    identity yanglib {
+        base config:module-type;
+        config:java-name-prefix Yanglib;
+    }
+
+    augment "/config:modules/config:module/config:configuration" {
+        case yanglib {
+            when "/config:modules/config:module/config:type = 'yanglib'";
+            container broker {
+                uses config:service-ref {
+                    refine type {
+                        mandatory true;
+                        config:required-identity md-sal-binding:binding-broker-osgi-registry;
+                    }
+                }
+            }
+
+            // TODO extracting the schema repositories
+            leaf cache-folder {
+                type string;
+                description "local filesystem folder to use as cache + to load yang models from";
+            }
+
+            // TODO it would be better if the binding arguments could be located by the app automatically
+            leaf binding-addr {
+                type string;
+                // TODO make this uri
+                description "binding address is necessary for generating proper URLS (accessible from the outside world)
+                             for models present directly in the library";
+            }
+
+            leaf binding-port {
+                type uint32;
+                // TODO proper type
+                description "binding port is necessary for generating proper URLS (accessible from the outside world)
+                             for models present directly in the library";
+            }
+        }
+    }
+}
