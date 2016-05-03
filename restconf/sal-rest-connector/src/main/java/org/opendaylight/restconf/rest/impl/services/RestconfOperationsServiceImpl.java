@@ -12,6 +12,7 @@ import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.restconf.rest.api.schema.context.SchemaContextHandler;
 import org.opendaylight.restconf.rest.api.services.RestconfOperationsService;
+import org.opendaylight.restconf.rest.handlers.api.DOMMountPointServiceHandler;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
@@ -21,15 +22,20 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 public class RestconfOperationsServiceImpl implements RestconfOperationsService {
 
     private final SchemaContextHandler schemaContextHandler;
+    private final DOMMountPointServiceHandler domMountPointServiceHandler;
 
     /**
      * Set {@link SchemaContextHandler} for getting actual {@link SchemaContext}
      *
      * @param schemaContextHandler
      *            - handling schema context
+     * @param domMountPointServiceHandler
+     *            - handling dom mount point service
      */
-    public RestconfOperationsServiceImpl(final SchemaContextHandler schemaContextHandler) {
+    public RestconfOperationsServiceImpl(final SchemaContextHandler schemaContextHandler,
+            final DOMMountPointServiceHandler domMountPointServiceHandler) {
         this.schemaContextHandler = schemaContextHandler;
+        this.domMountPointServiceHandler = domMountPointServiceHandler;
     }
 
     @Override
