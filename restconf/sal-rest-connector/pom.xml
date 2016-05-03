@@ -186,6 +186,7 @@
               org.opendaylight.netconf.sal.restconf.impl,
               org.opendaylight.netconf.md.sal.rest.common.*,
               org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.rest.connector.rev140724.*,
+              org.opendaylight.restconf.*,
               javax.annotation
             </Private-Package>
             <Import-Package>
