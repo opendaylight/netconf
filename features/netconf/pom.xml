@@ -28,6 +28,7 @@
     <config.configfile.directory>etc/opendaylight/karaf</config.configfile.directory>
     <config.netconf.client.configfile>01-netconf.xml</config.netconf.client.configfile>
     <config.netconf.mdsal.configfile>08-mdsal-netconf.xml</config.netconf.mdsal.configfile>
+    <config.yanglib.configfile>10-yanglib.xml</config.yanglib.configfile>
   </properties>
 
   <dependencyManagement>
@@ -238,6 +239,16 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-mdsal-config</artifactId>
+      <classifier>config</classifier>
+      <type>xml</type>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>yanglib</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>yanglib-config</artifactId>
       <classifier>config</classifier>
       <type>xml</type>
     </dependency>
