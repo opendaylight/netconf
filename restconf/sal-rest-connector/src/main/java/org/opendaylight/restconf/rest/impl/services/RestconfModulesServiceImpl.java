@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Set;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
@@ -72,7 +73,9 @@ public class RestconfModulesServiceImpl implements RestconfModulesService {
             throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
         final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.getSchemaContext());
-        final DOMMountPoint mountPoint = ParserIdentifier.toInstanceIdentifier(identifier).getMountPoint();
+        final DOMMountPoint mountPoint = ParserIdentifier.toMountPointIdentifier(identifier, schemaContextRef.get(),
+                this.schemaContextHandler.getDomMointPointService())
+                .getMountPoint();
         return getModules(schemaContextRef.getModules(mountPoint), schemaContextRef, mountPoint);
     }
 
@@ -85,7 +88,10 @@ public class RestconfModulesServiceImpl implements RestconfModulesService {
         Module module = null;
         DOMMountPoint mountPoint = null;
         if (identifier.contains(RestconfConstants.MOUNT)) {
-            mountPoint = ParserIdentifier.toInstanceIdentifier(identifier).getMountPoint();
+            final InstanceIdentifierContext<?> point = ParserIdentifier.toMountPointIdentifier(identifier,
+                    schemaContextRef.get(), this.schemaContextHandler.getDomMointPointService());
+            final DOMMountPointService domMointPointService = this.schemaContextHandler.getDomMointPointService();
+            mountPoint = domMointPointService.getMountPoint(point.getInstanceIdentifier()).get();
             module = schemaContextRef.findModuleInMountPointByQName(mountPoint, moduleQname);
         } else {
             module = schemaContextRef.findModuleByQName(moduleQname);
@@ -104,9 +110,15 @@ public class RestconfModulesServiceImpl implements RestconfModulesService {
         final DataSchemaNode moduleSchemaNode = RestconfSchemaUtil.getRestconfSchemaNode(
                 schemaContextRef.getRestconfModule(), Draft11.RestconfModule.MODULE_LIST_SCHEMA_NODE);
         Preconditions.checkState(moduleSchemaNode instanceof ListSchemaNode);
-        return new NormalizedNodeContext(
+        if (mountPoint == null) {
+            return new NormalizedNodeContext(
                 new InstanceIdentifierContext<>(null, moduleSchemaNode, mountPoint, schemaContextRef.get()), moduleMap);
+        } else {
+            return new NormalizedNodeContext(
+                    new InstanceIdentifierContext<>(null, moduleSchemaNode, mountPoint, mountPoint.getSchemaContext()),
+                    moduleMap);
         }
+    }
 
     /**
      * Get {@link NormalizedNodeContext} from set of modules. Used by
