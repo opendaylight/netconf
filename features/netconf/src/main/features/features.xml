@@ -144,6 +144,7 @@
     <bundle>mvn:org.opendaylight.netconf/aaa-authn-odl-plugin/{{VERSION}}</bundle>
   </feature>
 
+
   <feature name='odl-aaa-netconf-plugin-no-cluster'
            description='OpenDaylight :: AAA :: ODL NETCONF Plugin - NO CLUSTER'
            version='${project.version}'>
