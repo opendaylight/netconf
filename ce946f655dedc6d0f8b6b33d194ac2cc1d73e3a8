@@ -1,0 +1,153 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_315bfb55",
+        "filename": "netconf/models/ietf-netconf-yang-library/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-05-03T15:06:09Z",
+      "side": 1,
+      "message": "add copyright",
+      "revId": "ce946f655dedc6d0f8b6b33d194ac2cc1d73e3a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_f149838c",
+        "filename": "netconf/models/ietf-netconf-yang-library/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-05-03T15:06:09Z",
+      "side": 1,
+      "message": "I don\u0027t think you need this ...",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 21
+      },
+      "revId": "ce946f655dedc6d0f8b6b33d194ac2cc1d73e3a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_515e6f46",
+        "filename": "netconf/models/ietf-netconf-yang-library/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-05-03T15:06:09Z",
+      "side": 1,
+      "message": "... and this",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 21
+      },
+      "revId": "ce946f655dedc6d0f8b6b33d194ac2cc1d73e3a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_d131df0c",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-05-03T15:06:09Z",
+      "side": 1,
+      "message": "please remove the blank line",
+      "range": {
+        "startLine": 298,
+        "startChar": 0,
+        "endLine": 298,
+        "endChar": 0
+      },
+      "revId": "ce946f655dedc6d0f8b6b33d194ac2cc1d73e3a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_712c53ac",
+        "filename": "netconf/sal-netconf-connector/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-05-03T15:06:09Z",
+      "side": 1,
+      "message": "I don\u0027t think you need to provide the version here as they are provided by odlparent so they will be inherited. \n\nhttps://github.com/opendaylight/odlparent/blob/master/odlparent/pom.xml#L185l208\n\n\n---\n\n\nIn fact you don\u0027t even use powermockito so I think this can be removed",
+      "range": {
+        "startLine": 202,
+        "startChar": 2,
+        "endLine": 213,
+        "endChar": 17
+      },
+      "revId": "ce946f655dedc6d0f8b6b33d194ac2cc1d73e3a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_2c3e00b9",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/controller/config/yang/md/sal/connector/netconf/NetconfConnectorModule.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-05-03T15:06:09Z",
+      "side": 1,
+      "message": "do we need this?",
+      "range": {
+        "startLine": 370,
+        "startChar": 0,
+        "endLine": 372,
+        "endChar": 5
+      },
+      "revId": "ce946f655dedc6d0f8b6b33d194ac2cc1d73e3a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_ccff8400",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/controller/config/yang/md/sal/connector/netconf/NetconfConnectorModule.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-05-03T15:06:09Z",
+      "side": 1,
+      "message": "final",
+      "revId": "ce946f655dedc6d0f8b6b33d194ac2cc1d73e3a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
