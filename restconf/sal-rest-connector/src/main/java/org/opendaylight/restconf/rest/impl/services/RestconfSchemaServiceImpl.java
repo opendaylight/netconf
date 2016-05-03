@@ -10,6 +10,7 @@ package org.opendaylight.restconf.rest.impl.services;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
 import org.opendaylight.restconf.rest.api.schema.context.SchemaContextHandler;
 import org.opendaylight.restconf.rest.api.services.schema.RestconfSchemaService;
+import org.opendaylight.restconf.rest.handlers.api.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
@@ -20,6 +21,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 public class RestconfSchemaServiceImpl implements RestconfSchemaService {
 
     private final SchemaContextHandler schemaContextHandler;
+    private final DOMMountPointServiceHandler domMountPointServiceHandler;
 
     /**
      * Set {@link SchemaContextHandler} for getting actual {@link SchemaContext}
@@ -27,14 +29,19 @@ public class RestconfSchemaServiceImpl implements RestconfSchemaService {
      *
      * @param schemaContextHandler
      *            - handling schema context
+     * @param domMountPointServiceHandler
+     *            - handling dom mount point service
      */
-    public RestconfSchemaServiceImpl(final SchemaContextHandler schemaContextHandler) {
+    public RestconfSchemaServiceImpl(final SchemaContextHandler schemaContextHandler,
+            final DOMMountPointServiceHandler domMountPointServiceHandler) {
         this.schemaContextHandler = schemaContextHandler;
+        this.domMountPointServiceHandler = domMountPointServiceHandler;
     }
 
     @Override
     public SchemaExportContext getSchema(final String identifier) {
         final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.getSchemaContext());
-        return ParserIdentifier.toSchemaExportContextFromIdentifier(schemaContextRef.get(), identifier);
+        return ParserIdentifier.toSchemaExportContextFromIdentifier(schemaContextRef.get(), identifier,
+                this.domMountPointServiceHandler.getDOMMountPointService());
     }
 }
