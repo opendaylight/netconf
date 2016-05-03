@@ -16,6 +16,7 @@ import org.opendaylight.restconf.rest.api.services.RestconfModulesService;
 import org.opendaylight.restconf.rest.api.services.RestconfOperationsService;
 import org.opendaylight.restconf.rest.api.services.RestconfStreamsService;
 import org.opendaylight.restconf.rest.api.services.schema.RestconfSchemaService;
+import org.opendaylight.restconf.rest.handlers.api.DOMMountPointServiceHandler;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
@@ -34,12 +35,14 @@ public class Draft11ServicesWrapperImpl implements Draft11ServicesWrapper {
      *
      * @param schemaContextHandler
      *            - for handling {@link SchemaContext}
+     * @param domMountPointServiceHandler
      */
-    public Draft11ServicesWrapperImpl(final SchemaContextHandler schemaContextHandler) {
-        this.delegRestModSer = new RestconfModulesServiceImpl(schemaContextHandler);
-        this.delegRestOpsSer = new RestconfOperationsServiceImpl(schemaContextHandler);
+    public Draft11ServicesWrapperImpl(final SchemaContextHandler schemaContextHandler,
+            final DOMMountPointServiceHandler domMountPointServiceHandler) {
+        this.delegRestModSer = new RestconfModulesServiceImpl(schemaContextHandler, domMountPointServiceHandler);
+        this.delegRestOpsSer = new RestconfOperationsServiceImpl(schemaContextHandler, domMountPointServiceHandler);
         this.delegRestStrsSer = new RestconfStreamsServiceImpl(schemaContextHandler);
-        this.delegRestSchSer = new RestconfSchemaServiceImpl(schemaContextHandler);
+        this.delegRestSchSer = new RestconfSchemaServiceImpl(schemaContextHandler, domMountPointServiceHandler);
     }
 
     @Override

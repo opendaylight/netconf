@@ -12,6 +12,7 @@ import java.net.URI;
 import java.util.Date;
 import java.util.Set;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.Draft11;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -27,6 +28,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 final class SchemaContextRef {
 
     private final SoftReference<SchemaContext> schemaContextRef;
+    private DOMMountPointService domMointPointService;
 
     /**
      * Create {@link SoftReference} of actual {@link SchemaContext}
@@ -137,5 +139,4 @@ final class SchemaContextRef {
     public Module findModuleByNameAndRevision(final String localName, final Date revision) {
         return this.get().findModuleByName(localName, revision);
     }
-
 }
