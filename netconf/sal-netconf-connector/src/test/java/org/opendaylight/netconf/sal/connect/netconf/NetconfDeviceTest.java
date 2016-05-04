@@ -124,7 +124,14 @@ public class NetconfDeviceTest {
 
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO
                 = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), schemaFactory, stateSchemasResolver);
-        final NetconfDevice device = new NetconfDevice(schemaResourcesDTO, getId(), facade, getExecutor(),true);
+        final NetconfDevice device = new NetconfDeviceBuilder()
+                .setReconnectOnSchemasChange(true)
+                .setSchemaResourcesDTO(schemaResourcesDTO)
+                .setGlobalProcessingExecutor(getExecutor())
+                .setId(getId())
+                .setSalFacade(facade)
+                .build();
+
         // Monitoring not supported
         final NetconfSessionPreferences sessionCaps = getSessionCaps(false, capList);
         device.onRemoteSessionUp(sessionCaps, listener);
@@ -169,7 +176,13 @@ public class NetconfDeviceTest {
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO
                 = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), schemaFactory, stateSchemasResolver);
 
-        final NetconfDevice device = new NetconfDevice(schemaResourcesDTO, getId(), facade, getExecutor(), true);
+        final NetconfDevice device = new NetconfDeviceBuilder()
+                .setReconnectOnSchemasChange(true)
+                .setSchemaResourcesDTO(schemaResourcesDTO)
+                .setGlobalProcessingExecutor(getExecutor())
+                .setId(getId())
+                .setSalFacade(facade)
+                .build();
         // Monitoring supported
         final NetconfSessionPreferences sessionCaps = getSessionCaps(true, Lists.newArrayList(TEST_CAPABILITY, TEST_CAPABILITY2));
         device.onRemoteSessionUp(sessionCaps, listener);
@@ -193,7 +206,13 @@ public class NetconfDeviceTest {
 
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO
                 = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), getSchemaFactory(), stateSchemasResolver);
-        final NetconfDevice device = new NetconfDevice(schemaResourcesDTO, getId(), facade, getExecutor(), true);
+        final NetconfDevice device = new NetconfDeviceBuilder()
+                .setReconnectOnSchemasChange(true)
+                .setSchemaResourcesDTO(schemaResourcesDTO)
+                .setGlobalProcessingExecutor(getExecutor())
+                .setId(getId())
+                .setSalFacade(facade)
+                .build();
 
         device.onNotification(notification);
         device.onNotification(notification);
@@ -222,7 +241,13 @@ public class NetconfDeviceTest {
 
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO
                 = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), schemaContextProviderFactory, stateSchemasResolver);
-        final NetconfDevice device = new NetconfDevice(schemaResourcesDTO, getId(), facade, getExecutor(), true);
+        final NetconfDevice device = new NetconfDeviceBuilder()
+                .setReconnectOnSchemasChange(true)
+                .setSchemaResourcesDTO(schemaResourcesDTO)
+                .setGlobalProcessingExecutor(getExecutor())
+                .setId(getId())
+                .setSalFacade(facade)
+                .build();
         final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
                 Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
         device.onRemoteSessionUp(sessionCaps, listener);
