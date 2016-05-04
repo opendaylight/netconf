@@ -163,9 +163,6 @@ public class Parameters {
                 .setDefault(1)
                 .dest("thread-amount");
 
-        // TODO add get-config option instead of edit + commit
-        // TODO different edit config content
-
         return parser;
     }
 
@@ -181,7 +178,8 @@ public class Parameters {
         Preconditions.checkArgument(editContent.exists(), "Edit content file missing");
         Preconditions.checkArgument(editContent.isDirectory() == false, "Edit content file is a dir");
         Preconditions.checkArgument(editContent.canRead(), "Edit content file is unreadable");
-        // TODO validate
+        Preconditions.checkArgument(threadAmount > 0, "Parameter thread-amount must be greater than 0");
+        Preconditions.checkArgument(msgTimeout >= 0, "Parameter msg-timeout must be greater than 0");
     }
 
     public InetSocketAddress getInetAddress() {

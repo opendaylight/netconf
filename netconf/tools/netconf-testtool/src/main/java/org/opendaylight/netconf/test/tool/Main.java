@@ -54,7 +54,7 @@ public final class Main {
         final ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(params.debug ? Level.DEBUG : Level.INFO);
 
-        final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator();
+        final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator(params.threadPoolSize);
         try {
             final List<Integer> openDevices = netconfDeviceSimulator.start(params);
             if (openDevices.size() == 0) {
