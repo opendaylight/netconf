@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 import com.google.common.collect.Iterables;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,10 +43,6 @@ public class NetconfToNotificationTest {
     @SuppressWarnings("deprecation")
     @Before
     public void setup() throws Exception {
-        final SchemaContext schemaContext = getNotificationSchemaContext(getClass());
-
-        messageTransformer = new NetconfMessageTransformer(schemaContext, true);
-
         final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         InputStream notifyPayloadStream = getClass().getResourceAsStream("/notification-payload.xml");
@@ -57,8 +53,17 @@ public class NetconfToNotificationTest {
         userNotification = new NetconfMessage(doc);
     }
 
-    static SchemaContext getNotificationSchemaContext(Class<?> loadClass) {
-        final List<InputStream> modelsToParse = Collections.singletonList(loadClass.getResourceAsStream("/schemas/user-notification.yang"));
+    static SchemaContext getNotificationSchemaContext(Class<?> loadClass, boolean getExceptionTest) {
+        final List<InputStream> modelsToParse = new ArrayList<>();
+
+        if (getExceptionTest) {
+            modelsToParse.add(loadClass.getResourceAsStream("/schemas/user-notification4.yang"));
+            modelsToParse.add(loadClass.getResourceAsStream("/schemas/user-notification3.yang"));
+        } else {
+            modelsToParse.add(loadClass.getResourceAsStream("/schemas/user-notification.yang"));
+            modelsToParse.add(loadClass.getResourceAsStream("/schemas/user-notification2.yang"));
+        }
+
         final YangContextParser parser = new YangParserImpl();
         final Set<Module> modules = parser.parseYangModelsFromStreams(modelsToParse);
         assertTrue(!modules.isEmpty());
@@ -67,8 +72,17 @@ public class NetconfToNotificationTest {
         return schemaContext;
     }
 
+    @Test(expected =  IllegalStateException.class)
+    public void testMostRecentWrongYangModel() throws Exception {
+        final SchemaContext schemaContext = getNotificationSchemaContext(getClass(), true);
+        messageTransformer = new NetconfMessageTransformer(schemaContext, true);
+        messageTransformer.toNotification(userNotification);
+    }
+
     @Test
-    public void test() throws Exception {
+    public void testToNotificationFunction() throws Exception {
+        final SchemaContext schemaContext = getNotificationSchemaContext(getClass(), false);
+        messageTransformer = new NetconfMessageTransformer(schemaContext, true);
         final DOMNotification domNotification = messageTransformer.toNotification(userNotification);
         final ContainerNode root = domNotification.getBody();
         assertNotNull(root);
