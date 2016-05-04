@@ -1,0 +1,11 @@
+{
+  "node": {
+    "node-id": "{PORT}-sim-device",
+    "host": "{HOST}",
+    "port": "{PORT}",
+    "username": "admin",
+    "password": "admin",
+    "tcp-only": "{SSH}",
+    "keepalive-delay": "0"
+  }
+}

@@ -64,9 +64,9 @@ public class Execution implements Callable<Void> {
 
         this.payloads = new ArrayList<>();
         for (DestToPayload payload : payloads) {
-            AsyncHttpClient.BoundRequestBuilder requestBuilder = asyncHttpClient.preparePut(payload.getDestination())
-                    .addHeader("Content-Type", "application/xml")
-                    .addHeader("Accept", "application/xml")
+            AsyncHttpClient.BoundRequestBuilder requestBuilder = asyncHttpClient.preparePost(payload.getDestination())
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Accept", "application/json")
                     .setBody(payload.getPayload())
                     .setRequestTimeout(Integer.MAX_VALUE);
 
@@ -75,7 +75,7 @@ public class Execution implements Callable<Void> {
                         .setScheme(Realm.AuthScheme.BASIC)
                         .setPrincipal(params.auth.get(0))
                         .setPassword(params.auth.get(1))
-                        .setMethodName("PUT")
+                        .setMethodName("POST")
                         .setUsePreemptiveAuth(true)
                         .build());
             }
@@ -89,9 +89,14 @@ public class Execution implements Callable<Void> {
             try {
                 Response response = asyncHttpClient.executeRequest(request).get();
                 if (response.getStatusCode() != 200 && response.getStatusCode() != 204) {
-                    LOG.warn("Status code: {}", response.getStatusCode());
-                    LOG.warn("url: {}", request.getUrl());
-                    LOG.warn(response.getResponseBody());
+                    if (response.getStatusCode() == 409) {
+                        LOG.warn("Request failed, status code: {} - one or more of the devices" +
+                                " is already configured, skipping the whole batch", response.getStatusCode());
+                    } else {
+                        LOG.warn("Status code: {}", response.getStatusCode());
+                        LOG.warn("url: {}", request.getUrl());
+                        LOG.warn(response.getResponseBody());
+                    }
                 }
             } catch (InterruptedException | ExecutionException | IOException e) {
                 LOG.warn(e.toString());
@@ -115,8 +120,13 @@ public class Execution implements Callable<Void> {
                 public STATE onStatusReceived(HttpResponseStatus status) throws Exception {
                     super.onStatusReceived(status);
                     if (status.getStatusCode() != 200 && status.getStatusCode() != 204) {
-                        LOG.warn("Request failed, status code: {}", status.getStatusCode() + status.getStatusText());
-                        LOG.warn("request: {}", request.toString());
+                        if (status.getStatusCode() == 409) {
+                            LOG.warn("Request failed, status code: {} - one or more of the devices" +
+                                    " is already configured, skipping the whole batch", status.getStatusCode());
+                        } else {
+                            LOG.warn("Request failed, status code: {}", status.getStatusCode() + status.getStatusText());
+                            LOG.warn("request: {}", request.toString());
+                        }
                     }
                     return STATE.CONTINUE;
                 }

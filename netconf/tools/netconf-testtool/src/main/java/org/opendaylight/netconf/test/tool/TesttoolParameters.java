@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -33,73 +34,52 @@ public class TesttoolParameters {
     private static final String PORT_KEY = "{PORT}";
     private static final String SSH = "{SSH}";
     private static final String ADDRESS_PORT = "{ADDRESS:PORT}";
-    private static final String dest = "http://{ADDRESS:PORT}/restconf/config/network-topology:network-topology/topology/topology-netconf/node/{PORT}-sim-device";
+    private static final String dest = "http://{ADDRESS:PORT}/restconf/config/network-topology:network-topology/topology/topology-netconf/";
 
-    private static final String RESOURCE = "/config-template.xml";
-    private InputStream stream;
-
+    private static final String RESOURCE = "/config-template.json";
     @Arg(dest = "edit-content")
     public File editContent;
-
     @Arg(dest = "async")
     public boolean async;
-
     @Arg(dest = "thread-amount")
     public int threadAmount;
-
     @Arg(dest = "throttle")
     public int throttle;
-
     @Arg(dest = "auth")
     public ArrayList<String> auth;
-
     @Arg(dest = "controller-destination")
     public String controllerDestination;
-
     @Arg(dest = "schemas-dir")
     public File schemasDir;
-
     @Arg(dest = "devices-count")
     public int deviceCount;
-
     @Arg(dest = "devices-per-port")
     public int devicesPerPort;
-
     @Arg(dest = "starting-port")
     public int startingPort;
-
     @Arg(dest = "generate-config-connection-timeout")
     public int generateConfigsTimeout;
-
     @Arg(dest = "generate-config-address")
     public String generateConfigsAddress;
-
     @Arg(dest = "distro-folder")
     public File distroFolder;
-
     @Arg(dest = "generate-configs-batch-size")
     public int generateConfigBatchSize;
-
     @Arg(dest = "ssh")
     public boolean ssh;
-
     @Arg(dest = "exi")
     public boolean exi;
-
     @Arg(dest = "debug")
     public boolean debug;
-
     @Arg(dest = "notification-file")
     public File notificationFile;
-
     @Arg(dest = "md-sal")
     public boolean mdSal;
-
     @Arg(dest = "initial-config-xml-file")
     public File initialConfigXMLFile;
-
     @Arg(dest = "time-out")
     public long timeOut;
+    private InputStream stream;
 
     static ArgumentParser getParser() {
         final ArgumentParser parser = ArgumentParsers.newArgumentParser("netconf testtool");
@@ -134,10 +114,10 @@ public class TesttoolParameters {
 
         parser.addArgument("--controller-destination")
                 .type(String.class)
-                .help("Ip address and port of controller. Must be in following format <ip>:<port> "+
-                      "if available it will be used for spawning netconf connectors via topology configuration as "+
-                      "a part of URI. Example (http://<controller destination>/restconf/config/network-topology:network-topology/topology/topology-netconf/node/<node-id>)"+
-                      "otherwise it will just start simulated devices and skip the execution of PUT requests")
+                .help("Ip address and port of controller. Must be in following format <ip>:<port> " +
+                        "if available it will be used for spawning netconf connectors via topology configuration as " +
+                        "a part of URI. Example (http://<controller destination>/restconf/config/network-topology:network-topology/topology/topology-netconf/node/<node-id>)" +
+                        "otherwise it will just start simulated devices and skip the execution of PUT requests")
                 .dest("controller-destination");
 
         parser.addArgument("--device-count")
@@ -187,7 +167,7 @@ public class TesttoolParameters {
 
         parser.addArgument("--generate-configs-batch-size")
                 .type(Integer.class)
-                .setDefault(4000)
+                .setDefault(1)
                 .help("Number of connector configs per generated file")
                 .dest("generate-configs-batch-size");
 
@@ -242,6 +222,25 @@ public class TesttoolParameters {
         return null;
     }
 
+    private static String modifyMessage(final StringBuilder payloadBuilder, final int payloadPosition, final int size) {
+        if (size == 1) {
+            return payloadBuilder.toString();
+        }
+
+        if (payloadPosition == 0) {
+            payloadBuilder.insert(payloadBuilder.toString().indexOf('{', 2), "[");
+            payloadBuilder.replace(payloadBuilder.length() - 1, payloadBuilder.length(), ",");
+        } else if (payloadPosition + 1 == size) {
+            payloadBuilder.delete(0, payloadBuilder.toString().indexOf(':') + 1);
+            payloadBuilder.insert(payloadBuilder.toString().indexOf('}', 2) + 1, "]");
+        } else {
+            payloadBuilder.delete(0, payloadBuilder.toString().indexOf(':') + 1);
+            payloadBuilder.replace(payloadBuilder.length() - 2, payloadBuilder.length() - 1, ",");
+            payloadBuilder.deleteCharAt(payloadBuilder.toString().lastIndexOf('}'));
+        }
+        return payloadBuilder.toString();
+    }
+
     void validate() {
         if (editContent == null) {
             stream = TesttoolParameters.class.getResourceAsStream(RESOURCE);
@@ -267,11 +266,10 @@ public class TesttoolParameters {
         }
     }
 
-    public ArrayList<ArrayList<Execution.DestToPayload>> getThreadsPayloads(List<Integer> openDevices) {
+    public ArrayList<ArrayList<Execution.DestToPayload>> getThreadsPayloads(final List<Integer> openDevices) {
         final String editContentString;
         try {
-            if(stream == null)
-            {
+            if (stream == null) {
                 editContentString = Files.toString(editContent, Charsets.UTF_8);
             } else {
                 editContentString = CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8));
@@ -280,18 +278,67 @@ public class TesttoolParameters {
             throw new IllegalArgumentException("Cannot read content of " + editContent);
         }
 
-        final ArrayList<ArrayList<Execution.DestToPayload>> allThreadsPayloads = new ArrayList<>();
-        for (int i = 0; i < threadAmount; i++) {
-            final ArrayList<Execution.DestToPayload> payloads = new ArrayList<>();
-            for (int j = 0; j < openDevices.size(); j++) {
-                final StringBuilder destBuilder = new StringBuilder(dest);
-                destBuilder.replace(destBuilder.indexOf(ADDRESS_PORT), destBuilder.indexOf(ADDRESS_PORT) + ADDRESS_PORT.length(), controllerDestination)
-                        .replace(destBuilder.indexOf(PORT_KEY), destBuilder.indexOf(PORT_KEY) + PORT_KEY.length(), Integer.toString(openDevices.get(j)));
-                payloads.add(new Execution.DestToPayload(destBuilder.toString(), prepareMessage(openDevices.get(j), editContentString)));
-            }
-            allThreadsPayloads.add(payloads);
-        }
+        int from, to;
+        Iterator<Integer> iterator;
 
+        final ArrayList<ArrayList<Execution.DestToPayload>> allThreadsPayloads = new ArrayList<>();
+        if (generateConfigBatchSize > 1) {
+
+            final int batchedRequests = openDevices.size() / generateConfigBatchSize;
+            final int batchedRequestsPerThread = batchedRequests / threadAmount;
+            final int leftoverBatchedRequests = (batchedRequests) % threadAmount;
+            final int leftoverRequests = openDevices.size() - (batchedRequests * generateConfigBatchSize);
+
+            final StringBuilder destBuilder = new StringBuilder(dest);
+            destBuilder.replace(destBuilder.indexOf(ADDRESS_PORT), destBuilder.indexOf(ADDRESS_PORT) + ADDRESS_PORT.length(), controllerDestination);
+
+            for (int l = 0; l < threadAmount; l++) {
+                from = l * (batchedRequests * batchedRequestsPerThread);
+                to = from + (batchedRequests * batchedRequestsPerThread);
+                iterator = openDevices.subList(from, to).iterator();
+                allThreadsPayloads.add(createBatchedPayloads(batchedRequestsPerThread, iterator, editContentString, destBuilder.toString()));
+            }
+            ArrayList<Execution.DestToPayload> payloads = null;
+            if (leftoverBatchedRequests > 0) {
+                from = threadAmount * (batchedRequests * batchedRequestsPerThread);
+                to = from + (batchedRequests * batchedRequestsPerThread);
+                iterator = openDevices.subList(from, to).iterator();
+                payloads = createBatchedPayloads(leftoverBatchedRequests, iterator, editContentString, destBuilder.toString());
+            }
+            String payload = "";
+
+            for (int j = 0; j < leftoverRequests; j++) {
+                from = openDevices.size() - leftoverRequests;
+                to = openDevices.size();
+                iterator = openDevices.subList(from, to).iterator();
+                final StringBuilder payloadBuilder = new StringBuilder(prepareMessage(iterator.next(), editContentString));
+                payload += modifyMessage(payloadBuilder, j, leftoverRequests);
+            }
+            if (leftoverRequests > 0 || leftoverBatchedRequests > 0) {
+
+                if (payloads != null) {
+                    payloads.add(new Execution.DestToPayload(destBuilder.toString(), payload));
+                }
+                allThreadsPayloads.add(payloads);
+            }
+        } else {
+            final int requestPerThreads = openDevices.size() / threadAmount;
+            final int leftoverRequests = openDevices.size() % threadAmount;
+
+            for (int i = 0; i < threadAmount; i++) {
+                from = i * requestPerThreads;
+                to = from + requestPerThreads;
+                iterator = openDevices.subList(from, to).iterator();
+                allThreadsPayloads.add(createPayloads(iterator, editContentString));
+            }
+
+            if (leftoverRequests > 0) {
+                from = (threadAmount) * requestPerThreads;
+                to = from + leftoverRequests;
+                iterator = openDevices.subList(from, to).iterator();
+                allThreadsPayloads.add(createPayloads(iterator, editContentString));
+            }
+        }
         return allThreadsPayloads;
     }
 
@@ -309,5 +356,31 @@ public class TesttoolParameters {
             messageBuilder.replace(messageBuilder.indexOf(SSH), messageBuilder.indexOf(SSH) + SSH.length(), Boolean.toString(ssh));
         }
         return messageBuilder.toString();
+    }
+
+    private ArrayList<Execution.DestToPayload> createPayloads(final Iterator<Integer> openDevices, final String editContentString) {
+        final ArrayList<Execution.DestToPayload> payloads = new ArrayList<>();
+
+        while (openDevices.hasNext()) {
+            final StringBuilder destBuilder = new StringBuilder(dest);
+            destBuilder.replace(destBuilder.indexOf(ADDRESS_PORT), destBuilder.indexOf(ADDRESS_PORT) + ADDRESS_PORT.length(), controllerDestination);
+            payloads.add(new Execution.DestToPayload(destBuilder.toString(), prepareMessage(openDevices.next(), editContentString)));
+        }
+        return payloads;
+    }
+
+    private ArrayList<Execution.DestToPayload> createBatchedPayloads(final int batchedRequestsCount, final Iterator<Integer> openDevices, final String editContentString,
+                                                                     final String destination) {
+        final ArrayList<Execution.DestToPayload> payloads = new ArrayList<>();
+
+        for (int i = 0; i < batchedRequestsCount; i++) {
+            String payload = "";
+            for (int j = 0; j < generateConfigBatchSize; j++) {
+                final StringBuilder payloadBuilder = new StringBuilder(prepareMessage(openDevices.next(), editContentString));
+                payload += modifyMessage(payloadBuilder, j, generateConfigBatchSize);
+            }
+            payloads.add(new Execution.DestToPayload(destination, payload));
+        }
+        return payloads;
     }
 }
