@@ -45,6 +45,30 @@
       "revId": "7fcaa20de438fe9995145ccb7a8cbef6b3067669",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_182d3347",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-05-05T18:38:08Z",
+      "side": 1,
+      "message": "Done, thanks for the English review :)",
+      "parentUuid": "fa57193c_6d5bcf87",
+      "range": {
+        "startLine": 10,
+        "startChar": 42,
+        "endLine": 10,
+        "endChar": 48
+      },
+      "revId": "7fcaa20de438fe9995145ccb7a8cbef6b3067669",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
