@@ -260,7 +260,7 @@
      reference
       "RFC 2578: Structure of Management Information Version 2 (SMIv2)";
    }
-
+   
     typedef yang-identifier {
        type string {
          length "1..max";
@@ -280,7 +280,7 @@
        reference
          "RFC 6020: YANG - A Data Modeling Language for the Network
                     Configuration Protocol (NETCONF)";
-     }
+     }   
 
    /*** collection of date and time related types ***/
 
