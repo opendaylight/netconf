@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.restconf.rest.impl.services;
+package org.opendaylight.restconf.rest.services.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -40,7 +40,6 @@ import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.restconf.Draft11;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.rest.services.api.RestconfStreamsService;
-import org.opendaylight.restconf.rest.services.impl.RestconfStreamsServiceImpl;
 import org.opendaylight.restconf.utils.mapping.RestconfMappingNodeConstants;
 import org.opendaylight.restconf.utils.mapping.RestconfMappingStreamConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
