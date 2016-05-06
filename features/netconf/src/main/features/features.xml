@@ -52,6 +52,7 @@
     <feature version='${project.version}'>odl-netconf-mapping-api</feature>
     <feature version='${project.version}'>odl-netconf-util</feature>
     <feature version='${project.version}'>odl-netconf-netty-util</feature>
+    <feature version='${config.version}'>odl-config-netty</feature>
     <!-- Netconf server without config connector is just an empty shell -->
     <feature version='${project.version}'>odl-config-netconf-connector</feature>
     <!-- Netconf will not provide schemas without monitoring -->
@@ -68,6 +69,7 @@
     <feature version='${project.version}'>odl-netconf-netty-util</feature>
     <bundle>mvn:org.opendaylight.netconf/netconf-impl/{{VERSION}}</bundle>
     <feature version='${project.version}'>odl-netconf-notifications-api</feature>
+    <feature version='${config.version}'>odl-config-netty</feature>
     <bundle>mvn:org.opendaylight.netconf/netconf-notifications-impl/{{VERSION}}</bundle>
     <bundle>mvn:org.opendaylight.netconf/config-netconf-connector/{{VERSION}}</bundle>
   </feature>

@@ -11,6 +11,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.util.Collections;
@@ -28,6 +29,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionEnd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionStart;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev100924.ZeroBasedCounter32;
 
 public class SessionNotificationProducerTest {
 
@@ -57,6 +59,22 @@ public class SessionNotificationProducerTest {
     }
 
     @Test
+    public void testOnDataChangedSessionUpdated() throws Exception {
+        final DataTreeModification<Session> treeChange = mock(DataTreeModification.class);
+        final DataObjectModification<Session> changeObject = mock(DataObjectModification.class);
+        final Session sessionBefore = createSessionWithInRpcCount(1, 0);
+        final Session sessionAfter = createSessionWithInRpcCount(1, 1);
+        doReturn(sessionBefore).when(changeObject).getDataBefore();
+        doReturn(sessionAfter).when(changeObject).getDataAfter();
+        doReturn(DataObjectModification.ModificationType.WRITE).when(changeObject).getModificationType();
+        doReturn(changeObject).when(treeChange).getRootNode();
+        publisher.onDataTreeChanged(Collections.singleton(treeChange));
+        //session didn't start, only stats changed. No notification should be produced
+        verify(registration, never()).onSessionStarted(any());
+        verify(registration, never()).onSessionEnded(any());
+    }
+
+    @Test
     public void testOnDataChangedSessionDeleted() throws Exception {
         final Session session = createSession(1);
         final DataTreeModification<Session> data = getTreeModification(session, DataObjectModification.ModificationType.DELETE);
@@ -70,10 +88,15 @@ public class SessionNotificationProducerTest {
     }
 
     private Session createSession(long id) {
+        return createSessionWithInRpcCount(id, 0);
+    }
+
+    private Session createSessionWithInRpcCount(long id, long inRpc) {
         return new SessionBuilder()
                 .setSessionId(id)
                 .setSourceHost(new Host("0.0.0.0".toCharArray()))
                 .setUsername("user")
+                .setInRpcs(new ZeroBasedCounter32(inRpc))
                 .build();
     }
 
@@ -83,6 +106,7 @@ public class SessionNotificationProducerTest {
         final DataObjectModification<Session> changeObject = mock(DataObjectModification.class);
         switch (type) {
             case WRITE:
+                doReturn(null).when(changeObject).getDataBefore();
                 doReturn(session).when(changeObject).getDataAfter();
                 break;
             case DELETE:

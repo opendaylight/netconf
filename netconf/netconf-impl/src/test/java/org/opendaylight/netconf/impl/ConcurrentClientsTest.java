@@ -12,7 +12,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -52,6 +51,8 @@ import org.junit.runners.Parameterized;
 import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.netconf.api.monitoring.SessionEvent;
+import org.opendaylight.netconf.api.monitoring.SessionListener;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
@@ -119,15 +120,17 @@ public class ConcurrentClientsTest {
 
     public static NetconfMonitoringService createMockedMonitoringService() {
         NetconfMonitoringService monitoring = mock(NetconfMonitoringService.class);
-        doNothing().when(monitoring).onSessionUp(any(NetconfServerSession.class));
-        doNothing().when(monitoring).onSessionDown(any(NetconfServerSession.class));
+        final SessionListener sessionListener = mock(SessionListener.class);
+        doNothing().when(sessionListener).onSessionUp(any(NetconfServerSession.class));
+        doNothing().when(sessionListener).onSessionDown(any(NetconfServerSession.class));
+        doNothing().when(sessionListener).onSessionEvent(any(SessionEvent.class));
         doReturn(new AutoCloseable() {
             @Override
             public void close() throws Exception {
 
             }
-        }).when(monitoring).registerListener(any(NetconfMonitoringService.MonitoringListener.class));
-        doNothing().when(monitoring).onCapabilitiesChanged(anySetOf(Capability.class), anySetOf(Capability.class));
+        }).when(monitoring).registerCapabilitiesListener(any(NetconfMonitoringService.CapabilitiesListener.class));
+        doReturn(sessionListener).when(monitoring).getSessionListener();
         doReturn(new CapabilitiesBuilder().setCapability(Collections.<Uri>emptyList()).build()).when(monitoring).getCapabilities();
         return monitoring;
     }
