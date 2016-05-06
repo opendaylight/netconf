@@ -198,4 +198,12 @@ public class TestRestconfUtils {
 
         return reactor.buildEffective();
     }
+
+    public static SchemaContext parseYangSource(String filePath) throws SourceException, ReactorException,
+            FileNotFoundException {
+        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR.newBuild();
+        reactor.addSource(new YangStatementSourceImpl(new NamedFileInputStream(new File(filePath), filePath)));
+
+        return reactor.buildEffective();
+    }
 }
