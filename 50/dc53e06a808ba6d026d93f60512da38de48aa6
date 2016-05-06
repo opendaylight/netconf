@@ -1,0 +1,9 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+1: Martin Ciglan <mciglan@cisco.com>
+Code-Review+1: Vaclav Demcak <vaclav.demcak@pantheon.sk>
+Code-Review+2: Tomas Cere <tcere@cisco.com>
+Submitted-by: Tomas Cere <tcere@cisco.com>
+Submitted-at: Fri, 06 May 2016 10:12:48 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/36106
+Project: netconf
+Branch: refs/heads/master
