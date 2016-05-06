@@ -29,6 +29,8 @@ import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.restconf.rest.api.services.RestconfModulesService;
 import org.opendaylight.restconf.rest.api.services.RestconfOperationsService;
 import org.opendaylight.restconf.rest.api.services.RestconfStreamsService;
+import org.opendaylight.restconf.restful.services.api.RestconfDataService;
+import org.opendaylight.restconf.restful.services.api.RestconfInvokeOperationsService;
 
 /**
  * The URI hierarchy for the RESTCONF resources consists of an entry point container, 4 top-level resources, and 1
@@ -62,7 +64,7 @@ public interface RestconfService {
     public Object getRoot();
 
     /**
-     * @deprecated do not use this method. It is replaced by
+     * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfModulesService#getModules(UriInfo)}
      */
     @Deprecated
@@ -73,7 +75,7 @@ public interface RestconfService {
     public NormalizedNodeContext getModules(@Context UriInfo uriInfo);
 
     /**
-     * @deprecated do not use this method. It is replaced by
+     * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfModulesService#getModules(String, UriInfo)}
      */
     @Deprecated
@@ -84,7 +86,7 @@ public interface RestconfService {
     public NormalizedNodeContext getModules(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 
     /**
-     * @deprecated do not use this method. It is replaced by
+     * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfModulesService#getModule(String, UriInfo)}
      */
     @Deprecated
@@ -95,7 +97,7 @@ public interface RestconfService {
     public NormalizedNodeContext getModule(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 
     /**
-     * @deprecated do not use this method. It is replaced by
+     * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfOperationsService#getOperations(UriInfo)}
      */
     @Deprecated
@@ -106,7 +108,7 @@ public interface RestconfService {
     public NormalizedNodeContext getOperations(@Context UriInfo uriInfo);
 
     /**
-     * @deprecated do not use this method. It is replaced by
+     * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfOperationsService#getOperations(String, UriInfo)}
      */
     @Deprecated
@@ -116,6 +118,11 @@ public interface RestconfService {
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public NormalizedNodeContext getOperations(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 
+    /**
+     * @deprecated do not use this method. It will be replaced by
+     *             {@link RestconfInvokeOperationsService#invokeRpc(String, NormalizedNodeContext, UriInfo)}
+     */
+    @Deprecated
     @POST
     @Path("/operations/{identifier:.+}")
     @Produces({ Draft02.MediaTypes.OPERATION + JSON, Draft02.MediaTypes.OPERATION + XML,
@@ -136,6 +143,11 @@ public interface RestconfService {
     public NormalizedNodeContext invokeRpc(@Encoded @PathParam("identifier") String identifier,
             @DefaultValue("") String noPayload, @Context UriInfo uriInfo);
 
+    /**
+     * @deprecated do not use this method. It will be replaced by
+     *             {@link RestconfDataService#readData(String, UriInfo)}
+     */
+    @Deprecated
     @GET
     @Path("/config/{identifier:.+}")
     @Produces({ Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
@@ -143,6 +155,11 @@ public interface RestconfService {
     public NormalizedNodeContext readConfigurationData(@Encoded @PathParam("identifier") String identifier,
             @Context UriInfo uriInfo);
 
+    /**
+     * @deprecated do not use this method. It will be replaced by
+     *             {@link RestconfDataService#readData(String, UriInfo)}
+     */
+    @Deprecated
     @GET
     @Path("/operational/{identifier:.+}")
     @Produces({ Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
@@ -150,12 +167,22 @@ public interface RestconfService {
     public NormalizedNodeContext readOperationalData(@Encoded @PathParam("identifier") String identifier,
             @Context UriInfo uriInfo);
 
+    /**
+     * @deprecated do not use this method. It will be replaced by
+     *             {@link RestconfDataService#putData(String, UriInfo)}
+     */
+    @Deprecated
     @PUT
     @Path("/config/{identifier:.+}")
     @Consumes({ Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public Response updateConfigurationData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload);
 
+    /**
+     * @deprecated do not use this method. It will be replaced by
+     *             {@link RestconfDataService#postData(String, UriInfo)}
+     */
+    @Deprecated
     @POST
     @Path("/config/{identifier:.+}")
     @Consumes({ Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
@@ -163,12 +190,22 @@ public interface RestconfService {
     public Response createConfigurationData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
             @Context UriInfo uriInfo);
 
+    /**
+     * @deprecated do not use this method. It will be replaced by
+     *             {@link RestconfDataService#postData(NormalizedNodeContext, UriInfo)}
+     */
+    @Deprecated
     @POST
     @Path("/config")
     @Consumes({ Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public Response createConfigurationData(NormalizedNodeContext payload, @Context UriInfo uriInfo);
 
+    /**
+     * @deprecated do not use this method. It will be replaced by
+     *             {@link RestconfDataService#deleteData(String)}
+     */
+    @Deprecated
     @DELETE
     @Path("/config/{identifier:.+}")
     public Response deleteConfigurationData(@Encoded @PathParam("identifier") String identifier);
@@ -178,7 +215,7 @@ public interface RestconfService {
     public Response subscribeToStream(@Encoded @PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 
     /**
-     * @deprecated do not use this method. It is replaced by
+     * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfStreamsService#getAvailableStreams(UriInfo)}
      */
     @Deprecated
@@ -188,6 +225,11 @@ public interface RestconfService {
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public NormalizedNodeContext getAvailableStreams(@Context UriInfo uriInfo);
 
+    /**
+     * @deprecated do not use this method. It will be replaced by
+     *             {@link RestconfDataService#patchData(String, PATCHContext, UriInfo)}
+     */
+    @Deprecated
     @PATCH
     @Path("/config/{identifier:.+}")
     @Consumes({MediaTypes.PATCH + JSON, MediaTypes.PATCH + XML})
@@ -195,6 +237,11 @@ public interface RestconfService {
     PATCHStatusContext patchConfigurationData(@Encoded @PathParam("identifier") String identifier, PATCHContext
             context, @Context UriInfo uriInfo);
 
+    /**
+     * @deprecated do not use this method. It will be replaced by
+     *             {@link RestconfDataService#patchData(PATCHContext, UriInfo)}
+     */
+    @Deprecated
     @PATCH
     @Path("/config")
     @Consumes({MediaTypes.PATCH + JSON, MediaTypes.PATCH + XML})
