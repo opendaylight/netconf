@@ -402,10 +402,9 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
                     if (t instanceof MissingSchemaSourceException){
                         requiredSources = handleMissingSchemaSourceException(requiredSources, (MissingSchemaSourceException) t);
                     } else if (t instanceof SchemaResolutionException) {
-                        // FIXME do not wrap MissingSchemaSourceException in a
-                        // SchemaResolutionException. Somewhere this exception
-                        // is wrapped thus the instanceod isn't seeing the root
-                        // the cause of the exception.
+                        // schemaBuilderFuture.checkedGet() throws only SchemaResolutionException
+                        // that might be wrapping a MissingSchemaSourceException so we need to look
+                        // at the cause of the exception to make sure we don't misinterpret it.
                         if (t.getCause() instanceof MissingSchemaSourceException) {
                             requiredSources = handleMissingSchemaSourceException(requiredSources, (MissingSchemaSourceException) t.getCause());
                             continue;
