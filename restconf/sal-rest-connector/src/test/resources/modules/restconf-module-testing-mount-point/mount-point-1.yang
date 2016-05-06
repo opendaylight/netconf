@@ -5,7 +5,4 @@ module mount-point-1 {
 
     container cont {
     }
-
-    list listA {
-    }
 }
