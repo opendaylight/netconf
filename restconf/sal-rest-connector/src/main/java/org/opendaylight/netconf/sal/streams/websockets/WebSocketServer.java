@@ -43,7 +43,7 @@ public class WebSocketServer implements Runnable {
      */
     public static WebSocketServer createInstance(int port) {
         Preconditions.checkState(instance == null, "createInstance() has already been called");
-        Preconditions.checkArgument(port > 1024, "Privileged port (below 1024) is not allowed");
+        Preconditions.checkArgument(port >= 1024, "Privileged port (below 1024) is not allowed");
 
         instance = new WebSocketServer(port);
         return instance;
