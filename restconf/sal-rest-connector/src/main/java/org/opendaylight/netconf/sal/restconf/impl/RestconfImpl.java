@@ -106,6 +106,9 @@ public class RestconfImpl implements RestconfService {
 
     private static final RestconfImpl INSTANCE = new RestconfImpl();
 
+    /**
+     * Notifications are served on port 8181.
+     */
     private static final int NOTIFICATION_PORT = 8181;
 
     private static final int CHAR_NOT_FOUND = -1;
@@ -113,8 +116,6 @@ public class RestconfImpl implements RestconfService {
     private static final SimpleDateFormat REVISION_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     private static final String SAL_REMOTE_NAMESPACE = "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote";
-
-    private static final String SAL_REMOTE_RPC_SUBSRCIBE = "create-data-change-event-subscription";
 
     private BrokerFacade broker;
 

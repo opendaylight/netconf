@@ -19,29 +19,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link WebSocketServer} is responsible to start and stop web socket server
+ * {@link WebSocketServer} is the singleton responsible for starting and stopping the
+ * web socket server.
  */
 public class WebSocketServer implements Runnable {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketServer.class);
-    public static final int DEFAULT_PORT = 8181;
+    private static final Logger LOG = LoggerFactory.getLogger(WebSocketServer.class);
+
+    private static WebSocketServer instance = null;
+
+    private final int port;
+
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
-    private static WebSocketServer instance = null;
-    private int port = DEFAULT_PORT;
 
-    private WebSocketServer(int port) {
+
+    private WebSocketServer(final int port) {
         this.port = port;
     }
 
     /**
-     * Create instance of {@link WebSocketServer}
+     * Create singleton instance of {@link WebSocketServer}
      *
-     * @param port
-     *            TCP port used for this server
+     * @param port TCP port used for this server
      * @return instance of {@link WebSocketServer}
      */
-    public static WebSocketServer createInstance(int port) {
+    public static WebSocketServer createInstance(final int port) {
         Preconditions.checkState(instance == null, "createInstance() has already been called");
         Preconditions.checkArgument(port >= 1024, "Privileged port (below 1024) is not allowed");
 
@@ -50,7 +53,7 @@ public class WebSocketServer implements Runnable {
     }
 
     /**
-     * Return websocket TCP port
+     * @return websocket TCP port
      */
     public int getPort() {
         return port;
@@ -67,7 +70,7 @@ public class WebSocketServer implements Runnable {
     }
 
     /**
-     * Destroy this already created instance
+     * Destroy the existing instance
      */
     public static void destroyInstance() {
         Preconditions.checkState(instance != null, "createInstance() must be called prior to destroyInstance()");
@@ -81,16 +84,16 @@ public class WebSocketServer implements Runnable {
         bossGroup = new NioEventLoopGroup();
         workerGroup = new NioEventLoopGroup();
         try {
-            ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+            final ServerBootstrap serverBootstrap = new ServerBootstrap();
+            serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
                     .childHandler(new WebSocketServerInitializer());
 
-            Channel ch = b.bind(port).sync().channel();
-            logger.info("Web socket server started at port {}.", port);
+            final Channel channel = serverBootstrap.bind(port).sync().channel();
+            LOG.info("Web socket server started at port {}.", port);
 
-            ch.closeFuture().sync();
-        } catch (InterruptedException e) {
-            // NOOP
+            channel.closeFuture().sync();
+        } catch (final InterruptedException e) {
+            LOG.error("Web socket server encountered an error during startup attempt on port {}", port, e);
         } finally {
             stop();
         }
@@ -100,6 +103,7 @@ public class WebSocketServer implements Runnable {
      * Stops the web socket server and removes all listeners.
      */
     private void stop() {
+        LOG.debug("Stopping the web socket server instance on port {}", port);
         Notificator.removeAllListeners();
         if (bossGroup != null) {
             bossGroup.shutdownGracefully();
