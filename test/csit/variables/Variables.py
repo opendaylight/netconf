@@ -228,3 +228,6 @@ SET_DASHBOARDRECORD = '/restconf/operations/dashboardrule:set-dashboard'
 DELETE_DASHBOARDRECORD = '/restconf/operations/dashboardrule:delete-dashboard'
 SET_SUBSCRIBEUSER = '/restconf/operations/subscribe:subscribe-user'
 SUBSCRIPTION = '/restconf/config/subscribe:subscription/'
+
+# Elasticsearch Variables
+ELASTICPORT = 9200
