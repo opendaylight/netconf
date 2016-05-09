@@ -80,7 +80,7 @@ public final class ParserIdentifier {
             moduleNameAndRevision = identifier;
         }
 
-        final Splitter splitter = Splitter.on("/").omitEmptyStrings();
+        final Splitter splitter = Splitter.on("/");
         final Iterable<String> split = splitter.split(moduleNameAndRevision);
         final List<String> pathArgs = Lists.<String> newArrayList(split);
         if (pathArgs.size() < 2) {
