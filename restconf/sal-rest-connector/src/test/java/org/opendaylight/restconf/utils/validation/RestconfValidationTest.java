@@ -152,4 +152,20 @@ public class RestconfValidationTest {
             assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
         }
     }
+
+    /**
+     * Negative test of module name validation when supplied name is empty. Test fails catching
+     * <code>RestconfDocumentedException</code> and checking for correct error type, error tag and error status code.
+     */
+    @Test
+    public void validateAndGetModuleNameEmptyTest() {
+        try {
+            RestconfValidation.validateAndGetModulName(Arrays.asList("").iterator());
+            fail("Test should fail due to empty module name");
+        } catch (RestconfDocumentedException e) {
+            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
+            assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
+        }
+    }
 }
