@@ -72,18 +72,28 @@ public final class ParserIdentifier {
      * @return {@link QName}
      */
     public static QName makeQNameFromIdentifier(final String identifier) {
+        // check if more than one slash is not used as path separator
+        if (identifier.contains(
+                String.valueOf(RestconfConstants.SLASH).concat(String.valueOf(RestconfConstants.SLASH)))) {
+            LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' " + identifier);
+            throw new RestconfDocumentedException(
+                    "URI has bad format. End of URI should be in format \'moduleName/yyyy-MM-dd\'", ErrorType.PROTOCOL,
+                    ErrorTag.INVALID_VALUE);
+        }
+
         final int mountIndex = identifier.indexOf(RestconfConstants.MOUNT);
         String moduleNameAndRevision = "";
         if (mountIndex >= 0) {
-            moduleNameAndRevision = identifier.substring(mountIndex + RestconfConstants.MOUNT.length());
+            moduleNameAndRevision = identifier.substring(mountIndex + RestconfConstants.MOUNT.length())
+                    .replaceFirst(String.valueOf(RestconfConstants.SLASH), "");
         } else {
             moduleNameAndRevision = identifier;
         }
 
-        final Splitter splitter = Splitter.on("/").omitEmptyStrings();
+        final Splitter splitter = Splitter.on(RestconfConstants.SLASH);
         final Iterable<String> split = splitter.split(moduleNameAndRevision);
-        final List<String> pathArgs = Lists.<String> newArrayList(split);
-        if (pathArgs.size() < 2) {
+        final List<String> pathArgs = Lists.newArrayList(split);
+        if (pathArgs.size() != 2) {
             LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' " + identifier);
             throw new RestconfDocumentedException(
                     "URI has bad format. End of URI should be in format \'moduleName/yyyy-MM-dd\'", ErrorType.PROTOCOL,

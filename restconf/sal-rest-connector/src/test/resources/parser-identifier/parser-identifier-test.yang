@@ -1,0 +1,40 @@
+module parser-identifier {
+  namespace "parser:identifier";
+  prefix "parserid";
+  yang-version 1;
+
+  import parser-identifier-included { prefix pii; revision-date 2016-06-02; }
+
+  revision 2016-06-02 {
+    description
+      "Initial revision.";
+  }
+
+  container cont1 {
+    container cont2 {
+      list listTest {
+        uses group;
+      }
+    }
+  }
+
+  grouping group {
+    list list-in-grouping {
+      key name;
+
+      leaf name {
+        type string;
+      }
+
+      leaf leaf-A.B {
+        type uint8;
+      }
+    }
+  }
+
+  augment "/pii:list-1" {
+    leaf augment-leaf {
+      type string;
+    }
+  }
+}

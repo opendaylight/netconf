@@ -1,0 +1,23 @@
+module parser-identifier-included {
+  namespace "parser:identifier:included";
+  prefix "parseridinc";
+  yang-version 1;
+
+  revision 2016-06-02 {
+    description
+      "Initial revision.";
+  }
+
+  list list-1 {
+    key "name revision";
+    description "List in grouping";
+
+    leaf name {
+      type string;
+    }
+
+    leaf revision {
+      type string;
+    }
+  }
+}
