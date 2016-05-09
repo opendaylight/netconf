@@ -1,0 +1,18 @@
+module mount-point {
+  namespace "mount:point";
+  prefix "mountp";
+  yang-version 1;
+
+  revision 2016-06-02 {
+    description "Initial revision.";
+  }
+
+  container mount-container {
+    list point {
+      key point.name;
+      leaf point.name {
+        type string;
+      }
+    }
+  }
+}
