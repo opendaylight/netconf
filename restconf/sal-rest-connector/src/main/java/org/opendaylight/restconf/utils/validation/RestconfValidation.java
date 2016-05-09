@@ -61,7 +61,7 @@ public final class RestconfValidation {
         final String name = moduleName.next();
 
         RestconfValidationUtils.checkDocumentedError(
-                ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR.matches(name.charAt(0)),
+                !name.isEmpty() && ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR.matches(name.charAt(0)),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                 "Identifier must start with character from set 'a-zA-Z_"
         );
