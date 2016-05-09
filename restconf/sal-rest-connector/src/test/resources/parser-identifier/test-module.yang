@@ -1,0 +1,9 @@
+module test-module {
+  namespace "test:module";
+  prefix "testm";
+  yang-version 1;
+
+  revision 2016-06-02 {
+    description "Initial revision.";
+  }
+}
