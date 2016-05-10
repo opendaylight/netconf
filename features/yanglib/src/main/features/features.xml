@@ -24,8 +24,5 @@
         <bundle>mvn:org.opendaylight.netconf/ietf-netconf-yang-library/{{VERSION}}</bundle>
         <feature>war</feature>
         <bundle>mvn:org.opendaylight.netconf/ietf-netconf-yang-library/{{VERSION}}</bundle>
-        <bundle>mvn:com.sun.jersey/jersey-core/{{VERSION}}</bundle>
-        <bundle>mvn:com.sun.jersey/jersey-server/{{VERSION}}</bundle>
-        <bundle>mvn:com.sun.jersey/jersey-servlet/{{VERSION}}</bundle>
     </feature>
 </features>
