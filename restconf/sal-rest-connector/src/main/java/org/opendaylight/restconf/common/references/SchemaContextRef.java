@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.rest.impl.services;
+package org.opendaylight.restconf.common.references;
 
 import java.lang.ref.SoftReference;
 import java.net.URI;
@@ -24,7 +24,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  * {@link SchemaContext}.
  *
  */
-final class SchemaContextRef {
+public final class SchemaContextRef {
 
     private final SoftReference<SchemaContext> schemaContextRef;
 
@@ -73,7 +73,7 @@ final class SchemaContextRef {
 
     /**
      * Get {@link Module} by ietf-restconf qname from
-     * {@link Draft09.RestconfModule}
+     * {@link Draft11.RestconfModule}
      *
      * @return {@link Module}
      */
@@ -103,7 +103,7 @@ final class SchemaContextRef {
      *
      * @param mountPoint
      *            - mount point
-     * @param qname
+     * @param moduleQname
      *            - {@link QName} of module
      * @return {@link Module}
      */
