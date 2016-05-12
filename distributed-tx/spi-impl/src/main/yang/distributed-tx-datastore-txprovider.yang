@@ -1,0 +1,38 @@
+module distributed-tx-datastore-txprovider {
+    yang-version 1;
+    namespace "urn:opendaylight:params:xml:ns:yang:distributed-tx:spi:datastore:txprovider";
+    prefix "distributed-tx-datastpre-txprovider";
+
+    import config { prefix config; revision-date 2013-04-05; }
+    import opendaylight-md-sal-binding { prefix md-sal-binding; revision-date 2013-10-28;}
+    import "distributed-tx-spi" { prefix "distributed-tx-spi"; revision-date 2014-12-10;}
+
+    description
+        "Service definition for distributed-tx project";
+
+    revision "2014-12-10" {
+        description
+            "Initial revision";
+    }
+
+    identity data-store-tx-provider {
+        base config:module-type;
+        config:provided-service distributed-tx-spi:tx-provider;
+        config:java-name-prefix DataStoreTxProvider;
+    }
+
+    augment "/config:modules/config:module/config:configuration" {
+        case data-store-tx-provider {
+            when "/config:modules/config:module/config:type = 'data-store-tx-provider'";
+
+            container broker {
+                uses config:service-ref {
+                    refine type {
+                        mandatory true;
+                        config:required-identity md-sal-binding:binding-broker-osgi-registry;
+                    }
+                }
+            }
+        }
+    }
+}
