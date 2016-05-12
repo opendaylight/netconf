@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,7 +22,8 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
-import org.opendaylight.restconf.rest.api.schema.context.SchemaContextHandler;
+import org.opendaylight.restconf.RestConnectorProvider;
+import org.opendaylight.restconf.common.handlers.api.SchemaContextHandler;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 
@@ -45,7 +45,7 @@ public class RestConnectorProviderTest {
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
-        connectorProvider = new RestConnectorProvider();
+        this.connectorProvider = new RestConnectorProvider();
     }
 
     /**
@@ -53,7 +53,7 @@ public class RestConnectorProviderTest {
      */
     @Test
     public void restConnectorProviderInitTest() {
-        assertNotNull("Connector provider should be initialized and not null", connectorProvider);
+        assertNotNull("Connector provider should be initialized and not null", this.connectorProvider);
     }
 
     /**
@@ -66,16 +66,16 @@ public class RestConnectorProviderTest {
     @Test
     public void successfulRegistrationTest() {
         // prepare conditions
-        when(mockSession.getService(SchemaService.class)).thenReturn(mockSchemaService);
-        when(mockSession.getService(DOMMountPointService.class)).thenReturn(mockMountPointService);
+        when(this.mockSession.getService(SchemaService.class)).thenReturn(this.mockSchemaService);
+        when(this.mockSession.getService(DOMMountPointService.class)).thenReturn(this.mockMountPointService);
 
         // test
-        connectorProvider.onSessionInitiated(mockSession);
+        this.connectorProvider.onSessionInitiated(this.mockSession);
 
         // verify interactions
-        verify(mockSession, times(1)).getService(SchemaService.class);
-        verify(mockSession, times(1)).getService(DOMMountPointService.class);
-        verify(mockSchemaService, times(1)).registerSchemaContextListener(Mockito.any(SchemaContextHandler.class));
+        verify(this.mockSession, times(1)).getService(SchemaService.class);
+        verify(this.mockSession, times(1)).getService(DOMMountPointService.class);
+        verify(this.mockSchemaService, times(1)).registerSchemaContextListener(Mockito.any(SchemaContextHandler.class));
     }
 
     /**
@@ -88,16 +88,16 @@ public class RestConnectorProviderTest {
     @Test
     public void successfulRegistrationWithoutMountPointTest() {
         // prepare conditions
-        when(mockSession.getService(SchemaService.class)).thenReturn(mockSchemaService);
-        when(mockSession.getService(DOMMountPointService.class)).thenReturn(null);
+        when(this.mockSession.getService(SchemaService.class)).thenReturn(this.mockSchemaService);
+        when(this.mockSession.getService(DOMMountPointService.class)).thenReturn(null);
 
         // test
-        connectorProvider.onSessionInitiated(mockSession);
+        this.connectorProvider.onSessionInitiated(this.mockSession);
 
         // verify interactions
-        verify(mockSession, times(1)).getService(SchemaService.class);
-        verify(mockSession, times(1)).getService(DOMMountPointService.class);
-        verify(mockSchemaService, times(1)).registerSchemaContextListener(Mockito.any(SchemaContextHandler.class));
+        verify(this.mockSession, times(1)).getService(SchemaService.class);
+        verify(this.mockSession, times(1)).getService(DOMMountPointService.class);
+        verify(this.mockSchemaService, times(1)).registerSchemaContextListener(Mockito.any(SchemaContextHandler.class));
     }
 
     /**
@@ -106,8 +106,8 @@ public class RestConnectorProviderTest {
      */
     @Test
     public void nullSessionRegistrationNegativeTest() {
-        thrown.expect(NullPointerException.class);
-        connectorProvider.onSessionInitiated(null);
+        this.thrown.expect(NullPointerException.class);
+        this.connectorProvider.onSessionInitiated(null);
     }
 
     /**
@@ -118,14 +118,14 @@ public class RestConnectorProviderTest {
     @Test
     public void withoutSchemaServiceRegistrationNegativeTest() {
         // prepare conditions
-        when(mockSession.getService(SchemaService.class)).thenReturn(null);
+        when(this.mockSession.getService(SchemaService.class)).thenReturn(null);
 
         // test
-        thrown.expect(NullPointerException.class);
-        connectorProvider.onSessionInitiated(mockSession);
+        this.thrown.expect(NullPointerException.class);
+        this.connectorProvider.onSessionInitiated(this.mockSession);
 
         // verify interaction
-        verify(mockSession, times(1)).getService(SchemaService.class);
+        verify(this.mockSession, times(1)).getService(SchemaService.class);
     }
 
     /**
@@ -133,7 +133,7 @@ public class RestConnectorProviderTest {
      */
     @Test
     public void closeNotOpenTest() throws Exception {
-        connectorProvider.close();
+        this.connectorProvider.close();
     }
 
     /**
@@ -142,18 +142,18 @@ public class RestConnectorProviderTest {
     @Test
     public void closeOpenTest() throws Exception {
         // prepare conditions
-        when(mockSession.getService(SchemaService.class)).thenReturn(mockSchemaService);
-        when(mockSession.getService(DOMMountPointService.class)).thenReturn(mockMountPointService);
-        when(mockSchemaService.registerSchemaContextListener(Mockito.any(SchemaContextHandler.class)))
-                .thenReturn(mockRegistration);
+        when(this.mockSession.getService(SchemaService.class)).thenReturn(this.mockSchemaService);
+        when(this.mockSession.getService(DOMMountPointService.class)).thenReturn(this.mockMountPointService);
+        when(this.mockSchemaService.registerSchemaContextListener(Mockito.any(SchemaContextHandler.class)))
+                .thenReturn(this.mockRegistration);
 
         // register
-        connectorProvider.onSessionInitiated(mockSession);
+        this.connectorProvider.onSessionInitiated(this.mockSession);
 
         // close registration
-        connectorProvider.close();
+        this.connectorProvider.close();
 
         // verify interaction
-        verify(mockRegistration, times(1)).close();
+        verify(this.mockRegistration, times(1)).close();
     }
 }
