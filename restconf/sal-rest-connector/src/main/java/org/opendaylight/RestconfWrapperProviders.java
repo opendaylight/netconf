@@ -12,7 +12,7 @@ import org.opendaylight.controller.config.yang.md.sal.rest.connector.RestConnect
 import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.sal.rest.api.RestConnector;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfProviderImpl;
-import org.opendaylight.restconf.rest.RestConnectorProvider;
+import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.PortNumber;
 
 /**
