@@ -14,7 +14,7 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
         <artifactId>netconf-subsystem</artifactId>
-        <version>1.0.2-Beryllium-SR2</version>
+        <version>1.0.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>messagebus-netconf</artifactId>
