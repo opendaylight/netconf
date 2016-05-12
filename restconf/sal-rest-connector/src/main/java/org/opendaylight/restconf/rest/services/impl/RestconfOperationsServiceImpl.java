@@ -5,43 +5,48 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.rest.impl.services;
+package org.opendaylight.restconf.rest.services.impl;
 
-import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
-import org.opendaylight.restconf.rest.api.schema.context.SchemaContextHandler;
-import org.opendaylight.restconf.rest.api.services.schema.RestconfSchemaService;
+import javax.ws.rs.core.UriInfo;
+import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.restconf.common.handlers.api.SchemaContextHandler;
 import org.opendaylight.restconf.rest.handlers.api.DOMMountPointServiceHandler;
-import org.opendaylight.restconf.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.rest.services.api.RestconfOperationsService;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
- * Implementation of {@link RestconfSchemaService}.
+ * Implementation of {@link RestconfOperationsService}
  *
  */
-public class RestconfSchemaServiceImpl implements RestconfSchemaService {
+public class RestconfOperationsServiceImpl implements RestconfOperationsService {
 
     private final SchemaContextHandler schemaContextHandler;
     private final DOMMountPointServiceHandler domMountPointServiceHandler;
 
     /**
      * Set {@link SchemaContextHandler} for getting actual {@link SchemaContext}
-     * .
      *
      * @param schemaContextHandler
      *            - handling schema context
      * @param domMountPointServiceHandler
      *            - handling dom mount point service
      */
-    public RestconfSchemaServiceImpl(final SchemaContextHandler schemaContextHandler,
+    public RestconfOperationsServiceImpl(final SchemaContextHandler schemaContextHandler,
             final DOMMountPointServiceHandler domMountPointServiceHandler) {
         this.schemaContextHandler = schemaContextHandler;
         this.domMountPointServiceHandler = domMountPointServiceHandler;
     }
 
     @Override
-    public SchemaExportContext getSchema(final String identifier) {
-        final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.getSchemaContext());
-        return ParserIdentifier.toSchemaExportContextFromIdentifier(schemaContextRef.get(), identifier,
-                this.domMountPointServiceHandler.getDOMMountPointService());
+    public NormalizedNodeContext getOperations(final UriInfo uriInfo) {
+        throw new RestconfDocumentedException("Not yet implemented.", new UnsupportedOperationException());
     }
+
+
+    @Override
+    public NormalizedNodeContext getOperations(final String identifier, final UriInfo uriInfo) {
+        throw new RestconfDocumentedException("Not yet implemented.", new UnsupportedOperationException());
+    }
+
 }
