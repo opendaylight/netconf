@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.rest.impl.services;
+package org.opendaylight.restconf.rest.services.impl;
 
 import com.google.common.base.Preconditions;
 import java.util.Set;
@@ -14,8 +14,9 @@ import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.restconf.Draft11;
-import org.opendaylight.restconf.rest.api.schema.context.SchemaContextHandler;
-import org.opendaylight.restconf.rest.api.services.RestconfStreamsService;
+import org.opendaylight.restconf.common.handlers.api.SchemaContextHandler;
+import org.opendaylight.restconf.common.references.SchemaContextRef;
+import org.opendaylight.restconf.rest.services.api.RestconfStreamsService;
 import org.opendaylight.restconf.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.utils.schema.context.RestconfSchemaUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
