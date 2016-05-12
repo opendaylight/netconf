@@ -27,6 +27,7 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
   <modules>
     <module>api</module>
     <module>spi</module>
+    <module>spi-impl</module>
   </modules>
 
 </project>
