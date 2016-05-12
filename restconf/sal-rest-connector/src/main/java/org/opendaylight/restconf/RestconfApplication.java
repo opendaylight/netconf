@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.rest;
+package org.opendaylight.restconf;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.HashSet;
@@ -15,11 +15,11 @@ import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYangBodyWr
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYinBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
-import org.opendaylight.restconf.rest.api.schema.context.SchemaContextHandler;
+import org.opendaylight.restconf.common.handlers.api.SchemaContextHandler;
+import org.opendaylight.restconf.common.handlers.impl.SchemaContextHandlerImpl;
 import org.opendaylight.restconf.rest.handlers.api.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.rest.handlers.impl.DOMMountPointServiceHandlerImpl;
-import org.opendaylight.restconf.rest.impl.schema.context.SchemaContextHandlerImpl;
-import org.opendaylight.restconf.rest.impl.services.Draft11ServicesWrapperImpl;
+import org.opendaylight.restconf.rest.services.impl.Draft11ServicesWrapperImpl;
 import org.osgi.framework.FrameworkUtil;
 
 public class RestconfApplication extends Application implements RestconfApplicationService {
