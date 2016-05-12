@@ -15,9 +15,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.EMPTY;
-import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.util.AbstractMap;
@@ -41,10 +38,13 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.restconf.Draft11;
-import org.opendaylight.restconf.rest.api.schema.context.SchemaContextHandler;
-import org.opendaylight.restconf.rest.api.services.RestconfStreamsService;
+import org.opendaylight.restconf.common.handlers.api.SchemaContextHandler;
+import org.opendaylight.restconf.rest.services.api.RestconfStreamsService;
+import org.opendaylight.restconf.rest.services.impl.RestconfStreamsServiceImpl;
 import org.opendaylight.restconf.utils.mapping.RestconfMappingNodeConstants;
 import org.opendaylight.restconf.utils.mapping.RestconfMappingStreamConstants;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
@@ -98,7 +98,7 @@ public class RestconfStreamsServiceTest {
      */
     @Test
     public void restconfStreamsServiceImplInitTest() {
-        assertNotNull("Streams service should be initialized and not null", streamsService);
+        assertNotNull("Streams service should be initialized and not null", this.streamsService);
     }
 
     /**
@@ -108,13 +108,13 @@ public class RestconfStreamsServiceTest {
     @Test
     public void getAvailableStreamsTest() throws Exception {
         // prepare conditions - get correct Restconf module
-        when(contextHandler.getSchemaContext()).thenReturn(mockSchemaContext);
-        when(mockSchemaContext.findModuleByNamespaceAndRevision(Draft11.RestconfModule.IETF_RESTCONF_QNAME
+        when(this.contextHandler.getSchemaContext()).thenReturn(this.mockSchemaContext);
+        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft11.RestconfModule.IETF_RESTCONF_QNAME
                 .getNamespace(), Draft11.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
                 .thenReturn(getTestingRestconfModule("ietf-restconf"));
 
         // make test
-        final NormalizedNodeContext nodeContext = streamsService.getAvailableStreams(null);
+        final NormalizedNodeContext nodeContext = this.streamsService.getAvailableStreams(null);
 
         // verify loaded streams
         assertNotNull("Normalized node context should not be null", nodeContext);
@@ -128,11 +128,11 @@ public class RestconfStreamsServiceTest {
     @Test
     public void getAvailableStreamsNullSchemaContextNegativeTest() {
         // prepare conditions - returned SchemaContext is null
-        when(contextHandler.getSchemaContext()).thenReturn(null);
+        when(this.contextHandler.getSchemaContext()).thenReturn(null);
 
         // make test
-        thrown.expect(NullPointerException.class);
-        streamsService.getAvailableStreams(null);
+        this.thrown.expect(NullPointerException.class);
+        this.streamsService.getAvailableStreams(null);
     }
 
     /**
@@ -142,13 +142,13 @@ public class RestconfStreamsServiceTest {
     @Test
     public void getAvailableStreamsMissingRestconfModuleNegativeTest() {
         // prepare conditions - get null Restconf module
-        when(contextHandler.getSchemaContext()).thenReturn(mockSchemaContext);
-        when(mockSchemaContext.findModuleByNamespaceAndRevision(Draft11.RestconfModule.IETF_RESTCONF_QNAME
+        when(this.contextHandler.getSchemaContext()).thenReturn(this.mockSchemaContext);
+        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft11.RestconfModule.IETF_RESTCONF_QNAME
                 .getNamespace(), Draft11.RestconfModule.IETF_RESTCONF_QNAME.getRevision())).thenReturn(null);
 
         // make test
-        thrown.expect(NullPointerException.class);
-        streamsService.getAvailableStreams(null);
+        this.thrown.expect(NullPointerException.class);
+        this.streamsService.getAvailableStreams(null);
     }
 
     /**
@@ -159,14 +159,14 @@ public class RestconfStreamsServiceTest {
     @Test
     public void getAvailableStreamsMissingListStreamNegativeTest() {
         // prepare conditions - get Restconf module with missing list stream
-        when(contextHandler.getSchemaContext()).thenReturn(mockSchemaContext);
-        when(mockSchemaContext.findModuleByNamespaceAndRevision(Draft11.RestconfModule.IETF_RESTCONF_QNAME
+        when(this.contextHandler.getSchemaContext()).thenReturn(this.mockSchemaContext);
+        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft11.RestconfModule.IETF_RESTCONF_QNAME
                 .getNamespace(), Draft11.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
                 .thenReturn(getTestingRestconfModule("restconf-module-with-missing-list-stream"));
 
         // make test and verify
         try {
-            streamsService.getAvailableStreams(null);
+            this.streamsService.getAvailableStreams(null);
             fail("Test is expected to fail due to missing list stream");
         } catch (final RestconfDocumentedException e) {
             assertEquals("Error type is not correct",
@@ -186,14 +186,14 @@ public class RestconfStreamsServiceTest {
     @Test
     public void getAvailableStreamsMissingContainerStreamsNegativeTest() {
         // prepare conditions - get Restconf module with missing container streams
-        when(contextHandler.getSchemaContext()).thenReturn(mockSchemaContext);
-        when(mockSchemaContext.findModuleByNamespaceAndRevision(Draft11.RestconfModule.IETF_RESTCONF_QNAME
+        when(this.contextHandler.getSchemaContext()).thenReturn(this.mockSchemaContext);
+        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft11.RestconfModule.IETF_RESTCONF_QNAME
                 .getNamespace(), Draft11.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
                 .thenReturn(getTestingRestconfModule("restconf-module-with-missing-container-streams"));
 
         // make test and verify
         try {
-            streamsService.getAvailableStreams(null);
+            this.streamsService.getAvailableStreams(null);
             fail("Test is expected to fail due to missing container streams");
         } catch (final RestconfDocumentedException e) {
             assertEquals("Error type is not correct",
@@ -212,14 +212,14 @@ public class RestconfStreamsServiceTest {
     @Test
     public void getAvailableStreamsIllegalListStreamNegativeTest() {
         // prepare conditions - get Restconf module with illegal list stream
-        when(contextHandler.getSchemaContext()).thenReturn(mockSchemaContext);
-        when(mockSchemaContext.findModuleByNamespaceAndRevision(Draft11.RestconfModule.IETF_RESTCONF_QNAME
+        when(this.contextHandler.getSchemaContext()).thenReturn(this.mockSchemaContext);
+        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft11.RestconfModule.IETF_RESTCONF_QNAME
                 .getNamespace(), Draft11.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
                 .thenReturn(getTestingRestconfModule("restconf-module-with-illegal-list-stream"));
 
         // make test
-        thrown.expect(IllegalStateException.class);
-        streamsService.getAvailableStreams(null);
+        this.thrown.expect(IllegalStateException.class);
+        this.streamsService.getAvailableStreams(null);
     }
 
     /**
@@ -229,14 +229,14 @@ public class RestconfStreamsServiceTest {
     @Test
     public void getAvailableStreamsIllegalContainerStreamsNegativeTest() {
         // prepare conditions - get Restconf module with illegal container streams
-        when(contextHandler.getSchemaContext()).thenReturn(mockSchemaContext);
-        when(mockSchemaContext.findModuleByNamespaceAndRevision(Draft11.RestconfModule.IETF_RESTCONF_QNAME
+        when(this.contextHandler.getSchemaContext()).thenReturn(this.mockSchemaContext);
+        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft11.RestconfModule.IETF_RESTCONF_QNAME
                 .getNamespace(), Draft11.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
                 .thenReturn(getTestingRestconfModule("restconf-module-with-illegal-container-streams"));
 
         // make test
-        thrown.expect(IllegalStateException.class);
-        streamsService.getAvailableStreams(null);
+        this.thrown.expect(IllegalStateException.class);
+        this.streamsService.getAvailableStreams(null);
     }
 
     /**
@@ -246,14 +246,14 @@ public class RestconfStreamsServiceTest {
     @Test
     public void getAvailableStreamsIllegalLeafDescriptionNegativeTest() {
         // prepare conditions - get Restconf module with illegal leaf description in list stream
-        when(contextHandler.getSchemaContext()).thenReturn(mockSchemaContext);
-        when(mockSchemaContext.findModuleByNamespaceAndRevision(Draft11.RestconfModule.IETF_RESTCONF_QNAME
+        when(this.contextHandler.getSchemaContext()).thenReturn(this.mockSchemaContext);
+        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft11.RestconfModule.IETF_RESTCONF_QNAME
                 .getNamespace(), Draft11.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
                 .thenReturn(getTestingRestconfModule("restconf-module-with-illegal-leaf-description"));
 
         // make test
-        thrown.expect(IllegalStateException.class);
-        streamsService.getAvailableStreams(null);
+        this.thrown.expect(IllegalStateException.class);
+        this.streamsService.getAvailableStreams(null);
     }
 
     /**
@@ -263,7 +263,7 @@ public class RestconfStreamsServiceTest {
      * @return Restconf module
      */
     private Module getTestingRestconfModule(final String s) {
-        return schemaContext.findModuleByName(s, Draft11.RestconfModule.IETF_RESTCONF_QNAME.getRevision());
+        return this.schemaContext.findModuleByName(s, Draft11.RestconfModule.IETF_RESTCONF_QNAME.getRevision());
     }
 
     /**

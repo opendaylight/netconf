@@ -10,15 +10,12 @@ package org.opendaylight.restconf.rest.impl.schema.context;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-
-import java.io.FileNotFoundException;
-import java.net.URISyntaxException;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
-import org.opendaylight.restconf.rest.api.schema.context.SchemaContextHandler;
+import org.opendaylight.restconf.common.handlers.api.SchemaContextHandler;
+import org.opendaylight.restconf.common.handlers.impl.SchemaContextHandlerImpl;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 /**
  * Tests for handling {@link SchemaContext}
@@ -33,10 +30,10 @@ public class SchemaContextHandlerTest {
 
     @Before
     public void setup() throws Exception {
-        schemaContextHandler = new SchemaContextHandlerImpl();
+        this.schemaContextHandler = new SchemaContextHandlerImpl();
 
-        schemaContext = TestRestconfUtils.loadSchemaContext(PATH_FOR_ACTUAL_SCHEMA_CONTEXT);
-        schemaContextHandler.onGlobalContextUpdated(schemaContext);
+        this.schemaContext = TestRestconfUtils.loadSchemaContext(PATH_FOR_ACTUAL_SCHEMA_CONTEXT);
+        this.schemaContextHandler.onGlobalContextUpdated(this.schemaContext);
     }
 
     /**
@@ -44,7 +41,7 @@ public class SchemaContextHandlerTest {
      */
     @Test
     public void schemaContextHandlerImplInitTest() {
-        assertNotNull("Handler should be created and not null", schemaContextHandler);
+        assertNotNull("Handler should be created and not null", this.schemaContextHandler);
     }
 
     /**
@@ -56,7 +53,7 @@ public class SchemaContextHandlerTest {
     @Test
     public void getSchemaContextTest() {
         assertEquals("SchemaContextHandler should has reference to actual SchemaContext",
-                schemaContext, schemaContextHandler.getSchemaContext());
+                this.schemaContext, this.schemaContextHandler.getSchemaContext());
     }
 
     /**
@@ -68,12 +65,12 @@ public class SchemaContextHandlerTest {
     @Test
     public void onGlobalContextUpdateTest() throws Exception {
         // create new SchemaContext and update SchemaContextHandler
-        SchemaContext newSchemaContext = TestRestconfUtils.loadSchemaContext(PATH_FOR_NEW_SCHEMA_CONTEXT);
-        schemaContextHandler.onGlobalContextUpdated(newSchemaContext);
+        final SchemaContext newSchemaContext = TestRestconfUtils.loadSchemaContext(PATH_FOR_NEW_SCHEMA_CONTEXT);
+        this.schemaContextHandler.onGlobalContextUpdated(newSchemaContext);
 
         assertNotEquals("SchemaContextHandler should not has reference to old SchemaContext",
-                schemaContext, schemaContextHandler.getSchemaContext());
+                this.schemaContext, this.schemaContextHandler.getSchemaContext());
         assertEquals("SchemaContextHandler should has reference to new SchemaContext",
-                newSchemaContext, schemaContextHandler.getSchemaContext());
+                newSchemaContext, this.schemaContextHandler.getSchemaContext());
     }
 }
