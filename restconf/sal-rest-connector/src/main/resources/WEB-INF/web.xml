@@ -4,21 +4,21 @@
     version="3.0">
 
     <servlet>
-        <servlet-name>JAXRSRestconf</servlet-name>
-        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-        <init-param>
-            <param-name>javax.ws.rs.Application</param-name>
-            <param-value>org.opendaylight.netconf.sal.rest.impl.RestconfApplication</param-value>
-        </init-param>
-        <load-on-startup>0</load-on-startup>
-    </servlet>
-
-    <servlet>
         <servlet-name>Restconf</servlet-name>
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
         <init-param>
             <param-name>javax.ws.rs.Application</param-name>
             <param-value>org.opendaylight.restconf.rest.RestconfApplication</param-value>
+        </init-param>
+        <load-on-startup>0</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>JAXRSRestconf</servlet-name>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>javax.ws.rs.Application</param-name>
+            <param-value>org.opendaylight.netconf.sal.rest.impl.RestconfApplication</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
