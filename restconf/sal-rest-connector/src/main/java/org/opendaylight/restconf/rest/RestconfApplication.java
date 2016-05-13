@@ -30,7 +30,7 @@ public class RestconfApplication extends Application implements RestconfApplicat
     public RestconfApplication() {
         this.schemaContextHandler = new SchemaContextHandlerImpl();
         this.domMountPointServiceHandler = new DOMMountPointServiceHandlerImpl();
-        FrameworkUtil.getBundle(getClass()).getBundleContext().registerService(RestconfApplicationService.class.getName(),
+        FrameworkUtil.getBundle(getClass()).getBundleContext().registerService(RestconfApplication.class.getName(),
                 this, null);
     }
 

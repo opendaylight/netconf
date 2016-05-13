@@ -45,7 +45,7 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
     }
 
     private <T> T getObjectFromBundleContext(final Class<T> type, final String serviceRefName) {
-        final BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
+        final BundleContext bundleContext = FrameworkUtil.getBundle(type).getBundleContext();
         final ServiceReference<?> serviceReference = bundleContext.getServiceReference(serviceRefName);
         return (T) bundleContext.getService(serviceReference);
     }
