@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2015 Cisco Systems, Inc. and others.  All rights reserved.
+
+This program and the accompanying materials are made available under the
+terms of the Eclipse Public License v1.0 which accompanies this distribution,
+and is available at http://www.eclipse.org/legal/epl-v10.html
+-->
+<snapshot>
+  <required-capabilities>
+      <capability>urn:opendaylight:params:xml:ns:yang:distributed-tx:impl?module=distributed-tx-impl&amp;revision=2014-12-10</capability>
+      <capability>urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding?module=opendaylight-md-sal-binding&amp;revision=2013-10-28</capability>
+  </required-capabilities>
+  <configuration>
+
+    <data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+      <modules xmlns="urn:opendaylight:params:xml:ns:yang:controller:config">
+        <module>
+          <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:distributed-tx:impl">prefix:distributed-tx-impl</type>
+          <name>distributed-tx-impl</name>
+          <tx-provider>
+            <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:distributed-tx:spi">prefix:tx-provider</type>
+            <name>mount-point-tx-provider</name>
+          </tx-provider>
+          <data-store-tx-provider>
+            <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:distributed-tx:spi">prefix:tx-provider</type>
+            <name>data-store-tx-provider</name>
+          </data-store-tx-provider>
+        </module>
+        <module>
+          <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:distributed-tx:spi:impl">prefix:mount-service-tx-provider</type>
+          <name>mount-point-tx-provider</name>
+          <broker>
+            <type xmlns:binding="urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding">binding:binding-broker-osgi-registry</type>
+            <name>binding-osgi-broker</name>
+          </broker>
+        </module>
+        <module>
+          <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:distributed-tx:spi:datastore:txprovider">prefix:data-store-tx-provider</type>
+          <name>data-store-tx-provider</name>
+          <broker>
+            <type xmlns:binding="urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding">binding:binding-broker-osgi-registry</type>
+            <name>binding-osgi-broker</name>
+          </broker>
+        </module>
+      </modules>
+      <services xmlns="urn:opendaylight:params:xml:ns:yang:controller:config">
+        <service>
+          <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:distributed-tx:spi">prefix:tx-provider</type>
+          <instance>
+            <name>mount-point-tx-provider</name>
+            <provider>/modules/module[type='mount-service-tx-provider'][name='mount-point-tx-provider']</provider>
+          </instance>
+        </service>
+        <service>
+          <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:distributed-tx:spi">prefix:tx-provider</type>
+          <instance>
+            <name>data-store-tx-provider</name>
+            <provider>/modules/module[type='data-store-tx-provider'][name='data-store-tx-provider']</provider>
+          </instance>
+        </service>
+      </services>
+    </data>
+  </configuration>
+</snapshot>
