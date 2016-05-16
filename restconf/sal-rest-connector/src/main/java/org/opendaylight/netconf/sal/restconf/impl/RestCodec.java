@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 
 public class RestCodec {
 
-    private static final Logger logger = LoggerFactory.getLogger(RestCodec.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RestCodec.class);
 
     private RestCodec() {
     }
@@ -54,7 +54,7 @@ public class RestCodec {
     @SuppressWarnings("rawtypes")
     public static final class ObjectCodec implements Codec<Object, Object> {
 
-        private final Logger logger = LoggerFactory.getLogger(RestCodec.class);
+        private static final Logger LOG = LoggerFactory.getLogger(ObjectCodec.class);
 
         public static final Codec LEAFREF_DEFAULT_CODEC = new LeafrefCodecImpl();
         private final Codec instanceIdentifier;
@@ -84,15 +84,17 @@ public class RestCodec {
                     if (input instanceof IdentityValuesDTO) {
                         return identityrefCodec.deserialize(input);
                     }
-                    logger.debug(
+                    if(LOG.isDebugEnabled()) {
+                        LOG.debug(
                             "Value is not instance of IdentityrefTypeDefinition but is {}. Therefore NULL is used as translation of  - {}",
                             input == null ? "null" : input.getClass(), String.valueOf(input));
+                    }
                     return null;
                 } else if (type instanceof InstanceIdentifierTypeDefinition) {
                     if (input instanceof IdentityValuesDTO) {
                         return instanceIdentifier.deserialize(input);
                     }
-                    logger.info(
+                    LOG.info(
                             "Value is not instance of InstanceIdentifierTypeDefinition but is {}. Therefore NULL is used as translation of  - {}",
                             input == null ? "null" : input.getClass(), String.valueOf(input));
                     return null;
@@ -105,13 +107,13 @@ public class RestCodec {
                         }
                         return typeAwarecodec.deserialize(String.valueOf(input));
                     } else {
-                        logger.debug("Codec for type \"" + type.getQName().getLocalName()
+                        LOG.debug("Codec for type \"" + type.getQName().getLocalName()
                                 + "\" is not implemented yet.");
                         return null;
                     }
                 }
             } catch (final ClassCastException e) { // TODO remove this catch when everyone use codecs
-                logger.error(
+                LOG.error(
                         "ClassCastException was thrown when codec is invoked with parameter " + String.valueOf(input),
                         e);
                 return null;
@@ -134,13 +136,15 @@ public class RestCodec {
                     if (typeAwarecodec != null) {
                         return typeAwarecodec.serialize(input);
                     } else {
-                        logger.debug("Codec for type \"" + type.getQName().getLocalName()
+                        if(LOG.isDebugEnabled()) {
+                            LOG.debug("Codec for type \"" + type.getQName().getLocalName()
                                 + "\" is not implemented yet.");
+                        }
                         return null;
                     }
                 }
             } catch (final ClassCastException e) { // TODO remove this catch when everyone use codecs
-                logger.error(
+                LOG.error(
                         "ClassCastException was thrown when codec is invoked with parameter " + String.valueOf(input),
                         e);
                 return input;
@@ -151,7 +155,7 @@ public class RestCodec {
 
     public static class IdentityrefCodecImpl implements IdentityrefCodec<IdentityValuesDTO> {
 
-        private final Logger logger = LoggerFactory.getLogger(IdentityrefCodecImpl.class);
+        private static final Logger LOG = LoggerFactory.getLogger(IdentityrefCodecImpl.class);
 
         private final DOMMountPoint mountPoint;
 
@@ -169,8 +173,8 @@ public class RestCodec {
             final IdentityValue valueWithNamespace = data.getValuesWithNamespaces().get(0);
             final Module module = getModuleByNamespace(valueWithNamespace.getNamespace(), mountPoint);
             if (module == null) {
-                logger.info("Module was not found for namespace {}", valueWithNamespace.getNamespace());
-                logger.info("Idenetityref will be translated as NULL for data - {}", String.valueOf(valueWithNamespace));
+                LOG.info("Module was not found for namespace {}", valueWithNamespace.getNamespace());
+                LOG.info("Idenetityref will be translated as NULL for data - {}", String.valueOf(valueWithNamespace));
                 return null;
             }
 
@@ -194,7 +198,7 @@ public class RestCodec {
     }
 
     public static class InstanceIdentifierCodecImpl implements InstanceIdentifierCodec<IdentityValuesDTO> {
-        private final Logger logger = LoggerFactory.getLogger(InstanceIdentifierCodecImpl.class);
+        private static final Logger LOG = LoggerFactory.getLogger(InstanceIdentifierCodecImpl.class);
         private final DOMMountPoint mountPoint;
 
         public InstanceIdentifierCodecImpl(final DOMMountPoint mountPoint) {
@@ -227,9 +231,9 @@ public class RestCodec {
             final IdentityValue valueWithNamespace = data.getValuesWithNamespaces().get(0);
             final Module module = getModuleByNamespace(valueWithNamespace.getNamespace(), mountPoint);
             if (module == null) {
-                logger.info("Module by namespace '{}' of first node in instance-identifier was not found.",
+                LOG.info("Module by namespace '{}' of first node in instance-identifier was not found.",
                         valueWithNamespace.getNamespace());
-                logger.info("Instance-identifier will be translated as NULL for data - {}",
+                LOG.info("Instance-identifier will be translated as NULL for data - {}",
                         String.valueOf(valueWithNamespace.getValue()));
                 return null;
             }
@@ -242,8 +246,8 @@ public class RestCodec {
                 final DataSchemaNode node = ControllerContext.findInstanceDataChildByNameAndNamespace(
                         parentContainer, identityValue.getValue(), validNamespace);
                 if (node == null) {
-                    logger.info("'{}' node was not found in {}", identityValue, parentContainer.getChildNodes());
-                    logger.info("Instance-identifier will be translated as NULL for data - {}",
+                    LOG.info("'{}' node was not found in {}", identityValue, parentContainer.getChildNodes());
+                    LOG.info("Instance-identifier will be translated as NULL for data - {}",
                             String.valueOf(identityValue.getValue()));
                     return null;
                 }
@@ -255,8 +259,8 @@ public class RestCodec {
                     if (node instanceof LeafListSchemaNode) { // predicate is value of leaf-list entry
                         final Predicate leafListPredicate = identityValue.getPredicates().get(0);
                         if (!leafListPredicate.isLeafList()) {
-                            logger.info("Predicate's data is not type of leaf-list. It should be in format \".='value'\"");
-                            logger.info("Instance-identifier will be translated as NULL for data - {}",
+                            LOG.info("Predicate's data is not type of leaf-list. It should be in format \".='value'\"");
+                            LOG.info("Instance-identifier will be translated as NULL for data - {}",
                                     String.valueOf(identityValue.getValue()));
                             return null;
                         }
@@ -273,8 +277,8 @@ public class RestCodec {
                         }
                         pathArgument = new NodeIdentifierWithPredicates(qName, predicatesMap);
                     } else {
-                        logger.info("Node {} is not List or Leaf-list.", node);
-                        logger.info("Instance-identifier will be translated as NULL for data - {}",
+                        LOG.info("Node {} is not List or Leaf-list.", node);
+                        LOG.info("Instance-identifier will be translated as NULL for data - {}",
                                 String.valueOf(identityValue.getValue()));
                         return null;
                     }
@@ -285,8 +289,8 @@ public class RestCodec {
                     if (node instanceof DataNodeContainer) {
                         parentContainer = (DataNodeContainer) node;
                     } else {
-                        logger.info("Node {} isn't instance of DataNodeContainer", node);
-                        logger.info("Instance-identifier will be translated as NULL for data - {}",
+                        LOG.info("Node {} isn't instance of DataNodeContainer", node);
+                        LOG.info("Instance-identifier will be translated as NULL for data - {}",
                                 String.valueOf(identityValue.getValue()));
                         return null;
                     }
@@ -323,7 +327,7 @@ public class RestCodec {
             module = ControllerContext.getInstance().findModuleByNamespace(validNamespace);
         }
         if (module == null) {
-            logger.info("Module for namespace " + validNamespace + " wasn't found.");
+            LOG.info("Module for namespace " + validNamespace + " wasn't found.");
             return null;
         }
         return module;
