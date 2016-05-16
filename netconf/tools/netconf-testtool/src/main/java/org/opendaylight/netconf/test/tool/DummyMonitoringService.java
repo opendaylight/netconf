@@ -18,7 +18,9 @@ import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opendaylight.controller.config.util.capability.Capability;
+import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.api.monitoring.SessionEvent;
 import org.opendaylight.netconf.api.monitoring.SessionListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
@@ -88,7 +90,22 @@ public class DummyMonitoringService implements NetconfMonitoringService {
 
     @Override
     public SessionListener getSessionListener() {
-        return null;
+        return new SessionListener() {
+            @Override
+            public void onSessionUp(NetconfManagementSession session) {
+                //no op
+            }
+
+            @Override
+            public void onSessionDown(NetconfManagementSession session) {
+                //no op
+            }
+
+            @Override
+            public void onSessionEvent(SessionEvent event) {
+                //no op
+            }
+        };
     }
 
     @Override
