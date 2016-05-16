@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_ea5041d6",
+        "filename": "distributed-tx/spi/src/main/java/org/opendaylight/distributed/tx/spi/CachedData.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-05-16T16:32:17Z",
+      "side": 1,
+      "message": "since this is targeted at Boron, java.util.Optional (from Java 8) is preferred to Guava. Unless this is being passed on to an API which is defined in terms of Guava, of course.",
+      "range": {
+        "startLine": 10,
+        "startChar": 7,
+        "endLine": 10,
+        "endChar": 39
+      },
+      "revId": "af04af0ce604e44e08695289f3443150b1747eae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_0a5655d2",
+        "filename": "distributed-tx/spi/src/main/java/org/opendaylight/distributed/tx/spi/CachedData.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-05-16T16:32:17Z",
+      "side": 1,
+      "message": "please do a Preconditions.checkNotNull() on constructur arguments which are required to be non-null -- @Nonnull does not enforce it.",
+      "range": {
+        "startLine": 29,
+        "startChar": 29,
+        "endLine": 29,
+        "endChar": 43
+      },
+      "revId": "af04af0ce604e44e08695289f3443150b1747eae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
