@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_ca4bbd29",
+        "filename": "distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTXLogicalTXProviderType.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-05-16T16:29:33Z",
+      "side": 1,
+      "message": "are these the only ones possible? what is the difference between the two and do we really need to centralize them in an enum?",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 26
+      },
+      "revId": "bd99939c1919a3cc36e91b232d5a3851f602fa43",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_4a384da0",
+        "filename": "distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTXLogicalTXProviderType.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-05-16T16:29:33Z",
+      "side": 1,
+      "message": "this constructor is not really needed",
+      "range": {
+        "startLine": 17,
+        "startChar": 5,
+        "endLine": 17,
+        "endChar": 40
+      },
+      "revId": "bd99939c1919a3cc36e91b232d5a3851f602fa43",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
