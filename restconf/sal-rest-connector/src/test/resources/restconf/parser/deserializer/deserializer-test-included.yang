@@ -1,0 +1,32 @@
+module deserializer-test-included {
+  namespace "deserializer:test:included";
+  prefix "dti";
+  yang-version 1;
+
+  revision 2016-06-06 {
+    description
+      "Initial revision.";
+  }
+
+  grouping inlcuded-group {
+    leaf group-name {
+      type string;
+    }
+
+    leaf group-number {
+      type uint32;
+    }
+
+    list group-list {
+      key list-key;
+
+      leaf list-key {
+        type uint16;
+      }
+
+      leaf list-value {
+        type string;
+      }
+    }
+  }
+}
