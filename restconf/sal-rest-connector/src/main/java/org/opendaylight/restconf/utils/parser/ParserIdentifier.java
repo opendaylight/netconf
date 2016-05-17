@@ -14,23 +14,16 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
-import org.opendaylight.restconf.parser.IdentifierCodec;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.restconf.utils.validation.RestconfValidation;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,26 +35,8 @@ public final class ParserIdentifier {
 
     private static final Logger LOG = LoggerFactory.getLogger(ParserIdentifier.class);
 
-    /**
-     * Make {@link InstanceIdentifierContext} from identifier.
-     *
-     * @param identifier
-     *            - path identifier
-     * @param schemaContext
-     *            - {@link SchemaContext}
-     * @return {@link InstanceIdentifierContext}
-     */
-    public static InstanceIdentifierContext<?> toInstanceIdentifier(final String identifier,
-            final SchemaContext schemaContext) {
-        final YangInstanceIdentifier deserialize;
-        if (identifier.contains(RestconfConstants.MOUNT)) {
-            final String mountPointId = identifier.substring(0, identifier.indexOf(RestconfConstants.MOUNT));
-            deserialize = IdentifierCodec.deserialize(mountPointId, schemaContext);
-        } else {
-            deserialize = IdentifierCodec.deserialize(identifier, schemaContext);
-        }
-        final DataSchemaContextNode<?> child = DataSchemaContextTree.from(schemaContext).getChild(deserialize);
-        return new InstanceIdentifierContext<SchemaNode>(deserialize, child.getDataSchemaNode(), null, schemaContext);
+    public static InstanceIdentifierContext<?> toInstanceIdentifier(final String identifier) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     /**
@@ -112,12 +87,10 @@ public final class ParserIdentifier {
      *            - {@link SchemaContext}
      * @param identifier
      *            - path parameter
-     * @param domMountPointService
-     *            - {@link DOMMountPointService}
      * @return {@link SchemaExportContext}
      */
     public static SchemaExportContext toSchemaExportContextFromIdentifier(final SchemaContext schemaContext,
-            final String identifier, final DOMMountPointService domMountPointService) {
+            final String identifier) {
         final Iterable<String> pathComponents = RestconfConstants.SLASH_SPLITTER.split(identifier);
         final Iterator<String> componentIter = pathComponents.iterator();
         if (!Iterables.contains(pathComponents, RestconfConstants.MOUNT)) {
@@ -137,9 +110,8 @@ public final class ParserIdentifier {
                     break;
                 }
             }
-            final InstanceIdentifierContext<?> point = ParserIdentifier
-                    .toInstanceIdentifier(pathBuilder.toString(), schemaContext);
-            final DOMMountPoint mountPoint = domMountPointService.getMountPoint(point.getInstanceIdentifier()).get();
+            final InstanceIdentifierContext<?> mountPoint = ParserIdentifier
+                    .toInstanceIdentifier(pathBuilder.toString());
             final String moduleName = RestconfValidation.validateAndGetModulName(componentIter);
             final Date revision = RestconfValidation.validateAndGetRevision(componentIter);
             final Module module = mountPoint.getSchemaContext().findModuleByName(moduleName, revision);

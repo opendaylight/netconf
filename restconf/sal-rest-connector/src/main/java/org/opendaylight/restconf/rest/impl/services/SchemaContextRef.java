@@ -137,4 +137,5 @@ final class SchemaContextRef {
     public Module findModuleByNameAndRevision(final String localName, final Date revision) {
         return this.get().findModuleByName(localName, revision);
     }
+
 }

@@ -16,7 +16,6 @@ import org.opendaylight.restconf.rest.api.services.RestconfModulesService;
 import org.opendaylight.restconf.rest.api.services.RestconfOperationsService;
 import org.opendaylight.restconf.rest.api.services.RestconfStreamsService;
 import org.opendaylight.restconf.rest.api.services.schema.RestconfSchemaService;
-import org.opendaylight.restconf.rest.handlers.api.DOMMountPointServiceHandler;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
@@ -25,60 +24,57 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  */
 public class Draft11ServicesWrapperImpl implements Draft11ServicesWrapper {
 
-    private final RestconfModulesService delegRestModService;
-    private final RestconfOperationsService delegRestOpsService;
-    private final RestconfStreamsService delegRestStrsService;
-    private final RestconfSchemaService delegRestSchService;
+    private final RestconfModulesService delegRestModSer;
+    private final RestconfOperationsService delegRestOpsSer;
+    private final RestconfStreamsService delegRestStrsSer;
+    private final RestconfSchemaService delegRestSchSer;
 
     /**
      * Creating delegates to all implemented services
      *
      * @param schemaContextHandler
      *            - for handling {@link SchemaContext}
-     * @param domMountPointServiceHandler
-     *            - for handling {@link DOMMountPointServiceHandler}
      */
-    public Draft11ServicesWrapperImpl(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointServiceHandler domMountPointServiceHandler) {
-        this.delegRestModService = new RestconfModulesServiceImpl(schemaContextHandler, domMountPointServiceHandler);
-        this.delegRestOpsService = new RestconfOperationsServiceImpl(schemaContextHandler, domMountPointServiceHandler);
-        this.delegRestStrsService = new RestconfStreamsServiceImpl(schemaContextHandler);
-        this.delegRestSchService = new RestconfSchemaServiceImpl(schemaContextHandler, domMountPointServiceHandler);
+    public Draft11ServicesWrapperImpl(final SchemaContextHandler schemaContextHandler) {
+        this.delegRestModSer = new RestconfModulesServiceImpl(schemaContextHandler);
+        this.delegRestOpsSer = new RestconfOperationsServiceImpl(schemaContextHandler);
+        this.delegRestStrsSer = new RestconfStreamsServiceImpl(schemaContextHandler);
+        this.delegRestSchSer = new RestconfSchemaServiceImpl(schemaContextHandler);
     }
 
     @Override
     public NormalizedNodeContext getModules(final UriInfo uriInfo) {
-        return this.delegRestModService.getModules(uriInfo);
+        return this.delegRestModSer.getModules(uriInfo);
     }
 
     @Override
     public NormalizedNodeContext getModules(final String identifier, final UriInfo uriInfo) {
-        return this.delegRestModService.getModules(identifier, uriInfo);
+        return this.delegRestModSer.getModules(identifier, uriInfo);
     }
 
     @Override
     public NormalizedNodeContext getModule(final String identifier, final UriInfo uriInfo) {
-        return this.delegRestModService.getModule(identifier, uriInfo);
+        return this.delegRestModSer.getModules(identifier, uriInfo);
     }
 
     @Override
     public NormalizedNodeContext getOperations(final UriInfo uriInfo) {
-        return this.delegRestOpsService.getOperations(uriInfo);
+        return this.delegRestOpsSer.getOperations(uriInfo);
     }
 
     @Override
     public NormalizedNodeContext getOperations(final String identifier, final UriInfo uriInfo) {
-        return this.delegRestOpsService.getOperations(identifier, uriInfo);
+        return this.delegRestOpsSer.getOperations(identifier, uriInfo);
     }
 
     @Override
     public NormalizedNodeContext getAvailableStreams(final UriInfo uriInfo) {
-        return this.delegRestStrsService.getAvailableStreams(uriInfo);
+        return this.delegRestStrsSer.getAvailableStreams(uriInfo);
     }
 
     @Override
     public SchemaExportContext getSchema(final String mountAndModuleId) {
-        return this.delegRestSchService.getSchema(mountAndModuleId);
+        return this.delegRestSchSer.getSchema(mountAndModuleId);
     }
 
 }

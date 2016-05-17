@@ -16,8 +16,6 @@ import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYinBodyWri
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
 import org.opendaylight.restconf.rest.api.schema.context.SchemaContextHandler;
-import org.opendaylight.restconf.rest.handlers.api.DOMMountPointServiceHandler;
-import org.opendaylight.restconf.rest.handlers.impl.DOMMountPointServiceHandlerImpl;
 import org.opendaylight.restconf.rest.impl.schema.context.SchemaContextHandlerImpl;
 import org.opendaylight.restconf.rest.impl.services.Draft11ServicesWrapperImpl;
 import org.osgi.framework.FrameworkUtil;
@@ -25,11 +23,9 @@ import org.osgi.framework.FrameworkUtil;
 public class RestconfApplication extends Application implements RestconfApplicationService {
 
     private final SchemaContextHandler schemaContextHandler;
-    private final DOMMountPointServiceHandler domMountPointServiceHandler;
 
     public RestconfApplication() {
         this.schemaContextHandler = new SchemaContextHandlerImpl();
-        this.domMountPointServiceHandler = new DOMMountPointServiceHandlerImpl();
         FrameworkUtil.getBundle(getClass()).getBundleContext().registerService(RestconfApplicationService.class.getName(),
                 this, null);
     }
@@ -46,17 +42,12 @@ public class RestconfApplication extends Application implements RestconfApplicat
     public Set<Object> getSingletons() {
         final Set<Object> singletons = new HashSet<>();
         singletons.add(this.schemaContextHandler);
-        singletons.add(new Draft11ServicesWrapperImpl(this.schemaContextHandler, this.domMountPointServiceHandler));
+        singletons.add(new Draft11ServicesWrapperImpl(this.schemaContextHandler));
         return singletons;
     }
 
     @Override
     public SchemaContextHandler getSchemaContextHandler() {
         return this.schemaContextHandler;
-    }
-
-    @Override
-    public DOMMountPointServiceHandler getDOMMountPointServiceHandler() {
-        return this.domMountPointServiceHandler;
     }
 }
