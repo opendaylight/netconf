@@ -17,7 +17,6 @@ import org.opendaylight.restconf.rest.api.services.RestconfOperationsService;
 import org.opendaylight.restconf.rest.api.services.RestconfStreamsService;
 import org.opendaylight.restconf.rest.api.services.schema.RestconfSchemaService;
 import org.opendaylight.restconf.rest.handlers.api.DOMMountPointServiceHandler;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * Implementation of {@link Draft11ServicesWrapper}
@@ -25,25 +24,12 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  */
 public class Draft11ServicesWrapperImpl implements Draft11ServicesWrapper {
 
-    private final RestconfModulesService delegRestModService;
-    private final RestconfOperationsService delegRestOpsService;
-    private final RestconfStreamsService delegRestStrsService;
-    private final RestconfSchemaService delegRestSchService;
+    private RestconfModulesService delegRestModService;
+    private RestconfOperationsService delegRestOpsService;
+    private RestconfStreamsService delegRestStrsService;
+    private RestconfSchemaService delegRestSchService;
 
-    /**
-     * Creating delegates to all implemented services
-     *
-     * @param schemaContextHandler
-     *            - for handling {@link SchemaContext}
-     * @param domMountPointServiceHandler
-     *            - for handling {@link DOMMountPointServiceHandler}
-     */
-    public Draft11ServicesWrapperImpl(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointServiceHandler domMountPointServiceHandler) {
-        this.delegRestModService = new RestconfModulesServiceImpl(schemaContextHandler, domMountPointServiceHandler);
-        this.delegRestOpsService = new RestconfOperationsServiceImpl(schemaContextHandler, domMountPointServiceHandler);
-        this.delegRestStrsService = new RestconfStreamsServiceImpl(schemaContextHandler);
-        this.delegRestSchService = new RestconfSchemaServiceImpl(schemaContextHandler, domMountPointServiceHandler);
+    private Draft11ServicesWrapperImpl() {
     }
 
     @Override
@@ -79,6 +65,22 @@ public class Draft11ServicesWrapperImpl implements Draft11ServicesWrapper {
     @Override
     public SchemaExportContext getSchema(final String mountAndModuleId) {
         return this.delegRestSchService.getSchema(mountAndModuleId);
+    }
+
+    public static Draft11ServicesWrapperImpl getInstance() {
+        return InstanceHolder.INSTANCE;
+    }
+
+    private static class InstanceHolder {
+        public static final Draft11ServicesWrapperImpl INSTANCE = new Draft11ServicesWrapperImpl();
+    }
+
+    public void setHandlers(final SchemaContextHandler schemaCtxHandler,
+            final DOMMountPointServiceHandler domMountPointServiceHandler) {
+        this.delegRestModService = new RestconfModulesServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
+        this.delegRestOpsService = new RestconfOperationsServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
+        this.delegRestSchService = new RestconfSchemaServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
+        this.delegRestStrsService = new RestconfStreamsServiceImpl(schemaCtxHandler);
     }
 
 }

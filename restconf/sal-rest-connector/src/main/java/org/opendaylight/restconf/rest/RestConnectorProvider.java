@@ -17,11 +17,11 @@ import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.netconf.sal.rest.api.RestConnector;
 import org.opendaylight.restconf.rest.api.schema.context.SchemaContextHandler;
 import org.opendaylight.restconf.rest.handlers.api.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.rest.handlers.impl.DOMMountPointServiceHandlerImpl;
+import org.opendaylight.restconf.rest.impl.schema.context.SchemaContextHandlerImpl;
+import org.opendaylight.restconf.rest.impl.services.Draft11ServicesWrapperImpl;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
 
 /**
  * Provider for restconf draft11.
@@ -34,20 +34,13 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
     @Override
     public void onSessionInitiated(final ProviderSession session) {
         final SchemaService schemaService = Preconditions.checkNotNull(session.getService(SchemaService.class));
-        final RestconfApplication restApp = getObjectFromBundleContext(RestconfApplication.class,
-                RestconfApplicationService.class.getName());
-        Preconditions.checkNotNull(restApp, "RestconfApplication service doesn't exist.");
-        final SchemaContextHandler schemaContextHandler = restApp.getSchemaContextHandler();
-        final DOMMountPointServiceHandler domMountPointServiceHandler = restApp.getDOMMountPointServiceHandler();
+        final DOMMountPointServiceHandler domMountPointServiceHandler = new DOMMountPointServiceHandlerImpl();
+        final SchemaContextHandler schemaCtxHandler = new SchemaContextHandlerImpl();
         domMountPointServiceHandler.setDOMMountPointService(session.getService(DOMMountPointService.class));
+        final Draft11ServicesWrapperImpl wrapperServices = Draft11ServicesWrapperImpl.getInstance();
+        this.listenerRegistration = schemaService.registerSchemaContextListener(schemaCtxHandler);
 
-        this.listenerRegistration = schemaService.registerSchemaContextListener(schemaContextHandler);
-    }
-
-    private <T> T getObjectFromBundleContext(final Class<T> type, final String serviceRefName) {
-        final BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
-        final ServiceReference<?> serviceReference = bundleContext.getServiceReference(serviceRefName);
-        return (T) bundleContext.getService(serviceReference);
+        wrapperServices.setHandlers(schemaCtxHandler, domMountPointServiceHandler);
     }
 
     @Override
