@@ -27,7 +27,7 @@ module list-test {
                 leaf key5 {
                    type string;
                 }
-                leaf result{
+                leaf result {
                     type string;
                 }
            }
