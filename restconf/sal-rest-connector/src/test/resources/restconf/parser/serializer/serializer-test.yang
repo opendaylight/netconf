@@ -1,0 +1,86 @@
+module serializer-test {
+  namespace "serializer:test";
+  prefix "st";
+  yang-version 1;
+
+  import serializer-test-included { prefix sti; revision-date 2016-06-06; }
+
+  revision 2016-06-06 {
+    description
+      "Initial revision.";
+  }
+
+  container contA {
+    leaf-list leaf-list-A {
+      type string;
+    }
+
+    leaf leaf-A {
+      type string;
+    }
+
+    list list-A {
+      key list-key;
+
+      leaf list-key {
+        type uint8;
+      }
+
+      leaf-list leaf-list-AA {
+        type string;
+      }
+    }
+  }
+
+  leaf-list leaf-list-0 {
+    type boolean;
+  }
+
+  leaf leaf-0 {
+    type string;
+  }
+
+  list list-no-key {
+    leaf name {
+      type string;
+    }
+
+    leaf number {
+      type uint8;
+    }
+  }
+
+  list list-one-key {
+    key name;
+
+    leaf name {
+      type string;
+    }
+
+    leaf number {
+      type uint8;
+    }
+  }
+
+  list list-multiple-keys {
+    key "name number enabled";
+
+    leaf name {
+      type string;
+    }
+
+    leaf number {
+      type uint8;
+    }
+
+    leaf enabled {
+      type boolean;
+    }
+  }
+
+  augment "/sti:augmented-list" {
+    leaf augmented-leaf {
+      type string;
+    }
+  }
+}
