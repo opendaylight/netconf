@@ -25,7 +25,6 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseRpcSchemalessTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.SchemalessMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
-import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.RpcResult;
@@ -46,12 +45,13 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
     private final SchemalessMessageTransformer schemalessTransformer;
     private final RemoteDeviceId deviceId;
 
-    public SchemalessNetconfDeviceRpc(RemoteDeviceId deviceId, final RemoteDeviceCommunicator<NetconfMessage> listener) {
+    public SchemalessNetconfDeviceRpc(RemoteDeviceId deviceId, final RemoteDeviceCommunicator<NetconfMessage> listener,
+                                      final BaseRpcSchemalessTransformer baseRpcTransformer,
+                                      final SchemalessMessageTransformer messageTransformer) {
         this.deviceId = deviceId;
         this.listener = listener;
-        final MessageCounter counter = new MessageCounter();
-        baseRpcTransformer = new BaseRpcSchemalessTransformer(counter);
-        schemalessTransformer = new SchemalessMessageTransformer(counter);
+        this.baseRpcTransformer = baseRpcTransformer;
+        this.schemalessTransformer = messageTransformer;
     }
 
     @Nonnull

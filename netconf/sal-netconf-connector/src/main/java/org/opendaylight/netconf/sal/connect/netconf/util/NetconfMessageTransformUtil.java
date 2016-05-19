@@ -60,7 +60,7 @@ import org.w3c.dom.Element;
 
 public class NetconfMessageTransformUtil {
 
-    private static final Logger LOG= LoggerFactory.getLogger(NetconfMessageTransformUtil.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformUtil.class);
 
     public static final String MESSAGE_ID_ATTR = "message-id";
 
@@ -70,7 +70,6 @@ public class NetconfMessageTransformUtil {
     // Blank document used for creation of new DOM nodes
     private static final Document BLANK_DOCUMENT = XmlUtil.newDocument();
     public static final String EVENT_TIME = "eventTime";
-
     private NetconfMessageTransformUtil() {}
 
     public static final QName IETF_NETCONF_MONITORING = QName.create(NetconfState.QNAME, "ietf-netconf-monitoring");
@@ -333,7 +332,7 @@ public class NetconfMessageTransformUtil {
             throw new UnsupportedOperationException();
         }
     };
-
+    
     public static Map.Entry<Date, XmlElement> stripNotification(final NetconfMessage message) {
         final XmlElement xmlElement = XmlElement.fromDomDocument(message.getDocument());
         final List<XmlElement> childElements = xmlElement.getChildElements();

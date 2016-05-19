@@ -10,6 +10,7 @@ package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RPC_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_URI;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.stripNotification;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
 import com.google.common.base.Function;
@@ -22,7 +23,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.xml.stream.XMLStreamException;
@@ -266,7 +266,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         return new DefaultDOMRpcResult(normalizedNode);
     }
 
-    private static class NetconfDeviceNotification implements DOMNotification, DOMEvent {
+    static class NetconfDeviceNotification implements DOMNotification, DOMEvent {
         private final ContainerNode content;
         private final SchemaPath schemaPath;
         private final Date eventTime;
