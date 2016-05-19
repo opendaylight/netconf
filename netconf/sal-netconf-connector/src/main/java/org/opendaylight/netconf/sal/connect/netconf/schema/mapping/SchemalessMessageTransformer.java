@@ -7,7 +7,11 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
+import java.util.Date;
+import java.util.Map;
 import javax.xml.transform.dom.DOMSource;
+import org.opendaylight.controller.config.util.xml.MissingNameSpaceException;
+import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
@@ -15,8 +19,10 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -30,6 +36,10 @@ public class SchemalessMessageTransformer implements MessageTransformer<NetconfM
 
     private static final YangInstanceIdentifier.NodeIdentifier REPLY_ID =
             new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME);
+    // TODO maybe we should move this somewhere else as this
+    // might be used in applications using schemaless mountpoints
+    public static final YangInstanceIdentifier.NodeIdentifier SCHEMALESS_NOTIFICATION_PAYLOAD =
+            new YangInstanceIdentifier.NodeIdentifier(QName.create("schemaless-notification-payload"));
 
     private final MessageCounter counter;
 
@@ -39,8 +49,26 @@ public class SchemalessMessageTransformer implements MessageTransformer<NetconfM
 
     @Override
     public DOMNotification toNotification(final NetconfMessage message) {
-        //TODO add support for notifications
-        throw new UnsupportedOperationException("Notifications not supported.");
+        final Map.Entry<Date, XmlElement> stripped = NetconfMessageTransformUtil.stripNotification(message);
+        final QName notificationNoRev;
+        try {
+            notificationNoRev =
+                    QName.create(stripped.getValue().getNamespace(), stripped.getValue().getName()).withoutRevision();
+        } catch (final MissingNameSpaceException e) {
+            throw new IllegalArgumentException("Unable to parse notification " + message + ", cannot find namespace", e);
+        }
+
+        final AnyXmlNode notificationPayload = Builders.anyXmlBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(notificationNoRev))
+                .withValue(new DOMSource(stripped.getValue().getDomElement()))
+                .build();
+
+        final ContainerNode notificationBody = Builders.containerBuilder()
+                .withNodeIdentifier(SCHEMALESS_NOTIFICATION_PAYLOAD)
+                .withChild(notificationPayload)
+                .build();
+
+        return new NetconfMessageTransformer.NetconfDeviceNotification(notificationBody, stripped.getKey());
     }
 
     @Override

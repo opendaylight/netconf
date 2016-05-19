@@ -16,6 +16,9 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseRpcSchemalessTransformer;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.SchemalessMessageTransformer;
+import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
@@ -37,7 +40,10 @@ public class SchemalessNetconfDeviceRpcTest {
         RpcResult<NetconfMessage> msg = null;
         ListenableFuture<RpcResult<NetconfMessage>> future = Futures.immediateFuture(msg);
         doReturn(future).when(listener).sendRequest(any(), any());
-        deviceRpc = new SchemalessNetconfDeviceRpc(new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("0.0.0.0", 17830)), listener);
+        final MessageCounter counter = new MessageCounter();
+        deviceRpc = new SchemalessNetconfDeviceRpc(
+                new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("0.0.0.0", 17830)), listener,
+                new BaseRpcSchemalessTransformer(counter), new SchemalessMessageTransformer(counter));
 
     }
 
