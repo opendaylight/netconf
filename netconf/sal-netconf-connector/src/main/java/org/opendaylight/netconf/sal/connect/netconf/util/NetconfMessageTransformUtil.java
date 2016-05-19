@@ -79,7 +79,6 @@ public class NetconfMessageTransformUtil {
     // Blank document used for creation of new DOM nodes
     private static final Document BLANK_DOCUMENT = XmlUtil.newDocument();
     public static final String EVENT_TIME = "eventTime";
-
     private NetconfMessageTransformUtil() {}
 
     public static final QName IETF_NETCONF_MONITORING = QName.create(NetconfState.QNAME, "ietf-netconf-monitoring").intern();
@@ -342,7 +341,7 @@ public class NetconfMessageTransformUtil {
             throw new UnsupportedOperationException();
         }
     };
-
+    
     public static Map.Entry<Date, XmlElement> stripNotification(final NetconfMessage message) {
         final XmlElement xmlElement = XmlElement.fromDomDocument(message.getDocument());
         final List<XmlElement> childElements = xmlElement.getChildElements();

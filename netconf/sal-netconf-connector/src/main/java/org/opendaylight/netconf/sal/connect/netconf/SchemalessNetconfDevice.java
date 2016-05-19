@@ -13,7 +13,10 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.SchemalessNetconfDeviceRpc;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseRpcSchemalessTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.SchemalessMessageTransformer;
+import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 
 public class SchemalessNetconfDevice implements
@@ -21,18 +24,22 @@ public class SchemalessNetconfDevice implements
 
     private RemoteDeviceId id;
     private RemoteDeviceHandler<NetconfSessionPreferences> salFacade;
+    private final SchemalessMessageTransformer messageTransformer;
+    private final BaseRpcSchemalessTransformer rpcTransformer;
 
     public SchemalessNetconfDevice(final RemoteDeviceId id,
                                    final RemoteDeviceHandler<NetconfSessionPreferences> salFacade) {
         this.id = id;
         this.salFacade = salFacade;
+        final MessageCounter counter = new MessageCounter();
+        rpcTransformer = new BaseRpcSchemalessTransformer(counter);
+        messageTransformer = new SchemalessMessageTransformer(counter);
     }
 
     @Override public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
                                             final NetconfDeviceCommunicator netconfDeviceCommunicator) {
-
         final SchemalessNetconfDeviceRpc schemalessNetconfDeviceRpc = new SchemalessNetconfDeviceRpc(id,
-                netconfDeviceCommunicator);
+                netconfDeviceCommunicator, rpcTransformer, messageTransformer);
 
         salFacade.onDeviceConnected(BaseSchema.BASE_NETCONF_CTX.getSchemaContext(),
                 remoteSessionCapabilities, schemalessNetconfDeviceRpc);
@@ -48,6 +55,6 @@ public class SchemalessNetconfDevice implements
     }
 
     @Override public void onNotification(final NetconfMessage notification) {
-        // TODO support for notifications
+        salFacade.onNotification(messageTransformer.toNotification(notification));
     }
 }
