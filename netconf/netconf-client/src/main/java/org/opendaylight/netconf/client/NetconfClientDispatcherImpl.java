@@ -54,9 +54,8 @@ public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClien
             return createReconnectingTcpClient(clientConfiguration);
         case SSH:
             return createReconnectingSshClient(clientConfiguration);
-        default:
-            throw new IllegalArgumentException("Unknown client protocol " + clientConfiguration.getProtocol());
         }
+        throw new IllegalArgumentException("Unknown client protocol " + clientConfiguration.getProtocol());
     }
 
     private Future<NetconfClientSession> createTcpClient(final NetconfClientConfiguration currentConfiguration) {
