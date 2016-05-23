@@ -123,6 +123,10 @@
               org.opendaylight.aaa.shiro.web.env,
               org.apache.shiro.web.env
             </Import-Package>
+            <Export-Package>
+              com.fasterxml.jackson.datatype.*,
+              org.json
+            </Export-Package>
             <Bundle-Activator>org.opendaylight.netconf.sal.rest.doc.DocProvider</Bundle-Activator>
             <Web-ContextPath>/apidoc</Web-ContextPath>
           </instructions>
