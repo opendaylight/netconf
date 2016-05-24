@@ -59,13 +59,13 @@ public final class YangInstanceIdentifierDeserializer {
             validArg(variables);
             final QName qname = prepareQName(variables);
 
-            if (!allCharsConsumed(variables)
-                    && (currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH)) {
+            // this is the last identifier (input is consumed) or end of identifier (slash)
+            if (allCharsConsumed(variables)
+                    || currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH) {
                 prepareIdentifier(qname, path, variables);
                 path.add(variables.getCurrent().getIdentifier());
-            } else if (!allCharsConsumed(variables)
-                    && (currentChar(variables.getOffset(),
-                            variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL)) {
+            } else if (currentChar(variables.getOffset(),
+                    variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL) {
                 current = nextContextNode(qname, path, variables);
                 if (!current.isKeyedEntry()) {
                     prepareNodeWithValue(qname, path, variables);
@@ -77,6 +77,7 @@ public final class YangInstanceIdentifierDeserializer {
                         "Bad char " + currentChar(offset, data) + " on position " + offset + ".");
             }
         }
+
         return ImmutableList.copyOf(path);
     }
 
