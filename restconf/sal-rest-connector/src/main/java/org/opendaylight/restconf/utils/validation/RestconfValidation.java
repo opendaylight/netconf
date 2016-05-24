@@ -14,6 +14,7 @@ import org.opendaylight.netconf.md.sal.rest.common.RestconfValidationUtils;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.restconf.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 
 /**
@@ -51,9 +52,33 @@ public final class RestconfValidation {
      * @return {@link String}
      */
     public static String validateAndGetModulName(final Iterator<String> moduleName) {
-        RestconfValidationUtils.checkDocumentedError(moduleName.hasNext(), ErrorType.PROTOCOL,
-                ErrorTag.INVALID_VALUE, "Module name must be supplied.");
-        return moduleName.next();
+        RestconfValidationUtils.checkDocumentedError(
+                moduleName.hasNext(),
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Module name must be supplied."
+        );
+
+        final String name = moduleName.next();
+
+        RestconfValidationUtils.checkDocumentedError(
+                ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR.matches(name.charAt(0)),
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Identifier must start with character from set 'a-zA-Z_"
+        );
+
+        RestconfValidationUtils.checkDocumentedError(
+                !name.substring(0, 3).equalsIgnoreCase("XML"),
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Identifier must NOT start with XML ignore case"
+        );
+
+        RestconfValidationUtils.checkDocumentedError(
+                ParserBuilderConstants.Deserializer.IDENTIFIER.matchesAllOf(name.substring(1)),
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Supplied name has not expected identifier format."
+        );
+
+        return name;
     }
 
 }
