@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
@@ -104,11 +103,18 @@ public class RestconfValidationTest {
 
     /**
      * Negative test of module name validation when supplied name is not parsable as module name. Test fails
-     * catching <code>RestconfDocumentedException</code>.
-     * <p>
-     * This test is ignored because tested functionality is not implemented yet.
+     * catching <code>RestconfDocumentedException</code> and checking for correct error type, error tag and error
+     * status code.
      */
-    @Ignore
-    @Test(expected = RestconfDocumentedException.class)
-    public void validateAndGetModuleNameNotParsableTest() {}
+    @Test
+    public void validateAndGetModuleNameNotParsableTest() {
+       try {
+           RestconfValidation.validateAndGetModulName(Arrays.asList("01-not-parsable").iterator());
+           fail("Test should fail due to not parsable module name");
+       } catch (RestconfDocumentedException e) {
+           assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+           assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
+           assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
+       }
+    }
 }
