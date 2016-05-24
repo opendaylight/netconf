@@ -72,6 +72,8 @@ public final class YangInstanceIdentifierDeserializer {
                 } else {
                     prepareNodeWithPredicates(qname, path, variables);
                 }
+            } else if (allCharsConsumed(variables)) {
+                break;
             } else {
                 throw new IllegalArgumentException(
                         "Bad char " + currentChar(offset, data) + " on position " + offset + ".");

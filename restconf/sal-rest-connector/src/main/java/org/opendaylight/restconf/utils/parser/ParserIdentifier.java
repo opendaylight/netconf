@@ -55,7 +55,7 @@ public final class ParserIdentifier {
             final SchemaContext schemaContext) {
         final YangInstanceIdentifier deserialize;
         if (identifier.contains(RestconfConstants.MOUNT)) {
-            final String mountPointId = identifier.substring(0, identifier.indexOf(RestconfConstants.MOUNT));
+            final String mountPointId = identifier.substring(0, identifier.indexOf(RestconfConstants.MOUNT) - 1);
             deserialize = IdentifierCodec.deserialize(mountPointId, schemaContext);
         } else {
             deserialize = IdentifierCodec.deserialize(identifier, schemaContext);
@@ -129,9 +129,7 @@ public final class ParserIdentifier {
             final StringBuilder pathBuilder = new StringBuilder();
             while (componentIter.hasNext()) {
                 final String current = componentIter.next();
-                if (pathBuilder.length() != 0) {
-                    pathBuilder.append("/");
-                }
+                pathBuilder.append("/");
                 pathBuilder.append(current);
                 if (RestconfConstants.MOUNT.equals(current)) {
                     break;
