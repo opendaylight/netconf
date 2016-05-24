@@ -77,8 +77,8 @@ def post(url, userId, password, data):
     session = _cache.switch("CLUSTERING_POST")
     resp = session.post(url, data.encode('utf-8'), headers=headers, auth=(userId, password))
 
-    # print (resp.raise_for_status())
-    print (resp.headers)
+    # print(resp.raise_for_status())
+    print(resp.headers)
     if resp.status_code >= 500:
         print(resp.text)
 
