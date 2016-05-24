@@ -112,21 +112,6 @@
 
           <instructions>
             <Bundle-Name>MD SAL Rest Api Doc Generator</Bundle-Name>
-            <Import-Package>!org.apache.maven.plugin.logging,
-              !org.apache.maven.project,
-              !org.opendaylight.yangtools.yang2sources.spi,
-              *,
-              com.sun.jersey.spi.container.servlet,
-              org.eclipse.jetty.servlets,
-              org.opendaylight.aaa.shiro.filters,
-              org.opendaylight.aaa.shiro.realm,
-              org.opendaylight.aaa.shiro.web.env,
-              org.apache.shiro.web.env
-            </Import-Package>
-            <Export-Package>
-              com.fasterxml.jackson.datatype.*,
-              org.json
-            </Export-Package>
             <Bundle-Activator>org.opendaylight.netconf.sal.rest.doc.DocProvider</Bundle-Activator>
             <Web-ContextPath>/apidoc</Web-ContextPath>
           </instructions>
