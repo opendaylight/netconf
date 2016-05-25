@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
@@ -32,7 +34,16 @@ import org.xml.sax.SAXException;
 public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfEXIToMessageDecoder.class);
-    private static final SAXTransformerFactory FACTORY = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
+    private static final SAXTransformerFactory FACTORY;
+    static {
+        final TransformerFactory f = SAXTransformerFactory.newInstance();
+        if (!f.getFeature(SAXTransformerFactory.FEATURE)) {
+            throw new TransformerFactoryConfigurationError(String.format("Factory %s is not a SAXTransformerFactory", f));
+        }
+
+        FACTORY = (SAXTransformerFactory)f;
+    }
+
     /**
      * This class is not marked as shared, so it can be attached to only a single channel,
      * which means that {@link #decode(ChannelHandlerContext, ByteBuf, List)}
