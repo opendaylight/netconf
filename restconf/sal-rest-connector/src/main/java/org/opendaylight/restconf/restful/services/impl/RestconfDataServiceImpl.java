@@ -21,9 +21,11 @@ import org.opendaylight.restconf.common.handlers.api.TransactionChainHandler;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
 import org.opendaylight.restconf.restful.transaction.TransactionNode;
+import org.opendaylight.restconf.restful.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 public class RestconfDataServiceImpl implements RestconfDataService {
 
@@ -52,7 +54,15 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response putData(final String identifier, final NormalizedNodeContext payload) {
-        // TODO Auto-generated method stub
+        Preconditions.checkNotNull(identifier);
+        Preconditions.checkNotNull(payload);
+
+        final InstanceIdentifierContext<? extends SchemaNode> iid = payload
+                .getInstanceIdentifierContext();
+        PutDataTransactionUtil.validInputData(iid.getSchemaNode(), payload);
+        PutDataTransactionUtil.validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
+        PutDataTransactionUtil.validateListKeysEqualityInPayloadAndUri(payload);
+
         return null;
     }
 
