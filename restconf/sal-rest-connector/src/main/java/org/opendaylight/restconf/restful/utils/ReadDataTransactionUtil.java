@@ -10,11 +10,8 @@ package org.opendaylight.restconf.restful.utils;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
-import java.util.concurrent.ExecutionException;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadTransaction;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
@@ -35,8 +32,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Util class for read data from data store via transaction.
@@ -48,8 +43,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public final class ReadDataTransactionUtil {
-
-    private final static Logger LOG = LoggerFactory.getLogger(ReadDataTransactionUtil.class);
 
     private ReadDataTransactionUtil() {
         throw new UnsupportedOperationException("Util class.");
@@ -69,81 +62,41 @@ public final class ReadDataTransactionUtil {
             switch (valueOfContent) {
                 case RestconfDataServiceConstant.ReadData.CONFIG:
                     transactionNode.setLogicalDatastoreType(LogicalDatastoreType.CONFIGURATION);
-                    return readData(transactionNode);
+                    return readDataViaTransaction(transactionNode);
                 case RestconfDataServiceConstant.ReadData.NONCONFIG:
                     transactionNode.setLogicalDatastoreType(LogicalDatastoreType.OPERATIONAL);
-                    return readData(transactionNode);
+                    return readDataViaTransaction(transactionNode);
                 case RestconfDataServiceConstant.ReadData.ALL:
-                    return readData(transactionNode);
+                    return readDataViaTransaction(transactionNode);
                 default:
                     throw new RestconfDocumentedException("Bad querry parameter for content.", ErrorType.APPLICATION,
                             ErrorTag.INVALID_VALUE);
             }
         } else {
-            return readData(transactionNode);
-        }
-    }
-
-    /**
-     * Check mount point
-     *
-     * @param transactionNode
-     *            - {@link TransactionVarsWrapper} - wrapper for variables
-     * @return {@link NormalizedNode}
-     */
-    private static NormalizedNode<?, ?> readData(final TransactionVarsWrapper transactionNode) {
-        if (transactionNode.getMountPoint() == null) {
-            return readDataViaTransaction(transactionNode.getDomTransactionChain().newReadOnlyTransaction(),
-                    transactionNode);
-        } else {
-            return readDataOfMountPointViaTransaction(transactionNode);
+            return readDataViaTransaction(transactionNode);
         }
     }
 
     /**
      * If is set specific {@link LogicalDatastoreType} in
-     * {@link TransactionVarsWrapper}, then read this type of data from DS. If don't,
-     * we have to read all data from DS (state + config)
+     * {@link TransactionVarsWrapper}, then read this type of data from DS. If
+     * don't, we have to read all data from DS (state + config)
      *
-     * @param readTransaction
-     *            - {@link DOMDataReadTransaction} to read data from DS
      * @param transactionNode
      *            - {@link TransactionVarsWrapper} - wrapper for variables
      * @return {@link NormalizedNode}
      */
-    private static NormalizedNode<?, ?> readDataViaTransaction(final DOMDataReadTransaction readTransaction,
-            final TransactionVarsWrapper transactionNode) {
+    private static NormalizedNode<?, ?> readDataViaTransaction(final TransactionVarsWrapper transactionNode) {
         if (transactionNode.getLogicalDatastoreType() != null) {
-            final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> listenableFuture = readTransaction
-                    .read(transactionNode.getLogicalDatastoreType(),
+            final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> listenableFuture = transactionNode
+                    .getTransaction().read(transactionNode.getLogicalDatastoreType(),
                             transactionNode.getInstanceIdentifier().getInstanceIdentifier());
-            final FutureDataFactory dataFactory = new FutureDataFactory();
-            FutureCallbackTx.addCallback(listenableFuture, readTransaction,
+            final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
+            FutureCallbackTx.addCallback(listenableFuture, transactionNode.getTransaction(),
                     RestconfDataServiceConstant.ReadData.READ_TYPE_TX, dataFactory);
             return dataFactory.build();
         } else {
             return readAllData(transactionNode);
-        }
-    }
-
-    /**
-     * Prepare transaction to read data of mount point, if these data are
-     * present.
-     *
-     * @param transactionNode
-     *            - {@link TransactionVarsWrapper} - wrapper for variables
-     * @return {@link NormalizedNode}
-     */
-    private static NormalizedNode<?, ?> readDataOfMountPointViaTransaction(final TransactionVarsWrapper transactionNode) {
-        final Optional<DOMDataBroker> domDataBrokerService = transactionNode.getMountPoint()
-                .getService(DOMDataBroker.class);
-        if (domDataBrokerService.isPresent()) {
-            return readDataViaTransaction(domDataBrokerService.get().newReadOnlyTransaction(), transactionNode);
-        } else {
-            final String errMsg = "DOM data broker service isn't available for mount point "
-                    + transactionNode.getInstanceIdentifier().getInstanceIdentifier();
-            LOG.warn(errMsg);
-            throw new RestconfDocumentedException(errMsg);
         }
     }
 
@@ -157,13 +110,13 @@ public final class ReadDataTransactionUtil {
     private static NormalizedNode<?, ?> readAllData(final TransactionVarsWrapper transactionNode) {
         // PREPARE STATE DATA NODE
         transactionNode.setLogicalDatastoreType(LogicalDatastoreType.OPERATIONAL);
-        final NormalizedNode<?, ?> stateDataNode = readData(transactionNode);
+        final NormalizedNode<?, ?> stateDataNode = readDataViaTransaction(transactionNode);
 
         // PREPARE CONFIG DATA NODE
         transactionNode.setLogicalDatastoreType(LogicalDatastoreType.CONFIGURATION);
-        final NormalizedNode<?, ?> configDataNode = readData(transactionNode);
+        final NormalizedNode<?, ?> configDataNode = readDataViaTransaction(transactionNode);
 
-        return mapNode(stateDataNode, configDataNode, transactionNode);
+        return mapNode(stateDataNode, configDataNode);
     }
 
     /**
@@ -178,8 +131,7 @@ public final class ReadDataTransactionUtil {
      * @return {@link NormalizedNode}
      */
     private static NormalizedNode<?, ?> mapNode(final NormalizedNode<?, ?> stateDataNode,
-            final NormalizedNode<?, ?> configDataNode,
-            final TransactionVarsWrapper transactionNode) {
+            final NormalizedNode<?, ?> configDataNode) {
         validPossibilityOfMergeNodes(stateDataNode, configDataNode);
         if (configDataNode instanceof RpcDefinition) {
             return prepareRpcData(configDataNode, stateDataNode);
@@ -322,36 +274,5 @@ public final class ReadDataTransactionUtil {
         if (moduleOfStateData != moduleOfConfigData) {
             throw new RestconfDocumentedException("It is not possible to merge ");
         }
-    }
-
-    /**
-     * Get data from future object if these data are present.
-     *
-     * @param listenableFuture
-     *            - future of optional {@link NormalizedNode}
-     * @param transactionNode
-     *            - {@link TransactionVarsWrapper} - wrapper for variables
-     * @return {@link NormalizedNode}
-     */
-    private static NormalizedNode<?, ?> getNodeFromFuture(
-            final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> listenableFuture,
-            final TransactionVarsWrapper transactionNode) {
-        Optional<NormalizedNode<?, ?>> optional;
-        try {
-            LOG.debug("Reading result data from transaction.");
-            optional = listenableFuture.get();
-        } catch (InterruptedException | ExecutionException e) {
-            LOG.warn("Exception by reading {} via Restconf: {}", transactionNode.getLogicalDatastoreType().name(),
-                    transactionNode.getInstanceIdentifier().getInstanceIdentifier(), e);
-            throw new RestconfDocumentedException("Problem to get data from transaction.", e.getCause());
-
-        }
-        if (optional != null) {
-            if (optional.isPresent()) {
-                return optional.get();
-            }
-        }
-        throw new RestconfDocumentedException("Normalized node is not available : "
-                + transactionNode.getInstanceIdentifier().getInstanceIdentifier());
     }
 }
