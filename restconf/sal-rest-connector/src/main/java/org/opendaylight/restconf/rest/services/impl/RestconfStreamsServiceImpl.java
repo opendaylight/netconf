@@ -14,8 +14,8 @@ import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.restconf.Draft11;
-import org.opendaylight.restconf.common.handlers.api.SchemaContextHandler;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
+import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.rest.services.api.RestconfStreamsService;
 import org.opendaylight.restconf.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.utils.schema.context.RestconfSchemaUtil;
@@ -52,7 +52,7 @@ public class RestconfStreamsServiceImpl implements RestconfStreamsService {
 
     @Override
     public NormalizedNodeContext getAvailableStreams(final UriInfo uriInfo) {
-        final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.getSchemaContext());
+        final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
         final Set<String> availableStreams = Notificator.getStreamNames();
 
         final DataSchemaNode streamListSchemaNode = RestconfSchemaUtil.getRestconfSchemaNode(
