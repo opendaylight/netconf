@@ -19,7 +19,9 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.restconf.RestConnectorProvider;
@@ -68,6 +70,10 @@ public class RestConnectorProviderTest {
         // prepare conditions
         when(this.mockSession.getService(SchemaService.class)).thenReturn(this.mockSchemaService);
         when(this.mockSession.getService(DOMMountPointService.class)).thenReturn(this.mockMountPointService);
+        final DOMDataBroker mockDataBroker = Mockito.mock(DOMDataBroker.class);
+        when(this.mockSession.getService(DOMDataBroker.class)).thenReturn(mockDataBroker);
+        final DOMTransactionChain mockTransactionChain = Mockito.mock(DOMTransactionChain.class);
+        when(mockDataBroker.createTransactionChain(Mockito.any())).thenReturn(mockTransactionChain);
 
         // test
         this.connectorProvider.onSessionInitiated(this.mockSession);
@@ -90,6 +96,10 @@ public class RestConnectorProviderTest {
         // prepare conditions
         when(this.mockSession.getService(SchemaService.class)).thenReturn(this.mockSchemaService);
         when(this.mockSession.getService(DOMMountPointService.class)).thenReturn(null);
+        final DOMDataBroker mockDataBroker = Mockito.mock(DOMDataBroker.class);
+        when(this.mockSession.getService(DOMDataBroker.class)).thenReturn(mockDataBroker);
+        final DOMTransactionChain mockTransactionChain = Mockito.mock(DOMTransactionChain.class);
+        when(mockDataBroker.createTransactionChain(Mockito.any())).thenReturn(mockTransactionChain);
 
         // test
         this.connectorProvider.onSessionInitiated(this.mockSession);
@@ -146,6 +156,10 @@ public class RestConnectorProviderTest {
         when(this.mockSession.getService(DOMMountPointService.class)).thenReturn(this.mockMountPointService);
         when(this.mockSchemaService.registerSchemaContextListener(Mockito.any(SchemaContextHandler.class)))
                 .thenReturn(this.mockRegistration);
+        final DOMDataBroker mockDataBroker = Mockito.mock(DOMDataBroker.class);
+        when(this.mockSession.getService(DOMDataBroker.class)).thenReturn(mockDataBroker);
+        final DOMTransactionChain mockTransactionChain = Mockito.mock(DOMTransactionChain.class);
+        when(mockDataBroker.createTransactionChain(Mockito.any())).thenReturn(mockTransactionChain);
 
         // register
         this.connectorProvider.onSessionInitiated(this.mockSession);
