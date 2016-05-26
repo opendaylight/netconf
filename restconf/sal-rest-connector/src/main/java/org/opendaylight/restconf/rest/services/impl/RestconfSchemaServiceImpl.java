@@ -8,9 +8,9 @@
 package org.opendaylight.restconf.rest.services.impl;
 
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
-import org.opendaylight.restconf.common.handlers.api.SchemaContextHandler;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
-import org.opendaylight.restconf.rest.handlers.api.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.rest.services.api.RestconfSchemaService;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -41,8 +41,8 @@ public class RestconfSchemaServiceImpl implements RestconfSchemaService {
 
     @Override
     public SchemaExportContext getSchema(final String identifier) {
-        final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.getSchemaContext());
+        final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
         return ParserIdentifier.toSchemaExportContextFromIdentifier(schemaContextRef.get(), identifier,
-                this.domMountPointServiceHandler.getDOMMountPointService());
+                this.domMountPointServiceHandler.get());
     }
 }

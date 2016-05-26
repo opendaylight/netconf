@@ -29,8 +29,8 @@ import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
-import org.opendaylight.restconf.common.handlers.api.SchemaContextHandler;
-import org.opendaylight.restconf.rest.handlers.api.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.rest.services.api.RestconfSchemaService;
 import org.opendaylight.restconf.rest.services.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.restconf.utils.RestconfConstants;
@@ -99,7 +99,7 @@ public class RestconfSchemaServiceTest {
         this.mountPointService = new DOMMountPointServiceImpl();
         ((DOMMountPointServiceImpl) this.mountPointService).registerMountPoint(this.mountPoint);
         ((DOMMountPointServiceImpl) this.mountPointService).registerMountPoint(this.mountPointWithNullSchemaContext);
-        when(this.mockMountPointHandler.getDOMMountPointService()).thenReturn(this.mountPointService);
+        when(this.mockMountPointHandler.get()).thenReturn(this.mountPointService);
 
         this.schemaService = new RestconfSchemaServiceImpl(this.mockContextHandler, this.mockMountPointHandler);
     }
@@ -118,7 +118,7 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaTest() {
         // prepare conditions - return not-mount point schema context
-        when(this.mockContextHandler.getSchemaContext()).thenReturn(this.schemaContext);
+        when(this.mockContextHandler.get()).thenReturn(this.schemaContext);
 
         // make test
         final SchemaExportContext exportContext = this.schemaService.getSchema(TEST_MODULE);
@@ -142,7 +142,7 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaForNotExistingModuleTest() {
         // prepare conditions - return not-mount point schema context
-        when(this.mockContextHandler.getSchemaContext()).thenReturn(this.schemaContext);
+        when(this.mockContextHandler.get()).thenReturn(this.schemaContext);
 
         // make test
         final SchemaExportContext exportContext = this.schemaService.getSchema(NOT_EXISTING_MODULE);
@@ -158,7 +158,7 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaMountPointTest() {
         // prepare conditions - return schema context with mount points
-        when(this.mockContextHandler.getSchemaContext()).thenReturn(this.schemaContextWithMountPoints);
+        when(this.mockContextHandler.get()).thenReturn(this.schemaContextWithMountPoints);
 
         // make test
         final SchemaExportContext exportContext = this.schemaService.getSchema(MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT);
@@ -182,7 +182,7 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaForNotExistingModuleMountPointTest() {
         // prepare conditions - return schema context with mount points
-        when(this.mockContextHandler.getSchemaContext()).thenReturn(this.schemaContextWithMountPoints);
+        when(this.mockContextHandler.get()).thenReturn(this.schemaContextWithMountPoints);
 
         // make test
         final SchemaExportContext exportContext = this.schemaService.getSchema(MOUNT_POINT + NOT_EXISTING_MODULE);
@@ -198,7 +198,7 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWithNullSchemaContextTest() {
         // prepare conditions - returned schema context is null
-        when(this.mockContextHandler.getSchemaContext()).thenReturn(null);
+        when(this.mockContextHandler.get()).thenReturn(null);
 
         // make test
         this.thrown.expect(NullPointerException.class);
@@ -212,7 +212,7 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWithNullSchemaContextMountPointTest() {
         // prepare conditions - returned schema context for mount points is null
-        when(this.mockContextHandler.getSchemaContext()).thenReturn(null);
+        when(this.mockContextHandler.get()).thenReturn(null);
 
         // make test
         this.thrown.expect(NullPointerException.class);
@@ -226,7 +226,7 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaNullSchemaContextBehindMountPointTest() {
         // prepare conditions - return correct schema context for mount points (this is not null)
-        when(this.mockContextHandler.getSchemaContext()).thenReturn(this.schemaContextWithMountPoints);
+        when(this.mockContextHandler.get()).thenReturn(this.schemaContextWithMountPoints);
 
         // make test - call service on mount point with null schema context
         this.thrown.expect(NullPointerException.class);
@@ -241,7 +241,7 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWithNullIdentifierTest() {
         // prepare conditions - return correct schema context
-        when(this.mockContextHandler.getSchemaContext()).thenReturn(this.schemaContext);
+        when(this.mockContextHandler.get()).thenReturn(this.schemaContext);
 
         // make test
         this.thrown.expect(NullPointerException.class);
@@ -255,7 +255,7 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWithEmptyIdentifierTest() {
         // prepare conditions - return correct schema context
-        when(this.mockContextHandler.getSchemaContext()).thenReturn(this.schemaContext);
+        when(this.mockContextHandler.get()).thenReturn(this.schemaContext);
 
         // make test and verify
         try {
@@ -276,7 +276,7 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWithEmptyIdentifierMountPointTest() {
         // prepare conditions - return correct schema context with mount points
-        when(this.mockContextHandler.getSchemaContext()).thenReturn(this.schemaContextWithMountPoints);
+        when(this.mockContextHandler.get()).thenReturn(this.schemaContextWithMountPoints);
 
         // make test and verify
         try {
@@ -296,7 +296,7 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWithNotParsableIdentifierTest() {
         // prepare conditions - return correct schema context without mount points
-        when(this.mockContextHandler.getSchemaContext()).thenReturn(this.schemaContext);
+        when(this.mockContextHandler.get()).thenReturn(this.schemaContext);
 
         // make test and verify
         try {
@@ -317,7 +317,7 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWithNotParsableIdentifierMountPointTest() {
         // prepare conditions - return correct schema context with mount points
-        when(this.mockContextHandler.getSchemaContext()).thenReturn(this.schemaContextWithMountPoints);
+        when(this.mockContextHandler.get()).thenReturn(this.schemaContextWithMountPoints);
 
         // make test and verify
         try {
@@ -339,7 +339,7 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWrongIdentifierTest() {
         // prepare conditions - return correct schema context without mount points
-        when(this.mockContextHandler.getSchemaContext()).thenReturn(this.schemaContext);
+        when(this.mockContextHandler.get()).thenReturn(this.schemaContext);
 
         // make test and verify
         try {
@@ -362,7 +362,7 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWrongIdentifierMountPointTest() {
         // prepare conditions - return correct schema context with mount points
-        when(this.mockContextHandler.getSchemaContext()).thenReturn(this.schemaContextWithMountPoints);
+        when(this.mockContextHandler.get()).thenReturn(this.schemaContextWithMountPoints);
 
         // make test and verify
         try {
@@ -383,7 +383,7 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWithoutRevisionTest() {
         // prepare conditions - return correct schema context without mount points
-        when(this.mockContextHandler.getSchemaContext()).thenReturn(this.schemaContext);
+        when(this.mockContextHandler.get()).thenReturn(this.schemaContext);
 
         // make test and verify
         try {
@@ -404,7 +404,7 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWithoutRevisionMountPointTest() {
         // prepare conditions - return correct schema context with mount points
-        when(this.mockContextHandler.getSchemaContext()).thenReturn(this.schemaContextWithMountPoints);
+        when(this.mockContextHandler.get()).thenReturn(this.schemaContextWithMountPoints);
 
         // make test and verify
         try {
@@ -424,7 +424,7 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaContextWithNotExistingMountPointTest() {
         // prepare conditions - return schema context with mount points
-        when(this.mockContextHandler.getSchemaContext()).thenReturn(this.schemaContextWithMountPoints);
+        when(this.mockContextHandler.get()).thenReturn(this.schemaContextWithMountPoints);
 
         // make test
         this.thrown.expect(IllegalArgumentException.class);
