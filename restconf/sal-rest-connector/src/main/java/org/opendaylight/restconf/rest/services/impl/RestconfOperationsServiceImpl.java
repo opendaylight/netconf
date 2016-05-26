@@ -10,8 +10,8 @@ package org.opendaylight.restconf.rest.services.impl;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
-import org.opendaylight.restconf.common.handlers.api.SchemaContextHandler;
-import org.opendaylight.restconf.rest.handlers.api.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.rest.services.api.RestconfOperationsService;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
