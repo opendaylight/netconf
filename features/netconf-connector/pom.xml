@@ -142,6 +142,22 @@
       <type>xml</type>
       <classifier>config</classifier>
     </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>netconf-config</artifactId>
+      <version>${netconf.version}</version>
+      <type>xml</type>
+      <classifier>config</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>odl-netconf-connector</artifactId>
+      <version>1.1.0-SNAPSHOT</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+    </dependency>
   </dependencies>
 
   <scm>
