@@ -15,6 +15,23 @@
     <module>netconf-connector</module>
     <module>restconf</module>
     <module>yanglib</module>
+    <module>odl-aaa-netconf-plugin</module>
+    <module>odl-aaa-netconf-plugin-no-cluster</module>
+    <module>odl-config-netconf-connector</module>
+    <module>odl-netconf-all</module>
+    <module>odl-netconf-api</module>
+    <module>odl-netconf-client</module>
+    <module>odl-netconf-connector</module>
+    <module>odl-netconf-impl</module>
+    <module>odl-netconf-mapping-api</module>
+    <module>odl-netconf-mdsal</module>
+    <module>odl-netconf-monitoring</module>
+    <module>odl-netconf-netty-util</module>
+    <module>odl-netconf-notifications-api</module>
+    <module>odl-netconf-notifications-impl</module>
+    <module>odl-netconf-ssh</module>
+    <module>odl-netconf-tcp</module>
+    <module>odl-netconf-util</module>
   </modules>
 
 </project>

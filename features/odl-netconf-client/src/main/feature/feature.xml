@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features name="odl-netconf-client-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.2.1">
+    <feature name="odl-netconf-client">
+        <configfile finalname='${config.configfile.directory}/${config.netconf.client.configfile}'>mvn:org.opendaylight.netconf/netconf-config/${project.version}/xml/config</configfile>
+    </feature>
+</features>
