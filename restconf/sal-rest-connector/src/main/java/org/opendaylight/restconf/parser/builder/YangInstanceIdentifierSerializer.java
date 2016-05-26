@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.parser.builder;
 
 import static org.opendaylight.restconf.utils.parser.builder.ParserBuilderConstants.Serializer;
-
 import com.google.common.base.Preconditions;
 import java.net.URI;
 import java.util.Iterator;
