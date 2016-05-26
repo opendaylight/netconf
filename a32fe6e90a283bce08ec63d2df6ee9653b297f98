@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_33156a40",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/SchemalessNetconfDevice.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-05-26T15:45:52Z",
+      "side": 1,
+      "message": "Do you need monitoring for schemaless devices? Maybe you can make new constant SCHEMALESS_NETCONF_CTX with just base netconf model.",
+      "range": {
+        "startLine": 37,
+        "startChar": 47,
+        "endLine": 37,
+        "endChar": 63
+      },
+      "revId": "a32fe6e90a283bce08ec63d2df6ee9653b297f98",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_b34fba6a",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/SchemalessNetconfDeviceRpc.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-05-26T15:45:52Z",
+      "side": 1,
+      "message": "LOG \u003d LoggerFactory\n\nIn fact, you do not even log anything.",
+      "revId": "a32fe6e90a283bce08ec63d2df6ee9653b297f98",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_333c4ac8",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/schema/mapping/NetconfMessageTransformer.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-05-26T15:45:52Z",
+      "side": 1,
+      "message": "Maybe this can go to some util class.",
+      "range": {
+        "startLine": 186,
+        "startChar": 0,
+        "endLine": 186,
+        "endChar": 4
+      },
+      "revId": "a32fe6e90a283bce08ec63d2df6ee9653b297f98",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_133946d7",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/schema/mapping/NetconfMessageTransformer.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-05-26T15:45:52Z",
+      "side": 1,
+      "message": "This method too",
+      "range": {
+        "startLine": 197,
+        "startChar": 4,
+        "endLine": 197,
+        "endChar": 10
+      },
+      "revId": "a32fe6e90a283bce08ec63d2df6ee9653b297f98",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
