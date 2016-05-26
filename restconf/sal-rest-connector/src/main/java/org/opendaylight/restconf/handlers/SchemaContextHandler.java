@@ -5,27 +5,28 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common.handlers.impl;
+package org.opendaylight.restconf.handlers;
 
-import org.opendaylight.restconf.common.handlers.api.SchemaContextHandler;
+import com.google.common.base.Preconditions;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * Implementation of {@link SchemaContextHandler}
  *
  */
-public class SchemaContextHandlerImpl implements SchemaContextHandler {
+public final class SchemaContextHandler implements SchemaContextListenerHandler {
 
     private SchemaContext context;
 
     @Override
     public void onGlobalContextUpdated(final SchemaContext context) {
+        Preconditions.checkNotNull(context);
         this.context = null;
         this.context = context;
     }
 
     @Override
-    public SchemaContext getSchemaContext() {
+    public SchemaContext get() {
         return this.context;
     }
 }
