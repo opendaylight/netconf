@@ -7,13 +7,11 @@
  */
 package org.opendaylight.restconf.restful.utils;
 
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncTransaction;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
@@ -43,10 +41,10 @@ final class FutureCallbackTx {
      * @param dataFactory
      *            - factory setting result
      */
-    static void addCallback(final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> listenableFuture,
+    static <T, X extends Exception> void addCallback(final CheckedFuture<T, X> listenableFuture,
             final AsyncTransaction<YangInstanceIdentifier, NormalizedNode<?, ?>> transaction, final String txType,
-            final FutureDataFactory dataFactory) {
-        Futures.addCallback(listenableFuture, new FutureCallback<Optional<NormalizedNode<?, ?>>>() {
+            final FutureDataFactory<T> dataFactory) {
+        Futures.addCallback(listenableFuture, new FutureCallback<T>() {
 
             @Override
             public void onFailure(final Throwable t) {
@@ -54,7 +52,7 @@ final class FutureCallbackTx {
             }
 
             @Override
-            public void onSuccess(final Optional<NormalizedNode<?, ?>> result) {
+            public void onSuccess(final T result) {
                 handlingLoggerAndValues(null, txType, transaction, result, dataFactory);
             }
 
@@ -79,17 +77,15 @@ final class FutureCallbackTx {
      * @param dataFactory
      *            - setter for result - in callback is onSuccess
      */
-    protected static void handlingLoggerAndValues(@Nullable final Throwable t, final String txType,
+    protected static <T> void handlingLoggerAndValues(@Nullable final Throwable t, final String txType,
             final AsyncTransaction<YangInstanceIdentifier, NormalizedNode<?, ?>> transaction,
-            final Optional<NormalizedNode<?, ?>> optionalNN, final FutureDataFactory dataFactory) {
+            final T result, final FutureDataFactory<T> dataFactory) {
         if (t != null) {
             LOG.info("Transaction({}) {} FAILED!", txType, transaction.getIdentifier(), t);
             throw new IllegalStateException("  Transaction(" + txType + ") not committed correctly", t);
         } else {
             LOG.trace("Transaction({}) {} SUCCESSFUL!", txType, transaction.getIdentifier());
-            if (optionalNN.isPresent()) {
-                dataFactory.setData(optionalNN.get());
-            }
+            dataFactory.setResult(result);
         }
     }
 }
