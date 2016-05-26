@@ -8,11 +8,9 @@
 package org.opendaylight.restconf.restful.transaction;
 
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * This class represent delegation wrapper for transaction variables.
@@ -23,34 +21,26 @@ public final class TransactionVarsWrapper {
     private final InstanceIdentifierContext<?> instanceIdentifier;
     private final DOMMountPoint mountPoint;
     private LogicalDatastoreType configuration = null;
-    private final DOMMountPointService domMountPointService;
-    private final SchemaContext schemaContext;
-    private final DOMTransactionChain domTransactionChain;
+    private final DOMDataReadWriteTransaction transaction;
 
     /**
      * Set base type of variables, which ones we need for transaction.
      * {@link LogicalDatastoreType} is default set to null (to read all data
-     * from ds - config + state).
+     * from DS - config + state).
      *
      * @param instanceIdentifier
      *            - {@link InstanceIdentifierContext} of data for transaction
      * @param mountPoint
-     *            - mount point if is presnet
-     * @param domTransactionChain
-     *            - {@link DOMTransactionChain} for transactions
-     * @param domMountPointService
-     *            - mount point service
-     * @param schemaContext
-     *            - {@link SchemaContext}
+     *            - mount point if is present
+     * @param transaction
+     *            - {@link DOMDataReadWriteTransaction} transaction for
+     *            operations
      */
     public TransactionVarsWrapper(final InstanceIdentifierContext<?> instanceIdentifier, final DOMMountPoint mountPoint,
-            final DOMTransactionChain domTransactionChain, final DOMMountPointService domMountPointService,
-            final SchemaContext schemaContext) {
+            final DOMDataReadWriteTransaction transaction) {
         this.instanceIdentifier = instanceIdentifier;
         this.mountPoint = mountPoint;
-        this.domTransactionChain = domTransactionChain;
-        this.domMountPointService = domMountPointService;
-        this.schemaContext = schemaContext;
+        this.transaction = transaction;
     }
 
     /**
@@ -92,29 +82,11 @@ public final class TransactionVarsWrapper {
     }
 
     /**
-     * Get mount point service
+     * Get specific type of transaction
      *
-     * @return {@link DOMMountPointService}
+     * @return specific type transaction
      */
-    public DOMMountPointService getDomMountPointService() {
-        return this.domMountPointService;
-    }
-
-    /**
-     * Get schema context of data
-     *
-     * @return {@link SchemaContext}
-     */
-    public SchemaContext getSchemaContext() {
-        return this.schemaContext;
-    }
-
-    /**
-     * Get transaction chain
-     *
-     * @return {@link DOMTransactionChain}
-     */
-    public DOMTransactionChain getDomTransactionChain() {
-        return this.domTransactionChain;
+    public DOMDataReadWriteTransaction getTransaction() {
+        return this.transaction;
     }
 }

@@ -7,18 +7,12 @@
  */
 package org.opendaylight.restconf.restful.utils;
 
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+class FutureDataFactory<T> {
 
-class FutureDataFactory {
+    protected T result;
 
-    private NormalizedNode<?, ?> normalizedNode = null;
-
-    public void setData(final NormalizedNode<?, ?> normalizedNode) {
-        this.normalizedNode = normalizedNode;
-    }
-
-    public NormalizedNode<?, ?> getData() {
-        return this.normalizedNode;
+    void setResult(final T result) {
+        this.result = result;
     }
 
 }
