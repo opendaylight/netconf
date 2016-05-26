@@ -13,8 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
-import org.opendaylight.restconf.common.handlers.api.SchemaContextHandler;
-import org.opendaylight.restconf.common.handlers.impl.SchemaContextHandlerImpl;
+import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
@@ -30,14 +29,14 @@ public class SchemaContextHandlerTest {
 
     @Before
     public void setup() throws Exception {
-        this.schemaContextHandler = new SchemaContextHandlerImpl();
+        this.schemaContextHandler = new SchemaContextHandler();
 
         this.schemaContext = TestRestconfUtils.loadSchemaContext(PATH_FOR_ACTUAL_SCHEMA_CONTEXT);
         this.schemaContextHandler.onGlobalContextUpdated(this.schemaContext);
     }
 
     /**
-     * Testing init of {@link SchemaContextHandlerImpl}
+     * Testing init of {@link SchemaContextHandler}
      */
     @Test
     public void schemaContextHandlerImplInitTest() {
@@ -53,7 +52,7 @@ public class SchemaContextHandlerTest {
     @Test
     public void getSchemaContextTest() {
         assertEquals("SchemaContextHandler should has reference to actual SchemaContext",
-                this.schemaContext, this.schemaContextHandler.getSchemaContext());
+                this.schemaContext, this.schemaContextHandler.get());
     }
 
     /**
@@ -69,8 +68,8 @@ public class SchemaContextHandlerTest {
         this.schemaContextHandler.onGlobalContextUpdated(newSchemaContext);
 
         assertNotEquals("SchemaContextHandler should not has reference to old SchemaContext",
-                this.schemaContext, this.schemaContextHandler.getSchemaContext());
+                this.schemaContext, this.schemaContextHandler.get());
         assertEquals("SchemaContextHandler should has reference to new SchemaContext",
-                newSchemaContext, this.schemaContextHandler.getSchemaContext());
+                newSchemaContext, this.schemaContextHandler.get());
     }
 }
