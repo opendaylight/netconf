@@ -8,7 +8,9 @@
 package org.opendaylight.restconf.restful.services.impl;
 
 import com.google.common.base.Preconditions;
+import java.net.URI;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
@@ -24,6 +26,7 @@ import org.opendaylight.restconf.common.handlers.api.TransactionChainHandler;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
 import org.opendaylight.restconf.restful.transaction.TransactionNode;
+import org.opendaylight.restconf.restful.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.RestconfDataServiceConstant;
@@ -81,14 +84,29 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response postData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
-        // TODO Auto-generated method stub
-        return null;
+        return postData(payload, uriInfo);
     }
 
     @Override
     public Response postData(final NormalizedNodeContext payload, final UriInfo uriInfo) {
-        // TODO Auto-generated method stub
-        return null;
+        Preconditions.checkNotNull(payload);
+        final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.getSchemaContext());
+        try {
+            PostDataTransactionUtil.postData(payload, uriInfo, this.transactionChainHandler, schemaContextRef)
+                    .checkedGet();
+        } catch (final TransactionCommitFailedException e) {
+            final String errMsg = "Error creating data ";
+            throw new RestconfDocumentedException(errMsg, e);
+        } catch (final RestconfDocumentedException e) {
+            throw e;
+        }
+        final URI location = PostDataTransactionUtil.resolveLocation(uriInfo,
+                payload.getInstanceIdentifierContext().getMountPoint(),
+                payload.getInstanceIdentifierContext().getInstanceIdentifier(), schemaContextRef);
+
+        final ResponseBuilder responseBuilder = Response.status(Status.NO_CONTENT);
+        responseBuilder.location(location);
+        return responseBuilder.build();
     }
 
     @Override
