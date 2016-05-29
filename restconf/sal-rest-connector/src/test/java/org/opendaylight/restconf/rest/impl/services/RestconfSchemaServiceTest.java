@@ -58,8 +58,10 @@ public class RestconfSchemaServiceTest {
     private RestconfSchemaService schemaService;
 
     // handlers
-    @Mock private SchemaContextHandler mockContextHandler;
-    @Mock private DOMMountPointServiceHandler mockMountPointHandler;
+    @Mock
+    private SchemaContextHandler mockContextHandler;
+    @Mock
+    private DOMMountPointServiceHandler mockMountPointHandler;
 
     // schema context with modules
     private SchemaContext schemaContext;

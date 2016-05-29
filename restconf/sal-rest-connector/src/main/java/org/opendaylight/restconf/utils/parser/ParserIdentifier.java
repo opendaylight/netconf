@@ -65,6 +65,18 @@ public final class ParserIdentifier {
     }
 
     /**
+     * Make {@link String} from {@link YangInstanceIdentifier}
+     *
+     * @param instanceIdentifier
+     * @param schemaContext
+     * @return
+     */
+    public static String toString(final YangInstanceIdentifier instanceIdentifier,
+            final SchemaContext schemaContext) {
+        return IdentifierCodec.serialize(instanceIdentifier, schemaContext);
+    }
+
+    /**
      * Make a {@link QName} from identifier
      *
      * @param identifier

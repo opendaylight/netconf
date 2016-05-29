@@ -100,6 +100,8 @@ public class RestConnectorProviderTest {
         when(this.mockSession.getService(DOMDataBroker.class)).thenReturn(mockDataBroker);
         final DOMTransactionChain mockTransactionChain = Mockito.mock(DOMTransactionChain.class);
         when(mockDataBroker.createTransactionChain(Mockito.any())).thenReturn(mockTransactionChain);
+        final DOMMountPointService mockDomMountPoint = Mockito.mock(DOMMountPointService.class);
+        when(this.mockSession.getService(DOMMountPointService.class)).thenReturn(mockDomMountPoint);
 
         // test
         this.connectorProvider.onSessionInitiated(this.mockSession);

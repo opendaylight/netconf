@@ -14,7 +14,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  * Implementation of {@link SchemaContextHandler}
  *
  */
-public final class SchemaContextHandler implements SchemaContextListenerHandler {
+public class SchemaContextHandler implements SchemaContextListenerHandler {
 
     private SchemaContext context;
 

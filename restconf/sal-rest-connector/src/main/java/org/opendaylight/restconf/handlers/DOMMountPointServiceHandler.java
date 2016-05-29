@@ -14,7 +14,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
  * Implementation of {@link DOMMountPointServiceHandler}
  *
  */
-public final class DOMMountPointServiceHandler implements Handler<DOMMountPointService> {
+public class DOMMountPointServiceHandler implements Handler<DOMMountPointService> {
 
     private final DOMMountPointService domMountPointService;
 
