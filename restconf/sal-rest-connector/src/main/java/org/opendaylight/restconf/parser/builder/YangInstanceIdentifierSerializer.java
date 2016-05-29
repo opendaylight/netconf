@@ -143,7 +143,7 @@ public final class YangInstanceIdentifierSerializer {
      * @return {@link StringBuilder}
      */
     private final static StringBuilder appendQName(final StringBuilder path, final QName qname) {
-        final String prefix = prefixForNamespace(qname.getNamespace());
+        final String prefix = prefixForNamespace(qname.getLocalName());
         Preconditions.checkArgument(prefix != null, "Failed to map QName {}", qname);
         path.append(prefix);
         path.append(':');
@@ -154,12 +154,12 @@ public final class YangInstanceIdentifierSerializer {
     /**
      * Create prefix of namespace from {@link URI}
      *
-     * @param namespace
+     * @param string
      *            - {@link URI}
      * @return {@link String}
      */
-    private static String prefixForNamespace(final URI namespace) {
-        final String prefix = namespace.toString();
+    private static String prefixForNamespace(final String string) {
+        final String prefix = string.toString();
         return prefix.replace(':', '-');
     }
 
