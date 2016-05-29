@@ -24,6 +24,7 @@ import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
+import org.opendaylight.restconf.restful.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.RestconfDataServiceConstant;
@@ -95,12 +96,26 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response postData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        return postData(payload, uriInfo);
     }
 
     @Override
     public Response postData(final NormalizedNodeContext payload, final UriInfo uriInfo) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        Preconditions.checkNotNull(payload);
+
+        final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
+        DOMDataReadWriteTransaction transaction = null;
+        SchemaContextRef ref = null;
+        if (mountPoint == null) {
+            transaction = this.transactionChainHandler.get().newReadWriteTransaction();
+            ref = new SchemaContextRef(this.schemaContextHandler.get());
+        } else {
+            transaction = transactionOfMountPoint(mountPoint);
+            ref = new SchemaContextRef(mountPoint.getSchemaContext());
+        }
+        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
+                payload.getInstanceIdentifierContext(), mountPoint, transaction);
+        return PostDataTransactionUtil.postData(uriInfo, payload, transactionNode, ref);
     }
 
     @Override
