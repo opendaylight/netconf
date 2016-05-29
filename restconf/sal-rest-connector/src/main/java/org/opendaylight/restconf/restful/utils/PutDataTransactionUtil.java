@@ -8,11 +8,8 @@
 package org.opendaylight.restconf.restful.utils;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.CheckedFuture;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -34,7 +31,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -175,45 +171,8 @@ public final class PutDataTransactionUtil {
     private static CheckedFuture<Void, TransactionCommitFailedException> submitData(final YangInstanceIdentifier path,
             final SchemaContext schemaContext,
             final DOMDataWriteTransaction writeTx, final NormalizedNode<?, ?> data) {
-        ensureParentsByMerge(path, schemaContext, writeTx);
+        TransactionUtil.ensureParentsByMerge(path, schemaContext, writeTx);
         writeTx.put(LogicalDatastoreType.CONFIGURATION, path, data);
         return writeTx.submit();
-    }
-
-    /**
-     * Merged parents of data
-     *
-     * @param path
-     *            - path of data
-     * @param schemaContext
-     *            - {@link SchemaContext}
-     * @param writeTx
-     *            - write transaction
-     */
-    private static void ensureParentsByMerge(final YangInstanceIdentifier path, final SchemaContext schemaContext,
-            final DOMDataWriteTransaction writeTx) {
-        final List<PathArgument> normalizedPathWithoutChildArgs = new ArrayList<>();
-        YangInstanceIdentifier rootNormalizedPath = null;
-
-        final Iterator<PathArgument> it = path.getPathArguments().iterator();
-
-        while (it.hasNext()) {
-            final PathArgument pathArgument = it.next();
-            if (rootNormalizedPath == null) {
-                rootNormalizedPath = YangInstanceIdentifier.create(pathArgument);
-            }
-            if (it.hasNext()) {
-                normalizedPathWithoutChildArgs.add(pathArgument);
-            }
-        }
-        if (normalizedPathWithoutChildArgs.isEmpty()) {
-            return;
-        }
-
-        Preconditions.checkArgument(rootNormalizedPath != null, "Empty path received");
-
-        final NormalizedNode<?, ?> parentStructure = ImmutableNodes.fromInstanceId(schemaContext,
-                YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));
-        writeTx.merge(LogicalDatastoreType.CONFIGURATION, rootNormalizedPath, parentStructure);
     }
 }
