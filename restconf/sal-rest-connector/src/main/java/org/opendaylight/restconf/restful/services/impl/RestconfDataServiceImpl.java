@@ -24,6 +24,7 @@ import org.opendaylight.restconf.common.handlers.api.TransactionChainHandler;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
 import org.opendaylight.restconf.restful.transaction.TransactionNode;
+import org.opendaylight.restconf.restful.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
@@ -78,13 +79,20 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response postData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
-        // TODO Auto-generated method stub
-        return null;
+        return postData(payload, uriInfo);
     }
 
     @Override
     public Response postData(final NormalizedNodeContext payload, final UriInfo uriInfo) {
-        // TODO Auto-generated method stub
+        Preconditions.checkNotNull(payload);
+        final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.getSchemaContext());
+        try {
+            PostDataTransactionUtil.postData(payload, uriInfo, this.transactionChainHandler, schemaContextRef)
+                    .checkedGet();
+        } catch (final TransactionCommitFailedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return null;
     }
 
