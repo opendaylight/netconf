@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.parser.builder;
 
 import com.google.common.base.Preconditions;
-import java.net.URI;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -20,6 +19,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithV
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
@@ -44,7 +44,7 @@ public final class YangInstanceIdentifierSerializer {
      */
     public static String create(final SchemaContext schemaContext, final YangInstanceIdentifier data) {
         final DataSchemaContextNode<?> current = DataSchemaContextTree.from(schemaContext).getRoot();
-        final MainVarsWrappar variables = new YangInstanceIdentifierSerializer.MainVarsWrappar(current);
+        final MainVarsWrappar variables = new YangInstanceIdentifierSerializer.MainVarsWrappar(current, schemaContext);
 
         final StringBuilder path = prepareFirstArgForPath(variables, data);
 
@@ -105,7 +105,7 @@ public final class YangInstanceIdentifierSerializer {
         variables.setCurrent(variables.getCurrent().getChild(firstArg));
 
         final StringBuilder path = new StringBuilder("/");
-        appendQName(path, firstArg.getNodeType());
+        appendQName(path, firstArg.getNodeType(), variables.getSchemaContext());
         return path;
     }
 
@@ -140,34 +140,28 @@ public final class YangInstanceIdentifierSerializer {
      *            - {@link StringBuilder}
      * @param qname
      *            - {@link QName} node
+     * @param schemaContext
+     *            - {@link SchemaContext} for find module by qname
      * @return {@link StringBuilder}
      */
-    private final static StringBuilder appendQName(final StringBuilder path, final QName qname) {
-        final String prefix = prefixForNamespace(qname.getNamespace());
-        Preconditions.checkArgument(prefix != null, "Failed to map QName {}", qname);
-        path.append(prefix);
-        path.append(':');
+    private final static StringBuilder appendQName(final StringBuilder path, final QName qname,
+            final SchemaContext schemaContext) {
+        final Module schema = schemaContext.findModuleByNamespaceAndRevision(qname.getNamespace(),
+                qname.getRevision());
+        final String name = schema.getName();
+        path.append(name);
+        path.append(":");
         path.append(qname.getLocalName());
         return path;
-    }
-
-    /**
-     * Create prefix of namespace from {@link URI}
-     *
-     * @param namespace
-     *            - {@link URI}
-     * @return {@link String}
-     */
-    private static String prefixForNamespace(final URI namespace) {
-        final String prefix = namespace.toString();
-        return prefix.replace(':', '-');
     }
 
     private static class MainVarsWrappar {
 
         private DataSchemaContextNode<?> current;
+        private final SchemaContext schemaContext;
 
-        public MainVarsWrappar(final DataSchemaContextNode<?> current) {
+        public MainVarsWrappar(final DataSchemaContextNode<?> current, final SchemaContext schemaContext) {
+            this.schemaContext = schemaContext;
             this.setCurrent(current);
         }
 
@@ -179,6 +173,9 @@ public final class YangInstanceIdentifierSerializer {
             this.current = current;
         }
 
+        public SchemaContext getSchemaContext() {
+            return this.schemaContext;
+        }
     }
 
 }
