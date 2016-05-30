@@ -126,7 +126,7 @@ module config-test-rpc {
 
         anyxml filter {
             description "Subtree or XPath filter to use.";
-                get-filter-element-attributes;
+                rpc:get-filter-element-attributes;
             }
         }
 
@@ -150,7 +150,7 @@ module config-test-rpc {
               description
                 "This parameter specifies the portion of the system
                  configuration and state data to retrieve.";
-              get-filter-element-attributes;
+              rpc:get-filter-element-attributes;
             }
         }
 

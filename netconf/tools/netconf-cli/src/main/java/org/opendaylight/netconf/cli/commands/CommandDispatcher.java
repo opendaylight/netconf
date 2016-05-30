@@ -32,7 +32,9 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.parser.impl.YangParserImpl;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
+import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
+import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
 
 /**
  * The registry of available commands local + remote. Created from schema contexts.
@@ -162,10 +164,16 @@ public class CommandDispatcher {
     }
 
     public static SchemaContext parseSchema(final Collection<String> yangPath) {
-        final YangParserImpl yangParserImpl = new YangParserImpl();
-        // TODO change deprecated method
-        final Set<Module> modules = yangParserImpl.parseYangModelsFromStreams(loadYangs(yangPath));
-        return yangParserImpl.resolveSchemaContext(modules);
+        final List<InputStream> streams = loadYangs(yangPath);
+        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
+                .newBuild();
+        final SchemaContext schemaContext;
+        try {
+            schemaContext = reactor.buildEffective(streams);
+        } catch (ReactorException e) {
+            throw new RuntimeException("Unable to build schema context from " + streams, e);
+        }
+        return schemaContext;
     }
 
     private static List<InputStream> loadYangs(final Collection<String> yangPaths) {

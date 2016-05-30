@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -68,12 +67,12 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
-import org.opendaylight.yangtools.yang.model.parser.api.YangSyntaxErrorException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
-import org.opendaylight.yangtools.yang.parser.builder.impl.BuilderUtils;
-import org.opendaylight.yangtools.yang.parser.impl.YangParserImpl;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
+import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
+import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -131,7 +130,7 @@ public class NetconfMDSalMappingTest {
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
 
-        this.schemaContext = parseSchemas(getYangSchemas());
+        this.schemaContext = parseYangStreams(getYangSchemas());
         schemaContext.getModules();
         final SchemaService schemaService = createSchemaService();
 
@@ -252,7 +251,7 @@ public class NetconfMDSalMappingTest {
         final int key2 = responseAsString.indexOf("key2");
 
         assertTrue(String.format("Key ordering invalid, should be key3(%d) < key1(%d) < key2(%d)", key3, key1, key2),
-            key3 < key1 && key1 < key2);
+                key3 < key1 && key1 < key2);
 
         deleteDatastore();
     }
@@ -676,7 +675,7 @@ public class NetconfMDSalMappingTest {
         return response;
     }
 
-    private Collection<InputStream> getYangSchemas() {
+    private List<InputStream> getYangSchemas() {
         final List<String> schemaPaths = Arrays.asList("/META-INF/yang/config.yang", "/yang/mdsal-netconf-mapping-test.yang");
         final List<InputStream> schemas = new ArrayList<>();
 
@@ -688,10 +687,16 @@ public class NetconfMDSalMappingTest {
         return schemas;
     }
 
-    private SchemaContext parseSchemas(Collection<InputStream> schemas) throws IOException, YangSyntaxErrorException {
-        final YangParserImpl parser = new YangParserImpl();
-        Collection<ByteSource> sources = BuilderUtils.streamsToByteSources(schemas);
-        return parser.parseSources(sources);
+    private static SchemaContext parseYangStreams(final List<InputStream> streams) {
+        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
+                .newBuild();
+        final SchemaContext schemaContext;
+        try {
+            schemaContext = reactor.buildEffective(streams);
+        } catch (ReactorException e) {
+            throw new RuntimeException("Unable to build schema context from " + streams, e);
+        }
+        return schemaContext;
     }
 
     private SchemaService createSchemaService() {
