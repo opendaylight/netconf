@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public class DocProvider implements BundleActivator, ServiceTrackerCustomizer<Broker, Broker>,
         Provider, AutoCloseable {
 
-    private final Logger _logger = LoggerFactory.getLogger(DocProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DocProvider.class);
 
     private ServiceTracker<Broker, Broker> brokerServiceTracker;
     private BundleContext bundleContext;
@@ -58,7 +58,7 @@ public class DocProvider implements BundleActivator, ServiceTrackerCustomizer<Br
         }
         MountPointSwagger.getInstance().setMountService(mountService);
 
-        _logger.debug("Restconf API Explorer started");
+        LOG.debug("Restconf API Explorer started");
     }
 
     @Override
