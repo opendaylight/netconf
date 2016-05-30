@@ -8,7 +8,6 @@
 package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertNotNull;
-
 import com.google.common.base.Preconditions;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -22,9 +21,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Date;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -48,8 +45,11 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableMa
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.parser.api.YangContextParser;
-import org.opendaylight.yangtools.yang.parser.impl.YangParserImpl;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
+import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
+import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
+import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangStatementSourceImpl;
+import org.opendaylight.yangtools.yang.parser.util.NamedFileInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -59,40 +59,27 @@ public final class TestUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestUtils.class);
 
-    private final static YangContextParser PARSER = new YangParserImpl();
+    public static SchemaContext loadSchemaContext(final String... yangPath)
+            throws FileNotFoundException, ReactorException {
+        final CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR.newBuild();
 
-    private static Set<Module> loadModules(final String resourceDirectory) throws FileNotFoundException {
-        final File testDir = new File(resourceDirectory);
-        final String[] fileList = testDir.list();
-        final List<File> testFiles = new ArrayList<File>();
-        if (fileList == null) {
-            throw new FileNotFoundException(resourceDirectory);
-        }
-        for (int i = 0; i < fileList.length; i++) {
-            final String fileName = fileList[i];
-            if (new File(testDir, fileName).isDirectory() == false) {
-                testFiles.add(new File(testDir, fileName));
+        for (int i = 0; i < yangPath.length; i++) {
+            final String path = yangPath[i];
+            final String pathToFile = TestUtils.class.getResource(path).getPath();
+            final File testDir = new File(pathToFile);
+            final String[] fileList = testDir.list();
+            if (fileList == null) {
+                throw new FileNotFoundException(pathToFile);
+            }
+            for (int j = 0; j < fileList.length; j++) {
+                final String fileName = fileList[j];
+                final File file = new File(testDir, fileName);
+                if (file.isDirectory() == false) {
+                    reactor.addSource(new YangStatementSourceImpl(new NamedFileInputStream(file, file.getPath())));
+                }
             }
         }
-        return PARSER.parseYangModels(testFiles);
-    }
-
-    public static Set<Module> loadModulesFrom(final String yangPath) {
-        try {
-            return TestUtils.loadModules(TestUtils.class.getResource(yangPath).getPath());
-        } catch (final FileNotFoundException e) {
-            LOG.error("Yang files at path: " + yangPath + " weren't loaded.");
-        }
-
-        return null;
-    }
-
-    public static SchemaContext loadSchemaContext(final Set<Module> modules) {
-        return PARSER.resolveSchemaContext(modules);
-    }
-
-    public static SchemaContext loadSchemaContext(final String resourceDirectory) throws FileNotFoundException {
-        return PARSER.resolveSchemaContext(loadModulesFrom(resourceDirectory));
+        return reactor.buildEffective();
     }
 
     public static Module findModule(final Set<Module> modules, final String moduleName) {
@@ -242,7 +229,7 @@ public final class TestUtils {
 
     public static YangInstanceIdentifier.NodeIdentifierWithPredicates getNodeIdentifierPredicate(final String localName,
             final String namespace, final String revision, final String... keysAndValues) throws ParseException {
-        if (keysAndValues.length % 2 != 0) {
+        if ((keysAndValues.length % 2) != 0) {
             new IllegalArgumentException("number of keys argument have to be divisible by 2 (map)");
         }
         final Map<QName, Object> predicate = new HashMap<>();

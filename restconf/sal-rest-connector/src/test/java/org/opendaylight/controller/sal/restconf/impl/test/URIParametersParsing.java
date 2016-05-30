@@ -13,7 +13,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil.getRevisionFormat;
-
 import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.util.Date;
@@ -48,6 +47,7 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaNodeUtils;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class URIParametersParsing {
 
@@ -56,13 +56,13 @@ public class URIParametersParsing {
     private ControllerContext controllerContext;
 
     @Before
-    public void init() throws FileNotFoundException {
-        restconf = RestconfImpl.getInstance();
-        mockedBrokerFacade = mock(BrokerFacade.class);
-        controllerContext = ControllerContext.getInstance();
-        controllerContext.setSchemas(TestUtils.loadSchemaContext("/datastore-and-scope-specification"));
-        restconf.setControllerContext(controllerContext);
-        restconf.setBroker(mockedBrokerFacade);
+    public void init() throws FileNotFoundException, ReactorException {
+        this.restconf = RestconfImpl.getInstance();
+        this.mockedBrokerFacade = mock(BrokerFacade.class);
+        this.controllerContext = ControllerContext.getInstance();
+        this.controllerContext.setSchemas(TestUtils.loadSchemaContext("/datastore-and-scope-specification"));
+        this.restconf.setControllerContext(this.controllerContext);
+        this.restconf.setBroker(this.mockedBrokerFacade);
     }
 
     @Test
@@ -102,7 +102,7 @@ public class URIParametersParsing {
 //       when(mockedBrokerFacade.invokeRpc(any(SchemaPath.class), any(NormalizedNode.class)))
 //       .thenReturn(Futures.<DOMRpcResult, DOMRpcException> immediateCheckedFuture(new DefaultDOMRpcResult(Builders.containerBuilder().build())));
 
-        restconf.invokeRpc("sal-remote:create-data-change-event-subscription", prepareDomRpcNode(datastore, scope),
+        this.restconf.invokeRpc("sal-remote:create-data-change-event-subscription", prepareDomRpcNode(datastore, scope),
                 mockedUriInfo);
 
         final ListenerAdapter listener = Notificator.getListenerFor("opendaylight-inventory:nodes/datastore="
@@ -112,7 +112,7 @@ public class URIParametersParsing {
     }
 
     private NormalizedNodeContext prepareDomRpcNode(final String datastore, final String scope) {
-        final SchemaContext schema = controllerContext.getGlobalSchema();
+        final SchemaContext schema = this.controllerContext.getGlobalSchema();
         final Date revDate;
         try {
             revDate = getRevisionFormat().parse("2014-01-14");

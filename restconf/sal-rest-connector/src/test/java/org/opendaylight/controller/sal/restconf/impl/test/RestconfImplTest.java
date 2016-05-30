@@ -17,7 +17,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.Futures;
 import java.io.FileNotFoundException;
@@ -43,6 +42,7 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 /**
  * @See {@link InvokeRpcMethodTest}
@@ -54,10 +54,12 @@ public class RestconfImplTest {
     private static ControllerContext controllerContext = null;
 
     @BeforeClass
-    public static void init() throws FileNotFoundException {
-        final Set<Module> allModules = TestUtils.loadModulesFrom("/full-versions/yangs");
+    public static void init() throws FileNotFoundException, ReactorException {
+        final SchemaContext schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs");
+
+        final Set<Module> allModules = schemaContext.getModules();
         assertNotNull(allModules);
-        final SchemaContext schemaContext = TestUtils.loadSchemaContext(allModules);
+
         controllerContext = spy(ControllerContext.getInstance());
         controllerContext.setSchemas(schemaContext);
 
@@ -65,8 +67,8 @@ public class RestconfImplTest {
 
     @Before
     public void initMethod() {
-        restconfImpl = RestconfImpl.getInstance();
-        restconfImpl.setControllerContext(controllerContext);
+        this.restconfImpl = RestconfImpl.getInstance();
+        this.restconfImpl.setControllerContext(controllerContext);
     }
 
     @SuppressWarnings("unchecked")
@@ -99,8 +101,8 @@ public class RestconfImplTest {
         final DOMRpcService rpcService = mock(DOMRpcService.class);
         doReturn(Optional.of(rpcService)).when(mount).getService(DOMRpcService.class);
         doReturn(Futures.immediateCheckedFuture(mock(DOMRpcResult.class))).when(rpcService).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
-        restconfImpl.invokeRpc("randomId", ctx, uriInfo);
-        restconfImpl.invokeRpc("ietf-netconf", ctx, uriInfo);
+        this.restconfImpl.invokeRpc("randomId", ctx, uriInfo);
+        this.restconfImpl.invokeRpc("ietf-netconf", ctx, uriInfo);
         verify(rpcService, times(2)).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
     }
 }

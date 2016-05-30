@@ -23,6 +23,7 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.opendaylight.controller.sal.restconf.impl.test.TestUtils;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
@@ -31,8 +32,8 @@ import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
-import org.opendaylight.controller.sal.restconf.impl.test.TestUtils;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -44,7 +45,7 @@ public class RestStream extends JerseyTest {
     private static SchemaContext schemaContextYangsIetf;
 
     @BeforeClass
-    public static void init() throws FileNotFoundException {
+    public static void init() throws FileNotFoundException, ReactorException {
         schemaContextYangsIetf = TestUtils.loadSchemaContext("/full-versions/yangs");
         final ControllerContext controllerContext = ControllerContext.getInstance();
         controllerContext.setSchemas(schemaContextYangsIetf);

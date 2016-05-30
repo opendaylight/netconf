@@ -11,11 +11,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import com.google.common.base.Optional;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -33,9 +31,7 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.Resource;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.parser.impl.YangParserImpl;
 
 public class MountPointSwaggerTest {
 
@@ -51,45 +47,45 @@ public class MountPointSwaggerTest {
 
     @Before
     public void setUp() throws Exception {
-        swagger = new MountPointSwagger();
-        helper = new DocGenTestHelper();
-        helper.setUp();
-        schemaContext = new YangParserImpl().resolveSchemaContext(new HashSet<Module>(helper.getModules().values()));
+        this.swagger = new MountPointSwagger();
+        this.helper = new DocGenTestHelper();
+        this.helper.setUp();
+        this.schemaContext = this.helper.getSchemaContext();
     }
 
     @Test()
     public void testGetResourceListBadIid() throws Exception {
-        UriInfo mockInfo = helper.createMockUriInfo(HTTP_URL);
+        final UriInfo mockInfo = this.helper.createMockUriInfo(HTTP_URL);
 
-        assertEquals(null, swagger.getResourceList(mockInfo, 1L));
+        assertEquals(null, this.swagger.getResourceList(mockInfo, 1L));
     }
 
     @Test()
     public void getInstanceIdentifiers() throws Exception {
-        UriInfo mockInfo = setUpSwaggerForDocGeneration();
+        final UriInfo mockInfo = setUpSwaggerForDocGeneration();
 
-        assertEquals(0, swagger.getInstanceIdentifiers().size());
-        swagger.onMountPointCreated(instanceId); // add this ID into the list of
+        assertEquals(0, this.swagger.getInstanceIdentifiers().size());
+        this.swagger.onMountPointCreated(instanceId); // add this ID into the list of
                                                  // mount points
-        assertEquals(1, swagger.getInstanceIdentifiers().size());
-        assertEquals((Long) 1L, swagger.getInstanceIdentifiers().entrySet().iterator().next()
+        assertEquals(1, this.swagger.getInstanceIdentifiers().size());
+        assertEquals((Long) 1L, this.swagger.getInstanceIdentifiers().entrySet().iterator().next()
                 .getValue());
-        assertEquals(INSTANCE_URL, swagger.getInstanceIdentifiers().entrySet().iterator().next()
+        assertEquals(INSTANCE_URL, this.swagger.getInstanceIdentifiers().entrySet().iterator().next()
                 .getKey());
-        swagger.onMountPointRemoved(instanceId); // remove ID from list of mount
+        this.swagger.onMountPointRemoved(instanceId); // remove ID from list of mount
                                                  // points
-        assertEquals(0, swagger.getInstanceIdentifiers().size());
+        assertEquals(0, this.swagger.getInstanceIdentifiers().size());
     }
 
     @Test
     public void testGetResourceListGoodId() throws Exception {
-        UriInfo mockInfo = setUpSwaggerForDocGeneration();
-        swagger.onMountPointCreated(instanceId); // add this ID into the list of
+        final UriInfo mockInfo = setUpSwaggerForDocGeneration();
+        this.swagger.onMountPointCreated(instanceId); // add this ID into the list of
                                                  // mount points
-        ResourceList resourceList = swagger.getResourceList(mockInfo, 1L);
+        final ResourceList resourceList = this.swagger.getResourceList(mockInfo, 1L);
 
         Resource dataStoreResource = null;
-        for (Resource r : resourceList.getApis()) {
+        for (final Resource r : resourceList.getApis()) {
             if (r.getPath().endsWith("/Datastores(-)")) {
                 dataStoreResource = r;
             }
@@ -99,25 +95,25 @@ public class MountPointSwaggerTest {
 
     @Test
     public void testGetDataStoreApi() throws Exception {
-        UriInfo mockInfo = setUpSwaggerForDocGeneration();
-        swagger.onMountPointCreated(instanceId); // add this ID into the list of
+        final UriInfo mockInfo = setUpSwaggerForDocGeneration();
+        this.swagger.onMountPointCreated(instanceId); // add this ID into the list of
                                                  // mount points
-        ApiDeclaration mountPointApi = swagger.getMountPointApi(mockInfo, 1L, "Datastores", "-");
+        final ApiDeclaration mountPointApi = this.swagger.getMountPointApi(mockInfo, 1L, "Datastores", "-");
         assertNotNull("failed to find Datastore API", mountPointApi);
-        List<Api> apis = mountPointApi.getApis();
+        final List<Api> apis = mountPointApi.getApis();
         assertEquals("Unexpected api list size", 3, apis.size());
 
-        Set<String> actualApis = new TreeSet<>();
-        for (Api api : apis) {
+        final Set<String> actualApis = new TreeSet<>();
+        for (final Api api : apis) {
             actualApis.add(api.getPath());
-            List<Operation> operations = api.getOperations();
+            final List<Operation> operations = api.getOperations();
             assertEquals("unexpected operation size on " + api.getPath(), 1, operations.size());
             assertEquals("unexpected operation method " + api.getPath(), "GET", operations.get(0)
                     .getMethod());
             assertNotNull("expected non-null desc on " + api.getPath(), operations.get(0)
                     .getNotes());
         }
-        Set<String> expectedApis = new TreeSet<>(Arrays.asList(new String[] {
+        final Set<String> expectedApis = new TreeSet<>(Arrays.asList(new String[] {
                 "/config/" + INSTANCE_URL + "yang-ext:mount/",
                 "/operational/" + INSTANCE_URL + "yang-ext:mount/",
                 "/operations/" + INSTANCE_URL + "yang-ext:mount/", }));
@@ -125,20 +121,20 @@ public class MountPointSwaggerTest {
     }
 
     protected UriInfo setUpSwaggerForDocGeneration() throws URISyntaxException {
-        UriInfo mockInfo = helper.createMockUriInfo(HTTP_URL);
+        final UriInfo mockInfo = this.helper.createMockUriInfo(HTTP_URL);
         // We are sharing the global schema service and the mount schema service
         // in our test.
         // OK for testing - real thing would have seperate instances.
-        SchemaContext context = helper.createMockSchemaContext();
-        SchemaService schemaService = helper.createMockSchemaService(context);
+        final SchemaContext context = this.helper.createMockSchemaContext();
+        final SchemaService schemaService = this.helper.createMockSchemaService(context);
 
-        DOMMountPoint mountPoint = mock(DOMMountPoint.class);
+        final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
         when(mountPoint.getSchemaContext()).thenReturn(context);
 
-        DOMMountPointService service = mock(DOMMountPointService.class);
+        final DOMMountPointService service = mock(DOMMountPointService.class);
         when(service.getMountPoint(instanceId)).thenReturn(Optional.of(mountPoint));
-        swagger.setMountService(service);
-        swagger.setGlobalSchema(schemaService);
+        this.swagger.setMountService(service);
+        this.swagger.setGlobalSchema(schemaService);
 
         return mockInfo;
     }

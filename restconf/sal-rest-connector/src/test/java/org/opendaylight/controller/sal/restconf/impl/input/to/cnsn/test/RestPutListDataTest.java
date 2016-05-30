@@ -13,7 +13,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.io.FileNotFoundException;
@@ -22,6 +21,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.opendaylight.controller.sal.restconf.impl.test.TestUtils;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
@@ -31,7 +31,6 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
-import org.opendaylight.controller.sal.restconf.impl.test.TestUtils;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -47,6 +46,7 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class RestPutListDataTest {
 
@@ -63,7 +63,7 @@ public class RestPutListDataTest {
     }
 
     @Before
-    public void initialize() throws FileNotFoundException {
+    public void initialize() throws FileNotFoundException, ReactorException {
         final ControllerContext controllerContext = ControllerContext.getInstance();
         schemaContextTestModule = TestUtils.loadSchemaContext("/full-versions/test-module");
         controllerContext.setSchemas(schemaContextTestModule);

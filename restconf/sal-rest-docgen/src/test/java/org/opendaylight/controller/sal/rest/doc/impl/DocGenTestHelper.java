@@ -9,7 +9,6 @@ package org.opendaylight.controller.sal.rest.doc.impl;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsonorg.JsonOrgModule;
@@ -17,11 +16,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.mockito.ArgumentCaptor;
@@ -30,41 +28,51 @@ import org.mockito.stubbing.Answer;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.parser.api.YangContextParser;
-import org.opendaylight.yangtools.yang.parser.impl.YangParserImpl;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
+import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
+import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
+import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangStatementSourceImpl;
+import org.opendaylight.yangtools.yang.parser.util.NamedFileInputStream;
 
 public class DocGenTestHelper {
 
-    private Map<File, Module> modules;
+    private Set<Module> modules;
     private ObjectMapper mapper;
+    private SchemaContext schemaContext;
 
-    public Map<File, Module> loadModules(String resourceDirectory) throws FileNotFoundException,
-            URISyntaxException {
+    public Set<Module> loadModules(final String resourceDirectory)
+            throws FileNotFoundException,
+            URISyntaxException, ReactorException {
 
-        URI resourceDirUri = getClass().getResource(resourceDirectory).toURI();
-        final YangContextParser parser = new YangParserImpl();
+        final URI resourceDirUri = getClass().getResource(resourceDirectory).toURI();
         final File testDir = new File(resourceDirUri);
         final String[] fileList = testDir.list();
-        final List<File> testFiles = new ArrayList<>();
         if (fileList == null) {
             throw new FileNotFoundException(resourceDirectory.toString());
         }
-        for (String fileName : fileList) {
-
-            testFiles.add(new File(testDir, fileName));
+        final CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR.newBuild();
+        for (final String fileName : fileList) {
+            final File file = new File(testDir, fileName);
+            reactor.addSource(new YangStatementSourceImpl(new NamedFileInputStream(file, file.getPath())));
         }
-        return parser.parseYangModelsMapped(testFiles);
+
+        this.schemaContext = reactor.buildEffective();
+        return this.schemaContext.getModules();
     }
 
-    public Map<File, Module> getModules() {
-        return modules;
+    public Collection<Module> getModules() {
+        return this.modules;
     }
 
     public void setUp() throws Exception {
-        modules = loadModules("/yang");
-        mapper = new ObjectMapper();
-        mapper.registerModule(new JsonOrgModule());
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        this.modules = loadModules("/yang");
+        this.mapper = new ObjectMapper();
+        this.mapper.registerModule(new JsonOrgModule());
+        this.mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+    }
+
+    public SchemaContext getSchemaContext() {
+        return this.schemaContext;
     }
 
     public SchemaService createMockSchemaService() {
@@ -76,14 +84,14 @@ public class DocGenTestHelper {
             mockContext = createMockSchemaContext();
         }
 
-        SchemaService mockSchemaService = mock(SchemaService.class);
+        final SchemaService mockSchemaService = mock(SchemaService.class);
         when(mockSchemaService.getGlobalContext()).thenReturn(mockContext);
         return mockSchemaService;
     }
 
     public SchemaContext createMockSchemaContext() {
-        SchemaContext mockContext = mock(SchemaContext.class);
-        when(mockContext.getModules()).thenReturn(new HashSet<Module>(modules.values()));
+        final SchemaContext mockContext = mock(SchemaContext.class);
+        when(mockContext.getModules()).thenReturn(this.modules);
 
         final ArgumentCaptor<String> moduleCapture = ArgumentCaptor.forClass(String.class);
         final ArgumentCaptor<Date> dateCapture = ArgumentCaptor.forClass(Date.class);
@@ -91,10 +99,10 @@ public class DocGenTestHelper {
         when(mockContext.findModuleByName(moduleCapture.capture(), dateCapture.capture())).then(
                 new Answer<Module>() {
                     @Override
-                    public Module answer(InvocationOnMock invocation) throws Throwable {
-                        String module = moduleCapture.getValue();
-                        Date date = dateCapture.getValue();
-                        for (Module m : modules.values()) {
+                    public Module answer(final InvocationOnMock invocation) throws Throwable {
+                        final String module = moduleCapture.getValue();
+                        final Date date = dateCapture.getValue();
+                        for (final Module m : Collections.unmodifiableSet(DocGenTestHelper.this.modules)) {
                             if (m.getName().equals(module) && m.getRevision().equals(date)) {
                                 return m;
                             }
@@ -105,10 +113,10 @@ public class DocGenTestHelper {
         when(mockContext.findModuleByNamespaceAndRevision(namespaceCapture.capture(), dateCapture.capture())).then(
                 new Answer<Module>() {
                     @Override
-                    public Module answer(InvocationOnMock invocation) throws Throwable {
-                        URI namespace = namespaceCapture.getValue();
-                        Date date = dateCapture.getValue();
-                        for (Module m : modules.values()) {
+                    public Module answer(final InvocationOnMock invocation) throws Throwable {
+                        final URI namespace = namespaceCapture.getValue();
+                        final Date date = dateCapture.getValue();
+                        for (final Module m : Collections.unmodifiableSet(DocGenTestHelper.this.modules)) {
                             if (m.getNamespace().equals(namespace) && m.getRevision().equals(date)) {
                                 return m;
                             }
@@ -119,21 +127,21 @@ public class DocGenTestHelper {
         return mockContext;
     }
 
-    public UriInfo createMockUriInfo(String urlPrefix) throws URISyntaxException {
+    public UriInfo createMockUriInfo(final String urlPrefix) throws URISyntaxException {
         final URI uri = new URI(urlPrefix);
 
-        UriBuilder mockBuilder = mock(UriBuilder.class);
+        final UriBuilder mockBuilder = mock(UriBuilder.class);
 
         final ArgumentCaptor<String> subStringCapture = ArgumentCaptor.forClass(String.class);
         when(mockBuilder.path(subStringCapture.capture())).thenReturn(mockBuilder);
         when(mockBuilder.build()).then(new Answer<URI>() {
             @Override
-            public URI answer(InvocationOnMock invocation) throws Throwable {
+            public URI answer(final InvocationOnMock invocation) throws Throwable {
                 return URI.create(uri + "/" + subStringCapture.getValue());
             }
         });
 
-        UriInfo info = mock(UriInfo.class);
+        final UriInfo info = mock(UriInfo.class);
 
         when(info.getRequestUriBuilder()).thenReturn(mockBuilder);
         when(info.getBaseUri()).thenReturn(uri);

@@ -19,6 +19,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class Bug3595Test {
 
@@ -30,8 +31,8 @@ public class Bug3595Test {
     private static ControllerContext controllerContext = ControllerContext.getInstance();
 
     @BeforeClass
-    public static void initialize() throws FileNotFoundException {
-        SchemaContext schemaContext = TestUtils.loadSchemaContext("/leafref/yang");
+    public static void initialize() throws FileNotFoundException, ReactorException {
+        final SchemaContext schemaContext = TestUtils.loadSchemaContext("/leafref/yang");
         Module module = TestUtils.findModule(schemaContext.getModules(), "leafref-module");
         assertNotNull(module);
         module = TestUtils.findModule(schemaContext.getModules(), "referenced-module");

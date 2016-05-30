@@ -13,7 +13,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.io.FileNotFoundException;
@@ -46,6 +45,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 @Ignore
 public class RestPutOperationTest extends JerseyTest {
@@ -60,7 +60,7 @@ public class RestPutOperationTest extends JerseyTest {
     private static SchemaContext schemaContextTestModule;
 
     @BeforeClass
-    public static void init() throws IOException {
+    public static void init() throws IOException, ReactorException {
         schemaContextYangsIetf = TestUtils.loadSchemaContext("/full-versions/yangs");
         schemaContextTestModule = TestUtils.loadSchemaContext("/full-versions/test-module");
         final ControllerContext controllerContext = ControllerContext.getInstance();

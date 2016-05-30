@@ -18,7 +18,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
@@ -27,7 +26,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -68,6 +66,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.util.SchemaNodeUtils;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class InvokeRpcMethodTest {
 
@@ -77,13 +76,12 @@ public class InvokeRpcMethodTest {
 
 
     @BeforeClass
-    public static void init() throws FileNotFoundException {
-        final Set<Module> allModules = new HashSet<Module>(TestUtils.loadModulesFrom("/full-versions/yangs"));
-        allModules.addAll(TestUtils.loadModulesFrom("/invoke-rpc"));
+    public static void init() throws FileNotFoundException, ReactorException {
+        final SchemaContext schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs", "/invoke-rpc");
+        final Set<Module> allModules = schemaContext.getModules();
         assertNotNull(allModules);
         final Module module = TestUtils.resolveModule("invoke-rpc-module", allModules);
         assertNotNull(module);
-        final SchemaContext schemaContext = TestUtils.loadSchemaContext(allModules);
         controllerContext = spy(ControllerContext.getInstance());
         controllerContext.setSchemas(schemaContext);
         uriInfo = mock(UriInfo.class);
@@ -94,8 +92,8 @@ public class InvokeRpcMethodTest {
 
     @Before
     public void initMethod() {
-        restconfImpl = RestconfImpl.getInstance();
-        restconfImpl.setControllerContext(controllerContext);
+        this.restconfImpl = RestconfImpl.getInstance();
+        this.restconfImpl.setControllerContext(controllerContext);
     }
 
     /**
@@ -172,10 +170,10 @@ public class InvokeRpcMethodTest {
 
         when(brokerFacade.invokeRpc(eq(type), any(NormalizedNode.class))).thenReturn(future);
 
-        restconfImpl.setBroker(brokerFacade);
+        this.restconfImpl.setBroker(brokerFacade);
 
         try {
-            restconfImpl.invokeRpc("toaster:cancel-toast", "", uriInfo);
+            this.restconfImpl.invokeRpc("toaster:cancel-toast", "", uriInfo);
             fail("Expected an exception to be thrown.");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
@@ -222,10 +220,10 @@ public class InvokeRpcMethodTest {
         final BrokerFacade brokerFacade = mock(BrokerFacade.class);
         when(brokerFacade.invokeRpc(eq(path), any(NormalizedNode.class))).thenReturn(future);
 
-        restconfImpl.setBroker(brokerFacade);
+        this.restconfImpl.setBroker(brokerFacade);
 
         try {
-            restconfImpl.invokeRpc("toaster:cancel-toast", "", uriInfo);
+            this.restconfImpl.invokeRpc("toaster:cancel-toast", "", uriInfo);
             fail("Expected an exception to be thrown.");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED, Optional.of("foo"),
@@ -247,9 +245,9 @@ public class InvokeRpcMethodTest {
         final BrokerFacade brokerFacade = mock(BrokerFacade.class);
         when(brokerFacade.invokeRpc(eq(path), any (NormalizedNode.class))).thenReturn(future);
 
-        restconfImpl.setBroker(brokerFacade);
+        this.restconfImpl.setBroker(brokerFacade);
 
-        final NormalizedNodeContext output = restconfImpl.invokeRpc("toaster:cancel-toast", "", uriInfo);
+        final NormalizedNodeContext output = this.restconfImpl.invokeRpc("toaster:cancel-toast", "", uriInfo);
         assertNotNull(output);
         assertEquals(null, output.getData());
         // additional validation in the fact that the restconfImpl does not
@@ -259,7 +257,7 @@ public class InvokeRpcMethodTest {
     @Test
     public void testInvokeRpcMethodExpectingNoPayloadButProvidePayload() {
         try {
-            restconfImpl.invokeRpc("toaster:cancel-toast", " a payload ", uriInfo);
+            this.restconfImpl.invokeRpc("toaster:cancel-toast", " a payload ", uriInfo);
             fail("Expected an exception");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
@@ -270,7 +268,7 @@ public class InvokeRpcMethodTest {
     @Test
     public void testInvokeRpcMethodWithBadMethodName() {
         try {
-            restconfImpl.invokeRpc("toaster:bad-method", "", uriInfo);
+            this.restconfImpl.invokeRpc("toaster:bad-method", "", uriInfo);
             fail("Expected an exception");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.RPC, ErrorTag.UNKNOWN_ELEMENT,
@@ -315,9 +313,9 @@ public class InvokeRpcMethodTest {
 
         final BrokerFacade brokerFacade = mock(BrokerFacade.class);
         when(brokerFacade.invokeRpc(eq(path), any(NormalizedNode.class))).thenReturn(future);
-        restconfImpl.setBroker(brokerFacade);
+        this.restconfImpl.setBroker(brokerFacade);
 
-        final NormalizedNodeContext output = restconfImpl.invokeRpc("toaster:make-toast", payload, uriInfo);
+        final NormalizedNodeContext output = this.restconfImpl.invokeRpc("toaster:make-toast", payload, uriInfo);
         assertNotNull(output);
         assertEquals(null, output.getData());
         // additional validation in the fact that the restconfImpl does not
@@ -327,7 +325,7 @@ public class InvokeRpcMethodTest {
     @Test
     public void testThrowExceptionWhenSlashInModuleName() {
         try {
-            restconfImpl.invokeRpc("toaster/slash", "", uriInfo);
+            this.restconfImpl.invokeRpc("toaster/slash", "", uriInfo);
             fail("Expected an exception.");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
@@ -373,9 +371,9 @@ public class InvokeRpcMethodTest {
         final BrokerFacade brokerFacade = mock(BrokerFacade.class);
         when(brokerFacade.invokeRpc(eq(rpcDef.getPath()), any(NormalizedNode.class))).thenReturn(future);
 
-        restconfImpl.setBroker(brokerFacade);
+        this.restconfImpl.setBroker(brokerFacade);
 
-        final NormalizedNodeContext output = restconfImpl.invokeRpc("toaster:testOutput", "", uriInfo);
+        final NormalizedNodeContext output = this.restconfImpl.invokeRpc("toaster:testOutput", "", uriInfo);
         assertNotNull(output);
         assertNotNull(output.getData());
         assertSame(container, output.getData());
