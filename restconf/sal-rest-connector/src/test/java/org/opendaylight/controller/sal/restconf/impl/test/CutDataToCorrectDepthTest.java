@@ -59,6 +59,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContaine
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class CutDataToCorrectDepthTest extends JerseyTest {
 
@@ -73,8 +74,8 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
         @GET
         @Path("/config/{identifier:.+}")
         @Produces({ "application/json", "application/xml" })
-        public NormalizedNodeContext getData(@Encoded @PathParam("identifier") String identifier,
-                                             @Context UriInfo uriInfo) {
+        public NormalizedNodeContext getData(@Encoded @PathParam("identifier") final String identifier,
+                                             @Context final UriInfo uriInfo) {
 
             final InstanceIdentifierContext iiWithData = ControllerContext.getInstance().toInstanceIdentifier(
                     identifier);
@@ -93,44 +94,44 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
         @GET
         @Path("/operational/{identifier:.+}")
         @Produces({ "application/json", "application/xml" })
-        public NormalizedNodeContext getDataOperational(@Encoded @PathParam("identifier") String identifier,
-                                                        @Context UriInfo uriInfo) {
+        public NormalizedNodeContext getDataOperational(@Encoded @PathParam("identifier") final String identifier,
+                                                        @Context final UriInfo uriInfo) {
             return getData(identifier, uriInfo);
         }
 
         @PUT
         @Path("/config/{identifier:.+}")
         @Consumes({ "application/json", "application/xml" })
-        public void normalizedData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload) throws InterruptedException {
+        public void normalizedData(@Encoded @PathParam("identifier") final String identifier, final NormalizedNodeContext payload) throws InterruptedException {
             System.out.println(payload);
             System.out.println(payload.getInstanceIdentifierContext().getInstanceIdentifier());
             System.out.println(payload.getData());
-            globalPayload = payload.getData();
+            CutDataToCorrectDepthTest.this.globalPayload = payload.getData();
         }
 
         @PUT
         @Path("/operational/{identifier:.+}")
         @Consumes({ "application/json", "application/xml" })
-        public void normalizedDataOperational(@Encoded @PathParam("identifier") String identifier,
-                                              NormalizedNodeContext payload) throws InterruptedException {
+        public void normalizedDataOperational(@Encoded @PathParam("identifier") final String identifier,
+                                              final NormalizedNodeContext payload) throws InterruptedException {
             normalizedData(identifier, payload);
         }
     }
 
     @BeforeClass
-    public static void initialize() throws FileNotFoundException {
+    public static void initialize() throws FileNotFoundException, ReactorException {
         schemaContextModules = TestUtils.loadSchemaContext("/modules");
-        Module module = TestUtils.findModule(schemaContextModules.getModules(), "nested-module");
+        final Module module = TestUtils.findModule(schemaContextModules.getModules(), "nested-module");
         assertNotNull(module);
 
-        UnkeyedListNode listAsUnkeyedList = unkeyedList(
+        final UnkeyedListNode listAsUnkeyedList = unkeyedList(
                 "depth2-cont1",
                 unkeyedEntry("depth2-cont1",
                         container("depth3-cont1",
                                 container("depth4-cont1", leaf("depth5-leaf1", "depth5-leaf1-value")),
                                 leaf("depth4-leaf1", "depth4-leaf1-value")), leaf("depth3-leaf1", "depth3-leaf1-value")));
 
-        MapNode listAsMap = mapNode(
+        final MapNode listAsMap = mapNode(
                 "depth2-list2",
                 mapEntryNode("depth2-list2", 2, leaf("depth3-lf1-key", "depth3-lf1-key-value"),
                         leaf("depth3-lf2-key", "depth3-lf2-key-value"), leaf("depth3-lf3", "depth3-lf3-value")));
@@ -201,15 +202,15 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
     }
 
     private void txtDataToNormalizedNode(final Response response, final String mediaType, final String uri) {
-        String responseStr = response.readEntity(String.class);
+        final String responseStr = response.readEntity(String.class);
         System.out.println(responseStr);
         target(uri).request(mediaType).put(Entity.entity(responseStr, mediaType));
     }
 
     private void verifyResponse(final NormalizedNode<?, ?> nodeData) throws WebApplicationException, IOException {
-        assertNotNull(globalPayload);
-        assertEquals(globalPayload, nodeData);
-        globalPayload = null;
+        assertNotNull(this.globalPayload);
+        assertEquals(this.globalPayload, nodeData);
+        this.globalPayload = null;
     }
 
     @Override
@@ -227,8 +228,8 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
     }
 
     private static ContainerNode container(final String localName, final DataContainerChild<?, ?>... children) {
-        DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder = Builders.containerBuilder();
-        for (DataContainerChild<?, ?> child : children) {
+        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder = Builders.containerBuilder();
+        for (final DataContainerChild<?, ?> child : children) {
             containerBuilder.withChild(child);
         }
         containerBuilder.withNodeIdentifier(toIdentifier(localName));
@@ -238,10 +239,10 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
     private static UnkeyedListNode unkeyedList(
             final String localName,
             final UnkeyedListEntryNode... entryNodes) {
-        CollectionNodeBuilder<UnkeyedListEntryNode, UnkeyedListNode> builder = Builders.unkeyedListBuilder();
+        final CollectionNodeBuilder<UnkeyedListEntryNode, UnkeyedListNode> builder = Builders.unkeyedListBuilder();
         final NodeIdentifier identifier = toIdentifier(localName);
         builder.withNodeIdentifier(identifier);
-        for (UnkeyedListEntryNode unkeyedListEntryNode : entryNodes) {
+        for (final UnkeyedListEntryNode unkeyedListEntryNode : entryNodes) {
             builder.withChild(unkeyedListEntryNode);
         }
         return builder.build();
@@ -249,18 +250,18 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
 
     private static UnkeyedListEntryNode unkeyedEntry(final String localName,
                                                      final DataContainerChild<?, ?>... children) {
-        DataContainerNodeAttrBuilder<NodeIdentifier, UnkeyedListEntryNode> builder = Builders.unkeyedListEntryBuilder();
+        final DataContainerNodeAttrBuilder<NodeIdentifier, UnkeyedListEntryNode> builder = Builders.unkeyedListEntryBuilder();
         builder.withNodeIdentifier(toIdentifier(localName));
-        for (DataContainerChild<?, ?> child : children) {
+        for (final DataContainerChild<?, ?> child : children) {
             builder.withChild(child);
         }
         return builder.build();
     }
 
     private static MapNode mapNode(final String localName, final MapEntryNode... entryNodes) {
-        CollectionNodeBuilder<MapEntryNode, MapNode> builder = Builders.mapBuilder();
+        final CollectionNodeBuilder<MapEntryNode, MapNode> builder = Builders.mapBuilder();
         builder.withNodeIdentifier(toIdentifier(localName));
-        for (MapEntryNode mapEntryNode : entryNodes) {
+        for (final MapEntryNode mapEntryNode : entryNodes) {
             builder.withChild(mapEntryNode);
         }
         return builder.build();
@@ -268,34 +269,34 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
 
     private static MapEntryNode mapEntryNode(final String localName, final int keysNumber,
                                              final DataContainerChild<?, ?>... children) {
-        DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder = Builders.mapEntryBuilder();
-        Map<QName, Object> keys = new HashMap<>();
+        final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder = Builders.mapEntryBuilder();
+        final Map<QName, Object> keys = new HashMap<>();
         for (int i = 0; i < keysNumber; i++) {
             keys.put(children[i].getNodeType(), children[i].getValue());
         }
         builder.withNodeIdentifier(toIdentifier(localName, keys));
 
-        for (DataContainerChild<?, ?> child : children) {
+        for (final DataContainerChild<?, ?> child : children) {
             builder.withChild(child);
         }
         return builder.build();
     }
 
     private static LeafSetNode<?> leafList(final String localName, final String... children) {
-        ListNodeBuilder<Object, LeafSetEntryNode<Object>> builder = Builders.leafSetBuilder();
+        final ListNodeBuilder<Object, LeafSetEntryNode<Object>> builder = Builders.leafSetBuilder();
         builder.withNodeIdentifier(toIdentifier(localName));
-        for (String child : children) {
+        for (final String child : children) {
             builder.withChild(Builders.leafSetEntryBuilder().withNodeIdentifier(toIdentifier(localName, child))
                     .withValue(child).build());
         }
         return builder.build();
     }
 
-    private static NodeIdentifier toIdentifier(String localName) {
+    private static NodeIdentifier toIdentifier(final String localName) {
         return new NodeIdentifier(QName.create("urn:nested:module", "2014-06-3", localName));
     }
 
-    private static NodeIdentifierWithPredicates toIdentifier(String localName, Map<QName, Object> keys) {
+    private static NodeIdentifierWithPredicates toIdentifier(final String localName, final Map<QName, Object> keys) {
         return new NodeIdentifierWithPredicates(QName.create("urn:nested:module", "2014-06-3", localName),
                 keys);
     }

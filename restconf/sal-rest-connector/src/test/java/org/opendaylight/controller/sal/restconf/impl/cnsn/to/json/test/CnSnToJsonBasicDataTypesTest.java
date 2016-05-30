@@ -15,11 +15,13 @@ import static org.junit.Assert.fail;
 import com.google.common.collect.Maps;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Map;
 import org.junit.BeforeClass;
 import org.opendaylight.controller.sal.restconf.impl.test.YangAndXmlAndDataSchemaLoader;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class CnSnToJsonBasicDataTypesTest extends YangAndXmlAndDataSchemaLoader {
 
@@ -36,11 +38,11 @@ public class CnSnToJsonBasicDataTypesTest extends YangAndXmlAndDataSchemaLoader 
         abstract Object getActualValue(JsonReader reader) throws IOException;
 
         void verify(final JsonReader reader, final String keyName) throws IOException {
-            assertEquals("Json value for key " + keyName, expectedValue, getActualValue(reader));
+            assertEquals("Json value for key " + keyName, this.expectedValue, getActualValue(reader));
         }
 
         JsonToken expectedTokenType() {
-            return expectedToken;
+            return this.expectedToken;
         }
     }
 
@@ -64,11 +66,11 @@ public class CnSnToJsonBasicDataTypesTest extends YangAndXmlAndDataSchemaLoader 
 
         @Override
         Object getActualValue(final JsonReader reader) throws IOException {
-            if (expectedValue instanceof Double) {
+            if (this.expectedValue instanceof Double) {
                 return reader.nextDouble();
-            } else if (expectedValue instanceof Long) {
+            } else if (this.expectedValue instanceof Long) {
                 return reader.nextLong();
-            } else if (expectedValue instanceof Integer) {
+            } else if (this.expectedValue instanceof Integer) {
                 return reader.nextInt();
             }
 
@@ -174,7 +176,7 @@ public class CnSnToJsonBasicDataTypesTest extends YangAndXmlAndDataSchemaLoader 
     }
 
     @BeforeClass
-    public static void initialize() {
+    public static void initialize() throws FileNotFoundException, ReactorException {
         dataLoad("/cnsn-to-json/simple-data-types");
     }
 

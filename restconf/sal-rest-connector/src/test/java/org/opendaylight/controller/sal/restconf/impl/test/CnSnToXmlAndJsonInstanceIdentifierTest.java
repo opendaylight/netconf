@@ -9,8 +9,8 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -30,11 +30,12 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class CnSnToXmlAndJsonInstanceIdentifierTest extends YangAndXmlAndDataSchemaLoader {
 
     @BeforeClass
-    public static void initialize() {
+    public static void initialize() throws FileNotFoundException, ReactorException {
         dataLoad("/instanceidentifier/yang", 4, "instance-identifier-module", "cont");
     }
 
@@ -54,7 +55,7 @@ public class CnSnToXmlAndJsonInstanceIdentifierTest extends YangAndXmlAndDataSch
                 if (startElement.getName().getLocalPart().equals("lf111")) {
                     final Iterator<?> prefixes = startElement.getNamespaceContext().getPrefixes("augment:augment:module");
 
-                    while (prefixes.hasNext() && aaModulePrefix == null) {
+                    while (prefixes.hasNext() && (aaModulePrefix == null)) {
                         final String prefix = (String) prefixes.next();
                         if (!prefix.isEmpty()) {
                             aaModulePrefix = prefix;
@@ -94,7 +95,7 @@ public class CnSnToXmlAndJsonInstanceIdentifierTest extends YangAndXmlAndDataSch
                 if (startElement.getName().getLocalPart().equals("lf111")) {
                     final Iterator<?> prefixes = startElement.getNamespaceContext().getPrefixes("augment:module:leaf:list");
 
-                    while (prefixes.hasNext() && aModuleLfLstPrefix == null) {
+                    while (prefixes.hasNext() && (aModuleLfLstPrefix == null)) {
                         final String prefix = (String) prefixes.next();
                         if (!prefix.isEmpty()) {
                             aModuleLfLstPrefix = prefix;

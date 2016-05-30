@@ -7,12 +7,14 @@
  */
 package org.opendaylight.controller.sal.restconf.impl.test;
 
+import java.io.FileNotFoundException;
 import org.junit.BeforeClass;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class XmlAndJsonToCnSnInstanceIdentifierTest extends YangAndXmlAndDataSchemaLoader {
 
     @BeforeClass
-    public static void initialize() {
+    public static void initialize() throws FileNotFoundException, ReactorException {
         dataLoad("/instanceidentifier/yang", 4, "instance-identifier-module", "cont");
     }
 

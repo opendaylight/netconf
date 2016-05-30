@@ -61,6 +61,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 /**
  * Unit tests for JSONRestconfServiceImpl.
@@ -99,7 +100,7 @@ public class JSONRestconfServiceImplTest {
     private final JSONRestconfServiceImpl service = new JSONRestconfServiceImpl();
 
     @BeforeClass
-    public static void init() throws IOException {
+    public static void init() throws IOException, ReactorException {
         ControllerContext.getInstance().setSchemas(TestUtils.loadSchemaContext("/full-versions/yangs"));
         brokerFacade = mock(BrokerFacade.class);
         RestconfImpl.getInstance().setBroker(brokerFacade);
@@ -121,13 +122,13 @@ public class JSONRestconfServiceImplTest {
         doReturn(Futures.immediateCheckedFuture(null)).when(brokerFacade).commitConfigurationDataPut(
                 notNull(SchemaContext.class), notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class));
 
-        String uriPath = "ietf-interfaces:interfaces/interface/eth0";
-        String payload = loadData("/parts/ietf-interfaces_interfaces.json");
+        final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
+        final String payload = loadData("/parts/ietf-interfaces_interfaces.json");
 
-        service.put(uriPath, payload);
+        this.service.put(uriPath, payload);
 
-        ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
-        ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
+        final ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
+        final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
         verify(brokerFacade).commitConfigurationDataPut(notNull(SchemaContext.class), capturedPath.capture(),
                 capturedNode.capture());
 
@@ -136,7 +137,7 @@ public class JSONRestconfServiceImplTest {
 
         assertTrue("Expected MapEntryNode. Actual " + capturedNode.getValue().getClass(),
                 capturedNode.getValue() instanceof MapEntryNode);
-        MapEntryNode actualNode = (MapEntryNode) capturedNode.getValue();
+        final MapEntryNode actualNode = (MapEntryNode) capturedNode.getValue();
         assertEquals("MapEntryNode node type", INTERFACE_QNAME, actualNode.getNodeType());
         verifyLeafNode(actualNode, NAME_QNAME, "eth0");
         verifyLeafNode(actualNode, TYPE_QNAME, "ethernetCsmacd");
@@ -147,25 +148,25 @@ public class JSONRestconfServiceImplTest {
     @SuppressWarnings("rawtypes")
     @Test
     public void testPutBehindMountPoint() throws Exception {
-        DOMMountPoint mockMountPoint = setupTestMountPoint();
+        final DOMMountPoint mockMountPoint = setupTestMountPoint();
 
         doReturn(Futures.immediateCheckedFuture(null)).when(brokerFacade).commitConfigurationDataPut(
                 notNull(DOMMountPoint.class), notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class));
 
-        String uriPath = "ietf-interfaces:interfaces/yang-ext:mount/test-module:cont/cont1";
-        String payload = loadData("/full-versions/testCont1Data.json");
+        final String uriPath = "ietf-interfaces:interfaces/yang-ext:mount/test-module:cont/cont1";
+        final String payload = loadData("/full-versions/testCont1Data.json");
 
-        service.put(uriPath, payload);
+        this.service.put(uriPath, payload);
 
-        ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
-        ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
+        final ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
+        final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
         verify(brokerFacade).commitConfigurationDataPut(same(mockMountPoint), capturedPath.capture(),
                 capturedNode.capture());
 
         verifyPath(capturedPath.getValue(), TEST_CONT_QNAME, TEST_CONT1_QNAME);
 
         assertTrue("Expected ContainerNode", capturedNode.getValue() instanceof ContainerNode);
-        ContainerNode actualNode = (ContainerNode) capturedNode.getValue();
+        final ContainerNode actualNode = (ContainerNode) capturedNode.getValue();
         assertEquals("ContainerNode node type", TEST_CONT1_QNAME, actualNode.getNodeType());
         verifyLeafNode(actualNode, TEST_LF11_QNAME, "lf11 data");
         verifyLeafNode(actualNode, TEST_LF12_QNAME, "lf12 data");
@@ -177,12 +178,12 @@ public class JSONRestconfServiceImplTest {
                 .when(brokerFacade).commitConfigurationDataPut(notNull(SchemaContext.class),
                         notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class));
 
-        String uriPath = "ietf-interfaces:interfaces/interface/eth0";
-        String payload = loadData("/parts/ietf-interfaces_interfaces.json");
+        final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
+        final String payload = loadData("/parts/ietf-interfaces_interfaces.json");
 
         try {
-            service.put(uriPath, payload);
-        } catch (OperationFailedException e) {
+            this.service.put(uriPath, payload);
+        } catch (final OperationFailedException e) {
             assertNotNull(e.getCause());
             throw e.getCause();
         }
@@ -194,32 +195,32 @@ public class JSONRestconfServiceImplTest {
         doReturn(Futures.immediateCheckedFuture(null)).when(brokerFacade).commitConfigurationDataPost(
                 any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class));
 
-        String uriPath = null;
-        String payload = loadData("/parts/ietf-interfaces_interfaces_absolute_path.json");
+        final String uriPath = null;
+        final String payload = loadData("/parts/ietf-interfaces_interfaces_absolute_path.json");
 
-        service.post(uriPath, payload);
+        this.service.post(uriPath, payload);
 
-        ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
-        ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
+        final ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
+        final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
         verify(brokerFacade).commitConfigurationDataPost(notNull(SchemaContext.class), capturedPath.capture(),
                 capturedNode.capture());
 
         verifyPath(capturedPath.getValue(), INTERFACES_QNAME);
 
         assertTrue("Expected ContainerNode", capturedNode.getValue() instanceof ContainerNode);
-        ContainerNode actualNode = (ContainerNode) capturedNode.getValue();
+        final ContainerNode actualNode = (ContainerNode) capturedNode.getValue();
         assertEquals("ContainerNode node type", INTERFACES_QNAME, actualNode.getNodeType());
 
-        Optional<DataContainerChild<?, ?>> mapChild = actualNode.getChild(new NodeIdentifier(INTERFACE_QNAME));
+        final Optional<DataContainerChild<?, ?>> mapChild = actualNode.getChild(new NodeIdentifier(INTERFACE_QNAME));
         assertEquals(INTERFACE_QNAME.toString() + " present", true, mapChild.isPresent());
         assertTrue("Expected MapNode. Actual " + mapChild.get().getClass(), mapChild.get() instanceof MapNode);
-        MapNode mapNode = (MapNode)mapChild.get();
+        final MapNode mapNode = (MapNode)mapChild.get();
 
-        NodeIdentifierWithPredicates entryNodeID = new NodeIdentifierWithPredicates(
+        final NodeIdentifierWithPredicates entryNodeID = new NodeIdentifierWithPredicates(
                 INTERFACE_QNAME, NAME_QNAME, "eth0");
-        Optional<MapEntryNode> entryChild = mapNode.getChild(entryNodeID);
+        final Optional<MapEntryNode> entryChild = mapNode.getChild(entryNodeID);
         assertEquals(entryNodeID.toString() + " present", true, entryChild.isPresent());
-        MapEntryNode entryNode = entryChild.get();
+        final MapEntryNode entryNode = entryChild.get();
         verifyLeafNode(entryNode, NAME_QNAME, "eth0");
         verifyLeafNode(entryNode, TYPE_QNAME, "ethernetCsmacd");
         verifyLeafNode(entryNode, ENABLED_QNAME, Boolean.FALSE);
@@ -229,25 +230,25 @@ public class JSONRestconfServiceImplTest {
     @SuppressWarnings("rawtypes")
     @Test
     public void testPostBehindMountPoint() throws Exception {
-        DOMMountPoint mockMountPoint = setupTestMountPoint();
+        final DOMMountPoint mockMountPoint = setupTestMountPoint();
 
         doReturn(Futures.immediateCheckedFuture(null)).when(brokerFacade).commitConfigurationDataPost(
                 notNull(DOMMountPoint.class), notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class));
 
-        String uriPath = "ietf-interfaces:interfaces/yang-ext:mount/test-module:cont";
-        String payload = loadData("/full-versions/testCont1Data.json");
+        final String uriPath = "ietf-interfaces:interfaces/yang-ext:mount/test-module:cont";
+        final String payload = loadData("/full-versions/testCont1Data.json");
 
-        service.post(uriPath, payload);
+        this.service.post(uriPath, payload);
 
-        ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
-        ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
+        final ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
+        final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
         verify(brokerFacade).commitConfigurationDataPost(same(mockMountPoint), capturedPath.capture(),
                 capturedNode.capture());
 
         verifyPath(capturedPath.getValue(), TEST_CONT_QNAME, TEST_CONT1_QNAME);
 
         assertTrue("Expected ContainerNode", capturedNode.getValue() instanceof ContainerNode);
-        ContainerNode actualNode = (ContainerNode) capturedNode.getValue();
+        final ContainerNode actualNode = (ContainerNode) capturedNode.getValue();
         assertEquals("ContainerNode node type", TEST_CONT1_QNAME, actualNode.getNodeType());
         verifyLeafNode(actualNode, TEST_LF11_QNAME, "lf11 data");
         verifyLeafNode(actualNode, TEST_LF12_QNAME, "lf12 data");
@@ -259,12 +260,12 @@ public class JSONRestconfServiceImplTest {
                 .when(brokerFacade).commitConfigurationDataPost(any(SchemaContext.class),
                         any(YangInstanceIdentifier.class), any(NormalizedNode.class));
 
-        String uriPath = null;
-        String payload = loadData("/parts/ietf-interfaces_interfaces_absolute_path.json");
+        final String uriPath = null;
+        final String payload = loadData("/parts/ietf-interfaces_interfaces_absolute_path.json");
 
         try {
-            service.post(uriPath, payload);
-        } catch (OperationFailedException e) {
+            this.service.post(uriPath, payload);
+        } catch (final OperationFailedException e) {
             assertNotNull(e.getCause());
             throw e.getCause();
         }
@@ -275,11 +276,11 @@ public class JSONRestconfServiceImplTest {
         doReturn(Futures.immediateCheckedFuture(null)).when(brokerFacade).commitConfigurationDataDelete(
                 notNull(YangInstanceIdentifier.class));
 
-        String uriPath = "ietf-interfaces:interfaces/interface/eth0";
+        final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
 
-        service.delete(uriPath);
+        this.service.delete(uriPath);
 
-        ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
+        final ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         verify(brokerFacade).commitConfigurationDataDelete(capturedPath.capture());
 
         verifyPath(capturedPath.getValue(), INTERFACES_QNAME, INTERFACE_QNAME,
@@ -288,9 +289,9 @@ public class JSONRestconfServiceImplTest {
 
     @Test(expected=OperationFailedException.class)
     public void testDeleteFailure() throws Exception {
-        String invalidUriPath = "ietf-interfaces:interfaces/invalid";
+        final String invalidUriPath = "ietf-interfaces:interfaces/invalid";
 
-        service.delete(invalidUriPath);
+        this.service.delete(invalidUriPath);
     }
 
     @Test
@@ -307,57 +308,57 @@ public class JSONRestconfServiceImplTest {
     public void testGetWithNoData() throws Exception {
         doReturn(null).when(brokerFacade).readConfigurationData(notNull(YangInstanceIdentifier.class));
 
-        String uriPath = "ietf-interfaces:interfaces";
+        final String uriPath = "ietf-interfaces:interfaces";
 
-        Optional<String> optionalResp = service.get(uriPath, LogicalDatastoreType.CONFIGURATION);
+        final Optional<String> optionalResp = this.service.get(uriPath, LogicalDatastoreType.CONFIGURATION);
 
         assertEquals("Response present", false, optionalResp.isPresent());
     }
 
     @Test(expected=OperationFailedException.class)
     public void testGetFailure() throws Exception {
-        String invalidUriPath = "/ietf-interfaces:interfaces/invalid";
+        final String invalidUriPath = "/ietf-interfaces:interfaces/invalid";
 
-        service.get(invalidUriPath, LogicalDatastoreType.CONFIGURATION);
+        this.service.get(invalidUriPath, LogicalDatastoreType.CONFIGURATION);
     }
 
     @SuppressWarnings("rawtypes")
     @Test
     public void testInvokeRpcWithInput() throws Exception {
-        SchemaPath path = SchemaPath.create(true, MAKE_TOAST_QNAME);
+        final SchemaPath path = SchemaPath.create(true, MAKE_TOAST_QNAME);
 
-        DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
+        final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
         doReturn(Futures.immediateCheckedFuture(expResult)).when(brokerFacade).invokeRpc(eq(path),
                 any(NormalizedNode.class));
 
-        String uriPath = "toaster:make-toast";
-        String input = loadData("/full-versions/make-toast-rpc-input.json");
+        final String uriPath = "toaster:make-toast";
+        final String input = loadData("/full-versions/make-toast-rpc-input.json");
 
-        Optional<String> output = service.invokeRpc(uriPath, Optional.of(input));
+        final Optional<String> output = this.service.invokeRpc(uriPath, Optional.of(input));
 
         assertEquals("Output present", false, output.isPresent());
 
-        ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
+        final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
         verify(brokerFacade).invokeRpc(eq(path), capturedNode.capture());
 
         assertTrue("Expected ContainerNode. Actual " + capturedNode.getValue().getClass(),
                 capturedNode.getValue() instanceof ContainerNode);
-        ContainerNode actualNode = (ContainerNode) capturedNode.getValue();
+        final ContainerNode actualNode = (ContainerNode) capturedNode.getValue();
         verifyLeafNode(actualNode, TOASTER_DONENESS_QNAME, Long.valueOf(10));
         verifyLeafNode(actualNode, TOASTER_TYPE_QNAME, WHEAT_BREAD_QNAME);
     }
 
     @Test
     public void testInvokeRpcWithNoInput() throws Exception {
-        SchemaPath path = SchemaPath.create(true, CANCEL_TOAST_QNAME);
+        final SchemaPath path = SchemaPath.create(true, CANCEL_TOAST_QNAME);
 
-        DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
+        final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
         doReturn(Futures.immediateCheckedFuture(expResult)).when(brokerFacade).invokeRpc(any(SchemaPath.class),
                 any(NormalizedNode.class));
 
-        String uriPath = "toaster:cancel-toast";
+        final String uriPath = "toaster:cancel-toast";
 
-        Optional<String> output = service.invokeRpc(uriPath, Optional.<String>absent());
+        final Optional<String> output = this.service.invokeRpc(uriPath, Optional.<String>absent());
 
         assertEquals("Output present", false, output.isPresent());
 
@@ -366,18 +367,18 @@ public class JSONRestconfServiceImplTest {
 
     @Test
     public void testInvokeRpcWithOutput() throws Exception {
-        SchemaPath path = SchemaPath.create(true, TEST_OUTPUT_QNAME);
+        final SchemaPath path = SchemaPath.create(true, TEST_OUTPUT_QNAME);
 
-        NormalizedNode<?, ?> outputNode = ImmutableContainerNodeBuilder.create()
+        final NormalizedNode<?, ?> outputNode = ImmutableContainerNodeBuilder.create()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(TEST_OUTPUT_QNAME))
                 .withChild(ImmutableNodes.leafNode(TEXT_OUT_QNAME, "foo")).build();
-        DOMRpcResult expResult = new DefaultDOMRpcResult(outputNode);
+        final DOMRpcResult expResult = new DefaultDOMRpcResult(outputNode);
         doReturn(Futures.immediateCheckedFuture(expResult)).when(brokerFacade).invokeRpc(any(SchemaPath.class),
                 any(NormalizedNode.class));
 
-        String uriPath = "toaster:testOutput";
+        final String uriPath = "toaster:testOutput";
 
-        Optional<String> output = service.invokeRpc(uriPath, Optional.<String>absent());
+        final Optional<String> output = this.service.invokeRpc(uriPath, Optional.<String>absent());
 
         assertEquals("Output present", true, output.isPresent());
         assertNotNull("Returned null response", output.get());
@@ -388,17 +389,17 @@ public class JSONRestconfServiceImplTest {
 
     @Test(expected=OperationFailedException.class)
     public void testInvokeRpcFailure() throws Exception {
-        DOMRpcException exception = new DOMRpcImplementationNotAvailableException("testExeption");
+        final DOMRpcException exception = new DOMRpcImplementationNotAvailableException("testExeption");
         doReturn(Futures.immediateFailedCheckedFuture(exception)).when(brokerFacade).invokeRpc(any(SchemaPath.class),
                 any(NormalizedNode.class));
 
-        String uriPath = "toaster:cancel-toast";
+        final String uriPath = "toaster:cancel-toast";
 
-        service.invokeRpc(uriPath, Optional.<String>absent());
+        this.service.invokeRpc(uriPath, Optional.<String>absent());
     }
 
     void testGet(final LogicalDatastoreType datastoreType) throws OperationFailedException {
-        MapEntryNode entryNode = ImmutableNodes.mapEntryBuilder(INTERFACE_QNAME, NAME_QNAME, "eth0")
+        final MapEntryNode entryNode = ImmutableNodes.mapEntryBuilder(INTERFACE_QNAME, NAME_QNAME, "eth0")
                 .withChild(ImmutableNodes.leafNode(NAME_QNAME, "eth0"))
                 .withChild(ImmutableNodes.leafNode(TYPE_QNAME, "ethernetCsmacd"))
                 .withChild(ImmutableNodes.leafNode(ENABLED_QNAME, Boolean.TRUE))
@@ -411,11 +412,11 @@ public class JSONRestconfServiceImplTest {
             doReturn(entryNode).when(brokerFacade).readOperationalData(notNull(YangInstanceIdentifier.class));
         }
 
-        String uriPath = "/ietf-interfaces:interfaces/interface/eth0";
+        final String uriPath = "/ietf-interfaces:interfaces/interface/eth0";
 
-        Optional<String> optionalResp = service.get(uriPath, datastoreType);
+        final Optional<String> optionalResp = this.service.get(uriPath, datastoreType);
         assertEquals("Response present", true, optionalResp.isPresent());
-        String jsonResp = optionalResp.get();
+        final String jsonResp = optionalResp.get();
 
         assertNotNull("Returned null response", jsonResp);
         assertThat("Missing \"name\"", jsonResp, containsString("\"name\":\"eth0\""));
@@ -423,7 +424,7 @@ public class JSONRestconfServiceImplTest {
         assertThat("Missing \"enabled\"", jsonResp, containsString("\"enabled\":true"));
         assertThat("Missing \"description\"", jsonResp, containsString("\"description\":\"eth interface\""));
 
-        ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
+        final ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         if (datastoreType == LogicalDatastoreType.CONFIGURATION) {
             verify(brokerFacade).readConfigurationData(capturedPath.capture());
         } else {
@@ -434,12 +435,12 @@ public class JSONRestconfServiceImplTest {
                 new Object[]{INTERFACE_QNAME, NAME_QNAME, "eth0"});
     }
 
-    DOMMountPoint setupTestMountPoint() throws FileNotFoundException {
-        SchemaContext schemaContextTestModule = TestUtils.loadSchemaContext("/full-versions/test-module");
-        DOMMountPoint mockMountPoint = mock(DOMMountPoint.class);
+    DOMMountPoint setupTestMountPoint() throws FileNotFoundException, ReactorException {
+        final SchemaContext schemaContextTestModule = TestUtils.loadSchemaContext("/full-versions/test-module");
+        final DOMMountPoint mockMountPoint = mock(DOMMountPoint.class);
         doReturn(schemaContextTestModule).when(mockMountPoint).getSchemaContext();
 
-        DOMMountPointService mockMountService = mock(DOMMountPointService.class);
+        final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
         doReturn(Optional.of(mockMountPoint)).when(mockMountService).getMountPoint(notNull(YangInstanceIdentifier.class));
 
         ControllerContext.getInstance().setMountService(mockMountService);
@@ -447,25 +448,25 @@ public class JSONRestconfServiceImplTest {
     }
 
     void verifyLeafNode(final DataContainerNode<?> parent, final QName leafType, final Object leafValue) {
-        Optional<DataContainerChild<?, ?>> leafChild = parent.getChild(new NodeIdentifier(leafType));
+        final Optional<DataContainerChild<?, ?>> leafChild = parent.getChild(new NodeIdentifier(leafType));
         assertEquals(leafType.toString() + " present", true, leafChild.isPresent());
         assertEquals(leafType.toString() + " value", leafValue, leafChild.get().getValue());
     }
 
     void verifyPath(final YangInstanceIdentifier path, final Object... expArgs) {
-        List<PathArgument> pathArgs = path.getPathArguments();
+        final List<PathArgument> pathArgs = path.getPathArguments();
         assertEquals("Arg count for actual path " + path, expArgs.length, pathArgs.size());
         int i = 0;
-        for(PathArgument actual: pathArgs) {
+        for(final PathArgument actual: pathArgs) {
             QName expNodeType;
             if(expArgs[i] instanceof Object[]) {
-                Object[] listEntry = (Object[]) expArgs[i];
+                final Object[] listEntry = (Object[]) expArgs[i];
                 expNodeType = (QName) listEntry[0];
 
                 assertTrue(actual instanceof NodeIdentifierWithPredicates);
-                Map<QName, Object> keyValues = ((NodeIdentifierWithPredicates)actual).getKeyValues();
+                final Map<QName, Object> keyValues = ((NodeIdentifierWithPredicates)actual).getKeyValues();
                 assertEquals(String.format("Path arg %d keyValues size", i + 1), 1, keyValues.size());
-                QName expKey = (QName) listEntry[1];
+                final QName expKey = (QName) listEntry[1];
                 assertEquals(String.format("Path arg %d keyValue for %s", i + 1, expKey), listEntry[2],
                         keyValues.get(expKey));
             } else {

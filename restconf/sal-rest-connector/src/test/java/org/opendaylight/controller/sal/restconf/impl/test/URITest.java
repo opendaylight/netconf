@@ -13,7 +13,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -35,6 +34,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class URITest {
 
@@ -44,10 +44,11 @@ public class URITest {
     public ExpectedException exception = ExpectedException.none();
 
     @BeforeClass
-    public static void init() throws FileNotFoundException {
-        final Set<Module> allModules = TestUtils.loadModulesFrom("/full-versions/yangs");
+    public static void init() throws FileNotFoundException, ReactorException {
+        final SchemaContext schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs");
+        final Set<Module> allModules = schemaContext.getModules();
         assertNotNull(allModules);
-        final SchemaContext schemaContext = TestUtils.loadSchemaContext(allModules);
+
         controllerContext.setSchemas(schemaContext);
     }
 
@@ -70,13 +71,13 @@ public class URITest {
 
     @Test
     public void testToInstanceIdentifierListWithNullKey() {
-        exception.expect(RestconfDocumentedException.class);
+        this.exception.expect(RestconfDocumentedException.class);
         controllerContext.toInstanceIdentifier("simple-nodes:user/null/boo");
     }
 
     @Test
     public void testToInstanceIdentifierListWithMissingKey() {
-        exception.expect(RestconfDocumentedException.class);
+        this.exception.expect(RestconfDocumentedException.class);
         controllerContext.toInstanceIdentifier("simple-nodes:user/foo");
     }
 
@@ -98,30 +99,30 @@ public class URITest {
 
     @Test
     public void testToInstanceIdentifierChoiceException() {
-        exception.expect(RestconfDocumentedException.class);
+        this.exception.expect(RestconfDocumentedException.class);
         controllerContext.toInstanceIdentifier("simple-nodes:food/snack");
     }
 
     @Test
     public void testToInstanceIdentifierCaseException() {
-        exception.expect(RestconfDocumentedException.class);
+        this.exception.expect(RestconfDocumentedException.class);
         controllerContext.toInstanceIdentifier("simple-nodes:food/sports-arena");
     }
 
     @Test
     public void testToInstanceIdentifierChoiceCaseException() {
-        exception.expect(RestconfDocumentedException.class);
+        this.exception.expect(RestconfDocumentedException.class);
         controllerContext.toInstanceIdentifier("simple-nodes:food/snack/sports-arena");
     }
 
     @Test
     public void testToInstanceIdentifierWithoutNode() {
-        exception.expect(RestconfDocumentedException.class);
+        this.exception.expect(RestconfDocumentedException.class);
         controllerContext.toInstanceIdentifier("simple-nodes");
     }
 
     @Test
-    public void testMountPointWithExternModul() throws FileNotFoundException {
+    public void testMountPointWithExternModul() throws FileNotFoundException, ReactorException {
         initMountService(true);
         final InstanceIdentifierContext<?> instanceIdentifier = controllerContext
                 .toInstanceIdentifier("simple-nodes:users/yang-ext:mount/test-interface2:class/student/name");
@@ -131,7 +132,7 @@ public class URITest {
     }
 
     @Test
-    public void testMountPointWithoutExternModul() throws FileNotFoundException {
+    public void testMountPointWithoutExternModul() throws FileNotFoundException, ReactorException {
         initMountService(true);
         final InstanceIdentifierContext<?> instanceIdentifier = controllerContext
                 .toInstanceIdentifier("simple-nodes:users/yang-ext:mount/");
@@ -140,30 +141,30 @@ public class URITest {
 
     @Test
     public void testMountPointWithoutMountService() throws FileNotFoundException {
-        exception.expect(RestconfDocumentedException.class);
+        this.exception.expect(RestconfDocumentedException.class);
 
         controllerContext.setMountService(null);
         controllerContext.toInstanceIdentifier("simple-nodes:users/yang-ext:mount/test-interface2:class/student/name");
     }
 
     @Test
-    public void testMountPointWithoutMountPointSchema() {
+    public void testMountPointWithoutMountPointSchema() throws FileNotFoundException, ReactorException {
         initMountService(false);
-        exception.expect(RestconfDocumentedException.class);
+        this.exception.expect(RestconfDocumentedException.class);
 
         controllerContext.toInstanceIdentifier("simple-nodes:users/yang-ext:mount/test-interface2:class");
     }
 
-    public void initMountService(final boolean withSchema) {
+    public void initMountService(final boolean withSchema) throws FileNotFoundException, ReactorException {
         final DOMMountPointService mountService = mock(DOMMountPointService.class);
         controllerContext.setMountService(mountService);
         final BrokerFacade brokerFacade = mock(BrokerFacade.class);
         final RestconfImpl restconfImpl = RestconfImpl.getInstance();
         restconfImpl.setBroker(brokerFacade);
         restconfImpl.setControllerContext(controllerContext);
+        final SchemaContext schemaContext2 = TestUtils.loadSchemaContext("/test-config-data/yang2");
+        final Set<Module> modules2 = schemaContext2.getModules();
 
-        final Set<Module> modules2 = TestUtils.loadModulesFrom("/test-config-data/yang2");
-        final SchemaContext schemaContext2 = TestUtils.loadSchemaContext(modules2);
         final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         if (withSchema) {
             when(mountInstance.getSchemaContext()).thenReturn(schemaContext2);
