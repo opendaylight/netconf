@@ -68,12 +68,12 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.parser.api.YangSyntaxErrorException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
-import org.opendaylight.yangtools.yang.parser.builder.impl.BuilderUtils;
-import org.opendaylight.yangtools.yang.parser.impl.YangParserImpl;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
+import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
+import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -189,7 +189,7 @@ public class RuntimeRpcTest {
             }
         }).when(sourceProvider).getSource(any(SourceIdentifier.class));
 
-        this.schemaContext = parseSchemas(getYangSchemas());
+        this.schemaContext = parseYangStreams(getYangSchemas());
         this.currentSchemaContext = new CurrentSchemaContext(schemaService, sourceProvider);
     }
 
@@ -295,7 +295,7 @@ public class RuntimeRpcTest {
 
     }
 
-    private Collection<InputStream> getYangSchemas() {
+    private List<InputStream> getYangSchemas() {
         final List<String> schemaPaths = Arrays.asList("/yang/mdsal-netconf-rpc-test.yang");
         final List<InputStream> schemas = new ArrayList<>();
 
@@ -307,9 +307,15 @@ public class RuntimeRpcTest {
         return schemas;
     }
 
-    private SchemaContext parseSchemas(Collection<InputStream> schemas) throws IOException, YangSyntaxErrorException {
-        final YangParserImpl parser = new YangParserImpl();
-        Collection<ByteSource> sources = BuilderUtils.streamsToByteSources(schemas);
-        return parser.parseSources(sources);
+    private static SchemaContext parseYangStreams(final List<InputStream> streams) {
+        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
+                .newBuild();
+        final SchemaContext schemaContext;
+        try {
+            schemaContext = reactor.buildEffective(streams);
+        } catch (ReactorException e) {
+            throw new RuntimeException("Unable to build schema context from " + streams, e);
+        }
+        return schemaContext;
     }
 }

@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.junit.Test;
@@ -65,7 +64,9 @@ import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
-import org.opendaylight.yangtools.yang.parser.impl.YangParserImpl;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
+import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
+import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
 
 public class NetconfDeviceTest {
 
@@ -154,7 +155,7 @@ public class NetconfDeviceTest {
         doAnswer(new Answer<Object>() {
             @Override
             public Object answer(final InvocationOnMock invocation) throws Throwable {
-                if(((Collection<?>) invocation.getArguments()[0]).size() == 2) {
+                if (((Collection<?>) invocation.getArguments()[0]).size() == 2) {
                     return Futures.immediateFailedCheckedFuture(schemaResolutionException);
                 } else {
                     return Futures.immediateCheckedFuture(schema);
@@ -270,13 +271,23 @@ public class NetconfDeviceTest {
         return schemaFactory;
     }
 
+    private static SchemaContext parseYangStreams(final List<InputStream> streams) {
+        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
+                .newBuild();
+        final SchemaContext schemaContext;
+        try {
+            schemaContext = reactor.buildEffective(streams);
+        } catch (ReactorException e) {
+            throw new RuntimeException("Unable to build schema context from " + streams, e);
+        }
+        return schemaContext;
+    }
+
     public static SchemaContext getSchema() {
-        final YangParserImpl parser = new YangParserImpl();
         final List<InputStream> modelsToParse = Lists.newArrayList(
                 NetconfDeviceTest.class.getResourceAsStream("/schemas/test-module.yang")
         );
-        final Set<Module> models = parser.parseYangModelsFromStreams(modelsToParse);
-        return parser.resolveSchemaContext(models);
+        return parseYangStreams(modelsToParse);
     }
 
     private RemoteDeviceHandler<NetconfSessionPreferences> getFacade() throws Exception {

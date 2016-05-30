@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.opendaylight.controller.config.util.xml.XmlUtil.readXmlToElement;
 import static org.opendaylight.netconf.util.test.XmlUnitUtil.assertContainsElement;
 import static org.opendaylight.netconf.util.test.XmlUnitUtil.assertContainsElementWithText;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
@@ -93,6 +94,7 @@ import org.opendaylight.controller.config.yang.test.impl.NetconfTestImplModuleMX
 import org.opendaylight.controller.config.yang.test.impl.Peers;
 import org.opendaylight.controller.config.yang.test.impl.TestImplModuleFactory;
 import org.opendaylight.controller.config.yangjmxgenerator.ModuleMXBeanEntry;
+import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.confignetconfconnector.operations.Commit;
 import org.opendaylight.netconf.confignetconfconnector.operations.DiscardChanges;
 import org.opendaylight.netconf.confignetconfconnector.operations.Lock;
@@ -109,17 +111,17 @@ import org.opendaylight.netconf.impl.osgi.NetconfOperationRouter;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.config.test.types.rev131127.TestIdentity1;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.config.test.types.rev131127.TestIdentity2;
 import org.opendaylight.yangtools.sal.binding.generator.util.BindingRuntimeContext;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextProvider;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
-import org.opendaylight.yangtools.yang.parser.impl.YangParserImpl;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
+import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
+import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
@@ -253,7 +255,7 @@ public class NetconfMappingTest extends AbstractConfigTest {
         final BindingRuntimeContext ret = super.getBindingRuntimeContext();
         doReturn(TestIdentity1.class).when(ret).getIdentityClass(TestIdentity1.QNAME);
         doReturn(TestIdentity2.class).when(ret).getIdentityClass(TestIdentity2.QNAME);
-        doReturn(getSchemaContext()).when(ret).getSchemaContext();
+        doReturn(parseYangStreams(getYangs())).when(ret).getSchemaContext();
         return ret;
     }
 
@@ -689,7 +691,7 @@ public class NetconfMappingTest extends AbstractConfigTest {
         String expectedEnumContent = "two";
 
         XMLAssert.assertXpathEvaluatesTo(expectedEnumContent,
-                getXpathForNetconfImplSubnode(INSTANCE_NAME,"extended-enum"),
+                getXpathForNetconfImplSubnode(INSTANCE_NAME, "extended-enum"),
                 response);
     }
 
@@ -723,8 +725,7 @@ public class NetconfMappingTest extends AbstractConfigTest {
 
         final Map<String, Map<String, ModuleMXBeanEntry>> mBeanEntries = Maps.newHashMap();
 
-        YangParserImpl yangParser = new YangParserImpl();
-        final SchemaContext schemaContext = yangParser.resolveSchemaContext(new HashSet<>(yangParser.parseYangModelsFromStreamsMapped(yangDependencies).values()));
+        final SchemaContext schemaContext = parseYangStreams(yangDependencies);
         YangStoreService yangStoreService = new YangStoreService(new SchemaContextProvider() {
             @Override public SchemaContext getSchemaContext() {
                 return schemaContext;
@@ -750,18 +751,21 @@ public class NetconfMappingTest extends AbstractConfigTest {
     }
 
     private Set<org.opendaylight.yangtools.yang.model.api.Module> getModules() throws Exception {
-        SchemaContext resolveSchemaContext = getSchemaContext();
+        SchemaContext resolveSchemaContext = parseYangStreams(getYangs());
         return resolveSchemaContext.getModules();
     }
 
-    private SchemaContext getSchemaContext() {
-        final List<InputStream> yangDependencies = getYangs();
-        YangParserImpl parser = new YangParserImpl();
+    private static SchemaContext parseYangStreams(final List<InputStream> streams) {
 
-        Set<Module> allYangModules = parser.parseYangModelsFromStreams(yangDependencies);
-
-        return parser.resolveSchemaContext(Sets
-                .newHashSet(allYangModules));
+        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
+                .newBuild();
+        final SchemaContext schemaContext;
+        try {
+            schemaContext = reactor.buildEffective(streams);
+        } catch (ReactorException e) {
+            throw new RuntimeException("Unable to build schema context from " + streams, e);
+        }
+        return schemaContext;
     }
 
     @Test

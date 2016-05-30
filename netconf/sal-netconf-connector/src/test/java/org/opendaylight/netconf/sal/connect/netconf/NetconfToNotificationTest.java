@@ -30,8 +30,9 @@ import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessag
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.parser.api.YangContextParser;
-import org.opendaylight.yangtools.yang.parser.impl.YangParserImpl;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
+import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
+import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
 import org.w3c.dom.Document;
 
 public class NetconfToNotificationTest {
@@ -64,11 +65,22 @@ public class NetconfToNotificationTest {
             modelsToParse.add(loadClass.getResourceAsStream("/schemas/user-notification2.yang"));
         }
 
-        final YangContextParser parser = new YangParserImpl();
-        final Set<Module> modules = parser.parseYangModelsFromStreams(modelsToParse);
+        final SchemaContext context = parseYangStreams(modelsToParse);
+        final Set<Module> modules = context.getModules();
         assertTrue(!modules.isEmpty());
-        final SchemaContext schemaContext = parser.resolveSchemaContext(modules);
-        assertNotNull(schemaContext);
+        assertNotNull(context);
+        return context;
+    }
+
+    private static SchemaContext parseYangStreams(final List<InputStream> streams) {
+        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
+                .newBuild();
+        final SchemaContext schemaContext;
+        try {
+            schemaContext = reactor.buildEffective(streams);
+        } catch (ReactorException e) {
+            throw new RuntimeException("Unable to build schema context from " + streams, e);
+        }
         return schemaContext;
     }
 

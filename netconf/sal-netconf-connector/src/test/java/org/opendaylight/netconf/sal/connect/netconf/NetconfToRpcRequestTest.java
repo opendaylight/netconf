@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
-import com.google.common.collect.Sets;
+
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
@@ -31,8 +31,9 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.parser.api.YangContextParser;
-import org.opendaylight.yangtools.yang.parser.impl.YangParserImpl;
+import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
+import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
+import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
 import org.w3c.dom.Document;
 
 public class NetconfToRpcRequestTest {
@@ -52,23 +53,29 @@ public class NetconfToRpcRequestTest {
     static SchemaContext cfgCtx;
     static NetconfMessageTransformer messageTransformer;
 
-    @SuppressWarnings("deprecation")
     @BeforeClass
     public static void setup() throws Exception {
         List<InputStream> modelsToParse = Collections
             .singletonList(NetconfToRpcRequestTest.class.getResourceAsStream("/schemas/rpc-notification-subscription.yang"));
-        YangContextParser parser = new YangParserImpl();
-        final Set<Module> notifModules = parser.parseYangModelsFromStreams(modelsToParse);
+        final Set<Module> notifModules = parseYangStreams(modelsToParse).getModules();
         assertTrue(!notifModules.isEmpty());
 
         modelsToParse = Collections
             .singletonList(NetconfToRpcRequestTest.class.getResourceAsStream("/schemas/config-test-rpc.yang"));
-        parser = new YangParserImpl();
-        final Set<Module> configModules = parser.parseYangModelsFromStreams(modelsToParse);
-        cfgCtx = parser.resolveSchemaContext(Sets.union(configModules, notifModules));
-        assertNotNull(cfgCtx);
-
+        cfgCtx = parseYangStreams(modelsToParse);
         messageTransformer = new NetconfMessageTransformer(cfgCtx, true);
+    }
+
+    private static SchemaContext parseYangStreams(final List<InputStream> streams) {
+        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
+                .newBuild();
+        final SchemaContext schemaContext;
+        try {
+            schemaContext = reactor.buildEffective(streams);
+        } catch (ReactorException e) {
+            throw new RuntimeException("Unable to build schema context from " + streams, e);
+        }
+        return schemaContext;
     }
 
     private static LeafNode<Object> buildLeaf(final QName running, final Object value) {
