@@ -7,12 +7,14 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
-import com.google.common.base.Preconditions;
 import javax.ws.rs.core.UriInfo;
+
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+
+import com.google.common.base.Preconditions;
 
 /**
  * This class gathers all YANG-defined {@link org.opendaylight.yangtools.yang.model.api.Module}s and generates Swagger compliant documentation.

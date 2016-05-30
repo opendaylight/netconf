@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.rest.doc.model.builder;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.opendaylight.netconf.sal.rest.doc.swagger.Operation;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Parameter;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
