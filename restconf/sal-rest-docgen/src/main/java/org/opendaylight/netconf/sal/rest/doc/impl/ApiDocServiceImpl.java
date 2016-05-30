@@ -10,10 +10,8 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Map.Entry;
-
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-
 import org.json.JSONWriter;
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;

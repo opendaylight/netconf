@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import com.google.common.base.Optional;
 import java.net.URISyntaxException;
 import java.util.Arrays;
