@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolvePathArgumentsName;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsonorg.JsonOrgModule;
@@ -32,16 +33,16 @@ import javax.ws.rs.core.UriInfo;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder;
+import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Delete;
+import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Get;
+import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Post;
+import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Put;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Api;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Operation;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Parameter;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Resource;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
-import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Delete;
-import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Get;
-import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Post;
-import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Put;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;

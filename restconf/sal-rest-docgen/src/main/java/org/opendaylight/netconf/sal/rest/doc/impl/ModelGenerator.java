@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolveNodesName;
+
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.util.ArrayList;

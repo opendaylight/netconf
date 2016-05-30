@@ -9,6 +9,7 @@ package org.opendaylight.controller.sal.rest.doc.impl;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsonorg.JsonOrgModule;
