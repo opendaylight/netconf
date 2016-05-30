@@ -15,7 +15,8 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
- * This class gathers all YANG-defined {@link org.opendaylight.yangtools.yang.model.api.Module}s and generates Swagger compliant documentation.
+ * This class gathers all YANG-defined {@link org.opendaylight.yangtools.yang.model.api.Module}s and
+ * generates Swagger compliant documentation.
  */
 public class ApiDocGenerator extends BaseYangSwaggerGenerator {
 
@@ -36,18 +37,12 @@ public class ApiDocGenerator extends BaseYangSwaggerGenerator {
     }
 
     /**
-     * Returns singleton instance
-     *
-     * @return
+     * Returns singleton instance.
      */
     public static ApiDocGenerator getInstance() {
         return INSTANCE;
     }
 
-    /**
-     *
-     * @param schemaService
-     */
     public void setSchemaService(SchemaService schemaService) {
         this.schemaService = schemaService;
     }

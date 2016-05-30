@@ -22,13 +22,14 @@ public class RestDocgenUtil {
     private RestDocgenUtil() {
     }
 
-    private static Map<URI, Map<Date, Module>> namespaceAndRevisionToModule = new HashMap<URI, Map<Date, Module>>();
+    private static Map<URI, Map<Date, Module>> namespaceAndRevisionToModule = new HashMap<>();
 
     /**
      * Resolve path argument name for {@code node}.
      *
-     * The name can contain also prefix which consists of module name followed by colon. The module prefix is presented
-     * if namespace of {@code node} and its parent is different. In other cases only name of {@code node} is returned.
+     * <p>The name can contain also prefix which consists of module name followed by colon. The module
+     * prefix is presented if namespace of {@code node} and its parent is different. In other cases
+     * only name of {@code node} is returned.
      *
      * @return name of {@code node}
      */
@@ -48,7 +49,8 @@ public class RestDocgenUtil {
         }
     }
 
-    private synchronized static String resolveFullNameFromNode(final SchemaNode node, final SchemaContext schemaContext) {
+    private static synchronized String resolveFullNameFromNode(final SchemaNode node,
+            final SchemaContext schemaContext) {
         final URI namespace = node.getQName().getNamespace();
         final Date revision = node.getQName().getRevision();
 
@@ -68,7 +70,8 @@ public class RestDocgenUtil {
         return node.getQName().getLocalName();
     }
 
-    public static String resolveNodesName(final SchemaNode node, final Module module, final SchemaContext schemaContext) {
+    public static String resolveNodesName(final SchemaNode node, final Module module,
+            final SchemaContext schemaContext) {
         if (node.getQName().getNamespace().equals(module.getQNameModule().getNamespace())
                 && node.getQName().getRevision().equals(module.getQNameModule().getRevision())) {
             return node.getQName().getLocalName();

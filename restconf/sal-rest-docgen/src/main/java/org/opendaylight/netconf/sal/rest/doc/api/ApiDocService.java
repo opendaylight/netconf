@@ -28,9 +28,6 @@ public interface ApiDocService {
      * Generates index document for Swagger UI. This document lists out all
      * modules with link to get APIs for each module. The API for each module is
      * served by <code> getDocByModule()</code> method.
-     *
-     * @param uriInfo
-     * @return
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -38,11 +35,6 @@ public interface ApiDocService {
 
     /**
      * Generates Swagger compliant document listing APIs for module.
-     *
-     * @param module
-     * @param revision
-     * @param uriInfo
-     * @return
      */
     @GET
     @Path("/{module}({revision})")
@@ -52,9 +44,6 @@ public interface ApiDocService {
 
     /**
      * Redirects to embedded swagger ui.
-     *
-     * @param uriInfo
-     * @return
      */
     @GET
     @Path("/ui")
@@ -65,9 +54,6 @@ public interface ApiDocService {
      * Generates index document for Swagger UI. This document lists out all
      * modules with link to get APIs for each module. The API for each module is
      * served by <code> getDocByModule()</code> method.
-     *
-     * @param uriInfo
-     * @return
      */
     @GET
     @Path("/mounts")
@@ -82,11 +68,6 @@ public interface ApiDocService {
 
     /**
      * Generates Swagger compliant document listing APIs for module.
-     *
-     * @param module
-     * @param revision
-     * @param uriInfo
-     * @return
      */
     @GET
     @Path("/mounts/{instance}/{module}({revision})")

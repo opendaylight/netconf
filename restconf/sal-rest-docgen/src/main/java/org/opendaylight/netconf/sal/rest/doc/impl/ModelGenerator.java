@@ -54,7 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Generates JSON Schema for data defined in Yang
+ * Generates JSON Schema for data defined in YANG.
  */
 @NotThreadSafe
 public class ModelGenerator {
@@ -123,7 +123,7 @@ public class ModelGenerator {
     }
 
     private void processModules(final Module module, final JSONObject models) throws JSONException {
-        createConcreteModelForPost(models, module.getName()+ BaseYangSwaggerGenerator.MODULE_NAME_SUFFIX, createPropertiesForPost(module));
+        createConcreteModelForPost(models, module.getName() + BaseYangSwaggerGenerator.MODULE_NAME_SUFFIX, createPropertiesForPost(module));
     }
 
     private void processContainersAndLists(final Module module, final JSONObject models, final SchemaContext schemaContext)
@@ -182,7 +182,6 @@ public class ModelGenerator {
      *            The module from which the identity stmt will be processed
      * @param models
      *            The JSONObject in which the parsed identity will be put as a 'model' obj
-     * @throws JSONException
      */
     private static void processIdentities(final Module module, final JSONObject models) throws JSONException {
 
@@ -229,13 +228,7 @@ public class ModelGenerator {
     }
 
     /**
-     * Processes the container and list nodes and populates the moduleJSON
-     *
-     * @param container
-     * @param moduleName
-     * @param isConfig
-     * @throws JSONException
-     * @throws IOException
+     * Processes the container and list nodes and populates the moduleJSON.
      */
     private JSONObject processDataNodeContainer(final DataNodeContainer dataNode, final String moduleName, final JSONObject models,
             final SchemaContext schemaContext) throws JSONException, IOException {
@@ -295,7 +288,7 @@ public class ModelGenerator {
                 property.put(TYPE_KEY, childNode instanceof ListSchemaNode ? ARRAY_TYPE : OBJECT_TYPE);
                 property.put(ITEMS_KEY, items);
                 properties.put(childNode.getQName().getLocalName(), property);
-            } else if (childNode instanceof LeafSchemaNode){
+            } else if (childNode instanceof LeafSchemaNode) {
                 JSONObject property = processLeafNode((LeafSchemaNode)childNode);
                 properties.put(childNode.getQName().getLocalName(), property);
             }
@@ -309,18 +302,11 @@ public class ModelGenerator {
     }
 
     /**
-     * Processes the nodes
-     *
-     * @param nodes
-     * @param parentQName
-     * @param moduleName
-     * @param isConfig
-     * @return
-     * @throws JSONException
-     * @throws IOException
+     * Processes the nodes.
      */
-    private JSONObject processChildren(final Iterable<DataSchemaNode> nodes, final QName parentQName, final String moduleName,
-            final JSONObject models, final boolean isConfig, final SchemaContext schemaContext) throws JSONException, IOException {
+    private JSONObject processChildren(final Iterable<DataSchemaNode> nodes, final QName parentQName,
+            final String moduleName, final JSONObject models, final boolean isConfig, final SchemaContext schemaContext)
+            throws JSONException, IOException {
 
         JSONObject properties = new JSONObject();
 
@@ -359,11 +345,6 @@ public class ModelGenerator {
         return properties;
     }
 
-    /**
-     *
-     * @param listNode
-     * @throws JSONException
-     */
     private JSONObject processLeafListNode(final LeafListSchemaNode listNode) throws JSONException {
         JSONObject props = new JSONObject();
         props.put(TYPE_KEY, ARRAY_TYPE);
@@ -378,13 +359,6 @@ public class ModelGenerator {
         return props;
     }
 
-    /**
-     *
-     * @param choiceNode
-     * @param moduleName
-     * @throws JSONException
-     * @throws IOException
-     */
     private JSONObject processChoiceNode(final ChoiceSchemaNode choiceNode, final String moduleName, final JSONObject models,
             final SchemaContext schemaContext) throws JSONException, IOException {
 
@@ -408,12 +382,6 @@ public class ModelGenerator {
         return oneOfProps;
     }
 
-    /**
-     *
-     * @param constraints
-     * @param props
-     * @throws JSONException
-     */
     private static void processConstraints(final ConstraintDefinition constraints, final JSONObject props) throws JSONException {
         boolean isMandatory = constraints.isMandatory();
         props.put(REQUIRED_KEY, isMandatory);
@@ -428,12 +396,6 @@ public class ModelGenerator {
         }
     }
 
-    /**
-     *
-     * @param leafNode
-     * @return
-     * @throws JSONException
-     */
     private JSONObject processLeafNode(final LeafSchemaNode leafNode) throws JSONException {
         JSONObject property = new JSONObject();
 
@@ -446,12 +408,6 @@ public class ModelGenerator {
         return property;
     }
 
-    /**
-     *
-     * @param leafNode
-     * @return
-     * @throws JSONException
-     */
     private static JSONObject processAnyXMLNode(final AnyXmlSchemaNode leafNode) throws JSONException {
         JSONObject property = new JSONObject();
 
@@ -463,12 +419,7 @@ public class ModelGenerator {
         return property;
     }
 
-    /**
-     * @param property
-     * @throws JSONException
-     */
     private void processTypeDef(final TypeDefinition<?> leafTypeDef, final JSONObject property) throws JSONException {
-
         if (leafTypeDef instanceof ExtendedType) {
             processExtendedType(leafTypeDef, property);
         } else if (leafTypeDef instanceof BinaryTypeDefinition) {
@@ -478,7 +429,8 @@ public class ModelGenerator {
         } else if (leafTypeDef instanceof EnumTypeDefinition) {
             processEnumType((EnumTypeDefinition) leafTypeDef, property);
         } else if (leafTypeDef instanceof IdentityrefTypeDefinition) {
-            property.putOpt(TYPE_KEY, ((IdentityrefTypeDefinition) leafTypeDef).getIdentity().getQName().getLocalName());
+            property.putOpt(TYPE_KEY,
+                    ((IdentityrefTypeDefinition) leafTypeDef).getIdentity().getQName().getLocalName());
         } else if (leafTypeDef instanceof StringTypeDefinition) {
             processStringType((StringTypeDefinition) leafTypeDef, property);
         } else if (leafTypeDef instanceof UnionTypeDefinition) {
@@ -492,12 +444,6 @@ public class ModelGenerator {
         }
     }
 
-    /**
-     *
-     * @param leafTypeDef
-     * @param property
-     * @throws JSONException
-     */
     private void processExtendedType(final TypeDefinition<?> leafTypeDef, final JSONObject property) throws JSONException {
         TypeDefinition<?> leafBaseType = leafTypeDef.getBaseType();
         if (leafBaseType instanceof ExtendedType) {
@@ -524,27 +470,15 @@ public class ModelGenerator {
         property.put(MEDIA_KEY, media);
     }
 
-    /**
-     *
-     * @param enumLeafType
-     * @param property
-     * @throws JSONException
-     */
     private static void processEnumType(final EnumTypeDefinition enumLeafType, final JSONObject property) throws JSONException {
         List<EnumPair> enumPairs = enumLeafType.getValues();
-        List<String> enumNames = new ArrayList<String>();
+        List<String> enumNames = new ArrayList<>();
         for (EnumPair enumPair : enumPairs) {
             enumNames.add(enumPair.getName());
         }
         property.putOpt(ENUM, new JSONArray(enumNames));
     }
 
-    /**
-     *
-     * @param bitsType
-     * @param property
-     * @throws JSONException
-     */
     private static void processBitsType(final BitsTypeDefinition bitsType, final JSONObject property) throws JSONException {
         property.put(TYPE_KEY, ARRAY_TYPE);
         property.put(MIN_ITEMS, 0);
@@ -564,8 +498,8 @@ public class ModelGenerator {
         StringTypeDefinition type = stringType;
         List<LengthConstraint> lengthConstraints = stringType.getLengthConstraints();
         while (lengthConstraints.isEmpty() && type.getBaseType() != null) {
-           type = type.getBaseType();
-           lengthConstraints = type.getLengthConstraints();
+            type = type.getBaseType();
+            lengthConstraints = type.getLengthConstraints();
         }
 
         // FIXME: json-schema is not expressive enough to capture min/max laternatives. We should find the true minimum
@@ -580,14 +514,7 @@ public class ModelGenerator {
         property.put(TYPE_KEY, STRING);
     }
 
-    /**
-     *
-     * @param unionType
-     * @param property
-     * @throws JSONException
-     */
     private static void processUnionType(final UnionTypeDefinition unionType, final JSONObject property) throws JSONException {
-
         StringBuilder type = new StringBuilder();
         for (TypeDefinition<?> typeDef : unionType.getTypes()) {
             if (type.length() > 0) {
@@ -601,9 +528,6 @@ public class ModelGenerator {
 
     /**
      * Helper method to generate a pre-filled JSON schema object.
-     *
-     * @return
-     * @throws JSONException
      */
     private static JSONObject getSchemaTemplate() throws JSONException {
         JSONObject schemaJSON = new JSONObject();

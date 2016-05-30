@@ -26,12 +26,11 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
  * >https://helloreverb.com/developers/swagger</a>) compliant documentation for
  * RESTCONF APIs. The output of this is used by embedded Swagger UI.
  *
- * NOTE: These API's need to be synchronized due to bug 1198. Thread access to
+ * <p>NOTE: These API's need to be synchronized due to bug 1198. Thread access to
  * the SchemaContext is not synchronized properly and thus you can end up with
  * missing definitions without this synchronization. There are likely otherways
  * to work around this limitation, but given that this API is a dev only tool
  * and not dependent UI, this was the fastest work around.
- *
  */
 public class ApiDocServiceImpl implements ApiDocService {
 
@@ -45,9 +44,6 @@ public class ApiDocServiceImpl implements ApiDocService {
      * Generates index document for Swagger UI. This document lists out all
      * modules with link to get APIs for each module. The API for each module is
      * served by <code> getDocByModule()</code> method.
-     *
-     * @param uriInfo
-     * @return
      */
     @Override
     public synchronized Response getRootDoc(UriInfo uriInfo) {
@@ -59,11 +55,6 @@ public class ApiDocServiceImpl implements ApiDocService {
 
     /**
      * Generates Swagger compliant document listing APIs for module.
-     *
-     * @param module
-     * @param revision
-     * @param uriInfo
-     * @return
      */
     @Override
     public synchronized Response getDocByModule(String module, String revision, UriInfo uriInfo) {
@@ -75,9 +66,6 @@ public class ApiDocServiceImpl implements ApiDocService {
 
     /**
      * Redirects to embedded swagger ui.
-     *
-     * @param uriInfo
-     * @return
      */
     @Override
     public synchronized Response getApiExplorer(UriInfo uriInfo) {
