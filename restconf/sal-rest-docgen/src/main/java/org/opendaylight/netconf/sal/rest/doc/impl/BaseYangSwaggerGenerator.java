@@ -63,7 +63,7 @@ public class BaseYangSwaggerGenerator {
     protected static final String RESTCONF_CONTEXT_ROOT = "restconf";
 
     static final String MODULE_NAME_SUFFIX = "_module";
-    protected final DateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    protected static final DateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private final ModelGenerator jsonConverter = new ModelGenerator();
 
     // private Map<String, ApiDeclaration> MODULE_DOC_CACHE = new HashMap<>()
@@ -75,11 +75,7 @@ public class BaseYangSwaggerGenerator {
     }
 
     /**
-     *
-     * @param uriInfo
-     * @param schemaContext
-     * @param context
-     * @return list of modules converted to swagger compliant resource list.
+     * Return list of modules converted to swagger compliant resource list.
      */
     public ResourceList getResourceListing(UriInfo uriInfo, SchemaContext schemaContext, String context) {
 
@@ -122,31 +118,32 @@ public class BaseYangSwaggerGenerator {
         return uri.toASCIIString();
     }
 
-    public ApiDeclaration getApiDeclaration(String module, String revision, UriInfo uriInfo, SchemaContext schemaContext, String context) {
+    public ApiDeclaration getApiDeclaration(String moduleName, String revision, UriInfo uriInfo, SchemaContext schemaContext, String context) {
         Date rev = null;
 
         try {
-            if(revision != null && !revision.equals("0000-00-00")) {
+            if (revision != null && !revision.equals("0000-00-00")) {
                 rev = SIMPLE_DATE_FORMAT.parse(revision);
             }
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }
 
-        if(rev != null) {
+        if (rev != null) {
             Calendar cal = new GregorianCalendar();
 
             cal.setTime(rev);
 
-            if(cal.get(Calendar.YEAR) < 1970) {
+            if (cal.get(Calendar.YEAR) < 1970) {
                 rev = null;
             }
         }
 
-        Module m = schemaContext.findModuleByName(module, rev);
-        Preconditions.checkArgument(m != null, "Could not find module by name,revision: " + module + "," + revision);
+        Module module = schemaContext.findModuleByName(moduleName, rev);
+        Preconditions.checkArgument(module != null,
+                "Could not find module by name,revision: " + moduleName + "," + revision);
 
-        return getApiDeclaration(m, rev, uriInfo, context, schemaContext);
+        return getApiDeclaration(module, rev, uriInfo, context, schemaContext);
     }
 
     public ApiDeclaration getApiDeclaration(Module module, Date revision, UriInfo uriInfo, String context, SchemaContext schemaContext) {
@@ -221,12 +218,13 @@ public class BaseYangSwaggerGenerator {
         return null;
     }
 
-    private void addRootPostLink(final Module m, final DataNodeContainer node, final List<Parameter> pathParams,
+    private void addRootPostLink(final Module module, final DataNodeContainer node, final List<Parameter> pathParams,
             final String resourcePath, final List<Api> apis) {
-        if (containsListOrContainer(m.getChildNodes())) {
+        if (containsListOrContainer(module.getChildNodes())) {
             final Api apiForRootPostUri = new Api();
             apiForRootPostUri.setPath(resourcePath);
-            apiForRootPostUri.setOperations(operationPost(m.getName()+MODULE_NAME_SUFFIX, m.getDescription(), m, pathParams, true));
+            apiForRootPostUri.setOperations(operationPost(module.getName() + MODULE_NAME_SUFFIX,
+                    module.getDescription(), module, pathParams, true));
             apis.add(apiForRootPostUri);
         }
     }
@@ -258,7 +256,7 @@ public class BaseYangSwaggerGenerator {
         LOG.debug("Adding path: [{}]", resourcePath);
         api.setPath(resourcePath);
 
-        Iterable<DataSchemaNode> childSchemaNodes = Collections.<DataSchemaNode> emptySet();
+        Iterable<DataSchemaNode> childSchemaNodes = Collections.<DataSchemaNode>emptySet();
         if ((node instanceof ListSchemaNode) || (node instanceof ContainerSchemaNode)) {
             DataNodeContainer dataNodeContainer = (DataNodeContainer) node;
             childSchemaNodes = dataNodeContainer.getChildNodes();
@@ -286,11 +284,6 @@ public class BaseYangSwaggerGenerator {
         return false;
     }
 
-    /**
-     * @param node
-     * @param pathParams
-     * @return
-     */
     private List<Operation> operation(DataSchemaNode node, List<Parameter> pathParams, boolean isConfig, Iterable<DataSchemaNode> childSchemaNodes) {
         List<Operation> operations = new ArrayList<>();
 
@@ -306,18 +299,13 @@ public class BaseYangSwaggerGenerator {
             operations.add(deleteBuilder.pathParams(pathParams).build());
 
             if (containsListOrContainer(childSchemaNodes)) {
-                operations.addAll(operationPost(node.getQName().getLocalName(), node.getDescription(), (DataNodeContainer) node,
-                        pathParams, isConfig));
+                operations.addAll(operationPost(node.getQName().getLocalName(), node.getDescription(),
+                        (DataNodeContainer) node, pathParams, isConfig));
             }
         }
         return operations;
     }
 
-    /**
-     * @param node
-     * @param pathParams
-     * @return
-     */
     private List<Operation> operationPost(final String name, final String description, final DataNodeContainer dataNodeContainer, List<Parameter> pathParams, boolean isConfig) {
         List<Operation> operations = new ArrayList<>();
         if (isConfig) {
@@ -336,8 +324,8 @@ public class BaseYangSwaggerGenerator {
         if ((schemaNode instanceof ListSchemaNode)) {
             final List<QName> listKeys = ((ListSchemaNode) schemaNode).getKeyDefinition();
             for (final QName listKey : listKeys) {
-                DataSchemaNode _dataChildByName = ((DataNodeContainer) schemaNode).getDataChildByName(listKey);
-                pathListParams.add(((LeafSchemaNode) _dataChildByName));
+                DataSchemaNode dataChildByName = ((DataNodeContainer) schemaNode).getDataChildByName(listKey);
+                pathListParams.add(((LeafSchemaNode) dataChildByName));
 
                 String pathParamIdentifier = new StringBuilder("/{").append(listKey.getLocalName()).append("}")
                         .toString();
@@ -345,7 +333,7 @@ public class BaseYangSwaggerGenerator {
 
                 Parameter pathParam = new Parameter();
                 pathParam.setName(listKey.getLocalName());
-                pathParam.setDescription(_dataChildByName.getDescription());
+                pathParam.setDescription(dataChildByName.getDescription());
                 pathParam.setType("string");
                 pathParam.setParamType("path");
 

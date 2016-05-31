@@ -22,6 +22,7 @@ public final class OperationBuilder {
     public static final String CONFIG = "(config)";
 
     public static final List<String> CONSUMES_PUT_POST = new ArrayList<>();
+
     static {
         CONSUMES_PUT_POST.add("application/json");
         CONSUMES_PUT_POST.add("application/xml");
@@ -110,7 +111,7 @@ public final class OperationBuilder {
                     Parameter payload = new Parameter();
                     payload.setParamType("body");
                     payload.setType(CONFIG + node.getQName().getLocalName());
-                    payload.setName("**"+CONFIG + node.getQName().getLocalName());
+                    payload.setName("**" + CONFIG + node.getQName().getLocalName());
                     parameters.add(payload);
                 }
             }

@@ -9,7 +9,6 @@ package org.opendaylight.netconf.sal.rest.doc.mountpoints;
 
 import com.google.common.base.Optional;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,12 +42,7 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
 
     private DOMMountPointService mountService;
     private final Map<YangInstanceIdentifier, Long> instanceIdToLongId = new TreeMap<>(
-            new Comparator<YangInstanceIdentifier>() {
-                @Override
-                public int compare(final YangInstanceIdentifier o1, final YangInstanceIdentifier o2) {
-                    return o1.toString().compareToIgnoreCase(o2.toString());
-                }
-            });
+            (o1, o2) -> o1.toString().compareToIgnoreCase(o2.toString()));
     private final Map<Long, YangInstanceIdentifier> longIdToInstanceId = new HashMap<>();
     private final Object lock = new Object();
 
@@ -116,7 +110,6 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
             return null; // indicating not found.
         }
         SchemaContext context = getSchemaContext(iid);
-        String urlPrefix = getYangMountUrl(iid);
         if (context == null) {
             return createResourceList();
         }
@@ -125,6 +118,7 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
         dataStores.setDescription("Provides methods for accessing the data stores.");
         dataStores.setPath(generatePath(uriInfo, DATASTORES_LABEL, DATASTORES_REVISION));
         resources.add(dataStores);
+        String urlPrefix = getYangMountUrl(iid);
         ResourceList list = super.getResourceListing(uriInfo, context, urlPrefix);
         resources.addAll(list.getApis());
         list.setApis(resources);
@@ -172,8 +166,6 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
     }
 
     private ApiDeclaration generateDataStoreApiDoc(final UriInfo uriInfo, final String context) {
-
-        ApiDeclaration declaration = super.createApiDeclaration(createBasePathFromUriInfo(uriInfo));
         List<Api> apis = new LinkedList<>();
         apis.add(createGetApi("config",
                 "Queries the config (startup) datastore on the mounted hosted.", context));
@@ -181,6 +173,8 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
                 "Queries the operational (running) datastore on the mounted hosted.", context));
         apis.add(createGetApi("operations",
                 "Queries the available operations (RPC calls) on the mounted hosted.", context));
+
+        ApiDeclaration declaration = super.createApiDeclaration(createBasePathFromUriInfo(uriInfo));
         declaration.setApis(apis);
         return declaration;
 
