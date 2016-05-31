@@ -210,7 +210,7 @@ public class ConcurrentClientsTest {
                 throw new IllegalStateException(e);
             } catch (ExecutionException e) {
                 LOG.error("Thread for testing client failed", e);
-                fail("Client failed: " + e.getMessage());
+                throw e;
             }
         }
 
