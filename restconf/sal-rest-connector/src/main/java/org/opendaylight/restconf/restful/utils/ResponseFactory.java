@@ -16,26 +16,28 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 final class ResponseFactory extends FutureDataFactory<Void> implements Builder<Response> {
 
-    private final NormalizedNode<?, ?> readData;
-    private final URI location;
-
+    private final ResponseBuilder responseBuilder;
     ResponseFactory(final NormalizedNode<?, ?> readData) {
-        this.readData = readData;
-        this.location = null;
+        final Status status = prepareStatus(readData);
+        this.responseBuilder = Response.status(status);
     }
 
     ResponseFactory(final NormalizedNode<?, ?> readData, final URI location) {
-        this.readData = readData;
-        this.location = location;
+        final Status status = prepareStatus(readData);
+        this.responseBuilder = Response.status(status);
+        this.responseBuilder.location(location);
+    }
+
+    ResponseFactory() {
+        this.responseBuilder = Response.status(Status.OK);
     }
 
     @Override
     public Response build() {
-        final Status status = this.readData != null ? Status.OK : Status.CREATED;
-        final ResponseBuilder responseBuilder = Response.status(status);
-        if (this.location != null) {
-            responseBuilder.location(this.location);
-        }
-        return responseBuilder.build();
+        return this.responseBuilder.build();
+    }
+
+    private Status prepareStatus(final NormalizedNode<?, ?> readData) {
+        return readData != null ? Status.OK : Status.CREATED;
     }
 }
