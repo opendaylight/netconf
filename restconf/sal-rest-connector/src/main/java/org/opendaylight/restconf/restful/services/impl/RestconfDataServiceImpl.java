@@ -7,7 +7,11 @@
  */
 package org.opendaylight.restconf.restful.services.impl;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicates;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
 import java.net.URI;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -20,18 +24,22 @@ import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.handlers.api.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.common.handlers.api.SchemaContextHandler;
 import org.opendaylight.restconf.common.handlers.api.TransactionChainHandler;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
 import org.opendaylight.restconf.restful.transaction.TransactionNode;
+import org.opendaylight.restconf.restful.utils.DeleteDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.RestconfDataServiceConstant;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.tree.ModifiedNodeDoesNotExistException;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 /**
@@ -111,8 +119,22 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response deleteData(final String identifier) {
-        // TODO Auto-generated method stub
-        return null;
+        final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.getSchemaContext());
+        final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
+                schemaContextRef.get());
+        try {
+            DeleteDataTransactionUtil.deleteData(instanceIdentifier, this.transactionChainHandler).checkedGet();
+        } catch (final Exception e) {
+            final Optional<Throwable> searchedException = Iterables.tryFind(Throwables.getCausalChain(e),
+                    Predicates.instanceOf(ModifiedNodeDoesNotExistException.class));
+            if (searchedException.isPresent()) {
+                throw new RestconfDocumentedException("Data specified for deleting doesn't exist.",
+                        ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
+            }
+            final String errMsg = "Error while deleting data";
+            throw new RestconfDocumentedException(errMsg, e);
+        }
+        return Response.status(Status.OK).build();
     }
 
     @Override
