@@ -90,14 +90,16 @@ public class NetconfCommandsImpl implements NetconfCommands {
         }
         if (nodeList != null) {
             for (final Node node : nodeList) {
-                final NetconfNode netconfNode = node.getAugmentation(NetconfNode.class);
-                final Map<String, List<String>> attributes = new HashMap<>();
-                attributes.put(NetconfConsoleConstants.NETCONF_ID, ImmutableList.of(node.getNodeId().getValue()));
-                attributes.put(NetconfConsoleConstants.NETCONF_IP, ImmutableList.of(netconfNode.getHost().getIpAddress().getIpv4Address().getValue()));
-                attributes.put(NetconfConsoleConstants.NETCONF_PORT, ImmutableList.of(netconfNode.getPort().getValue().toString()));
-                attributes.put(NetconfConsoleConstants.STATUS, ImmutableList.of(netconfNode.getConnectionStatus().name()));
-                attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES, netconfNode.getAvailableCapabilities().getAvailableCapability());
-                device.put(node.getNodeId().getValue(), attributes);
+                if (node != null) {
+                    final NetconfNode netconfNode = node.getAugmentation(NetconfNode.class);
+                    final Map<String, List<String>> attributes = new HashMap<>();
+                    attributes.put(NetconfConsoleConstants.NETCONF_ID, ImmutableList.of(node.getNodeId().getValue()));
+                    attributes.put(NetconfConsoleConstants.NETCONF_IP, ImmutableList.of(netconfNode.getHost().getIpAddress().getIpv4Address().getValue()));
+                    attributes.put(NetconfConsoleConstants.NETCONF_PORT, ImmutableList.of(netconfNode.getPort().getValue().toString()));
+                    attributes.put(NetconfConsoleConstants.STATUS, ImmutableList.of(netconfNode.getConnectionStatus().name()));
+                    attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES, netconfNode.getAvailableCapabilities().getAvailableCapability());
+                    device.put(node.getNodeId().getValue(), attributes);
+                }
             }
         }
         return device;

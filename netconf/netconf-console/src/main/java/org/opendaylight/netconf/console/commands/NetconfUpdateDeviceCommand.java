@@ -77,7 +77,7 @@ public class NetconfUpdateDeviceCommand extends AbstractAction {
 
     @Option(name = "-t",
             aliases = { "--tcp-only" },
-            description = "Type of connection, true for tcp only, false by default",
+            description = "Type of connection, true for tcp only",
             required = false,
             multiValued = false)
     private String newConnectionType = "false";

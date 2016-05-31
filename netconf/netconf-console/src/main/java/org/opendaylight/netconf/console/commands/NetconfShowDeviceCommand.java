@@ -33,14 +33,14 @@ public class NetconfShowDeviceCommand extends AbstractAction {
             description = "Node Identifier of the netconf device",
             required = false,
             multiValued = false)
-    private String deviceId = "";
+    private String deviceId;
 
     @Option(name = "-i",
             aliases = { "--ipaddress" },
             description = "IP address of the netconf device",
             required = false,
             multiValued = false)
-    private String deviceIp = "";
+    private String deviceIp;
 
     @Option(name = "-p",
             aliases = { "--port" },
@@ -52,7 +52,7 @@ public class NetconfShowDeviceCommand extends AbstractAction {
     @Override
     protected Object doExecute() throws Exception {
 
-        if (Strings.isNullOrEmpty(deviceIp) || Strings.isNullOrEmpty(devicePort) && Strings.isNullOrEmpty(deviceId)) {
+        if ((Strings.isNullOrEmpty(deviceIp) || Strings.isNullOrEmpty(devicePort)) && Strings.isNullOrEmpty(deviceId)) {
             return "You must provide either the device Ip and the device Port or the device Id";
         }
 

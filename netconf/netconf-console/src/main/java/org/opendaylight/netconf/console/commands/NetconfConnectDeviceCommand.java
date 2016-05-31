@@ -35,7 +35,7 @@ public class NetconfConnectDeviceCommand extends AbstractAction {
             description = "IP address of the netconf device",
             required = true,
             multiValued = false)
-    private String deviceIp = "";
+    private String deviceIp;
 
     @Option(name = "-p",
             aliases = { "--port" },
@@ -60,7 +60,7 @@ public class NetconfConnectDeviceCommand extends AbstractAction {
 
     @Option(name = "-t",
             aliases = { "--tcp-only" },
-            description = "Type of connection, true for tcp only, false by default",
+            description = "Type of connection, true for tcp only",
             required = false,
             multiValued = false)
     private String connectionType = "false";
@@ -70,7 +70,7 @@ public class NetconfConnectDeviceCommand extends AbstractAction {
             description = "Node Identifier of the netconf device",
             required = false,
             multiValued = false)
-    private String deviceId = "";
+    private String deviceId;
 
     @Override
     protected Object doExecute() throws Exception {

@@ -29,7 +29,7 @@ public class NetconfDisconnectDeviceCommand extends AbstractAction {
             description = "IP address of the netconf device",
             required = false,
             multiValued = false)
-    private String deviceIp = "";
+    private String deviceIp;
 
     @Option(name = "-p",
             aliases = { "--port" },
@@ -43,7 +43,7 @@ public class NetconfDisconnectDeviceCommand extends AbstractAction {
             description = "Node Identifier of the netconf device",
             required = false,
             multiValued = false)
-    private String deviceId = "";
+    private String deviceId;
 
     @Override
     protected Object doExecute() throws Exception {
