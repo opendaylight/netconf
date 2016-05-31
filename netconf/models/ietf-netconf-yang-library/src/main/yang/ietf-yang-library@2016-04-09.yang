@@ -1,41 +1,35 @@
 module ietf-yang-library {
-
-    yang-version 1;
     namespace "urn:ietf:params:xml:ns:yang:ietf-yang-library";
     prefix "yanglib";
 
     import ietf-yang-types {
       prefix yang;
-      revision-date "2013-07-15";
     }
-
     import ietf-inet-types {
       prefix inet;
-      revision-date "2010-09-24";
     }
-
 
     organization
       "IETF NETCONF (Network Configuration) Working Group";
 
     contact
       "WG Web:   <http://tools.ietf.org/wg/netconf/>
-      WG List:  <mailto:netconf@ietf.org>
+       WG List:  <mailto:netconf@ietf.org>
 
-      WG Chair: Mehmet Ersue
-                <mailto:mehmet.ersue@nsn.com>
+       WG Chair: Mehmet Ersue
+                 <mailto:mehmet.ersue@nsn.com>
 
-      WG Chair: Mahesh Jethanandani
-                <mailto:mjethanandani@gmail.com>
+       WG Chair: Mahesh Jethanandani
+                 <mailto:mjethanandani@gmail.com>
 
-      Editor:   Andy Bierman
-                <mailto:andy@yumaworks.com>
+       Editor:   Andy Bierman
+                 <mailto:andy@yumaworks.com>
 
-      Editor:   Martin Bjorklund
-                <mailto:mbj@tail-f.com>
+       Editor:   Martin Bjorklund
+                 <mailto:mbj@tail-f.com>
 
-      Editor:   Kent Watsen
-                <mailto:kwatsen@juniper.net>";
+       Editor:   Kent Watsen
+                 <mailto:kwatsen@juniper.net>";
 
     description
       "This module contains monitoring information about the YANG
@@ -55,16 +49,15 @@ module ietf-yang-library {
        This version of this YANG module is part of RFC XXXX; see
        the RFC itself for full legal notices.";
 
-       // RFC Ed.: replace XXXX with actual RFC number and remove this
-       // note.
+    // RFC Ed.: replace XXXX with actual RFC number and remove this
+    // note.
 
-       // RFC Ed.: remove this note
-       // Note: extracted from draft-ietf-netconf-yang-library-04.txt
+    // RFC Ed.: remove this note
+    // Note: extracted from draft-ietf-netconf-yang-library-06.txt
 
-       // RFC Ed.: update the date below with the date of RFC publication
-       // and remove this note.
-
-    revision 2016-02-01 {
+    // RFC Ed.: update the date below with the date of RFC publication
+    // and remove this note.
+    revision 2016-04-09 {
       description
         "Initial revision.";
       reference
@@ -74,12 +67,17 @@ module ietf-yang-library {
     /*
      * Typedefs
      */
+
     // FIXME inline this union after https://bugs.opendaylight.org/show_bug.cgi?id=5826 is fixed
     typedef optional-revision {
       type union {
         type revision-identifier;
         type string { length 0; }
       }
+      description
+        "The YANG module or submodule revision date.
+         A zero-length string is used if no revision statement
+         is present in the YANG module or submodule.";
     }
 
     typedef revision-identifier {
@@ -93,12 +91,12 @@ module ietf-yang-library {
     /*
      * Groupings
      */
+
     grouping module-list {
       description
         "The module data structure is represented as a grouping
          so it can be reused in configuration or another monitoring
          data structure.";
-
 
       grouping common-leafs {
         description
@@ -111,10 +109,6 @@ module ietf-yang-library {
         }
         leaf revision {
           type optional-revision;
-            description
-              "The YANG module or submodule revision date.
-               A zero-length string is used if no revision statement
-               is present in the YANG module or submodule.";
         }
       }
 
@@ -136,8 +130,8 @@ module ietf-yang-library {
       list module {
         key "name revision";
         description
-          "Each entry represents one module currently
-           supported by the server.";
+          "Each entry represents one revision of one module
+           currently supported by the server.";
 
         uses common-leafs;
         uses schema-leaf;
@@ -216,8 +210,8 @@ module ietf-yang-library {
             description
               "Each entry represents one submodule within the
                parent module.";
-             uses common-leafs;
-             uses schema-leaf;
+            uses common-leafs;
+            uses schema-leaf;
           }
         }
       }
@@ -249,10 +243,11 @@ module ietf-yang-library {
     /*
      * Notifications
      */
+
     notification yang-library-change {
       description
-        "Generated when the set of modules and submodules supported
-         by the server has changed.";
+       "Generated when the set of modules and submodules supported
+        by the server has changed.";
       leaf module-set-id {
         type leafref {
           path "/yanglib:modules-state/yanglib:module-set-id";
