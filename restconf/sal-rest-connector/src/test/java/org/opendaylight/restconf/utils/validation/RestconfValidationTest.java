@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
@@ -28,7 +27,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
  */
 public class RestconfValidationTest {
     private static final List<String> revisions = Arrays.asList("2014-01-01", "2015-01-01", "2016-01-01");
-    private static final List<String> names = Arrays.asList("module1", "module2", "module3");
+    private static final List<String> names = Arrays.asList("_module-1", "_module-2", "_module-3");
 
     /**
      * Test of successful validation of module revision.
@@ -83,7 +82,7 @@ public class RestconfValidationTest {
     public void validateAndGetModulNameTest() {
         String moduleName = RestconfValidation.validateAndGetModulName(names.iterator());
         assertNotNull("Correct module name should be validated", moduleName);
-        assertEquals("module1", moduleName);
+        assertEquals("_module-1", moduleName);
     }
 
     /**
@@ -103,12 +102,54 @@ public class RestconfValidationTest {
     }
 
     /**
-     * Negative test of module name validation when supplied name is not parsable as module name. Test fails
-     * catching <code>RestconfDocumentedException</code>.
-     * <p>
-     * This test is ignored because tested functionality is not implemented yet.
+     * Negative test of module name validation when supplied name is not parsable as module name on the first
+     * character. Test fails catching <code>RestconfDocumentedException</code> and checking for correct error type,
+     * error tag and error status code.
      */
-    @Ignore
-    @Test(expected = RestconfDocumentedException.class)
-    public void validateAndGetModuleNameNotParsableTest() {}
+    @Test
+    public void validateAndGetModuleNameNotParsableFirstTest() {
+       try {
+           RestconfValidation.validateAndGetModulName(
+                   Arrays.asList("01-not-parsable-as-name-on-firts-char").iterator());
+           fail("Test should fail due to not parsable module name on the first character");
+       } catch (RestconfDocumentedException e) {
+           assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+           assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
+           assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
+       }
+    }
+
+    /**
+     * Negative test of module name validation when supplied name is not parsable as module name on any of the
+     * characters after the first character. Test fails catching <code>RestconfDocumentedException</code> and checking
+     * for correct error type, error tag and error status code.
+     */
+    @Test
+    public void validateAndGetModuleNameNotParsableNextTest() {
+        try {
+            RestconfValidation.validateAndGetModulName(
+                    Arrays.asList("not-parsable-as-name-after-first-char*").iterator());
+            fail("Test should fail due to not parsable module name on any character after the first character");
+        } catch (RestconfDocumentedException e) {
+            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
+            assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
+        }
+    }
+
+    /**
+     * Negative test of module name validation when supplied name begins with 'XML' ignore case. Test fails catching
+     * <code>RestconfDocumentedException</code> and checking for correct error type, error tag and error status code.
+     */
+    @Test
+    public void validateAndGetModuleNameNotParsableXmlTest() {
+        try {
+            RestconfValidation.validateAndGetModulName(Arrays.asList("xMl-module-name").iterator());
+            fail("Test should fail due to module name beginning with 'xMl'");
+        } catch (RestconfDocumentedException e) {
+            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
+            assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
+        }
+    }
 }
