@@ -79,4 +79,16 @@ public final class RestconfDataServiceConstant {
             throw new UnsupportedOperationException("Util class.");
         }
     }
+
+    /**
+     * Constants for data to delete
+     *
+     */
+    public final class DeleteData {
+        public static final String DELETE_TX_TYPE = "DELETE";
+
+        private DeleteData() {
+            throw new UnsupportedOperationException("Util class.");
+        }
+    }
 }
