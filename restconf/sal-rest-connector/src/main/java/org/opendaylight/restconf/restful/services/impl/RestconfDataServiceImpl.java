@@ -24,6 +24,7 @@ import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
+import org.opendaylight.restconf.restful.utils.DeleteDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.ReadDataTransactionUtil;
@@ -120,7 +121,21 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response deleteData(final String identifier) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
+        final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
+                schemaContextRef.get());
+
+        final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
+        DOMDataReadWriteTransaction transaction = null;
+        if (mountPoint == null) {
+            transaction = this.transactionChainHandler.get().newReadWriteTransaction();
+        } else {
+            transaction = transactionOfMountPoint(mountPoint);
+        }
+
+        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(instanceIdentifier, mountPoint,
+                transaction);
+        return DeleteDataTransactionUtil.deleteData(transactionNode);
     }
 
     @Override

@@ -42,6 +42,10 @@ public final class ParserIdentifier {
 
     private static final Logger LOG = LoggerFactory.getLogger(ParserIdentifier.class);
 
+    private ParserIdentifier() {
+        throw new UnsupportedOperationException("Util class.");
+    }
+
     /**
      * Make {@link InstanceIdentifierContext} from identifier.
      *
