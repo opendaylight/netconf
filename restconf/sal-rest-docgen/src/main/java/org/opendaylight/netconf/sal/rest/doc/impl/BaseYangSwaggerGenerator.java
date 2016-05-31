@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -102,7 +101,7 @@ public class BaseYangSwaggerGenerator {
                 resource.setPath(generatePath(uriInfo, module.getName(), revisionString));
                 resources.add(resource);
             } else {
-                LOG.debug("Could not generate doc for {},{}", module.getName(), revisionString);
+                LOG.warn("Could not generate doc for {},{}", module.getName(), revisionString);
             }
         }
 
@@ -175,7 +174,7 @@ public class BaseYangSwaggerGenerator {
     public ApiDeclaration getSwaggerDocSpec(Module m, String basePath, String context, SchemaContext schemaContext) {
         ApiDeclaration doc = createApiDeclaration(basePath);
 
-        List<Api> apis = new ArrayList<Api>();
+        List<Api> apis = new ArrayList<>();
 
         Collection<DataSchemaNode> dataSchemaNodes = m.getChildNodes();
         LOG.debug("child nodes size [{}]", dataSchemaNodes.size());
@@ -184,12 +183,12 @@ public class BaseYangSwaggerGenerator {
 
                 LOG.debug("Is Configuration node [{}] [{}]", node.isConfiguration(), node.getQName().getLocalName());
 
-                List<Parameter> pathParams = new ArrayList<Parameter>();
+                List<Parameter> pathParams = new ArrayList<>();
                 String resourcePath = getDataStorePath("/config/", context);
                 addRootPostLink(m, (DataNodeContainer) node, pathParams, resourcePath, apis);
                 addApis(node, apis, resourcePath, pathParams, schemaContext, true);
 
-                pathParams = new ArrayList<Parameter>();
+                pathParams = new ArrayList<>();
                 resourcePath = getDataStorePath("/operational/", context);
                 addApis(node, apis, resourcePath, pathParams, schemaContext, false);
             }
@@ -214,7 +213,7 @@ public class BaseYangSwaggerGenerator {
                     LOG.debug(mapper.writeValueAsString(doc));
                 }
             } catch (IOException | JSONException e) {
-                e.printStackTrace();
+                LOG.error("Exception occured in ModelGenerator", e);
             }
 
             return doc;
@@ -245,10 +244,6 @@ public class BaseYangSwaggerGenerator {
         return dataStore + context;
     }
 
-    private String generateCacheKey(Module m) {
-        return generateCacheKey(m.getName(), SIMPLE_DATE_FORMAT.format(m.getRevision()));
-    }
-
     private String generateCacheKey(String module, String revision) {
         return module + "(" + revision + ")";
     }
@@ -257,7 +252,7 @@ public class BaseYangSwaggerGenerator {
             boolean addConfigApi) {
 
         Api api = new Api();
-        List<Parameter> pathParams = new ArrayList<Parameter>(parentPathParams);
+        List<Parameter> pathParams = new ArrayList<>(parentPathParams);
 
         String resourcePath = parentPath + createPath(node, pathParams, schemaContext) + "/";
         LOG.debug("Adding path: [{}]", resourcePath);
@@ -333,7 +328,7 @@ public class BaseYangSwaggerGenerator {
     }
 
     private String createPath(final DataSchemaNode schemaNode, List<Parameter> pathParams, SchemaContext schemaContext) {
-        ArrayList<LeafSchemaNode> pathListParams = new ArrayList<LeafSchemaNode>();
+        ArrayList<LeafSchemaNode> pathListParams = new ArrayList<>();
         StringBuilder path = new StringBuilder();
         String localName = resolvePathArgumentsName(schemaNode, schemaContext);
         path.append(localName);
@@ -392,20 +387,17 @@ public class BaseYangSwaggerGenerator {
 
         Set<Module> modules = schemaContext.getModules();
 
-        SortedSet<Module> sortedModules = new TreeSet<>(new Comparator<Module>() {
-            @Override
-            public int compare(Module module1, Module module2) {
-                int result = module1.getName().compareTo(module2.getName());
-                if (result == 0) {
-                    Date module1Revision = module1.getRevision() != null ? module1.getRevision() : new Date(0);
-                    Date module2Revision = module2.getRevision() != null ? module2.getRevision() : new Date(0);
-                    result = module1Revision.compareTo(module2Revision);
-                }
-                if (result == 0) {
-                    result = module1.getNamespace().compareTo(module2.getNamespace());
-                }
-                return result;
+        SortedSet<Module> sortedModules = new TreeSet<>((module1, module2) -> {
+            int result = module1.getName().compareTo(module2.getName());
+            if (result == 0) {
+                Date module1Revision = module1.getRevision() != null ? module1.getRevision() : new Date(0);
+                Date module2Revision = module2.getRevision() != null ? module2.getRevision() : new Date(0);
+                result = module1Revision.compareTo(module2Revision);
             }
+            if (result == 0) {
+                result = module1.getNamespace().compareTo(module2.getNamespace());
+            }
+            return result;
         });
         for (Module m : modules) {
             if (m != null) {
