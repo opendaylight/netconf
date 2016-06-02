@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.utils.parser.builder;
 
 import com.google.common.base.CharMatcher;
+import java.util.Arrays;
 import org.opendaylight.restconf.parser.builder.YangInstanceIdentifierDeserializer;
 import org.opendaylight.restconf.parser.builder.YangInstanceIdentifierSerializer;
 
@@ -32,7 +33,9 @@ public final class ParserBuilderConstants {
             throw new UnsupportedOperationException("Util class");
         }
 
-        public static final String DISABLED_CHARS = ",': /";
+        public static final String DISABLED_CHARS = Arrays.toString(new char[] { ':', '/', '?', '#', '[', ']', '@' })
+                .concat(Arrays.toString(new char[] { '!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=' }));
+
         public static final CharMatcher PERCENT_ENCODE_CHARS = CharMatcher.anyOf(DISABLED_CHARS).precomputed();
     }
 
@@ -48,9 +51,12 @@ public final class ParserBuilderConstants {
 
         public static final CharMatcher BASE = CharMatcher.inRange('a', 'z').or(CharMatcher.inRange('A', 'Z'))
                 .precomputed();
+
         public static final CharMatcher IDENTIFIER_FIRST_CHAR = BASE.or(CharMatcher.is('_')).precomputed();
+
         public static final CharMatcher IDENTIFIER = IDENTIFIER_FIRST_CHAR.or(CharMatcher.inRange('0', '9'))
                 .or(CharMatcher.anyOf(".-")).precomputed();
+
         public static final CharMatcher IDENTIFIER_HEXA = CharMatcher.inRange('a', 'f')
                 .or(CharMatcher.inRange('A', 'F')).or(CharMatcher.inRange('0', '9')).precomputed();
 
@@ -60,10 +66,9 @@ public final class ParserBuilderConstants {
         public static final char PERCENT_ENCODING = '%';
         public static final char QUOTE = '"';
 
-        public static final CharMatcher IDENTIFIER_FIRST_CHAR_PREDICATE = BASE.or(CharMatcher.inRange('0', '9'))
-                .or(CharMatcher.is(QUOTE)).or(CharMatcher.is(PERCENT_ENCODING)).precomputed();
+        public static final CharMatcher IDENTIFIER_PREDICATE =
+                CharMatcher.ASCII.and(CharMatcher.noneOf(Serializer.DISABLED_CHARS)).precomputed();
 
-        public static final CharMatcher IDENTIFIER_PREDICATE = IDENTIFIER_FIRST_CHAR_PREDICATE;
         public static final String EMPTY_STRING = "";
     }
 }
