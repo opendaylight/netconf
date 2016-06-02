@@ -111,7 +111,14 @@ public final class YangInstanceIdentifierDeserializer {
         final String preparedPrefix = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
         final String prefix, localName;
 
+        if (allCharsConsumed(variables)) {
+            return getQNameOfDataSchemaNode(preparedPrefix, variables);
+        }
+
         switch (currentChar(variables.getOffset(), variables.getData())) {
+            case RestconfConstants.SLASH:
+                prefix = preparedPrefix;
+                return getQNameOfDataSchemaNode(prefix, variables);
             case ParserBuilderConstants.Deserializer.COLON:
                 prefix = preparedPrefix;
                 skipCurrentChar(variables);
@@ -122,10 +129,14 @@ public final class YangInstanceIdentifierDeserializer {
                         variables.getOffset());
                 localName = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
 
-                final Module module = moduleForPrefix(prefix, variables.getSchemaContext());
-                Preconditions.checkArgument(module != null, "Failed to lookup prefix %s", prefix);
-
-                return QName.create(module.getQNameModule(), localName);
+                if (!allCharsConsumed(variables) && currentChar
+                        (variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL) {
+                    return getQNameOfDataSchemaNode(localName, variables);
+                } else {
+                    final Module module = moduleForPrefix(prefix, variables.getSchemaContext());
+                    Preconditions.checkArgument(module != null, "Failed to lookup prefix %s", prefix);
+                    return QName.create(module.getQNameModule(), localName);
+                }
             case ParserBuilderConstants.Deserializer.EQUAL:
                 prefix = preparedPrefix;
                 return getQNameOfDataSchemaNode(prefix, variables);
