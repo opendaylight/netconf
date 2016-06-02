@@ -11,8 +11,11 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import org.opendaylight.netconf.md.sal.rest.common.RestconfValidationUtils;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.restconf.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.restconf.utils.schema.context.RestconfSchemaUtil;
@@ -50,12 +53,12 @@ public final class YangInstanceIdentifierDeserializer {
      */
     public static Iterable<PathArgument> create(final SchemaContext schemaContext, final String data) {
         final List<PathArgument> path = new LinkedList<>();
-        DataSchemaContextNode<?> current = DataSchemaContextTree.from(schemaContext).getRoot();
-        final int offset = 0;
-        final MainVarsWrapper variables = new YangInstanceIdentifierDeserializer.MainVarsWrapper(data,
-                current, offset, schemaContext);
+        final MainVarsWrapper variables = new YangInstanceIdentifierDeserializer.MainVarsWrapper(
+                data, DataSchemaContextTree.from(schemaContext).getRoot(), 0, schemaContext);
 
-        while (!allCharsConsumed(variables)) {
+        checkValid(!data.isEmpty(), "Empty path is not valid", variables.getData(), variables.getOffset());
+
+        if (!data.equals(String.valueOf(RestconfConstants.SLASH))) while (!allCharsConsumed(variables)) {
             validArg(variables);
             final QName qname = prepareQName(variables);
 
@@ -66,15 +69,15 @@ public final class YangInstanceIdentifierDeserializer {
                 path.add(variables.getCurrent().getIdentifier());
             } else if (currentChar(variables.getOffset(),
                     variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL) {
-                current = nextContextNode(qname, path, variables);
-                if (!current.isKeyedEntry()) {
-                    prepareNodeWithValue(qname, path, variables);
-                } else {
+                if (nextContextNode(qname, path, variables).getDataSchemaNode() instanceof ListSchemaNode) {
                     prepareNodeWithPredicates(qname, path, variables);
+                } else {
+                    prepareNodeWithValue(qname, path, variables);
                 }
             } else {
                 throw new IllegalArgumentException(
-                        "Bad char " + currentChar(offset, data) + " on position " + offset + ".");
+                        "Bad char " + currentChar(variables.getOffset(), variables.getData()) + " on position "
+                        + variables.getOffset() + ".");
             }
         }
 
@@ -82,36 +85,85 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private static void prepareNodeWithPredicates(final QName qname, final List<PathArgument> path,
-            final MainVarsWrapper variables) {
-        final List<QName> keyDefinitions = ((ListSchemaNode) variables.getCurrent().getDataSchemaNode())
-                .getKeyDefinition();
-        final ImmutableMap.Builder<QName, Object> keyValues = ImmutableMap.builder();
+                                                  final MainVarsWrapper variables) {
 
-        for (final QName keyQName : keyDefinitions) {
-            skipCurrentChar(variables);
-            String value = null;
-            if ((currentChar(variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.COMMA)
-                    || (currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH)) {
-                value = ParserBuilderConstants.Deserializer.EMPTY_STRING;
-            } else {
-                value = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE,
-                        variables);
+        final DataSchemaNode dataSchemaNode = variables.getCurrent().getDataSchemaNode();
+        checkValid((dataSchemaNode != null), "Data schema node is null", variables.getData(), variables.getOffset());
+
+        final Iterator<QName> keys = ((ListSchemaNode) dataSchemaNode).getKeyDefinition().iterator();
+        final ImmutableMap.Builder<QName, Object> values = ImmutableMap.builder();
+
+        // skip already expected equal sign
+        skipCurrentChar(variables);
+
+        // read key value separated by comma
+        while (keys.hasNext() && !allCharsConsumed(variables) && currentChar(variables.getOffset(),
+                variables.getData()) != RestconfConstants.SLASH) {
+
+            // empty key value
+            if (currentChar(variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.COMMA) {
+                values.put(keys.next(), ParserBuilderConstants.Deserializer.EMPTY_STRING);
+                skipCurrentChar(variables);
+                continue;
             }
-            value = findAndParsePercentEncoded(value);
-            keyValues.put(keyQName, value);
+
+            // check if next value is parsable
+            RestconfValidationUtils.checkDocumentedError(
+                    ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE
+                            .matches(currentChar(variables.getOffset(), variables.getData())),
+                    RestconfError.ErrorType.PROTOCOL,
+                    RestconfError.ErrorTag.MALFORMED_MESSAGE,
+                    ""
+            );
+
+            // parse value
+            values.put(keys.next(), findAndParsePercentEncoded(nextIdentifierFromNextSequence(
+                    ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE, variables)));
+
+            // skip comma
+            if (keys.hasNext() && !allCharsConsumed(variables) && currentChar(
+                    variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.COMMA) {
+                skipCurrentChar(variables);
+            }
         }
-        path.add(new YangInstanceIdentifier.NodeIdentifierWithPredicates(qname, keyValues.build()));
+
+        // the last key is considered to be empty
+        if (keys.hasNext()) {
+            if (allCharsConsumed(variables)
+                    || currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH) {
+                values.put(keys.next(), ParserBuilderConstants.Deserializer.EMPTY_STRING);
+            }
+
+            // there should be no more missing keys
+            RestconfValidationUtils.checkDocumentedError(
+                    !keys.hasNext(),
+                    RestconfError.ErrorType.PROTOCOL,
+                    RestconfError.ErrorTag.MISSING_ATTRIBUTE,
+                    "Key value missing for: " + qname
+            );
+        }
+
+        path.add(new YangInstanceIdentifier.NodeIdentifierWithPredicates(qname, values.build()));
     }
+
 
     private static QName prepareQName(final MainVarsWrapper variables) {
         checkValid(
                 ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR
                         .matches(currentChar(variables.getOffset(), variables.getData())),
                 "Identifier must start with character from set 'a-zA-Z_'", variables.getData(), variables.getOffset());
-        final String preparedPrefix = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
+        final String preparedPrefix = nextIdentifierFromNextSequence(
+                ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
         final String prefix, localName;
 
+        if (allCharsConsumed(variables)) {
+            return getQNameOfDataSchemaNode(preparedPrefix, variables);
+        }
+
         switch (currentChar(variables.getOffset(), variables.getData())) {
+            case RestconfConstants.SLASH:
+                prefix = preparedPrefix;
+                return getQNameOfDataSchemaNode(prefix, variables);
             case ParserBuilderConstants.Deserializer.COLON:
                 prefix = preparedPrefix;
                 skipCurrentChar(variables);
@@ -122,10 +174,14 @@ public final class YangInstanceIdentifierDeserializer {
                         variables.getOffset());
                 localName = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
 
-                final Module module = moduleForPrefix(prefix, variables.getSchemaContext());
-                Preconditions.checkArgument(module != null, "Failed to lookup prefix %s", prefix);
-
-                return QName.create(module.getQNameModule(), localName);
+                if (!allCharsConsumed(variables) && currentChar
+                        (variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL) {
+                    return getQNameOfDataSchemaNode(localName, variables);
+                } else {
+                    final Module module = moduleForPrefix(prefix, variables.getSchemaContext());
+                    Preconditions.checkArgument(module != null, "Failed to lookup prefix %s", prefix);
+                    return QName.create(module.getQNameModule(), localName);
+                }
             case ParserBuilderConstants.Deserializer.EQUAL:
                 prefix = preparedPrefix;
                 return getQNameOfDataSchemaNode(prefix, variables);
@@ -150,9 +206,18 @@ public final class YangInstanceIdentifierDeserializer {
     private static void prepareNodeWithValue(final QName qname, final List<PathArgument> path,
             final MainVarsWrapper variables) {
         skipCurrentChar(variables);
-        String value = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
-        value = findAndParsePercentEncoded(value);
-        path.add(new YangInstanceIdentifier.NodeWithValue<>(qname, value));
+        final String value = nextIdentifierFromNextSequence(
+                ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE, variables);
+
+        // exception if value attribute is missing
+        RestconfValidationUtils.checkDocumentedError(
+                !value.isEmpty(),
+                RestconfError.ErrorType.PROTOCOL,
+                RestconfError.ErrorTag.MISSING_ATTRIBUTE,
+                "Value missing for: " + qname
+        );
+
+        path.add(new YangInstanceIdentifier.NodeWithValue<>(qname, findAndParsePercentEncoded(value)));
     }
 
     private static void prepareIdentifier(final QName qname, final List<PathArgument> path,
@@ -176,26 +241,24 @@ public final class YangInstanceIdentifierDeserializer {
         return current;
     }
 
-    private static String findAndParsePercentEncoded(String preparedPrefix) {
+    private static String findAndParsePercentEncoded(final String preparedPrefix) {
         if (!preparedPrefix.contains(String.valueOf(ParserBuilderConstants.Deserializer.PERCENT_ENCODING))) {
             return preparedPrefix;
         }
-        final StringBuilder newPrefix = new StringBuilder();
-        int i = 0;
-        int startPoint = 0;
-        int endPoint = preparedPrefix.length();
-        while ((i = preparedPrefix.indexOf(ParserBuilderConstants.Deserializer.PERCENT_ENCODING)) != -1) {
-            newPrefix.append(preparedPrefix.substring(startPoint, i));
-            startPoint = i;
-            startPoint++;
-            final String hex = preparedPrefix.substring(startPoint, startPoint + 2);
-            startPoint += 2;
-            newPrefix.append((char) Integer.parseInt(hex, 16));
-            preparedPrefix = preparedPrefix.substring(startPoint, endPoint);
-            startPoint = 0;
-            endPoint = preparedPrefix.length();
+
+        final StringBuilder parsedPrefix = new StringBuilder(preparedPrefix);
+        final CharMatcher matcher = CharMatcher.is(ParserBuilderConstants.Deserializer.PERCENT_ENCODING);
+
+        while (matcher.matchesAnyOf(parsedPrefix)) {
+            final int i = matcher.indexIn(parsedPrefix);
+            parsedPrefix.replace(
+                    i,
+                    i + 3,
+                    String.valueOf((char) Integer.parseInt(parsedPrefix.substring(i + 1, i + 3), 16))
+            );
         }
-        return newPrefix.toString();
+
+        return parsedPrefix.toString();
     }
 
     private static QName getQNameOfDataSchemaNode(final String nodeName, final MainVarsWrapper variables) {
@@ -282,6 +345,5 @@ public final class YangInstanceIdentifierDeserializer {
         public SchemaContext getSchemaContext() {
             return this.schemaContext;
         }
-
     }
 }
