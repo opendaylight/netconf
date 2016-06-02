@@ -46,29 +46,40 @@ public final class YangInstanceIdentifierSerializer {
         final DataSchemaContextNode<?> current = DataSchemaContextTree.from(schemaContext).getRoot();
         final MainVarsWrappar variables = new YangInstanceIdentifierSerializer.MainVarsWrappar(current);
 
-        final StringBuilder path = prepareFirstArgForPath(variables, data);
+        final StringBuilder path = new StringBuilder();
 
-        for (int i = 1; i < data.getPathArguments().size(); i++) {
+        for (int i = 0; i < data.getPathArguments().size(); i++) {
             final PathArgument arg = data.getPathArguments().get(i);
             variables.setCurrent(variables.getCurrent().getChild(arg));
+
             Preconditions.checkArgument(current != null,
                     "Invalid input %s: schema for argument %s (after %s) not found", data, arg, path);
 
             if (variables.getCurrent().isMixin()) {
                 continue;
             }
+
             path.append('/');
+
+            /*If a node in the
+            path is defined in another module than its parent node, then module
+            name followed by a colon character (":") is prepended to the node
+            name in the resource identifier*/
 
             if (arg instanceof NodeIdentifierWithPredicates) {
                 prepareNodeWithPredicates(path, arg);
             } else if (arg instanceof NodeWithValue) {
                 prepareNodeWithValue(path, arg);
+            } else {
+                appendQName(path, arg.getNodeType());
             }
         }
+
         return path.toString();
     }
 
     private static void prepareNodeWithValue(final StringBuilder path, final PathArgument arg) {
+        //FIXME
         path.append(arg.getNodeType().getLocalName());
         path.append("=");
 
@@ -80,6 +91,7 @@ public final class YangInstanceIdentifierSerializer {
     }
 
     private static void prepareNodeWithPredicates(final StringBuilder path, final PathArgument arg) {
+        //FIXME
         path.append(arg.getNodeType().getLocalName());
         path.append("=");
 
@@ -97,16 +109,6 @@ public final class YangInstanceIdentifierSerializer {
                 s++;
             }
         }
-    }
-
-    private static StringBuilder prepareFirstArgForPath(final MainVarsWrappar variables,
-            final YangInstanceIdentifier data) {
-        final PathArgument firstArg = data.getPathArguments().get(0);
-        variables.setCurrent(variables.getCurrent().getChild(firstArg));
-
-        final StringBuilder path = new StringBuilder("/");
-        appendQName(path, firstArg.getNodeType());
-        return path;
     }
 
     /**
