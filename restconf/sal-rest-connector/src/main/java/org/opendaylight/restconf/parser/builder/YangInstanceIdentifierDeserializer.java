@@ -67,10 +67,10 @@ public final class YangInstanceIdentifierDeserializer {
             } else if (currentChar(variables.getOffset(),
                     variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL) {
                 current = nextContextNode(qname, path, variables);
-                if (!current.isKeyedEntry()) {
-                    prepareNodeWithValue(qname, path, variables);
-                } else {
+                if (current.getDataSchemaNode() instanceof ListSchemaNode) {
                     prepareNodeWithPredicates(qname, path, variables);
+                } else {
+                    prepareNodeWithValue(qname, path, variables);
                 }
             } else {
                 throw new IllegalArgumentException(
@@ -111,7 +111,14 @@ public final class YangInstanceIdentifierDeserializer {
         final String preparedPrefix = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
         final String prefix, localName;
 
+        if (allCharsConsumed(variables)) {
+            return getQNameOfDataSchemaNode(preparedPrefix, variables);
+        }
+
         switch (currentChar(variables.getOffset(), variables.getData())) {
+            case RestconfConstants.SLASH:
+                prefix = preparedPrefix;
+                return getQNameOfDataSchemaNode(prefix, variables);
             case ParserBuilderConstants.Deserializer.COLON:
                 prefix = preparedPrefix;
                 skipCurrentChar(variables);
@@ -122,10 +129,14 @@ public final class YangInstanceIdentifierDeserializer {
                         variables.getOffset());
                 localName = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
 
-                final Module module = moduleForPrefix(prefix, variables.getSchemaContext());
-                Preconditions.checkArgument(module != null, "Failed to lookup prefix %s", prefix);
-
-                return QName.create(module.getQNameModule(), localName);
+                if (!allCharsConsumed(variables) && currentChar
+                        (variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL) {
+                    return getQNameOfDataSchemaNode(localName, variables);
+                } else {
+                    final Module module = moduleForPrefix(prefix, variables.getSchemaContext());
+                    Preconditions.checkArgument(module != null, "Failed to lookup prefix %s", prefix);
+                    return QName.create(module.getQNameModule(), localName);
+                }
             case ParserBuilderConstants.Deserializer.EQUAL:
                 prefix = preparedPrefix;
                 return getQNameOfDataSchemaNode(prefix, variables);
@@ -150,9 +161,10 @@ public final class YangInstanceIdentifierDeserializer {
     private static void prepareNodeWithValue(final QName qname, final List<PathArgument> path,
             final MainVarsWrapper variables) {
         skipCurrentChar(variables);
-        String value = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
-        value = findAndParsePercentEncoded(value);
-        path.add(new YangInstanceIdentifier.NodeWithValue<>(qname, value));
+        final String value = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
+        checkValid(!value.isEmpty(), "Entry " + qname + " requires value to be present",
+                variables.getData(), variables.getOffset());
+        path.add(new YangInstanceIdentifier.NodeWithValue<>(qname, findAndParsePercentEncoded(value)));
     }
 
     private static void prepareIdentifier(final QName qname, final List<PathArgument> path,
@@ -176,25 +188,23 @@ public final class YangInstanceIdentifierDeserializer {
         return current;
     }
 
-    private static String findAndParsePercentEncoded(String preparedPrefix) {
+    private static String findAndParsePercentEncoded(final String preparedPrefix) {
         if (!preparedPrefix.contains(String.valueOf(ParserBuilderConstants.Deserializer.PERCENT_ENCODING))) {
             return preparedPrefix;
         }
-        final StringBuilder newPrefix = new StringBuilder();
-        int i = 0;
-        int startPoint = 0;
-        int endPoint = preparedPrefix.length();
-        while ((i = preparedPrefix.indexOf(ParserBuilderConstants.Deserializer.PERCENT_ENCODING)) != -1) {
-            newPrefix.append(preparedPrefix.substring(startPoint, i));
-            startPoint = i;
-            startPoint++;
-            final String hex = preparedPrefix.substring(startPoint, startPoint + 2);
-            startPoint += 2;
-            newPrefix.append((char) Integer.parseInt(hex, 16));
-            preparedPrefix = preparedPrefix.substring(startPoint, endPoint);
-            startPoint = 0;
-            endPoint = preparedPrefix.length();
+
+        final StringBuilder newPrefix = new StringBuilder(preparedPrefix);
+        final CharMatcher matcher = CharMatcher.is(ParserBuilderConstants.Deserializer.PERCENT_ENCODING);
+
+        while (matcher.matchesAnyOf(newPrefix)) {
+            final int i = matcher.indexIn(newPrefix);
+            newPrefix.replace(
+                    i,
+                    i + 3,
+                    String.valueOf((char) Integer.parseInt(newPrefix.substring(i + 1, i + 3), 16))
+            );
         }
+
         return newPrefix.toString();
     }
 

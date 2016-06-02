@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.utils.parser.builder;
 
 import com.google.common.base.CharMatcher;
+import java.util.Arrays;
 import org.opendaylight.restconf.parser.builder.YangInstanceIdentifierDeserializer;
 import org.opendaylight.restconf.parser.builder.YangInstanceIdentifierSerializer;
 
@@ -32,7 +33,9 @@ public final class ParserBuilderConstants {
             throw new UnsupportedOperationException("Util class");
         }
 
-        public static final String DISABLED_CHARS = ",': /";
+        public static final String DISABLED_CHARS = Arrays.toString(new char[] { ':', '/', '?', '#', '[', ']', '@' })
+                .concat(Arrays.toString(new char[] { '!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=' }));
+
         public static final CharMatcher PERCENT_ENCODE_CHARS = CharMatcher.anyOf(DISABLED_CHARS).precomputed();
     }
 
