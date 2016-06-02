@@ -7,13 +7,14 @@
  */
 package org.opendaylight.restconf.parser.builder;
 
+import static org.opendaylight.restconf.utils.parser.builder.ParserBuilderConstants.Serializer;
+
 import com.google.common.base.Preconditions;
 import java.net.URI;
-import java.util.Map;
+import java.util.Iterator;
 import java.util.Map.Entry;
-import java.util.Set;
-import org.opendaylight.restconf.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
@@ -44,27 +45,41 @@ public final class YangInstanceIdentifierSerializer {
      */
     public static String create(final SchemaContext schemaContext, final YangInstanceIdentifier data) {
         final DataSchemaContextNode<?> current = DataSchemaContextTree.from(schemaContext).getRoot();
-        final MainVarsWrappar variables = new YangInstanceIdentifierSerializer.MainVarsWrappar(current);
+        final MainVarsWrapper variables = new MainVarsWrapper(current);
 
-        final StringBuilder path = prepareFirstArgForPath(variables, data);
+        final StringBuilder path = new StringBuilder();
 
-        for (int i = 1; i < data.getPathArguments().size(); i++) {
+        for (int i = 0; i < data.getPathArguments().size(); i++) {
+            final QNameModule parentModule = variables.getCurrent().getDataSchemaNode().getQName().getModule();
+
             final PathArgument arg = data.getPathArguments().get(i);
             variables.setCurrent(variables.getCurrent().getChild(arg));
-            Preconditions.checkArgument(current != null,
+
+            Preconditions.checkArgument(variables.getCurrent() != null,
                     "Invalid input %s: schema for argument %s (after %s) not found", data, arg, path);
 
             if (variables.getCurrent().isMixin()) {
                 continue;
             }
-            path.append('/');
+
+            // append namespace before first node and before every node which is defined in other module than its parent
+            if (path.length() == 0) {
+                path.append("/" + prefixForNamespace(arg.getNodeType()) + ":");
+            } else if (!arg.getNodeType().getModule().equals(parentModule)) {
+                path.append("/" + prefixForNamespace(arg.getNodeType()) + ":");
+            } else {
+                path.append("/");
+            }
 
             if (arg instanceof NodeIdentifierWithPredicates) {
                 prepareNodeWithPredicates(path, arg);
             } else if (arg instanceof NodeWithValue) {
                 prepareNodeWithValue(path, arg);
+            } else {
+                appendQName(path, arg.getNodeType());
             }
         }
+
         return path.toString();
     }
 
@@ -73,7 +88,7 @@ public final class YangInstanceIdentifierSerializer {
         path.append("=");
 
         String value = ((NodeWithValue<String>) arg).getValue();
-        if (ParserBuilderConstants.Serializer.PERCENT_ENCODE_CHARS.matchesAnyOf(value)) {
+        if (Serializer.PERCENT_ENCODE_CHARS.matchesAnyOf(value)) {
             value = parsePercentEncodeChars(value);
         }
         path.append(value);
@@ -81,37 +96,28 @@ public final class YangInstanceIdentifierSerializer {
 
     private static void prepareNodeWithPredicates(final StringBuilder path, final PathArgument arg) {
         path.append(arg.getNodeType().getLocalName());
-        path.append("=");
 
-        final Set<Entry<QName, Object>> entrySet = ((NodeIdentifierWithPredicates) arg).getKeyValues().entrySet();
-        final int endOfSet = entrySet.size();
-        int s = 1;
-        for (final Map.Entry<QName, Object> entry : entrySet) {
-            String valueOf = String.valueOf(entry.getValue());
-            if (ParserBuilderConstants.Serializer.PERCENT_ENCODE_CHARS.matchesAnyOf(valueOf)) {
+        final Iterator<Entry<QName, Object>> iterator = ((NodeIdentifierWithPredicates) arg).getKeyValues()
+                .entrySet().iterator();
+
+        if (iterator.hasNext()) {
+            path.append("=");
+        }
+
+        while (iterator.hasNext()) {
+            String valueOf = String.valueOf(iterator.next().getValue());
+            if (Serializer.PERCENT_ENCODE_CHARS.matchesAnyOf(valueOf)) {
                 valueOf = parsePercentEncodeChars(valueOf);
             }
             path.append(valueOf);
-            if (s != endOfSet) {
+            if (iterator.hasNext()) {
                 path.append(",");
-                s++;
             }
         }
     }
 
-    private static StringBuilder prepareFirstArgForPath(final MainVarsWrappar variables,
-            final YangInstanceIdentifier data) {
-        final PathArgument firstArg = data.getPathArguments().get(0);
-        variables.setCurrent(variables.getCurrent().getChild(firstArg));
-
-        final StringBuilder path = new StringBuilder("/");
-        appendQName(path, firstArg.getNodeType());
-        return path;
-    }
-
     /**
-     * Encode {@link YangInstanceIdentifierSerializer#DISABLED_CHARS}
-     * chars to percent encoded chars
+     * Encode {@link Serializer#DISABLED_CHARS} chars to percent encoded chars
      *
      * @param valueOf
      *            - string to encode
@@ -121,7 +127,7 @@ public final class YangInstanceIdentifierSerializer {
         final StringBuilder sb = new StringBuilder();
         int start = 0;
         while (start < valueOf.length()) {
-            if (ParserBuilderConstants.Serializer.PERCENT_ENCODE_CHARS.matches(valueOf.charAt(start))) {
+            if (Serializer.PERCENT_ENCODE_CHARS.matches(valueOf.charAt(start))) {
                 final String format = String.format("%x", (int) valueOf.charAt(start));
                 final String upperCase = format.toUpperCase();
                 sb.append("%" + upperCase);
@@ -143,31 +149,29 @@ public final class YangInstanceIdentifierSerializer {
      * @return {@link StringBuilder}
      */
     private final static StringBuilder appendQName(final StringBuilder path, final QName qname) {
-        final String prefix = prefixForNamespace(qname.getNamespace());
-        Preconditions.checkArgument(prefix != null, "Failed to map QName {}", qname);
-        path.append(prefix);
-        path.append(':');
         path.append(qname.getLocalName());
         return path;
     }
 
     /**
-     * Create prefix of namespace from {@link URI}
+     * Create prefix of namespace from {@link QName}
      *
-     * @param namespace
-     *            - {@link URI}
+     * @param qname
+     *            - {@link QName}
      * @return {@link String}
      */
-    private static String prefixForNamespace(final URI namespace) {
+    private static String prefixForNamespace(final QName qname) {
+        final URI namespace = qname.getNamespace();
+        Preconditions.checkArgument(namespace != null, "Failed to map QName {}", qname);
         final String prefix = namespace.toString();
         return prefix.replace(':', '-');
     }
 
-    private static class MainVarsWrappar {
+    private static class MainVarsWrapper {
 
         private DataSchemaContextNode<?> current;
 
-        public MainVarsWrappar(final DataSchemaContextNode<?> current) {
+        public MainVarsWrapper(final DataSchemaContextNode<?> current) {
             this.setCurrent(current);
         }
 
