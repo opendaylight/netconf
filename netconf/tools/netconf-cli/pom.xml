@@ -20,6 +20,10 @@
   <packaging>jar</packaging>
   <name>${project.artifactId}</name>
 
+  <properties>
+    <sonar.skip>true</sonar.skip>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>

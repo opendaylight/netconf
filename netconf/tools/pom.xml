@@ -6,15 +6,12 @@
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-subsystem</artifactId>
     <version>1.1.0-SNAPSHOT</version>
+    <relativePath/>
   </parent>
 
   <artifactId>netconf-tools</artifactId>
   <packaging>pom</packaging>
   <name>${project.artifactId}</name>
-
-  <properties>
-    <sonar.skip>true</sonar.skip>
-  </properties>
 
   <modules>
     <module>netconf-cli</module>
