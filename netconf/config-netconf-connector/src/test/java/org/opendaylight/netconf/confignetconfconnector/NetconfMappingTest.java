@@ -704,9 +704,10 @@ public class NetconfMappingTest extends AbstractConfigTest {
         return "/urn:ietf:params:xml:ns:netconf:base:1.0:rpc-reply" +
                 "/urn:ietf:params:xml:ns:netconf:base:1.0:data" +
                 "/urn:opendaylight:params:xml:ns:yang:controller:config:modules" +
-                "/module[name='"+instanceName+"']" +
+                "/urn:opendaylight:params:xml:ns:yang:controller:config:module" +
+                "[urn:opendaylight:params:xml:ns:yang:controller:config:name='"+instanceName+"']" +
                 "/urn:opendaylight:params:xml:ns:yang:controller:test:impl:impl-netconf" +
-                "/urn:opendaylight:params:xml:ns:yang:controller:test:impl:"+subnode;
+                "/urn:opendaylight:params:xml:ns:yang:controller:test:impl:" + subnode;
     }
 
     private static void checkTypeConfigAttribute(final Document response) throws Exception {
