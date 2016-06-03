@@ -175,19 +175,48 @@ public class BaseYangSwaggerGenerator {
     public ApiDeclaration getSwaggerDocSpec(Module m, String basePath, String context, SchemaContext schemaContext) {
         ApiDeclaration doc = createApiDeclaration(basePath);
 
+<<<<<<< HEAD:opendaylight/restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java
         List<Api> apis = new ArrayList<Api>();
+=======
+        List<Api> apis = new ArrayList<>();
+        boolean hasAddRootPostLink = false;
+>>>>>>> fbc1bc9... Fix bug 5810, 5812::restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java
 
         Collection<DataSchemaNode> dataSchemaNodes = m.getChildNodes();
         LOG.debug("child nodes size [{}]", dataSchemaNodes.size());
         for (DataSchemaNode node : dataSchemaNodes) {
             if ((node instanceof ListSchemaNode) || (node instanceof ContainerSchemaNode)) {
-
                 LOG.debug("Is Configuration node [{}] [{}]", node.isConfiguration(), node.getQName().getLocalName());
 
+<<<<<<< HEAD:opendaylight/restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java
                 List<Parameter> pathParams = new ArrayList<Parameter>();
                 String resourcePath = getDataStorePath("/config/", context);
                 addRootPostLink(m, (DataNodeContainer) node, pathParams, resourcePath, apis);
                 addApis(node, apis, resourcePath, pathParams, schemaContext, true);
+=======
+                List<Parameter> pathParams = new ArrayList<>();
+                String resourcePath;
+
+                /*
+                 * Only when the node's config statement is true, such apis as GET/PUT/POST/DELETE config
+                 * are added for this node.
+                 */
+                if (node.isConfiguration()) { // This node's config statement is true.
+                    resourcePath = getDataStorePath("/config/", context);
+
+                    /*
+                     * When there are two or more top container or list nodes whose config statement is true in module,
+                     * make sure that only one root post link is added for this module.
+                     */
+                    if (!hasAddRootPostLink) {
+                        LOG.debug("Has added root post link for module {}", m.getName());
+                        addRootPostLink(m, (DataNodeContainer) node, pathParams, resourcePath, apis);
+                        hasAddRootPostLink = true;
+                    }
+
+                    addApis(node, apis, resourcePath, pathParams, schemaContext, true);
+                }
+>>>>>>> fbc1bc9... Fix bug 5810, 5812::restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java
 
                 pathParams = new ArrayList<Parameter>();
                 resourcePath = getDataStorePath("/operational/", context);
