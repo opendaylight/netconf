@@ -12,10 +12,6 @@
   <packaging>pom</packaging>
   <name>${project.artifactId}</name>
 
-  <properties>
-    <sonar.skip>true</sonar.skip>
-  </properties>
-
   <modules>
     <module>netconf-cli</module>
     <module>netconf-testtool</module>
