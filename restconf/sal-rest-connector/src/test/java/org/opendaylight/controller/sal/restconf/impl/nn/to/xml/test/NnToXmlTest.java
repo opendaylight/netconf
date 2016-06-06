@@ -40,21 +40,7 @@ import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.EnumTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.EnumTypeDefinition.EnumPair;
-import org.opendaylight.yangtools.yang.model.util.BinaryType;
-import org.opendaylight.yangtools.yang.model.util.BitsType;
-import org.opendaylight.yangtools.yang.model.util.BooleanType;
-import org.opendaylight.yangtools.yang.model.util.EmptyType;
-import org.opendaylight.yangtools.yang.model.util.EnumerationType;
-import org.opendaylight.yangtools.yang.model.util.Int16;
-import org.opendaylight.yangtools.yang.model.util.Int32;
-import org.opendaylight.yangtools.yang.model.util.Int64;
-import org.opendaylight.yangtools.yang.model.util.Int8;
-import org.opendaylight.yangtools.yang.model.util.StringType;
-import org.opendaylight.yangtools.yang.model.util.Uint16;
-import org.opendaylight.yangtools.yang.model.util.Uint32;
-import org.opendaylight.yangtools.yang.model.util.Uint64;
-import org.opendaylight.yangtools.yang.model.util.Uint8;
-import org.opendaylight.yangtools.yang.model.util.UnionType;
+import org.opendaylight.yangtools.yang.model.util.type.BaseTypes;
 
 public class NnToXmlTest extends AbstractBodyReaderTest {
 
@@ -105,7 +91,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     @Test
     public void nnAsYangStringToXmlTest() throws Exception {
         final NormalizedNodeContext normalizedNodeContext = prepareNNC(
-                TypeDefinitionAwareCodec.from(StringType.getInstance())
+                TypeDefinitionAwareCodec.from(BaseTypes.stringType())
                         .deserialize("lfStr value"), "lfStr");
         nnToXml(normalizedNodeContext, "<lfStr>lfStr value</lfStr>");
     }
@@ -115,7 +101,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         final String elName = "lfInt8";
 
         final NormalizedNodeContext normalizedNodeContext = prepareNNC(
-                TypeDefinitionAwareCodec.from(Int8.getInstance()).deserialize(
+                TypeDefinitionAwareCodec.from(BaseTypes.int8Type()).deserialize(
                         "14"), elName);
         nnToXml(normalizedNodeContext, "<" + elName + ">14</" + elName
                 + ">");
@@ -126,7 +112,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         final String elName = "lfInt16";
 
         final NormalizedNodeContext normalizedNodeContext = prepareNNC(
-                TypeDefinitionAwareCodec.from(Int16.getInstance()).deserialize(
+                TypeDefinitionAwareCodec.from(BaseTypes.int16Type()).deserialize(
                         "3000"), elName);
         nnToXml(normalizedNodeContext, "<" + elName + ">3000</" + elName
                 + ">");
@@ -137,7 +123,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         final String elName = "lfInt32";
 
         final NormalizedNodeContext normalizedNodeContext = prepareNNC(
-                TypeDefinitionAwareCodec.from(Int32.getInstance()).deserialize(
+                TypeDefinitionAwareCodec.from(BaseTypes.int32Type()).deserialize(
                         "201234"), elName);
         nnToXml(normalizedNodeContext, "<" + elName + ">201234</"
                 + elName + ">");
@@ -148,7 +134,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         final String elName = "lfInt64";
 
         final NormalizedNodeContext normalizedNodeContext = prepareNNC(
-                TypeDefinitionAwareCodec.from(Int64.getInstance()).deserialize(
+                TypeDefinitionAwareCodec.from(BaseTypes.int64Type()).deserialize(
                         "5123456789"), elName);
         nnToXml(normalizedNodeContext, "<" + elName + ">5123456789</"
                 + elName + ">");
@@ -202,7 +188,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         final String elName = "lfBinary";
         final NormalizedNodeContext normalizedNodeContext = prepareNNC(
                 TypeDefinitionAwareCodec
-                        .from(BinaryType.getInstance())
+                        .from(BaseTypes.binaryType())
                         .deserialize(
                                 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567"),
                 elName);
@@ -256,7 +242,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     public void nnAsYangEmptyToXmlTest() throws Exception {
         final String elName = "lfEmpty";
         final NormalizedNodeContext normalizedNodeContext = prepareNNC(
-                TypeDefinitionAwareCodec.from(EmptyType.getInstance())
+                TypeDefinitionAwareCodec.from(BaseTypes.emptyType())
                         .deserialize(null), elName);
         nnToXml(normalizedNodeContext, "<" + elName + "></" + elName
                 + ">");
@@ -266,13 +252,13 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     public void nnAsYangBooleanToXmlTest() throws Exception {
         final String elName = "lfBoolean";
         NormalizedNodeContext normalizedNodeContext = prepareNNC(
-                TypeDefinitionAwareCodec.from(BooleanType.getInstance())
+                TypeDefinitionAwareCodec.from(BaseTypes.booleanType())
 .deserialize("false"), elName);
         nnToXml(normalizedNodeContext, "<" + elName + ">false</"
                 + elName + ">");
 
         normalizedNodeContext = prepareNNC(
-                TypeDefinitionAwareCodec.from(BooleanType.getInstance())
+                TypeDefinitionAwareCodec.from(BaseTypes.booleanType())
                         .deserialize("true"), elName);
         nnToXml(normalizedNodeContext, "<" + elName + ">true</" + elName
                 + ">");
@@ -291,9 +277,9 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
                 mockBit1, mockBit2);
 
         final List<TypeDefinition<?>> types = Lists
-                .<TypeDefinition<?>> newArrayList(Int8.getInstance(), BitsType
+                .<TypeDefinition<?>> newArrayList(BaseTypes.int8Type(), BitsType
                         .create(Mockito.mock(SchemaPath.class), bitList),
-                        BooleanType.getInstance());
+                        BaseTypes.booleanType());
         final UnionType unionType = UnionType.create(types);
 
         final String elName = "lfUnion";
