@@ -49,7 +49,6 @@ import org.opendaylight.yangtools.yang.model.api.type.LengthConstraint;
 import org.opendaylight.yangtools.yang.model.api.type.StringTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.UnionTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.UnsignedIntegerTypeDefinition;
-import org.opendaylight.yangtools.yang.model.util.ExtendedType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -420,9 +419,7 @@ public class ModelGenerator {
     }
 
     private void processTypeDef(final TypeDefinition<?> leafTypeDef, final JSONObject property) throws JSONException {
-        if (leafTypeDef instanceof ExtendedType) {
-            processExtendedType(leafTypeDef, property);
-        } else if (leafTypeDef instanceof BinaryTypeDefinition) {
+        if (leafTypeDef instanceof BinaryTypeDefinition) {
             processBinaryType((BinaryTypeDefinition) leafTypeDef, property);
         } else if (leafTypeDef instanceof BitsTypeDefinition) {
             processBitsType((BitsTypeDefinition) leafTypeDef, property);
@@ -442,25 +439,6 @@ public class ModelGenerator {
             }
             property.putOpt(TYPE_KEY, jsonType);
         }
-    }
-
-    private void processExtendedType(final TypeDefinition<?> leafTypeDef, final JSONObject property) throws JSONException {
-        TypeDefinition<?> leafBaseType = leafTypeDef.getBaseType();
-        if (leafBaseType instanceof ExtendedType) {
-            // recursively process an extended type until we hit a base type
-            processExtendedType(leafBaseType, property);
-        } else {
-            List<LengthConstraint> lengthConstraints = ((ExtendedType) leafTypeDef).getLengthConstraints();
-            for (LengthConstraint lengthConstraint : lengthConstraints) {
-                Number min = lengthConstraint.getMin();
-                Number max = lengthConstraint.getMax();
-                property.putOpt(MIN_LENGTH_KEY, min);
-                property.putOpt(MAX_LENGTH_KEY, max);
-            }
-            String jsonType = jsonTypeFor(leafBaseType);
-            property.putOpt(TYPE_KEY, jsonType);
-        }
-
     }
 
     private static void processBinaryType(final BinaryTypeDefinition binaryType, final JSONObject property) throws JSONException {
