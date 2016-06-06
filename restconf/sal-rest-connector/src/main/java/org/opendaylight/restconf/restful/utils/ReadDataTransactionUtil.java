@@ -92,8 +92,8 @@ public final class ReadDataTransactionUtil {
                     .getTransaction().read(transactionNode.getLogicalDatastoreType(),
                             transactionNode.getInstanceIdentifier().getInstanceIdentifier());
             final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
-            FutureCallbackTx.addCallback(listenableFuture, transactionNode.getTransaction(),
-                    RestconfDataServiceConstant.ReadData.READ_TYPE_TX, dataFactory);
+            FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+                    dataFactory);
             return dataFactory.build();
         } else {
             return readAllData(transactionNode);

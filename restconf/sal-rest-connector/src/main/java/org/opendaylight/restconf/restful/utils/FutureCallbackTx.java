@@ -11,9 +11,7 @@ import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import javax.annotation.Nullable;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncTransaction;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,26 +32,23 @@ final class FutureCallbackTx {
      *
      * @param listenableFuture
      *            - future object
-     * @param transaction
-     *            - transaction used for read of future object
      * @param txType
      *            - type of operation (READ, POST, PUT, DELETE)
      * @param dataFactory
      *            - factory setting result
      */
-    static <T, X extends Exception> void addCallback(final CheckedFuture<T, X> listenableFuture,
-            final AsyncTransaction<YangInstanceIdentifier, NormalizedNode<?, ?>> transaction, final String txType,
+    static <T, X extends Exception> void addCallback(final CheckedFuture<T, X> listenableFuture, final String txType,
             final FutureDataFactory<T> dataFactory) {
         Futures.addCallback(listenableFuture, new FutureCallback<T>() {
 
             @Override
             public void onFailure(final Throwable t) {
-                handlingLoggerAndValues(t, txType, transaction, null, null);
+                handlingLoggerAndValues(t, txType, null, null);
             }
 
             @Override
             public void onSuccess(final T result) {
-                handlingLoggerAndValues(null, txType, transaction, result, dataFactory);
+                handlingLoggerAndValues(null, txType, result, dataFactory);
             }
 
         });
@@ -70,21 +65,18 @@ final class FutureCallbackTx {
      *            - exception - if callback is onFailure
      * @param txType
      *            - type of operation (READ, POST, PUT, DELETE)
-     * @param transaction
-     *            - transaction used for read of future object
-     * @param optionalNN
-     *            - result - if callback is on Success
+     * @param result
+     *            - result of future - if callback is on Success
      * @param dataFactory
      *            - setter for result - in callback is onSuccess
      */
     protected static <T> void handlingLoggerAndValues(@Nullable final Throwable t, final String txType,
-            final AsyncTransaction<YangInstanceIdentifier, NormalizedNode<?, ?>> transaction,
             final T result, final FutureDataFactory<T> dataFactory) {
         if (t != null) {
-            LOG.info("Transaction({}) {} FAILED!", txType, transaction.getIdentifier(), t);
-            throw new IllegalStateException("  Transaction(" + txType + ") not committed correctly", t);
+            LOG.info("Transaction({}) FAILED!", txType, t);
+            throw new RestconfDocumentedException("  Transaction(" + txType + ") not committed correctly", t);
         } else {
-            LOG.trace("Transaction({}) {} SUCCESSFUL!", txType, transaction.getIdentifier());
+            LOG.trace("Transaction({}) SUCCESSFUL!", txType);
             dataFactory.setResult(result);
         }
     }
