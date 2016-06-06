@@ -37,8 +37,7 @@ public final class DeleteDataTransactionUtil {
         final CheckedFuture<Void, TransactionCommitFailedException> future = submitData(
                 transactionNode.getTransaction(), transactionNode.getInstanceIdentifier().getInstanceIdentifier());
         final ResponseFactory response = new ResponseFactory();
-        FutureCallbackTx.addCallback(future, transactionNode.getTransaction(),
-                RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE, response);
+        FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE, response);
         return response.build();
     }
 
