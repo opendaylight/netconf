@@ -140,8 +140,7 @@ public final class PutDataTransactionUtil {
                 ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.CONFIG, transactionNode));
         final CheckedFuture<Void, TransactionCommitFailedException> submitData = submitData(path, schemaCtxRef.get(),
                 transactionNode.getTransaction(), payload.getData());
-        FutureCallbackTx.addCallback(submitData, transactionNode.getTransaction(),
-                RestconfDataServiceConstant.PutData.PUT_TX_TYPE, responseFactory);
+        FutureCallbackTx.addCallback(submitData, RestconfDataServiceConstant.PutData.PUT_TX_TYPE, responseFactory);
         return responseFactory.build();
     }
 
