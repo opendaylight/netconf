@@ -74,8 +74,7 @@ public final class PostDataTransactionUtil {
         final ResponseFactory dataFactory = new ResponseFactory(
                 ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.CONFIG, transactionNode),
                 location);
-        FutureCallbackTx.addCallback(future, transactionNode.getTransaction(),
-                RestconfDataServiceConstant.PostData.POST_TX_TYPE, dataFactory);
+        FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.PostData.POST_TX_TYPE, dataFactory);
         return dataFactory.build();
     }
 
