@@ -178,11 +178,13 @@ public class NetconfDeviceMasterDataBroker implements ProxyNetconfDeviceDataBrok
             @Override
             public void onSuccess(Void result) {
                 promise.success(result);
+                writeTx = null;
             }
 
             @Override
             public void onFailure(Throwable t) {
                 promise.failure(t);
+                writeTx = null;
             }
         });
         return promise.future();
@@ -197,11 +199,13 @@ public class NetconfDeviceMasterDataBroker implements ProxyNetconfDeviceDataBrok
             @Override
             public void onSuccess(RpcResult<TransactionStatus> result) {
                 promise.success(result);
+                writeTx = null;
             }
 
             @Override
             public void onFailure(Throwable t) {
                 promise.failure(t);
+                writeTx = null;
             }
         });
         return promise.future();
