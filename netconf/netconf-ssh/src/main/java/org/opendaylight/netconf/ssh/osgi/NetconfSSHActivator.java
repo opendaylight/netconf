@@ -7,10 +7,7 @@
  */
 package org.opendaylight.netconf.ssh.osgi;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.common.base.Optional;
-import com.google.common.base.Strings;
 import io.netty.channel.local.LocalAddress;
 import io.netty.channel.nio.NioEventLoopGroup;
 import java.io.IOException;
@@ -83,23 +80,24 @@ public class NetconfSSHActivator implements BundleActivator {
 
     private SshProxyServer startSSHServer(final BundleContext bundleContext) throws IOException {
         final Optional<InetSocketAddress> maybeSshSocketAddress = NetconfConfigUtil.extractNetconfServerAddress(bundleContext, InfixProp.ssh);
-
         if (!maybeSshSocketAddress.isPresent()) {
-            LOG.trace("SSH bridge not configured");
-            return null;
+            LOG.warn("SSH bridge not configured. Using default value {}", NetconfConfigUtil.DEFAULT_SSH_SERVER_ADRESS);
         }
-
-        final InetSocketAddress sshSocketAddress = maybeSshSocketAddress.get();
-        LOG.trace("Starting netconf SSH bridge at {}", sshSocketAddress);
+        final InetSocketAddress sshSocketAddress = maybeSshSocketAddress
+                .or(NetconfConfigUtil.DEFAULT_SSH_SERVER_ADRESS);
+        LOG.info("Starting netconf SSH bridge at {}", sshSocketAddress);
 
         final LocalAddress localAddress = NetconfConfigUtil.getNetconfLocalAddress();
 
         authProviderTracker = new AuthProviderTracker(bundleContext);
 
-        final String path = NetconfConfigUtil.getPrivateKeyPath(bundleContext);
-
-        checkState(!Strings.isNullOrEmpty(path), "Path to ssh private key is blank. Reconfigure %s",
-                NetconfConfigUtil.getPrivateKeyKey());
+        final Optional<String> maybePath = NetconfConfigUtil.getPrivateKeyPath(bundleContext);
+        if(!maybePath.isPresent()) {
+            LOG.warn("Private key path not configured. Using default value {}",
+                    NetconfConfigUtil.DEFAULT_PRIVATE_KEY_PATH);
+        }
+        final String path = maybePath.or(NetconfConfigUtil.DEFAULT_PRIVATE_KEY_PATH);
+        LOG.trace("Starting netconf SSH bridge with path to ssh private key {}", path);
 
         final SshProxyServer sshProxyServer = new SshProxyServer(minaTimerExecutor, clientGroup, nioExecutor);
         sshProxyServer.bind(

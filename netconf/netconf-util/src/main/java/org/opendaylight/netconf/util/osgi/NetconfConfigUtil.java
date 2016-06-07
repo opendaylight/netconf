@@ -33,11 +33,15 @@ public final class NetconfConfigUtil {
     private static final String PRIVATE_KEY_PATH_PROP = ".pk.path";
 
     private static final String CONNECTION_TIMEOUT_MILLIS_PROP = "connectionTimeoutMillis";
+    private static final String LOCAL_HOST = "127.0.0.1";
     public static final long DEFAULT_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(30);
-    private static final LocalAddress netconfLocalAddress = new LocalAddress("netconf");
+    private static final LocalAddress NETCONF_LOCAL_ADDRESS = new LocalAddress("netconf");
+    public static final String DEFAULT_PRIVATE_KEY_PATH = "./configuration/RSA.pk";
+    public static final InetSocketAddress DEFAULT_TCP_SERVER_ADRESS = new InetSocketAddress(LOCAL_HOST, 8383);
+    public static final InetSocketAddress DEFAULT_SSH_SERVER_ADRESS = new InetSocketAddress(LOCAL_HOST, 1830);
 
     public static LocalAddress getNetconfLocalAddress() {
-        return netconfLocalAddress;
+        return NETCONF_LOCAL_ADDRESS;
     }
 
     public static long extractTimeoutMillis(final BundleContext bundleContext) {
@@ -54,20 +58,16 @@ public final class NetconfConfigUtil {
         }
     }
 
-    public static String getPrivateKeyPath(final BundleContext context) {
-        return getPropertyValue(context, getPrivateKeyKey());
+    /**
+     * @param context from which properties are being read.
+     * @return value of private key path if value is present, Optional.absent otherwise
+     */
+    public static Optional<String> getPrivateKeyPath(final BundleContext context) {
+        return getProperty(context, getPrivateKeyKey());
     }
 
     public static String getPrivateKeyKey() {
         return PREFIX_PROP + InfixProp.ssh + PRIVATE_KEY_PATH_PROP;
-    }
-
-    private static String getPropertyValue(final BundleContext context, final String propertyName) {
-        final String propertyValue = context.getProperty(propertyName);
-        if (propertyValue == null) {
-            throw new IllegalStateException("Cannot find initial property with name '" + propertyName + "'");
-        }
-        return propertyValue;
     }
 
     public static String getNetconfServerAddressKey(InfixProp infixProp) {
@@ -78,7 +78,6 @@ public final class NetconfConfigUtil {
      * @param context   from which properties are being read.
      * @param infixProp either tcp or ssh
      * @return value if address and port are present and valid, Optional.absent otherwise.
-     * @throws IllegalStateException if address or port are invalid, or configuration is missing
      */
     public static Optional<InetSocketAddress> extractNetconfServerAddress(final BundleContext context,
                                                                            final InfixProp infixProp) {
