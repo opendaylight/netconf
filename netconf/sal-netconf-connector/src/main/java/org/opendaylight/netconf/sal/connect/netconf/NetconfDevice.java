@@ -48,6 +48,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
+import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
@@ -69,7 +70,8 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     public static final Function<QName, SourceIdentifier> QNAME_TO_SOURCE_ID_FUNCTION = new Function<QName, SourceIdentifier>() {
         @Override
         public SourceIdentifier apply(final QName input) {
-            return new SourceIdentifier(input.getLocalName(), Optional.fromNullable(input.getFormattedRevision()));
+            return RevisionSourceIdentifier
+                    .create(input.getLocalName(), Optional.fromNullable(input.getFormattedRevision()));
         }
     };
 
