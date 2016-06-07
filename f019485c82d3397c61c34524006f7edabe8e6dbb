@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da5c1566_6a3a9fce",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/osgi/NetconfSSHActivator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-06-07T11:15:08Z",
+      "side": 1,
+      "message": "Make this a static final constant",
+      "range": {
+        "startLine": 94,
+        "startChar": 20,
+        "endLine": 94,
+        "endChar": 59
+      },
+      "revId": "f019485c82d3397c61c34524006f7edabe8e6dbb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da5c1566_4a37dbe3",
+        "filename": "netconf/netconf-tcp/src/main/java/org/opendaylight/netconf/tcp/osgi/NetconfTCPActivator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-06-07T11:15:08Z",
+      "side": 1,
+      "message": "same as above",
+      "range": {
+        "startLine": 36,
+        "startChar": 52,
+        "endLine": 36,
+        "endChar": 91
+      },
+      "revId": "f019485c82d3397c61c34524006f7edabe8e6dbb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
