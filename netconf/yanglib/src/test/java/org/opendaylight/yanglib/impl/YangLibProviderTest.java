@@ -11,8 +11,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -41,7 +39,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.ModuleKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.api.YinSchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
@@ -77,11 +75,13 @@ public class YangLibProviderTest {
 
         List<PotentialSchemaSource<?>> list = new ArrayList<>();
         list.add(
-                PotentialSchemaSource.create(new SourceIdentifier("no-revision"),
+                PotentialSchemaSource.create(
+                        RevisionSourceIdentifier.create("no-revision"),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
         list.add(
-                PotentialSchemaSource.create(new SourceIdentifier("with-revision", "2016-04-28"),
+                PotentialSchemaSource.create(
+                        RevisionSourceIdentifier.create("with-revision", "2016-04-28"),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
         when(writeTransaction.submit()).thenReturn(Futures.immediateCheckedFuture(null));
@@ -126,11 +126,13 @@ public class YangLibProviderTest {
         // expected behavior is to do nothing
         potentialSources = new ArrayList<>();
         potentialSources.add(
-                PotentialSchemaSource.create(new SourceIdentifier("yin-source-representation"),
+                PotentialSchemaSource.create(
+                        RevisionSourceIdentifier.create("yin-source-representation"),
                         YinSchemaSourceRepresentation.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
         potentialSources.add(
-                PotentialSchemaSource.create(new SourceIdentifier("asts-schema-source"),
+                PotentialSchemaSource.create(
+                        RevisionSourceIdentifier.create("asts-schema-source"),
                         ASTSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
         yangLibProvider.schemaSourceRegistered(potentialSources);
@@ -138,7 +140,8 @@ public class YangLibProviderTest {
 
         // add yang schema source to list
         potentialSources.add(
-                PotentialSchemaSource.create(new SourceIdentifier("yang-schema-source"),
+                PotentialSchemaSource.create(
+                        RevisionSourceIdentifier.create("yang-schema-source"),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTransaction);
@@ -158,7 +161,8 @@ public class YangLibProviderTest {
         yangLibProvider.onSessionInitiated(context);
 
         final PotentialSchemaSource<YinSchemaSourceRepresentation> nonYangSource =
-                PotentialSchemaSource.create(new SourceIdentifier("yin-source-representation"),
+                PotentialSchemaSource.create(
+                        RevisionSourceIdentifier.create("yin-source-representation"),
                 YinSchemaSourceRepresentation.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue());
 
         yangLibProvider.schemaSourceUnregistered(nonYangSource);
@@ -178,7 +182,8 @@ public class YangLibProviderTest {
         when(writeTransaction.submit()).thenReturn(Futures.immediateCheckedFuture(null));
 
         PotentialSchemaSource<YangTextSchemaSource> yangUnregistererSource =
-                PotentialSchemaSource.create(new SourceIdentifier("unregistered-yang-schema-without-revision"),
+                PotentialSchemaSource.create(
+                        RevisionSourceIdentifier.create("unregistered-yang-schema-without-revision"),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.LOCAL_IO.getValue());
 
         yangLibProvider.schemaSourceUnregistered(yangUnregistererSource);
@@ -193,7 +198,8 @@ public class YangLibProviderTest {
         verify(writeTransaction).submit();
 
         yangUnregistererSource =
-                PotentialSchemaSource.create(new SourceIdentifier("unregistered-yang-with-revision", "2016-04-28"),
+                PotentialSchemaSource.create(
+                        RevisionSourceIdentifier.create("unregistered-yang-with-revision", "2016-04-28"),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.LOCAL_IO.getValue());
 
         yangLibProvider.schemaSourceUnregistered(yangUnregistererSource);

@@ -53,6 +53,7 @@ import org.opendaylight.protocol.framework.TimedReconnectStrategy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.IpAddress;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
@@ -239,8 +240,10 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
                     }
                     if (userCapabilities.isPresent()) {
                         for (QName qname : userCapabilities.get().getModuleBasedCaps()) {
-                            final SourceIdentifier sourceIdentifier = new SourceIdentifier(qname.getLocalName(), qname.getFormattedRevision());
-                            dto.getSchemaRegistry().registerSchemaSource(DEFAULT_CACHE, PotentialSchemaSource.create(sourceIdentifier, YangTextSchemaSource.class, LOCAL_IO_FALLBACK_COST));
+                            final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier
+                                    .create(qname.getLocalName(), qname.getFormattedRevision());
+                            dto.getSchemaRegistry().registerSchemaSource(DEFAULT_CACHE, PotentialSchemaSource
+                                    .create(sourceIdentifier, YangTextSchemaSource.class, LOCAL_IO_FALLBACK_COST));
                         }
                     }
                 }

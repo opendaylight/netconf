@@ -12,6 +12,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -24,7 +25,7 @@ public class YangLibrarySchemaYangSourceProviderTest {
     @Before
     public void setUp() throws Exception {
         final URL url = getClass().getResource("/schemas/config-test-rpc.yang");
-        workingSid = new SourceIdentifier("abc", Optional.<String>absent());
+        workingSid = RevisionSourceIdentifier.create("abc", Optional.<String>absent());
         final Map<SourceIdentifier, URL> sourceIdentifierURLMap = Collections.singletonMap(workingSid, url);
         final RemoteDeviceId id = new RemoteDeviceId("id", new InetSocketAddress("localhost", 22));
         yangLibrarySchemaYangSourceProvider = new YangLibrarySchemaYangSourceProvider(id, sourceIdentifierURLMap);
@@ -53,6 +54,6 @@ public class YangLibrarySchemaYangSourceProviderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetSourceNotAvailable() throws Exception {
-        yangLibrarySchemaYangSourceProvider.getSource(new SourceIdentifier("aaaaa", "0000-00-00"));
+        yangLibrarySchemaYangSourceProvider.getSource(RevisionSourceIdentifier.create("aaaaa", "0000-00-00"));
     }
 }

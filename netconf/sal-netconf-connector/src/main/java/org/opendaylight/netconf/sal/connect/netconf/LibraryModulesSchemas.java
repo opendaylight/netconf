@@ -44,6 +44,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -244,8 +245,8 @@ public class LibraryModulesSchemas {
 
 
         final SourceIdentifier sourceId = revision.isPresent()
-                ? new SourceIdentifier(moduleName, revision.get())
-                : new SourceIdentifier(moduleName);
+                ? RevisionSourceIdentifier.create(moduleName, revision.get())
+                : RevisionSourceIdentifier.create(moduleName);
 
         try {
             return Optional.<Map.Entry<SourceIdentifier, URL>>of(new AbstractMap.SimpleImmutableEntry<>(

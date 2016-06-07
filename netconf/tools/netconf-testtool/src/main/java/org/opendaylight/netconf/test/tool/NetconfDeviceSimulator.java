@@ -59,6 +59,7 @@ import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
@@ -328,16 +329,16 @@ public class NetconfDeviceSimulator implements Closeable {
     }
 
     private void addDefaultSchemas(final SharedSchemaRepository consumer) {
-        SourceIdentifier sId = new SourceIdentifier("ietf-netconf-monitoring", "2010-10-04");
+        SourceIdentifier sId = RevisionSourceIdentifier.create("ietf-netconf-monitoring", "2010-10-04");
         registerSource(consumer, "/META-INF/yang/ietf-netconf-monitoring.yang", sId);
 
-        sId = new SourceIdentifier("ietf-netconf-monitoring-extension", "2013-12-10");
+        sId = RevisionSourceIdentifier.create("ietf-netconf-monitoring-extension", "2013-12-10");
         registerSource(consumer, "/META-INF/yang/ietf-netconf-monitoring-extension.yang", sId);
 
-        sId = new SourceIdentifier("ietf-yang-types", "2010-09-24");
+        sId = RevisionSourceIdentifier.create("ietf-yang-types", "2010-09-24");
         registerSource(consumer, "/META-INF/yang/ietf-yang-types.yang", sId);
 
-        sId = new SourceIdentifier("ietf-inet-types", "2010-09-24");
+        sId = RevisionSourceIdentifier.create("ietf-inet-types", "2010-09-24");
         registerSource(consumer, "/META-INF/yang/ietf-inet-types.yang", sId);
     }
 

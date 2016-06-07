@@ -13,11 +13,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.io.IOException;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import org.opendaylight.yanglib.api.YangLibService;
+import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -47,7 +44,7 @@ public class YangLibServiceImpl implements YangLibService {
         Preconditions.checkNotNull(schemaRepository, "Schema repository is not initialized");
         LOG.debug("Attempting load for schema source {}:{}", name, revision);
         final SourceIdentifier sourceId =
-                new SourceIdentifier(name, Optional.fromNullable(revision.equals("") ? null : revision));
+                RevisionSourceIdentifier.create(name, Optional.fromNullable(revision.equals("") ? null : revision));
 
         final CheckedFuture<YangTextSchemaSource, SchemaSourceException> sourceFuture =
                 schemaRepository.getSchemaSource(sourceId, YangTextSchemaSource.class);

@@ -58,6 +58,7 @@ import org.opendaylight.yangtools.yang.model.api.ModuleImport;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
+import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -92,10 +93,12 @@ public class NetconfDeviceTest {
     public static final String TEST_NAMESPACE = "test:namespace";
     public static final String TEST_MODULE = "test-module";
     public static final String TEST_REVISION = "2013-07-22";
-    public static final SourceIdentifier TEST_SID = new SourceIdentifier(TEST_MODULE, Optional.of(TEST_REVISION));
+    public static final SourceIdentifier TEST_SID =
+            RevisionSourceIdentifier.create(TEST_MODULE, Optional.of(TEST_REVISION));
     public static final String TEST_CAPABILITY = TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION;
 
-    public static final SourceIdentifier TEST_SID2 = new SourceIdentifier(TEST_MODULE + "2", Optional.of(TEST_REVISION));
+    public static final SourceIdentifier TEST_SID2 =
+            RevisionSourceIdentifier.create(TEST_MODULE + "2", Optional.of(TEST_REVISION));
     public static final String TEST_CAPABILITY2 = TEST_NAMESPACE + "?module=" + TEST_MODULE + "2" + "&amp;revision=" + TEST_REVISION;
 
     private static final NetconfStateSchemas.NetconfStateSchemasResolver stateSchemasResolver = new NetconfStateSchemas.NetconfStateSchemasResolver() {

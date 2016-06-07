@@ -13,10 +13,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
-import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.netconf.sal.connect.netconf.LibraryModulesSchemas;
+import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 
 public class LibraryModulesSchemasTest {
@@ -41,20 +40,22 @@ public class LibraryModulesSchemasTest {
         final Map<SourceIdentifier, URL> resolvedModulesSchema = libraryModulesSchemas.getAvailableModels();
         Assert.assertThat(resolvedModulesSchema.size(), is(3));
 
-        Assert.assertTrue(resolvedModulesSchema.containsKey(new SourceIdentifier("module-with-revision", "2014-04-08")));
+        Assert.assertTrue(resolvedModulesSchema.containsKey(RevisionSourceIdentifier.create("module-with-revision",
+                "2014-04-08")));
         Assert.assertThat(resolvedModulesSchema.get(
-                new SourceIdentifier("module-with-revision", "2014-04-08")),
+                RevisionSourceIdentifier.create("module-with-revision", "2014-04-08")),
                 is(new URL("http://localhost:8181/yanglib/schemas/module-with-revision/2014-04-08")));
 
         Assert.assertTrue(resolvedModulesSchema.containsKey(
-                new SourceIdentifier("another-module-with-revision", "2013-10-21")));
+                RevisionSourceIdentifier.create("another-module-with-revision", "2013-10-21")));
         Assert.assertThat(resolvedModulesSchema.get(
-                new SourceIdentifier("another-module-with-revision", "2013-10-21")),
+                RevisionSourceIdentifier.create("another-module-with-revision", "2013-10-21")),
                 is(new URL("http://localhost:8181/yanglib/schemas/another-module-with-revision/2013-10-21")));
 
-        Assert.assertTrue(resolvedModulesSchema.containsKey(new SourceIdentifier("module-without-revision")));
+        Assert.assertTrue(resolvedModulesSchema.containsKey(
+                RevisionSourceIdentifier.create("module-without-revision")));
         Assert.assertThat(resolvedModulesSchema.get(
-                new SourceIdentifier("module-without-revision")),
+                RevisionSourceIdentifier.create("module-without-revision")),
                 is(new URL("http://localhost:8181/yanglib/schemas/module-without-revision/")));
     }
 
@@ -66,10 +67,12 @@ public class LibraryModulesSchemasTest {
         final Map<SourceIdentifier, URL> resolvedModulesSchema = libraryModulesSchemas.getAvailableModels();
         Assert.assertThat(resolvedModulesSchema.size(), is(1));
 
-        Assert.assertFalse(resolvedModulesSchema.containsKey(new SourceIdentifier("module-with-bad-url")));
         Assert.assertFalse(resolvedModulesSchema.containsKey(
-                new SourceIdentifier("module-with-bad-revision", "bad-revision")));
-        Assert.assertTrue(resolvedModulesSchema.containsKey(new SourceIdentifier("good-ol-module")));
+                RevisionSourceIdentifier.create("module-with-bad-url")));
+        Assert.assertFalse(resolvedModulesSchema.containsKey(
+                RevisionSourceIdentifier.create("module-with-bad-revision", "bad-revision")));
+        Assert.assertTrue(resolvedModulesSchema.containsKey(
+                RevisionSourceIdentifier.create("good-ol-module")));
     }
 
 
