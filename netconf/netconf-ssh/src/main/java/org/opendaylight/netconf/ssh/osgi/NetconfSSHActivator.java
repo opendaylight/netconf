@@ -14,6 +14,8 @@ import com.google.common.base.Strings;
 import io.netty.channel.local.LocalAddress;
 import io.netty.channel.nio.NioEventLoopGroup;
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -85,11 +87,11 @@ public class NetconfSSHActivator implements BundleActivator {
         final Optional<InetSocketAddress> maybeSshSocketAddress = NetconfConfigUtil.extractNetconfServerAddress(bundleContext, InfixProp.ssh);
 
         if (!maybeSshSocketAddress.isPresent()) {
-            LOG.trace("SSH bridge not configured");
-            return null;
+            LOG.warn("SSH bridge not configured. Using default setting");
         }
 
-        final InetSocketAddress sshSocketAddress = maybeSshSocketAddress.get();
+        final InetSocketAddress sshSocketAddress = maybeSshSocketAddress
+                .or(new InetSocketAddress("127.0.0.1", 1830));
         LOG.trace("Starting netconf SSH bridge at {}", sshSocketAddress);
 
         final LocalAddress localAddress = NetconfConfigUtil.getNetconfLocalAddress();
