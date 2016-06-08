@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.restful.services.impl;
 
+import java.net.URI;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
@@ -16,7 +17,9 @@ import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.restful.services.api.RestconfInvokeOperationsService;
+import org.opendaylight.restconf.restful.utils.CreateStreamUtil;
 import org.opendaylight.restconf.restful.utils.RestconfInvokeOperationsUtil;
+import org.opendaylight.restconf.restful.utils.RestconfStreamsConstants;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -32,17 +35,27 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
 
     @Override
     public NormalizedNodeContext invokeRpc(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+        final SchemaContextRef refSchemaCtx = new SchemaContextRef(this.schemaContextHandler.get());
         final SchemaPath schemaPath = payload.getInstanceIdentifierContext().getSchemaNode().getPath();
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
+        final URI namespace = payload.getInstanceIdentifierContext().getSchemaNode().getQName().getNamespace();
         DOMRpcResult response;
+
         SchemaContextRef schemaContextRef;
+
         if (mountPoint == null) {
-            response = RestconfInvokeOperationsUtil.invokeRpc(payload.getData(), schemaPath, this.rpcServiceHandler);
+            if (namespace.toString().equals(RestconfStreamsConstants.SAL_REMOTE_NAMESPACE)) {
+                response = CreateStreamUtil.createStream(payload, refSchemaCtx);
+            } else {
+                response = RestconfInvokeOperationsUtil.invokeRpc(payload.getData(), schemaPath,
+                        this.rpcServiceHandler);
+            }
             schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
         } else {
             response = RestconfInvokeOperationsUtil.invokeRpcViaMountPoint(mountPoint, payload.getData(), schemaPath);
             schemaContextRef = new SchemaContextRef(mountPoint.getSchemaContext());
         }
+
         final DOMRpcResult result = RestconfInvokeOperationsUtil.checkResponse(response);
 
         RpcDefinition resultNodeSchema = null;
