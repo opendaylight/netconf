@@ -97,10 +97,15 @@ module basic-module {
             }
         }
 
+        leaf lfLfrefNegative {
+            type leafref {
+                path "/cont/not-existing";
+            }
+        }
+
         leaf lfInIdentifier {
             type instance-identifier;
         }
 
     }
-
 }

@@ -10,16 +10,13 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
-
-import java.util.Collections;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.restconf.impl.RestCodec;
 import org.opendaylight.yangtools.concepts.Codec;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition.Bit;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
-import org.opendaylight.yangtools.yang.model.util.BitsType;
+import org.opendaylight.yangtools.yang.model.util.type.BaseTypes;
 
 public class RestCodecExceptionsTest {
 
@@ -27,17 +24,17 @@ public class RestCodecExceptionsTest {
 
     @Test
     public void serializeExceptionTest() {
-        Codec<Object, Object> codec = RestCodec.from(BitsType.create(PATH, Collections.<Bit> emptyList()), null);
-        String serializedValue = (String) codec.serialize("incorrect value"); // set
+        final Codec<Object, Object> codec = RestCodec.from(BaseTypes.bitsTypeBuilder(PATH).build(), null);
+        final String serializedValue = (String) codec.serialize("incorrect value"); // set
                                                                               // expected
         assertEquals("incorrect value", serializedValue);
     }
 
     @Test
     public void deserializeExceptionTest() {
-        IdentityrefTypeDefinition mockedIidentityrefType = mock(IdentityrefTypeDefinition.class);
+        final IdentityrefTypeDefinition mockedIidentityrefType = mock(IdentityrefTypeDefinition.class);
 
-        Codec<Object, Object> codec = RestCodec.from(mockedIidentityrefType, null);
+        final Codec<Object, Object> codec = RestCodec.from(mockedIidentityrefType, null);
         assertNull(codec.deserialize("incorrect value"));
     }
 
