@@ -143,16 +143,7 @@ public final class CreateStreamUtil {
             return null;
         }
 
-        return resolveEnum(clazz, (String) value);
-    }
-
-    private static <T> T resolveEnum(final Class<T> clazz, final String value) {
-        for (final T t : clazz.getEnumConstants()) {
-            if (((Enum<?>) t).name().equals(value)) {
-                return t;
-            }
-        }
-        return null;
+        return StreamUtil.resolveEnum(clazz, (String) value);
     }
 
     private static YangInstanceIdentifier preparePath(final NormalizedNodeContext payload, final ContainerNode data,
