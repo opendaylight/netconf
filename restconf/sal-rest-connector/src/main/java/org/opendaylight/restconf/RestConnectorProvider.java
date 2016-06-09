@@ -20,9 +20,11 @@ import org.opendaylight.controller.sal.core.api.Broker.ProviderSession;
 import org.opendaylight.controller.sal.core.api.Provider;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.netconf.sal.rest.api.RestConnector;
+import org.opendaylight.restconf.common.handlers.api.DOMDataBrokerHandler;
 import org.opendaylight.restconf.common.handlers.api.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.common.handlers.api.SchemaContextHandler;
 import org.opendaylight.restconf.common.handlers.api.TransactionChainHandler;
+import org.opendaylight.restconf.common.handlers.impl.DOMDataBrokerHandlerImpl;
 import org.opendaylight.restconf.common.handlers.impl.DOMMountPointServiceHandlerImpl;
 import org.opendaylight.restconf.common.handlers.impl.SchemaContextHandlerImpl;
 import org.opendaylight.restconf.common.handlers.impl.TransactionChainHandlerImpl;
@@ -74,6 +76,9 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         this.dataBroker = session.getService(DOMDataBroker.class);
         this.transactionChain = this.dataBroker.createTransactionChain(this.transactionListener);
         this.transactionChainHandler.setTransactionChain(this.transactionChain);
+
+        final DOMDataBrokerHandler brokerHandler = new DOMDataBrokerHandlerImpl();
+        brokerHandler.setDOMDataBroker(this.dataBroker);
 
         wrapperServices.setHandlers(schemaCtxHandler, domMountPointServiceHandler);
     }
