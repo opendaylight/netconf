@@ -72,12 +72,12 @@ public class NetconfConfigUtilTest {
     @Test
     public void testGetPrivateKeyPath() throws Exception {
         doReturn("path").when(bundleContext).getProperty("netconf.ssh.pk.path");
-        assertEquals(NetconfConfigUtil.getPrivateKeyPath(bundleContext), "path");
+        assertEquals(NetconfConfigUtil.getPrivateKeyPath(bundleContext).get(), "path");
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testGetPrivateKeyPath2() throws Exception {
+    @Test
+    public void testGetPrivateKeyPathNotPresent() throws Exception {
         doReturn(null).when(bundleContext).getProperty("netconf.ssh.pk.path");
-        assertEquals(NetconfConfigUtil.getPrivateKeyPath(bundleContext), "path");
+        assertEquals(NetconfConfigUtil.getPrivateKeyPath(bundleContext), Optional.absent());
     }
 }

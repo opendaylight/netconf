@@ -29,10 +29,12 @@ public class NetconfTCPActivator implements BundleActivator {
     public void start(BundleContext context) {
         final Optional<InetSocketAddress> maybeAddress = NetconfConfigUtil.extractNetconfServerAddress(context, InfixProp.tcp);
         if (maybeAddress.isPresent() == false) {
-            LOG.debug("Netconf tcp server is not configured to start");
-            return;
+            LOG.warn("Netconf tcp server is not configured. Using default value {}",
+                    NetconfConfigUtil.DEFAULT_TCP_SERVER_ADRESS);
         }
-        InetSocketAddress address = maybeAddress.get();
+
+        InetSocketAddress address = maybeAddress.or(NetconfConfigUtil.DEFAULT_TCP_SERVER_ADRESS);
+
         if (address.getAddress().isAnyLocalAddress()) {
             LOG.warn("Unprotected netconf TCP address is configured to ANY local address. This is a security risk. Consider changing {} to 127.0.0.1",
                     NetconfConfigUtil.getNetconfServerAddressKey(InfixProp.tcp));
