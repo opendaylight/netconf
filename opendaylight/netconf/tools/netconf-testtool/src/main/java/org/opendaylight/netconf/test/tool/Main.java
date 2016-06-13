@@ -188,6 +188,28 @@ public final class Main {
                 checkArgument(schemasDir.canRead(), "Schemas dir has to be readable");
             }
         }
+
+        @Override
+        public String toString() {
+            StringBuffer params = new StringBuffer("TesttoolParameters{");
+            params.append(", schemas-dir='").append(schemasDir).append('\'');
+            params.append(", devices-count='").append(deviceCount).append('\'');
+            params.append(", devices-per-port='").append(devicesPerPort).append('\'');
+            params.append(", starting-port='").append(startingPort).append('\'');
+            params.append(", generate-config-connection-timeout='").append(generateConfigsTimeout).append('\'');
+            params.append(", generate-config-address='").append(generateConfigsAddress).append('\'');
+            params.append(", distro-folder='").append(distroFolder).append('\'');
+            params.append(", generate-configs-batch-size='").append(generateConfigBatchSize).append('\'');
+            params.append(", ssh='").append(ssh).append('\'');
+            params.append(", exi='").append(exi).append('\'');
+            params.append(", debug='").append(debug).append('\'');
+            params.append(", notification-file='").append(notificationFile).append('\'');
+            params.append(", md-sal='").append(mdSal).append('\'');
+            params.append(", initial-config-xml-file='").append(initialConfigXMLFile).append('\'');
+            params.append('}');
+
+            return params.toString();
+        }
     }
 
     public static void main(final String[] args) {
@@ -199,6 +221,7 @@ public final class Main {
 
         final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator();
         try {
+            LOG.debug("Trying to start netconf test-tool with parameters {}", params);
             final List<Integer> openDevices = netconfDeviceSimulator.start(params);
             if (openDevices.size() == 0) {
                 LOG.error("Failed to start any simulated devices, exiting...");

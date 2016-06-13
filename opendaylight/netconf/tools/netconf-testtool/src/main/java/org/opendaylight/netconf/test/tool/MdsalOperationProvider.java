@@ -117,7 +117,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             this.sourceProvider = sourceProvider;
             this.schemaService = createSchemaService();
 
-            this.dataBroker = createDataStore(schemaService);
+            this.dataBroker = createDataStore(schemaService, currentSessionId);
 
         }
 
@@ -206,7 +206,8 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
                     new YangInstanceIdentifier.NodeIdentifier(NetconfState.QNAME)).withChild(schemasContainer).build();
         }
 
-        private DOMDataBroker createDataStore(SchemaService schemaService) {
+        private DOMDataBroker createDataStore(SchemaService schemaService, long sessionId) {
+            LOG.debug("Session {}: Creating data stores for simulated device", sessionId);
             final DOMStore operStore = InMemoryDOMDataStoreFactory
                     .create("DOM-OPER", schemaService);
             final DOMStore configStore = InMemoryDOMDataStoreFactory
