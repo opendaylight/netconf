@@ -652,14 +652,17 @@ public class RestconfImpl implements RestconfService {
          * document the behavior).
          */
         int tries = 2;
+        PutResult result = null;
         while(true) {
             try {
                 if (mountPoint != null) {
-                    this.broker.commitConfigurationDataPut(mountPoint, normalizedII, payload.getData()).checkedGet();
-                } else {
-                    this.broker.commitConfigurationDataPut(this.controllerContext.getGlobalSchema(), normalizedII, payload.getData()).checkedGet();
-                }
 
+                    result = this.broker.commitConfigurationDataPut(mountPoint, normalizedII, payload.getData());
+                } else {
+                    result = this.broker.commitConfigurationDataPut(this.controllerContext.getGlobalSchema(),
+                            normalizedII, payload.getData());
+                }
+                result.getFutureOfPutData().checkedGet();
                 break;
             } catch (final TransactionCommitFailedException e) {
                 if(e instanceof OptimisticLockFailedException) {
@@ -680,7 +683,7 @@ public class RestconfImpl implements RestconfService {
             }
         }
 
-        return Response.status(Status.OK).build();
+        return Response.status(result.getStatus()).build();
     }
 
     private static void validateTopLevelNodeName(final NormalizedNodeContext node,
