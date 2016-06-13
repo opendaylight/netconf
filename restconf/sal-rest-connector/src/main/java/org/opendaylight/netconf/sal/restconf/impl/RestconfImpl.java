@@ -652,11 +652,15 @@ public class RestconfImpl implements RestconfService {
          * document the behavior).
          */
         int tries = 2;
+        Status status = Status.NOT_MODIFIED;
         while(true) {
             try {
                 if (mountPoint != null) {
+                    status = this.broker.readConfigurationData(mountPoint, normalizedII) != null ? Status.OK
+                            : Status.CREATED;
                     this.broker.commitConfigurationDataPut(mountPoint, normalizedII, payload.getData()).checkedGet();
                 } else {
+                    status = this.broker.readConfigurationData(normalizedII) != null ? Status.OK : Status.CREATED;
                     this.broker.commitConfigurationDataPut(this.controllerContext.getGlobalSchema(), normalizedII, payload.getData()).checkedGet();
                 }
 
@@ -680,7 +684,7 @@ public class RestconfImpl implements RestconfService {
             }
         }
 
-        return Response.status(Status.OK).build();
+        return Response.status(status).build();
     }
 
     private static void validateTopLevelNodeName(final NormalizedNodeContext node,
