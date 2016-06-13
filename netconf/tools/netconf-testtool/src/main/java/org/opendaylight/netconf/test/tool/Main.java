@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
 public final class Main {
 
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
-
+    
     public static void main(final String[] args) {
         final TesttoolParameters params = TesttoolParameters.parseArgs(args, TesttoolParameters.getParser());
         params.validate();
@@ -56,6 +56,7 @@ public final class Main {
 
         final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator(params.threadPoolSize);
         try {
+            LOG.debug("Trying to start netconf test-tool with parameters {}", params);
             final List<Integer> openDevices = netconfDeviceSimulator.start(params);
             if (openDevices.size() == 0) {
                 LOG.error("Failed to start any simulated devices, exiting...");

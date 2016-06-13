@@ -404,4 +404,33 @@ public class TesttoolParameters {
         }
         return payloads;
     }
+
+    //TODO This may be more scalable enumerating parameters via reflection
+    @Override
+    public String toString() {
+        StringBuilder params = new StringBuilder();
+        params.append("edit-content: " + editContent + "/n");
+        params.append("async: " + async + "/n");
+        params.append("thread-amounr: " + threadAmount + "/n");
+        params.append("throttle: " + throttle + "/n");
+        params.append("auth: " + auth + "/n");
+        params.append("controller-destinatio: " + controllerDestination + "/n");
+        params.append("schemas-dir: " + schemasDir + "/n");
+        params.append("devices-count: " + deviceCount + "/n");
+        params.append("devices-per-port: " + devicesPerPort + "/n");
+        params.append("starting-port: " + startingPort + "/n");
+        params.append("generate-config-connection-timeout: " + generateConfigsTimeout + "/n");
+        params.append("generate-config-address: " + generateConfigsAddress + "/n");
+        params.append("distro-folder: " + distroFolder + "/n");
+        params.append("generate-configs-batch-size: " + generateConfigBatchSize + "/n");
+        params.append("ssh: " + ssh + "/n");
+        params.append("exi: " + exi + "/n");
+        params.append("debug: " + debug + "/n");
+        params.append("notification-file: " + notificationFile + "/n");
+        params.append("md-sal: " + mdSal + "/n");
+        params.append("initial-config-xml-file: " + initialConfigXMLFile + "/n");
+        params.append("time-out: " + timeOut);
+
+        return params.toString();
+    }
 }
