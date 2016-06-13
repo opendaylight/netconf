@@ -404,4 +404,34 @@ public class TesttoolParameters {
         }
         return payloads;
     }
+
+    //TODO This may be more scalable enumerating parameters via reflection
+    @Override
+    public String toString() {
+        StringBuffer params = new StringBuffer("TesttoolParameters{");
+        params.append("edit-content='").append(editContent).append('\'');
+        params.append(", async='").append(async).append('\'');
+        params.append(", thread-amount='").append(threadAmount).append('\'');
+        params.append(", throttle='").append(throttle).append('\'');
+        params.append(", auth='").append(auth).append('\'');
+        params.append(", controller-destination='").append(controllerDestination).append('\'');
+        params.append(", schemas-dir='").append(schemasDir).append('\'');
+        params.append(", devices-count='").append(deviceCount).append('\'');
+        params.append(", devices-per-port='").append(devicesPerPort).append('\'');
+        params.append(", starting-port='").append(startingPort).append('\'');
+        params.append(", generate-config-connection-timeout='").append(generateConfigsTimeout).append('\'');
+        params.append(", generate-config-address='").append(generateConfigsAddress).append('\'');
+        params.append(", distro-folder='").append(distroFolder).append('\'');
+        params.append(", generate-configs-batch-size='").append(generateConfigBatchSize).append('\'');
+        params.append(", ssh='").append(ssh).append('\'');
+        params.append(", exi='").append(exi).append('\'');
+        params.append(", debug='").append(debug).append('\'');
+        params.append(", notification-file='").append(notificationFile).append('\'');
+        params.append(", md-sal='").append(mdSal).append('\'');
+        params.append(", initial-config-xml-file='").append(initialConfigXMLFile).append('\'');
+        params.append(", time-out='").append(timeOut).append('\'');
+        params.append('}');
+
+        return params.toString();
+    }
 }

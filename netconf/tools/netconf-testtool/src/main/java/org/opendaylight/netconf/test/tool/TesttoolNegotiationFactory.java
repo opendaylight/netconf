@@ -19,8 +19,11 @@ import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactoryBuilde
 import org.opendaylight.netconf.impl.SessionIdProvider;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TesttoolNegotiationFactory extends NetconfServerSessionNegotiatorFactory {
+    private static final Logger LOG = LoggerFactory.getLogger(TesttoolNegotiationFactory.class);
 
     private final Map<SocketAddress, NetconfOperationService> cachedOperationServices = new HashMap<>();
 
@@ -39,10 +42,14 @@ public class TesttoolNegotiationFactory extends NetconfServerSessionNegotiatorFa
     @Override
     protected NetconfOperationService getOperationServiceForAddress(final String netconfSessionIdForReporting, final SocketAddress socketAddress) {
         if (cachedOperationServices.containsKey(socketAddress)) {
+            LOG.debug("Session {}: Getting cached operation service factory for test tool device on address {}",
+                    netconfSessionIdForReporting, socketAddress);
             return cachedOperationServices.get(socketAddress);
         } else {
             final NetconfOperationService service = getOperationServiceFactory().createService(netconfSessionIdForReporting);
             cachedOperationServices.put(socketAddress, service);
+            LOG.debug("Session {}: Creating new operation service factory for test tool device on address {}",
+                    netconfSessionIdForReporting, socketAddress);
             return service;
         }
     }
