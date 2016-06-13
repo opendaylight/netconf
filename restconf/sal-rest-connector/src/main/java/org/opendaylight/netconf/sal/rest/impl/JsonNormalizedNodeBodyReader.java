@@ -30,6 +30,8 @@ import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.restconf.Draft11;
+import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
@@ -50,7 +52,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Provider
-@Consumes({ Draft02.MediaTypes.DATA + RestconfService.JSON, Draft02.MediaTypes.OPERATION + RestconfService.JSON,
+@Consumes({ Draft02.MediaTypes.DATA + RestconfService.JSON, Draft11.MediaTypes.DATA + RestconfConstants.JSON,
+        Draft02.MediaTypes.OPERATION + RestconfService.JSON, Draft11.MediaTypes.OPERATION + RestconfConstants.JSON,
         MediaType.APPLICATION_JSON })
 public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsProvider implements MessageBodyReader<NormalizedNodeContext> {
 
@@ -75,7 +78,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPr
         }
     }
 
-    private static void propagateExceptionAs(Exception e) throws RestconfDocumentedException {
+    private static void propagateExceptionAs(final Exception e) throws RestconfDocumentedException {
         if(e instanceof RestconfDocumentedException) {
             throw (RestconfDocumentedException)e;
         }
@@ -134,7 +137,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPr
         final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
         InstanceIdentifierContext<? extends SchemaNode> newIIContext;
 
-        while (result instanceof AugmentationNode || result instanceof ChoiceNode) {
+        while ((result instanceof AugmentationNode) || (result instanceof ChoiceNode)) {
             final Object childNode = ((DataContainerNode) result).getValue().iterator().next();
             if (isPost) {
                 iiToDataList.add(result.getIdentifier());

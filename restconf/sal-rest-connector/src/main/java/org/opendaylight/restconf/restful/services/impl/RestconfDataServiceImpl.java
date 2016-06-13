@@ -42,8 +42,14 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     private final static Logger LOG = LoggerFactory.getLogger(RestconfDataServiceImpl.class);
 
-    private SchemaContextHandler schemaContextHandler;
-    private TransactionChainHandler transactionChainHandler;
+    private final SchemaContextHandler schemaContextHandler;
+    private final TransactionChainHandler transactionChainHandler;
+
+    public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
+            final TransactionChainHandler transactionChainHandler) {
+        this.schemaContextHandler = schemaContextHandler;
+        this.transactionChainHandler = transactionChainHandler;
+    }
 
     @Override
     public NormalizedNodeContext readData(final String identifier, final UriInfo uriInfo) {
