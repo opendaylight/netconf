@@ -32,8 +32,14 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
  */
 public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperationsService {
 
-    private RpcServiceHandler rpcServiceHandler;
-    private SchemaContextHandler schemaContextHandler;
+    private final RpcServiceHandler rpcServiceHandler;
+    private final SchemaContextHandler schemaContextHandler;
+
+    public RestconfInvokeOperationsServiceImpl(final RpcServiceHandler rpcServiceHandler,
+            final SchemaContextHandler schemaContextHandler) {
+        this.rpcServiceHandler = rpcServiceHandler;
+        this.schemaContextHandler = schemaContextHandler;
+    }
 
     @Override
     public NormalizedNodeContext invokeRpc(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
@@ -46,14 +52,15 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
         SchemaContextRef schemaContextRef;
 
         if (mountPoint == null) {
-            response = RestconfInvokeOperationsUtil.invokeRpc(payload.getData(), schemaPath, this.rpcServiceHandler);
-            schemaContextRef = new SchemaContextRef(this.schemaContextHandler.getSchemaContext());
-        } else {
             if (namespace.toString().equals(RestconfStreamsConstants.SAL_REMOTE_NAMESPACE)) {
                 response = CreateStreamUtil.createStream(payload, refSchemaCtx);
             } else {
-                response = RestconfInvokeOperationsUtil.invokeRpcViaMountPoint(mountPoint, payload.getData(), schemaPath);
+                response = RestconfInvokeOperationsUtil.invokeRpc(payload.getData(), schemaPath,
+                        this.rpcServiceHandler);
             }
+            schemaContextRef = new SchemaContextRef(this.schemaContextHandler.getSchemaContext());
+        } else {
+            response = RestconfInvokeOperationsUtil.invokeRpcViaMountPoint(mountPoint, payload.getData(), schemaPath);
             schemaContextRef = new SchemaContextRef(mountPoint.getSchemaContext());
         }
 
