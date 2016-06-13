@@ -15,7 +15,7 @@ import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYangBodyWr
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYinBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
-import org.opendaylight.restconf.rest.services.impl.Draft11ServicesWrapperImpl;
+import org.opendaylight.restconf.common.wrapper.services.Draft11ServicesWrapperImpl;
 
 public class RestconfApplication extends Application {
 
