@@ -7,13 +7,13 @@
  */
 package org.opendaylight.restconf.parser.builder;
 
-import static org.opendaylight.restconf.utils.parser.builder.ParserBuilderConstants.Serializer;
 import com.google.common.base.Preconditions;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.restconf.utils.parser.builder.ParserBuilderConstants;
+import org.opendaylight.restconf.utils.parser.builder.ParserBuilderConstants.Serializer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -22,6 +22,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithV
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
@@ -73,7 +74,7 @@ public final class YangInstanceIdentifierSerializer {
             // condition is satisfied also for the first path argument
             if (!arg.getNodeType().getModule().equals(parentModule)) {
                 path.append(RestconfConstants.SLASH
-                        + prefixForNamespace(arg.getNodeType())
+                        + prefixForNamespace(arg.getNodeType(), schemaContext)
                         + ParserBuilderConstants.Deserializer.COLON);
             } else {
                 path.append(RestconfConstants.SLASH);
@@ -168,11 +169,11 @@ public final class YangInstanceIdentifierSerializer {
      *            - {@link QName}
      * @return {@link String}
      */
-    private static String prefixForNamespace(final QName qname) {
+    private static String prefixForNamespace(final QName qname, final SchemaContext schemaContext) {
         final URI namespace = qname.getNamespace();
         Preconditions.checkArgument(namespace != null, "Failed to map QName {}", qname);
-        final String prefix = namespace.toString();
-        return prefix.replace(ParserBuilderConstants.Deserializer.COLON, ParserBuilderConstants.Deserializer.HYPHEN);
+        final Module module = schemaContext.findModuleByNamespaceAndRevision(namespace, qname.getRevision());
+        return module.getName();
     }
 
     private static final class MainVarsWrapper {

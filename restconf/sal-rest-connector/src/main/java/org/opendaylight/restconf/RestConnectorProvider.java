@@ -15,17 +15,19 @@ import org.opendaylight.controller.md.sal.common.api.data.TransactionChain;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.sal.core.api.Broker.ProviderSession;
 import org.opendaylight.controller.sal.core.api.Provider;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.netconf.sal.rest.api.RestConnector;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.restconf.common.wrapper.services.Draft11ServicesWrapperImpl;
 import org.opendaylight.restconf.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.rest.services.impl.Draft11ServicesWrapperImpl;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.slf4j.Logger;
@@ -77,7 +79,11 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
 
         final DOMDataBrokerHandler brokerHandler = new DOMDataBrokerHandler(this.dataBroker);
 
-        wrapperServices.setHandlers(schemaCtxHandler, domMountPointServiceHandler);
+        final DOMRpcService rpcService = session.getService(DOMRpcService.class);
+        final RpcServiceHandler rpcServiceHandler = new RpcServiceHandler(rpcService);
+
+        wrapperServices.setHandlers(schemaCtxHandler, domMountPointServiceHandler, transactionChainHandler,
+                brokerHandler, rpcServiceHandler);
     }
 
     /**
