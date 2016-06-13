@@ -36,7 +36,11 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStreamsSubscriptionServiceImpl.class);
 
-    private DOMDataBrokerHandler domDataBrokerHandler;
+    private final DOMDataBrokerHandler domDataBrokerHandler;
+
+    public RestconfStreamsSubscriptionServiceImpl(final DOMDataBrokerHandler domDataBrokerHandler) {
+        this.domDataBrokerHandler = domDataBrokerHandler;
+    }
 
     @Override
     public Response subscribeToStream(final String identifier, final UriInfo uriInfo) {

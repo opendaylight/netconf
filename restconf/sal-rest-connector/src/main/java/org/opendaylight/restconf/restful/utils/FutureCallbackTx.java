@@ -10,6 +10,7 @@ package org.opendaylight.restconf.restful.utils;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import java.util.concurrent.CountDownLatch;
 import javax.annotation.Nullable;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.slf4j.Logger;
@@ -39,19 +40,29 @@ final class FutureCallbackTx {
      */
     static <T, X extends Exception> void addCallback(final CheckedFuture<T, X> listenableFuture, final String txType,
             final FutureDataFactory<T> dataFactory) {
+        final CountDownLatch responseWaiter = new CountDownLatch(1);
         Futures.addCallback(listenableFuture, new FutureCallback<T>() {
 
             @Override
             public void onFailure(final Throwable t) {
                 handlingLoggerAndValues(t, txType, null, null);
+                responseWaiter.countDown();
             }
 
             @Override
             public void onSuccess(final T result) {
                 handlingLoggerAndValues(null, txType, result, dataFactory);
+                responseWaiter.countDown();
             }
 
         });
+        try {
+            responseWaiter.await();
+        } catch (final InterruptedException e) {
+            final String msg = "Problem while waiting for response";
+            LOG.warn(msg);
+            throw new RestconfDocumentedException(msg, e);
+        }
     }
 
     /**
@@ -73,7 +84,7 @@ final class FutureCallbackTx {
     protected static <T> void handlingLoggerAndValues(@Nullable final Throwable t, final String txType,
             final T result, final FutureDataFactory<T> dataFactory) {
         if (t != null) {
-            LOG.info("Transaction({}) FAILED!", txType, t);
+            LOG.warn("Transaction({}) FAILED!", txType, t);
             throw new RestconfDocumentedException("  Transaction(" + txType + ") not committed correctly", t);
         } else {
             LOG.trace("Transaction({}) SUCCESSFUL!", txType);
