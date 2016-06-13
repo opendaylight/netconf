@@ -47,9 +47,17 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
  */
 public class RestconfDataServiceImpl implements RestconfDataService {
 
-    private SchemaContextHandler schemaContextHandler;
-    private DOMMountPointServiceHandler domMountPointServiceHandler;
-    private TransactionChainHandler transactionChainHandler;
+    private final SchemaContextHandler schemaContextHandler;
+    private final DOMMountPointServiceHandler domMountPointServiceHandler;
+    private final TransactionChainHandler transactionChainHandler;
+
+    public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
+            final TransactionChainHandler transactionChainHandler,
+            final DOMMountPointServiceHandler domMountPointServiceHandler) {
+        this.schemaContextHandler = schemaContextHandler;
+        this.domMountPointServiceHandler = domMountPointServiceHandler;
+        this.transactionChainHandler = transactionChainHandler;
+    }
 
     @Override
     public NormalizedNodeContext readData(final String identifier, final UriInfo uriInfo) {
