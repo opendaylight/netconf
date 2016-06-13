@@ -188,6 +188,26 @@ public final class Main {
                 checkArgument(schemasDir.canRead(), "Schemas dir has to be readable");
             }
         }
+
+        @Override
+        public String toString() {
+            StringBuilder params = new StringBuilder();
+            params.append("schemas-dir: " + schemasDir + "/n");
+            params.append("devices-count: " + deviceCount + "/n");
+            params.append("devices-per-port: " + devicesPerPort + "/n");
+            params.append("starting-port: " + startingPort + "/n");
+            params.append("generate-config-connection-timeout" + generateConfigsTimeout + "/n");
+            params.append("distro-folder: " + distroFolder + "/n");
+            params.append("generate-configs-batch-size: " + generateConfigBatchSize + "/n");
+            params.append("ssh: " + ssh + "/n");
+            params.append("exi: " + exi + "/n");
+            params.append("debug: " + debug + "/n");
+            params.append("notification-file: " + notificationFile + "/n");
+            params.append("md-sal: " + mdSal + "/n");
+            params.append("initial-config-xml-file: " + initialConfigXMLFile + "/n");
+
+            return params.toString();
+        }
     }
 
     public static void main(final String[] args) {
@@ -199,6 +219,7 @@ public final class Main {
 
         final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator();
         try {
+            LOG.debug("Trying to start netconf test-tool with parameters {}", params);
             final List<Integer> openDevices = netconfDeviceSimulator.start(params);
             if (openDevices.size() == 0) {
                 LOG.error("Failed to start any simulated devices, exiting...");
