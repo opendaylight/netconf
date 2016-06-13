@@ -13,16 +13,19 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYangBodyWriter;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYinBodyWriter;
+import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
-import org.opendaylight.restconf.rest.services.impl.Draft11ServicesWrapperImpl;
+import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
+import org.opendaylight.restconf.common.wrapper.services.Draft11ServicesWrapperImpl;
 
 public class RestconfApplication extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
         return ImmutableSet.<Class<?>> builder().add(NormalizedNodeJsonBodyWriter.class)
-                .add(NormalizedNodeXmlBodyWriter.class).add(SchemaExportContentYinBodyWriter.class)
+                .add(NormalizedNodeXmlBodyWriter.class).add(JsonNormalizedNodeBodyReader.class)
+                .add(XmlNormalizedNodeBodyReader.class).add(SchemaExportContentYinBodyWriter.class)
                 .add(SchemaExportContentYangBodyWriter.class)
                 .build();
     }

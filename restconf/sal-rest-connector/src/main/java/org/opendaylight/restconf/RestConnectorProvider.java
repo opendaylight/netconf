@@ -15,6 +15,7 @@ import org.opendaylight.controller.md.sal.common.api.data.TransactionChain;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.sal.core.api.Broker.ProviderSession;
 import org.opendaylight.controller.sal.core.api.Provider;
@@ -22,13 +23,15 @@ import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.netconf.sal.rest.api.RestConnector;
 import org.opendaylight.restconf.common.handlers.api.DOMDataBrokerHandler;
 import org.opendaylight.restconf.common.handlers.api.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.common.handlers.api.RpcServiceHandler;
 import org.opendaylight.restconf.common.handlers.api.SchemaContextHandler;
 import org.opendaylight.restconf.common.handlers.api.TransactionChainHandler;
 import org.opendaylight.restconf.common.handlers.impl.DOMDataBrokerHandlerImpl;
 import org.opendaylight.restconf.common.handlers.impl.DOMMountPointServiceHandlerImpl;
+import org.opendaylight.restconf.common.handlers.impl.RpcServiceHandlerImpl;
 import org.opendaylight.restconf.common.handlers.impl.SchemaContextHandlerImpl;
 import org.opendaylight.restconf.common.handlers.impl.TransactionChainHandlerImpl;
-import org.opendaylight.restconf.rest.services.impl.Draft11ServicesWrapperImpl;
+import org.opendaylight.restconf.common.wrapper.services.Draft11ServicesWrapperImpl;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.slf4j.Logger;
@@ -80,7 +83,12 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         final DOMDataBrokerHandler brokerHandler = new DOMDataBrokerHandlerImpl();
         brokerHandler.setDOMDataBroker(this.dataBroker);
 
-        wrapperServices.setHandlers(schemaCtxHandler, domMountPointServiceHandler);
+        final DOMRpcService rpcService = session.getService(DOMRpcService.class);
+        final RpcServiceHandler rpcServiceHandler = new RpcServiceHandlerImpl();
+        rpcServiceHandler.setRpcService(rpcService);
+
+        wrapperServices.setHandlers(schemaCtxHandler, domMountPointServiceHandler, this.transactionChainHandler,
+                brokerHandler, rpcServiceHandler);
     }
 
     /**

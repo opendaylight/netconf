@@ -7,10 +7,8 @@
  */
 package org.opendaylight.restconf.rest.services.api;
 
-import javax.ws.rs.Path;
-
 /**
- * Wrapper for all services:
+ * Wrapper for all base services:
  * <ul>
  * <li>{@link RestconfModulesService}
  * <li>{@link RestconfOperationsService}
@@ -19,7 +17,6 @@ import javax.ws.rs.Path;
  * </ul>
  *
  */
-@Path("/")
-public interface Draft11ServicesWrapper
+public interface Draft11BaseServicesWrapper
         extends RestconfModulesService, RestconfOperationsService, RestconfStreamsService, RestconfSchemaService {
 }
