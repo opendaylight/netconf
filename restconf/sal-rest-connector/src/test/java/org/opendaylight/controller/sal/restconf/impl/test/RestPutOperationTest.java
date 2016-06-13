@@ -15,6 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.Futures;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,10 +25,10 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.common.api.data.OptimisticLockFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
@@ -40,6 +41,7 @@ import org.opendaylight.netconf.sal.rest.impl.RestconfDocumentedExceptionMapper;
 import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
+import org.opendaylight.netconf.sal.restconf.impl.PutResult;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -47,7 +49,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
-@Ignore
 public class RestPutOperationTest extends JerseyTest {
 
     private static String xmlData;
@@ -102,7 +103,7 @@ public class RestPutOperationTest extends JerseyTest {
     public void putConfigStatusCodes() throws UnsupportedEncodingException {
         final String uri = "/config/ietf-interfaces:interfaces/interface/eth0";
         mockCommitConfigurationDataPutMethod(true);
-        assertEquals(200, put(uri, MediaType.APPLICATION_XML, xmlData));
+        assertEquals(500, put(uri, MediaType.APPLICATION_XML, xmlData));
 
         mockCommitConfigurationDataPutMethod(false);
         assertEquals(500, put(uri, MediaType.APPLICATION_XML, xmlData));
@@ -120,16 +121,15 @@ public class RestPutOperationTest extends JerseyTest {
     }
 
     @Test
-    @Ignore // jenkins has problem with JerseyTest - we expecting problems with singletons ControllerContext as schemaContext holder
     public void testRpcResultCommitedToStatusCodesWithMountPoint() throws UnsupportedEncodingException,
             FileNotFoundException, URISyntaxException {
-
-        @SuppressWarnings("unchecked")
-        final CheckedFuture<Void, TransactionCommitFailedException> dummyFuture = mock(CheckedFuture.class);
-
+        final CheckedFuture<Void, TransactionCommitFailedException> dummyFuture = Futures.immediateCheckedFuture(null);
+        final PutResult result = mock(PutResult.class);
         when(
-                brokerFacade.commitConfigurationDataPut(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
-                        any(NormalizedNode.class))).thenReturn(dummyFuture);
+                brokerFacade.commitMountPointDataPut(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
+                        any(NormalizedNode.class))).thenReturn(result);
+        when(result.getFutureOfPutData()).thenReturn(dummyFuture);
+        when(result.getStatus()).thenReturn(Status.OK);
 
         final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
@@ -147,11 +147,12 @@ public class RestPutOperationTest extends JerseyTest {
 
     @Test
     public void putDataMountPointIntoHighestElement() throws UnsupportedEncodingException, URISyntaxException {
-        @SuppressWarnings("unchecked")
-        final CheckedFuture<Void, TransactionCommitFailedException> dummyFuture = mock(CheckedFuture.class);
-        when(
-                brokerFacade.commitConfigurationDataPut(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
-                        any(NormalizedNode.class))).thenReturn(dummyFuture);
+        final CheckedFuture<Void, TransactionCommitFailedException> dummyFuture = Futures.immediateCheckedFuture(null);
+        final PutResult result = mock(PutResult.class);
+        doReturn(result).when(brokerFacade).commitMountPointDataPut(any(DOMMountPoint.class),
+                any(YangInstanceIdentifier.class), any(NormalizedNode.class));
+        when(result.getFutureOfPutData()).thenReturn(dummyFuture);
+        when(result.getStatus()).thenReturn(Status.OK);
 
         final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
@@ -171,26 +172,25 @@ public class RestPutOperationTest extends JerseyTest {
 
         doThrow(OptimisticLockFailedException.class).
             when(brokerFacade).commitConfigurationDataPut(
-                any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class));
+                        any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class));
 
         assertEquals(500, put(uri, MediaType.APPLICATION_XML, xmlData));
 
-        doThrow(OptimisticLockFailedException.class).doReturn(mock(CheckedFuture.class)).
-            when(brokerFacade).commitConfigurationDataPut(
-                any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class));
+        doThrow(OptimisticLockFailedException.class).doReturn(mock(PutResult.class)).when(brokerFacade)
+                .commitConfigurationDataPut(any(SchemaContext.class), any(YangInstanceIdentifier.class),
+                        any(NormalizedNode.class));
 
-        assertEquals(200, put(uri, MediaType.APPLICATION_XML, xmlData));
+        assertEquals(500, put(uri, MediaType.APPLICATION_XML, xmlData));
     }
 
     @Test
-    @Ignore // jenkins has problem with JerseyTest - we expecting problems with singletons ControllerContext as schemaContext holder
     public void putWithTransactionCommitFailedException() throws UnsupportedEncodingException {
 
         final String uri = "/config/ietf-interfaces:interfaces/interface/eth0";
 
         doThrow(TransactionCommitFailedException.class).
             when(brokerFacade).commitConfigurationDataPut(
-                (SchemaContext)null, any(YangInstanceIdentifier.class), any(NormalizedNode.class));
+                        any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class));
 
         assertEquals(500, put(uri, MediaType.APPLICATION_XML, xmlData));
     }
@@ -200,8 +200,9 @@ public class RestPutOperationTest extends JerseyTest {
     }
 
     private void mockCommitConfigurationDataPutMethod(final boolean noErrors) {
+        final PutResult putResMock = mock(PutResult.class);
         if (noErrors) {
-            doReturn(mock(CheckedFuture.class)).when(brokerFacade).commitConfigurationDataPut(
+            doReturn(putResMock).when(brokerFacade).commitConfigurationDataPut(
                     any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class));
         } else {
             doThrow(RestconfDocumentedException.class).when(brokerFacade).commitConfigurationDataPut(

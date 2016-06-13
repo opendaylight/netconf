@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import java.math.BigInteger;
 import java.net.URI;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -651,36 +653,67 @@ public class RestconfImpl implements RestconfService {
          * failures back to the client and forcing them to handle it via retry (and having to
          * document the behavior).
          */
-        int tries = 2;
+        PutResult result = null;
+        final TryOfPutData tryPutData = new TryOfPutData();
         while(true) {
+            if (mountPoint != null) {
+
+                result = this.broker.commitMountPointDataPut(mountPoint, normalizedII, payload.getData());
+            } else {
+                result = this.broker.commitConfigurationDataPut(this.controllerContext.getGlobalSchema(), normalizedII,
+                        payload.getData());
+            }
+            final CountDownLatch waiter = new CountDownLatch(1);
+            Futures.addCallback(result.getFutureOfPutData(), new FutureCallback<Void>() {
+
+                @Override
+                public void onSuccess(final Void result) {
+                    handlingLoggerPut(null, tryPutData, identifier);
+                    waiter.countDown();
+                }
+
+                @Override
+                public void onFailure(final Throwable t) {
+                    waiter.countDown();
+                    handlingLoggerPut(t, tryPutData, identifier);
+                }
+            });
+
             try {
-                if (mountPoint != null) {
-                    this.broker.commitConfigurationDataPut(mountPoint, normalizedII, payload.getData()).checkedGet();
-                } else {
-                    this.broker.commitConfigurationDataPut(this.controllerContext.getGlobalSchema(), normalizedII, payload.getData()).checkedGet();
-                }
+                waiter.await();
+            } catch (final InterruptedException e) {
+                final String msg = "Problem while waiting for response";
+                LOG.warn(msg);
+                throw new RestconfDocumentedException(msg, e);
+            }
 
+            if(tryPutData.isDone()){
                 break;
-            } catch (final TransactionCommitFailedException e) {
-                if(e instanceof OptimisticLockFailedException) {
-                    if(--tries <= 0) {
-                        LOG.debug("Got OptimisticLockFailedException on last try - failing " + identifier);
-                        throw new RestconfDocumentedException(e.getMessage(), e, e.getErrorList());
-                    }
-
-                    LOG.debug("Got OptimisticLockFailedException - trying again " + identifier);
-                } else {
-                    LOG.debug("Update ConfigDataStore fail " + identifier, e);
-                    throw new RestconfDocumentedException(e.getMessage(), e, e.getErrorList());
-                }
-            } catch (final Exception e) {
-                final String errMsg = "Error updating data ";
-                LOG.debug(errMsg + identifier, e);
-                throw new RestconfDocumentedException(errMsg, e);
+            } else {
+                throw new RestconfDocumentedException("Problem while PUT operations");
             }
         }
 
-        return Response.status(Status.OK).build();
+        return Response.status(result.getStatus()).build();
+    }
+
+    protected void handlingLoggerPut(final Throwable t, final TryOfPutData tryPutData, final String identifier) {
+        if (t != null) {
+            if (t instanceof OptimisticLockFailedException) {
+                if (tryPutData.countGet() <= 0) {
+                    LOG.debug("Got OptimisticLockFailedException on last try - failing " + identifier);
+                    throw new RestconfDocumentedException(t.getMessage(), t);
+                }
+                LOG.debug("Got OptimisticLockFailedException - trying again " + identifier);
+                tryPutData.countDown();
+            } else {
+                LOG.debug("Update ConfigDataStore fail " + identifier, t);
+                throw new RestconfDocumentedException(t.getMessage(), t);
+            }
+        } else {
+            LOG.trace("PUT Successful " + identifier);
+            tryPutData.done();
+        }
     }
 
     private static void validateTopLevelNodeName(final NormalizedNodeContext node,
@@ -801,18 +834,37 @@ public class RestconfImpl implements RestconfService {
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final InstanceIdentifierContext<?> iiWithData = payload.getInstanceIdentifierContext();
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
-        try {
-            if (mountPoint != null) {
-                this.broker.commitConfigurationDataPost(mountPoint, normalizedII, payload.getData()).checkedGet();
-            } else {
-                this.broker.commitConfigurationDataPost(this.controllerContext.getGlobalSchema(), normalizedII, payload.getData()).checkedGet();
+
+        CheckedFuture<Void, TransactionCommitFailedException> future;
+        if (mountPoint != null) {
+            future = this.broker.commitConfigurationDataPost(mountPoint, normalizedII, payload.getData());
+        } else {
+            future = this.broker.commitConfigurationDataPost(this.controllerContext.getGlobalSchema(), normalizedII,
+                    payload.getData());
+        }
+
+        final CountDownLatch waiter = new CountDownLatch(1);
+        Futures.addCallback(future, new FutureCallback<Void>() {
+
+            @Override
+            public void onSuccess(final Void result) {
+                handlerLoggerPost(null, uriInfo);
+                waiter.countDown();
             }
-        } catch(final RestconfDocumentedException e) {
-            throw e;
-        } catch (final Exception e) {
-            final String errMsg = "Error creating data ";
-            LOG.info(errMsg + (uriInfo != null ? uriInfo.getPath() : ""), e);
-            throw new RestconfDocumentedException(errMsg, e);
+
+            @Override
+            public void onFailure(final Throwable t) {
+                waiter.countDown();
+                handlerLoggerPost(t, uriInfo);
+            }
+        });
+
+        try {
+            waiter.await();
+        } catch (final InterruptedException e) {
+            final String msg = "Problem while waiting for response";
+            LOG.warn(msg);
+            throw new RestconfDocumentedException(msg, e);
         }
 
         final ResponseBuilder responseBuilder = Response.status(Status.NO_CONTENT);
@@ -822,6 +874,16 @@ public class RestconfImpl implements RestconfService {
             responseBuilder.location(location);
         }
         return responseBuilder.build();
+    }
+
+    protected void handlerLoggerPost(final Throwable t, final UriInfo uriInfo) {
+        if (t != null) {
+            final String errMsg = "Error creating data ";
+            LOG.warn(errMsg + (uriInfo != null ? uriInfo.getPath() : ""), t);
+            throw new RestconfDocumentedException(errMsg, t);
+        } else {
+            LOG.trace("Successfuly create data.");
+        }
     }
 
     private URI resolveLocation(final UriInfo uriInfo, final String uriBehindBase, final DOMMountPoint mountPoint, final YangInstanceIdentifier normalizedII) {
@@ -847,23 +909,53 @@ public class RestconfImpl implements RestconfService {
         final DOMMountPoint mountPoint = iiWithData.getMountPoint();
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
 
-        try {
-            if (mountPoint != null) {
-                this.broker.commitConfigurationDataDelete(mountPoint, normalizedII);
-            } else {
-                this.broker.commitConfigurationDataDelete(normalizedII).get();
+        CheckedFuture<Void, TransactionCommitFailedException> future;
+        if (mountPoint != null) {
+            future = this.broker.commitConfigurationDataDelete(mountPoint, normalizedII);
+        } else {
+            future = this.broker.commitConfigurationDataDelete(normalizedII);
+        }
+
+        final CountDownLatch waiter = new CountDownLatch(1);
+        Futures.addCallback(future, new FutureCallback<Void>() {
+
+            @Override
+            public void onSuccess(final Void result) {
+                handlerLoggerDelete(null);
+                waiter.countDown();
             }
-        } catch (final Exception e) {
-            final Optional<Throwable> searchedException = Iterables.tryFind(Throwables.getCausalChain(e),
+
+            @Override
+            public void onFailure(final Throwable t) {
+                waiter.countDown();
+                handlerLoggerDelete(t);
+            }
+
+        });
+
+        try {
+            waiter.await();
+        } catch (final InterruptedException e) {
+            final String msg = "Problem while waiting for response";
+            LOG.warn(msg);
+            throw new RestconfDocumentedException(msg, e);
+        }
+        return Response.status(Status.OK).build();
+    }
+
+    protected void handlerLoggerDelete(final Throwable t) {
+        if (t != null) {
+            final Optional<Throwable> searchedException = Iterables.tryFind(Throwables.getCausalChain(t),
                     Predicates.instanceOf(ModifiedNodeDoesNotExistException.class));
             if (searchedException.isPresent()) {
                 throw new RestconfDocumentedException("Data specified for deleting doesn't exist.", ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
             }
             final String errMsg = "Error while deleting data";
-            LOG.info(errMsg, e);
-            throw new RestconfDocumentedException(errMsg, e);
+            LOG.info(errMsg, t);
+            throw new RestconfDocumentedException(errMsg, t);
+        } else {
+            LOG.trace("Successfuly delete data.");
         }
-        return Response.status(Status.OK).build();
     }
 
     /**
@@ -1103,5 +1195,25 @@ public class RestconfImpl implements RestconfService {
                 .withValue("").build());
 
         return streamNodeValues.build();
+    }
+
+    private class TryOfPutData {
+        int tries = 2;
+        boolean done = false;
+
+        void countDown() {
+            this.tries--;
+        }
+
+        void done() {
+            this.done = true;
+        }
+
+        boolean isDone() {
+            return this.done;
+        }
+        int countGet() {
+            return this.tries;
+        }
     }
 }

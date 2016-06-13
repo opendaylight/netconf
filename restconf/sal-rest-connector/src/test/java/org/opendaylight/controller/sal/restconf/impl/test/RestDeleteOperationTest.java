@@ -13,7 +13,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.Futures;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.Set;
@@ -72,12 +72,11 @@ public class RestDeleteOperationTest extends JerseyTest {
         return resourceConfig;
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void deleteConfigStatusCodes() throws UnsupportedEncodingException {
         final String uri = "/config/test-interface:interfaces";
         when(brokerFacade.commitConfigurationDataDelete(any(YangInstanceIdentifier.class))).thenReturn(
-                mock(CheckedFuture.class));
+                Futures.immediateCheckedFuture(null));
         Response response = target(uri).request(MediaType.APPLICATION_XML).delete();
         assertEquals(200, response.getStatus());
 
