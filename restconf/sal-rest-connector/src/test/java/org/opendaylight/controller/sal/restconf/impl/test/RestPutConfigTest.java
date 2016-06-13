@@ -10,6 +10,7 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
+import javax.ws.rs.core.Response.Status;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +23,7 @@ import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.netconf.sal.restconf.impl.PutResult;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -53,17 +55,17 @@ public class RestPutConfigTest {
 
     @Before
     public void init() {
-        restconfService = RestconfImpl.getInstance();
-        controllerCx = ControllerContext.getInstance();
-        schemaCx = TestRestconfUtils.loadSchemaContext("/test-config-data/yang1/", null);
-        controllerCx.setSchemas(schemaCx);
-        restconfService.setControllerContext(controllerCx);
+        this.restconfService = RestconfImpl.getInstance();
+        this.controllerCx = ControllerContext.getInstance();
+        this.schemaCx = TestRestconfUtils.loadSchemaContext("/test-config-data/yang1/", null);
+        this.controllerCx.setSchemas(this.schemaCx);
+        this.restconfService.setControllerContext(this.controllerCx);
     }
 
     @Test
     public void testPutConfigData() {
         final String identifier = "test-interface:interfaces/interface/key";
-        final InstanceIdentifierContext<?> iiCx = controllerCx.toInstanceIdentifier(identifier);
+        final InstanceIdentifierContext<?> iiCx = this.controllerCx.toInstanceIdentifier(identifier);
         final MapEntryNode data = Mockito.mock(MapEntryNode.class);
         final QName qName = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "interface");
         final QName qNameKey = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "name");
@@ -74,13 +76,13 @@ public class RestPutConfigTest {
 
         mockingBrokerPut(iiCx.getInstanceIdentifier(), data);
 
-        restconfService.updateConfigurationData(identifier, payload);
+        this.restconfService.updateConfigurationData(identifier, payload);
     }
 
     @Test
     public void testPutConfigDataCheckOnlyLastElement() {
         final String identifier = "test-interface:interfaces/interface/key/sub-interface/subkey";
-        final InstanceIdentifierContext<?> iiCx = controllerCx.toInstanceIdentifier(identifier);
+        final InstanceIdentifierContext<?> iiCx = this.controllerCx.toInstanceIdentifier(identifier);
         final MapEntryNode data = Mockito.mock(MapEntryNode.class);
         final QName qName = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "sub-interface");
         final QName qNameSubKey = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "sub-name");
@@ -91,19 +93,19 @@ public class RestPutConfigTest {
 
         mockingBrokerPut(iiCx.getInstanceIdentifier(), data);
 
-        restconfService.updateConfigurationData(identifier, payload);
+        this.restconfService.updateConfigurationData(identifier, payload);
     }
 
     @Test(expected=RestconfDocumentedException.class)
     public void testPutConfigDataMissingUriKey() {
         final String identifier = "test-interface:interfaces/interface";
-        controllerCx.toInstanceIdentifier(identifier);
+        this.controllerCx.toInstanceIdentifier(identifier);
     }
 
     @Test(expected=RestconfDocumentedException.class)
     public void testPutConfigDataDiferentKey() {
         final String identifier = "test-interface:interfaces/interface/key";
-        final InstanceIdentifierContext<?> iiCx = controllerCx.toInstanceIdentifier(identifier);
+        final InstanceIdentifierContext<?> iiCx = this.controllerCx.toInstanceIdentifier(identifier);
         final MapEntryNode data = Mockito.mock(MapEntryNode.class);
         final QName qName = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "interface");
         final QName qNameKey = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "name");
@@ -114,12 +116,16 @@ public class RestPutConfigTest {
 
         mockingBrokerPut(iiCx.getInstanceIdentifier(), data);
 
-        restconfService.updateConfigurationData(identifier, payload);
+        this.restconfService.updateConfigurationData(identifier, payload);
     }
 
     private void mockingBrokerPut(final YangInstanceIdentifier yii, final NormalizedNode<?, ?> data) {
+        final PutResult result = Mockito.mock(PutResult.class);
         final CheckedFuture<Void, TransactionCommitFailedException> checkedFuture = Futures.immediateCheckedFuture(null);
-        Mockito.when(brokerFacade.commitConfigurationDataPut(schemaCx, yii, data)).thenReturn(checkedFuture);
-        restconfService.setBroker(brokerFacade);
+        Mockito.when(this.brokerFacade.commitConfigurationDataPut(this.schemaCx, yii, data))
+                .thenReturn(result);
+        Mockito.when(result.getFutureOfPutData()).thenReturn(checkedFuture);
+        Mockito.when(result.getStatus()).thenReturn(Status.OK);
+        this.restconfService.setBroker(this.brokerFacade);
     }
 }

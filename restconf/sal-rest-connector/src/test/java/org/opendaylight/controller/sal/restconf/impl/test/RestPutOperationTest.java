@@ -24,6 +24,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.BeforeClass;
@@ -40,6 +41,7 @@ import org.opendaylight.netconf.sal.rest.impl.RestconfDocumentedExceptionMapper;
 import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
+import org.opendaylight.netconf.sal.restconf.impl.PutResult;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -126,10 +128,12 @@ public class RestPutOperationTest extends JerseyTest {
 
         @SuppressWarnings("unchecked")
         final CheckedFuture<Void, TransactionCommitFailedException> dummyFuture = mock(CheckedFuture.class);
-
+        final PutResult result = mock(PutResult.class);
         when(
                 brokerFacade.commitConfigurationDataPut(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
-                        any(NormalizedNode.class))).thenReturn(dummyFuture);
+                        any(NormalizedNode.class))).thenReturn(result);
+        when(result.getFutureOfPutData()).thenReturn(dummyFuture);
+        when(result.getStatus()).thenReturn(Status.OK);
 
         final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
@@ -149,9 +153,11 @@ public class RestPutOperationTest extends JerseyTest {
     public void putDataMountPointIntoHighestElement() throws UnsupportedEncodingException, URISyntaxException {
         @SuppressWarnings("unchecked")
         final CheckedFuture<Void, TransactionCommitFailedException> dummyFuture = mock(CheckedFuture.class);
-        when(
-                brokerFacade.commitConfigurationDataPut(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
-                        any(NormalizedNode.class))).thenReturn(dummyFuture);
+        final PutResult result = mock(PutResult.class);
+        when(brokerFacade.commitConfigurationDataPut(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
+                any(NormalizedNode.class))).thenReturn(result);
+        when(result.getFutureOfPutData()).thenReturn(dummyFuture);
+        when(result.getStatus()).thenReturn(Status.OK);
 
         final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
@@ -171,13 +177,13 @@ public class RestPutOperationTest extends JerseyTest {
 
         doThrow(OptimisticLockFailedException.class).
             when(brokerFacade).commitConfigurationDataPut(
-                any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class));
+                        any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class));
 
         assertEquals(500, put(uri, MediaType.APPLICATION_XML, xmlData));
 
-        doThrow(OptimisticLockFailedException.class).doReturn(mock(CheckedFuture.class)).
-            when(brokerFacade).commitConfigurationDataPut(
-                any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class));
+        doThrow(OptimisticLockFailedException.class).doReturn(mock(CheckedFuture.class)).when(brokerFacade)
+                .commitConfigurationDataPut(any(SchemaContext.class), any(YangInstanceIdentifier.class),
+                        any(NormalizedNode.class));
 
         assertEquals(200, put(uri, MediaType.APPLICATION_XML, xmlData));
     }
@@ -190,7 +196,7 @@ public class RestPutOperationTest extends JerseyTest {
 
         doThrow(TransactionCommitFailedException.class).
             when(brokerFacade).commitConfigurationDataPut(
-                (SchemaContext)null, any(YangInstanceIdentifier.class), any(NormalizedNode.class));
+                        (SchemaContext) null, any(YangInstanceIdentifier.class), any(NormalizedNode.class));
 
         assertEquals(500, put(uri, MediaType.APPLICATION_XML, xmlData));
     }
