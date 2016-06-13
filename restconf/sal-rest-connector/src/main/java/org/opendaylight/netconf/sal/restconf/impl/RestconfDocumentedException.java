@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.sal.restconf.impl;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import java.util.Collection;
@@ -58,7 +59,7 @@ public class RestconfDocumentedException extends WebApplicationException {
      *            The underlying exception cause.
      */
     public RestconfDocumentedException(String message, ErrorType errorType, ErrorTag errorTag, Throwable cause) {
-        this(cause, new RestconfError(errorType, errorTag, message, null, RestconfError.toErrorInfo(cause)));
+        this(cause, new RestconfError(errorType, errorTag, message, null, Throwables.getStackTraceAsString(cause)));
     }
 
     /**
@@ -86,7 +87,7 @@ public class RestconfDocumentedException extends WebApplicationException {
      */
     public RestconfDocumentedException(String message, Throwable cause) {
         this(cause, new RestconfError(RestconfError.ErrorType.APPLICATION, RestconfError.ErrorTag.OPERATION_FAILED,
-                message, null, RestconfError.toErrorInfo(cause)));
+                message, null, Throwables.getStackTraceAsString(cause)));
     }
 
     /**

@@ -8,8 +8,7 @@
 package org.opendaylight.netconf.sal.restconf.impl;
 
 import com.google.common.base.Preconditions;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import com.google.common.base.Throwables;
 import org.opendaylight.yangtools.yang.common.RpcError;
 
 /**
@@ -99,14 +98,7 @@ public class RestconfError {
     private final String errorInfo;
     private final String errorAppTag;
     private final String errorMessage;
-
     // TODO: Add in the error-path concept as defined in the ietf draft.
-
-    static String toErrorInfo(Throwable cause) {
-        StringWriter writer = new StringWriter();
-        cause.printStackTrace(new PrintWriter(writer));
-        return writer.toString();
-    }
 
     /**
      * Constructs a RestConfError
@@ -180,7 +172,7 @@ public class RestconfError {
         String errorInfo = null;
         if (rpcError.getInfo() == null) {
             if (rpcError.getCause() != null) {
-                errorInfo = toErrorInfo(rpcError.getCause());
+                errorInfo = Throwables.getStackTraceAsString(rpcError.getCause());
             } else if (rpcError.getSeverity() != null) {
                 errorInfo = "<severity>" + rpcError.getSeverity().toString().toLowerCase() + "</severity>";
             }
