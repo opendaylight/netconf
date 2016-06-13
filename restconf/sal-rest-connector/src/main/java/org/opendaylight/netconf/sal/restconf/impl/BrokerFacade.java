@@ -14,10 +14,12 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
@@ -39,9 +41,9 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
+import org.opendaylight.restconf.restful.utils.TransactionUtil;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -60,8 +62,7 @@ public class BrokerFacade {
     private DOMDataBroker domDataBroker;
     private DOMNotificationService domNotification;
 
-    private BrokerFacade() {
-    }
+    private BrokerFacade() {}
 
     public void setRpcService(final DOMRpcService router) {
         this.rpcService = router;
@@ -117,19 +118,66 @@ public class BrokerFacade {
         throw new RestconfDocumentedException(errMsg);
     }
 
-    // PUT configuration
-    public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataPut(
+    /**
+     * <b>PUT configuration data</b>
+     *
+     * Prepare result(status) for PUT operation and PUT data via transaction.
+     * Return wrapped status and future from PUT.
+     *
+     * @param globalSchema
+     *            - used by merge parents (if contains list)
+     * @param path
+     *            - path of node
+     * @param payload
+     *            - input data
+     * @return wrapper of status and future of PUT
+     */
+    public PutResult commitConfigurationDataPut(
             final SchemaContext globalSchema, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload) {
+        Preconditions.checkNotNull(globalSchema);
+        Preconditions.checkNotNull(path);
+        Preconditions.checkNotNull(payload);
+
         checkPreconditions();
-        return putDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path, payload, globalSchema);
+
+        final DOMDataReadWriteTransaction newReadWriteTransaction = this.domDataBroker.newReadWriteTransaction();
+        final Status status = readDataViaTransaction(newReadWriteTransaction, CONFIGURATION, path) != null ? Status.OK
+                : Status.CREATED;
+        final CheckedFuture<Void, TransactionCommitFailedException> future = putDataViaTransaction(
+                newReadWriteTransaction, CONFIGURATION, path, payload, globalSchema);
+        return new PutResult(status, future);
     }
 
-    public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataPut(
+    /**
+     * <b>PUT configuration data (Mount point)</b>
+     *
+     * Prepare result(status) for PUT operation and PUT data via transaction.
+     * Return wrapped status and future from PUT.
+     *
+     * @param mountPoint
+     *            - mount point for getting transaction for operation and schema
+     *            context for merging parents(if contains list)
+     * @param path
+     *            - path of node
+     * @param payload
+     *            - input data
+     * @return wrapper of status and future of PUT
+     */
+    public PutResult commitMountPointDataPut(
             final DOMMountPoint mountPoint, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload) {
+        Preconditions.checkNotNull(mountPoint);
+        Preconditions.checkNotNull(path);
+        Preconditions.checkNotNull(payload);
+
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
-            return putDataViaTransaction(domDataBrokerService.get().newReadWriteTransaction(), CONFIGURATION, path,
+            final DOMDataReadWriteTransaction newReadWriteTransaction = domDataBrokerService.get().newReadWriteTransaction();
+            final Status status = readDataViaTransaction(newReadWriteTransaction, CONFIGURATION, path) != null
+                    ? Status.OK : Status.CREATED;
+            final CheckedFuture<Void, TransactionCommitFailedException> future = putDataViaTransaction(
+                    newReadWriteTransaction, CONFIGURATION, path,
                     payload, mountPoint.getSchemaContext());
+            return new PutResult(status, future);
         }
         final String errMsg = "DOM data broker service isn't available for mount point " + path;
         LOG.warn(errMsg);
@@ -298,23 +346,48 @@ public class BrokerFacade {
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
         LOG.trace("Read {} via Restconf: {}", datastore.name(), path);
         final ListenableFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = transaction.read(datastore, path);
-        if (listenableFuture != null) {
-            Optional<NormalizedNode<?, ?>> optional;
-            try {
-                LOG.debug("Reading result data from transaction.");
-                optional = listenableFuture.get();
-            } catch (InterruptedException | ExecutionException e) {
-                LOG.warn("Exception by reading {} via Restconf: {}", datastore.name(), path, e);
-                throw new RestconfDocumentedException("Problem to get data from transaction.", e.getCause());
+        final ReadDataResult readData = new ReadDataResult();
+        final CountDownLatch responseWaiter = new CountDownLatch(1);
 
+        Futures.addCallback(listenableFuture, new FutureCallback<Optional<NormalizedNode<?, ?>>>() {
+
+            @Override
+            public void onSuccess(final Optional<NormalizedNode<?, ?>> result) {
+                handlingCallback(null, datastore, path, result, readData);
+                responseWaiter.countDown();
             }
-            if (optional != null) {
-                if (optional.isPresent()) {
-                    return optional.get();
+
+            @Override
+            public void onFailure(final Throwable t) {
+                handlingCallback(t, datastore, path, null, null);
+                responseWaiter.countDown();
+            }
+        });
+
+        try {
+            responseWaiter.await();
+        } catch (final InterruptedException e) {
+            final String msg = "Problem while waiting for response";
+            LOG.warn(msg);
+            throw new RestconfDocumentedException(msg, e);
+        }
+        return readData.getResult();
+    }
+
+    protected static void handlingCallback(final Throwable t, final LogicalDatastoreType datastore,
+            final YangInstanceIdentifier path, final Optional<NormalizedNode<?, ?>> result,
+            final ReadDataResult readData) {
+        if (t != null) {
+            LOG.warn("Exception by reading {} via Restconf: {}", datastore.name(), path, t);
+            throw new RestconfDocumentedException("Problem to get data from transaction.", t);
+        } else {
+            LOG.debug("Reading result data from transaction.");
+            if (result != null) {
+                if (result.isPresent()) {
+                    readData.setResult(result.get());
                 }
             }
         }
-        return null;
     }
 
     private CheckedFuture<Void, TransactionCommitFailedException> postDataViaTransaction(
@@ -326,7 +399,7 @@ public class BrokerFacade {
             LOG.trace("POST {} via Restconf: {} with payload {}", datastore.name(), path, payload);
             final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
             rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-            ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
+            TransactionUtil.ensureParentsByMerge(path, schemaContext, rWTransaction);
             for(final MapEntryNode child : ((MapNode) payload).getValue()) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
                 checkItemDoesNotExists(rWTransaction, datastore, childPath);
@@ -334,7 +407,7 @@ public class BrokerFacade {
             }
         } else {
             checkItemDoesNotExists(rWTransaction,datastore, path);
-            ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
+            TransactionUtil.ensureParentsByMerge(path, schemaContext, rWTransaction);
             rWTransaction.put(datastore, path, payload);
         }
         return rWTransaction.submit();
@@ -349,7 +422,7 @@ public class BrokerFacade {
             LOG.trace("POST {} within Restconf PATCH: {} with payload {}", datastore.name(), path, payload);
             final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
             rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-            ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
+            TransactionUtil.ensureParentsByMerge(path, schemaContext, rWTransaction);
             for(final MapEntryNode child : ((MapNode) payload).getValue()) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
                 checkItemDoesNotExists(rWTransaction, datastore, childPath);
@@ -357,7 +430,7 @@ public class BrokerFacade {
             }
         } else {
             checkItemDoesNotExists(rWTransaction,datastore, path);
-            ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
+            TransactionUtil.ensureParentsByMerge(path, schemaContext, rWTransaction);
             rWTransaction.put(datastore, path, payload);
         }
     }
@@ -382,7 +455,7 @@ public class BrokerFacade {
             final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         LOG.trace("Put {} via Restconf: {} with payload {}", datastore.name(), path, payload);
-        ensureParentsByMerge(datastore, path, writeTransaction, schemaContext);
+        TransactionUtil.ensureParentsByMerge(path, schemaContext, writeTransaction);
         writeTransaction.put(datastore, path, payload);
         return writeTransaction.submit();
     }
@@ -391,7 +464,7 @@ public class BrokerFacade {
             final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         LOG.trace("Put {} within Restconf PATCH: {} with payload {}", datastore.name(), path, payload);
-        ensureParentsByMerge(datastore, path, writeTransaction, schemaContext);
+        TransactionUtil.ensureParentsByMerge(path, schemaContext, writeTransaction);
         writeTransaction.put(datastore, path, payload);
     }
 
@@ -414,7 +487,7 @@ public class BrokerFacade {
             final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         LOG.trace("Merge {} within Restconf PATCH: {} with payload {}", datastore.name(), path, payload);
-        ensureParentsByMerge(datastore, path, writeTransaction, schemaContext);
+        TransactionUtil.ensureParentsByMerge(path, schemaContext, writeTransaction);
 
         // merging is necessary only for lists otherwise we can call put method
         if (payload instanceof MapNode) {
@@ -428,35 +501,16 @@ public class BrokerFacade {
         this.domDataBroker = domDataBroker;
     }
 
-    private void ensureParentsByMerge(final LogicalDatastoreType store,
-                                      final YangInstanceIdentifier normalizedPath, final DOMDataReadWriteTransaction rwTx, final SchemaContext schemaContext) {
-        final List<PathArgument> normalizedPathWithoutChildArgs = new ArrayList<>();
-        YangInstanceIdentifier rootNormalizedPath = null;
+    private class ReadDataResult {
+        NormalizedNode<?, ?> result = null;
 
-        final Iterator<PathArgument> it = normalizedPath.getPathArguments().iterator();
-
-        while(it.hasNext()) {
-            final PathArgument pathArgument = it.next();
-            if(rootNormalizedPath == null) {
-                rootNormalizedPath = YangInstanceIdentifier.create(pathArgument);
-            }
-
-            // Skip last element, its not a parent
-            if(it.hasNext()) {
-                normalizedPathWithoutChildArgs.add(pathArgument);
-            }
+        NormalizedNode<?, ?> getResult() {
+            return this.result;
         }
 
-        // No parent structure involved, no need to ensure parents
-        if(normalizedPathWithoutChildArgs.isEmpty()) {
-            return;
+        void setResult(final NormalizedNode<?, ?> result) {
+            this.result = result;
         }
-
-        Preconditions.checkArgument(rootNormalizedPath != null, "Empty path received");
-
-        final NormalizedNode<?, ?> parentStructure =
-                ImmutableNodes.fromInstanceId(schemaContext, YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));
-        rwTx.merge(store, rootNormalizedPath, parentStructure);
     }
 
     public void registerToListenNotification(final NotificationListenerAdapter listener) {
