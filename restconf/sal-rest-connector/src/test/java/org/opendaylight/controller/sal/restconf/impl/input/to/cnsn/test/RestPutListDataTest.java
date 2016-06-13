@@ -18,6 +18,7 @@ import com.google.common.util.concurrent.CheckedFuture;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.List;
+import javax.ws.rs.core.Response.Status;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -26,6 +27,7 @@ import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.netconf.sal.restconf.impl.PutResult;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
@@ -71,8 +73,12 @@ public class RestPutListDataTest {
         restconfImpl = RestconfImpl.getInstance();
         restconfImpl.setBroker(brokerFacade);
         restconfImpl.setControllerContext(controllerContext);
-        when(brokerFacade.commitConfigurationDataPut(any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class)))
-                .thenReturn(mock(CheckedFuture.class));
+        final PutResult result = mock(PutResult.class);
+        when(brokerFacade.commitConfigurationDataPut(any(SchemaContext.class), any(YangInstanceIdentifier.class),
+                any(NormalizedNode.class)))
+                        .thenReturn(result);
+        when(result.getFutureOfPutData()).thenReturn(mock(CheckedFuture.class));
+        when(result.getStatus()).thenReturn(Status.OK);
     }
 
     /**

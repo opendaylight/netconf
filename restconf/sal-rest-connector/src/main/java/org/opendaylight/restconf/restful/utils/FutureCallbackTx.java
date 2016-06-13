@@ -45,8 +45,8 @@ final class FutureCallbackTx {
 
             @Override
             public void onFailure(final Throwable t) {
-                handlingLoggerAndValues(t, txType, null, null);
                 responseWaiter.countDown();
+                handlingLoggerAndValues(t, txType, null, null);
             }
 
             @Override
