@@ -16,12 +16,14 @@ import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
@@ -30,6 +32,7 @@ import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.notifications.NetconfNotification;
+import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.EditContent;
@@ -46,8 +49,11 @@ import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.impl.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
@@ -60,8 +66,9 @@ import org.w3c.dom.Element;
 
 public class NetconfMessageTransformUtil {
 
-    private static final Logger LOG= LoggerFactory.getLogger(NetconfMessageTransformUtil.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformUtil.class);
 
+    public static final String MESSAGE_ID_PREFIX = "m";
     public static final String MESSAGE_ID_ATTR = "message-id";
 
     public static final QName CREATE_SUBSCRIPTION_RPC_QNAME = QName.cachedReference(QName.create(CreateSubscriptionInput.QNAME, "create-subscription"));
@@ -271,7 +278,7 @@ public class NetconfMessageTransformUtil {
         return Builders.containerBuilder().withNodeIdentifier(toId(name)).withValue(ImmutableList.copyOf(node)).build();
     }
 
-    public static DataContainerChild<?, ?> createEditConfigStructure(final SchemaContext ctx, final YangInstanceIdentifier dataPath,
+    public static AnyXmlNode createEditConfigAnyxml(final SchemaContext ctx, final YangInstanceIdentifier dataPath,
                                                                      final Optional<ModifyAction> operation, final Optional<NormalizedNode<?, ?>> lastChildOverride) {
         final NormalizedNode<?, ?> configContent;
 
@@ -294,8 +301,13 @@ public class NetconfMessageTransformUtil {
         }
         final DOMSource value = new DOMSource(element);
 
-        return Builders.choiceBuilder().withNodeIdentifier(toId(EditContent.QNAME)).withChild(
-                Builders.anyXmlBuilder().withNodeIdentifier(toId(NETCONF_CONFIG_QNAME)).withValue(value).build()).build();
+        return Builders.anyXmlBuilder().withNodeIdentifier(toId(NETCONF_CONFIG_QNAME)).withValue(value).build();
+    }
+
+    public static DataContainerChild<?, ?> createEditConfigStructure(final SchemaContext ctx, final YangInstanceIdentifier dataPath,
+                                                                     final Optional<ModifyAction> operation, final Optional<NormalizedNode<?, ?>> lastChildOverride) {
+        return Builders.choiceBuilder().withNodeIdentifier(toId(EditContent.QNAME))
+                .withChild(createEditConfigAnyxml(ctx, dataPath, operation, lastChildOverride)).build();
     }
 
     public static SchemaPath toPath(final QName rpc) {
@@ -356,6 +368,40 @@ public class NetconfMessageTransformUtil {
         } catch (ParseException e) {
             LOG.warn("Unable to parse event time from {}. Setting time to {}", eventTimeElement, NetconfNotification.UNKNOWN_EVENT_TIME, e);
             return new AbstractMap.SimpleEntry<>(NetconfNotification.UNKNOWN_EVENT_TIME, notificationElement);
+        }
+    }
+
+    public static DOMResult prepareDomResultForRpcRequest(final QName rpcQName, final MessageCounter counter) {
+        final Document document = XmlUtil.newDocument();
+        final Element rpcNS =
+                document.createElementNS(NETCONF_RPC_QNAME.getNamespace().toString(), NETCONF_RPC_QNAME.getLocalName());
+        // set msg id
+        rpcNS.setAttribute(MESSAGE_ID_ATTR, counter.getNewMessageId(MESSAGE_ID_PREFIX));
+        final Element elementNS = document.createElementNS(rpcQName.getNamespace().toString(), rpcQName.getLocalName());
+        rpcNS.appendChild(elementNS);
+        document.appendChild(rpcNS);
+        return new DOMResult(elementNS);
+    }
+
+    public static void writeNormalizedRpc(final ContainerNode normalized, final DOMResult result,
+                                          final SchemaPath schemaPath, final SchemaContext baseNetconfCtx) throws IOException, XMLStreamException {
+        final XMLStreamWriter writer = NetconfUtil.XML_FACTORY.createXMLStreamWriter(result);
+        try {
+            try (final NormalizedNodeStreamWriter normalizedNodeStreamWriter =
+                    XMLStreamNormalizedNodeStreamWriter.create(writer, baseNetconfCtx, schemaPath)) {
+                try (final SchemaOrderedNormalizedNodeWriter normalizedNodeWriter =
+                        new SchemaOrderedNormalizedNodeWriter(normalizedNodeStreamWriter, baseNetconfCtx, schemaPath)) {
+                    Collection<DataContainerChild<?, ?>> value = normalized.getValue();
+                    normalizedNodeWriter.write(value);
+                    normalizedNodeWriter.flush();
+                }
+            }
+        } finally {
+            try {
+                writer.close();
+            } catch (final Exception e) {
+               LOG.warn("Unable to close resource properly", e);
+            }
         }
     }
 }

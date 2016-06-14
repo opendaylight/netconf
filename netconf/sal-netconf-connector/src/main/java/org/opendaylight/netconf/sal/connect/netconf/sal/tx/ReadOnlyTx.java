@@ -8,9 +8,7 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -21,14 +19,10 @@ import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
-import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.util.concurrent.MappingCheckedFuture;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,50 +60,16 @@ public final class ReadOnlyTx implements DOMDataReadOnlyTransaction {
 
     private CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> readConfigurationData(
             final YangInstanceIdentifier path) {
-        final ListenableFuture<DOMRpcResult> configRunning = netconfOps.getConfigRunning(loggingCallback, Optional.fromNullable(path));
+        final ListenableFuture<Optional<NormalizedNode<?, ?>>> configRunning = netconfOps.getConfigRunningData(loggingCallback, Optional.fromNullable(path));
 
-        final ListenableFuture<Optional<NormalizedNode<?, ?>>> transformedFuture = Futures.transform(configRunning, new Function<DOMRpcResult, Optional<NormalizedNode<?, ?>>>() {
-            @Override
-            public Optional<NormalizedNode<?, ?>> apply(final DOMRpcResult result) {
-                checkReadSuccess(result, path);
-
-                final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> dataNode = findDataNode(result);
-                return NormalizedNodes.findNode(dataNode, path.getPathArguments());
-            }
-        });
-
-        return MappingCheckedFuture.create(transformedFuture, ReadFailedException.MAPPER);
-    }
-
-    private DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> findDataNode(final DOMRpcResult result) {
-        return ((ContainerNode) result.getResult()).getChild(NetconfMessageTransformUtil.toId(NetconfMessageTransformUtil.NETCONF_DATA_QNAME)).get();
-    }
-
-    private void checkReadSuccess(final DOMRpcResult result, final YangInstanceIdentifier path) {
-        try {
-            Preconditions.checkArgument(AbstractWriteTx.isSuccess(result), "%s: Unable to read data: %s, errors: %s", id, path, result.getErrors());
-        } catch (final IllegalArgumentException e) {
-            LOG.warn("{}: Unable to read data: {}, errors: {}", id, path, result.getErrors());
-            throw e;
-        }
+        return MappingCheckedFuture.create(configRunning, ReadFailedException.MAPPER);
     }
 
     private CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> readOperationalData(
             final YangInstanceIdentifier path) {
-        final ListenableFuture<DOMRpcResult> configCandidate = netconfOps.get(loggingCallback, Optional.fromNullable(path));
+        final ListenableFuture<Optional<NormalizedNode<?, ?>>> configCandidate = netconfOps.getData(loggingCallback, Optional.fromNullable(path));
 
-        // Find data node and normalize its content
-        final ListenableFuture<Optional<NormalizedNode<?, ?>>> transformedFuture = Futures.transform(configCandidate, new Function<DOMRpcResult, Optional<NormalizedNode<?, ?>>>() {
-            @Override
-            public Optional<NormalizedNode<?, ?>> apply(final DOMRpcResult result) {
-                checkReadSuccess(result, path);
-
-                final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> dataNode = findDataNode(result);
-                return NormalizedNodes.findNode(dataNode, path.getPathArguments());
-            }
-        });
-
-        return MappingCheckedFuture.create(transformedFuture, ReadFailedException.MAPPER);
+        return MappingCheckedFuture.create(configCandidate, ReadFailedException.MAPPER);
     }
 
     @Override

@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.Set;
 import org.junit.Test;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -34,7 +34,7 @@ public class NetconfStateSchemasTest {
 
     @Test
     public void testCreate() throws Exception {
-        final SchemaContext schemaContext = NetconfMessageTransformer.BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext();
+        final SchemaContext schemaContext = BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext();
         final DataSchemaNode schemasNode = ((ContainerSchemaNode) schemaContext.getDataChildByName("netconf-state")).getDataChildByName("schemas");
 
         final Document schemasXml = XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/netconf-state.schemas.payload.xml"));
