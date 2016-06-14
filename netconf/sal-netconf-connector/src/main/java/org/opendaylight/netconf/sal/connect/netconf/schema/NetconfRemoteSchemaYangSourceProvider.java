@@ -31,6 +31,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yangtools.util.concurrent.ExceptionMapper;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -67,24 +68,30 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
         this.rpc = Preconditions.checkNotNull(rpc);
     }
 
+    private static final QName FORMAT_QNAME = QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "format").intern();
+    private static final NodeIdentifier FORMAT_PATHARG = new NodeIdentifier(FORMAT_QNAME);
+
+    private static final QName IDENTIFIER_QNAME = QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "identifier").intern();
+    private static final NodeIdentifier IDENTIFIER_PATHARG = new NodeIdentifier(IDENTIFIER_QNAME);
+
+    private static final QName VERSION_QNAME = QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "version").intern();
+    private static final NodeIdentifier VERSION_PATHARG = new NodeIdentifier(VERSION_QNAME);
+
+    private static final NodeIdentifier GET_SCHEMA_PATHARG = new NodeIdentifier(NetconfMessageTransformUtil.GET_SCHEMA_QNAME);
+
+    private static final LeafNode<QName> FORMAT_LEAF = Builders.leafBuilder().withNodeIdentifier(FORMAT_PATHARG).withValue(Yang.QNAME).build();
+
+    private static final NETCONF_DATA_QNAME = QName.create(GET_SCHEMA_QNAME, NETCONF_DATA_QNAME.getLocalName()).intern();
+    private static final NodeIdentifier NETCONF_DATA_PATHARG = toId(NETCONF_DATA_QNAME);
+
     public static ContainerNode createGetSchemaRequest(final String moduleName, final Optional<String> revision) {
-        final QName identifierQName = QName.cachedReference(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "identifier"));
-        final YangInstanceIdentifier.NodeIdentifier identifierId = new YangInstanceIdentifier.NodeIdentifier(identifierQName);
-        final LeafNode<String> identifier = Builders.<String>leafBuilder().withNodeIdentifier(identifierId).withValue(moduleName).build();
+        final LeafNode<String> identifier = Builders.leafBuilder().withNodeIdentifier(IDENTIFIER_PATHARG).withValue(moduleName).build();
+        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builder = Builders.containerBuilder();
 
-        final QName formatQName = QName.cachedReference(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "format"));
-        final YangInstanceIdentifier.NodeIdentifier formatId = new YangInstanceIdentifier.NodeIdentifier(formatQName);
-        final LeafNode<QName> format = Builders.<QName>leafBuilder().withNodeIdentifier(formatId).withValue(Yang.QNAME).build();
+        builder.withNodeIdentifier(GET_SCHEMA_PATHARG).withChild(identifier).withChild(FORMAT);
 
-        final DataContainerNodeAttrBuilder<YangInstanceIdentifier.NodeIdentifier, ContainerNode> builder = Builders.containerBuilder();
-
-        builder.withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.GET_SCHEMA_QNAME))
-                .withChild(identifier).withChild(format);
-
-        if(revision.isPresent()) {
-            final QName revisionQName = QName.cachedReference(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "version"));
-            final YangInstanceIdentifier.NodeIdentifier revisionId = new YangInstanceIdentifier.NodeIdentifier(revisionQName);
-            final LeafNode<String> revisionNode = Builders.<String>leafBuilder().withNodeIdentifier(revisionId).withValue(revision.get()).build();
+        if (revision.isPresent()) {
+            final LeafNode<String> revisionNode = Builders.leafBuilder().withNodeIdentifier(VERSION_PATHARG).withValue(revision.get()).build();
 
             builder.withChild(revisionNode);
         }
@@ -97,12 +104,11 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
             return Optional.absent();
         }
 
-        final QName schemaWrapperNode = QName.cachedReference(QName.create(GET_SCHEMA_QNAME, NETCONF_DATA_QNAME.getLocalName()));
-        final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> child = ((ContainerNode) result).getChild(toId(schemaWrapperNode));
+        final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> child = ((ContainerNode) result).getChild(NETCONF_DATA_PATHARG);
 
         Preconditions.checkState(child.isPresent() && child.get() instanceof AnyXmlNode,
                 "%s Unexpected response to get-schema, expected response with one child %s, but was %s", id,
-                schemaWrapperNode, result);
+                NETCONF_DATA_QNAME, result);
 
         final DOMSource wrappedNode = ((AnyXmlNode) child.get()).getValue();
         Preconditions.checkNotNull(wrappedNode.getNode());
