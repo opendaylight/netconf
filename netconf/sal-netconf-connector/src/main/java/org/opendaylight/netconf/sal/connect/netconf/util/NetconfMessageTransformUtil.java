@@ -42,6 +42,8 @@ import org.opendaylight.yangtools.yang.common.RpcError.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -64,7 +66,7 @@ public class NetconfMessageTransformUtil {
 
     public static final String MESSAGE_ID_ATTR = "message-id";
 
-    public static final QName CREATE_SUBSCRIPTION_RPC_QNAME = QName.cachedReference(QName.create(CreateSubscriptionInput.QNAME, "create-subscription"));
+    public static final QName CREATE_SUBSCRIPTION_RPC_QNAME = QName.create(CreateSubscriptionInput.QNAME, "create-subscription").intern();
     private static final String SUBTREE = "subtree";
 
     // Blank document used for creation of new DOM nodes
@@ -73,41 +75,41 @@ public class NetconfMessageTransformUtil {
 
     private NetconfMessageTransformUtil() {}
 
-    public static final QName IETF_NETCONF_MONITORING = QName.create(NetconfState.QNAME, "ietf-netconf-monitoring");
-    public static final QName GET_DATA_QNAME = QName.create(IETF_NETCONF_MONITORING, "data");
-    public static final QName GET_SCHEMA_QNAME = QName.create(IETF_NETCONF_MONITORING, "get-schema");
-    public static final QName IETF_NETCONF_MONITORING_SCHEMA_FORMAT = QName.create(IETF_NETCONF_MONITORING, "format");
-    public static final QName IETF_NETCONF_MONITORING_SCHEMA_LOCATION = QName.create(IETF_NETCONF_MONITORING, "location");
-    public static final QName IETF_NETCONF_MONITORING_SCHEMA_IDENTIFIER = QName.create(IETF_NETCONF_MONITORING, "identifier");
-    public static final QName IETF_NETCONF_MONITORING_SCHEMA_VERSION = QName.create(IETF_NETCONF_MONITORING, "version");
-    public static final QName IETF_NETCONF_MONITORING_SCHEMA_NAMESPACE = QName.create(IETF_NETCONF_MONITORING, "namespace");
+    public static final QName IETF_NETCONF_MONITORING = QName.create(NetconfState.QNAME, "ietf-netconf-monitoring").intern();
+    public static final QName GET_DATA_QNAME = QName.create(IETF_NETCONF_MONITORING, "data").intern();
+    public static final QName GET_SCHEMA_QNAME = QName.create(IETF_NETCONF_MONITORING, "get-schema").intern();
+    public static final QName IETF_NETCONF_MONITORING_SCHEMA_FORMAT = QName.create(IETF_NETCONF_MONITORING, "format").intern();
+    public static final QName IETF_NETCONF_MONITORING_SCHEMA_LOCATION = QName.create(IETF_NETCONF_MONITORING, "location").intern();
+    public static final QName IETF_NETCONF_MONITORING_SCHEMA_IDENTIFIER = QName.create(IETF_NETCONF_MONITORING, "identifier").intern();
+    public static final QName IETF_NETCONF_MONITORING_SCHEMA_VERSION = QName.create(IETF_NETCONF_MONITORING, "version").intern();
+    public static final QName IETF_NETCONF_MONITORING_SCHEMA_NAMESPACE = QName.create(IETF_NETCONF_MONITORING, "namespace").intern();
 
-    public static final QName IETF_NETCONF_NOTIFICATIONS = QName.create(NetconfCapabilityChange.QNAME, "ietf-netconf-notifications");
+    public static final QName IETF_NETCONF_NOTIFICATIONS = QName.create(NetconfCapabilityChange.QNAME, "ietf-netconf-notifications").intern();
 
-    public static final QName NETCONF_QNAME = QName.cachedReference(QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "netconf"));
+    public static final QName NETCONF_QNAME = QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "netconf").intern();
     public static final URI NETCONF_URI = NETCONF_QNAME.getNamespace();
 
-    public static final QName NETCONF_DATA_QNAME = QName.create(NETCONF_QNAME, "data");
-    public static final QName NETCONF_RPC_REPLY_QNAME = QName.create(NETCONF_QNAME, "rpc-reply");
-    public static final QName NETCONF_OK_QNAME = QName.create(NETCONF_QNAME, "ok");
-    public static final QName NETCONF_ERROR_OPTION_QNAME = QName.create(NETCONF_QNAME, "error-option");
-    public static final QName NETCONF_RUNNING_QNAME = QName.create(NETCONF_QNAME, "running");
-    public static final QName NETCONF_SOURCE_QNAME = QName.create(NETCONF_QNAME, "source");
-    public static final QName NETCONF_CANDIDATE_QNAME = QName.create(NETCONF_QNAME, "candidate");
-    public static final QName NETCONF_TARGET_QNAME = QName.create(NETCONF_QNAME, "target");
-    public static final QName NETCONF_CONFIG_QNAME = QName.create(NETCONF_QNAME, "config");
-    public static final QName NETCONF_COMMIT_QNAME = QName.create(NETCONF_QNAME, "commit");
-    public static final QName NETCONF_VALIDATE_QNAME = QName.create(NETCONF_QNAME, "validate");
-    public static final QName NETCONF_COPY_CONFIG_QNAME = QName.create(NETCONF_QNAME, "copy-config");
-    public static final QName NETCONF_OPERATION_QNAME = QName.create(NETCONF_QNAME, "operation");
-    public static final QName NETCONF_DEFAULT_OPERATION_QNAME = QName.create(NETCONF_OPERATION_QNAME, "default-operation");
-    public static final QName NETCONF_EDIT_CONFIG_QNAME = QName.create(NETCONF_QNAME, "edit-config");
+    public static final QName NETCONF_DATA_QNAME = QName.create(NETCONF_QNAME, "data").intern();
+    public static final QName NETCONF_RPC_REPLY_QNAME = QName.create(NETCONF_QNAME, "rpc-reply").intern();
+    public static final QName NETCONF_OK_QNAME = QName.create(NETCONF_QNAME, "ok").intern();
+    public static final QName NETCONF_ERROR_OPTION_QNAME = QName.create(NETCONF_QNAME, "error-option").intern();
+    public static final QName NETCONF_RUNNING_QNAME = QName.create(NETCONF_QNAME, "running").intern();
+    public static final QName NETCONF_SOURCE_QNAME = QName.create(NETCONF_QNAME, "source").intern();
+    public static final QName NETCONF_CANDIDATE_QNAME = QName.create(NETCONF_QNAME, "candidate").intern();
+    public static final QName NETCONF_TARGET_QNAME = QName.create(NETCONF_QNAME, "target").intern();
+    public static final QName NETCONF_CONFIG_QNAME = QName.create(NETCONF_QNAME, "config").intern();
+    public static final QName NETCONF_COMMIT_QNAME = QName.create(NETCONF_QNAME, "commit").intern();
+    public static final QName NETCONF_VALIDATE_QNAME = QName.create(NETCONF_QNAME, "validate").intern();
+    public static final QName NETCONF_COPY_CONFIG_QNAME = QName.create(NETCONF_QNAME, "copy-config").intern();
+    public static final QName NETCONF_OPERATION_QNAME = QName.create(NETCONF_QNAME, "operation").intern();
+    public static final QName NETCONF_DEFAULT_OPERATION_QNAME = QName.create(NETCONF_OPERATION_QNAME, "default-operation").intern();
+    public static final QName NETCONF_EDIT_CONFIG_QNAME = QName.create(NETCONF_QNAME, "edit-config").intern();
     public static final QName NETCONF_GET_CONFIG_QNAME = QName.create(NETCONF_QNAME, "get-config");
     public static final QName NETCONF_DISCARD_CHANGES_QNAME = QName.create(NETCONF_QNAME, "discard-changes");
-    public static final QName NETCONF_TYPE_QNAME = QName.create(NETCONF_QNAME, "type");
-    public static final QName NETCONF_FILTER_QNAME = QName.create(NETCONF_QNAME, "filter");
-    public static final QName NETCONF_GET_QNAME = QName.create(NETCONF_QNAME, "get");
-    public static final QName NETCONF_RPC_QNAME = QName.create(NETCONF_QNAME, "rpc");
+    public static final QName NETCONF_TYPE_QNAME = QName.create(NETCONF_QNAME, "type").intern();
+    public static final QName NETCONF_FILTER_QNAME = QName.create(NETCONF_QNAME, "filter").intern();
+    public static final QName NETCONF_GET_QNAME = QName.create(NETCONF_QNAME, "get").intern();
+    public static final QName NETCONF_RPC_QNAME = QName.create(NETCONF_QNAME, "rpc").intern();
 
     public static final URI NETCONF_ROLLBACK_ON_ERROR_URI = URI
             .create("urn:ietf:params:netconf:capability:rollback-on-error:1.0");
@@ -122,29 +124,29 @@ public class NetconfMessageTransformUtil {
     public static final URI NETCONF_RUNNING_WRITABLE_URI = URI
             .create("urn:ietf:params:netconf:capability:writable-running:1.0");
 
-    public static final QName NETCONF_LOCK_QNAME = QName.create(NETCONF_QNAME, "lock");
-    public static final QName NETCONF_UNLOCK_QNAME = QName.create(NETCONF_QNAME, "unlock");
+    public static final QName NETCONF_LOCK_QNAME = QName.create(NETCONF_QNAME, "lock").intern();
+    public static final QName NETCONF_UNLOCK_QNAME = QName.create(NETCONF_QNAME, "unlock").intern();
 
     // Discard changes message
     public static final ContainerNode DISCARD_CHANGES_RPC_CONTENT =
-            Builders.containerBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(NETCONF_DISCARD_CHANGES_QNAME)).build();
+            Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(NETCONF_DISCARD_CHANGES_QNAME)).build();
 
     // Commit changes message
     public static final ContainerNode COMMIT_RPC_CONTENT =
-            Builders.containerBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(NETCONF_COMMIT_QNAME)).build();
+            Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(NETCONF_COMMIT_QNAME)).build();
 
     // Get message
     public static final ContainerNode GET_RPC_CONTENT =
-            Builders.containerBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(NETCONF_GET_QNAME)).build();
+            Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(NETCONF_GET_QNAME)).build();
 
     // Create-subscription changes message
     public static final ContainerNode CREATE_SUBSCRIPTION_RPC_CONTENT =
-            Builders.containerBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(CREATE_SUBSCRIPTION_RPC_QNAME)).build();
+            Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(CREATE_SUBSCRIPTION_RPC_QNAME)).build();
 
     public static final DataContainerChild<?, ?> EMPTY_FILTER;
 
     static {
-        final NormalizedNodeAttrBuilder<YangInstanceIdentifier.NodeIdentifier, DOMSource, AnyXmlNode> anyXmlBuilder = Builders.anyXmlBuilder().withNodeIdentifier(toId(NETCONF_FILTER_QNAME));
+        final NormalizedNodeAttrBuilder<NodeIdentifier, DOMSource, AnyXmlNode> anyXmlBuilder = Builders.anyXmlBuilder().withNodeIdentifier(toId(NETCONF_FILTER_QNAME));
         anyXmlBuilder.withAttributes(Collections.singletonMap(NETCONF_TYPE_QNAME, SUBTREE));
 
         final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(), Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
@@ -156,7 +158,7 @@ public class NetconfMessageTransformUtil {
     }
 
     public static DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier identifier, final SchemaContext ctx) {
-        final NormalizedNodeAttrBuilder<YangInstanceIdentifier.NodeIdentifier, DOMSource, AnyXmlNode> anyXmlBuilder = Builders.anyXmlBuilder().withNodeIdentifier(toId(NETCONF_FILTER_QNAME));
+        final NormalizedNodeAttrBuilder<NodeIdentifier, DOMSource, AnyXmlNode> anyXmlBuilder = Builders.anyXmlBuilder().withNodeIdentifier(toId(NETCONF_FILTER_QNAME));
         anyXmlBuilder.withAttributes(Collections.singletonMap(NETCONF_TYPE_QNAME, SUBTREE));
 
         final NormalizedNode<?, ?> filterContent = ImmutableNodes.fromInstanceId(ctx, identifier);
@@ -241,12 +243,12 @@ public class NetconfMessageTransformUtil {
         }
     }
 
-    public static YangInstanceIdentifier.NodeIdentifier toId(final YangInstanceIdentifier.PathArgument qname) {
+    public static NodeIdentifier toId(final PathArgument qname) {
         return toId(qname.getNodeType());
     }
 
-    public static YangInstanceIdentifier.NodeIdentifier toId(final QName nodeType) {
-        return new YangInstanceIdentifier.NodeIdentifier(nodeType);
+    public static NodeIdentifier toId(final QName nodeType) {
+        return new NodeIdentifier(nodeType);
     }
 
     public static Element getDataSubtree(final Document doc) {
