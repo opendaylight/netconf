@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_fb10f9a9",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-06-14T08:41:17Z",
+      "side": 1,
+      "message": "remove whitespace",
+      "range": {
+        "startLine": 328,
+        "startChar": 0,
+        "endLine": 328,
+        "endChar": 8
+      },
+      "revId": "ce61c64c8d0fbc399d72c863e6f2db4b2e950238",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
