@@ -1,0 +1,48 @@
+module ncmount-l2fib {
+
+  namespace "org:opendaylight:coretutorials:ncmount:example:l2fib";
+
+  prefix "l2fib";
+
+  import ietf-yang-types {
+    prefix "yang";
+  }
+
+  description
+    "Sample model used for notification utilization demonstration.
+    This model is not used by XR or any other netconf server.";
+
+  revision "2016-03-07" {
+    description
+      "Initial revision.";
+  }
+
+   container bridge-domains {
+     list bridge-domain {
+
+      key "name";
+      leaf name {
+        type string;
+      }
+
+      list l2-fib {
+        key "phys-address";
+
+          leaf phys-address {
+            type yang:phys-address;
+          }
+
+          leaf action {
+            type enumeration {
+              enum "forward";
+              enum "filter";
+            }
+            mandatory true;
+          }
+      }
+
+    }
+  }
+
+
+}
