@@ -48,7 +48,6 @@ public class ClusteredNetconfDevice extends NetconfDevice implements EntityOwner
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusteredNetconfDevice.class);
 
-    private boolean isMaster = false;
     private NetconfDeviceCommunicator listener;
     private NetconfSessionPreferences sessionPreferences;
     private SchemaRepository schemaRepo;
