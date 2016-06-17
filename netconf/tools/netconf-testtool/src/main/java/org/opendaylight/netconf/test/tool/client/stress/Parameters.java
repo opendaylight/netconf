@@ -67,6 +67,9 @@ public class Parameters {
     @Arg(dest = "thread-amount")
     public int threadAmount;
 
+    @Arg(dest = "concurrent-message-limit")
+    public int concurrentMessageLimit;
+
     static ArgumentParser getParser() {
         final ArgumentParser parser = ArgumentParsers.newArgumentParser("netconf stress client");
 
@@ -162,6 +165,12 @@ public class Parameters {
                 .type(Integer.class)
                 .setDefault(1)
                 .dest("thread-amount");
+
+        parser.addArgument("--concurrent-message-limit")
+                .type(Integer.class)
+                .setDefault(0)
+                .help("Number of rpc messages that can be sent before receiving reply to them.")
+                .dest("concurrent-message-limit");
 
         return parser;
     }
