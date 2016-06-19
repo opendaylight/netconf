@@ -6,6 +6,7 @@ module ietf-yang-library {
       prefix yang;
     }
     import ietf-inet-types {
+      revision-date "2013-07-15";
       prefix inet;
     }
 
