@@ -159,7 +159,8 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = setupSchemaCacheDTO(nodeId, node);
 
         final NetconfDevice device = new ClusteredNetconfDevice(schemaResourcesDTO, remoteDeviceId, salFacade,
-                processingExecutor.getExecutor(), actorSystem, topologyId, nodeId.getValue(), TypedActor.context());
+                processingExecutor.getExecutor(), actorSystem, topologyId, nodeId.getValue(), TypedActor.context(),
+                reconnectOnChangedSchema);
 
         final int rpcMessageLimit =
                 node.getConcurrentRpcLimit() == null ? DEFAULT_CONCURRENT_RPC_LIMIT : node.getConcurrentRpcLimit();

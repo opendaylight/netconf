@@ -61,8 +61,8 @@ public class ClusteredNetconfDevice extends NetconfDevice implements EntityOwner
 
     public ClusteredNetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
                                   final ExecutorService globalProcessingExecutor, final ActorSystem actorSystem, final String topologyId, final String nodeId,
-                                  ActorContext cachedContext) {
-        super(schemaResourcesDTO, id, salFacade, globalProcessingExecutor, false);
+                                  final ActorContext cachedContext, final boolean reconnectOnSchemaChanged) {
+        super(schemaResourcesDTO, id, salFacade, globalProcessingExecutor, reconnectOnSchemaChanged);
         this.schemaRepo = (SchemaRepository) schemaResourcesDTO.getSchemaRegistry();
         this.actorSystem = actorSystem;
         this.topologyId = topologyId;
