@@ -1,5 +1,5 @@
-module restconf-module-with-missing-list-stream {
-     namespace "urn:ietf:params:xml:ns:yang:ietf-restconf-rmwmls";
+module restconf-module-with-missing-list-module {
+     namespace "urn:ietf:params:xml:ns:yang:ietf-restconf-rmwmlm";
      prefix "restconf";
 
      import ietf-yang-types { prefix yang; }
@@ -519,46 +519,12 @@ module restconf-module-with-missing-list-stream {
              "Contains a list of module description entries.
               These modules are currently loaded into the server.";
 
-           list module {
-             key "name revision";
-             description
-               "Each entry represents one module currently
-                supported by the server.";
-
-             leaf name {
-               type yang:yang-identifier;
-               description "The YANG module name.";
-             }
-             leaf revision {
-               type union {
-                 type revision-identifier;
-                 type string { length 0; }
-               }
-               description
-                 "The YANG module revision date. An empty string is
-                  used if no revision statement is present in the
-                  YANG module.";
-             }
-             leaf namespace {
-               type inet:uri;
-               mandatory true;
-               description
-                 "The XML namespace identifier for this module.";
-             }
-             leaf-list feature {
-               type yang:yang-identifier;
-               description
-                 "List of YANG feature names from this module that are
-                  supported by the server.";
-             }
-             leaf-list deviation {
-               type yang:yang-identifier;
-               description
-                 "List of YANG deviation module names used by this
-                  server to modify the conformance of the module
-                  associated with this entry.";
-             }
-           }
+            // removed list module for testing purposes + added list test-list
+            list test-list {
+              leaf test-leaf {
+                type string;
+              }
+            }
          }
 
          container operations {
@@ -586,10 +552,48 @@ module restconf-module-with-missing-list-stream {
             reference
               "RFC 5277, Section 3.4, <streams> element.";
 
-           /** deleted list stream for testing purposes + added list test-list **/
-           list test-list {
-             leaf test-leaf {
+           list stream {
+             key name;
+             description
+               "Each entry describes an event stream supported by
+                the server.";
+
+             leaf name {
                type string;
+               description "The stream name";
+               reference "RFC 5277, Section 3.4, <name> element.";
+             }
+
+             leaf description {
+               type string;
+               description "Description of stream content";
+               reference
+                 "RFC 5277, Section 3.4, <description> element.";
+             }
+
+             leaf replay-support {
+               type boolean;
+               description
+                 "Indicates if replay buffer supported for this stream";
+               reference
+                 "RFC 5277, Section 3.4, <replaySupport> element.";
+             }
+
+             leaf replay-log-creation-time {
+               type yang:date-and-time;
+               description
+                 "Indicates the time the replay log for this stream
+                  was created.";
+               reference
+                 "RFC 5277, Section 3.4, <replayLogCreationTime>
+                  element.";
+             }
+
+             leaf events {
+               type empty;
+               description
+                 "Represents the entry point for establishing
+                  notification delivery via server sent events.";
              }
            }
          }
