@@ -40,7 +40,7 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.LibraryModulesSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceBuilder;
-import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemas;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemasResolverImpl;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.listener.UserPreferences;
@@ -134,7 +134,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         schemaResourcesDTOs.put(DEFAULT_CACHE_DIRECTORY,
                 new NetconfDevice.SchemaResourcesDTO(DEFAULT_SCHEMA_REPOSITORY,
                         DEFAULT_SCHEMA_CONTEXT_FACTORY,
-                        new NetconfStateSchemas.NetconfStateSchemasResolverImpl()));
+                        new NetconfStateSchemasResolverImpl()));
         DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(DEFAULT_CACHE);
         DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(
                 TextToASTTransformer.create(DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY));
@@ -284,7 +284,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
 
         if (schemaResourcesDTO == null) {
             schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(schemaRegistry, schemaContextFactory,
-                    new NetconfStateSchemas.NetconfStateSchemasResolverImpl());
+                    new NetconfStateSchemasResolverImpl());
         }
 
         final NetconfDevice device = new NetconfDeviceBuilder()
@@ -330,7 +330,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
                 createDeviceFilesystemCache(moduleSchemaCacheDirectory);
         repository.registerSchemaSourceListener(deviceCache);
         return new NetconfDevice.SchemaResourcesDTO(repository, schemaContextFactory,
-                new NetconfStateSchemas.NetconfStateSchemasResolverImpl());
+                new NetconfStateSchemasResolverImpl());
     }
 
     /**
