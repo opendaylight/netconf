@@ -8,23 +8,36 @@
 package org.opendaylight.netconf.sal.connect.netconf;
 
 import static javax.xml.bind.DatatypeConverter.printBase64Binary;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.gson.stream.JsonReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
+import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
+import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
+import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
+import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.Module;
 import org.opendaylight.yangtools.sal.binding.generator.impl.ModuleInfoBackedContext;
@@ -39,6 +52,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlUtils;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
@@ -54,28 +68,47 @@ import org.xml.sax.SAXException;
  * Holds URLs with YANG schema resources for all yang modules reported in
  * ietf-netconf-yang-library/modules-state/modules node
  */
-public class LibraryModulesSchemas {
+public class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
     private static final Logger LOG = LoggerFactory.getLogger(LibraryModulesSchemas.class);
 
-    private static SchemaContext libraryContext;
-
-    private final Map<SourceIdentifier, URL> availableModels;
+    private static final SchemaContext LIBRARY_CONTEXT;
 
     static {
         final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
         moduleInfoBackedContext.registerModuleInfo(
                 org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.
                         $YangModuleInfoImpl.getInstance());
-        libraryContext = moduleInfoBackedContext.tryToCreateSchemaContext().get();
+        LIBRARY_CONTEXT = moduleInfoBackedContext.tryToCreateSchemaContext().get();
     }
 
-    private LibraryModulesSchemas(final Map<SourceIdentifier, URL> availableModels) {
+    private final Map<QName, URL> availableModels;
+
+    private static final YangInstanceIdentifier MODULES_STATE_MODULE_LIST =
+            YangInstanceIdentifier.builder().node(ModulesState.QNAME).node(Module.QNAME).build();
+
+    private static final ContainerNode GET_MODULES_STATE_MODULE_LIST_RPC;
+
+    static {
+        final DataContainerChild<?, ?> filter =
+                NetconfMessageTransformUtil.toFilterStructure(MODULES_STATE_MODULE_LIST, LIBRARY_CONTEXT);
+        GET_MODULES_STATE_MODULE_LIST_RPC =
+                Builders.containerBuilder().withNodeIdentifier(toId(NETCONF_GET_QNAME)).withChild(filter).build();
+    }
+
+    private LibraryModulesSchemas(final Map<QName, URL> availableModels) {
         this.availableModels = availableModels;
     }
 
     public Map<SourceIdentifier, URL> getAvailableModels() {
-        return availableModels;
+        final Map<SourceIdentifier, URL> result = Maps.newHashMap();
+        for (final Map.Entry<QName, URL> entry : availableModels.entrySet()) {
+            final SourceIdentifier sId = RevisionSourceIdentifier
+                    .create(entry.getKey().getLocalName(), Optional.fromNullable(entry.getKey().getFormattedRevision()));
+            result.put(sId, entry.getValue());
+        }
+
+        return result;
     }
 
 
@@ -102,10 +135,77 @@ public class LibraryModulesSchemas {
 
         } catch (IOException e) {
             LOG.warn("Unable to download yang library from {}", url, e);
-            return new LibraryModulesSchemas(Collections.<SourceIdentifier, URL>emptyMap());
+            return new LibraryModulesSchemas(Collections.<QName, URL>emptyMap());
         }
     }
 
+
+    public static LibraryModulesSchemas create(final NetconfDeviceRpc deviceRpc, final RemoteDeviceId deviceId) {
+        final DOMRpcResult moduleListNodeResult;
+        try {
+            moduleListNodeResult =
+                    deviceRpc.invokeRpc(toPath(NETCONF_GET_QNAME), GET_MODULES_STATE_MODULE_LIST_RPC).get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(deviceId + ": Interrupted while waiting for response to "
+                    + MODULES_STATE_MODULE_LIST, e);
+        } catch (ExecutionException e) {
+            LOG.warn("{}: Unable to detect available schemas, get to {} failed", deviceId, MODULES_STATE_MODULE_LIST, e);
+            return new LibraryModulesSchemas(Collections.<QName, URL>emptyMap());
+        }
+
+        if(moduleListNodeResult.getErrors().isEmpty() == false) {
+            LOG.warn("{}: Unable to detect available schemas, get to {} failed, {}",
+                    deviceId, MODULES_STATE_MODULE_LIST, moduleListNodeResult.getErrors());
+            return new LibraryModulesSchemas(Collections.<QName, URL>emptyMap());
+        }
+
+
+        final Optional<? extends NormalizedNode<?, ?>> modulesStateNode =
+                findModulesStateNode(moduleListNodeResult.getResult());
+        if(modulesStateNode.isPresent()) {
+            Preconditions.checkState(modulesStateNode.get() instanceof ContainerNode,
+                    "Expecting container containing schemas, but was %s", modulesStateNode.get());
+            return create(((ContainerNode) modulesStateNode.get()));
+        } else {
+            LOG.warn("{}: Unable to detect available schemas, get to {} was empty", deviceId, toId(ModulesState.QNAME));
+            return new LibraryModulesSchemas(Collections.<QName, URL>emptyMap());
+        }
+    }
+
+    private static Optional<? extends NormalizedNode<?, ?>> findModulesStateNode(final NormalizedNode<?, ?> result) {
+        if(result == null) {
+            return Optional.absent();
+        }
+        final Optional<DataContainerChild<?, ?>> dataNode = ((DataContainerNode<?>) result).getChild(toId(NETCONF_DATA_QNAME));
+        if(dataNode.isPresent() == false) {
+            return Optional.absent();
+        }
+
+       return ((DataContainerNode<?>) dataNode.get()).getChild(toId(ModulesState.QNAME));
+    }
+
+    private static LibraryModulesSchemas create(final ContainerNode modulesStateNode) {
+        final YangInstanceIdentifier.NodeIdentifier moduleListNodeId =
+                new YangInstanceIdentifier.NodeIdentifier(Module.QNAME);
+        final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> moduleListNode =
+                modulesStateNode.getChild(moduleListNodeId);
+        Preconditions.checkState(moduleListNode.isPresent(),
+                "Unable to find list: %s in %s", moduleListNodeId, modulesStateNode);
+        Preconditions.checkState(moduleListNode.get() instanceof MapNode,
+                "Unexpected structure for container: %s in : %s. Expecting a list",
+                moduleListNodeId, modulesStateNode);
+
+        final ImmutableMap.Builder<QName, URL> schemasMapping = new ImmutableMap.Builder<>();
+        for (final MapEntryNode moduleNode : ((MapNode) moduleListNode.get()).getValue()) {
+            final Optional<Map.Entry<QName, URL>> schemaMappingEntry = createFromEntry(moduleNode);
+            if (schemaMappingEntry.isPresent()) {
+                schemasMapping.put(createFromEntry(moduleNode).get());
+            }
+        }
+
+        return new LibraryModulesSchemas(schemasMapping.build());
+    }
 
     private static LibraryModulesSchemas createFromURLConnection(URLConnection connection) {
 
@@ -124,7 +224,7 @@ public class LibraryModulesSchemas {
                     contentType.equals("application/json") ? readJson(in) : readXml(in);
 
             if (!optionalModulesStateNode.isPresent()) {
-                return new LibraryModulesSchemas(Collections.<SourceIdentifier, URL>emptyMap());
+                return new LibraryModulesSchemas(Collections.<QName, URL>emptyMap());
             }
 
             final NormalizedNode<?, ?> modulesStateNode = optionalModulesStateNode.get();
@@ -143,9 +243,9 @@ public class LibraryModulesSchemas {
                     "Unexpected structure for container: %s in : %s. Expecting a list",
                     moduleListNodeId, modulesStateNode);
 
-            final ImmutableMap.Builder<SourceIdentifier, URL> schemasMapping = new ImmutableMap.Builder<>();
+            final ImmutableMap.Builder<QName, URL> schemasMapping = new ImmutableMap.Builder<>();
             for (final MapEntryNode moduleNode : ((MapNode) moduleListNode.get()).getValue()) {
-                final Optional<Map.Entry<SourceIdentifier, URL>> schemaMappingEntry = createFromEntry(moduleNode);
+                final Optional<Map.Entry<QName, URL>> schemaMappingEntry = createFromEntry(moduleNode);
                 if (schemaMappingEntry.isPresent()) {
                     schemasMapping.put(createFromEntry(moduleNode).get());
                 }
@@ -154,7 +254,7 @@ public class LibraryModulesSchemas {
             return new LibraryModulesSchemas(schemasMapping.build());
         } catch (IOException e) {
             LOG.warn("Unable to download yang library from {}", connection.getURL(), e);
-            return new LibraryModulesSchemas(Collections.<SourceIdentifier, URL>emptyMap());
+            return new LibraryModulesSchemas(Collections.<QName, URL>emptyMap());
         }
     }
 
@@ -177,7 +277,7 @@ public class LibraryModulesSchemas {
 
         } catch (IOException e) {
             LOG.warn("Unable to download yang library from {}", url, e);
-            return new LibraryModulesSchemas(Collections.<SourceIdentifier, URL>emptyMap());
+            return new LibraryModulesSchemas(Collections.<QName, URL>emptyMap());
         }
     }
 
@@ -195,7 +295,7 @@ public class LibraryModulesSchemas {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
-        final JsonParserStream jsonParser = JsonParserStream.create(writer, libraryContext);
+        final JsonParserStream jsonParser = JsonParserStream.create(writer, LIBRARY_CONTEXT);
         final JsonReader reader = new JsonReader(new InputStreamReader(in));
 
         jsonParser.parse(reader);
@@ -207,12 +307,12 @@ public class LibraryModulesSchemas {
 
     private static Optional<NormalizedNode<?, ?>> readXml(final InputStream in) {
         final DomToNormalizedNodeParserFactory parserFactory =
-                DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, libraryContext);
+                DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, LIBRARY_CONTEXT);
 
         try {
             final NormalizedNode<?, ?> parsed =
                     parserFactory.getContainerNodeParser().parse(Collections.singleton(XmlUtil.readXmlToElement(in)),
-                            (ContainerSchemaNode) libraryContext.getDataChildByName(ModulesState.QNAME));
+                            (ContainerSchemaNode) LIBRARY_CONTEXT.getDataChildByName(ModulesState.QNAME));
             return Optional.of(parsed);
         } catch (IOException|SAXException e) {
             LOG.warn("Unable to parse yang library xml content", e);
@@ -221,7 +321,7 @@ public class LibraryModulesSchemas {
         return Optional.<NormalizedNode<?, ?>>absent();
     }
 
-    private static Optional<Map.Entry<SourceIdentifier, URL>> createFromEntry(final MapEntryNode moduleNode) {
+    private static Optional<Map.Entry<QName, URL>> createFromEntry(final MapEntryNode moduleNode) {
         Preconditions.checkArgument(
                 moduleNode.getNodeType().equals(Module.QNAME), "Wrong QName %s", moduleNode.getNodeType());
 
@@ -234,7 +334,7 @@ public class LibraryModulesSchemas {
         if(revision.isPresent()) {
             if(!SourceIdentifier.REVISION_PATTERN.matcher(revision.get()).matches()) {
                 LOG.warn("Skipping library schema for {}. Revision {} is in wrong format.", moduleNode, revision.get());
-                return Optional.<Map.Entry<SourceIdentifier, URL>>absent();
+                return Optional.<Map.Entry<QName, URL>>absent();
             }
         }
 
@@ -248,13 +348,20 @@ public class LibraryModulesSchemas {
                 ? RevisionSourceIdentifier.create(moduleName, revision.get())
                 : RevisionSourceIdentifier.create(moduleName);
 
+        childNodeId = new YangInstanceIdentifier.NodeIdentifier(QName.create(Module.QNAME, "namespace"));
+        final String moduleNameSpace = getSingleChildNodeValue(moduleNode, childNodeId).get();
+
+        final QName moduleQName = revision.isPresent()
+                ? QName.create(moduleNameSpace, revision.get(), moduleName)
+                : QName.create(URI.create(moduleNameSpace), null, moduleName);
+
         try {
-            return Optional.<Map.Entry<SourceIdentifier, URL>>of(new AbstractMap.SimpleImmutableEntry<>(
-                    sourceId, new URL(schemaUriAsString.get())));
+            return Optional.<Map.Entry<QName, URL>>of(new AbstractMap.SimpleImmutableEntry<>(
+                    moduleQName, new URL(schemaUriAsString.get())));
         } catch (MalformedURLException e) {
             LOG.warn("Skipping library schema for {}. URL {} representing yang schema resource is not valid",
                     moduleNode, schemaUriAsString.get());
-            return Optional.<Map.Entry<SourceIdentifier, URL>>absent();
+            return Optional.<Map.Entry<QName, URL>>absent();
         }
     }
 
@@ -273,4 +380,8 @@ public class LibraryModulesSchemas {
                 ? Optional.<String>absent() : Optional.of(value.toString().trim());
     }
 
+    @Override
+    public Set<QName> getAvailableYangSchemasQNames() {
+        return null;
+    }
 }

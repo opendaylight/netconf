@@ -4,16 +4,19 @@
       {
         "name": "module-with-revision",
         "revision": "2014-04-08",
-        "schema": "http://localhost:8181/yanglib/schemas/module-with-revision/2014-04-08"
+        "schema": "http://localhost:8181/yanglib/schemas/module-with-revision/2014-04-08",
+        "namespace": "bla"
       },
       {
         "name": "another-module-with-revision",
         "revision": "2014-06-08",
+        "namespace": "test",
         "schema": "http://localhost:8181/yanglib/schemas/another-module-with-revision/2013-10-21"
       },
       {
         "name": "module-without-revision",
         "revision": "",
+        "namespace": "namespace:module-without-revision",
         "schema": "http://localhost:8181/yanglib/schemas/module-without-revision/2013-10-21"
       }
     ]

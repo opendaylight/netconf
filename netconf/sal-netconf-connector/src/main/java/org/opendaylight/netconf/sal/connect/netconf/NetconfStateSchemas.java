@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
+import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
@@ -51,27 +52,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Holds QNames for all yang modules reported by ietf-netconf-monitoring/state/schemas
  */
-public final class NetconfStateSchemas {
+public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfStateSchemas.class);
-
-    /**
-     * Factory for NetconfStateSchemas
-     */
-    public interface NetconfStateSchemasResolver {
-        NetconfStateSchemas resolve(final NetconfDeviceRpc deviceRpc, final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id);
-    }
-
-    /**
-     * Default implementation resolving schemas QNames from netconf-state
-     */
-    public static final class NetconfStateSchemasResolverImpl implements NetconfStateSchemasResolver {
-
-        @Override
-        public NetconfStateSchemas resolve(final NetconfDeviceRpc deviceRpc, final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id) {
-            return NetconfStateSchemas.create(deviceRpc, remoteSessionCapabilities, id);
-        }
-    }
 
     public static final NetconfStateSchemas EMPTY = new NetconfStateSchemas(Collections.<RemoteYangSchema>emptySet());
 
@@ -96,6 +79,7 @@ public final class NetconfStateSchemas {
         return availableYangSchemas;
     }
 
+    @Override
     public Set<QName> getAvailableYangSchemasQNames() {
         return Sets.newHashSet(Collections2.transform(getAvailableYangSchemas(), new Function<RemoteYangSchema, QName>() {
             @Override
@@ -108,7 +92,7 @@ public final class NetconfStateSchemas {
     /**
      * Issue get request to remote device and parse response to find all schemas under netconf-state/schemas
      */
-    private static NetconfStateSchemas create(final NetconfDeviceRpc deviceRpc, final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id) {
+    static NetconfStateSchemas create(final NetconfDeviceRpc deviceRpc, final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id) {
         if(remoteSessionCapabilities.isMonitoringSupported() == false) {
             // TODO - need to search for get-schema support, not just ietf-netconf-monitoring support
             // issue might be a deviation to ietf-netconf-monitoring where get-schema is unsupported...

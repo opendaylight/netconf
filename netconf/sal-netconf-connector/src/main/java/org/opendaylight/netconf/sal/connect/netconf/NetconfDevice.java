@@ -32,6 +32,8 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
+import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
+import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
@@ -40,6 +42,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommun
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.NetconfRemoteSchemaYangSourceProvider;
+import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -56,6 +59,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.slf4j.Logger;
@@ -83,7 +87,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     private final RemoteDeviceHandler<NetconfSessionPreferences> salFacade;
     private final ListeningExecutorService processingExecutor;
     protected final SchemaSourceRegistry schemaRegistry;
-    private final NetconfStateSchemas.NetconfStateSchemasResolver stateSchemasResolver;
+    private final NetconfDeviceSchemasResolver stateSchemasResolver;
     private final NotificationHandler notificationHandler;
     protected final List<SchemaSourceRegistration<? extends SchemaSourceRepresentation>> sourceRegistrations = Lists.newArrayList();
 
@@ -226,7 +230,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     }
 
     private void addProvidedSourcesToSchemaRegistry(final NetconfDeviceRpc deviceRpc, final DeviceSources deviceSources) {
-        final NetconfRemoteSchemaYangSourceProvider yangProvider = new NetconfRemoteSchemaYangSourceProvider(id, deviceRpc);
+        final SchemaSourceProvider<YangTextSchemaSource> yangProvider = deviceSources.getSourceProvider();
         for (final SourceIdentifier sourceId : deviceSources.getProvidedSources()) {
             sourceRegistrations.add(schemaRegistry.registerSchemaSource(yangProvider,
                     PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
@@ -260,12 +264,14 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     public static class SchemaResourcesDTO {
         private final SchemaSourceRegistry schemaRegistry;
         private final SchemaContextFactory schemaContextFactory;
-        private final NetconfStateSchemas.NetconfStateSchemasResolver stateSchemasResolver;
+        private final NetconfDeviceSchemasResolver stateSchemasResolver;
 
-        public SchemaResourcesDTO(final SchemaSourceRegistry schemaRegistry, final SchemaContextFactory schemaContextFactory, final NetconfStateSchemas.NetconfStateSchemasResolver stateSchemasResolver) {
+        public SchemaResourcesDTO(final SchemaSourceRegistry schemaRegistry,
+                                  final SchemaContextFactory schemaContextFactory,
+                                  final NetconfDeviceSchemasResolver deviceSchemasResolver) {
             this.schemaRegistry = Preconditions.checkNotNull(schemaRegistry);
             this.schemaContextFactory = Preconditions.checkNotNull(schemaContextFactory);
-            this.stateSchemasResolver = Preconditions.checkNotNull(stateSchemasResolver);
+            this.stateSchemasResolver = Preconditions.checkNotNull(deviceSchemasResolver);
         }
 
         public SchemaSourceRegistry getSchemaRegistry() {
@@ -276,7 +282,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
             return schemaContextFactory;
         }
 
-        public NetconfStateSchemas.NetconfStateSchemasResolver getStateSchemasResolver() {
+        public NetconfDeviceSchemasResolver getStateSchemasResolver() {
             return stateSchemasResolver;
         }
     }
@@ -289,23 +295,23 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
         private final NetconfDeviceRpc deviceRpc;
         private final NetconfSessionPreferences remoteSessionCapabilities;
         private final RemoteDeviceId id;
-        private final NetconfStateSchemas.NetconfStateSchemasResolver stateSchemasResolver;
+        private final NetconfDeviceSchemasResolver stateSchemasResolver;
 
         DeviceSourcesResolver(final NetconfDeviceRpc deviceRpc, final NetconfSessionPreferences remoteSessionCapabilities,
-                                     final RemoteDeviceId id, final NetconfStateSchemas.NetconfStateSchemasResolver stateSchemasResolver) {
+                                     final RemoteDeviceId id, final NetconfDeviceSchemasResolver stateSchemasResolver) {
             this.deviceRpc = deviceRpc;
             this.remoteSessionCapabilities = remoteSessionCapabilities;
             this.id = id;
             this.stateSchemasResolver = stateSchemasResolver;
         }
 
-        public DeviceSourcesResolver(final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id, final NetconfStateSchemas.NetconfStateSchemasResolver stateSchemasResolver, final NetconfDeviceRpc rpcForMonitoring) {
+        public DeviceSourcesResolver(final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id, final NetconfDeviceSchemasResolver stateSchemasResolver, final NetconfDeviceRpc rpcForMonitoring) {
             this(rpcForMonitoring, remoteSessionCapabilities, id, stateSchemasResolver);
         }
 
         @Override
         public DeviceSources call() throws Exception {
-            final NetconfStateSchemas availableSchemas = stateSchemasResolver.resolve(deviceRpc, remoteSessionCapabilities, id);
+            final NetconfDeviceSchemas availableSchemas = stateSchemasResolver.resolve(deviceRpc, remoteSessionCapabilities, id);
             LOG.debug("{}: Schemas exposed by ietf-netconf-monitoring: {}", id, availableSchemas.getAvailableYangSchemasQNames());
 
             final Set<QName> requiredSources = Sets.newHashSet(remoteSessionCapabilities.getModuleBasedCaps());
@@ -331,7 +337,15 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
                 requiredSources.addAll(providedSourcesNotRequired);
             }
 
-            return new DeviceSources(requiredSources, providedSources);
+            final SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
+            if(availableSchemas instanceof LibraryModulesSchemas) {
+                sourceProvider = new YangLibrarySchemaYangSourceProvider(id,
+                        ((LibraryModulesSchemas) availableSchemas).getAvailableModels());
+            } else {
+                sourceProvider = new NetconfRemoteSchemaYangSourceProvider(id, deviceRpc);
+            }
+
+            return new DeviceSources(requiredSources, providedSources, sourceProvider);
         }
     }
 
@@ -341,10 +355,13 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     private static final class DeviceSources {
         private final Set<QName> requiredSources;
         private final Set<QName> providedSources;
+        private final SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
 
-        public DeviceSources(final Set<QName> requiredSources, final Set<QName> providedSources) {
+        public DeviceSources(final Set<QName> requiredSources, final Set<QName> providedSources,
+                             final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
             this.requiredSources = requiredSources;
             this.providedSources = providedSources;
+            this.sourceProvider = sourceProvider;
         }
 
         public Set<QName> getRequiredSourcesQName() {
@@ -363,6 +380,9 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
             return Collections2.transform(providedSources, QNAME_TO_SOURCE_ID_FUNCTION);
         }
 
+        public SchemaSourceProvider<YangTextSchemaSource> getSourceProvider() {
+            return sourceProvider;
+        }
     }
 
     /**

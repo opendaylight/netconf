@@ -2,6 +2,7 @@
     <module>
         <name>module-with-bad-url</name>
         <revision></revision>
+        <namespace>b</namespace>
         <schema>
             badurl
         </schema>
@@ -9,10 +10,12 @@
     <module>
         <name>module-bad-revision</name>
         <revision>bad-revision</revision>
+        <namespace>bbb</namespace>
     </module>
     <module>
         <name>good-ol-module</name>
         <revision></revision>
         <schema>http://www.example.com</schema>
+        <namespace>bbbds</namespace>
     </module>
 </modules>
