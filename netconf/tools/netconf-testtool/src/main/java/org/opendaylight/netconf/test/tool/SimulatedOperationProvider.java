@@ -22,6 +22,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.test.tool.rpc.DataList;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedCommit;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedCreateSubscription;
+import org.opendaylight.netconf.test.tool.rpc.SimulatedDiscardChanges;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedEditConfig;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedGet;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedGetConfig;
@@ -84,7 +85,8 @@ class SimulatedOperationProvider implements NetconfOperationServiceFactory {
             final SimulatedUnLock sUnlock = new SimulatedUnLock(String.valueOf(currentSessionId));
             final SimulatedCreateSubscription sCreateSubs = new SimulatedCreateSubscription(
                     String.valueOf(currentSessionId), notificationsFile);
-            return Sets.<NetconfOperation>newHashSet(sGet, sGetConfig, sEditConfig, sCommit, sLock, sUnlock, sCreateSubs);
+            final SimulatedDiscardChanges sDiscardChanges = new SimulatedDiscardChanges(String.valueOf(currentSessionId));
+            return Sets.<NetconfOperation>newHashSet(sGet, sGetConfig, sEditConfig, sCommit, sLock, sUnlock, sCreateSubs, sDiscardChanges);
         }
 
         @Override
