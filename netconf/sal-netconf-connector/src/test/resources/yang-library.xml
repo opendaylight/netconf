@@ -2,6 +2,7 @@
     <module>
         <name>module-with-revision</name>
         <revision>2014-04-08</revision>
+        <namespace>namespace</namespace>
         <schema>
             http://localhost:8181/yanglib/schemas/module-with-revision/2014-04-08
         </schema>
@@ -9,12 +10,14 @@
     <module>
         <name>another-module-with-revision</name>
         <revision>2013-10-21</revision>
+        <namespace>another-module-with-revision:namespace</namespace>
         <schema>
             http://localhost:8181/yanglib/schemas/another-module-with-revision/2013-10-21
         </schema>
     </module>
     <module>
         <name>module-without-revision</name>
+        <namespace>module-without-revision:namespace</namespace>
         <revision></revision>
         <schema>
             http://localhost:8181/yanglib/schemas/module-without-revision/
