@@ -5,7 +5,7 @@ module ietf-netconf-notifications {
 
    prefix ncn;
 
-   import ietf-inet-types { prefix inet; revision-date "2010-09-24";}
+   import ietf-inet-types { prefix inet; revision-date "2013-07-15";}
    import ietf-netconf { prefix nc; revision-date "2011-06-01";}
 
    organization

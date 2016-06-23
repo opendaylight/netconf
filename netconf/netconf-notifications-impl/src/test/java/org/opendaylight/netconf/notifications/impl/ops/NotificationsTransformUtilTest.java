@@ -21,7 +21,7 @@ import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.junit.Test;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.notifications.NetconfNotification;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Uri;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;

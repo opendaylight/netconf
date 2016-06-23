@@ -4,7 +4,7 @@ module netconf-node-topology {
 
     import network-topology { prefix nt; revision-date 2013-10-21; }
     import yang-ext { prefix ext; revision-date "2013-07-09";}
-    import ietf-inet-types { prefix inet; revision-date "2010-09-24"; }
+    import ietf-inet-types { prefix inet; revision-date "2013-07-15"; }
 
     revision "2015-01-14" {
         description "Initial revision of Topology model";
