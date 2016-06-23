@@ -9,7 +9,7 @@ module odl-sal-netconf-connector-cfg {
     import opendaylight-md-sal-dom {prefix dom;}
     import opendaylight-md-sal-binding {prefix md-sal-binding; revision-date 2013-10-28;}
     import odl-netconf-cfg { prefix cfg-net; revision-date 2014-04-08; }
-    import ietf-inet-types {prefix inet; revision-date "2010-09-24";}
+    import ietf-inet-types {prefix inet; revision-date "2013-07-15";}
 
     description
         "Config definition for Netconf Connector modules";

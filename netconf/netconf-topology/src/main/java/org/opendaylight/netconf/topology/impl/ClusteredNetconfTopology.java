@@ -54,7 +54,7 @@ import org.opendaylight.netconf.topology.util.BaseTopologyManager;
 import org.opendaylight.netconf.topology.util.NodeRoleChangeStrategy;
 import org.opendaylight.netconf.topology.util.NodeWriter;
 import org.opendaylight.netconf.topology.util.TopologyRoleChangeStrategy;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.IpAddress;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;

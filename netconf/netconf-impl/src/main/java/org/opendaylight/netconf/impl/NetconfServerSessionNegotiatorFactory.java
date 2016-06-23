@@ -30,7 +30,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.protocol.framework.SessionListenerFactory;
 import org.opendaylight.protocol.framework.SessionNegotiator;
 import org.opendaylight.protocol.framework.SessionNegotiatorFactory;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev100924.Uri;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

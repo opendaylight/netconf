@@ -8,7 +8,7 @@ module netconf-northbound-tcp {
     import config { prefix config; revision-date 2013-04-05; }
     import threadpool {prefix th;}
     import netty {prefix netty;}
-    import ietf-inet-types { prefix inet; revision-date 2010-09-24; }
+    import ietf-inet-types { prefix inet; revision-date 2013-07-15; }
 
     organization "Cisco Systems, Inc.";
 
