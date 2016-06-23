@@ -46,7 +46,7 @@ public class DTxProviderImpl implements DTxProvider, AutoCloseable {
     }
 
     @Nonnull @Override public synchronized DTx newTx(@Nonnull final Set<InstanceIdentifier<?>> nodes)
-        throws DTxException.DTxInitializationFailedException {
+            throws DTxException.DTxInitializationFailedException {
         boolean lockSucceed = dtxLock.lockDevices(DTXLogicalTXProviderType.NETCONF_TX_PROVIDER, nodes);
 
         if(!lockSucceed) {
@@ -128,65 +128,65 @@ public class DTxProviderImpl implements DTxProvider, AutoCloseable {
         }
 
         @Override public void delete(final LogicalDatastoreType logicalDatastoreType,
-            final InstanceIdentifier<?> instanceIdentifier) throws DTxException.EditFailedException {
+                                     final InstanceIdentifier<?> instanceIdentifier) throws DTxException.EditFailedException {
             delegate.delete(logicalDatastoreType, instanceIdentifier);
         }
 
         @Override public void delete(final LogicalDatastoreType logicalDatastoreType,
-            final InstanceIdentifier<?> instanceIdentifier, final InstanceIdentifier<?> nodeId)
-            throws DTxException.EditFailedException, DTxException.RollbackFailedException {
+                                     final InstanceIdentifier<?> instanceIdentifier, final InstanceIdentifier<?> nodeId)
+                throws DTxException.EditFailedException, DTxException.RollbackFailedException {
             delegate.delete(logicalDatastoreType, instanceIdentifier, nodeId);
         }
 
         @Override public <T extends DataObject> void merge(final LogicalDatastoreType logicalDatastoreType,
-            final InstanceIdentifier<T> instanceIdentifier, final T t)
-            throws DTxException.EditFailedException, DTxException.RollbackFailedException {
+                                                           final InstanceIdentifier<T> instanceIdentifier, final T t)
+                throws DTxException.EditFailedException, DTxException.RollbackFailedException {
             delegate.merge(logicalDatastoreType, instanceIdentifier, t);
         }
 
         @Override public <T extends DataObject> void merge(final LogicalDatastoreType logicalDatastoreType,
-            final InstanceIdentifier<T> instanceIdentifier, final T t, final boolean b)
-            throws DTxException.EditFailedException {
+                                                           final InstanceIdentifier<T> instanceIdentifier, final T t, final boolean b)
+                throws DTxException.EditFailedException {
             delegate.merge(logicalDatastoreType, instanceIdentifier, t, b);
         }
 
         @Override public <T extends DataObject> void merge(final LogicalDatastoreType logicalDatastoreType,
-            final InstanceIdentifier<T> instanceIdentifier, final T t, final boolean b,
-            final InstanceIdentifier<?> nodeId) throws DTxException.EditFailedException {
+                                                           final InstanceIdentifier<T> instanceIdentifier, final T t, final boolean b,
+                                                           final InstanceIdentifier<?> nodeId) throws DTxException.EditFailedException {
             delegate.merge(logicalDatastoreType, instanceIdentifier, t, b, nodeId);
         }
 
         @Override public <T extends DataObject> void merge(final LogicalDatastoreType logicalDatastoreType,
-            final InstanceIdentifier<T> instanceIdentifier, final T t, final InstanceIdentifier<?> nodeId)
-            throws DTxException.EditFailedException {
+                                                           final InstanceIdentifier<T> instanceIdentifier, final T t, final InstanceIdentifier<?> nodeId)
+                throws DTxException.EditFailedException {
             delegate.merge(logicalDatastoreType, instanceIdentifier, t, nodeId);
         }
 
         @Override public <T extends DataObject> void put(final LogicalDatastoreType logicalDatastoreType,
-            final InstanceIdentifier<T> instanceIdentifier, final T t) throws DTxException.EditFailedException {
+                                                         final InstanceIdentifier<T> instanceIdentifier, final T t) throws DTxException.EditFailedException {
             delegate.put(logicalDatastoreType, instanceIdentifier, t);
         }
 
         @Override public <T extends DataObject> void put(final LogicalDatastoreType logicalDatastoreType,
-            final InstanceIdentifier<T> instanceIdentifier, final T t, final boolean b)
-            throws DTxException.EditFailedException {
+                                                         final InstanceIdentifier<T> instanceIdentifier, final T t, final boolean b)
+                throws DTxException.EditFailedException {
             delegate.put(logicalDatastoreType, instanceIdentifier, t, b);
         }
 
         @Override public <T extends DataObject> void put(final LogicalDatastoreType logicalDatastoreType,
-            final InstanceIdentifier<T> instanceIdentifier, final T t, final boolean b,
-            final InstanceIdentifier<?> nodeId) throws DTxException.EditFailedException {
+                                                         final InstanceIdentifier<T> instanceIdentifier, final T t, final boolean b,
+                                                         final InstanceIdentifier<?> nodeId) throws DTxException.EditFailedException {
             delegate.put(logicalDatastoreType, instanceIdentifier, t, b, nodeId);
         }
 
         @Override public <T extends DataObject> void put(final LogicalDatastoreType logicalDatastoreType,
-            final InstanceIdentifier<T> instanceIdentifier, final T t, final InstanceIdentifier<?> nodeId)
-            throws DTxException.EditFailedException {
+                                                         final InstanceIdentifier<T> instanceIdentifier, final T t, final InstanceIdentifier<?> nodeId)
+                throws DTxException.EditFailedException {
             delegate.put(logicalDatastoreType, instanceIdentifier, t, nodeId);
         }
 
         @Override public CheckedFuture<Void, TransactionCommitFailedException> submit()
-            throws DTxException.SubmitFailedException, DTxException.RollbackFailedException {
+                throws DTxException.SubmitFailedException, DTxException.RollbackFailedException {
             final CheckedFuture<Void, TransactionCommitFailedException> submit = delegate.submit();
 
             Futures.addCallback(submit, new FutureCallback<Void>() {
@@ -229,4 +229,3 @@ public class DTxProviderImpl implements DTxProvider, AutoCloseable {
         }
     }
 }
-

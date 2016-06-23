@@ -161,7 +161,7 @@ public interface DTx extends WriteTransaction {
      *
      * @return CheckedFuture indicating the result of merge.
      * <ul>
-     * <li> set DTxException.ReadFailedException to the future if read failure</li>
+     * <li> set DTxException.EditFailedException to the future if merge failure but rollback success</li>
      * <li> set DTxException.RollbackFailedException if rollback failure</li>
      * <li> set DTxException for other failure</li>
      * <li> set null to the future otherwise</li>
@@ -186,7 +186,7 @@ public interface DTx extends WriteTransaction {
      *
      * @return CheckedFuture indicating the result of put
      * <ul>
-     * <li> set DTxException.ReadFailedException to the future if read failure</li>
+     * <li> set DTxException.EditFailedException to the future if put failure but rollback success</li>
      * <li> set DTxException.RollbackFailedException if rollback failure</li>
      * <li> set DTxException for other failure</li>
      * <li> set null to the future otherwise</li>
@@ -209,7 +209,7 @@ public interface DTx extends WriteTransaction {
      *
      * @return CheckedFuture indicating the result of delete.
      * <ul>
-     * <li> set DTxException.ReadFailedException to the future if read failure</li>
+     * <li> set DTxException.EditFailedException to the future if delete failure but rollback success</li>
      * <li> set DTxException.RollbackFailedException if rollback failure</li>
      * <li> set DTxException for other failure</li>
      * <li> set null to the future otherwise</li>
@@ -246,7 +246,7 @@ public interface DTx extends WriteTransaction {
      *
      * @return CheckedFuture indicating the result of the merge operation.
      * <ul>
-     * <li> set DTxException.ReadFailedException to the future if read failure</li>
+     * <li> set DTxException.EditFailedException to the future if merge failure but rollback success</li>
      * <li> set DTxException.RollbackFailedException if rollback failure</li>
      * <li> set DTxException for other failure</li>
      * <li> set null to the future otherwise</li>
@@ -271,7 +271,7 @@ public interface DTx extends WriteTransaction {
      *
      * @return CheckedFuture indicating the result of the put operation.
      * <ul>
-     * <li> set DTxException.ReadFailedException to the future if read failure</li>
+     * <li> set DTxException.EditFailedException to the future if put failure but rollback success</li>
      * <li> set DTxException.RollbackFailedException if rollback failure</li>
      * <li> set DTxException for other failure</li>
      * <li> set null to the future otherwise</li>
@@ -294,7 +294,7 @@ public interface DTx extends WriteTransaction {
      *
      * @return CheckedFuture indicating the result of the merge operation.
      * <ul>
-     * <li> set DTxException.ReadFailedException to the future if read failure</li>
+     * <li> set DTxException.EditFailedException to the future if delete failure but rollback success</li>
      * <li> set DTxException.RollbackFailedException if rollback failure</li>
      * <li> set DTxException for other failure</li>
      * <li> set null to the future otherwise</li>

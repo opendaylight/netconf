@@ -67,4 +67,3 @@ public class DTxTransactionLockImpl implements TransactionLock {
         }
     }
 }
-
