@@ -160,6 +160,10 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         salFacade.close();
     }
 
+    public RemoteDeviceHandler<NetconfSessionPreferences> getSalFacade() {
+        return salFacade;
+    }
+
     // Keepalive RPC static resources
     private static final SchemaPath PATH = toPath(NETCONF_GET_CONFIG_QNAME);
     private static final ContainerNode KEEPALIVE_PAYLOAD =
