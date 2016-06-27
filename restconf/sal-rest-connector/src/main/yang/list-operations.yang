@@ -1,0 +1,20 @@
+module list-operations {
+    yang-version 1;
+    namespace "list:operations";
+    prefix "listop";
+
+    description
+        "Operations of all modules";
+ 
+    revision "2016-06-28" {
+        description
+            "Initial revision";
+    }
+
+    list operations{
+        key operation;
+        leaf operation{
+            type string;
+        }
+    }
+}

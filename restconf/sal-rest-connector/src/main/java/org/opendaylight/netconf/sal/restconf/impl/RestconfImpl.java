@@ -311,7 +311,62 @@ public class RestconfImpl implements RestconfService {
 
     private NormalizedNodeContext operationsFromModulesToNormalizedContext(final Set<Module> modules,
             final DOMMountPoint mountPoint) {
-        throw new UnsupportedOperationException();
+//        final Module restconfModule = getRestconfModule();
+//        final ModuleBuilder restConfModuleBuilder = new ModuleBuilder(restconfModule);
+//        final Set<GroupingBuilder> gropingBuilders = restConfModuleBuilder.getGroupingBuilders();
+//        final Iterable<GroupingBuilder> filteredGroups = Iterables.filter(gropingBuilders, GROUPING_FILTER);
+//        final GroupingBuilder restconfGroupingBuilder = Iterables.getFirst(filteredGroups, null);
+//        final ContainerSchemaNodeBuilder restContainerSchemaNodeBuilder = (ContainerSchemaNodeBuilder) restconfGroupingBuilder
+//                .getDataChildByName(Draft02.RestConfModule.RESTCONF_CONTAINER_SCHEMA_NODE);
+//        final ContainerSchemaNodeBuilder containerSchemaNodeBuilder = (ContainerSchemaNodeBuilder) restContainerSchemaNodeBuilder
+//                .getDataChildByName(Draft02.RestConfModule.OPERATIONS_CONTAINER_SCHEMA_NODE);
+//
+//        final ContainerSchemaNodeBuilder fakeOperationsSchemaNodeBuilder = containerSchemaNodeBuilder;
+//        final SchemaPath fakeSchemaPath = fakeOperationsSchemaNodeBuilder.getPath().createChild(QName.create("dummy"));
+//
+//        final List<LeafNode<Object>> operationsAsData = new ArrayList<>();
+//
+//        for (final Module module : modules) {
+//            final Set<RpcDefinition> rpcs = module.getRpcs();
+//            for (final RpcDefinition rpc : rpcs) {
+//                final QName rpcQName = rpc.getQName();
+//                final String name = module.getName();
+//
+//                final QName qName = QName.create(restconfModule.getQNameModule(), rpcQName.getLocalName());
+//                final LeafSchemaNodeBuilder leafSchemaNodeBuilder = new LeafSchemaNodeBuilder(name, 0, qName,
+//                        fakeSchemaPath);
+//                final LeafSchemaNodeBuilder fakeRpcSchemaNodeBuilder = leafSchemaNodeBuilder;
+//                fakeRpcSchemaNodeBuilder.setAugmenting(true);
+//
+//                final EmptyType instance = EmptyType.getInstance();
+//                fakeRpcSchemaNodeBuilder.setType(instance);
+        // final LeafSchemaNode fakeRpcS chemaNode; =
+        // fakeRpcSchemaNodeBuilder.build();
+//                fakeOperationsSchemaNodeBuilder.addChildNode(fakeRpcSchemaNode);
+//
+//                final LeafNode<Object> leaf = Builders.leafBuilder(fakeRpcSchemaNode).build();
+//                operationsAsData.add(leaf);
+//            }y
+//        }
+//
+//        final ContainerSchemaNode operContainerSchemaNode = fakeOperationsSchemaNodeBuilder.build();
+//        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> operContainerNode = Builders
+//                .containerBuilder(operContainerSchemaNode);
+//
+//        for (final LeafNode<Object> oper : operationsAsData) {
+//            operContainerNode.withChild(oper);
+//        }
+//
+//        final Set<Module> fakeRpcModules = Collections.singleton(restConfModuleBuilder.build());
+//
+//        final YangParserImpl yangParser = new YangParserImpl();
+//        final SchemaContext fakeSchemaCx = yangParser.resolveSchemaContext(fakeRpcModules);
+//
+//        final InstanceIdentifierContext<?> fakeIICx = new InstanceIdentifierContext<>(null, operContainerSchemaNode,
+//                mountPoint, fakeSchemaCx);
+//
+//        return new NormalizedNodeContext(fakeIICx, operContainerNode.build());
+        return null;
     }
 
     private Module getRestconfModule() {

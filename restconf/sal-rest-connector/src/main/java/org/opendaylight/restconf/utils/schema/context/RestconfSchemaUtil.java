@@ -91,6 +91,15 @@ public final class RestconfSchemaUtil {
                         Draft11.MonitoringModule.STREAMS_CONTAINER_SCHEMA_NODE);
                 Preconditions.checkNotNull(streamsContSchNode);
                 return streamsContSchNode;
+
+            //OPERATIONS
+            case Draft11.RestconfModule.OPERATIONS_CONTAINER_SCHEMA_NODE:
+                final DataSchemaNode operationsContSchemaNode = findSchemaNodeInCollection(
+                        ((DataNodeContainer) restCont).getChildNodes(),
+                        Draft11.RestconfModule.OPERATIONS_CONTAINER_SCHEMA_NODE);
+                Preconditions.checkNotNull(operationsContSchemaNode);
+                return operationsContSchemaNode;
+
             default:
                 throw new RestconfDocumentedException("Schema node " + schemaNodeName + " does not exist in module.",
                         ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
