@@ -177,26 +177,35 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
         return new TopologyMountPointFacade(topologyId, id, domBroker, bindingBroker);
     }
 
+    private TopologyMountPointFacade obtainTopologyMountPointFacade(NetconfConnectorDTO netconfConnectorDTO) {
+        RemoteDeviceHandler<NetconfSessionPreferences> facade = netconfConnectorDTO.getFacade();
+        if (facade instanceof KeepaliveSalFacade) {
+            return ((KeepaliveSalFacade) facade).getSalFacade();
+        } else {
+            return facade;
+        }
+    }
+
     @Override
     public void registerMountPoint(final ActorContext context, final NodeId nodeId) {
-        ((TopologyMountPointFacade) activeConnectors.get(nodeId).getFacade()).registerMountPoint(actorSystem, context);
+        obtainTopologyMountPointFacade(activeConnectors.get(nodeId)).registerMountPoint(actorSystem, context);
     }
 
     @Override
     public void registerMountPoint(final ActorContext context, final NodeId nodeId, final ActorRef masterRef) {
-        ((TopologyMountPointFacade) activeConnectors.get(nodeId).getFacade()).registerMountPoint(actorSystem, context, masterRef);
+        obtainTopologyMountPointFacade(activeConnectors.get(nodeId)).registerMountPoint(actorSystem, context, masterRef);
     }
 
     @Override
     public void unregisterMountPoint(final NodeId nodeId) {
         Preconditions.checkState(activeConnectors.containsKey(nodeId), "Cannot unregister nonexistent mountpoint");
-        ((TopologyMountPointFacade) activeConnectors.get(nodeId).getFacade()).unregisterMountPoint();
+        obtainTopologyMountPointFacade(activeConnectors.get(nodeId)).unregisterMountPoint();
     }
 
     @Override
     public ConnectionStatusListenerRegistration registerConnectionStatusListener(final NodeId node, final RemoteDeviceHandler<NetconfSessionPreferences> listener) {
         Preconditions.checkState(activeConnectors.containsKey(node), "Need to connect a node before a connection listener can be registered");
-        return ((TopologyMountPointFacade) activeConnectors.get(node).getFacade()).registerConnectionStatusListener(listener);
+        return obtainTopologyMountPointFacade(activeConnectors.get(node)).registerConnectionStatusListener(listener);
     }
 
     public Collection<ProviderFunctionality> getProviderFunctionality() {
