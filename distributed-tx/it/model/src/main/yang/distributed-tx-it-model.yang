@@ -1,0 +1,296 @@
+module distributed-tx-it-model{
+        yang-version 1;
+        namespace "urn:opendaylight:params:xml:ns:yang:distributed-tx:it:model";
+        prefix "distributed-tx-it-model";
+
+        revision "2015-01-05" {
+                description "Initial revision of distributed-tx-it model";
+        }
+
+        typedef operation-type{
+          type enumeration {
+               enum "PUT" {
+                    value 1;
+                    description
+                         "Put operation";
+               }
+               enum "MERGE" {
+                     value 2;
+                     description
+                          "Merge operation";
+               }
+               enum "DELETE" {
+                     value 3;
+                     description
+                           "Delete operation";
+               }
+           }
+           description
+              "Operation type for the transaction";
+        }
+
+        typedef status-type{
+          type enumeration {
+              enum "OK" {
+                  value 1;
+              }
+              enum "FAILED" {
+                  value 2;
+              }
+              enum "TEST-IN-PROGRESS" {
+                  value 3;
+              }
+          }
+          description
+              "Indicates whether the test finished successfully";
+        }
+
+        typedef test-type{
+          type enumeration {
+              enum "NORMAL" {
+                   value 1;
+              }
+              enum "ROLLBACK-ON-FAILURE"{
+                   value 2;
+              }
+              enum "ROLLBACK" {
+                   value 3;
+              }
+          }
+          description
+              "Stands for the test type, normal test is used to test DTx writing ability,
+               rollback on failure test is used to test neither DTx action rollback or submit rollback,
+               rollback test is used to test DTx rollback ability";
+        }
+
+        container datastore-test-data {
+            config true;
+            list outer-list {
+                key id;
+                leaf id {
+                   type int32;
+                }
+                list inner-list {
+                   key name;
+                   leaf name {
+                      type int32;
+                   }
+                   leaf value {
+                      type string;
+                   }
+                }
+            }
+        }
+
+        container test-status {
+                leaf execStatus {
+                    type enumeration {
+                        enum "idle" {
+                            value 1;
+                        }
+                        enum "executing" {
+                            value 2;
+                        }
+                    }
+                    config false;
+                    mandatory true;
+                    description
+                        "Indicates whether the test is in progress, only one test can run at a time";
+                }
+        }
+
+	    rpc benchmark-test {
+                  input {
+                      leaf logicalTxType {
+                         mandatory true;
+                         type enumeration {
+                            enum "DATASTORE" {
+                                 value 1;
+                                 description
+                                    "Operations on datastore nodes";
+                            }
+                            enum "NETCONF" {
+                                 value 2;
+                                 description
+                                    "Operations on netconf devices";
+                            }
+                         }
+                      }
+                      leaf loop {
+                          type int32;
+                          default 1;
+                          description
+                             "Times of the test";
+                      }
+                      leaf operation {
+                           type operation-type;
+                      }
+                      leaf putsPerTx {
+                           type int32;
+                           default 1;
+                           description
+                                "Number of write operations (PUT, MERGE, or DELETE) per transaction submit";
+                      }
+                      leaf outerList {
+                           type int32;
+                           default 1000;
+                           description
+                                "Size of outerList";
+                      }
+                      leaf innerList {
+                           type int32;
+                           default 1000;
+                           description
+                               "Size of innerList";
+                      }
+                  }
+                  output {
+                      leaf status {
+                           mandatory true;
+                           type status-type;
+                           description
+                               "Indicates whether the test finished successfully";
+                      }
+                      leaf execTime {
+                           type uint32;
+                           default 1;
+                           description
+                              "Time took to execute all the transactions via databroker or netconf";
+                      }
+                      leaf dtxSyncExecTime {
+                           type uint32;
+                           default 1;
+                           description
+                              "Time took to synchronously execute all the transactions via dtx";
+                      }
+                      leaf dtxAsyncExecTime {
+                           type uint32;
+                           default 1;
+                           description
+                              "Time took to asynchronously execute all the transactions via dtx";
+                      }
+                      leaf dbOk {
+                           type int32;
+                           default 0;
+                           description
+                              "Number of successful databroker tests";
+                      }
+                      leaf dTxSyncOk {
+                           type int32;
+                           default 0;
+                           description
+                              "Number of successful dtx synchronous tests ";
+                      }
+                      leaf dTxAsyncOk {
+                           type int32;
+                           default 0;
+                           description
+                              "Number of successful dtx asynchronous tests ";
+                      }
+                  }
+        }
+        rpc datastore-test{
+            input {
+              leaf operation {
+                  mandatory true;
+                  type operation-type;
+                  default "PUT";
+                }
+              leaf putsPerTx {
+                 type int32;
+                 default 1;
+                 description
+                     "Number of operations {PUT,MERGE,DELETE} per submit";
+              }
+              leaf outerList {
+                 type int32;
+                 default 10;
+                 description
+                     "Size of outerList";
+              }
+              leaf innerList {
+                 type int32;
+                 default 10;
+                 description
+                     "Size of innerList";
+              }
+              leaf type {
+                 type test-type;
+                 default "NORMAL";
+              }
+            }
+            output {
+              leaf status {
+                 type status-type;
+              }
+            }
+            description
+               "DTx datastore test";
+        }
+        rpc netconf-test{
+            input {
+              leaf operation {
+                 mandatory true;
+                 type operation-type;
+                 default "PUT";
+              }
+              leaf putsPerTx {
+                 type int32;
+                 default 1;
+                 description
+                    "Number of operations {PUT,MERGE,DELETE} per submit";
+              }
+              leaf numberOfTxs {
+                 type int32;
+                 default 1;
+                 description
+                    "Number of transations";
+              }
+              leaf type {
+                 type test-type;
+                 default "NORMAL";
+              }
+            }
+            output {
+               leaf status {
+                 type status-type;
+               }
+            }
+            description
+                "DTx netconf test";
+        }
+        rpc mixed-provider-test{
+            input {
+               leaf operation {
+                   mandatory true;
+                   type operation-type;
+                   default "PUT";
+               }
+               leaf putsPerTx {
+                   type int32;
+                   default 1;
+                   description
+                       "Number of operations {PUT,MERGE,DELETE} per submit";
+               }
+               leaf numberOfTxs {
+                    type int32;
+                    default 10;
+                    description
+                         "Number of netconf transactions";
+               }
+               leaf type {
+                    type test-type;
+                    default "NORMAL";
+               }
+            }
+            output {
+               leaf status {
+                  type status-type;
+               }
+            }
+            description
+               "DTx mixed providers test";
+        }
+}
+
+
