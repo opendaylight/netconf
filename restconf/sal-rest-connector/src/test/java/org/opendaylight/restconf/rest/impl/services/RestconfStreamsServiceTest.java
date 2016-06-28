@@ -27,7 +27,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -54,7 +56,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  * Unit tests for {@link RestconfStreamsServiceImpl}
  */
 public class RestconfStreamsServiceTest {
-    private final List<String> expectedStreams = Arrays.asList(new String[] {"stream-1", "stream-2", "stream-3"});
+    private static final List<String> expectedStreams = Arrays.asList(new String[] {"stream-1", "stream-2", "stream-3"});
 
     @Rule public ExpectedException thrown = ExpectedException.none();
 
@@ -73,11 +75,22 @@ public class RestconfStreamsServiceTest {
 
         schemaContext = TestRestconfUtils.loadSchemaContext("/modules/restconf-module-testing");
         streamsService = new RestconfStreamsServiceImpl(contextHandler);
+    }
 
-        // create streams
+    @BeforeClass
+    public static void setupTestStreams() {
+        // clean
+        Notificator.removeAllListeners();
+
+        // put test streams
         Notificator.createListener(EMPTY, expectedStreams.get(0));
         Notificator.createListener(EMPTY, expectedStreams.get(1));
         Notificator.createListener(EMPTY, expectedStreams.get(2));
+    }
+
+    @AfterClass
+    public static void removeTestStreams() {
+        Notificator.removeAllListeners();
     }
 
     /**
