@@ -30,3 +30,5 @@ maven-eclipse.xml
 opendaylight/md-sal/sal-distributed-datastore/journal
 !opendaylight/distribution/opendaylight-karaf-resources/src/main/resources/bin
 maven-metadata-local.xml
+.checkstyle
+.factorypath
