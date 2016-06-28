@@ -241,10 +241,7 @@ public class DistributedTxProviderImpl implements DistributedTxItModelService, D
         if (input.getLogicalTxType() == BenchmarkTestInput.LogicalTxType.DATASTORE)
             return dsBenchmarkTest(input);
         else
-            return RpcResultBuilder
-                    .success(new BenchmarkTestOutputBuilder()
-                            .setStatus(StatusType.FAILED)
-                            .build()).buildFuture();
+            return netconfBenchmarkTest(input);
     }
 
     /*
@@ -335,6 +332,85 @@ public class DistributedTxProviderImpl implements DistributedTxItModelService, D
                     .success(new BenchmarkTestOutputBuilder()
                             .setStatus(StatusType.FAILED)
                             .build()).buildFuture();
+        }
+    }
+
+    /**
+     * This rpc is used to do DTx netconf performance test
+     */
+    public Future<RpcResult<BenchmarkTestOutput>> netconfBenchmarkTest(BenchmarkTestInput input) {
+        long nativeNetconfExecTime = 0, dtxNetconfSyncExecTime = 0, dtxNetconfAsyncExecTime = 0;
+        int loopTime = 1;
+        int dbOk = 0, dTxSyncOk = 0, dTxAyncOk = 0, errorCase = 0; //number of successful transactions
+        //Get xrNodeBroker of netconf node1
+        DataBroker xrNodeBroker = xrNodeBrokerMap.get(DTXITConstants.XRV_NAME1);
+
+        LOG.info("Start DTx netconf performance test");
+
+        if (netConfTestStatus.compareAndSet(TestStatus.ExecStatus.Idle, TestStatus.ExecStatus.Executing) == false) {
+            return RpcResultBuilder
+                    .success(new BenchmarkTestOutputBuilder()
+                            .setStatus(StatusType.TESTINPROGRESS).
+                                    build()).buildFuture();
+        }
+
+        for (int i = 0; i < loopTime; i++) {
+            //Data write with MD-SAL netconf transaction provider API
+            DataBrokerNetConfWriter databroker = new DataBrokerNetConfWriter(input, xrNodeBroker, nodeIdSet, nodeIfList);
+            //Data synchronous write with distributed-tx netconf API
+            DtxNetConfSyncWriter dtxNetconfSync = new DtxNetConfSyncWriter(input, xrNodeBroker, dTxProvider, nodeIdSet, nodeIfList);
+            //Data asynchronous write with distributed-tx netconf API
+            DtxNetconfAsyncWriter dtxNetconfAsync = new DtxNetconfAsyncWriter(input, xrNodeBroker, dTxProvider, nodeIdSet, nodeIfList);
+
+            try {
+                databroker.writeData();
+            } catch (Exception e) {
+                LOG.trace("Data broker test error: {}", e.toString());
+                errorCase++;
+                continue;
+            }
+
+            try {
+                dtxNetconfSync.writeData();
+            } catch (Exception e) {
+                LOG.trace("Dtx netconf sync test error: {}", e.toString());
+                errorCase++;
+                continue;
+            }
+
+            try {
+                dtxNetconfAsync.writeData();
+            } catch (Exception e) {
+                LOG.trace("Dtx netconf async test error: {}", e.toString());
+                errorCase++;
+                continue;
+            }
+            //Count the number of successful transactions
+            dbOk += databroker.getTxSucceed();
+            dTxSyncOk += dtxNetconfSync.getTxSucceed();
+            dTxAyncOk += dtxNetconfAsync.getTxSucceed();
+            //Count executing time
+            nativeNetconfExecTime += databroker.getExecTime();
+            dtxNetconfSyncExecTime += dtxNetconfSync.getExecTime();
+            dtxNetconfAsyncExecTime += dtxNetconfAsync.getExecTime();
+        }
+
+        netConfTestStatus.set(TestStatus.ExecStatus.Idle);
+        LOG.info("Netconf performance test finishs");
+        if (loopTime != errorCase) {
+            return RpcResultBuilder
+                    .success(new BenchmarkTestOutputBuilder()
+                            .setStatus(StatusType.OK)
+                            .setExecTime(nativeNetconfExecTime / (loopTime - errorCase))
+                            .setDtxSyncExecTime(dtxNetconfSyncExecTime / (loopTime - errorCase))
+                            .setDtxAsyncExecTime(dtxNetconfAsyncExecTime / (loopTime - errorCase))
+                            .setDbOk(dbOk)
+                            .setDTxAsyncOk(dTxAyncOk)
+                            .setDTxSyncOk(dTxSyncOk)
+                            .build()).buildFuture();
+        } else {
+            return RpcResultBuilder.success(new BenchmarkTestOutputBuilder().setStatus(StatusType.FAILED)
+                    .build()).buildFuture();
         }
     }
 
