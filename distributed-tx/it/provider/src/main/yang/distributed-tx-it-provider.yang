@@ -1,0 +1,45 @@
+module distributed-tx-it-provider {
+    yang-version 1;
+    namespace "urn:opendaylight:params:xml:ns:yang:distributed-tx:it:provider";
+    prefix "distributed-tx-it-provider";
+
+    import config { prefix config; revision-date 2013-04-05; }
+    import "distributed-tx-api" { prefix "distributed-tx-api"; revision-date 2015-01-05;}
+    import opendaylight-md-sal-binding { prefix md-sal-binding; revision-date 2013-10-28;}
+
+    description
+        "distributed-tx-it provider";
+
+    revision "2014-12-10" {
+        description
+            "Initial revision";
+    }
+
+    identity distributed-tx-it-provider{
+        base config:module-type;
+        config:java-name-prefix DistributedTxItProvider;
+    }
+
+    augment "/config:modules/config:module/config:configuration" {
+        case distributed-tx-it-provider {
+            when "/config:modules/config:module/config:type = 'distributed-tx-it-provider'";
+            container broker {
+                    uses config:service-ref {
+                            refine type {
+                                    mandatory true;
+                                    config:required-identity md-sal-binding:binding-broker-osgi-registry;
+                            }
+                    }
+            }
+
+            container dtx-provider {
+                uses config:service-ref {
+                    refine type {
+                        mandatory true;
+                        config:required-identity distributed-tx-api:dtx-provider;
+                    }
+                }
+            }
+        }
+    }
+}
