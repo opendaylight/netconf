@@ -1,0 +1,44 @@
+<!--
+  ~ Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
+  ~
+  ~ This program and the accompanying materials are made available under the
+  ~ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+  ~ and is available at http://www.eclipse.org/legal/epl-v10.html
+  -->
+<yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+    <patch-id>test-patch</patch-id>
+    <comment>Test to create and replace data in container directly using / sign as a target</comment>
+    <edit>
+        <edit-id>edit1</edit-id>
+        <operation>create</operation>
+        <target>/</target>
+        <value>
+            <patch-cont xmlns="instance:identifier:patch:module">
+                <my-list1>
+                    <name>my-list1 - A</name>
+                    <my-leaf11>I am leaf11-0</my-leaf11>
+                    <my-leaf12>I am leaf12-1</my-leaf12>
+                </my-list1>
+                <my-list1>
+                    <name>my-list1 - B</name>
+                    <my-leaf11>I am leaf11-0</my-leaf11>
+                    <my-leaf12>I am leaf12-1</my-leaf12>
+                </my-list1>
+            </patch-cont>
+        </value>
+    </edit>
+    <edit>
+        <edit-id>edit2</edit-id>
+        <operation>replace</operation>
+        <target>/</target>
+        <value>
+            <patch-cont xmlns="instance:identifier:patch:module">
+                <my-list1>
+                    <name>my-list1 - Replacing</name>
+                    <my-leaf11>I am leaf11-0</my-leaf11>
+                    <my-leaf12>I am leaf12-1</my-leaf12>
+                </my-list1>
+            </patch-cont>
+        </value>
+    </edit>
+</yang-patch>
