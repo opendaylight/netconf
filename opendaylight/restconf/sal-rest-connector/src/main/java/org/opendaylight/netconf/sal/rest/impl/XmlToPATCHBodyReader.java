@@ -39,6 +39,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlUtils;
 import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
@@ -149,17 +150,25 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
             StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
                     pathContext.getSchemaContext(), module.getName());
 
-            // find complete path to target
-            final YangInstanceIdentifier targetII = codec.deserialize(codec.serialize(pathContext
-                    .getInstanceIdentifier()).concat(prepareNonCondXpath(schemaNode, target, firstValueElement,
-                    namespace, module.getQNameModule().getFormattedRevision())));
+            // find complete path to target and target schema node
+            // target can be also empty (after removing first slash)
+            YangInstanceIdentifier targetII;
+            SchemaNode targetNode;
+            if (target.isEmpty()) {
+                targetII = pathContext.getInstanceIdentifier();
+                targetNode = pathContext.getSchemaContext();
+            } else {
+                targetII = codec.deserialize(codec.serialize(pathContext.getInstanceIdentifier())
+                        .concat(prepareNonCondXpath(schemaNode, target, firstValueElement, namespace,
+                                module.getQNameModule().getFormattedRevision())));
 
-            // move schema node and get target node
-            schemaNode = (DataSchemaNode) SchemaContextUtil.findDataSchemaNode(pathContext.getSchemaContext(),
-                    codec.getDataContextTree().getChild(targetII).getDataSchemaNode().getPath());
+                targetNode = SchemaContextUtil.findDataSchemaNode(pathContext.getSchemaContext(),
+                        codec.getDataContextTree().getChild(targetII).getDataSchemaNode().getPath().getParent());
 
-            SchemaNode targetNode = SchemaContextUtil.findDataSchemaNode(pathContext.getSchemaContext(),
-                    codec.getDataContextTree().getChild(targetII).getDataSchemaNode().getPath().getParent());
+                // move schema node
+                schemaNode = (DataSchemaNode) SchemaContextUtil.findDataSchemaNode(pathContext.getSchemaContext(),
+                        codec.getDataContextTree().getChild(targetII).getDataSchemaNode().getPath());
+            }
 
             if (targetNode == null) {
                 LOG.debug("Target node {} not found in path {} ", target, pathContext.getSchemaNode());
@@ -174,7 +183,12 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                         parsed = parserFactory.getMapNodeParser().parse(values, (ListSchemaNode) schemaNode);
                     }
 
-                    resultCollection.add(new PATCHEntity(editId, operation, targetII.getParent(), parsed));
+                    // for lists allow to manipulate with list items through their parent
+                    if (targetII.getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
+                        targetII = targetII.getParent();
+                    }
+
+                    resultCollection.add(new PATCHEntity(editId, operation, targetII, parsed));
                 } else {
                     resultCollection.add(new PATCHEntity(editId, operation, targetII));
                 }
