@@ -101,4 +101,18 @@ public class TestXmlPATCHBodyReader extends AbstractBodyReaderTest {
                 .readFrom(null, null, null, mediaType, null, inputStream);
         checkPATCHContext(returnValue);
     }
+
+    /**
+     * Test using PATCH when target is completely specified in request URI and thus target leaf contains only '/' sign.
+     */
+    @Test
+    public void modulePATCHCompleteTargetInURITest() throws Exception {
+        final String uri = "instance-identifier-patch-module:patch-cont";
+        mockBodyReader(uri, xmlPATCHBodyReader, false);
+        final InputStream inputStream = TestXmlBodyReader.class
+                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataCompleteTargetInURI.xml");
+        final PATCHContext returnValue = xmlPATCHBodyReader
+                .readFrom(null, null, null, mediaType, null, inputStream);
+        checkPATCHContext(returnValue);
+    }
 }
