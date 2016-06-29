@@ -214,10 +214,18 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider 
                     edit.setOperation(in.nextString());
                     break;
                 case "target" :
-                    edit.setTarget(codec.deserialize(codec.serialize(path.getInstanceIdentifier()) + in.nextString()));
-                    edit.setTargetSchemaNode(SchemaContextUtil.findDataSchemaNode(path.getSchemaContext(),
-                            codec.getDataContextTree().getChild(edit.getTarget()).getDataSchemaNode().getPath()
-                                    .getParent()));
+                    // target can be specified completely in requested URI
+                    final String target = in.nextString();
+                    if (target.equals("/")) {
+                        edit.setTarget(path.getInstanceIdentifier());
+                        edit.setTargetSchemaNode(path.getSchemaNode());
+                    } else {
+                        edit.setTarget(codec.deserialize(codec.serialize(path.getInstanceIdentifier()).concat(target)));
+                        edit.setTargetSchemaNode(SchemaContextUtil.findDataSchemaNode(path.getSchemaContext(),
+                                codec.getDataContextTree().getChild(edit.getTarget()).getDataSchemaNode().getPath()
+                                        .getParent()));
+                    }
+
                     break;
                 case "value" :
                     // save data defined in value node for next (later) processing, because target needs to be read

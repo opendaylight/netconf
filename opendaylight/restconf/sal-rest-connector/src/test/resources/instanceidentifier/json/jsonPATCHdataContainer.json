@@ -1,0 +1,21 @@
+{
+  "ietf-yang-patch:yang-patch" : {
+
+    "patch-id" : "test-patch",
+    "comment" : "Test to replace data in container directly using / sign as a target",
+    "edit" : [
+      {
+        "edit-id": "edit1",
+        "operation": "replace",
+        "target": "/",
+        "value": {
+          "my-list1": {
+            "name": "my-list1",
+            "my-leaf11": "I am leaf11-0",
+            "my-leaf12": "I am leaf12-1"
+          }
+        }
+      }
+    ]
+  }
+}

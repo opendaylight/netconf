@@ -99,4 +99,17 @@ public class TestJsonPATCHBodyReader extends AbstractBodyReaderTest {
             assertEquals("Error code 400 expected", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
         }
     }
+
+    @Test
+    public void modulePATCHContainerTest() throws Exception {
+        final String uri = "instance-identifier-patch-module:patch-cont";
+        mockBodyReader(uri, jsonPATCHBodyReader, false);
+
+        final InputStream inputStream = TestJsonBodyReader.class
+                .getResourceAsStream("/instanceidentifier/json/jsonPATCHdataContainer.json");
+
+        final PATCHContext returnValue = jsonPATCHBodyReader
+                .readFrom(null, null, null, mediaType, null, inputStream);
+        checkPATCHContext(returnValue);
+    }
 }
