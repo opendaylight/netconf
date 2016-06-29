@@ -55,6 +55,9 @@ public class TestJsonPATCHBodyReader extends AbstractBodyReaderTest {
         checkPATCHContext(returnValue);
     }
 
+    /**
+     * Test of successful PATCH consisting of create and delete PATCH operations.
+     */
     @Test
     public void modulePATCHCreateAndDeleteTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1/leaf1";
@@ -68,8 +71,12 @@ public class TestJsonPATCHBodyReader extends AbstractBodyReaderTest {
         checkPATCHContext(returnValue);
     }
 
+    /**
+     * Test trying to use PATCH create operation which requires value without value. Test should fail with
+     * {@link RestconfDocumentedException} with error code 400.
+     */
     @Test
-    public void modulePATCHValueMissingTest() throws Exception {
+    public void modulePATCHValueMissingNegativeTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1/leaf1";
         mockBodyReader(uri, jsonPATCHBodyReader, false);
 
@@ -79,13 +86,17 @@ public class TestJsonPATCHBodyReader extends AbstractBodyReaderTest {
         try {
             jsonPATCHBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
             fail("Test should return error 400 due to missing value node when attempt to invoke create operation");
-        } catch (RestconfDocumentedException e) {
+        } catch (final RestconfDocumentedException e) {
             assertEquals("Error code 400 expected", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
         }
     }
 
+    /**
+     * Test trying to use value with PATCH delete operation which does not support value. Test should fail with
+     * {@link RestconfDocumentedException} with error code 400.
+     */
     @Test
-    public void modulePATCHValueNotSupportedTest() throws Exception {
+    public void modulePATCHValueNotSupportedNegativeTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1/leaf1";
         mockBodyReader(uri, jsonPATCHBodyReader, false);
 
@@ -95,8 +106,24 @@ public class TestJsonPATCHBodyReader extends AbstractBodyReaderTest {
         try {
             jsonPATCHBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
             fail("Test should return error 400 due to present value node when attempt to invoke delete operation");
-        } catch (RestconfDocumentedException e) {
+        } catch (final RestconfDocumentedException e) {
             assertEquals("Error code 400 expected", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
         }
+    }
+
+    /**
+     * Test using PATCH when target is completely specified in request URI and thus target leaf contains only '/' sign.
+     */
+    @Test
+    public void modulePATCHCompleteTargetInURITest() throws Exception {
+        final String uri = "instance-identifier-patch-module:patch-cont";
+        mockBodyReader(uri, jsonPATCHBodyReader, false);
+
+        final InputStream inputStream = TestJsonBodyReader.class
+                .getResourceAsStream("/instanceidentifier/json/jsonPATCHdataCompleteTargetInURI.json");
+
+        final PATCHContext returnValue = jsonPATCHBodyReader
+                .readFrom(null, null, null, mediaType, null, inputStream);
+        checkPATCHContext(returnValue);
     }
 }
