@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.controller.sal.rest.impl.test.providers;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -55,6 +54,9 @@ public class TestJsonPATCHBodyReader extends AbstractBodyReaderTest {
         checkPATCHContext(returnValue);
     }
 
+    /**
+     * Test of successful patch consisting of create and delete operation.
+     */
     @Test
     public void modulePATCHCreateAndDeleteTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1/leaf1";
@@ -68,6 +70,10 @@ public class TestJsonPATCHBodyReader extends AbstractBodyReaderTest {
         checkPATCHContext(returnValue);
     }
 
+    /**
+     * Test trying to use PATCH operation which requires value without value. Test should fail with
+     * {@link RestconfDocumentedException} and error code 400 should be returned.
+     */
     @Test
     public void modulePATCHValueMissingTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1/leaf1";
@@ -84,6 +90,10 @@ public class TestJsonPATCHBodyReader extends AbstractBodyReaderTest {
         }
     }
 
+    /**
+     * Test trying to use value with PATCH operation which does not support value. Test should fail with
+     * {@link RestconfDocumentedException} and error code 400 should be returned.
+     */
     @Test
     public void modulePATCHValueNotSupportedTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1/leaf1";
@@ -98,5 +108,21 @@ public class TestJsonPATCHBodyReader extends AbstractBodyReaderTest {
         } catch (RestconfDocumentedException e) {
             assertEquals("Error code 400 expected", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
         }
+    }
+
+    /**
+     * Test using PATCH when target is completely specified in request URI and thus target leaf contains only '/' sign.
+     */
+    @Test
+    public void modulePATCHCompleteTargetInURITest() throws Exception {
+        final String uri = "instance-identifier-patch-module:patch-cont";
+        mockBodyReader(uri, jsonPATCHBodyReader, false);
+
+        final InputStream inputStream = TestJsonBodyReader.class
+                .getResourceAsStream("/instanceidentifier/json/jsonPATCHCompleteTargetInURI.json");
+
+        final PATCHContext returnValue = jsonPATCHBodyReader
+                .readFrom(null, null, null, mediaType, null, inputStream);
+        checkPATCHContext(returnValue);
     }
 }
