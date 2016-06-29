@@ -28,7 +28,7 @@
     <feature name='odl-restconf-noauth' version='${project.version}' description="OpenDaylight :: Restconf">
         <feature version='${aaa.version}'>odl-aaa-shiro</feature>
         <feature version='${controller.mdsal.version}'>odl-mdsal-broker</feature>
-        <feature version='[4.0.30,4.1.0)'>odl-netty</feature>
+        <feature version='[4.0.30,5.0.0)'>odl-netty</feature>
         <feature>war</feature>
         <!-- presently we need sal-remote to be listed BEFORE sal-rest-connector because sal-rest-connector
              has a yang file which augments a yang file in sal-remote, and order seems to matter -->
