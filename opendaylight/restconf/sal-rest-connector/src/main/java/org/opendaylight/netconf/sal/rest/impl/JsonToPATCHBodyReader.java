@@ -43,6 +43,7 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
@@ -214,10 +215,18 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider 
                     edit.setOperation(in.nextString());
                     break;
                 case "target" :
-                    edit.setTarget(codec.deserialize(codec.serialize(path.getInstanceIdentifier()) + in.nextString()));
-                    edit.setTargetSchemaNode(SchemaContextUtil.findDataSchemaNode(path.getSchemaContext(),
-                            codec.getDataContextTree().getChild(edit.getTarget()).getDataSchemaNode().getPath()
-                                    .getParent()));
+                    // target can be specified completely in requested URI
+                    final String target = in.nextString();
+                    if (target.equals("/")) {
+                        edit.setTarget(path.getInstanceIdentifier());
+                        edit.setTargetSchemaNode(path.getSchemaContext());
+                    } else {
+                        edit.setTarget(codec.deserialize(codec.serialize(path.getInstanceIdentifier()).concat(target)));
+                        edit.setTargetSchemaNode(SchemaContextUtil.findDataSchemaNode(path.getSchemaContext(),
+                                codec.getDataContextTree().getChild(edit.getTarget()).getDataSchemaNode().getPath()
+                                        .getParent()));
+                    }
+
                     break;
                 case "value" :
                     // save data defined in value node for next (later) processing, because target needs to be read
@@ -281,7 +290,28 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider 
         while (in.hasNext()) {
             value.append("\"" + in.nextName() + "\"");
             value.append(":");
-            value.append("\"" + in.nextString() + "\"");
+
+            if (in.peek() == JsonToken.STRING) {
+                value.append("\"" + in.nextString() + "\"");
+            } else {
+                if (in.peek() == JsonToken.BEGIN_ARRAY) {
+                    in.beginArray();
+                    value.append("[");
+
+                    while (in.hasNext()) {
+                        readValueObject(value, in);
+                        if (in.peek() != JsonToken.END_ARRAY) {
+                            value.append(",");
+                        }
+                    }
+
+                    in.endArray();
+                    value.append("]");
+                } else {
+                    readValueObject(value, in);
+                }
+            }
+
             if (in.peek() != JsonToken.END_OBJECT) {
                 value.append(",");
             }
@@ -314,7 +344,15 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider 
         if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
                 && checkDataPresence(edit.getOperation(), (edit.getData() != null))) {
             if (isPatchOperationWithValue(edit.getOperation())) {
-                return new PATCHEntity(edit.getId(), edit.getOperation(), edit.getTarget().getParent(), edit.getData());
+                // for lists allow to manipulate with list items through their parent
+                YangInstanceIdentifier targetNode;
+                if (edit.getTargetSchemaNode() instanceof ListSchemaNode) {
+                    targetNode = edit.getTarget().getParent();
+                } else {
+                    targetNode = edit.getTarget();
+                }
+
+                return new PATCHEntity(edit.getId(), edit.getOperation(), targetNode, edit.getData());
             } else {
                 return new PATCHEntity(edit.getId(), edit.getOperation(), edit.getTarget());
             }
