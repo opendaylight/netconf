@@ -39,6 +39,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlUtils;
 import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
@@ -132,13 +133,12 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
             final Element element = (Element) editNodes.item(i);
             final String operation = element.getElementsByTagName("operation").item(0).getFirstChild().getNodeValue();
             final String editId = element.getElementsByTagName("edit-id").item(0).getFirstChild().getNodeValue();
-            final String target = element.getElementsByTagName("target").item(0).getFirstChild().getNodeValue()
-                    .replaceFirst("/", "");
+            final String target = element.getElementsByTagName("target").item(0).getFirstChild().getNodeValue();
             final List<Element> values = readValueNodes(element, operation);
             final Element firstValueElement = values != null ? values.get(0) : null;
 
             // get namespace according to schema node from path context or value
-            String namespace = (firstValueElement == null) ?
+            final String namespace = (firstValueElement == null) ?
                     schemaNode.getQName().getNamespace().toString() : firstValueElement.getNamespaceURI();
 
             // find module according to namespace
@@ -149,17 +149,21 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
             final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
                     pathContext.getSchemaContext(), module.getName());
 
-            // find complete path to target
-            final YangInstanceIdentifier targetII = codec.deserialize(codec.serialize(pathContext
-                    .getInstanceIdentifier()).concat(prepareNonCondXpath(schemaNode, target, firstValueElement,
-                    namespace, module.getQNameModule().getFormattedRevision())));
+            // find complete path to target and target schema node
+            // target can be also empty (only slash)
+            YangInstanceIdentifier targetII;
+            SchemaNode targetNode;
+            if (target.equals("/")) {
+                targetII = pathContext.getInstanceIdentifier();
+                targetNode = pathContext.getSchemaContext();
+            } else {
+                targetII = codec.deserialize(codec.serialize(pathContext.getInstanceIdentifier())
+                        .concat(prepareNonCondXpath(schemaNode, target.replaceFirst("/", ""), firstValueElement,
+                                namespace, module.getQNameModule().getFormattedRevision())));
 
-            // move schema node and get target node
-            schemaNode = (DataSchemaNode) SchemaContextUtil.findDataSchemaNode(pathContext.getSchemaContext(),
-                    codec.getDataContextTree().getChild(targetII).getDataSchemaNode().getPath());
-
-            final SchemaNode targetNode = SchemaContextUtil.findDataSchemaNode(pathContext.getSchemaContext(),
-                    codec.getDataContextTree().getChild(targetII).getDataSchemaNode().getPath().getParent());
+                targetNode = SchemaContextUtil.findDataSchemaNode(pathContext.getSchemaContext(),
+                        codec.getDataContextTree().getChild(targetII).getDataSchemaNode().getPath().getParent());
+            }
 
             if (targetNode == null) {
                 LOG.debug("Target node {} not found in path {} ", target, pathContext.getSchemaNode());
@@ -174,7 +178,12 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                         parsed = parserFactory.getMapNodeParser().parse(values, (ListSchemaNode) schemaNode);
                     }
 
-                    resultCollection.add(new PATCHEntity(editId, operation, targetII.getParent(), parsed));
+                    // for lists allow to manipulate with list items through their parent
+                    if (targetII.getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
+                        targetII = targetII.getParent();
+                    }
+
+                    resultCollection.add(new PATCHEntity(editId, operation, targetII, parsed));
                 } else {
                     resultCollection.add(new PATCHEntity(editId, operation, targetII));
                 }
