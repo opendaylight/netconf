@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a561d44_527e83af",
+        "filename": "distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-06-30T13:47:09Z",
+      "side": 1,
+      "message": "DTxException is extending a RuntimeException, therefore stating it in the throws block is confusing to users, since this behaviour is used with CheckedExceptions, if you want to show to make it obvious to the user that an unchecked exception might be thrown put it in the Javadoc.",
+      "range": {
+        "startLine": 28,
+        "startChar": 12,
+        "endLine": 28,
+        "endChar": 51
+      },
+      "revId": "dc45e036e430152b0db3ec2ba476064da346d298",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
