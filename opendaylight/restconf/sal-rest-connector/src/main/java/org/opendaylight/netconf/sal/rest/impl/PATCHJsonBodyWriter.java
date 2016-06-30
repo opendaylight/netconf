@@ -54,7 +54,7 @@ public class PATCHJsonBodyWriter implements MessageBodyWriter<PATCHStatusContext
         jsonWriter.beginObject();
         jsonWriter.name("patch-id").value(patchStatusContext.getPatchId());
         if (patchStatusContext.isOk()) {
-            jsonWriter.name("ok").nullValue();
+            reportSuccess(jsonWriter);
         } else {
             if (patchStatusContext.getGlobalErrors() != null) {
                 reportErrors(patchStatusContext.getGlobalErrors(), jsonWriter);
@@ -71,7 +71,7 @@ public class PATCHJsonBodyWriter implements MessageBodyWriter<PATCHStatusContext
                     reportErrors(patchStatusEntity.getEditErrors(), jsonWriter);
                 } else {
                     if (patchStatusEntity.isOk()) {
-                        jsonWriter.name("ok").nullValue();
+                        reportSuccess(jsonWriter);
                     }
                 }
                 jsonWriter.endObject();
@@ -83,6 +83,10 @@ public class PATCHJsonBodyWriter implements MessageBodyWriter<PATCHStatusContext
         jsonWriter.endObject();
         jsonWriter.flush();
 
+    }
+
+    private void reportSuccess(JsonWriter jsonWriter) throws IOException {
+        jsonWriter.name("ok").beginArray().nullValue().endArray();
     }
 
     private static void reportErrors(List<RestconfError> errors, JsonWriter jsonWriter) throws IOException {
