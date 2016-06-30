@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a561d44_9e87870f",
+        "filename": "distributed-tx/spi-impl/src/main/java/org/opendaylight/distributed/tx/spiimpl/TxProviderLock.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-06-30T07:53:33Z",
+      "side": 1,
+      "message": "I dont think this is needed since theres a copyright above",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 3
+      },
+      "revId": "dc4434f43eb0a0951071bab7e07f0fbcf18576b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
