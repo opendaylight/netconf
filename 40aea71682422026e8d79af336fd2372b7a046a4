@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a561d44_d6ff1e00",
+        "filename": "distributed-tx/api/pom.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T13:47:13Z",
+      "side": 1,
+      "message": "This should go to the previous patch",
+      "revId": "40aea71682422026e8d79af336fd2372b7a046a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_99e79740",
+        "filename": "distributed-tx/spi/pom.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T13:47:13Z",
+      "side": 1,
+      "message": "I think you are actually using more dependencies than just these two",
+      "revId": "40aea71682422026e8d79af336fd2372b7a046a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_5654ae53",
+        "filename": "distributed-tx/spi/src/main/java/org/opendaylight/distributed/tx/spi/DTXReadWriteTransaction.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T13:47:13Z",
+      "side": 1,
+      "message": "One space should be enough between interface keyword and interface name. Also between extends keyword and name of the extended class",
+      "revId": "40aea71682422026e8d79af336fd2372b7a046a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_d9e90f1c",
+        "filename": "distributed-tx/spi/src/main/java/org/opendaylight/distributed/tx/spi/DTXReadWriteTransaction.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T13:47:13Z",
+      "side": 1,
+      "message": "Is there any point in setting Unchecked exceptions to checked future? Checked get won\u0027t give you any advantage over normal get.",
+      "revId": "40aea71682422026e8d79af336fd2372b7a046a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_767e12b0",
+        "filename": "distributed-tx/spi/src/main/java/org/opendaylight/distributed/tx/spi/DTXReadWriteTransaction.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T13:47:13Z",
+      "side": 1,
+      "message": "Space between type of return value and method name.",
+      "revId": "40aea71682422026e8d79af336fd2372b7a046a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_59ddff6f",
+        "filename": "distributed-tx/spi/src/main/java/org/opendaylight/distributed/tx/spi/DTXReadWriteTransaction.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T13:47:13Z",
+      "side": 1,
+      "message": "What does this actually means for this interface?",
+      "revId": "40aea71682422026e8d79af336fd2372b7a046a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_d6127eb3",
+        "filename": "distributed-tx/spi/src/main/java/org/opendaylight/distributed/tx/spi/TransactionLock.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T13:47:13Z",
+      "side": 1,
+      "message": "Thread safety should be implementation issue.",
+      "revId": "40aea71682422026e8d79af336fd2372b7a046a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_563f8e25",
+        "filename": "distributed-tx/spi/src/main/java/org/opendaylight/distributed/tx/spi/TransactionLock.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T13:47:13Z",
+      "side": 1,
+      "message": "instance identifier",
+      "revId": "40aea71682422026e8d79af336fd2372b7a046a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_b6e26ad3",
+        "filename": "distributed-tx/spi/src/main/java/org/opendaylight/distributed/tx/spi/TxProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T13:47:13Z",
+      "side": 1,
+      "message": "Release",
+      "revId": "40aea71682422026e8d79af336fd2372b7a046a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
