@@ -2,6 +2,63 @@
   "comments": [
     {
       "key": {
+        "uuid": "9a561d44_d281f34b",
+        "filename": "distributed-tx/api/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T11:03:07Z",
+      "side": 1,
+      "message": "You actually depend on more artifacts than just this one. For example, you use also some yangtools stuff, so you should explicitly import that too.",
+      "range": {
+        "startLine": 22,
+        "startChar": 16,
+        "endLine": 22,
+        "endChar": 17
+      },
+      "revId": "dc45e036e430152b0db3ec2ba476064da346d298",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_f3407458",
+        "filename": "distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T11:03:07Z",
+      "side": 1,
+      "message": "Why are you extending WriteTransaction, if deprecates almost all of its methods? And what exactly does this deprecation mean?",
+      "revId": "dc45e036e430152b0db3ec2ba476064da346d298",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_732c64ac",
+        "filename": "distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T11:03:07Z",
+      "side": 1,
+      "message": "This should be implementation detail, not part of interface.",
+      "revId": "dc45e036e430152b0db3ec2ba476064da346d298",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a561d44_527e83af",
         "filename": "distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTx.java",
         "patchSetId": 5
@@ -19,6 +76,171 @@
         "endLine": 28,
         "endChar": 51
       },
+      "revId": "dc45e036e430152b0db3ec2ba476064da346d298",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_f31194ad",
+        "filename": "distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T11:03:07Z",
+      "side": 1,
+      "message": "Is there any reason to declare a method in your interface and at the same time deprecate it? There are more such declarations in this interface",
+      "revId": "dc45e036e430152b0db3ec2ba476064da346d298",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_33adcc32",
+        "filename": "distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T11:03:07Z",
+      "side": 1,
+      "message": "Naming T t, boolean b is not really the best one. It does not say anything about those method parameters.",
+      "revId": "dc45e036e430152b0db3ec2ba476064da346d298",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_e8ca48a0",
+        "filename": "distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T11:03:07Z",
+      "side": 1,
+      "message": "Is there any point in setting exception to checked future and also throwing the exception? Or what does throw clause with exception suppose to mean? Also, DTxException is not subtype of TransactionCommitFailedException, so how do you want to set DTxException to this CheckedFuture?",
+      "revId": "dc45e036e430152b0db3ec2ba476064da346d298",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_93aad817",
+        "filename": "distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T11:03:07Z",
+      "side": 1,
+      "message": "This is implementation detail. This should be part of an implementation, not the interface.",
+      "revId": "dc45e036e430152b0db3ec2ba476064da346d298",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_73a74450",
+        "filename": "distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T11:03:07Z",
+      "side": 1,
+      "message": "Merge",
+      "revId": "dc45e036e430152b0db3ec2ba476064da346d298",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_b336fc01",
+        "filename": "distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T11:03:07Z",
+      "side": 1,
+      "message": "This should be write transaction, so maybe exception named WriteFailedException would be more suitable.",
+      "revId": "dc45e036e430152b0db3ec2ba476064da346d298",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_57582d56",
+        "filename": "distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T11:03:07Z",
+      "side": 1,
+      "message": "Put",
+      "range": {
+        "startLine": 177,
+        "startChar": 7,
+        "endLine": 177,
+        "endChar": 12
+      },
+      "revId": "dc45e036e430152b0db3ec2ba476064da346d298",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_535e8046",
+        "filename": "distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T11:03:07Z",
+      "side": 1,
+      "message": "Merge",
+      "range": {
+        "startLine": 238,
+        "startChar": 7,
+        "endLine": 238,
+        "endChar": 12
+      },
+      "revId": "dc45e036e430152b0db3ec2ba476064da346d298",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_b31d5c76",
+        "filename": "distributed-tx/api/src/main/java/org/opendaylight/distributed/tx/api/DTxProvider.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-07-01T11:03:07Z",
+      "side": 1,
+      "message": "Do you have to state in method declaration, that you are throwing unchecked exceptions?",
       "revId": "dc45e036e430152b0db3ec2ba476064da346d298",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
