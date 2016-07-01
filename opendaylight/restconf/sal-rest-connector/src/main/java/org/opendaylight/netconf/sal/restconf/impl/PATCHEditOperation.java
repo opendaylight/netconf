@@ -8,6 +8,8 @@
 
 package org.opendaylight.netconf.sal.restconf.impl;
 
+import javax.annotation.Nonnull;
+
 /**
  *
  * Each YANG patch edit specifies one edit operation on the target data
@@ -22,5 +24,25 @@ public enum PATCHEditOperation {
     MERGE,
     MOVE,    //delete+post
     REPLACE, //put
-    REMOVE   //delete
+    REMOVE;  //delete
+
+    /**
+     * Not all patch operations support value node. Check if operation requires value or not.
+     * @param operation Name of the operation to be checked
+     * @return true if operation requires value, false otherwise
+     */
+    public static final boolean isPatchOperationWithValue(@Nonnull final String operation) {
+        switch (final PATCHEditOperation.valueOf(operation.toUpperCase())) {
+            case CREATE:
+                // fall through
+            case MERGE:
+                // fall through
+            case REPLACE:
+                // fall through
+            case INSERT:
+                return true;
+            default:
+                return false;
+        }
+    }
 }
