@@ -775,11 +775,9 @@ public class ControllerContext implements SchemaContextListener {
         Codec<Object, Object> codec = RestCodec.from(typedef, mountPoint);
         Object decoded = codec.deserialize(urlDecoded);
         String additionalInfo = "";
-        if (decoded == null) {
-            if ((baseType instanceof IdentityrefTypeDefinition)) {
-                decoded = toQName(urlDecoded, null);
-                additionalInfo = "For key which is of type identityref it should be in format module_name:identity_name.";
-            }
+        if (decoded == null && baseType instanceof IdentityrefTypeDefinition) {
+            decoded = toQName(urlDecoded, null);
+            additionalInfo = "For key which is of type identityref it should be in format module_name:identity_name.";
         }
 
         if (decoded == null) {

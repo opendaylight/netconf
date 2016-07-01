@@ -57,10 +57,8 @@ class SeparatedNodes {
         }
 
         for (final DataSchemaNode dataSchemaNode : dataNodeContainer.getChildNodes()) {
-            if (removeConfigFalseNodes) {
-                if (!dataSchemaNode.isConfiguration()) {
-                    continue;
-                }
+            if (removeConfigFalseNodes && !dataSchemaNode.isConfiguration()) {
+                continue;
             }
             if (keyQNames.contains(dataSchemaNode.getQName())) {
                 Preconditions.checkArgument(dataSchemaNode instanceof LeafSchemaNode);

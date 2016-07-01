@@ -231,11 +231,9 @@ public class LibraryModulesSchemas {
 
         childNodeId = new YangInstanceIdentifier.NodeIdentifier(QName.create(Module.QNAME, "revision"));
         final Optional<String> revision = getSingleChildNodeValue(moduleNode, childNodeId);
-        if(revision.isPresent()) {
-            if(!SourceIdentifier.REVISION_PATTERN.matcher(revision.get()).matches()) {
-                LOG.warn("Skipping library schema for {}. Revision {} is in wrong format.", moduleNode, revision.get());
-                return Optional.<Map.Entry<SourceIdentifier, URL>>absent();
-            }
+        if(revision.isPresent() && !SourceIdentifier.REVISION_PATTERN.matcher(revision.get()).matches()) {
+            LOG.warn("Skipping library schema for {}. Revision {} is in wrong format.", moduleNode, revision.get());
+            return Optional.<Map.Entry<SourceIdentifier, URL>>absent();
         }
 
         // FIXME leaf schema with url that represents the yang schema resource for this module is not mandatory

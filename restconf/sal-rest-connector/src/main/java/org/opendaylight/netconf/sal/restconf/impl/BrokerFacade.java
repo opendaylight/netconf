@@ -285,10 +285,8 @@ public class BrokerFacade {
                 throw new RestconfDocumentedException("Problem to get data from transaction.", e.getCause());
 
             }
-            if (optional != null) {
-                if (optional.isPresent()) {
-                    return optional.get();
-                }
+            if (optional != null && optional.isPresent()) {
+                return optional.get();
             }
         }
         return null;

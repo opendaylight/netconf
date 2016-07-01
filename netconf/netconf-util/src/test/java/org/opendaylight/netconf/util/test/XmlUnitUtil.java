@@ -34,10 +34,8 @@ public class XmlUnitUtil {
 
             @Override
             public void testText(Text text) throws NodeTestException {
-                if(!textFound) {
-                    if (text.getData().equalsIgnoreCase(textToFind)) {
-                        textFound = true;
-                    }
+                if(!textFound && text.getData().equalsIgnoreCase(textToFind)) {
+                    textFound = true;
                 }
             }
 
@@ -57,10 +55,8 @@ public class XmlUnitUtil {
 
             @Override
             public void testElement(Element element) throws NodeTestException {
-                if (!elementFound) {
-                    if(element.isEqualNode(testElement)) {
-                        elementFound = true;
-                    }
+                if (!elementFound && element.isEqualNode(testElement)) {
+                    elementFound = true;
                 }
             }
 
@@ -80,10 +76,10 @@ public class XmlUnitUtil {
 
             @Override
             public void testElement(Element element) throws NodeTestException {
-                if (!elementFound) {
-                    if (element.getNodeName() != null && element.getNodeName().equals(elementName)) {
-                        elementFound = true;
-                    }
+                if (!elementFound
+                        && element.getNodeName() != null
+                        && element.getNodeName().equals(elementName)) {
+                    elementFound = true;
                 }
             }
 

@@ -165,10 +165,8 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         boolean dataMissing = false;
         if(e instanceof RestconfDocumentedException) {
             RestconfDocumentedException rde = (RestconfDocumentedException)e;
-            if(!rde.getErrors().isEmpty()) {
-                if(rde.getErrors().get(0).getErrorTag() == ErrorTag.DATA_MISSING) {
-                    dataMissing = true;
-                }
+            if(!rde.getErrors().isEmpty() && rde.getErrors().get(0).getErrorTag() == ErrorTag.DATA_MISSING) {
+                dataMissing = true;
             }
         }
 

@@ -361,15 +361,13 @@ public class NetconfMappingTest extends AbstractConfigTest {
 
             @Override
             public void testElement(final Element element) throws NodeTestException {
-                if(element.getNodeName() != null) {
-                    if(element.getNodeName().equals("name")) {
-                        String elmText = element.getTextContent();
-                        if(refNames2.contains(elmText)) {
-                            refNames2.remove(elmText);
-                        } else {
-                            throw new NodeTestException("Unexpected services defined: " + elmText);
-                        }
-                    }
+                if(element.getNodeName() != null && element.getNodeName().equals("name")) {
+                   String elmText = element.getTextContent();
+                   if(refNames2.contains(elmText)) {
+                       refNames2.remove(elmText);
+                   } else {
+                       throw new NodeTestException("Unexpected services defined: " + elmText);
+                   }
                 }
             }
 
