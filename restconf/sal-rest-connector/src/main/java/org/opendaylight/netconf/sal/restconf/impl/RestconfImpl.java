@@ -26,9 +26,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,6 +69,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgum
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
@@ -90,6 +93,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.effective.EffectiveSchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -309,9 +313,48 @@ public class RestconfImpl implements RestconfService {
         return operationsFromModulesToNormalizedContext(modules, mountPoint);
     }
 
+    /**
+     * Special case only for GET restconf/operations use (since moment of old
+     * Yang parser and old Yang model API removal). The method is creating fake
+     * schema context with fake module and fake data by use own implementations
+     * of schema nodes and module.
+     *
+     * @param modules
+     *            - set of modules for get RPCs from every module
+     * @param mountPoint
+     *            - mount point, if in use otherwise null
+     * @return {@link NormalizedNodeContext}
+     */
     private NormalizedNodeContext operationsFromModulesToNormalizedContext(final Set<Module> modules,
             final DOMMountPoint mountPoint) {
-        throw new UnsupportedOperationException();
+
+        final ContainerSchemaNodeImpl fakeCont = new ContainerSchemaNodeImpl();
+        final List<LeafNode<Object>> listRpcNodes = new ArrayList<>();
+        for (final Module m : modules) {
+            for (final RpcDefinition rpc : m.getRpcs()) {
+
+                final LeafSchemaNode fakeLeaf = new LeafSchemaNodeImpl(fakeCont.getPath(),
+                        QName.create(ModuleImpl.moduleQName, m.getName() + ":" + rpc.getQName().getLocalName()));
+                fakeCont.addNodeChild(fakeLeaf);
+                listRpcNodes.add(Builders.leafBuilder(fakeLeaf).build());
+            }
+        }
+        final ContainerSchemaNode fakeContSchNode = fakeCont;
+        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder = Builders
+                .containerBuilder(fakeContSchNode);
+
+        for (final LeafNode<Object> rpcNode : listRpcNodes) {
+            containerBuilder.withChild(rpcNode);
+        }
+
+        final Module fakeModule = new ModuleImpl(fakeContSchNode);
+
+        final Set<Module> fakeModules = new HashSet<>();
+        fakeModules.add(fakeModule);
+        final SchemaContext fakeSchemaCtx = EffectiveSchemaContext.resolveSchemaContext(fakeModules);
+        final InstanceIdentifierContext<ContainerSchemaNode> instanceIdentifierContext = new InstanceIdentifierContext<>(
+                null, fakeContSchNode, mountPoint, fakeSchemaCtx);
+        return new NormalizedNodeContext(instanceIdentifierContext, containerBuilder.build());
     }
 
     private Module getRestconfModule() {
