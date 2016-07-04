@@ -359,7 +359,7 @@ public class BrokerFacade {
             final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         LOG.trace("Put {} via Restconf: {} with payload {}", datastore.name(), path, payload);
-        ensureParentsByMerge(datastore, path, writeTransaction, schemaContext);
+       // ensureParentsByMerge(datastore, path, writeTransaction, schemaContext);
         writeTransaction.put(datastore, path, payload);
         return writeTransaction.submit();
     }
