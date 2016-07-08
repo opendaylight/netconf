@@ -7,12 +7,15 @@
  */
 package org.opendaylight.netconf.sal.streams.listeners;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 /**
  * {@link Notificator} is responsible to create, remove and find
@@ -21,6 +24,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 public class Notificator {
 
     private static Map<String, ListenerAdapter> listenersByStreamName = new ConcurrentHashMap<>();
+    private static Map<String, List<NotificationListenerAdapter>> notificationListenersByStreamName = new ConcurrentHashMap<>();
+
     private static final Lock lock = new ReentrantLock();
 
     private Notificator() {
@@ -40,7 +45,7 @@ public class Notificator {
      *            The name of the stream.
      * @return {@link ListenerAdapter} specified by stream name.
      */
-    public static ListenerAdapter getListenerFor(String streamName) {
+    public static ListenerAdapter getListenerFor(final String streamName) {
         return listenersByStreamName.get(streamName);
     }
 
@@ -50,7 +55,7 @@ public class Notificator {
      * @param streamName
      * @return True if the listener exist, false otherwise.
      */
-    public static boolean existListenerFor(String streamName) {
+    public static boolean existListenerFor(final String streamName) {
         return listenersByStreamName.containsKey(streamName);
     }
 
@@ -63,8 +68,8 @@ public class Notificator {
      *            The name of the stream.
      * @return New {@link ListenerAdapter} listener from {@link YangInstanceIdentifier} path and stream name.
      */
-    public static ListenerAdapter createListener(YangInstanceIdentifier path, String streamName) {
-        ListenerAdapter listener = new ListenerAdapter(path, streamName);
+    public static ListenerAdapter createListener(final YangInstanceIdentifier path, final String streamName) {
+        final ListenerAdapter listener = new ListenerAdapter(path, streamName);
         try {
             lock.lock();
             listenersByStreamName.put(streamName, listener);
@@ -82,7 +87,7 @@ public class Notificator {
      *            URI for creation stream name.
      * @return String representation of stream name.
      */
-    public static String createStreamNameFromUri(String uri) {
+    public static String createStreamNameFromUri(final String uri) {
         if (uri == null) {
             return null;
         }
@@ -100,10 +105,10 @@ public class Notificator {
      * Removes all listeners.
      */
     public static void removeAllListeners() {
-        for (ListenerAdapter listener : listenersByStreamName.values()) {
+        for (final ListenerAdapter listener : listenersByStreamName.values()) {
             try {
                 listener.close();
-            } catch (Exception e) {
+            } catch (final Exception e) {
             }
         }
         try {
@@ -120,7 +125,7 @@ public class Notificator {
      * @param listener
      *            ListenerAdapter
      */
-    public static void removeListenerIfNoSubscriberExists(ListenerAdapter listener) {
+    public static void removeListenerIfNoSubscriberExists(final ListenerAdapter listener) {
         if (!listener.hasSubscribers()) {
             deleteListener(listener);
         }
@@ -132,11 +137,11 @@ public class Notificator {
      * @param listener
      *            ListenerAdapter
      */
-    private static void deleteListener(ListenerAdapter listener) {
+    private static void deleteListener(final ListenerAdapter listener) {
         if (listener != null) {
             try {
                 listener.close();
-            } catch (Exception e) {
+            } catch (final Exception e) {
             }
             try {
                 lock.lock();
@@ -145,6 +150,52 @@ public class Notificator {
                 lock.unlock();
             }
         }
+    }
+
+    public static boolean existNotificationListenerFor(final String streamName) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public static List<NotificationListenerAdapter> createNotificationListener(final List<SchemaPath> paths,
+            final String streamName, final String outputType) {
+        final List<NotificationListenerAdapter> listListeners = new ArrayList<>();
+        for (final SchemaPath path : paths) {
+            final NotificationListenerAdapter listener = new NotificationListenerAdapter(path, streamName, outputType);
+            listListeners.add(listener);
+        }
+        try {
+            lock.lock();
+            notificationListenersByStreamName.put(streamName, listListeners);
+        } finally {
+            lock.unlock();
+        }
+        return listListeners;
+    }
+
+    public static void removeNotificationListenerIfNoSubscriberExists(final NotificationListenerAdapter listener) {
+        if (!listener.hasSubscribers()) {
+            deleteNotificationListener(listener);
+        }
+    }
+
+    private static void deleteNotificationListener(final NotificationListenerAdapter listener) {
+        if (listener != null) {
+            try {
+                listener.close();
+            } catch (final Exception e) {
+            }
+            try {
+                lock.lock();
+                notificationListenersByStreamName.remove(listener.getStreamName());
+            } finally {
+                lock.unlock();
+            }
+        }
+    }
+
+    public static List<NotificationListenerAdapter> getNotificationListenerFor(final String streamName) {
+        return notificationListenersByStreamName.get(streamName);
     }
 
 }
