@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.OPERATIONAL;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -28,6 +29,8 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataReadTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
+import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
+import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
@@ -35,6 +38,7 @@ import org.opendaylight.controller.sal.core.api.Broker.ConsumerSession;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
+import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
@@ -54,12 +58,17 @@ public class BrokerFacade {
     private volatile DOMRpcService rpcService;
     private volatile ConsumerSession context;
     private DOMDataBroker domDataBroker;
+    private DOMNotificationService domNotification;
 
     private BrokerFacade() {
     }
 
     public void setRpcService(final DOMRpcService router) {
-        rpcService = router;
+        this.rpcService = router;
+    }
+
+    public void setDomNotificationService(final DOMNotificationService domNotification) {
+        this.domNotification = domNotification;
     }
 
     public void setContext(final ConsumerSession context) {
@@ -71,7 +80,7 @@ public class BrokerFacade {
     }
 
     private void checkPreconditions() {
-        if (context == null || domDataBroker == null) {
+        if ((this.context == null) || (this.domDataBroker == null)) {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
     }
@@ -79,7 +88,7 @@ public class BrokerFacade {
     // READ configuration
     public NormalizedNode<?, ?> readConfigurationData(final YangInstanceIdentifier path) {
         checkPreconditions();
-        return readDataViaTransaction(domDataBroker.newReadOnlyTransaction(), CONFIGURATION, path);
+        return readDataViaTransaction(this.domDataBroker.newReadOnlyTransaction(), CONFIGURATION, path);
     }
 
     public NormalizedNode<?, ?> readConfigurationData(final DOMMountPoint mountPoint, final YangInstanceIdentifier path) {
@@ -95,7 +104,7 @@ public class BrokerFacade {
     // READ operational
     public NormalizedNode<?, ?> readOperationalData(final YangInstanceIdentifier path) {
         checkPreconditions();
-        return readDataViaTransaction(domDataBroker.newReadOnlyTransaction(), OPERATIONAL, path);
+        return readDataViaTransaction(this.domDataBroker.newReadOnlyTransaction(), OPERATIONAL, path);
     }
 
     public NormalizedNode<?, ?> readOperationalData(final DOMMountPoint mountPoint, final YangInstanceIdentifier path) {
@@ -112,7 +121,7 @@ public class BrokerFacade {
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataPut(
             final SchemaContext globalSchema, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload) {
         checkPreconditions();
-        return putDataViaTransaction(domDataBroker.newReadWriteTransaction(), CONFIGURATION, path, payload, globalSchema);
+        return putDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path, payload, globalSchema);
     }
 
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataPut(
@@ -129,13 +138,13 @@ public class BrokerFacade {
 
     public PATCHStatusContext patchConfigurationDataWithinTransaction(final PATCHContext context,
                                                                       final SchemaContext globalSchema) {
-        final DOMDataReadWriteTransaction patchTransaction = domDataBroker.newReadWriteTransaction();
-        List<PATCHStatusEntity> editCollection = new ArrayList<>();
+        final DOMDataReadWriteTransaction patchTransaction = this.domDataBroker.newReadWriteTransaction();
+        final List<PATCHStatusEntity> editCollection = new ArrayList<>();
         List<RestconfError> editErrors;
-        List<RestconfError> globalErrors = null;
+        final List<RestconfError> globalErrors = null;
         int errorCounter = 0;
 
-        for (PATCHEntity patchEntity : context.getData()) {
+        for (final PATCHEntity patchEntity : context.getData()) {
             final PATCHEditOperation operation = PATCHEditOperation.valueOf(patchEntity.getOperation().toUpperCase());
 
             switch (operation) {
@@ -145,7 +154,7 @@ public class BrokerFacade {
                             postDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity.getTargetNode(),
                                     patchEntity.getNode(), globalSchema);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
-                        } catch (RestconfDocumentedException e) {
+                        } catch (final RestconfDocumentedException e) {
                             editErrors = new ArrayList<>();
                             editErrors.addAll(e.getErrors());
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
@@ -159,7 +168,7 @@ public class BrokerFacade {
                             putDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
                                     .getTargetNode(), patchEntity.getNode(), globalSchema);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
-                        } catch (RestconfDocumentedException e) {
+                        } catch (final RestconfDocumentedException e) {
                             editErrors = new ArrayList<>();
                             editErrors.addAll(e.getErrors());
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
@@ -173,7 +182,7 @@ public class BrokerFacade {
                             deleteDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
                                     .getTargetNode());
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
-                        } catch (RestconfDocumentedException e) {
+                        } catch (final RestconfDocumentedException e) {
                             editErrors = new ArrayList<>();
                             editErrors.addAll(e.getErrors());
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
@@ -187,7 +196,7 @@ public class BrokerFacade {
                             deleteDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
                                     .getTargetNode());
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
-                        } catch (RestconfDocumentedException e) {
+                        } catch (final RestconfDocumentedException e) {
                             LOG.error("Error removing {} by {} operation", patchEntity.getTargetNode().toString(),
                                     patchEntity.getEditId(), e);
                         }
@@ -213,7 +222,7 @@ public class BrokerFacade {
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataPost(
             final SchemaContext globalSchema, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload) {
         checkPreconditions();
-        return postDataViaTransaction(domDataBroker.newReadWriteTransaction(), CONFIGURATION, path, payload, globalSchema);
+        return postDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path, payload, globalSchema);
     }
 
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataPost(
@@ -232,7 +241,7 @@ public class BrokerFacade {
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataDelete(
             final YangInstanceIdentifier path) {
         checkPreconditions();
-        return deleteDataViaTransaction(domDataBroker.newWriteOnlyTransaction(), CONFIGURATION, path);
+        return deleteDataViaTransaction(this.domDataBroker.newWriteOnlyTransaction(), CONFIGURATION, path);
     }
 
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataDelete(
@@ -249,11 +258,11 @@ public class BrokerFacade {
     // RPC
     public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
         checkPreconditions();
-        if (rpcService == null) {
+        if (this.rpcService == null) {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
         LOG.trace("Invoke RPC {} with input: {}", type, input);
-        return rpcService.invokeRpc(type, input);
+        return this.rpcService.invokeRpc(type, input);
     }
 
     public void registerToListenDataChanges(final LogicalDatastoreType datastore, final DataChangeScope scope,
@@ -265,7 +274,7 @@ public class BrokerFacade {
         }
 
         final YangInstanceIdentifier path = listener.getPath();
-        final ListenerRegistration<DOMDataChangeListener> registration = domDataBroker.registerDataChangeListener(
+        final ListenerRegistration<DOMDataChangeListener> registration = this.domDataBroker.registerDataChangeListener(
                 datastore, path, listener, scope);
 
         listener.setRegistration(registration);
@@ -420,5 +429,19 @@ public class BrokerFacade {
         final NormalizedNode<?, ?> parentStructure =
                 ImmutableNodes.fromInstanceId(schemaContext, YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));
         rwTx.merge(store, rootNormalizedPath, parentStructure);
+    }
+
+    public void registerToListenNotification(final NotificationListenerAdapter listener) {
+        checkPreconditions();
+
+        if (listener.isListening()) {
+            return;
+        }
+
+        final SchemaPath path = listener.getSchemaPath();
+        final ListenerRegistration<DOMNotificationListener> registration = this.domNotification
+                .registerNotificationListener(listener, path);
+
+        listener.setRegistration(registration);
     }
 }
