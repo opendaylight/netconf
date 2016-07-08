@@ -16,7 +16,14 @@ import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
 import static io.netty.handler.codec.http.HttpResponseStatus.FORBIDDEN;
 import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
-
+import java.io.IOException;
+import java.util.List;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
+import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
+import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
+import org.opendaylight.netconf.sal.streams.listeners.Notificator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
@@ -34,11 +41,6 @@ import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.util.CharsetUtil;
-import java.io.IOException;
-import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
-import org.opendaylight.netconf.sal.streams.listeners.Notificator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * {@link WebSocketServerHandler} is implementation of {@link SimpleChannelInboundHandler} which allow handle
@@ -80,24 +82,37 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
             return;
         }
 
-        String streamName = Notificator.createStreamNameFromUri(req.getUri());
-        ListenerAdapter listener = Notificator.getListenerFor(streamName);
-        if (listener != null) {
-            listener.addSubscriber(ctx.channel());
-            logger.debug("Subscriber successfully registered.");
-        } else {
-            logger.error("Listener for stream with name '{}' was not found.", streamName);
-            sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, INTERNAL_SERVER_ERROR));
+        final String streamName = Notificator.createStreamNameFromUri(req.getUri());
+        if (streamName.contains(RestconfImpl.DATA_SUBSCR)) {
+            final ListenerAdapter listener = Notificator.getListenerFor(streamName);
+            if (listener != null) {
+                listener.addSubscriber(ctx.channel());
+                logger.debug("Subscriber successfully registered.");
+            } else {
+                logger.error("Listener for stream with name '{}' was not found.", streamName);
+                sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, INTERNAL_SERVER_ERROR));
+            }
+        } else if (streamName.contains(RestconfImpl.NOTIFICATION_STREAM)) {
+            final List<NotificationListenerAdapter> listeners = Notificator.getNotificationListenerFor(streamName);
+            if (!listeners.isEmpty() && (listeners != null)) {
+                for (final NotificationListenerAdapter listener : listeners) {
+                    listener.addSubscriber(ctx.channel());
+                    logger.debug("Subscriber successfully registered.");
+                }
+            } else {
+                logger.error("Listener for stream with name '{}' was not found.", streamName);
+                sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, INTERNAL_SERVER_ERROR));
+            }
         }
 
         // Handshake
-        WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req),
+        final WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req),
                 null, false);
-        handshaker = wsFactory.newHandshaker(req);
-        if (handshaker == null) {
+        this.handshaker = wsFactory.newHandshaker(req);
+        if (this.handshaker == null) {
             WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
         } else {
-            handshaker.handshake(ctx.channel(), req);
+            this.handshaker.handshake(ctx.channel(), req);
         }
 
     }
@@ -116,15 +131,15 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
             final FullHttpResponse res) {
         // Generate an error page if response getStatus code is not OK (200).
         if (res.getStatus().code() != 200) {
-            ByteBuf buf = Unpooled.copiedBuffer(res.getStatus().toString(), CharsetUtil.UTF_8);
+            final ByteBuf buf = Unpooled.copiedBuffer(res.getStatus().toString(), CharsetUtil.UTF_8);
             res.content().writeBytes(buf);
             buf.release();
             setContentLength(res, res.content().readableBytes());
         }
 
         // Send the response and close the connection if necessary.
-        ChannelFuture f = ctx.channel().writeAndFlush(res);
-        if (!isKeepAlive(req) || res.getStatus().code() != 200) {
+        final ChannelFuture f = ctx.channel().writeAndFlush(res);
+        if (!isKeepAlive(req) || (res.getStatus().code() != 200)) {
             f.addListener(ChannelFutureListener.CLOSE);
         }
     }
@@ -139,14 +154,23 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
      */
     private void handleWebSocketFrame(final ChannelHandlerContext ctx, final WebSocketFrame frame) throws IOException {
         if (frame instanceof CloseWebSocketFrame) {
-            handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain());
-            String streamName = Notificator.createStreamNameFromUri(((CloseWebSocketFrame) frame).reasonText());
-            ListenerAdapter listener = Notificator.getListenerFor(streamName);
-            if (listener != null) {
-                listener.removeSubscriber(ctx.channel());
-                logger.debug("Subscriber successfully registered.");
+            this.handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain());
+            final String streamName = Notificator.createStreamNameFromUri(((CloseWebSocketFrame) frame).reasonText());
+            if (streamName.contains(RestconfImpl.DATA_SUBSCR)) {
+                final ListenerAdapter listener = Notificator.getListenerFor(streamName);
+                if (listener != null) {
+                    listener.removeSubscriber(ctx.channel());
+                    logger.debug("Subscriber successfully registered.");
+                }
+                Notificator.removeListenerIfNoSubscriberExists(listener);
+            } else if (streamName.contains(RestconfImpl.NOTIFICATION_STREAM)) {
+                final List<NotificationListenerAdapter> listeners = Notificator.getNotificationListenerFor(streamName);
+                if (!listeners.isEmpty() && (listeners != null)) {
+                    for (final NotificationListenerAdapter listener : listeners) {
+                        listener.removeSubscriber(ctx.channel());
+                    }
+                }
             }
-            Notificator.removeListenerIfNoSubscriberExists(listener);
             return;
         } else if (frame instanceof PingWebSocketFrame) {
             ctx.channel().write(new PongWebSocketFrame(frame.content().retain()));
@@ -156,7 +180,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        if (cause instanceof java.nio.channels.ClosedChannelException == false) {
+        if ((cause instanceof java.nio.channels.ClosedChannelException) == false) {
             // cause.printStackTrace();
         }
         ctx.close();
