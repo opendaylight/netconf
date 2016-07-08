@@ -11,9 +11,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.util.internal.ConcurrentSet;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -66,6 +63,9 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.util.internal.ConcurrentSet;
 
 /**
  * {@link ListenerAdapter} is responsible to track events, which occurred by changing data in data source.
@@ -77,7 +77,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
     private static final TransformerFactory FACTORY = TransformerFactory.newInstance();
     private static final Pattern RFC3339_PATTERN = Pattern.compile("(\\d\\d)(\\d\\d)$");
 
-    private final SimpleDateFormat rfc3339 = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ");
+    private static final SimpleDateFormat rfc3339 = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ");
 
     private final YangInstanceIdentifier path;
     private ListenerRegistration<DOMDataChangeListener> registration;
@@ -96,12 +96,12 @@ public class ListenerAdapter implements DOMDataChangeListener {
      */
     ListenerAdapter(final YangInstanceIdentifier path, final String streamName) {
         Preconditions.checkNotNull(path);
-        Preconditions.checkArgument(streamName != null && !streamName.isEmpty());
+        Preconditions.checkArgument((streamName != null) && !streamName.isEmpty());
         this.path = path;
         this.streamName = streamName;
-        eventBus = new AsyncEventBus(Executors.newSingleThreadExecutor());
-        eventBusChangeRecorder = new EventBusChangeRecorder();
-        eventBus.register(eventBusChangeRecorder);
+        this.eventBus = new AsyncEventBus(Executors.newSingleThreadExecutor());
+        this.eventBusChangeRecorder = new EventBusChangeRecorder();
+        this.eventBus.register(this.eventBusChangeRecorder);
     }
 
     @Override
@@ -111,7 +111,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
             final String xml = prepareXmlFrom(change);
             final Event event = new Event(EventType.NOTIFY);
             event.setData(xml);
-            eventBus.post(event);
+            this.eventBus.post(event);
         }
     }
 
@@ -123,20 +123,20 @@ public class ListenerAdapter implements DOMDataChangeListener {
         public void recordCustomerChange(final Event event) {
             if (event.getType() == EventType.REGISTER) {
                 final Channel subscriber = event.getSubscriber();
-                if (!subscribers.contains(subscriber)) {
-                    subscribers.add(subscriber);
+                if (!ListenerAdapter.this.subscribers.contains(subscriber)) {
+                    ListenerAdapter.this.subscribers.add(subscriber);
                 }
             } else if (event.getType() == EventType.DEREGISTER) {
-                subscribers.remove(event.getSubscriber());
+                ListenerAdapter.this.subscribers.remove(event.getSubscriber());
                 Notificator.removeListenerIfNoSubscriberExists(ListenerAdapter.this);
             } else if (event.getType() == EventType.NOTIFY) {
-                for (final Channel subscriber : subscribers) {
+                for (final Channel subscriber : ListenerAdapter.this.subscribers) {
                     if (subscriber.isActive()) {
                         LOG.debug("Data are sent to subscriber {}:", subscriber.remoteAddress());
                         subscriber.writeAndFlush(new TextWebSocketFrame(event.getData()));
                     } else {
                         LOG.debug("Subscriber {} is removed - channel is not active yet.", subscriber.remoteAddress());
-                        subscribers.remove(subscriber);
+                        ListenerAdapter.this.subscribers.remove(subscriber);
                     }
                 }
             }
@@ -167,7 +167,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
          * @return Channel
          */
         public Channel getSubscriber() {
-            return subscriber;
+            return this.subscriber;
         }
 
         /**
@@ -186,7 +186,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
          * @return String representation of event data.
          */
         public String getData() {
-            return data;
+            return this.data;
         }
 
         /**
@@ -204,7 +204,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
          * @return The type of the event.
          */
         public EventType getType() {
-            return type;
+            return this.type;
         }
     }
 
@@ -267,7 +267,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
      *            Date
      * @return Data specified by RFC3339.
      */
-    private String toRFC3339(final Date d) {
+    public static String toRFC3339(final Date d) {
         return RFC3339_PATTERN.matcher(rfc3339.format(d)).replaceAll("$1:$2");
     }
 
@@ -275,7 +275,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
      * Creates {@link Document} document.
      * @return {@link Document} document.
      */
-    private Document createDocument() {
+    public static Document createDocument() {
         final DocumentBuilder bob;
         try {
             bob = DBF.newDocumentBuilder();
@@ -326,7 +326,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
      */
     private void addValuesFromDataToElement(final Document doc, final Set<YangInstanceIdentifier> data, final Element element,
             final Operation operation) {
-        if (data == null || data.isEmpty()) {
+        if ((data == null) || data.isEmpty()) {
             return;
         }
         for (final YangInstanceIdentifier path : data) {
@@ -340,10 +340,10 @@ public class ListenerAdapter implements DOMDataChangeListener {
     private void addCreatedChangedValuesFromDataToElement(final Document doc, final Set<Entry<YangInstanceIdentifier,
                 NormalizedNode<?,?>>> data, final Element element, final Operation operation, final SchemaContext
             schemaContext, final DataSchemaContextTree dataSchemaContextTree) {
-        if (data == null || data.isEmpty()) {
+        if ((data == null) || data.isEmpty()) {
             return;
         }
-        for (Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> entry : data) {
+        for (final Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> entry : data) {
             if (!ControllerContext.getInstance().isNodeMixin(entry.getKey())) {
                 final Node node = createCreatedChangedDataChangeEventElement(doc, entry, operation, schemaContext,
                         dataSchemaContextTree);
@@ -396,16 +396,17 @@ public class ListenerAdapter implements DOMDataChangeListener {
             final Element dataElement = doc.createElement("data");
             dataElement.appendChild(result);
             dataChangeEventElement.appendChild(dataElement);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOG.error("Error in writer ", e);
-        } catch (XMLStreamException e) {
+        } catch (final XMLStreamException e) {
             LOG.error("Error processing stream", e);
         }
 
         return dataChangeEventElement;
     }
 
-    private static DOMResult writeNormalizedNode(final NormalizedNode<?,?> normalized, final
+    private static DOMResult writeNormalizedNode(final NormalizedNode<?, ?> normalized,
+            final
         YangInstanceIdentifier path, final SchemaContext context, final DataSchemaContextTree dataSchemaContextTree) throws
             IOException, XMLStreamException {
         final XMLOutputFactory XML_FACTORY = XMLOutputFactory.newFactory();
@@ -416,7 +417,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
         XMLStreamWriter writer = null;
         final SchemaPath nodePath;
 
-        if (normalized instanceof MapEntryNode || normalized instanceof UnkeyedListEntryNode) {
+        if ((normalized instanceof MapEntryNode) || (normalized instanceof UnkeyedListEntryNode)) {
             nodePath = dataSchemaContextTree.getChild(path).getDataSchemaNode().getPath();
         } else {
             nodePath = dataSchemaContextTree.getChild(path).getDataSchemaNode().getPath().getParent();
@@ -542,7 +543,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
      * @return Path pointed to data in data store.
      */
     public YangInstanceIdentifier getPath() {
-        return path;
+        return this.path;
     }
 
     /**
@@ -560,17 +561,17 @@ public class ListenerAdapter implements DOMDataChangeListener {
      * @return The name of the stream.
      */
     public String getStreamName() {
-        return streamName;
+        return this.streamName;
     }
 
     /**
      * Removes all subscribers and unregisters event bus change recorder form event bus.
      */
     public void close() throws Exception {
-        subscribers = new ConcurrentSet<>();
-        registration.close();
-        registration = null;
-        eventBus.unregister(eventBusChangeRecorder);
+        this.subscribers = new ConcurrentSet<>();
+        this.registration.close();
+        this.registration = null;
+        this.eventBus.unregister(this.eventBusChangeRecorder);
     }
 
     /**
@@ -579,7 +580,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
      * @return True if exist, false otherwise.
      */
     public boolean isListening() {
-        return registration == null ? false : true;
+        return this.registration == null ? false : true;
     }
 
     /**
@@ -595,7 +596,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
         }
         final Event event = new Event(EventType.REGISTER);
         event.setSubscriber(subscriber);
-        eventBus.post(event);
+        this.eventBus.post(event);
     }
 
     /**
@@ -608,7 +609,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
         LOG.debug("Subscriber {} is removed.", subscriber.remoteAddress());
         final Event event = new Event(EventType.DEREGISTER);
         event.setSubscriber(subscriber);
-        eventBus.post(event);
+        this.eventBus.post(event);
     }
 
     /**
@@ -617,7 +618,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
      * @return True if exist at least one {@link Channel} subscriber, false otherwise.
      */
     public boolean hasSubscribers() {
-        return !subscribers.isEmpty();
+        return !this.subscribers.isEmpty();
     }
 
     /**
