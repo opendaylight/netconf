@@ -101,4 +101,18 @@ public class TestXmlPATCHBodyReader extends AbstractBodyReaderTest {
                 .readFrom(null, null, null, mediaType, null, inputStream);
         checkPATCHContext(returnValue);
     }
+
+    /**
+     * Test of Yang PATCH merge operation. Test consists of two edit operations - replace and merge.
+     */
+    @Test
+    public void moduleDataMergeOperationTest() throws Exception {
+        final String uri = "instance-identifier-patch-module:patch-cont/my-list1/leaf1";
+        mockBodyReader(uri, xmlPATCHBodyReader, false);
+        final InputStream inputStream = TestXmlBodyReader.class
+                .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataMergeOperation.xml");
+        final PATCHContext returnValue = xmlPATCHBodyReader
+                .readFrom(null, null, null, mediaType, null, inputStream);
+        checkPATCHContext(returnValue);
+    }
 }
