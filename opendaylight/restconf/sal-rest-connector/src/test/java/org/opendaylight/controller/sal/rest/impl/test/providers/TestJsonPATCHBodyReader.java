@@ -126,4 +126,36 @@ public class TestJsonPATCHBodyReader extends AbstractBodyReaderTest {
                 .readFrom(null, null, null, mediaType, null, inputStream);
         checkPATCHContext(returnValue);
     }
+
+    /**
+     * Test of Yang PATCH merge operation on list. Test consists of two edit operations - replace and merge.
+     */
+    @Test
+    public void modulePATCHMergeOperationOnListTest() throws Exception {
+        final String uri = "instance-identifier-patch-module:patch-cont/my-list1/leaf1";
+        mockBodyReader(uri, jsonPATCHBodyReader, false);
+
+        final InputStream inputStream = TestJsonBodyReader.class
+                .getResourceAsStream("/instanceidentifier/json/jsonPATCHMergeOperationOnList.json");
+
+        final PATCHContext returnValue = jsonPATCHBodyReader
+                .readFrom(null, null, null, mediaType, null, inputStream);
+        checkPATCHContext(returnValue);
+    }
+
+    /**
+     * Test of Yang PATCH merge operation on container. Test consists of two edit operations - create and merge.
+     */
+    @Test
+    public void modulePATCHMergeOperationOnContainerTest() throws Exception {
+        final String uri = "instance-identifier-patch-module:patch-cont";
+        mockBodyReader(uri, jsonPATCHBodyReader, false);
+
+        final InputStream inputStream = TestJsonBodyReader.class
+                .getResourceAsStream("/instanceidentifier/json/jsonPATCHMergeOperationOnContainer.json");
+
+        final PATCHContext returnValue = jsonPATCHBodyReader
+                .readFrom(null, null, null, mediaType, null, inputStream);
+        checkPATCHContext(returnValue);
+    }
 }
