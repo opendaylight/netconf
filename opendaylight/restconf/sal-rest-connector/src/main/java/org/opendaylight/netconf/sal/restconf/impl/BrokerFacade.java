@@ -193,6 +193,20 @@ public class BrokerFacade {
                         }
                     }
                     break;
+                case MERGE:
+                    if (errorCounter == 0) {
+                        try {
+                            mergeDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
+                                    .getTargetNode(), patchEntity.getNode());
+                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
+                        } catch (RestconfDocumentedException e) {
+                            editErrors = new ArrayList<>();
+                            editErrors.addAll(e.getErrors());
+                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
+                            errorCounter++;
+                        }
+                    }
+                    break;
             }
         }
 
@@ -405,6 +419,13 @@ public class BrokerFacade {
             final YangInstanceIdentifier path) {
         LOG.trace("Delete {} within Restconf PATCH: {}", datastore.name(), path);
         writeTransaction.delete(datastore, path);
+    }
+
+    private void mergeDataWithinTransaction(
+            final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload) {
+        LOG.trace("Merge {} within Restconf PATCH: {} with payload {}", datastore.name(), path, payload);
+        writeTransaction.merge(datastore, path, payload);
     }
 
     public void setDomDataBroker(final DOMDataBroker domDataBroker) {
