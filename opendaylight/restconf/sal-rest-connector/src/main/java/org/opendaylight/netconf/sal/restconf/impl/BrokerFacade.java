@@ -248,14 +248,14 @@ public class BrokerFacade {
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataDelete(
             final YangInstanceIdentifier path) {
         checkPreconditions();
-        return deleteDataViaTransaction(domDataBroker.newWriteOnlyTransaction(), CONFIGURATION, path);
+        return deleteDataViaTransaction(domDataBroker.newReadWriteTransaction(), CONFIGURATION, path);
     }
 
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataDelete(
             final DOMMountPoint mountPoint, final YangInstanceIdentifier path) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
-            return deleteDataViaTransaction(domDataBrokerService.get().newWriteOnlyTransaction(), CONFIGURATION, path);
+            return deleteDataViaTransaction(domDataBrokerService.get().newReadWriteTransaction(), CONFIGURATION, path);
         }
         final String errMsg = "DOM data broker service isn't available for mount point " + path;
         LOG.warn(errMsg);
@@ -370,11 +370,31 @@ public class BrokerFacade {
         }
     }
 
-    private void checkItemDoesNotExists(final DOMDataReadWriteTransaction rWTransaction,final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+    private void checkItemExists(final DOMDataReadWriteTransaction rWTransaction,
+                                 final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        checkItem(rWTransaction, store, path, Boolean.TRUE);
+    }
+
+    private void checkItemDoesNotExists(final DOMDataReadWriteTransaction rWTransaction,
+                                        final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        checkItem(rWTransaction, store, path, Boolean.FALSE);
+    }
+
+    private void checkItem(final DOMDataReadWriteTransaction rWTransaction,
+                           final LogicalDatastoreType store, final YangInstanceIdentifier path,
+                           boolean dataShouldExists) {
         final ListenableFuture<Boolean> futureDatastoreData = rWTransaction.exists(store, path);
         try {
-            if (futureDatastoreData.get()) {
-                final String errMsg = "Post Configuration via Restconf was not executed because data already exists";
+            if (dataShouldExists && !futureDatastoreData.get()) {
+                final String errMsg = "Operation via Restconf was not executed because data does not exist";
+                LOG.trace("{}:{}", errMsg, path);
+                rWTransaction.cancel();
+                throw new RestconfDocumentedException("Data does not exist for path: " + path, ErrorType.PROTOCOL,
+                        ErrorTag.DATA_MISSING);
+            }
+
+            if (!dataShouldExists && futureDatastoreData.get()) {
+                final String errMsg = "Operation via Restconf was not executed because data already exists";
                 LOG.trace("{}:{}", errMsg, path);
                 rWTransaction.cancel();
                 throw new RestconfDocumentedException("Data already exists for path: " + path, ErrorType.PROTOCOL,
@@ -383,7 +403,6 @@ public class BrokerFacade {
         } catch (InterruptedException | ExecutionException e) {
             LOG.warn("It wasn't possible to get data loaded from datastore at path {}", path, e);
         }
-
     }
 
     private CheckedFuture<Void, TransactionCommitFailedException> putDataViaTransaction(
@@ -409,11 +428,12 @@ public class BrokerFacade {
     }
 
     private CheckedFuture<Void, TransactionCommitFailedException> deleteDataViaTransaction(
-            final DOMDataWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
+            final DOMDataReadWriteTransaction readWriteTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path) {
         LOG.trace("Delete {} via Restconf: {}", datastore.name(), path);
-        writeTransaction.delete(datastore, path);
-        return writeTransaction.submit();
+        checkItemExists(readWriteTransaction, datastore, path);
+        readWriteTransaction.delete(datastore, path);
+        return readWriteTransaction.submit();
     }
 
     private void deleteDataWithinTransaction(
