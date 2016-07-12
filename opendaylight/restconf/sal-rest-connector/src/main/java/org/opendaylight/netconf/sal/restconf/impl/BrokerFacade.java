@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.OPERATIONAL;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -247,7 +248,9 @@ public class BrokerFacade {
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataDelete(
             final YangInstanceIdentifier path) {
         checkPreconditions();
-        return deleteDataViaTransaction(domDataBroker.newWriteOnlyTransaction(), CONFIGURATION, path);
+        final DOMDataReadWriteTransaction readWriteTransaction = domDataBroker.newReadWriteTransaction();
+        checkItemExists(readWriteTransaction, CONFIGURATION, path);
+        return deleteDataViaTransaction(readWriteTransaction, CONFIGURATION, path);
     }
 
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataDelete(
@@ -369,11 +372,33 @@ public class BrokerFacade {
         }
     }
 
-    private void checkItemDoesNotExists(final DOMDataReadWriteTransaction rWTransaction,final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+    private void checkItemExists(final DOMDataReadWriteTransaction rWTransaction,
+                                 final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        checkItem(rWTransaction, store, path, Boolean.TRUE);
+    }
+
+    private void checkItemDoesNotExists(final DOMDataReadWriteTransaction rWTransaction,
+                                        final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        checkItem(rWTransaction, store, path, Boolean.FALSE);
+    }
+
+    private void checkItem(final DOMDataReadWriteTransaction rWTransaction,
+                           final LogicalDatastoreType store, final YangInstanceIdentifier path,
+                           boolean dataShouldExists) {
         final ListenableFuture<Boolean> futureDatastoreData = rWTransaction.exists(store, path);
         try {
-            if (futureDatastoreData.get()) {
-                final String errMsg = "Post Configuration via Restconf was not executed because data already exists";
+            if (dataShouldExists && !futureDatastoreData.get()) {
+                if (!futureDatastoreData.get()) {
+                    final String errMsg = "Operation via Restconf was not executed because data does not exist";
+                    LOG.trace("{}:{}", errMsg, path);
+                    rWTransaction.cancel();
+                    throw new RestconfDocumentedException("Data does not exist for path: " + path, ErrorType.PROTOCOL,
+                            ErrorTag.DATA_MISSING);
+                }
+            }
+
+            if (!dataShouldExists && futureDatastoreData.get()) {
+                final String errMsg = "Operation via Restconf was not executed because data already exists";
                 LOG.trace("{}:{}", errMsg, path);
                 rWTransaction.cancel();
                 throw new RestconfDocumentedException("Data already exists for path: " + path, ErrorType.PROTOCOL,
@@ -382,7 +407,6 @@ public class BrokerFacade {
         } catch (InterruptedException | ExecutionException e) {
             LOG.warn("It wasn't possible to get data loaded from datastore at path {}", path, e);
         }
-
     }
 
     private CheckedFuture<Void, TransactionCommitFailedException> putDataViaTransaction(
