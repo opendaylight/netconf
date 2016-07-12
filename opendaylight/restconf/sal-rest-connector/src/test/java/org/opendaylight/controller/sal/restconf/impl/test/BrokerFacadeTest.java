@@ -11,6 +11,7 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
@@ -47,6 +48,8 @@ import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
@@ -64,43 +67,26 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
  * @author Thomas Pantelis
  */
 public class BrokerFacadeTest {
+    @Mock private DOMDataBroker domDataBroker;
+    @Mock private ConsumerSession context;
+    @Mock private DOMRpcService mockRpcService;
+    @Mock private DOMMountPoint mockMountInstance;
 
-    @Mock
-    DOMDataBroker domDataBroker;
+    private final BrokerFacade brokerFacade = BrokerFacade.getInstance();
+    private final NormalizedNode<?, ?> dummyNode = createDummyNode("test:module", "2014-01-09", "interfaces");
+    private final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> dummyNodeInFuture =
+            wrapDummyNode(dummyNode);
+    private final QName qname = TestUtils.buildQName("interfaces","test:module", "2014-01-09");
+    private final SchemaPath type = SchemaPath.create(true, qname);
+    private final YangInstanceIdentifier instanceID = YangInstanceIdentifier.builder().node(qname).build();
 
-    @Mock
-    ConsumerSession context;
-
-    @Mock
-    DOMRpcService mockRpcService;
-
-    @Mock
-    DOMMountPoint mockMountInstance;
-
-    BrokerFacade brokerFacade = BrokerFacade.getInstance();
-
-    NormalizedNode<?, ?> dummyNode = createDummyNode("test:module", "2014-01-09", "interfaces");
-    CheckedFuture<Optional<NormalizedNode<?, ?>>,ReadFailedException> dummyNodeInFuture = wrapDummyNode(dummyNode);
-
-    QName qname = TestUtils.buildQName("interfaces","test:module", "2014-01-09");
-
-    SchemaPath type = SchemaPath.create(true, qname);
-
-    YangInstanceIdentifier instanceID = YangInstanceIdentifier.builder().node(qname).build();
-
-    @Mock
-    DOMDataReadOnlyTransaction rTransaction;
-
-    @Mock
-    DOMDataWriteTransaction wTransaction;
-
-    @Mock
-    DOMDataReadWriteTransaction rwTransaction;
+    @Mock private DOMDataReadOnlyTransaction rTransaction;
+    @Mock private DOMDataWriteTransaction wTransaction;
+    @Mock private DOMDataReadWriteTransaction rwTransaction;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        // TODO it is started before every test method
         brokerFacade.setDomDataBroker(domDataBroker);
         brokerFacade.setRpcService(mockRpcService);
         brokerFacade.setContext(context);
@@ -109,17 +95,16 @@ public class BrokerFacadeTest {
         when(domDataBroker.newReadWriteTransaction()).thenReturn(rwTransaction);
 
         ControllerContext.getInstance().setSchemas(TestUtils.loadSchemaContext("/full-versions/test-module"));
-
     }
 
-    private CheckedFuture<Optional<NormalizedNode<?, ?>>,ReadFailedException> wrapDummyNode(final NormalizedNode<?, ?> dummyNode) {
-        return  Futures.immediateCheckedFuture(Optional.<NormalizedNode<?, ?>> of(dummyNode));
+    private CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> wrapDummyNode(
+            final NormalizedNode<?, ?> dummyNode) {
+        return Futures.immediateCheckedFuture(Optional.<NormalizedNode<?, ?>> of(dummyNode));
     }
 
-    private CheckedFuture<Boolean,ReadFailedException> wrapExistence(final Boolean exists) {
-        return  Futures.immediateCheckedFuture(exists);
+    private CheckedFuture<Boolean, ReadFailedException> wrapExistence(final Boolean exists) {
+        return Futures.immediateCheckedFuture(exists);
     }
-
 
     /**
      * Value of this node shouldn't be important for testing purposes
@@ -200,7 +185,6 @@ public class BrokerFacadeTest {
         when(rwTransaction.exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class))).thenReturn(
             wrapExistence(false));
 
-
         when(rwTransaction.submit()).thenReturn(expFuture);
 
         final CheckedFuture<Void, TransactionCommitFailedException> actualFuture = brokerFacade.commitConfigurationDataPost(
@@ -229,22 +213,61 @@ public class BrokerFacadeTest {
         }
     }
 
+    /**
+     * Positive test of delete operation when data to delete exits. Returned value and order of steps are validated.
+     */
     @Test
-    public void testCommitConfigurationDataDelete() {
-        @SuppressWarnings("unchecked")
+    public void testCommitConfigurationDataDelete() throws Exception {
+        // assume that data to delete exists
+        prepareDataForDelete(true);
+
+        // expected result
         final CheckedFuture<Void, TransactionCommitFailedException> expFuture = mock(CheckedFuture.class);
+        when(rwTransaction.submit()).thenReturn(expFuture);
 
-        when(wTransaction.submit()).thenReturn(expFuture);
-
+        // test
         final CheckedFuture<Void, TransactionCommitFailedException> actualFuture = brokerFacade
                 .commitConfigurationDataDelete(instanceID);
 
+        // verify result and interactions
         assertSame("commitConfigurationDataDelete", expFuture, actualFuture);
 
-        final InOrder inOrder = inOrder(domDataBroker, wTransaction);
-        inOrder.verify(domDataBroker).newWriteOnlyTransaction();
-        inOrder.verify(wTransaction).delete(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
-        inOrder.verify(wTransaction).submit();
+        // check exists, delete, submit
+        final InOrder inOrder = inOrder(domDataBroker, rwTransaction);
+        inOrder.verify(rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, instanceID);
+        inOrder.verify(rwTransaction).delete(LogicalDatastoreType.CONFIGURATION, instanceID);
+        inOrder.verify(rwTransaction).submit();
+    }
+
+    /**
+     * Negative test of delete operation when data to delete does not exist. Error 404 should be returned.
+     */
+    @Test
+    public void testCommitConfigurationDataDeleteNoData() throws Exception {
+        // assume that data to delete does not exist
+        prepareDataForDelete(false);
+
+        // try to delete and expect 404 error
+        try {
+            brokerFacade.commitConfigurationDataDelete(instanceID);
+            fail("Delete operation should fail due to missing data");
+        } catch (final RestconfDocumentedException e) {
+            assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals(ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
+            assertEquals(404, e.getErrors().get(0).getErrorTag().getStatusCode());
+        }
+    }
+
+    /**
+     * Prepare conditions to test delete operation. Data to delete exists or does not exist according to value of
+     * {@code assumeDataExists} parameter.
+     * @param assumeDataExists
+     * @throws Exception
+     */
+    private void prepareDataForDelete(final boolean assumeDataExists) throws Exception {
+        final CheckedFuture<Boolean, ReadFailedException> checkDataExistFuture = mock(CheckedFuture.class);
+        when(checkDataExistFuture.get()).thenReturn(assumeDataExists);
+        when(rwTransaction.exists(LogicalDatastoreType.CONFIGURATION, instanceID)).thenReturn(checkDataExistFuture);
     }
 
     @SuppressWarnings("unchecked")
@@ -267,6 +290,5 @@ public class BrokerFacadeTest {
 
         brokerFacade.registerToListenDataChanges(LogicalDatastoreType.CONFIGURATION, DataChangeScope.BASE, listener);
         verifyNoMoreInteractions(domDataBroker);
-
     }
 }
