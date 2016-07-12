@@ -24,6 +24,7 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
@@ -247,6 +248,7 @@ public class BrokerFacade {
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataDelete(
             final YangInstanceIdentifier path) {
         checkPreconditions();
+        checkItemExists(domDataBroker.newReadOnlyTransaction(), CONFIGURATION, path);
         return deleteDataViaTransaction(domDataBroker.newWriteOnlyTransaction(), CONFIGURATION, path);
     }
 
@@ -369,7 +371,8 @@ public class BrokerFacade {
         }
     }
 
-    private void checkItemDoesNotExists(final DOMDataReadWriteTransaction rWTransaction,final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+    private void checkItemDoesNotExists(final DOMDataReadWriteTransaction rWTransaction,
+                                        final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         final ListenableFuture<Boolean> futureDatastoreData = rWTransaction.exists(store, path);
         try {
             if (futureDatastoreData.get()) {
@@ -383,6 +386,22 @@ public class BrokerFacade {
             LOG.warn("It wasn't possible to get data loaded from datastore at path {}", path, e);
         }
 
+    }
+
+    private void checkItemExists(final DOMDataReadOnlyTransaction rWTransaction, final LogicalDatastoreType store,
+                                 final YangInstanceIdentifier path) {
+        final ListenableFuture<Boolean> futureDatastoreData = rWTransaction.exists(store, path);
+        try {
+            if (!futureDatastoreData.get()) {
+                final String errMsg = "Delete Configuration via Restconf was not executed because data does not exist";
+                LOG.trace("{}:{}", errMsg, path);
+                rWTransaction.close();
+                throw new RestconfDocumentedException("Data does not exist for path: " + path, ErrorType.PROTOCOL,
+                        ErrorTag.DATA_MISSING);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            LOG.warn("It wasn't possible to get data loaded from datastore at path {}", path, e);
+        }
     }
 
     private CheckedFuture<Void, TransactionCommitFailedException> putDataViaTransaction(
