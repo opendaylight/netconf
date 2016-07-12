@@ -129,7 +129,8 @@ public class BrokerFacade {
     }
 
     public PATCHStatusContext patchConfigurationDataWithinTransaction(final PATCHContext context,
-                                                                      final SchemaContext globalSchema) {
+                                                                      final SchemaContext globalSchema)
+            throws TransactionCommitFailedException {
         final DOMDataReadWriteTransaction patchTransaction = domDataBroker.newReadWriteTransaction();
         List<PATCHStatusEntity> editCollection = new ArrayList<>();
         List<RestconfError> editErrors;
@@ -214,7 +215,7 @@ public class BrokerFacade {
         //TODO: make sure possible global errors are filled up correctly and decide transaction submission based on that
         //globalErrors = new ArrayList<>();
         if (errorCounter == 0) {
-            final CheckedFuture<Void, TransactionCommitFailedException> submit = patchTransaction.submit();
+            patchTransaction.submit().checkedGet();
             return new PATCHStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), true,
                     globalErrors);
         } else {
