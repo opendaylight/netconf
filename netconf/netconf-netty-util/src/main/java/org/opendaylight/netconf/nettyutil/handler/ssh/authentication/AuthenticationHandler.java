@@ -9,7 +9,7 @@
 package org.opendaylight.netconf.nettyutil.handler.ssh.authentication;
 
 import java.io.IOException;
-import org.apache.sshd.ClientSession;
+import org.apache.sshd.client.session.ClientSession;
 
 /**
  * Class providing authentication facility to SSH handler.
