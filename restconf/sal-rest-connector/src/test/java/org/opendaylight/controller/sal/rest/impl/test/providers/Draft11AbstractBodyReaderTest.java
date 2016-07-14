@@ -21,25 +21,25 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
-import org.opendaylight.netconf.sal.rest.impl.AbstractIdentifierAwareJaxRsProvider;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
+import org.opendaylight.restconf.utils.patch.Draft11AbstractIdentifierAwareJaxRsProvider;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
-public abstract class AbstractBodyReaderTest {
+public abstract class Draft11AbstractBodyReaderTest {
 
     protected final static ControllerContext controllerContext = ControllerContext.getInstance();
     protected final MediaType mediaType;
     private static Field uriField;
     private static Field requestField;
 
-    public AbstractBodyReaderTest() throws NoSuchFieldException,
+    public Draft11AbstractBodyReaderTest() throws NoSuchFieldException,
             SecurityException {
-        uriField = AbstractIdentifierAwareJaxRsProvider.class
+        uriField = Draft11AbstractIdentifierAwareJaxRsProvider.class
                 .getDeclaredField("uriInfo");
         uriField.setAccessible(true);
-        requestField = AbstractIdentifierAwareJaxRsProvider.class
+        requestField = Draft11AbstractIdentifierAwareJaxRsProvider.class
                 .getDeclaredField("request");
         requestField.setAccessible(true);
         mediaType = getMediaType();
@@ -52,7 +52,7 @@ public abstract class AbstractBodyReaderTest {
         return TestRestconfUtils.loadSchemaContext(yangPath, schemaContext);
     }
 
-    protected static <T extends AbstractIdentifierAwareJaxRsProvider> void mockBodyReader(
+    protected static <T extends Draft11AbstractIdentifierAwareJaxRsProvider> void mockBodyReader(
             final String identifier, final T normalizedNodeProvider,
             final boolean isPost) throws NoSuchFieldException,
             SecurityException, IllegalArgumentException, IllegalAccessException {
