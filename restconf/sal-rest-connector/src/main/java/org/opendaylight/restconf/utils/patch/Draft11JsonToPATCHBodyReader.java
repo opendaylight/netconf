@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.sal.rest.impl;
+package org.opendaylight.restconf.utils.patch;
 
 import static org.opendaylight.netconf.sal.restconf.impl.PATCHEditOperation.isPatchOperationWithValue;
 
@@ -28,8 +28,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
-import org.opendaylight.netconf.sal.rest.api.Draft02;
-import org.opendaylight.netconf.sal.rest.api.RestconfService;
+import org.opendaylight.netconf.sal.rest.impl.StringModuleInstanceIdentifierCodec;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
@@ -37,7 +36,8 @@ import org.opendaylight.netconf.sal.restconf.impl.PATCHEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
-import org.opendaylight.restconf.utils.patch.Draft11JsonToPATCHBodyReader;
+import org.opendaylight.restconf.Draft11;
+import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -51,24 +51,25 @@ import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @deprecated This class will be replaced by {@link Draft11JsonToPATCHBodyReader}
- */
-@Deprecated
 @Provider
-@Consumes({Draft02.MediaTypes.PATCH + RestconfService.JSON})
-public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider implements MessageBodyReader<PATCHContext> {
+@Consumes({Draft11.MediaTypes.PATCH + RestconfConstants.JSON})
+public class Draft11JsonToPATCHBodyReader extends Draft11AbstractIdentifierAwareJaxRsProvider
+        implements MessageBodyReader<PATCHContext> {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JsonToPATCHBodyReader.class);
+    private final static Logger LOG = LoggerFactory.getLogger(Draft11JsonToPATCHBodyReader.class);
     private String patchId;
 
     @Override
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+    public boolean isReadable(final Class<?> type, final Type genericType,
+                              final Annotation[] annotations, final MediaType mediaType) {
         return true;
     }
 
     @Override
-    public PATCHContext readFrom(Class<PATCHContext> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
+    public PATCHContext readFrom(final Class<PATCHContext> type, final Type genericType,
+                                 final Annotation[] annotations, final MediaType mediaType,
+                                 final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream)
+            throws IOException, WebApplicationException {
         try {
             return readFrom(getInstanceIdentifierContext(), entityStream);
         } catch (final Exception e) {
@@ -76,7 +77,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider 
         }
     }
 
-    private static RuntimeException propagateExceptionAs(Exception e) throws RestconfDocumentedException {
+    private static RuntimeException propagateExceptionAs(final Exception e) throws RestconfDocumentedException {
         if (e instanceof RestconfDocumentedException) {
             throw (RestconfDocumentedException)e;
         }
@@ -101,7 +102,8 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider 
         }
     }
 
-    private PATCHContext readFrom(final InstanceIdentifierContext<?> path, final InputStream entityStream) throws IOException {
+    private PATCHContext readFrom(final InstanceIdentifierContext<?> path, final InputStream entityStream)
+            throws IOException {
         if (entityStream.available() < 1) {
             return new PATCHContext(path, null, null);
         }
@@ -114,9 +116,10 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider 
     }
 
     private List<PATCHEntity> read(final JsonReader in, InstanceIdentifierContext path) throws IOException {
-        List<PATCHEntity> resultCollection = new ArrayList<>();
-        StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(path.getSchemaContext());
-        JsonToPATCHBodyReader.PatchEdit edit = new JsonToPATCHBodyReader.PatchEdit();
+        final List<PATCHEntity> resultCollection = new ArrayList<>();
+        final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
+                path.getSchemaContext());
+        final Draft11JsonToPATCHBodyReader.PatchEdit edit = new Draft11JsonToPATCHBodyReader.PatchEdit();
 
         while (in.hasNext()) {
             switch (in.peek()) {
