@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.sal.rest.impl;
+package org.opendaylight.restconf.utils.patch;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
@@ -28,7 +28,6 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHEditOperation;
@@ -36,6 +35,7 @@ import org.opendaylight.netconf.sal.restconf.impl.PATCHEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.restconf.Draft11;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -58,11 +58,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @Provider
-@Consumes({Draft02.MediaTypes.PATCH + RestconfConstants.XML})
-public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider implements
+@Consumes({Draft11.MediaTypes.PATCH + RestconfConstants.XML})
+public class Draft11XmlToPATCHBodyReader extends Draft11AbstractIdentifierAwareJaxRsProvider implements
         MessageBodyReader<PATCHContext> {
 
-    private final static Logger LOG = LoggerFactory.getLogger(XmlToPATCHBodyReader.class);
+    private final static Logger LOG = LoggerFactory.getLogger(Draft11XmlToPATCHBodyReader.class);
     private static final DocumentBuilderFactory BUILDERFACTORY;
 
     static {
@@ -148,7 +148,7 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                     URI.create(namespace)).iterator().next();
 
             // initialize codec + set default prefix derived from module name
-            final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
+            final Draft11StringModuleInstanceIdentifierCodec codec = new Draft11StringModuleInstanceIdentifierCodec(
                     pathContext.getSchemaContext(), module.getName());
 
             // find complete path to target and target schema node
@@ -235,7 +235,7 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
 
     /**
      * Prepare non-conditional XPath suitable for deserialization
-     * with {@link StringModuleInstanceIdentifierCodec}
+     * with {@link Draft11StringModuleInstanceIdentifierCodec}
      * @param schemaNode Top schema node
      * @param target Edit operation target
      * @param value Element with value

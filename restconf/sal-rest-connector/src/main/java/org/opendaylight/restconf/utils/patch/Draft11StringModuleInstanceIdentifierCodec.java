@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.sal.rest.impl;
+package org.opendaylight.restconf.utils.patch;
 
 import com.google.common.base.Preconditions;
 import java.net.URI;
@@ -17,24 +17,19 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
-/**
- * @deprecated This calass will be repalced by
- * {@link org.opendaylight.restconf.utils.patch.Draft11StringModuleInstanceIdentifierCodec}
- */
-@Deprecated
-final class StringModuleInstanceIdentifierCodec extends AbstractModuleStringInstanceIdentifierCodec {
+final class Draft11StringModuleInstanceIdentifierCodec extends AbstractModuleStringInstanceIdentifierCodec {
 
     private final DataSchemaContextTree dataContextTree;
     private final SchemaContext context;
     private final String defaultPrefix;
 
-    StringModuleInstanceIdentifierCodec(SchemaContext context) {
+    Draft11StringModuleInstanceIdentifierCodec(SchemaContext context) {
         this.context = Preconditions.checkNotNull(context);
         this.dataContextTree = DataSchemaContextTree.from(context);
         this.defaultPrefix = "";
     }
 
-    StringModuleInstanceIdentifierCodec(SchemaContext context, @Nonnull String defaultPrefix) {
+    Draft11StringModuleInstanceIdentifierCodec(SchemaContext context, @Nonnull String defaultPrefix) {
         this.context = Preconditions.checkNotNull(context);
         this.dataContextTree = DataSchemaContextTree.from(context);
         this.defaultPrefix = defaultPrefix;

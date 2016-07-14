@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.sal.rest.impl;
+package org.opendaylight.restconf.utils.patch;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -23,20 +23,15 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
-import org.opendaylight.restconf.utils.patch.Draft11PATCHXmlBodyWriter;
+import org.opendaylight.restconf.Draft11;
 
-/**
- * @deprecated This class will be replaced by {@link Draft11PATCHXmlBodyWriter}
- */
-@Deprecated
 @Provider
-@Produces({Draft02.MediaTypes.PATCH_STATUS + RestconfService.XML})
-public class PATCHXmlBodyWriter implements MessageBodyWriter<PATCHStatusContext> {
+@Produces({Draft11.MediaTypes.PATCH_STATUS + RestconfService.XML})
+public class Draft11PATCHXmlBodyWriter implements MessageBodyWriter<PATCHStatusContext> {
 
     private static final XMLOutputFactory XML_FACTORY;
 
@@ -61,7 +56,7 @@ public class PATCHXmlBodyWriter implements MessageBodyWriter<PATCHStatusContext>
     public void writeTo(final PATCHStatusContext patchStatusContext, final Class<?> type, final Type genericType,
                         final Annotation[] annotations, final MediaType mediaType,
                         final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream)
-            throws IOException, WebApplicationException {
+                throws IOException, WebApplicationException {
 
         try {
             final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream);

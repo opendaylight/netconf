@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.sal.rest.impl;
+package org.opendaylight.restconf.utils.patch;
 
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
@@ -22,21 +22,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
-import org.opendaylight.restconf.utils.patch.Draft11PATCHJsonBodyWriter;
+import org.opendaylight.restconf.Draft11;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 
-/**
- * @deprecated This class will be replaced by {@link Draft11PATCHJsonBodyWriter}
- */
-@Deprecated
 @Provider
-@Produces({Draft02.MediaTypes.PATCH_STATUS + RestconfService.JSON})
-public class PATCHJsonBodyWriter implements MessageBodyWriter<PATCHStatusContext> {
+@Produces({Draft11.MediaTypes.PATCH_STATUS + RestconfService.JSON})
+public class Draft11PATCHJsonBodyWriter implements MessageBodyWriter<PATCHStatusContext> {
 
     @Override
     public boolean isWriteable(final Class<?> type, final Type genericType,
@@ -54,7 +49,7 @@ public class PATCHJsonBodyWriter implements MessageBodyWriter<PATCHStatusContext
     public void writeTo(final PATCHStatusContext patchStatusContext, final Class<?> type, final Type genericType,
                         final Annotation[] annotations, final MediaType mediaType,
                         final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream)
-            throws IOException, WebApplicationException {
+                throws IOException, WebApplicationException {
 
         final JsonWriter jsonWriter = createJsonWriter(entityStream);
         jsonWriter.beginObject().name("ietf-yang-patch:yang-patch-status");
