@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2015 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.sal.rest.impl;
+package org.opendaylight.restconf.utils.patch;
 
 import static org.opendaylight.netconf.sal.restconf.impl.PATCHEditOperation.isPatchOperationWithValue;
 
@@ -28,8 +28,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
-import org.opendaylight.netconf.sal.rest.api.Draft02;
-import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
@@ -37,7 +35,8 @@ import org.opendaylight.netconf.sal.restconf.impl.PATCHEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
-import org.opendaylight.restconf.utils.patch.Draft11JsonToPATCHBodyReader;
+import org.opendaylight.restconf.Draft11;
+import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -51,16 +50,12 @@ import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @deprecated This class will be replaced by {@link Draft11JsonToPATCHBodyReader}
- */
-@Deprecated
 @Provider
-@Consumes({Draft02.MediaTypes.PATCH + RestconfService.JSON})
-public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
+@Consumes({Draft11.MediaTypes.PATCH + RestconfConstants.JSON})
+public class Draft11JsonToPATCHBodyReader extends Draft11AbstractIdentifierAwareJaxRsProvider
         implements MessageBodyReader<PATCHContext> {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JsonToPATCHBodyReader.class);
+    private final static Logger LOG = LoggerFactory.getLogger(Draft11JsonToPATCHBodyReader.class);
     private String patchId;
 
     @Override
@@ -120,9 +115,9 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
 
     private List<PATCHEntity> read(final JsonReader in, final InstanceIdentifierContext path) throws IOException {
         final List<PATCHEntity> resultCollection = new ArrayList<>();
-        final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
+        final Draft11StringModuleInstanceIdentifierCodec codec = new Draft11StringModuleInstanceIdentifierCodec(
                 path.getSchemaContext());
-        final JsonToPATCHBodyReader.PatchEdit edit = new JsonToPATCHBodyReader.PatchEdit();
+        final Draft11JsonToPATCHBodyReader.PatchEdit edit = new Draft11JsonToPATCHBodyReader.PatchEdit();
 
         while (in.hasNext()) {
             switch (in.peek()) {
@@ -168,13 +163,13 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @param edit PatchEdit instance
      * @param in JsonReader reader
      * @param path InstanceIdentifierContext context
-     * @param codec StringModuleInstanceIdentifierCodec codec
+     * @param codec Draft11StringModuleInstanceIdentifierCodec codec
      * @param resultCollection collection of parsed edits
      * @throws IOException
      */
     private void parseByName(@Nonnull final String name, @Nonnull final PatchEdit edit,
                              @Nonnull final JsonReader in, @Nonnull final InstanceIdentifierContext path,
-                             @Nonnull final StringModuleInstanceIdentifierCodec codec,
+                             @Nonnull final Draft11StringModuleInstanceIdentifierCodec codec,
                              @Nonnull final List<PATCHEntity> resultCollection) throws IOException {
         switch (name) {
             case "edit" :
@@ -208,12 +203,12 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @param edit PatchEdit instance to be filled with read data
      * @param in JsonReader reader
      * @param path InstanceIdentifierContext path context
-     * @param codec StringModuleInstanceIdentifierCodec codec
+     * @param codec Draft11StringModuleInstanceIdentifierCodec codec
      * @throws IOException
      */
     private void readEditDefinition(@Nonnull final PatchEdit edit, @Nonnull final JsonReader in,
                                     @Nonnull final InstanceIdentifierContext path,
-                                    @Nonnull final StringModuleInstanceIdentifierCodec codec) throws IOException {
+                                    @Nonnull final Draft11StringModuleInstanceIdentifierCodec codec) throws IOException {
         final StringBuffer value = new StringBuffer();
         in.beginObject();
 
