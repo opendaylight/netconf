@@ -10,14 +10,16 @@ package org.opendaylight.netconf.ssh.osgi;
 import com.google.common.base.Optional;
 import io.netty.channel.local.LocalAddress;
 import io.netty.channel.nio.NioEventLoopGroup;
+import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
-import org.apache.sshd.common.util.ThreadUtils;
-import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
+import org.apache.sshd.common.util.SecurityUtils;
+import org.apache.sshd.common.util.threads.ThreadUtils;
+import org.apache.sshd.server.keyprovider.AbstractGeneratorHostKeyProvider;
 import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
 import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
@@ -61,19 +63,19 @@ public class NetconfSSHActivator implements BundleActivator {
             server.close();
         }
 
-        if(authProviderTracker != null) {
+        if (authProviderTracker != null) {
             authProviderTracker.stop();
         }
 
-        if(nioExecutor!=null) {
+        if (nioExecutor!=null) {
             nioExecutor.shutdownNow();
         }
 
-        if(clientGroup != null) {
+        if (clientGroup != null) {
             clientGroup.shutdownGracefully();
         }
 
-        if(minaTimerExecutor != null) {
+        if (minaTimerExecutor != null) {
             minaTimerExecutor.shutdownNow();
         }
     }
@@ -92,7 +94,7 @@ public class NetconfSSHActivator implements BundleActivator {
         authProviderTracker = new AuthProviderTracker(bundleContext);
 
         final Optional<String> maybePath = NetconfConfigUtil.getPrivateKeyPath(bundleContext);
-        if(!maybePath.isPresent()) {
+        if (!maybePath.isPresent()) {
             LOG.warn("Private key path not configured. Using default value {}",
                     NetconfConfigUtil.DEFAULT_PRIVATE_KEY_PATH);
         }
@@ -100,12 +102,17 @@ public class NetconfSSHActivator implements BundleActivator {
         LOG.trace("Starting netconf SSH bridge with path to ssh private key {}", path);
 
         final SshProxyServer sshProxyServer = new SshProxyServer(minaTimerExecutor, clientGroup, nioExecutor);
+        final AbstractGeneratorHostKeyProvider keyPairProvider = SecurityUtils.createGeneratorHostKeyProvider(null);
+        keyPairProvider.setAlgorithm(ALGORITHM);
+        keyPairProvider.setKeySize(KEY_SIZE);
+        keyPairProvider.setFile(new File(path));
+
         sshProxyServer.bind(
                 new SshProxyServerConfigurationBuilder()
                         .setBindingAddress(sshSocketAddress)
                         .setLocalAddress(localAddress)
                         .setAuthenticator(authProviderTracker)
-                        .setKeyPairProvider(new PEMGeneratorHostKeyProvider(path, ALGORITHM, KEY_SIZE))
+                        .setKeyPairProvider(keyPairProvider)
                         .setIdleTimeout(DEFAULT_IDLE_TIMEOUT)
                         .createSshProxyServerConfiguration());
         return sshProxyServer;
