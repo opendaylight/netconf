@@ -91,4 +91,16 @@ public final class RestconfDataServiceConstant {
             throw new UnsupportedOperationException("Util class.");
         }
     }
+
+    /**
+     * Constants for data to yang patch
+     *
+     */
+    public final class PatchData {
+        public static final String PATCH_TX_TYPE = "PATCH";
+
+        private PatchData() {
+            throw new UnsupportedOperationException("Util class.");
+        }
+    }
 }

@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response.Status;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 /**
  * Unchecked exception to communicate error information, as defined in the ietf restcong draft, to be sent to the
@@ -42,7 +43,7 @@ public class RestconfDocumentedException extends WebApplicationException {
      * @param message
      *            A string which provides a plain text string describing the error.
      */
-    public RestconfDocumentedException(String message) {
+    public RestconfDocumentedException(final String message) {
         this(message, RestconfError.ErrorType.APPLICATION, RestconfError.ErrorTag.OPERATION_FAILED);
     }
 
@@ -58,8 +59,10 @@ public class RestconfDocumentedException extends WebApplicationException {
      * @param cause
      *            The underlying exception cause.
      */
-    public RestconfDocumentedException(String message, ErrorType errorType, ErrorTag errorTag, Throwable cause) {
-        this(cause, new RestconfError(errorType, errorTag, message, null, Throwables.getStackTraceAsString(cause)));
+    public RestconfDocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag,
+                                       final Throwable cause) {
+        this(cause, new RestconfError(errorType, errorTag, message, null,
+                Throwables.getStackTraceAsString(cause), null));
     }
 
     /**
@@ -72,8 +75,25 @@ public class RestconfDocumentedException extends WebApplicationException {
      * @param errorTag
      *            The enumerated tag representing a more specific error cause.
      */
-    public RestconfDocumentedException(String message, ErrorType errorType, ErrorTag errorTag) {
+    public RestconfDocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag) {
         this(null, new RestconfError(errorType, errorTag, message));
+    }
+
+    /**
+     * Constructs an instance with an error message, error type, error tag and error path.
+     *
+     * @param message
+     *            A string which provides a plain text string describing the error.
+     * @param errorType
+     *            The enumerated type indicating the layer where the error occurred.
+     * @param errorTag
+     *            The enumerated tag representing a more specific error cause.
+     * @param errorPath
+     *            The instance identifier representing error path
+     */
+    public RestconfDocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag,
+                                       final YangInstanceIdentifier errorPath) {
+        this(null, new RestconfError(errorType, errorTag, message, errorPath));
     }
 
     /**
@@ -85,22 +105,22 @@ public class RestconfDocumentedException extends WebApplicationException {
      * @param cause
      *            The underlying exception cause.
      */
-    public RestconfDocumentedException(String message, Throwable cause) {
+    public RestconfDocumentedException(final String message, final Throwable cause) {
         this(cause, new RestconfError(RestconfError.ErrorType.APPLICATION, RestconfError.ErrorTag.OPERATION_FAILED,
-                message, null, Throwables.getStackTraceAsString(cause)));
+                message, null, Throwables.getStackTraceAsString(cause), null));
     }
 
     /**
      * Constructs an instance with the given error.
      */
-    public RestconfDocumentedException(RestconfError error) {
+    public RestconfDocumentedException(final RestconfError error) {
         this(null, error);
     }
 
     /**
      * Constructs an instance with the given errors.
      */
-    public RestconfDocumentedException(String message, Throwable cause, List<RestconfError> errors) {
+    public RestconfDocumentedException(final String message, final Throwable cause, final List<RestconfError> errors) {
         // FIXME: We override getMessage so supplied message is lost for any public access
         // this was lost also in original code.
         super(cause);
@@ -117,7 +137,8 @@ public class RestconfDocumentedException extends WebApplicationException {
     /**
      * Constructs an instance with the given RpcErrors.
      */
-    public RestconfDocumentedException(String message, Throwable cause, Collection<RpcError> rpcErrors) {
+    public RestconfDocumentedException(final String message, final Throwable cause,
+                                       final Collection<RpcError> rpcErrors) {
         this(message, cause, convertToRestconfErrors(rpcErrors));
     }
 
@@ -127,21 +148,21 @@ public class RestconfDocumentedException extends WebApplicationException {
      * @param status
      *            the HTTP status.
      */
-    public RestconfDocumentedException(Status status) {
+    public RestconfDocumentedException(final Status status) {
         Preconditions.checkNotNull(status, "Status can't be null");
         errors = ImmutableList.of();
         this.status = status;
     }
 
-    private RestconfDocumentedException(Throwable cause, RestconfError error) {
+    private RestconfDocumentedException(final Throwable cause, final RestconfError error) {
         super(cause);
         Preconditions.checkNotNull(error, "RestconfError can't be null");
         errors = ImmutableList.of(error);
         status = null;
     }
 
-    private static List<RestconfError> convertToRestconfErrors(Collection<RpcError> rpcErrors) {
-        List<RestconfError> errorList = Lists.newArrayList();
+    private static List<RestconfError> convertToRestconfErrors(final Collection<RpcError> rpcErrors) {
+        final List<RestconfError> errorList = Lists.newArrayList();
         if(rpcErrors != null) {
             for (RpcError rpcError : rpcErrors) {
                 errorList.add(new RestconfError(rpcError));
@@ -150,7 +171,6 @@ public class RestconfDocumentedException extends WebApplicationException {
 
         return errorList;
     }
-
 
     public List<RestconfError> getErrors() {
         return errors;
