@@ -44,8 +44,8 @@ public final class Draft11 {
         public static final String DATASTORE = "application/yang.datastore";
         public static final String DATA = "application/yang.data";
         public static final String OPERATION = "application/yang.operation";
-        public static final String PATCH = "application/yang.patch";
-        public static final String PATCH_STATUS = "application/yang.patch-status";
+        public static final String PATCH = "application/yang-patch";
+        public static final String PATCH_STATUS = "application/yang-data";
         public static final String ERRORS = "application/yang.errors";
         public static final String YIN = "application/yin";
         public static final String YANG = "application/yang";
