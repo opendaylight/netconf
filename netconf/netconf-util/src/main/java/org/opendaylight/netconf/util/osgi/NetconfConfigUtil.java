@@ -34,11 +34,12 @@ public final class NetconfConfigUtil {
 
     private static final String CONNECTION_TIMEOUT_MILLIS_PROP = "connectionTimeoutMillis";
     private static final String LOCAL_HOST = "127.0.0.1";
+    private static final String INADDR_ANY = "0.0.0.0";
     public static final long DEFAULT_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(30);
     private static final LocalAddress NETCONF_LOCAL_ADDRESS = new LocalAddress("netconf");
     public static final String DEFAULT_PRIVATE_KEY_PATH = "./configuration/RSA.pk";
     public static final InetSocketAddress DEFAULT_TCP_SERVER_ADRESS = new InetSocketAddress(LOCAL_HOST, 8383);
-    public static final InetSocketAddress DEFAULT_SSH_SERVER_ADRESS = new InetSocketAddress(LOCAL_HOST, 1830);
+    public static final InetSocketAddress DEFAULT_SSH_SERVER_ADRESS = new InetSocketAddress(INADDR_ANY, 1830);
 
     public static LocalAddress getNetconfLocalAddress() {
         return NETCONF_LOCAL_ADDRESS;
@@ -70,7 +71,7 @@ public final class NetconfConfigUtil {
         return PREFIX_PROP + InfixProp.ssh + PRIVATE_KEY_PATH_PROP;
     }
 
-    public static String getNetconfServerAddressKey(InfixProp infixProp) {
+    public static String getNetconfServerAddressKey(final InfixProp infixProp) {
         return PREFIX_PROP + infixProp + ADDRESS_SUFFIX_PROP;
     }
 
