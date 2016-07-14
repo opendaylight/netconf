@@ -5,11 +5,13 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
+
 package org.opendaylight.netconf.sal.restconf.impl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import org.opendaylight.yangtools.yang.common.RpcError;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 /**
  * Encapsulates a restconf error as defined in the ietf restconf draft.
@@ -23,7 +25,7 @@ import org.opendaylight.yangtools.yang.common.RpcError;
  */
 public class RestconfError {
 
-    public static enum ErrorType {
+    public enum ErrorType {
         /** Errors relating to the transport layer */
         TRANSPORT,
         /** Errors relating to the RPC or notification layer */
@@ -37,7 +39,7 @@ public class RestconfError {
             return name().toLowerCase();
         }
 
-        public static ErrorType valueOfCaseInsensitive(String value) {
+        public static ErrorType valueOfCaseInsensitive(final String value) {
             try {
                 return ErrorType.valueOf(ErrorType.class, value.toUpperCase());
             } catch (IllegalArgumentException e) {
@@ -46,7 +48,7 @@ public class RestconfError {
         }
     }
 
-    public static enum ErrorTag {
+    public enum ErrorTag {
         IN_USE("in-use", 409 /* Conflict */),
         INVALID_VALUE("invalid-value", 400 /* Bad Request */),
         TOO_BIG("too-big", 413 /* Request Entity Too Large */),
@@ -80,7 +82,7 @@ public class RestconfError {
             return this.tagValue.toLowerCase();
         }
 
-        public static ErrorTag valueOfCaseInsensitive(String value) {
+        public static ErrorTag valueOfCaseInsensitive(final String value) {
             try {
                 return ErrorTag.valueOf(ErrorTag.class, value.toUpperCase().replaceAll("-", "_"));
             } catch (IllegalArgumentException e) {
@@ -98,7 +100,7 @@ public class RestconfError {
     private final String errorInfo;
     private final String errorAppTag;
     private final String errorMessage;
-    // TODO: Add in the error-path concept as defined in the ietf draft.
+    private final YangInstanceIdentifier errorPath;
 
     /**
      * Constructs a RestConfError
@@ -110,8 +112,8 @@ public class RestconfError {
      * @param errorMessage
      *            A string which provides a plain text string describing the error.
      */
-    public RestconfError(ErrorType errorType, ErrorTag errorTag, String errorMessage) {
-        this(errorType, errorTag, errorMessage, null);
+    public RestconfError(final ErrorType errorType, final ErrorTag errorTag, final String errorMessage) {
+        this(errorType, errorTag, errorMessage, null, null, null);
     }
 
     /**
@@ -126,8 +128,26 @@ public class RestconfError {
      * @param errorAppTag
      *            A string which represents an application-specific error tag that further specifies the error cause.
      */
-    public RestconfError(ErrorType errorType, ErrorTag errorTag, String errorMessage, String errorAppTag) {
-        this(errorType, errorTag, errorMessage, errorAppTag, null);
+    public RestconfError(final ErrorType errorType, final ErrorTag errorTag, final String errorMessage,
+                         final String errorAppTag) {
+        this(errorType, errorTag, errorMessage, errorAppTag, null, null);
+    }
+
+    /**
+     * Constructs a RestConfError object.
+     *
+     * @param errorType
+     *            The enumerated type indicating the layer where the error occurred.
+     * @param errorTag
+     *            The enumerated tag representing a more specific error cause.
+     * @param errorMessage
+     *            A string which provides a plain text string describing the error.
+     * @param errorPath
+     *            An instance identifier which contains error path
+     */
+    public RestconfError(final ErrorType errorType, final ErrorTag errorTag, final String errorMessage,
+                         final YangInstanceIdentifier errorPath) {
+        this(errorType, errorTag, errorMessage, null, null, errorPath);
     }
 
     /**
@@ -144,8 +164,29 @@ public class RestconfError {
      * @param errorInfo
      *            A string, <b>formatted as XML</b>, which contains additional error information.
      */
-    public RestconfError(ErrorType errorType, ErrorTag errorTag, String errorMessage, String errorAppTag,
-            String errorInfo) {
+    public RestconfError(final ErrorType errorType, final ErrorTag errorTag, final String errorMessage,
+                         final String errorAppTag, final String errorInfo) {
+        this(errorType, errorTag, errorMessage, errorAppTag, errorInfo, null);
+    }
+
+    /**
+     * Constructs a RestConfError object.
+     *
+     * @param errorType
+     *            The enumerated type indicating the layer where the error occurred.
+     * @param errorTag
+     *            The enumerated tag representing a more specific error cause.
+     * @param errorMessage
+     *            A string which provides a plain text string describing the error.
+     * @param errorAppTag
+     *            A string which represents an application-specific error tag that further specifies the error cause.
+     * @param errorInfo
+     *            A string, <b>formatted as XML</b>, which contains additional error information.
+     * @param errorPath
+     *            An instance identifier which contains error path
+     */
+    public RestconfError(final ErrorType errorType, final ErrorTag errorTag, final String errorMessage,
+                         final String errorAppTag, final String errorInfo, final YangInstanceIdentifier errorPath) {
         Preconditions.checkNotNull(errorType, "Error type is required for RestConfError");
         Preconditions.checkNotNull(errorTag, "Error tag is required for RestConfError");
         this.errorType = errorType;
@@ -153,12 +194,13 @@ public class RestconfError {
         this.errorMessage = errorMessage;
         this.errorAppTag = errorAppTag;
         this.errorInfo = errorInfo;
+        this.errorPath = errorPath;
     }
 
     /**
      * Constructs a RestConfError object from an RpcError.
      */
-    public RestconfError(RpcError rpcError) {
+    public RestconfError(final RpcError rpcError) {
 
         this.errorType = rpcError.getErrorType() == null ? ErrorType.APPLICATION : ErrorType
                 .valueOfCaseInsensitive(rpcError.getErrorType().name());
@@ -181,6 +223,7 @@ public class RestconfError {
         }
 
         this.errorInfo = errorInfo;
+        this.errorPath = null;
     }
 
     public ErrorType getErrorType() {
@@ -203,12 +246,18 @@ public class RestconfError {
         return errorMessage;
     }
 
-    @Override
-    public String toString() {
-        return "error-type: " + errorType.getErrorTypeTag() + ", error-tag: " + errorTag.getTagValue() + ", "
-                + (errorAppTag != null ? "error-app-tag: " + errorAppTag + ", " : "")
-                + (errorMessage != null ? "error-message: " + errorMessage : "")
-                + (errorInfo != null ? "error-info: " + errorInfo + ", " : "") + "]";
+    public YangInstanceIdentifier getErrorPath() {
+        return errorPath;
     }
 
+    @Override
+    public String toString() {
+        return "RestconfError ["
+                + "error-type: " + errorType.getErrorTypeTag() + ", error-tag: " + errorTag.getTagValue()
+                + (errorAppTag != null ? ", error-app-tag: " + errorAppTag : "")
+                + (errorMessage != null ? ", error-message: " + errorMessage : "")
+                + (errorInfo != null ? ", error-info: " + errorInfo : "")
+                + (errorPath != null ? ", error-path: " + errorPath.toString() : "")
+                + "]";
+    }
 }

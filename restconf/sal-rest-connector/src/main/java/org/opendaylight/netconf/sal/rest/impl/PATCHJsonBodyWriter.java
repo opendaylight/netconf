@@ -22,32 +22,38 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import org.opendaylight.netconf.sal.rest.api.Draft02.MediaTypes;
+import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
+import org.opendaylight.restconf.Draft11;
+import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 
+
 @Provider
-@Produces({MediaTypes.PATCH_STATUS + RestconfService.JSON})
+@Produces({Draft02.MediaTypes.PATCH_STATUS + RestconfService.JSON,
+        Draft11.MediaTypes.PATCH_STATUS + RestconfConstants.JSON})
 public class PATCHJsonBodyWriter implements MessageBodyWriter<PATCHStatusContext> {
 
     @Override
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+    public boolean isWriteable(final Class<?> type, final Type genericType,
+                               final Annotation[] annotations, final MediaType mediaType) {
         return type.equals(PATCHStatusContext.class);
     }
 
     @Override
-    public long getSize(PATCHStatusContext patchStatusContext, Class<?> type, Type genericType, Annotation[]
-            annotations, MediaType mediaType) {
+    public long getSize(final PATCHStatusContext patchStatusContext, final Class<?> type, final Type genericType,
+                        final Annotation[] annotations, final MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(PATCHStatusContext patchStatusContext, Class<?> type, Type genericType, Annotation[]
-            annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
-                throws IOException, WebApplicationException {
+    public void writeTo(final PATCHStatusContext patchStatusContext, final Class<?> type, final Type genericType,
+                        final Annotation[] annotations, final MediaType mediaType,
+                        final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream)
+            throws IOException, WebApplicationException {
 
         final JsonWriter jsonWriter = createJsonWriter(entityStream);
         jsonWriter.beginObject().name("ietf-yang-patch:yang-patch-status");
@@ -64,7 +70,7 @@ public class PATCHJsonBodyWriter implements MessageBodyWriter<PATCHStatusContext
             jsonWriter.beginObject();
             jsonWriter.name("edit");
             jsonWriter.beginArray();
-            for (PATCHStatusEntity patchStatusEntity : patchStatusContext.getEditCollection()) {
+            for (final PATCHStatusEntity patchStatusEntity : patchStatusContext.getEditCollection()) {
                 jsonWriter.beginObject();
                 jsonWriter.name("edit-id").value(patchStatusEntity.getEditId());
                 if (patchStatusEntity.getEditErrors() != null) {
@@ -82,26 +88,33 @@ public class PATCHJsonBodyWriter implements MessageBodyWriter<PATCHStatusContext
         jsonWriter.endObject();
         jsonWriter.endObject();
         jsonWriter.flush();
-
     }
 
-    private void reportSuccess(JsonWriter jsonWriter) throws IOException {
+    private void reportSuccess(final JsonWriter jsonWriter) throws IOException {
         jsonWriter.name("ok").beginArray().nullValue().endArray();
     }
 
-    private static void reportErrors(List<RestconfError> errors, JsonWriter jsonWriter) throws IOException {
+    private static void reportErrors(final List<RestconfError> errors, final JsonWriter jsonWriter) throws IOException {
         jsonWriter.name("errors");
         jsonWriter.beginObject();
         jsonWriter.name("error");
         jsonWriter.beginArray();
 
-        for (RestconfError restconfError : errors) {
+        for (final RestconfError restconfError : errors) {
             jsonWriter.beginObject();
             jsonWriter.name("error-type").value(restconfError.getErrorType().getErrorTypeTag());
             jsonWriter.name("error-tag").value(restconfError.getErrorTag().getTagValue());
-            //TODO: fix error-path reporting (separate error-path from error-message)
-            //jsonWriter.name("error-path").value(restconfError.getErrorPath());
-            jsonWriter.name("error-message").value(restconfError.getErrorMessage());
+
+            // optional node
+            if (restconfError.getErrorPath() != null) {
+                jsonWriter.name("error-path").value(restconfError.getErrorPath().toString());
+            }
+
+            // optional node
+            if (restconfError.getErrorMessage() != null) {
+                jsonWriter.name("error-message").value(restconfError.getErrorMessage());
+            }
+
             jsonWriter.endObject();
         }
 
