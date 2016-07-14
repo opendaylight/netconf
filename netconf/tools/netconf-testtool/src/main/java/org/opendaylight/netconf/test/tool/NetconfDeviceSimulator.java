@@ -37,8 +37,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import org.apache.sshd.common.util.ThreadUtils;
-import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
+import org.apache.sshd.common.keyprovider.KeyPairProvider;
+import org.apache.sshd.common.util.SecurityUtils;
+import org.apache.sshd.common.util.threads.ThreadUtils;
 import org.opendaylight.controller.config.util.capability.BasicCapability;
 import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.controller.config.util.capability.YangModuleCapability;
@@ -183,7 +184,7 @@ public class NetconfDeviceSimulator implements Closeable {
         final List<Integer> openDevices = Lists.newArrayList();
 
         // Generate key to temp folder
-        final PEMGeneratorHostKeyProvider keyPairProvider = getPemGeneratorHostKeyProvider();
+        final KeyPairProvider keyPairProvider = getPemGeneratorHostKeyProvider();
 
         for (int i = 0; i < params.deviceCount; i++) {
             if (currentPort > 65535) {
@@ -259,7 +260,8 @@ public class NetconfDeviceSimulator implements Closeable {
         return openDevices;
     }
 
-    private SshProxyServerConfiguration getSshConfiguration(final InetSocketAddress bindingAddress, final LocalAddress tcpLocalAddress, final PEMGeneratorHostKeyProvider keyPairProvider) throws IOException {
+    private static SshProxyServerConfiguration getSshConfiguration(final InetSocketAddress bindingAddress,
+            final LocalAddress tcpLocalAddress, final KeyPairProvider keyPairProvider) {
         return new SshProxyServerConfigurationBuilder()
                 .setBindingAddress(bindingAddress)
                 .setLocalAddress(tcpLocalAddress)
@@ -274,13 +276,13 @@ public class NetconfDeviceSimulator implements Closeable {
                 .createSshProxyServerConfiguration();
     }
 
-    private PEMGeneratorHostKeyProvider getPemGeneratorHostKeyProvider() {
+    private static KeyPairProvider getPemGeneratorHostKeyProvider() {
         try {
             final Path tempFile = Files.createTempFile("tempKeyNetconfTest", "suffix");
-            return new PEMGeneratorHostKeyProvider(tempFile.toAbsolutePath().toString());
+            return SecurityUtils.createGeneratorHostKeyProvider(tempFile.toAbsolutePath());
         } catch (final IOException e) {
             LOG.error("Unable to generate PEM key", e);
-            throw new RuntimeException(e);
+            throw new RuntimeException("Unable to generate PEM key", e);
         }
     }
 
@@ -331,7 +333,8 @@ public class NetconfDeviceSimulator implements Closeable {
         return capabilities;
     }
 
-    private void addModuleCapability(final SharedSchemaRepository consumer, final Set<Capability> capabilities, final Module module) {
+    private static void addModuleCapability(final SharedSchemaRepository consumer, final Set<Capability> capabilities,
+            final Module module) {
         final SourceIdentifier moduleSourceIdentifier = SourceIdentifier.create(module.getName(),
                 (SimpleDateFormatUtil.DEFAULT_DATE_REV == module.getRevision() ? Optional.<String>absent() :
                         Optional.of(module.getQNameModule().getFormattedRevision())));
@@ -345,7 +348,7 @@ public class NetconfDeviceSimulator implements Closeable {
         }
     }
 
-    private void addDefaultSchemas(final SharedSchemaRepository consumer) {
+    private static void addDefaultSchemas(final SharedSchemaRepository consumer) {
         SourceIdentifier sId = RevisionSourceIdentifier.create("ietf-netconf-monitoring", "2010-10-04");
         registerSource(consumer, "/META-INF/yang/ietf-netconf-monitoring.yang", sId);
 
@@ -359,7 +362,8 @@ public class NetconfDeviceSimulator implements Closeable {
         registerSource(consumer, "/META-INF/yang/ietf-inet-types@2013-07-15.yang", sId);
     }
 
-    private void registerSource(final SharedSchemaRepository consumer, final String resource, final SourceIdentifier sourceId) {
+    private static void registerSource(final SharedSchemaRepository consumer, final String resource,
+            final SourceIdentifier sourceId) {
         consumer.registerSchemaSource(new SchemaSourceProvider<SchemaSourceRepresentation>() {
             @Override
             public CheckedFuture<? extends SchemaSourceRepresentation, SchemaSourceException> getSource(final SourceIdentifier sourceIdentifier) {
@@ -389,7 +393,11 @@ public class NetconfDeviceSimulator implements Closeable {
     @Override
     public void close() {
         for (final SshProxyServer sshWrapper : sshWrappers) {
-            sshWrapper.close();
+            try {
+                sshWrapper.close();
+            } catch (IOException e) {
+                LOG.error("Failed to close wrapper {}", sshWrapper, e);
+            }
         }
         for (final Channel deviceCh : devicesChannels) {
             deviceCh.close();

@@ -21,16 +21,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import org.apache.sshd.ClientSession;
-import org.apache.sshd.SshClient;
+import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.ConnectFuture;
-import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
+import org.apache.sshd.client.session.ClientSession;
+import org.apache.sshd.common.util.security.SecurityUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
 import org.opendaylight.netconf.util.osgi.NetconfConfiguration;
@@ -72,13 +71,11 @@ public class SSHServerTest {
 
         final InetSocketAddress addr = InetSocketAddress.createUnresolved(HOST, PORT);
         server = new SshProxyServer(minaTimerEx, clientGroup, nioExec);
-        server.bind(
-                new SshProxyServerConfigurationBuilder().setBindingAddress(addr).setLocalAddress(NetconfConfiguration.NETCONF_LOCAL_ADDRESS).setAuthenticator(new AuthProvider() {
-                    @Override
-                    public boolean authenticated(final String username, final String password) {
-                        return true;
-                    }
-                }).setKeyPairProvider(new PEMGeneratorHostKeyProvider(sshKeyPair.toPath().toAbsolutePath().toString())).setIdleTimeout(Integer.MAX_VALUE).createSshProxyServerConfiguration());
+        server.bind(new SshProxyServerConfigurationBuilder().setBindingAddress(addr)
+                .setLocalAddress(NetconfConfiguration.NETCONF_LOCAL_ADDRESS)
+                .setAuthenticator((username, password) -> true)
+                .setKeyPairProvider(SecurityUtils.createGeneratorHostKeyProvider(sshKeyPair.toPath()))
+                .setIdleTimeout(Integer.MAX_VALUE).createSshProxyServerConfiguration());
         LOG.info("SSH server started on {}", PORT);
     }
 

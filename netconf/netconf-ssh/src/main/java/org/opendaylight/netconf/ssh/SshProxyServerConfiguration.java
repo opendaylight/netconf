@@ -11,7 +11,7 @@ package org.opendaylight.netconf.ssh;
 import com.google.common.base.Preconditions;
 import io.netty.channel.local.LocalAddress;
 import java.net.InetSocketAddress;
-import org.apache.sshd.common.KeyPairProvider;
+import org.apache.sshd.common.keyprovider.KeyPairProvider;
 import org.opendaylight.netconf.auth.AuthProvider;
 
 public final class SshProxyServerConfiguration {

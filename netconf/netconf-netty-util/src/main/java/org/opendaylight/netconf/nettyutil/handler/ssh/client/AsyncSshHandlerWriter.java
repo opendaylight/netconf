@@ -20,7 +20,8 @@ import org.apache.sshd.common.future.SshFutureListener;
 import org.apache.sshd.common.io.IoOutputStream;
 import org.apache.sshd.common.io.IoWriteFuture;
 import org.apache.sshd.common.io.WritePendingException;
-import org.apache.sshd.common.util.Buffer;
+import org.apache.sshd.common.util.buffer.Buffer;
+import org.apache.sshd.common.util.buffer.ByteArrayBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,11 +173,14 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
     }
 
     private static Buffer toBuffer(final ByteBuf msg) {
-        // TODO Buffer vs ByteBuf translate, Can we handle that better ?
+        // FIXME: Translation from ByteBuf to Buffer. Buffer is an abstract class, so based on the assumptions
+        //        we can make about the contents of ByteBuf, we should be able to skip copying byte arrays around
+        //        by creating an appropriate subclass.
+
         msg.resetReaderIndex();
         final byte[] temp = new byte[msg.readableBytes()];
         msg.readBytes(temp, 0, msg.readableBytes());
-        return new Buffer(temp);
+        return new ByteArrayBuffer(temp);
     }
 
     private static final class PendingWriteRequest {

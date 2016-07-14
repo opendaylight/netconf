@@ -16,7 +16,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.Executors;
-import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
+import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.opendaylight.netconf.api.NetconfServerDispatcher;
 import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -49,7 +49,7 @@ public class NetconfNorthboundSshServer {
         sshProxyServerConfigurationBuilder.setLocalAddress(localAddress);
         sshProxyServerConfigurationBuilder.setAuthenticator(authProvider);
         sshProxyServerConfigurationBuilder.setIdleTimeout(Integer.MAX_VALUE);
-        sshProxyServerConfigurationBuilder.setKeyPairProvider(new PEMGeneratorHostKeyProvider());
+        sshProxyServerConfigurationBuilder.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
 
         localServer.addListener(future -> {
             if (future.isDone() && !future.isCancelled()) {
@@ -66,17 +66,18 @@ public class NetconfNorthboundSshServer {
         });
     }
 
-    private InetSocketAddress getInetAddress(final String bindingAddress, final String portNumber) {
+    private static InetSocketAddress getInetAddress(final String bindingAddress, final String portNumber) {
         try {
             IpAddress ipAddress= IpAddressBuilder.getDefaultInstance(bindingAddress);
-            final InetAddress inetAd = InetAddress.getByName(ipAddress.getIpv4Address() == null ? ipAddress.getIpv6Address().getValue() : ipAddress.getIpv4Address().getValue());
-            return new InetSocketAddress(inetAd, Integer.valueOf(portNumber));
+            final InetAddress inetAd = InetAddress.getByName(ipAddress.getIpv4Address() == null
+                    ? ipAddress.getIpv6Address().getValue() : ipAddress.getIpv4Address().getValue());
+            return new InetSocketAddress(inetAd, Integer.parseInt(portNumber));
         } catch (final UnknownHostException e) {
             throw new IllegalArgumentException("Unable to bind netconf endpoint to address " + bindingAddress, e);
         }
     }
 
-    public void close() {
+    public void close() throws IOException {
         sshProxyServer.close();
 
         if (localServer.isDone()) {

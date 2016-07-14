@@ -26,11 +26,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
+import org.apache.sshd.common.util.security.SecurityUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.netty.EchoClientHandler.State;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler;
@@ -74,12 +73,10 @@ public class SSHTest {
         final InetSocketAddress addr = new InetSocketAddress("127.0.0.1", 10831);
         final SshProxyServer sshProxyServer = new SshProxyServer(minaTimerEx, nettyGroup, nioExec);
         sshProxyServer.bind(
-                new SshProxyServerConfigurationBuilder().setBindingAddress(addr).setLocalAddress(NetconfConfiguration.NETCONF_LOCAL_ADDRESS).setAuthenticator(new AuthProvider() {
-                    @Override
-                    public boolean authenticated(final String username, final String password) {
-                        return true;
-                    }
-                }).setKeyPairProvider(new PEMGeneratorHostKeyProvider(sshKeyPair.toPath().toAbsolutePath().toString())).setIdleTimeout(Integer.MAX_VALUE).createSshProxyServerConfiguration());
+                new SshProxyServerConfigurationBuilder().setBindingAddress(addr).setLocalAddress(NetconfConfiguration.NETCONF_LOCAL_ADDRESS).setAuthenticator((username, password) -> true)
+            .setKeyPairProvider(SecurityUtils.createGeneratorHostKeyProvider(sshKeyPair.toPath()))
+            .setIdleTimeout(Integer.MAX_VALUE)
+            .createSshProxyServerConfiguration());
 
         final EchoClientHandler echoClientHandler = connectClient(addr);
 

@@ -12,20 +12,16 @@ import com.google.common.collect.ImmutableList;
 import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
 import java.nio.channels.AsynchronousChannelGroup;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import org.apache.sshd.SshServer;
-import org.apache.sshd.common.Cipher;
 import org.apache.sshd.common.FactoryManager;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.RuntimeSshException;
-import org.apache.sshd.common.cipher.ARCFOUR128;
-import org.apache.sshd.common.cipher.ARCFOUR256;
+import org.apache.sshd.common.cipher.BuiltinCiphers;
+import org.apache.sshd.common.cipher.Cipher;
 import org.apache.sshd.common.io.IoAcceptor;
 import org.apache.sshd.common.io.IoConnector;
 import org.apache.sshd.common.io.IoHandler;
@@ -34,9 +30,10 @@ import org.apache.sshd.common.io.IoServiceFactoryFactory;
 import org.apache.sshd.common.io.nio2.Nio2Acceptor;
 import org.apache.sshd.common.io.nio2.Nio2Connector;
 import org.apache.sshd.common.io.nio2.Nio2ServiceFactoryFactory;
-import org.apache.sshd.common.util.CloseableUtils;
-import org.apache.sshd.server.PasswordAuthenticator;
+import org.apache.sshd.common.util.closeable.AbstractCloseable;
 import org.apache.sshd.server.ServerFactoryManager;
+import org.apache.sshd.server.SshServer;
+import org.apache.sshd.server.auth.password.PasswordAuthenticator;
 import org.apache.sshd.server.session.ServerSession;
 
 /**
@@ -45,8 +42,6 @@ import org.apache.sshd.server.session.ServerSession;
  */
 public class SshProxyServer implements AutoCloseable {
 
-    private static final ARCFOUR128.Factory DEFAULT_ARCFOUR128_FACTORY = new ARCFOUR128.Factory();
-    private static final ARCFOUR256.Factory DEFAULT_ARCFOUR256_FACTORY = new ARCFOUR256.Factory();
     private final SshServer sshServer;
     private final ScheduledExecutorService minaTimerExecutor;
     private final EventLoopGroup clientGroup;
@@ -67,8 +62,8 @@ public class SshProxyServer implements AutoCloseable {
         final List<NamedFactory<Cipher>> cipherFactories = sshServer.getCipherFactories();
         for (Iterator<NamedFactory<Cipher>> i = cipherFactories.iterator(); i.hasNext(); ) {
             final NamedFactory<Cipher> factory = i.next();
-            if (factory.getName().contains(DEFAULT_ARCFOUR128_FACTORY.getName())
-                    || factory.getName().contains(DEFAULT_ARCFOUR256_FACTORY.getName())) {
+            if (factory.getName().contains(BuiltinCiphers.arcfour128.getName())
+                    || factory.getName().contains(BuiltinCiphers.arcfour256.getName())) {
                 i.remove();
             }
         }
@@ -83,7 +78,10 @@ public class SshProxyServer implements AutoCloseable {
 
         sshServer.setIoServiceFactoryFactory(nioServiceWithPoolFactoryFactory);
         sshServer.setScheduledExecutorService(minaTimerExecutor);
-        sshServer.setProperties(getProperties(sshProxyServerConfiguration));
+        sshServer.getProperties().put(ServerFactoryManager.IDLE_TIMEOUT,
+            String.valueOf(sshProxyServerConfiguration.getIdleTimeout()));
+        sshServer.getProperties().put(ServerFactoryManager.AUTH_TIMEOUT,
+            String.valueOf(sshProxyServerConfiguration.getIdleTimeout()));
 
         final RemoteNetconfCommand.NetconfCommandFactory netconfCommandFactory =
                 new RemoteNetconfCommand.NetconfCommandFactory(clientGroup, sshProxyServerConfiguration.getLocalAddress());
@@ -91,21 +89,10 @@ public class SshProxyServer implements AutoCloseable {
         sshServer.start();
     }
 
-    private static Map<String, String> getProperties(final SshProxyServerConfiguration sshProxyServerConfiguration) {
-        final Map<String, String> ret = new HashMap<>();
-        ret.put(ServerFactoryManager.IDLE_TIMEOUT, String.valueOf(sshProxyServerConfiguration.getIdleTimeout()));
-        // TODO make auth timeout configurable on its own
-        ret.put(ServerFactoryManager.AUTH_TIMEOUT, String.valueOf(sshProxyServerConfiguration.getIdleTimeout()));
-
-        return ret;
-    }
-
     @Override
-    public void close() {
+    public void close() throws IOException {
         try {
             sshServer.stop(true);
-        } catch (final InterruptedException e) {
-            throw new RuntimeException("Interrupted while stopping sshServer", e);
         } finally {
             sshServer.close(true);
         }
@@ -114,7 +101,7 @@ public class SshProxyServer implements AutoCloseable {
     /**
      * Based on Nio2ServiceFactory with one addition: injectable executor
      */
-    private static final class NioServiceWithPoolFactory extends CloseableUtils.AbstractCloseable implements IoServiceFactory {
+    private static final class NioServiceWithPoolFactory extends AbstractCloseable implements IoServiceFactory {
 
         private final FactoryManager manager;
         private final AsynchronousChannelGroup group;
