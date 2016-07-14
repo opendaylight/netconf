@@ -140,7 +140,7 @@ public interface RestconfDataService {
      */
     @PATCH
     @Path("/data")
-    @Consumes({ Draft11.MediaTypes.PATCH + RestconfConstants.JSON, Draft11.MediaTypes.PATCH + RestconfConstants.XML })
+    @Consumes({ Draft11.MediaTypes.PATCH + RestconfConstants.JSON, Draft11.MediaTypes.PATCH + RestconfConstants.XML }) // FIXME
     @Produces({ Draft11.MediaTypes.PATCH_STATUS + RestconfConstants.JSON,
             Draft11.MediaTypes.PATCH_STATUS + RestconfConstants.XML })
     PATCHStatusContext patchData(PATCHContext context, @Context UriInfo uriInfo);
