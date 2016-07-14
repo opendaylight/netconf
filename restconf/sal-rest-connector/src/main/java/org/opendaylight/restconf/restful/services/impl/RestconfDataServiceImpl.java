@@ -24,11 +24,7 @@ import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
-import org.opendaylight.restconf.restful.utils.DeleteDataTransactionUtil;
-import org.opendaylight.restconf.restful.utils.PostDataTransactionUtil;
-import org.opendaylight.restconf.restful.utils.PutDataTransactionUtil;
-import org.opendaylight.restconf.restful.utils.ReadDataTransactionUtil;
-import org.opendaylight.restconf.restful.utils.RestconfDataServiceConstant;
+import org.opendaylight.restconf.restful.utils.*;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -146,22 +142,36 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public PATCHStatusContext patchData(final String identifier, final PATCHContext context, final UriInfo uriInfo) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        Preconditions.checkNotNull(identifier);
+        return patchData(context, uriInfo);
     }
 
     @Override
     public PATCHStatusContext patchData(final PATCHContext context, final UriInfo uriInfo) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        Preconditions.checkNotNull(context);
+        final DOMMountPoint mountPoint = context.getInstanceIdentifierContext().getMountPoint();
+
+        DOMDataReadWriteTransaction transaction;
+        SchemaContextRef ref;
+        if (mountPoint == null) {
+            transaction = this.transactionChainHandler.get().newReadWriteTransaction();
+            ref = new SchemaContextRef(this.schemaContextHandler.get());
+        } else {
+            transaction = transactionOfMountPoint(mountPoint);
+            ref = new SchemaContextRef(mountPoint.getSchemaContext());
+        }
+
+        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
+                context.getInstanceIdentifierContext(), mountPoint, transaction);
+
+        return PatchDataTransactionUtil.patchData(context, transactionNode, ref);
     }
 
     /**
      * Prepare transaction to read data of mount point, if these data are
      * present.
      * @param mountPoint
-     *
-     * @param transactionNode
-     *            - {@link TransactionVarsWrapper} - wrapper for variables
-     * @return {@link NormalizedNode}
+     * @return {@link DOMDataReadWriteTransaction}
      */
     private static DOMDataReadWriteTransaction transactionOfMountPoint(final DOMMountPoint mountPoint) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
