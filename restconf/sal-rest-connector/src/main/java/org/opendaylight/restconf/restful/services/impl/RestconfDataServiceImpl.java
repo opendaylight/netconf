@@ -24,11 +24,7 @@ import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
-import org.opendaylight.restconf.restful.utils.DeleteDataTransactionUtil;
-import org.opendaylight.restconf.restful.utils.PostDataTransactionUtil;
-import org.opendaylight.restconf.restful.utils.PutDataTransactionUtil;
-import org.opendaylight.restconf.restful.utils.ReadDataTransactionUtil;
-import org.opendaylight.restconf.restful.utils.RestconfDataServiceConstant;
+import org.opendaylight.restconf.restful.utils.*;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -146,12 +142,27 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public PATCHStatusContext patchData(final String identifier, final PATCHContext context, final UriInfo uriInfo) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        Preconditions.checkNotNull(identifier);
+        return patchData(context, uriInfo);
     }
 
     @Override
     public PATCHStatusContext patchData(final PATCHContext context, final UriInfo uriInfo) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        Preconditions.checkNotNull(context);
+
+        final DOMMountPoint mountPoint = context.getInstanceIdentifierContext().getMountPoint();
+
+        DOMDataReadWriteTransaction transaction;
+        if (mountPoint == null) {
+            transaction = this.transactionChainHandler.get().newReadWriteTransaction();
+        } else {
+            transaction = transactionOfMountPoint(mountPoint);
+        }
+
+        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
+                context.getInstanceIdentifierContext(), mountPoint, transaction);
+
+        return PatchDataTransactionUtil.patchData(context, transactionNode);
     }
 
     /**
