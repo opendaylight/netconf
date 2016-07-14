@@ -23,7 +23,7 @@
     <netconf.version>1.1.0-SNAPSHOT</netconf.version>
     <protocol-framework.version>0.8.0-SNAPSHOT</protocol-framework.version>
     <yangtools.version>1.0.0-SNAPSHOT</yangtools.version>
-    <sshd-core.version>0.14.0</sshd-core.version>
+    <sshd-core.version>1.2.0</sshd-core.version>
 
     <config.configfile.directory>etc/opendaylight/karaf</config.configfile.directory>
     <config.netconf.client.configfile>01-netconf.xml</config.netconf.client.configfile>
