@@ -5,6 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
+
 package org.opendaylight.netconf.sal.rest.impl;
 
 import java.io.IOException;
@@ -22,14 +23,17 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import org.opendaylight.netconf.sal.rest.api.Draft02.MediaTypes;
+import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
+import org.opendaylight.restconf.Draft11;
+import org.opendaylight.restconf.utils.RestconfConstants;
 
 @Provider
-@Produces({ MediaTypes.PATCH_STATUS + RestconfService.XML})
+@Produces({Draft02.MediaTypes.PATCH_STATUS + RestconfService.XML,
+        Draft11.MediaTypes.PATCH_STATUS + RestconfConstants.XML})
 public class PATCHXmlBodyWriter implements MessageBodyWriter<PATCHStatusContext> {
 
     private static final XMLOutputFactory XML_FACTORY;
@@ -40,33 +44,35 @@ public class PATCHXmlBodyWriter implements MessageBodyWriter<PATCHStatusContext>
     }
 
     @Override
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+    public boolean isWriteable(final Class<?> type, final Type genericType,
+                               final Annotation[] annotations, final MediaType mediaType) {
         return type.equals(PATCHStatusContext.class);
     }
 
     @Override
-    public long getSize(PATCHStatusContext patchStatusContext, Class<?> type, Type genericType, Annotation[]
-            annotations, MediaType mediaType) {
+    public long getSize(final PATCHStatusContext patchStatusContext, Class<?> type, final Type genericType,
+                        final Annotation[] annotations, final MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(PATCHStatusContext patchStatusContext, Class<?> type, Type genericType, Annotation[]
-            annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
-                throws IOException, WebApplicationException {
+    public void writeTo(final PATCHStatusContext patchStatusContext, final Class<?> type, final Type genericType,
+                        final Annotation[] annotations, final MediaType mediaType,
+                        final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream)
+            throws IOException, WebApplicationException {
 
         try {
-            XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream);
+            final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream);
             writeDocument(xmlWriter, patchStatusContext);
         } catch (final XMLStreamException e) {
             throw new IllegalStateException(e);
         } catch (final FactoryConfigurationError e) {
             throw new IllegalStateException(e);
         }
-
     }
 
-    private static void writeDocument(XMLStreamWriter writer, PATCHStatusContext context) throws XMLStreamException, IOException {
+    private static void writeDocument(final XMLStreamWriter writer, final PATCHStatusContext context)
+            throws XMLStreamException, IOException {
         writer.writeStartElement("", "yang-patch-status", "urn:ietf:params:xml:ns:yang:ietf-yang-patch");
         writer.writeStartElement("patch-id");
         writer.writeCharacters(context.getPatchId());
@@ -79,7 +85,7 @@ public class PATCHXmlBodyWriter implements MessageBodyWriter<PATCHStatusContext>
                 reportErrors(context.getGlobalErrors(), writer);
             }
             writer.writeStartElement("edit-status");
-            for (PATCHStatusEntity patchStatusEntity : context.getEditCollection()) {
+            for (final PATCHStatusEntity patchStatusEntity : context.getEditCollection()) {
                 writer.writeStartElement("edit");
                 writer.writeStartElement("edit-id");
                 writer.writeCharacters(patchStatusEntity.getEditId());
@@ -101,23 +107,32 @@ public class PATCHXmlBodyWriter implements MessageBodyWriter<PATCHStatusContext>
         writer.flush();
     }
 
-    private static void reportErrors(List<RestconfError> errors, XMLStreamWriter writer) throws IOException, XMLStreamException {
+    private static void reportErrors(final List<RestconfError> errors, final XMLStreamWriter writer)
+            throws IOException, XMLStreamException {
         writer.writeStartElement("errors");
 
-        for (RestconfError restconfError : errors) {
+        for (final RestconfError restconfError : errors) {
             writer.writeStartElement("error-type");
             writer.writeCharacters(restconfError.getErrorType().getErrorTypeTag());
             writer.writeEndElement();
+
             writer.writeStartElement("error-tag");
             writer.writeCharacters(restconfError.getErrorTag().getTagValue());
             writer.writeEndElement();
-            //TODO: fix error-path reporting (separate error-path from error-message)
-//            writer.writeStartElement("error-path");
-//            writer.writeCharacters(restconfError.getErrorPath());
-//            writer.writeEndElement();
-            writer.writeStartElement("error-message");
-            writer.writeCharacters(restconfError.getErrorMessage());
-            writer.writeEndElement();
+
+            // optional node
+            if (restconfError.getErrorPath() != null) {
+                writer.writeStartElement("error-path");
+                writer.writeCharacters(restconfError.getErrorPath().toString());
+                writer.writeEndElement();
+            }
+
+            // optional node
+            if (restconfError.getErrorMessage() != null) {
+                writer.writeStartElement("error-message");
+                writer.writeCharacters(restconfError.getErrorMessage());
+                writer.writeEndElement();
+            }
         }
 
         writer.writeEndElement();
