@@ -187,7 +187,7 @@ public abstract class AbstractNetconfConfigTest extends AbstractConfigTest {
         final List<String> paths = Arrays.asList("/META-INF/yang/config.yang", "/META-INF/yang/rpc-context.yang",
                 "/META-INF/yang/config-test.yang", "/META-INF/yang/config-test-impl.yang",
                 "/META-INF/yang/test-types.yang", "/META-INF/yang/test-groups.yang",
-                "/META-INF/yang/ietf-inet-types.yang");
+                "/META-INF/yang/ietf-inet-types@2013-07-15.yang");
 
         final Collection<InputStream> yangDependencies = new ArrayList<>();
         final List<String> failedToFind = new ArrayList<>();
