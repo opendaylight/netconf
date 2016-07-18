@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.sal.rest.doc.swagger;
 
 import java.util.List;
-
 import org.json.JSONObject;
 
 /**
