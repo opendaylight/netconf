@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.nettyutil.handler;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -19,6 +18,7 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import org.opendaylight.controller.config.util.xml.XmlUtil;

@@ -11,7 +11,6 @@ package org.opendaylight.netconf.test.tool;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import ch.qos.logback.classic.Level;
-import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
@@ -26,6 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -156,7 +156,7 @@ public final class Main {
 
             try (InputStream stream = Main.class.getResourceAsStream(NETCONF_CONNECTOR_XML)) {
                 checkNotNull(stream, "Cannot load %s", NETCONF_CONNECTOR_XML);
-                String configBlueprint = CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8));
+                String configBlueprint = CharStreams.toString(new InputStreamReader(stream, StandardCharsets.UTF_8));
 
                 final String before = configBlueprint.substring(0, configBlueprint.indexOf("<module>"));
                 final String middleBlueprint = configBlueprint.substring(configBlueprint.indexOf("<module>"), configBlueprint.indexOf("</module>"));
@@ -185,7 +185,7 @@ public final class Main {
                             b.append(after);
                             final File to = new File(configDir, String.format(SIM_DEVICE_CFG_PREFIX + "%d-%d.xml", batchStart, openDevice));
                             generatedConfigs.add(to);
-                            Files.write(b.toString(), to, Charsets.UTF_8);
+                            Files.write(b.toString(), to, StandardCharsets.UTF_8);
                             connectorCount = 0;
                             b = new StringBuilder();
                             b.append(before);
@@ -199,7 +199,7 @@ public final class Main {
                     b.append(after);
                     final File to = new File(configDir, String.format(SIM_DEVICE_CFG_PREFIX + "%d-%d.xml", batchStart, openDevices.get(openDevices.size() - 1)));
                     generatedConfigs.add(to);
-                    Files.write(b.toString(), to, Charsets.UTF_8);
+                    Files.write(b.toString(), to, StandardCharsets.UTF_8);
                 }
 
                 LOG.info("Config files generated in {}", configDir);

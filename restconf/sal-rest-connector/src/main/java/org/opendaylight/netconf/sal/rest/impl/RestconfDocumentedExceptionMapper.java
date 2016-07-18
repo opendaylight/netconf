@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.sal.rest.impl;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
@@ -17,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
 import javax.ws.rs.core.Context;
@@ -213,7 +213,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         final DataSchemaNode schema = (DataSchemaNode) context.getSchemaNode();
 
         SchemaPath path = context.getSchemaNode().getPath();
-        final OutputStreamWriter outputWriter = new OutputStreamWriter(outStream, Charsets.UTF_8);
+        final OutputStreamWriter outputWriter = new OutputStreamWriter(outStream, StandardCharsets.UTF_8);
         if (data == null) {
             throw new RestconfDocumentedException(Response.Status.NOT_FOUND);
         }

@@ -10,7 +10,6 @@ package org.opendaylight.netconf.test.tool;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
@@ -18,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -291,9 +291,9 @@ public class TesttoolParameters {
         final String editContentString;
         try {
             if (stream == null) {
-                editContentString = Files.toString(editContent, Charsets.UTF_8);
+                editContentString = Files.toString(editContent, StandardCharsets.UTF_8);
             } else {
-                editContentString = CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8));
+                editContentString = CharStreams.toString(new InputStreamReader(stream, StandardCharsets.UTF_8));
             }
         } catch (final IOException e) {
             throw new IllegalArgumentException("Cannot read content of " + editContent);

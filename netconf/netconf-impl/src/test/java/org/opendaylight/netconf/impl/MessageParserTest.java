@@ -15,11 +15,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.base.Charsets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Queue;
 import org.junit.Before;
 import org.junit.Test;
@@ -111,7 +111,7 @@ public class MessageParserTest {
 
     private static long getHeaderLength(byte[] bytes) {
         byte[] HEADER_START = new byte[] { (byte) 0x0a, (byte) 0x23 };
-        return Long.parseLong(Charsets.US_ASCII.decode(
+        return Long.parseLong(StandardCharsets.US_ASCII.decode(
                 ByteBuffer.wrap(bytes, HEADER_START.length, bytes.length - HEADER_START.length - 1)).toString());
     }
 }

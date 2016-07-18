@@ -11,11 +11,11 @@ package org.opendaylight.netconf.nettyutil.handler;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.base.Charsets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -55,7 +55,7 @@ public class ChunkedFramingMechanismEncoderTest {
 
         byte[] buf = new byte[destination.readableBytes()];
         destination.readBytes(buf);
-        String s = Charsets.US_ASCII.decode(ByteBuffer.wrap(buf)).toString();
+        String s = StandardCharsets.US_ASCII.decode(ByteBuffer.wrap(buf)).toString();
 
         assertTrue(s.startsWith("\n#256\na"));
         assertTrue(s.endsWith("\n#20\naaaaaaaaaaaaaaaaaaaa\n##\n"));
