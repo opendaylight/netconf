@@ -314,12 +314,12 @@ public class NetconfDeviceSimulator implements Closeable {
         return capabilities;
     }
 
-    private void addModuleCapability(SharedSchemaRepository consumer, Set<Capability> capabilities, Module module) {
+    private void addModuleCapability(final SharedSchemaRepository consumer, final Set<Capability> capabilities, final Module module) {
         final SourceIdentifier moduleSourceIdentifier = SourceIdentifier.create(module.getName(),
                 (SimpleDateFormatUtil.DEFAULT_DATE_REV == module.getRevision() ? Optional.<String>absent() :
                         Optional.of(SimpleDateFormatUtil.getRevisionFormat().format(module.getRevision()))));
         try {
-            String moduleContent = new String(consumer.getSchemaSource(moduleSourceIdentifier, YangTextSchemaSource.class)
+            final String moduleContent = new String(consumer.getSchemaSource(moduleSourceIdentifier, YangTextSchemaSource.class)
                     .checkedGet().read());
             capabilities.add(new YangModuleCapability(module, moduleContent));
             //IOException would be thrown in creating SchemaContext already
@@ -335,11 +335,11 @@ public class NetconfDeviceSimulator implements Closeable {
         sId = RevisionSourceIdentifier.create("ietf-netconf-monitoring-extension", "2013-12-10");
         registerSource(consumer, "/META-INF/yang/ietf-netconf-monitoring-extension.yang", sId);
 
-        sId = RevisionSourceIdentifier.create("ietf-yang-types", "2010-09-24");
-        registerSource(consumer, "/META-INF/yang/ietf-yang-types.yang", sId);
+        sId = RevisionSourceIdentifier.create("ietf-yang-types", "2013-07-15");
+        registerSource(consumer, "/META-INF/yang/ietf-yang-types@2013-07-15.yang", sId);
 
-        sId = RevisionSourceIdentifier.create("ietf-inet-types", "2010-09-24");
-        registerSource(consumer, "/META-INF/yang/ietf-inet-types.yang", sId);
+        sId = RevisionSourceIdentifier.create("ietf-inet-types", "2013-07-15");
+        registerSource(consumer, "/META-INF/yang/ietf-inet-types@2013-07-15.yang", sId);
     }
 
     private void registerSource(final SharedSchemaRepository consumer, final String resource, final SourceIdentifier sourceId) {
