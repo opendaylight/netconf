@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.sal.rest.impl;
 
-import com.google.common.base.Charsets;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -16,6 +15,7 @@ import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.charset.StandardCharsets;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -106,6 +106,6 @@ public class PATCHJsonBodyWriter implements MessageBodyWriter<PATCHStatusContext
     }
 
     private static JsonWriter createJsonWriter(final OutputStream entityStream) {
-        return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, Charsets.UTF_8));
+        return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8));
     }
 }

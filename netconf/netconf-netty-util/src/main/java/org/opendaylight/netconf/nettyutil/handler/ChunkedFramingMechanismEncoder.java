@@ -8,11 +8,11 @@
 
 package org.opendaylight.netconf.nettyutil.handler;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import java.util.charset.StandardCharsets;
 import org.opendaylight.netconf.util.messages.NetconfMessageConstants;
 
 public class ChunkedFramingMechanismEncoder extends MessageToByteEncoder<ByteBuf> {
@@ -41,7 +41,7 @@ public class ChunkedFramingMechanismEncoder extends MessageToByteEncoder<ByteBuf
             final int xfer = Math.min(chunkSize, msg.readableBytes());
 
             out.writeBytes(NetconfMessageConstants.START_OF_CHUNK);
-            out.writeBytes(String.valueOf(xfer).getBytes(Charsets.US_ASCII));
+            out.writeBytes(String.valueOf(xfer).getBytes(StandardCharsets.US_ASCII));
             out.writeByte('\n');
 
             out.writeBytes(msg, xfer);

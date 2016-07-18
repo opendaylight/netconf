@@ -9,11 +9,11 @@ package org.opendaylight.netconf.nettyutil.handler;
 
 import static org.junit.Assert.assertEquals;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.util.List;
+import java.util.charset.StandardCharsets;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -46,25 +46,25 @@ public class NetconfChunkAggregatorTest {
     @Test
     public void testMultipleChunks() throws Exception {
         final List<Object> output = Lists.newArrayList();
-        final ByteBuf input = Unpooled.copiedBuffer(CHUNKED_MESSAGE.getBytes(Charsets.UTF_8));
+        final ByteBuf input = Unpooled.copiedBuffer(CHUNKED_MESSAGE.getBytes(StandardCharsets.UTF_8));
         agr.decode(null, input, output);
 
         assertEquals(1, output.size());
         final ByteBuf chunk = (ByteBuf) output.get(0);
 
-        assertEquals(EXPECTED_MESSAGE, chunk.toString(Charsets.UTF_8));
+        assertEquals(EXPECTED_MESSAGE, chunk.toString(StandardCharsets.UTF_8));
     }
 
     @Test
     public void testOneChunks() throws Exception {
         final List<Object> output = Lists.newArrayList();
-        final ByteBuf input = Unpooled.copiedBuffer(CHUNKED_MESSAGE_ONE.getBytes(Charsets.UTF_8));
+        final ByteBuf input = Unpooled.copiedBuffer(CHUNKED_MESSAGE_ONE.getBytes(StandardCharsets.UTF_8));
         agr.decode(null, input, output);
 
         assertEquals(1, output.size());
         final ByteBuf chunk = (ByteBuf) output.get(0);
 
-        assertEquals(EXPECTED_MESSAGE, chunk.toString(Charsets.UTF_8));
+        assertEquals(EXPECTED_MESSAGE, chunk.toString(StandardCharsets.UTF_8));
     }
 
 

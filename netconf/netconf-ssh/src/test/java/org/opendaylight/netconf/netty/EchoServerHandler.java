@@ -8,12 +8,12 @@
 
 package org.opendaylight.netconf.netty;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import java.util.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,7 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf byteBuf = (ByteBuf) msg;
-        String message = byteBuf.toString(Charsets.UTF_8);
+        String message = byteBuf.toString(StandardCharsets.UTF_8);
         LOG.info("writing back '{}'", message);
         ctx.write(msg);
         fromLastNewLine += message;

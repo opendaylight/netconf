@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.netty;
 
-import com.google.common.base.Charsets;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -20,6 +19,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.local.LocalAddress;
 import io.netty.channel.local.LocalChannel;
+import java.util.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +95,7 @@ class ProxyClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         ByteBuf bb = (ByteBuf) msg;
-        LOG.info(">{}", bb.toString(Charsets.UTF_8));
+        LOG.info(">{}", bb.toString(StandardCharsets.UTF_8));
         remoteCtx.write(msg);
     }
 

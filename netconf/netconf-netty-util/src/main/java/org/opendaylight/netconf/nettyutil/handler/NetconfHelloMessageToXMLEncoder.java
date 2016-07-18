@@ -8,12 +8,12 @@
 package org.opendaylight.netconf.nettyutil.handler;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
+import java.util.charset.StandardCharsets;
 import javax.xml.transform.TransformerException;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
@@ -51,7 +51,7 @@ public final class NetconfHelloMessageToXMLEncoder extends NetconfMessageToXMLEn
 
         // If additional header present, serialize it along with netconf hello message
         if (headerOptional.isPresent()) {
-            out.writeBytes(headerOptional.get().toFormattedString().getBytes(Charsets.UTF_8));
+            out.writeBytes(headerOptional.get().toFormattedString().getBytes(StandardCharsets.UTF_8));
         }
 
         super.encode(ctx, msg, out);

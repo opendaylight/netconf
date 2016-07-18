@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.sal.rest.impl;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
@@ -16,6 +15,7 @@ import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.util.charset.StandardCharsets;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -150,10 +150,10 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
 
     private JsonWriter createJsonWriter(final OutputStream entityStream, final boolean prettyPrint) {
         if (prettyPrint) {
-            return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, Charsets.UTF_8),
+            return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8),
                     DEFAULT_INDENT_SPACES_NUM);
         } else {
-            return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, Charsets.UTF_8));
+            return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8));
         }
     }
 

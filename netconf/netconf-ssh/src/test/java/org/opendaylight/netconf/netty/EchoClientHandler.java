@@ -9,8 +9,8 @@
 package org.opendaylight.netconf.netty;
 
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.charset.StandardCharsets.UTF_8;
 
-import com.google.common.base.Charsets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
@@ -52,7 +52,7 @@ public class EchoClientHandler extends ChannelInboundHandlerAdapter implements C
     @Override
     public synchronized void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf bb = (ByteBuf) msg;
-        String string = bb.toString(Charsets.UTF_8);
+        String string = bb.toString(UTF_8);
         fromServer.append(string);
         LOG.info(">{}", string);
         bb.release();

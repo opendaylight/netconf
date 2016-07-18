@@ -15,7 +15,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.opendaylight.netconf.util.test.XmlUnitUtil.assertContainsElementWithText;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 import java.io.BufferedReader;
@@ -26,6 +25,7 @@ import java.net.Socket;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.charset.StandardCharsets;
 import org.junit.Test;
 import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
@@ -71,12 +71,12 @@ public class NetconfITMonitoringTest extends AbstractNetconfConfigTest {
         final String get = XmlFileLoader.fileToString(fileName);
 
         final Socket sock = new Socket(TCP_ADDRESS.getHostName(), TCP_ADDRESS.getPort());
-        sock.getOutputStream().write(hello.getBytes(Charsets.UTF_8));
+        sock.getOutputStream().write(hello.getBytes(StandardCharsets.UTF_8));
         final String separator = "]]>]]>";
 
-        sock.getOutputStream().write(separator.getBytes(Charsets.UTF_8));
-        sock.getOutputStream().write(get.getBytes(Charsets.UTF_8));
-        sock.getOutputStream().write(separator.getBytes(Charsets.UTF_8));
+        sock.getOutputStream().write(separator.getBytes(StandardCharsets.UTF_8));
+        sock.getOutputStream().write(get.getBytes(StandardCharsets.UTF_8));
+        sock.getOutputStream().write(separator.getBytes(StandardCharsets.UTF_8));
 
         final StringBuilder responseBuilder = new StringBuilder();
 
