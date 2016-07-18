@@ -8,11 +8,11 @@
 
 package org.opendaylight.netconf.util.test;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteSource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import javax.xml.parsers.ParserConfigurationException;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -54,7 +54,7 @@ public class XmlFileLoader {
                 public InputStream openStream() {
                     return resourceAsStream;
                 }
-            }.asCharSource(Charsets.UTF_8).read();
+            }.asCharSource(StandardCharsets.UTF_8).read();
 
         }
     }

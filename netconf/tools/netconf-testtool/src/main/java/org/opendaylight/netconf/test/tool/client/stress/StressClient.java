@@ -9,13 +9,13 @@
 package org.opendaylight.netconf.test.tool.client.stress;
 
 import ch.qos.logback.classic.Level;
-import com.google.common.base.Charsets;
 import com.google.common.base.Stopwatch;
 import com.google.common.io.Files;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timer;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -130,7 +130,7 @@ public final class StressClient {
 
         final String editContentString;
         try {
-            editContentString = Files.toString(params.editContent, Charsets.UTF_8);
+            editContentString = Files.toString(params.editContent, StandardCharsets.UTF_8);
         } catch (final IOException e) {
             throw new IllegalArgumentException("Cannot read content of " + params.editContent);
         }

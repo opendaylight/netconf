@@ -8,13 +8,13 @@
 
 package org.opendaylight.netconf.mdsal.connector;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.io.CharStreams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -103,7 +103,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
         String source;
         try {
             sourceStream = rootSchemaSourceProviderDependency.getSource(moduleSourceIdentifier).checkedGet().openStream();
-            source = CharStreams.toString(new InputStreamReader(sourceStream, Charsets.UTF_8));
+            source = CharStreams.toString(new InputStreamReader(sourceStream, StandardCharsets.UTF_8));
         } catch (IOException | SchemaSourceException e) {
             LOG.warn("Ignoring source for module {}. Unable to read content", moduleSourceIdentifier, e);
             source = null;
