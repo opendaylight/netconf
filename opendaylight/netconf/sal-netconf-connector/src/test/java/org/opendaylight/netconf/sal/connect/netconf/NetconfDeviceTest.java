@@ -10,6 +10,7 @@ package org.opendaylight.netconf.sal.connect.netconf;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyCollectionOf;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -51,6 +52,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPrefe
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.copy.config.input.Source;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -58,14 +60,12 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.ModuleImport;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.*;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.opendaylight.yangtools.yang.parser.impl.YangParserImpl;
+import org.opendaylight.yangtools.yang.parser.util.ASTSchemaSource;
 
 public class NetconfDeviceTest {
 
@@ -113,6 +113,7 @@ public class NetconfDeviceTest {
         final NetconfDeviceCommunicator listener = getListener();
 
         final SchemaContextFactory schemaFactory = getSchemaFactory();
+        final SchemaRepository schemaRepository = getSchemaRepository();
 
         // Make fallback attempt to fail due to empty resolved sources
         final SchemaResolutionException schemaResolutionException
@@ -123,7 +124,7 @@ public class NetconfDeviceTest {
                 .when(schemaFactory).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
 
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO
-                = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), schemaFactory, stateSchemasResolver);
+                = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), schemaRepository, schemaFactory, stateSchemasResolver);
         final NetconfDevice device = new NetconfDevice(schemaResourcesDTO, getId(), facade, getExecutor(),true);
         // Monitoring not supported
         final NetconfSessionPreferences sessionCaps = getSessionCaps(false, capList);
@@ -141,9 +142,11 @@ public class NetconfDeviceTest {
         final SchemaContext schema = getSchema();
 
         final SchemaContextFactory schemaFactory = getSchemaFactory();
+        final SchemaRepository schemaRepository = getSchemaRepository();
 
         // Make fallback attempt to fail due to empty resolved sources
         final MissingSchemaSourceException schemaResolutionException = new MissingSchemaSourceException("fail first", TEST_SID);
+        doReturn(Futures.immediateFailedCheckedFuture(schemaResolutionException)).when(schemaRepository).getSchemaSource(eq(TEST_SID), eq(ASTSchemaSource.class));
         doAnswer(new Answer<Object>() {
             @Override
             public Object answer(final InvocationOnMock invocation) throws Throwable {
@@ -154,6 +157,7 @@ public class NetconfDeviceTest {
                 }
             }
         }).when(schemaFactory).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
+
 
         final NetconfStateSchemas.NetconfStateSchemasResolver stateSchemasResolver = new NetconfStateSchemas.NetconfStateSchemasResolver() {
             @Override
@@ -167,7 +171,7 @@ public class NetconfDeviceTest {
         };
 
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO
-                = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), schemaFactory, stateSchemasResolver);
+                = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), schemaRepository, schemaFactory, stateSchemasResolver);
 
         final NetconfDevice device = new NetconfDevice(schemaResourcesDTO, getId(), facade, getExecutor(), true);
         // Monitoring supported
@@ -175,7 +179,7 @@ public class NetconfDeviceTest {
         device.onRemoteSessionUp(sessionCaps, listener);
 
         Mockito.verify(facade, Mockito.timeout(5000)).onDeviceConnected(any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class));
-        Mockito.verify(schemaFactory, times(2)).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
+        Mockito.verify(schemaFactory, times(1)).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
     }
 
     private SchemaSourceRegistry getSchemaRegistry() {
@@ -186,13 +190,20 @@ public class NetconfDeviceTest {
         return mock;
     }
 
+    private SchemaRepository getSchemaRepository() {
+        final SchemaRepository mock = mock(SchemaRepository.class);
+        final SchemaSourceRepresentation mockRep = mock(SchemaSourceRepresentation.class);
+        doReturn(Futures.immediateCheckedFuture(mockRep)).when(mock).getSchemaSource(any(SourceIdentifier.class), eq(ASTSchemaSource.class));
+        return mock;
+    }
+
     @Test
     public void testNotificationBeforeSchema() throws Exception {
         final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
 
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO
-                = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), getSchemaFactory(), stateSchemasResolver);
+                = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), getSchemaRepository(), getSchemaFactory(), stateSchemasResolver);
         final NetconfDevice device = new NetconfDevice(schemaResourcesDTO, getId(), facade, getExecutor(), true);
 
         device.onNotification(notification);
@@ -221,7 +232,7 @@ public class NetconfDeviceTest {
         final SchemaContextFactory schemaContextProviderFactory = getSchemaFactory();
 
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO
-                = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), schemaContextProviderFactory, stateSchemasResolver);
+                = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), getSchemaRepository(), schemaContextProviderFactory, stateSchemasResolver);
         final NetconfDevice device = new NetconfDevice(schemaResourcesDTO, getId(), facade, getExecutor(), true);
         final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
                 Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
