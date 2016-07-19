@@ -83,7 +83,7 @@ public class NetconfDeviceConnectionManager implements Closeable {
         repository.registerSchemaSourceListener(cache);
         repository.registerSchemaSourceListener(TextToASTTransformer.create(repository, repository));
 
-        device = new NetconfDevice(new SchemaResourcesDTO(repository, schemaContextFactory, new NetconfStateSchemasResolverImpl()),
+        device = new NetconfDevice(new SchemaResourcesDTO(repository, repository, schemaContextFactory, new NetconfStateSchemasResolverImpl()),
                 deviceId, handler, executor, true);
         listener = new NetconfDeviceCommunicator(deviceId, device);
         configBuilder.withSessionListener(listener);
