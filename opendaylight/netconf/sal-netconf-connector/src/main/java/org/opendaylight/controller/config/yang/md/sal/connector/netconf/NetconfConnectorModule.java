@@ -124,7 +124,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
     // directory cache/schema is used.
     static {
         schemaResourcesDTOs.put(DEFAULT_CACHE_DIRECTORY,
-                new NetconfDevice.SchemaResourcesDTO(DEFAULT_SCHEMA_REPOSITORY,
+                new NetconfDevice.SchemaResourcesDTO(DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY,
                         DEFAULT_SCHEMA_CONTEXT_FACTORY,
                         new NetconfStateSchemas.NetconfStateSchemasResolverImpl()));
         DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(DEFAULT_CACHE);
@@ -135,6 +135,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
     private BundleContext bundleContext;
     private Optional<NetconfSessionPreferences> userCapabilities;
     private SchemaSourceRegistry schemaRegistry = DEFAULT_SCHEMA_REPOSITORY;
+    private SchemaRepository schemaRepository = DEFAULT_SCHEMA_REPOSITORY;
     private SchemaContextFactory schemaContextFactory = DEFAULT_SCHEMA_CONTEXT_FACTORY;
 
     private Broker domRegistry;
@@ -247,7 +248,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         }
 
         if (schemaResourcesDTO == null) {
-            schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(schemaRegistry, schemaContextFactory,
+            schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(schemaRegistry, schemaRepository, schemaContextFactory,
                     new NetconfStateSchemas.NetconfStateSchemasResolverImpl());
         }
 
@@ -284,7 +285,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         final FilesystemSchemaSourceCache<YangTextSchemaSource> deviceCache =
                 createDeviceFilesystemCache(moduleSchemaCacheDirectory);
         repository.registerSchemaSourceListener(deviceCache);
-        return new NetconfDevice.SchemaResourcesDTO(repository, schemaContextFactory,
+        return new NetconfDevice.SchemaResourcesDTO(repository, repository, schemaContextFactory,
                 new NetconfStateSchemas.NetconfStateSchemasResolverImpl());
     }
 
