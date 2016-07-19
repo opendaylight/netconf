@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.sal.restconf.impl;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.io.ByteArrayInputStream;
@@ -15,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -45,7 +45,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
 
         LOG.debug("put: uriPath: {}, payload: {}", uriPath, payload);
 
-        InputStream entityStream = new ByteArrayInputStream(payload.getBytes(Charsets.UTF_8));
+        InputStream entityStream = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
         NormalizedNodeContext context = JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, false);
 
         LOG.debug("Parsed YangInstanceIdentifier: {}", context.getInstanceIdentifierContext().getInstanceIdentifier());
@@ -64,7 +64,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
 
         LOG.debug("post: uriPath: {}, payload: {}", uriPath, payload);
 
-        InputStream entityStream = new ByteArrayInputStream(payload.getBytes(Charsets.UTF_8));
+        InputStream entityStream = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
         NormalizedNodeContext context = JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, true);
 
         LOG.debug("Parsed YangInstanceIdentifier: {}", context.getInstanceIdentifierContext().getInstanceIdentifier());
@@ -127,7 +127,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         try {
             NormalizedNodeContext outputContext;
             if(actualInput != null) {
-                InputStream entityStream = new ByteArrayInputStream(actualInput.getBytes(Charsets.UTF_8));
+                InputStream entityStream = new ByteArrayInputStream(actualInput.getBytes(StandardCharsets.UTF_8));
                 NormalizedNodeContext inputContext = JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, true);
 
                 LOG.debug("Parsed YangInstanceIdentifier: {}", inputContext.getInstanceIdentifierContext()
@@ -158,7 +158,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writer.writeTo(readData, NormalizedNodeContext.class, null, EMPTY_ANNOTATIONS,
                 MediaType.APPLICATION_JSON_TYPE, null, outputStream );
-        return outputStream.toString(Charsets.UTF_8.name());
+        return outputStream.toString(StandardCharsets.UTF_8.name());
     }
 
     private boolean isDataMissing(Exception e) {

@@ -8,10 +8,10 @@
 
 package org.opendaylight.netconf.test.tool.client.http.perf;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Stopwatch;
 import com.google.common.io.Files;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -75,7 +75,7 @@ public class RestPerfClient {
 
         final String editContentString;
         try {
-            editContentString = Files.toString(parameters.editContent, Charsets.UTF_8);
+            editContentString = Files.toString(parameters.editContent, StandardCharsets.UTF_8);
         } catch (final IOException e) {
             throw new IllegalArgumentException("Cannot read content of " + parameters.editContent);
         }

@@ -11,7 +11,6 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
@@ -22,6 +21,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
@@ -191,7 +191,7 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
 
         @Override
         public InputStream openStream() throws IOException {
-            return new ByteArrayInputStream(schemaString.get().getBytes(Charsets.UTF_8));
+            return new ByteArrayInputStream(schemaString.get().getBytes(StandardCharsets.UTF_8));
         }
     }
 }

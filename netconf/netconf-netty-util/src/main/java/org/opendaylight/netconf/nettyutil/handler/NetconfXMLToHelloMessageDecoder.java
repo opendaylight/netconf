@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.nettyutil.handler;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -19,6 +18,7 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
@@ -161,7 +161,7 @@ public final class NetconfXMLToHelloMessageDecoder extends ByteToMessageDecoder 
 
     private static void logMessage(final byte[] bytes) {
         if (LOG.isDebugEnabled()) {
-            String s = Charsets.UTF_8.decode(ByteBuffer.wrap(bytes)).toString();
+            String s = StandardCharsets.UTF_8.decode(ByteBuffer.wrap(bytes)).toString();
             LOG.debug("Parsing message \n{}", s);
         }
     }
@@ -184,7 +184,7 @@ public final class NetconfXMLToHelloMessageDecoder extends ByteToMessageDecoder 
     }
 
     private static String additionalHeaderToString(final byte[] bytes) {
-        return Charsets.UTF_8.decode(ByteBuffer.wrap(bytes)).toString();
+        return StandardCharsets.UTF_8.decode(ByteBuffer.wrap(bytes)).toString();
     }
 
     /**

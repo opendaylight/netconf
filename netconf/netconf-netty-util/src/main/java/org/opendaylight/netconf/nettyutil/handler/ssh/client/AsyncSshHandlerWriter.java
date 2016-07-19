@@ -8,11 +8,11 @@
 
 package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import java.nio.charset.StandardCharsets;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -147,7 +147,7 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
     }
 
     public static String byteBufToString(final ByteBuf msg) {
-        final String s = msg.toString(Charsets.UTF_8);
+        final String s = msg.toString(StandardCharsets.UTF_8);
         msg.resetReaderIndex();
         return s;
     }
