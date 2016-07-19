@@ -84,7 +84,7 @@ public class NetconfDeviceConnectionManager implements Closeable {
         final FilesystemSchemaSourceCache<YangTextSchemaSource> cache = new FilesystemSchemaSourceCache<>(repository, YangTextSchemaSource.class, new File(CACHE));
         repository.registerSchemaSourceListener(cache);
         repository.registerSchemaSourceListener(TextToASTTransformer.create(repository, repository));
-        final SchemaResourcesDTO schemaResourcesDTO = new SchemaResourcesDTO(repository, schemaContextFactory, new NetconfStateSchemasResolverImpl());
+        final SchemaResourcesDTO schemaResourcesDTO = new SchemaResourcesDTO(repository, repository, schemaContextFactory, new NetconfStateSchemasResolverImpl());
 
         device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
