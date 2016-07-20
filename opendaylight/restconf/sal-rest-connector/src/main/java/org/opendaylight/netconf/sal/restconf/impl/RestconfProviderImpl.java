@@ -20,6 +20,7 @@ import org.opendaylight.controller.config.yang.md.sal.rest.connector.RestConnect
 import org.opendaylight.controller.config.yang.md.sal.rest.connector.Rpcs;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.sal.core.api.Broker.ProviderSession;
 import org.opendaylight.controller.sal.core.api.Provider;
@@ -48,16 +49,16 @@ public class RestconfProviderImpl implements Provider, AutoCloseable, RestConnec
         BrokerFacade.getInstance().setContext(session);
         BrokerFacade.getInstance().setDomDataBroker( domDataBroker);
         final SchemaService schemaService = session.getService(SchemaService.class);
-        listenerRegistration = schemaService.registerSchemaContextListener(ControllerContext.getInstance());
+        this.listenerRegistration = schemaService.registerSchemaContextListener(ControllerContext.getInstance());
         BrokerFacade.getInstance().setRpcService(session.getService(DOMRpcService.class));
-
+        BrokerFacade.getInstance().setDomNotificationService(session.getService(DOMNotificationService.class));
 
         ControllerContext.getInstance().setSchemas(schemaService.getGlobalContext());
         ControllerContext.getInstance().setMountService(session.getService(DOMMountPointService.class));
 
-        webSocketServerThread = new Thread(WebSocketServer.createInstance(port.getValue().intValue()));
-        webSocketServerThread.setName("Web socket server on port " + port);
-        webSocketServerThread.start();
+        this.webSocketServerThread = new Thread(WebSocketServer.createInstance(this.port.getValue().intValue()));
+        this.webSocketServerThread.setName("Web socket server on port " + this.port);
+        this.webSocketServerThread.start();
     }
 
     @Override
@@ -68,12 +69,12 @@ public class RestconfProviderImpl implements Provider, AutoCloseable, RestConnec
     @Override
     public void close() {
 
-        if (listenerRegistration != null) {
-            listenerRegistration.close();
+        if (this.listenerRegistration != null) {
+            this.listenerRegistration.close();
         }
 
         WebSocketServer.destroyInstance();
-        webSocketServerThread.interrupt();
+        this.webSocketServerThread.interrupt();
     }
 
     @Override
@@ -81,27 +82,27 @@ public class RestconfProviderImpl implements Provider, AutoCloseable, RestConnec
         final Config config = new Config();
 
         final Get get = new Get();
-        get.setReceivedRequests(stats.getConfigGet());
-        get.setSuccessfulResponses(stats.getSuccessGetConfig());
-        get.setFailedResponses(stats.getFailureGetConfig());
+        get.setReceivedRequests(this.stats.getConfigGet());
+        get.setSuccessfulResponses(this.stats.getSuccessGetConfig());
+        get.setFailedResponses(this.stats.getFailureGetConfig());
         config.setGet(get);
 
         final Post post = new Post();
-        post.setReceivedRequests(stats.getConfigPost());
-        post.setSuccessfulResponses(stats.getSuccessPost());
-        post.setFailedResponses(stats.getFailurePost());
+        post.setReceivedRequests(this.stats.getConfigPost());
+        post.setSuccessfulResponses(this.stats.getSuccessPost());
+        post.setFailedResponses(this.stats.getFailurePost());
         config.setPost(post);
 
         final Put put = new Put();
-        put.setReceivedRequests(stats.getConfigPut());
-        put.setSuccessfulResponses(stats.getSuccessPut());
-        put.setFailedResponses(stats.getFailurePut());
+        put.setReceivedRequests(this.stats.getConfigPut());
+        put.setSuccessfulResponses(this.stats.getSuccessPut());
+        put.setFailedResponses(this.stats.getFailurePut());
         config.setPut(put);
 
         final Delete delete = new Delete();
-        delete.setReceivedRequests(stats.getConfigDelete());
-        delete.setSuccessfulResponses(stats.getSuccessDelete());
-        delete.setFailedResponses(stats.getFailureDelete());
+        delete.setReceivedRequests(this.stats.getConfigDelete());
+        delete.setSuccessfulResponses(this.stats.getSuccessDelete());
+        delete.setFailedResponses(this.stats.getFailureDelete());
         config.setDelete(delete);
 
         return config;
@@ -109,19 +110,19 @@ public class RestconfProviderImpl implements Provider, AutoCloseable, RestConnec
 
     @Override
     public Operational getOperational() {
-        final BigInteger opGet = stats.getOperationalGet();
+        final BigInteger opGet = this.stats.getOperationalGet();
         final Operational operational = new Operational();
         final Get get = new Get();
         get.setReceivedRequests(opGet);
-        get.setSuccessfulResponses(stats.getSuccessGetOperational());
-        get.setFailedResponses(stats.getFailureGetOperational());
+        get.setSuccessfulResponses(this.stats.getSuccessGetOperational());
+        get.setFailedResponses(this.stats.getFailureGetOperational());
         operational.setGet(get);
         return operational;
     }
 
     @Override
     public Rpcs getRpcs() {
-        final BigInteger rpcInvoke = stats.getRpc();
+        final BigInteger rpcInvoke = this.stats.getRpc();
         final Rpcs rpcs = new Rpcs();
         rpcs.setReceivedRequests(rpcInvoke);
         return rpcs;

@@ -7,7 +7,7 @@ module sal-remote-augment {
     import sal-remote {prefix salrmt; revision-date "2014-01-14";}
 
     description
-        "Added input parameters to rpc create-data-change-event-subscription";
+        "Added input parameters to rpc create-data-change-event-subscription and to create-notification-stream";
 
     revision "2014-07-08" {
     }
@@ -25,6 +25,17 @@ module sal-remote-augment {
                 enum ONE;
                 enum SUBTREE;
             }
+        }
+    }
+
+    augment "/salrmt:create-notification-stream/salrmt:input" {
+        leaf notification-output-type {
+            type enumeration {
+                enum JSON;
+                enum XML;
+            }
+            default "XML";
+            description "Input parameter which type of output will be parsed on notification";
         }
     }
 
