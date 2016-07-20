@@ -16,11 +16,13 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import java.util.concurrent.Future;
@@ -51,6 +53,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
+import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -88,6 +91,7 @@ public class BrokerFacadeTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         brokerFacade.setDomDataBroker(domDataBroker);
+        brokerFacade.setDomNotificationService(domNotification);
         brokerFacade.setRpcService(mockRpcService);
         brokerFacade.setContext(context);
         when(domDataBroker.newReadOnlyTransaction()).thenReturn(rTransaction);
@@ -290,5 +294,38 @@ public class BrokerFacadeTest {
 
         brokerFacade.registerToListenDataChanges(LogicalDatastoreType.CONFIGURATION, DataChangeScope.BASE, listener);
         verifyNoMoreInteractions(domDataBroker);
+    }
+
+    /**
+     * Create, register, close and remove notification listener.
+     */
+    @Test
+    public void testRegisterToListenNotificationChanges() {
+        // create test notification listener
+        final String identifier = "create-notification-stream/toaster:toastDone";
+        final SchemaPath path = SchemaPath.create(true,
+                QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toastDone"));
+        Notificator.createNotificationListener(Lists.newArrayList(path), identifier, "XML");
+        final NotificationListenerAdapter listener = Notificator.getNotificationListenerFor(identifier).get(0);
+
+        // mock registration
+        final ListenerRegistration<NotificationListenerAdapter> registration = mock(ListenerRegistration.class);
+        when(domNotification.registerNotificationListener(listener, listener.getSchemaPath()))
+                .thenReturn(registration);
+
+        // test to register listener for the first time
+        brokerFacade.registerToListenNotification(listener);
+        assertEquals("Registration was not successful", true, listener.isListening());
+
+        // try to register for the second time
+        brokerFacade.registerToListenNotification(listener);
+        assertEquals("Registration was not successful", true, listener.isListening());
+
+        // registrations should be invoked only once
+        verify(domNotification, times(1)).registerNotificationListener(listener, listener.getSchemaPath());
+
+        // close and remove test notification listener
+        listener.close();
+        Notificator.removeNotificationListenerIfNoSubscriberExists(listener);
     }
 }
