@@ -1,0 +1,32 @@
+{
+  "ietf-yang-patch:yang-patch" : {
+    "patch-id" : "Test merge operation",
+    "comment" : "This is test patch for merge operation on list",
+    "edit" : [
+      {
+        "edit-id": "edit1",
+        "operation": "replace",
+        "target": "/instance-identifier-patch-module:my-list2[instance-identifier-patch-module:name='my-leaf20']",
+        "value": {
+          "my-list2": {
+            "name": "my-leaf20",
+            "my-leaf21": "I am leaf21-0",
+            "my-leaf22": "I am leaf22-0"
+          }
+        }
+      },
+      {
+        "edit-id": "edit2",
+        "operation": "merge",
+        "target": "/instance-identifier-patch-module:my-list2[instance-identifier-patch-module:name='my-leaf21']",
+        "value": {
+          "my-list2": {
+            "name": "my-leaf21",
+            "my-leaf21": "I am leaf21-1",
+            "my-leaf22": "I am leaf22-1"
+          }
+        }
+      }
+    ]
+  }
+}

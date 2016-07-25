@@ -1,0 +1,43 @@
+{
+  "ietf-yang-patch:yang-patch" : {
+    "patch-id" : "Test merge operation",
+    "comment" : "This is test patch for merge operation on container",
+    "edit" : [
+      {
+        "edit-id": "edit1",
+        "operation": "create",
+        "target": "/",
+        "value": {
+          "patch-cont": {
+            "my-list1": [
+              {
+                "name": "my-list1 - A",
+                "my-leaf11": "I am leaf11-0",
+                "my-leaf12": "I am leaf12-1"
+              },
+              {
+                "name": "my-list1 - B",
+                "my-leaf11": "I am leaf11-0",
+                "my-leaf12": "I am leaf12-1"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "edit-id": "edit2",
+        "operation": "merge",
+        "target": "/",
+        "value": {
+          "patch-cont": {
+            "my-list1": {
+              "name": "my-list1 - Merged",
+              "my-leaf11": "I am leaf11-0",
+              "my-leaf12": "I am leaf12-1"
+            }
+          }
+        }
+      }
+    ]
+  }
+}
