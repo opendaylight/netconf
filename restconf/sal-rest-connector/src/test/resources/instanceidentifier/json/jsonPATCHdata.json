@@ -6,8 +6,8 @@
     "edit" : [
       {
         "edit-id": "edit1",
-        "operation": "create",
-        "target": "/my-list2",
+        "operation": "replace",
+        "target": "/instance-identifier-patch-module:my-list2[instance-identifier-patch-module:name='my-leaf20']",
         "value": {
           "my-list2": {
             "name": "my-leaf20",
@@ -19,11 +19,11 @@
 
       {
         "edit-id": "edit2",
-        "operation": "create",
-        "target": "/my-list2",
+        "operation": "replace",
+        "target": "/instance-identifier-patch-module:my-list2[instance-identifier-patch-module:name='my-leaf20']",
         "value": {
           "my-list2": {
-            "name": "my-leaf21",
+            "name": "my-leaf20",
             "my-leaf21": "I am leaf21-1",
             "my-leaf22": "I am leaf22-1"
           }
