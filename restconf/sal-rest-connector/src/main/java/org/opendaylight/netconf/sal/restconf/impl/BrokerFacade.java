@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.OPERATIONAL;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -190,6 +191,20 @@ public class BrokerFacade {
                         } catch (RestconfDocumentedException e) {
                             LOG.error("Error removing {} by {} operation", patchEntity.getTargetNode().toString(),
                                     patchEntity.getEditId(), e);
+                        }
+                    }
+                    break;
+                case MERGE:
+                    if (errorCounter == 0) {
+                        try {
+                            mergeDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity.getTargetNode(),
+                                    patchEntity.getNode(), globalSchema);
+                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
+                        } catch (RestconfDocumentedException e) {
+                            editErrors = new ArrayList<>();
+                            editErrors.addAll(e.getErrors());
+                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
+                            errorCounter++;
                         }
                     }
                     break;
@@ -385,6 +400,20 @@ public class BrokerFacade {
             final YangInstanceIdentifier path) {
         LOG.trace("Delete {} within Restconf PATCH: {}", datastore.name(), path);
         writeTransaction.delete(datastore, path);
+    }
+
+    private void mergeDataWithinTransaction(
+            final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
+        LOG.trace("Merge {} within Restconf PATCH: {} with payload {}", datastore.name(), path, payload);
+        ensureParentsByMerge(datastore, path, writeTransaction, schemaContext);
+
+        // merging is necessary only for lists otherwise we can call put method
+        if (payload instanceof MapNode) {
+            writeTransaction.merge(datastore, path, payload);
+        } else {
+            writeTransaction.put(datastore, path, payload);
+        }
     }
 
     public void setDomDataBroker(final DOMDataBroker domDataBroker) {
