@@ -17,14 +17,13 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.sshd.ClientChannel;
-import org.apache.sshd.ClientSession;
-import org.apache.sshd.SshClient;
+import org.apache.sshd.client.SshClient;
+import org.apache.sshd.client.channel.ClientChannel;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.ConnectFuture;
 import org.apache.sshd.client.future.OpenFuture;
+import org.apache.sshd.client.session.ClientSession;
+import org.apache.sshd.client.session.ClientSessionCreator;
 import org.apache.sshd.common.future.CloseFuture;
 import org.apache.sshd.common.future.SshFutureListener;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
@@ -45,13 +44,9 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
     public static final SshClient DEFAULT_CLIENT;
     static {
-        final Map<String, String> props = new HashMap<>();
-        props.put(SshClient.AUTH_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
-        props.put(SshClient.IDLE_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
-
         final SshClient c = SshClient.setUpDefaultClient();
-
-        c.setProperties(props);
+        c.getProperties().put(SshClient.AUTH_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
+        c.getProperties().put(SshClient.IDLE_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
         // TODO make configurable, or somehow reuse netty threadpool
         c.setNioWorkers(SSH_DEFAULT_NIO_WORKERS);
         c.start();
@@ -59,7 +54,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     }
 
     private final AuthenticationHandler authenticationHandler;
-    private final SshClient sshClient;
+    private final ClientSessionCreator sshClient;
     private Future<?> negotiationFuture;
 
     private AsyncSshHandlerReader sshReadAsyncListener;
@@ -70,8 +65,8 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private ChannelPromise connectPromise;
     private GenericFutureListener negotiationFutureListener;
 
-    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final SshClient sshClient,
-            final Future<?> negotiationFuture) throws IOException {
+    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final ClientSessionCreator sshClient,
+            final Future<?> negotiationFuture) {
         this(authenticationHandler, sshClient);
         this.negotiationFuture = negotiationFuture;
     }
@@ -80,33 +75,31 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
      *
      * @param authenticationHandler
      * @param sshClient started SshClient
-     * @throws IOException
      */
-    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final SshClient sshClient) throws IOException {
+    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final ClientSessionCreator sshClient) {
         this.authenticationHandler = Preconditions.checkNotNull(authenticationHandler);
         this.sshClient = Preconditions.checkNotNull(sshClient);
     }
 
-    public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler) throws IOException {
+    public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler) {
         return new AsyncSshHandler(authenticationHandler, DEFAULT_CLIENT);
     }
 
     /**
      *
-     * Create AsyncSshHandler for netconf subsystem. Negotiation future has to be set to success after successful netconf
-     * negotiation.
+     * Create AsyncSshHandler for netconf subsystem. Negotiation future has to be set to success after successful
+     * NETCONF negotiation.
      *
      * @param authenticationHandler
      * @param negotiationFuture
      * @return
-     * @throws IOException
      */
     public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler,
-            final Future<?> negotiationFuture) throws IOException {
+            final Future<?> negotiationFuture) {
         return new AsyncSshHandler(authenticationHandler, DEFAULT_CLIENT, negotiationFuture);
     }
 
-    private void startSsh(final ChannelHandlerContext ctx, final SocketAddress address) {
+    private void startSsh(final ChannelHandlerContext ctx, final SocketAddress address) throws IOException {
         LOG.debug("Starting SSH to {} on channel: {}", address, ctx.channel());
 
         final ConnectFuture sshConnectionFuture = sshClient.connect(authenticationHandler.getUsername(), address);
