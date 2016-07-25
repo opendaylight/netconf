@@ -15,7 +15,7 @@ package org.opendaylight.netconf.sal.restconf.impl;
  * operations, but also includes some new operations.
  *
  */
-enum PATCHEditOperation {
+public enum PATCHEditOperation {
     CREATE,  //post
     DELETE,  //delete
     INSERT,  //post
