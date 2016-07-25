@@ -1,0 +1,23 @@
+<!--
+  ~ Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
+  ~
+  ~ This program and the accompanying materials are made available under the
+  ~ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+  ~ and is available at http://www.eclipse.org/legal/epl-v10.html
+  -->
+<yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+    <patch-id>test-patch</patch-id>
+    <comment>Test patch with not allowed value node for delete operation</comment>
+    <edit>
+        <edit-id>edit1</edit-id>
+        <operation>delete</operation>
+        <target>/my-list2/my-leaf21</target>
+        <value>
+            <my-list2 xmlns="instance:identifier:patch:module">
+                <name>my-leaf20</name>
+                <my-leaf21>I am leaf21-0</my-leaf21>
+                <my-leaf22>I am leaf22-0</my-leaf22>
+            </my-list2>
+        </value>
+    </edit>
+</yang-patch>
