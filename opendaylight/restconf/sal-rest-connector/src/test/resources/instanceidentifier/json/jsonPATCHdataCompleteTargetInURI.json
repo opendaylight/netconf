@@ -1,0 +1,44 @@
+{
+  "ietf-yang-patch:yang-patch" : {
+
+    "patch-id" : "test-patch",
+    "comment" : "Test to create and replace data in container directly using / sign as a target",
+    "edit" : [
+      {
+        "edit-id": "edit1",
+        "operation": "create",
+        "target": "/",
+        "value": {
+          "patch-cont": {
+            "my-list1": [
+              {
+                "name": "my-list1 - A",
+                "my-leaf11": "I am leaf11-0",
+                "my-leaf12": "I am leaf12-1"
+              },
+              {
+                "name": "my-list1 - B",
+                "my-leaf11": "I am leaf11-0",
+                "my-leaf12": "I am leaf12-1"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "edit-id": "edit2",
+        "operation": "replace",
+        "target": "/",
+        "value": {
+          "patch-cont": {
+            "my-list1": {
+              "name": "my-list1 - Replacing",
+              "my-leaf11": "I am leaf11-0",
+              "my-leaf12": "I am leaf12-1"
+            }
+          }
+        }
+      }
+    ]
+  }
+}
