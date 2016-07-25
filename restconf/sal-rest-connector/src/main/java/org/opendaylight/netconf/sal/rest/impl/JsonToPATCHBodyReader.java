@@ -8,19 +8,18 @@
 
 package org.opendaylight.netconf.sal.rest.impl;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -32,20 +31,18 @@ import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
+import org.opendaylight.netconf.sal.restconf.impl.PATCHEditOperation;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
-import org.opendaylight.yangtools.yang.data.util.AbstractModuleStringInstanceIdentifierCodec;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
@@ -109,15 +106,10 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider 
         return new PATCHContext(path, resultList, patchId);
     }
 
-    private List<PATCHEntity> read(final JsonReader in, InstanceIdentifierContext path) throws
-            IOException {
-
-        boolean inEdit = false;
-        boolean inValue = false;
-        String operation = null;
-        String target = null;
-        String editId = null;
+    private List<PATCHEntity> read(final JsonReader in, InstanceIdentifierContext path) throws IOException {
         List<PATCHEntity> resultCollection = new ArrayList<>();
+        StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(path.getSchemaContext());
+        JsonToPATCHBodyReader.PatchEdit edit = new JsonToPATCHBodyReader.PatchEdit();
 
         while (in.hasNext()) {
             switch (in.peek()) {
@@ -135,94 +127,298 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider 
                     in.beginArray();
                     break;
                 case BEGIN_OBJECT:
-                    if (inEdit && operation != null & target != null & inValue) {
-                        StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(path
-                              .getSchemaContext());
-
-                        YangInstanceIdentifier targetII = codec.deserialize(codec.serialize(path
-                                .getInstanceIdentifier()) + target);
-                        SchemaNode targetSchemaNode = SchemaContextUtil.findDataSchemaNode(path.getSchemaContext(),
-                                codec.getDataContextTree().getChild(targetII).getDataSchemaNode().getPath()
-                                        .getParent());
-
-                        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
-                        final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-
-                        //keep on parsing json from place where target points
-                        final JsonParserStream jsonParser = JsonParserStream.create(writer, path.getSchemaContext(),
-                                targetSchemaNode);
-                        jsonParser.parse(in);
-                        resultCollection.add(new PATCHEntity(editId, operation, targetII.getParent(), resultHolder.getResult()));
-                        inValue = false;
-
-                        operation = null;
-                        target = null;
-                        in.endObject();
-                    } else {
-                        in.beginObject();
-                    }
+                    in.beginObject();
                     break;
                 case END_DOCUMENT:
                     break;
                 case NAME:
-                    final String name = in.nextName();
-
-                    switch (name) {
-                        case "edit" : inEdit = true;
-                            break;
-                        case "operation" : operation = in.nextString();
-                            break;
-                        case "target" : target = in.nextString();
-                            break;
-                        case "value" : inValue = true;
-                            break;
-                        case "patch-id" : patchId = in.nextString();
-                            break;
-                        case "edit-id" : editId = in.nextString();
-                            break;
-                    }
+                    parseByName(in.nextName(), edit, in, path, codec, resultCollection);
                     break;
                 case END_OBJECT:
                     in.endObject();
                     break;
-            case END_ARRAY:
-                in.endArray();
-                break;
+                case END_ARRAY:
+                    in.endArray();
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
             }
         }
 
         return ImmutableList.copyOf(resultCollection);
     }
 
-    private class StringModuleInstanceIdentifierCodec extends AbstractModuleStringInstanceIdentifierCodec {
+    /**
+     * Switch value of parsed JsonToken.NAME and read edit definition or patch id
+     * @param name value of token
+     * @param edit PatchEdit instance
+     * @param in JsonReader reader
+     * @param path InstanceIdentifierContext context
+     * @param codec StringModuleInstanceIdentifierCodec codec
+     * @param resultCollection collection of parsed edits
+     * @throws IOException
+     */
+    private void parseByName(@Nonnull final String name, @Nonnull final PatchEdit edit,
+                             @Nonnull final JsonReader in, @Nonnull final InstanceIdentifierContext path,
+                             @Nonnull final StringModuleInstanceIdentifierCodec codec,
+                             @Nonnull final List<PATCHEntity> resultCollection) throws IOException {
+        switch (name) {
+            case "edit" :
+                if (in.peek() == JsonToken.BEGIN_ARRAY) {
+                    in.beginArray();
 
-        private final DataSchemaContextTree dataContextTree;
-        private final SchemaContext context;
+                    while (in.hasNext()) {
+                        readEditDefinition(edit, in, path, codec);
+                        resultCollection.add(prepareEditOperation(edit));
+                        edit.clear();
+                    }
 
-        StringModuleInstanceIdentifierCodec(SchemaContext context) {
-            this.context = Preconditions.checkNotNull(context);
-            this.dataContextTree = DataSchemaContextTree.from(context);
+                    in.endArray();
+                } else {
+                    readEditDefinition(edit, in, path, codec);
+                    resultCollection.add(prepareEditOperation(edit));
+                    edit.clear();
+                }
+
+                break;
+            case "patch-id" :
+                this.patchId = in.nextString();
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Read one patch edit object from Json input
+     * @param edit PatchEdit instance to be filled with read data
+     * @param in JsonReader reader
+     * @param path InstanceIdentifierContext path context
+     * @param codec StringModuleInstanceIdentifierCodec codec
+     * @throws IOException
+     */
+    private void readEditDefinition(@Nonnull final PatchEdit edit, @Nonnull final JsonReader in,
+                                    @Nonnull final InstanceIdentifierContext path,
+                                    @Nonnull final StringModuleInstanceIdentifierCodec codec) throws IOException {
+        StringBuffer value = new StringBuffer();
+        in.beginObject();
+
+        while (in.hasNext()) {
+            final String editDefinition = in.nextName();
+            switch (editDefinition) {
+                case "edit-id" :
+                    edit.setId(in.nextString());
+                    break;
+                case "operation" :
+                    edit.setOperation(in.nextString());
+                    break;
+                case "target" :
+                    edit.setTarget(codec.deserialize(codec.serialize(path.getInstanceIdentifier()) + in.nextString()));
+                    edit.setTargetSchemaNode(SchemaContextUtil.findDataSchemaNode(path.getSchemaContext(),
+                            codec.getDataContextTree().getChild(edit.getTarget()).getDataSchemaNode().getPath()
+                                    .getParent()));
+                    break;
+                case "value" :
+                    // save data defined in value node for next (later) processing, because target needs to be read
+                    // always first and there is no ordering in Json input
+                    readValueNode(value, in);
+                    break;
+                default:
+                    break;
+            }
         }
 
-        @Override
-        protected Module moduleForPrefix(@Nonnull String prefix) {
-            return context.findModuleByName(prefix, null);
+        in.endObject();
+
+        // read saved data to normalized node when target schema is already known
+        edit.setData(readEditData(new JsonReader(new StringReader(value.toString())), edit.getTargetSchemaNode(), path));
+    }
+
+    /**
+     * Parse data defined in value node and saves it to buffer
+     * @param value Buffer to read value node
+     * @param in JsonReader reader
+     * @throws IOException
+     */
+    private void readValueNode(@Nonnull final StringBuffer value, @Nonnull final JsonReader in) throws IOException {
+        in.beginObject();
+        value.append("{");
+
+        value.append("\"" + in.nextName() + "\"" + ":");
+
+        if (in.peek() == JsonToken.BEGIN_ARRAY) {
+            in.beginArray();
+            value.append("[");
+
+            while (in.hasNext()) {
+                readValueObject(value, in);
+                if (in.peek() != JsonToken.END_ARRAY) {
+                    value.append(",");
+                }
+            }
+
+            in.endArray();
+            value.append("]");
+        } else {
+            readValueObject(value, in);
         }
 
-        @Nonnull
-        @Override
-        protected DataSchemaContextTree getDataContextTree() {
-            return dataContextTree;
+        in.endObject();
+        value.append("}");
+    }
+
+    /**
+     * Parse one value object of data and saves it to buffer
+     * @param value Buffer to read value object
+     * @param in JsonReader reader
+     * @throws IOException
+     */
+    private void readValueObject(@Nonnull final StringBuffer value, @Nonnull final JsonReader in) throws IOException {
+        in.beginObject();
+        value.append("{");
+
+        while (in.hasNext()) {
+            value.append("\"" + in.nextName() + "\"");
+            value.append(":");
+            value.append("\"" + in.nextString() + "\"");
+            if (in.peek() != JsonToken.END_OBJECT) {
+                value.append(",");
+            }
         }
 
-        @Nullable
-        @Override
-        protected String prefixForNamespace(@Nonnull URI namespace) {
-            final Module module = context.findModuleByNamespaceAndRevision(namespace, null);
-            return module == null ? null : module.getName();
+        in.endObject();
+        value.append("}");
+    }
+
+    /**
+     * Read patch edit data defined in value node to NormalizedNode
+     * @param in reader JsonReader reader
+     * @return NormalizedNode representing data
+     */
+    private NormalizedNode readEditData(@Nonnull final JsonReader in, @Nonnull SchemaNode targetSchemaNode,
+                                        @Nonnull InstanceIdentifierContext path) {
+        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+        final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+        JsonParserStream.create(writer, path.getSchemaContext(), targetSchemaNode).parse(in);
+
+        return resultHolder.getResult();
+    }
+
+    /**
+     * Prepare PATCHEntity from PatchEdit instance when it satisfies conditions, otherwise throws exception
+     * @param edit Instance of PatchEdit
+     * @return PATCHEntity
+     */
+    private PATCHEntity prepareEditOperation(@Nonnull final PatchEdit edit) {
+        if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
+                && checkDataPresence(edit.getOperation(), (edit.getData() != null))) {
+            if (isPatchOperationWithValue(edit.getOperation())) {
+                return new PATCHEntity(edit.getId(), edit.getOperation(), edit.getTarget().getParent(), edit.getData());
+            } else {
+                return new PATCHEntity(edit.getId(), edit.getOperation(), edit.getTarget());
+            }
+        }
+
+        throw new RestconfDocumentedException("Error parsing input", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+    }
+
+    /**
+     * Check if data is present when operation requires it and not present when operation data is not allowed
+     * @param operation Name of operation
+     * @param hasData Data in edit are present/not present
+     * @return true if data is present when operation requires it or if there are no data when operation does not
+     * allow it, false otherwise
+     */
+    private boolean checkDataPresence(@Nonnull final String operation, final boolean hasData) {
+        if (isPatchOperationWithValue(operation)) {
+            if (hasData) {
+                return true;
+            } else {
+                return false;
+            }
+        } else  {
+            if (!hasData) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    /**
+     * Check if operation requires data to be specified
+     * @param operation Name of the operation to be checked
+     * @return true if operation requires data, false otherwise
+     */
+    private boolean isPatchOperationWithValue(@Nonnull final String operation) {
+        switch (PATCHEditOperation.valueOf(operation.toUpperCase())) {
+            case CREATE:
+            case MERGE:
+            case REPLACE:
+            case INSERT:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Helper class representing one patch edit
+     */
+    private static final class PatchEdit {
+        private String id;
+        private String operation;
+        private YangInstanceIdentifier target;
+        private SchemaNode targetSchemaNode;
+        private NormalizedNode data;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getOperation() {
+            return operation;
+        }
+
+        public void setOperation(String operation) {
+            this.operation = operation;
+        }
+
+        public YangInstanceIdentifier getTarget() {
+            return target;
+        }
+
+        public void setTarget(YangInstanceIdentifier target) {
+            this.target = target;
+        }
+
+        public SchemaNode getTargetSchemaNode() {
+            return targetSchemaNode;
+        }
+
+        public void setTargetSchemaNode(SchemaNode targetSchemaNode) {
+            this.targetSchemaNode = targetSchemaNode;
+        }
+
+        public NormalizedNode getData() {
+            return data;
+        }
+
+        public void setData(NormalizedNode data) {
+            this.data = data;
+        }
+
+        public void clear() {
+            id = null;
+            operation = null;
+            target = null;
+            targetSchemaNode = null;
+            data = null;
         }
     }
 }

@@ -1,0 +1,20 @@
+{
+  "ietf-yang-patch:yang-patch" : {
+    "patch-id" : "test-patch",
+    "comment" : "this is test patch",
+    "edit" : [
+      {
+        "edit-id": "edit2",
+        "operation": "delete",
+        "target": "/instance-identifier-patch-module:my-list2[instance-identifier-patch-module:name='my-leaf20']",
+        "value": {
+          "my-list2": [
+            {
+              "name": "my-leaf20"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
