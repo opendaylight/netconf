@@ -69,20 +69,24 @@ public abstract class AbstractBodyReaderTest {
             final boolean isPost) throws NoSuchFieldException,
             SecurityException, IllegalArgumentException, IllegalAccessException {
         final UriInfo uriInfoMock = mock(UriInfo.class);
-        final MultivaluedMap<String, String> pathParm = new MultivaluedHashMap<>(
-                1);
-        pathParm.put(RestconfConstants.IDENTIFIER,
-                Collections.singletonList(identifier));
+        final MultivaluedMap<String, String> pathParm = new MultivaluedHashMap<>(1);
+
+        if (!identifier.isEmpty()) {
+            pathParm.put(RestconfConstants.IDENTIFIER, Collections.singletonList(identifier));
+        }
+
         when(uriInfoMock.getPathParameters()).thenReturn(pathParm);
         when(uriInfoMock.getPathParameters(false)).thenReturn(pathParm);
         when(uriInfoMock.getPathParameters(true)).thenReturn(pathParm);
         uriField.set(normalizedNodeProvider, uriInfoMock);
+
         final Request request = mock(Request.class);
         if (isPost) {
             when(request.getMethod()).thenReturn("POST");
         } else {
             when(request.getMethod()).thenReturn("PUT");
         }
+
         requestField.set(normalizedNodeProvider, request);
     }
 
