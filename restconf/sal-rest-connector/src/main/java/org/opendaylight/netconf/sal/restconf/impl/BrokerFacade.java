@@ -13,12 +13,17 @@ import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastor
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import javax.annotation.Nullable;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -137,11 +142,12 @@ public class BrokerFacade {
     }
 
     public PATCHStatusContext patchConfigurationDataWithinTransaction(final PATCHContext context,
-                                                                      final SchemaContext globalSchema) {
+                                                                      final SchemaContext globalSchema)
+            throws InterruptedException {
         final DOMDataReadWriteTransaction patchTransaction = this.domDataBroker.newReadWriteTransaction();
         final List<PATCHStatusEntity> editCollection = new ArrayList<>();
+
         List<RestconfError> editErrors;
-        final List<RestconfError> globalErrors = null;
         int errorCounter = 0;
 
         for (final PATCHEntity patchEntity : context.getData()) {
@@ -208,7 +214,7 @@ public class BrokerFacade {
                             mergeDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity.getTargetNode(),
                                     patchEntity.getNode(), globalSchema);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
-                        } catch (RestconfDocumentedException e) {
+                        } catch (final RestconfDocumentedException e) {
                             editErrors = new ArrayList<>();
                             editErrors.addAll(e.getErrors());
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
@@ -219,17 +225,37 @@ public class BrokerFacade {
             }
         }
 
-        //TODO: make sure possible global errors are filled up correctly and decide transaction submission based on that
-        //globalErrors = new ArrayList<>();
-        if (errorCounter == 0) {
-            final CheckedFuture<Void, TransactionCommitFailedException> submit = patchTransaction.submit();
-            return new PATCHStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), true,
-                    globalErrors);
-        } else {
+        // if errors then cancel transaction and return error status
+        if (errorCounter != 0) {
             patchTransaction.cancel();
-            return new PATCHStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), false,
-                    globalErrors);
+            return new PATCHStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), false, null);
         }
+
+        // if no errors commit transaction
+        final CountDownLatch waiter = new CountDownLatch(1);
+        final CheckedFuture<Void, TransactionCommitFailedException> future = patchTransaction.submit();
+        final PATCHStatusContextHelper status = new PATCHStatusContextHelper();
+
+        Futures.addCallback(future, new FutureCallback<Void>() {
+            @Override
+            public void onSuccess(@Nullable final Void result) {
+                status.setStatus(new PATCHStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection),
+                        true, null));
+                waiter.countDown();
+            }
+
+            @Override
+            public void onFailure(final Throwable t) {
+                // if commit failed it is global error
+                status.setStatus(new PATCHStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection),
+                        false, Lists.newArrayList(
+                        new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, t.getMessage()))));
+                waiter.countDown();
+            }
+        });
+
+        waiter.await();
+        return status.getStatus();
     }
 
     // POST configuration
@@ -471,5 +497,17 @@ public class BrokerFacade {
                 .registerNotificationListener(listener, path);
 
         listener.setRegistration(registration);
+    }
+
+    private final class PATCHStatusContextHelper {
+        PATCHStatusContext status;
+
+        public PATCHStatusContext getStatus() {
+            return this.status;
+        }
+
+        public void setStatus(PATCHStatusContext status) {
+            this.status = status;
+        }
     }
 }
