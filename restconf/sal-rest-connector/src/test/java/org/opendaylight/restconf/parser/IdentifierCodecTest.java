@@ -9,6 +9,7 @@
 package org.opendaylight.restconf.parser;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,8 +23,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 public class IdentifierCodecTest {
 
     private static final String URI_WITH_LIST_AND_LEAF =
-            "/list-test:top/list1=%2C%27" + '"' + "%3A" + '"' + "%20%2F,,foo/list2=a,b/result";
-    private static final String URI_WITH_LEAF_LIST = "/list-test:top/Y=x%3Ay";
+            "list-test:top/list1=%2C%27" + '"' + "%3A" + '"' + "%20%2F,,foo/list2=a,b/result";
+    private static final String URI_WITH_LEAF_LIST = "list-test:top/Y=x%3Ay";
 
     private SchemaContext schemaContext;
 
@@ -74,13 +75,13 @@ public class IdentifierCodecTest {
     }
 
     /**
-     * Positive test of serialization <code>YangInstanceIdentifier.EMPTY</code>. Single slash is
+     * Positive test of serialization <code>YangInstanceIdentifier.EMPTY</code>. Empty <code>String</code> is
      * expected to be returned.
      */
     @Test
     public void codecSerializeEmptyTest () {
         final String serialized = IdentifierCodec.serialize(YangInstanceIdentifier.EMPTY, this.schemaContext);
-        assertEquals("Failed codec serialization test", "/", serialized);
+        assertTrue("Failed codec serialization test", serialized.isEmpty());
     }
 
     /**

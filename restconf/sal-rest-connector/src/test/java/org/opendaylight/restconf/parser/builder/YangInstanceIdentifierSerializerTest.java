@@ -54,7 +54,7 @@ public class YangInstanceIdentifierSerializerTest {
 
         final String result = YangInstanceIdentifierSerializer.create(schemaContext, data);
         assertEquals("Serialization not successful",
-                "/serializer-test:contA", result);
+                "serializer-test:contA", result);
     }
 
     /**
@@ -69,7 +69,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .build();
 
         final String result = YangInstanceIdentifierSerializer.create(schemaContext, data);
-        assertEquals("Serialization not successful", "/serializer-test:contA/leaf-A", result);
+        assertEquals("Serialization not successful", "serializer-test:contA/leaf-A", result);
     }
 
     /**
@@ -92,7 +92,7 @@ public class YangInstanceIdentifierSerializerTest {
 
         final String result = YangInstanceIdentifierSerializer.create(schemaContext, data);
         assertEquals("Serialization not successful",
-                "/serializer-test:contA/list-A=100/leaf-list-AA=instance",
+                "serializer-test:contA/list-A=100/leaf-list-AA=instance",
                 result);
     }
 
@@ -109,7 +109,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .build();
 
         final String result = YangInstanceIdentifierSerializer.create(schemaContext, data);
-        assertEquals("Serialization not successful", "/serializer-test:list-no-key", result);
+        assertEquals("Serialization not successful", "serializer-test:list-no-key", result);
     }
 
     /**
@@ -126,7 +126,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .build();
 
         final String result = YangInstanceIdentifierSerializer.create(schemaContext, data);
-        assertEquals("Serialization not successful", "/serializer-test:list-one-key=value", result);
+        assertEquals("Serialization not successful", "serializer-test:list-one-key=value", result);
     }
 
     /**
@@ -146,7 +146,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .node(list).nodeWithKey(list, values).build();
 
         final String result = YangInstanceIdentifierSerializer.create(schemaContext, data);
-        assertEquals("Serialization not successful", "/serializer-test:list-multiple-keys=value-1,2,true", result);
+        assertEquals("Serialization not successful", "serializer-test:list-multiple-keys=value-1,2,true", result);
     }
 
     /**
@@ -161,7 +161,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .build();
 
         final String result = YangInstanceIdentifierSerializer.create(schemaContext, data);
-        assertEquals("Serialization not successful", "/serializer-test:leaf-0", result);
+        assertEquals("Serialization not successful", "serializer-test:leaf-0", result);
     }
 
     /**
@@ -177,7 +177,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .build();
 
         final String result = YangInstanceIdentifierSerializer.create(schemaContext, data);
-        assertEquals("Serialization not successful", "/serializer-test:leaf-list-0=instance", result);
+        assertEquals("Serialization not successful", "serializer-test:leaf-list-0=instance", result);
     }
 
     /**
@@ -205,12 +205,12 @@ public class YangInstanceIdentifierSerializerTest {
     /**
      * Test of serialization <code>YangInstanceIdentifier</code> to <code>String</code> when supplied
      * <code>YangInstanceIdentifier</code> is <code>YangInstanceIdentifier.EMPTY</code>.
-     * Single slash is expected as a return value.
+     * Empty <code>String</code> is expected as a return value.
      */
     @Test
     public void serializeEmptyDataTest() {
         final String result = YangInstanceIdentifierSerializer.create(schemaContext, YangInstanceIdentifier.EMPTY);
-        assertEquals("Empty identifier is expected", "/", result);
+        assertEquals("Empty identifier is expected", "", result);
     }
 
     /**
@@ -263,7 +263,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .build();
 
         final String result = YangInstanceIdentifierSerializer.create(schemaContext, data);
-        assertEquals("Serialization not successful", "/serializer-test:list-one-key=" + encoded, result);
+        assertEquals("Serialization not successful", "serializer-test:list-one-key=" + encoded, result);
     }
 
     /**
@@ -280,7 +280,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .build();
 
         final String result = YangInstanceIdentifierSerializer.create(schemaContext, data);
-        assertEquals("Serialization not successful", "/serializer-test:list-one-key=" + value, result);
+        assertEquals("Serialization not successful", "serializer-test:list-one-key=" + value, result);
     }
 
     /**
@@ -303,7 +303,7 @@ public class YangInstanceIdentifierSerializerTest {
         final String result = YangInstanceIdentifierSerializer.create(schemaContext, data);
 
         assertEquals("Serialization not successful",
-                "/serializer-test-included:augmented-list=100/serializer-test:augmented-leaf", result);
+                "serializer-test-included:augmented-list=100/serializer-test:augmented-leaf", result);
     }
 
     /**
