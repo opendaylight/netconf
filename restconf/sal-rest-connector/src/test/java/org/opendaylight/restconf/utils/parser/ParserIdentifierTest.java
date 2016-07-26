@@ -45,18 +45,18 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 public class ParserIdentifierTest {
     // mount point identifier + expected result
     private static final String MOUNT_POINT_IDENT =
-            "/mount-point:mount-container/point-number" + "/" + RestconfConstants.MOUNT;
+            "mount-point:mount-container/point-number" + "/" + RestconfConstants.MOUNT;
 
     private static final String MOUNT_POINT_IDENT_RESULT =
             "/(mount:point?revision=2016-06-02)mount-container/point-number";
 
     // invalid mount point identifier
     private static final String INVALID_MOUNT_POINT_IDENT =
-            "/mount-point:point-number" + "/" + RestconfConstants.MOUNT;
+            "mount-point:point-number" + "/" + RestconfConstants.MOUNT;
 
     // test identifier + expected result
     private static final String TEST_IDENT =
-            "/parser-identifier:cont1/cont2/listTest/list-in-grouping=name/leaf-A.B";
+            "parser-identifier:cont1/cont2/listTest/list-in-grouping=name/leaf-A.B";
 
     private static final String TEST_IDENT_RESULT =
             "/(parser:identifier?revision=2016-06-02)cont1/cont2/listTest/listTest/list-in-grouping/"
@@ -64,7 +64,7 @@ public class ParserIdentifierTest {
 
     // test identifier with nodes defined in other modules using augmentation + expected result
     private static final String TEST_IDENT_OTHERS =
-            "/parser-identifier-included:list-1=name,2016-06-02/parser-identifier:augment-leaf";
+            "parser-identifier-included:list-1=name,2016-06-02/parser-identifier:augment-leaf";
 
     private static final String TEST_IDENT_OTHERS_RESULT =
             "/(parser:identifier:included?revision=2016-06-02)list-1/list-1"
@@ -75,7 +75,7 @@ public class ParserIdentifierTest {
 
     // invalid test identifier
     private static final String INVALID_TEST_IDENT =
-            "/parser-identifier:cont2/listTest/list-in-grouping=name/leaf-A.B";
+            "parser-identifier:cont2/listTest/list-in-grouping=name/leaf-A.B";
 
     // schema context with test modules
     private SchemaContext schemaContext;
@@ -83,7 +83,6 @@ public class ParserIdentifierTest {
     private static final String TEST_MODULE_NAME = "test-module";
     private static final String TEST_MODULE_REVISION = "2016-06-02";
     private static final String TEST_MODULE_NAMESPACE = "test:module";
-    private static final String MOUNT_POINT_IDENT_WITHOUT_SLASH = MOUNT_POINT_IDENT.replaceFirst("/", "");
 
     // mount point and mount point service
     private DOMMountPoint mountPoint;
@@ -493,7 +492,7 @@ public class ParserIdentifierTest {
     public void toSchemaExportContextFromIdentifierMountPointTest() {
         final SchemaExportContext exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
                 schemaContext,
-                MOUNT_POINT_IDENT_WITHOUT_SLASH + "/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION,
+                MOUNT_POINT_IDENT + "/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION,
                 mountPointService);
 
         final Module module = exportContext.getModule();
@@ -515,7 +514,7 @@ public class ParserIdentifierTest {
     public void toSchemaExportContextFromIdentifierMountPointNotFoundTest() {
         final SchemaExportContext exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
                 schemaContext,
-                MOUNT_POINT_IDENT_WITHOUT_SLASH + "/" + "not-existing-module" + "/" + "2016-01-01",
+                MOUNT_POINT_IDENT + "/" + "not-existing-module" + "/" + "2016-01-01",
                 mountPointService);
 
         assertNotNull("Export context should be parsed", exportContext);
@@ -532,7 +531,7 @@ public class ParserIdentifierTest {
         try {
             ParserIdentifier.toSchemaExportContextFromIdentifier(
                     schemaContext,
-                    MOUNT_POINT_IDENT_WITHOUT_SLASH + "/" + TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME,
+                    MOUNT_POINT_IDENT + "/" + TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME,
                     mountPointService);
 
             fail("Test should fail due to invalid identifier supplied");
@@ -589,7 +588,7 @@ public class ParserIdentifierTest {
         thrown.expect(NullPointerException.class);
         ParserIdentifier.toSchemaExportContextFromIdentifier(
                 null,
-                MOUNT_POINT_IDENT_WITHOUT_SLASH
+                MOUNT_POINT_IDENT
                 + "/"
                 + TEST_MODULE_NAME
                 + "/"
@@ -607,7 +606,7 @@ public class ParserIdentifierTest {
         thrown.expect(NullPointerException.class);
         ParserIdentifier.toSchemaExportContextFromIdentifier(
                 schemaContext,
-                MOUNT_POINT_IDENT_WITHOUT_SLASH
+                MOUNT_POINT_IDENT
                 + "/"
                 + TEST_MODULE_NAME
                 + "/"
