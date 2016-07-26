@@ -1000,7 +1000,14 @@ public class RestconfImpl implements RestconfService {
         if (context == null) {
             throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
-        return this.broker.patchConfigurationDataWithinTransaction(context, this.controllerContext.getGlobalSchema());
+
+        try {
+            return this.broker.patchConfigurationDataWithinTransaction(context,
+                    this.controllerContext.getGlobalSchema());
+        } catch (final InterruptedException e) {
+            LOG.debug("Patch transaction failed", e);
+            throw new RestconfDocumentedException(e.getMessage());
+        }
     }
 
     @Override
@@ -1008,7 +1015,14 @@ public class RestconfImpl implements RestconfService {
         if (context == null) {
             throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
-        return this.broker.patchConfigurationDataWithinTransaction(context, this.controllerContext.getGlobalSchema());
+
+        try {
+            return this.broker.patchConfigurationDataWithinTransaction(context,
+                    this.controllerContext.getGlobalSchema());
+        } catch (final InterruptedException e) {
+            LOG.debug("Patch transaction failed", e);
+            throw new RestconfDocumentedException(e.getMessage());
+        }
     }
 
     /**
