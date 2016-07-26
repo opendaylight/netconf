@@ -57,30 +57,26 @@ public final class YangInstanceIdentifierDeserializer {
                 data, DataSchemaContextTree.from(schemaContext).getRoot(),
                 YangInstanceIdentifierDeserializer.MainVarsWrapper.STARTING_OFFSET, schemaContext);
 
-        checkValid(!data.isEmpty(), "Empty path is not valid", variables.getData(), variables.getOffset());
+        while (!allCharsConsumed(variables)) {
+            validArg(variables);
+            final QName qname = prepareQName(variables);
 
-        if (!data.equals(String.valueOf(RestconfConstants.SLASH))) {
-            while (!allCharsConsumed(variables)) {
-                validArg(variables);
-                final QName qname = prepareQName(variables);
-
-                // this is the last identifier (input is consumed) or end of identifier (slash)
-                if (allCharsConsumed(variables)
-                        || currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH) {
-                    prepareIdentifier(qname, path, variables);
-                    path.add(variables.getCurrent().getIdentifier());
-                } else if (currentChar(variables.getOffset(),
-                        variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL) {
-                    if (nextContextNode(qname, path, variables).getDataSchemaNode() instanceof ListSchemaNode) {
-                        prepareNodeWithPredicates(qname, path, variables);
-                    } else {
-                        prepareNodeWithValue(qname, path, variables);
-                    }
+            // this is the last identifier (input is consumed) or end of identifier (slash)
+            if (allCharsConsumed(variables)
+                    || currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH) {
+                prepareIdentifier(qname, path, variables);
+                path.add(variables.getCurrent().getIdentifier());
+            } else if (currentChar(variables.getOffset(),
+                    variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL) {
+                if (nextContextNode(qname, path, variables).getDataSchemaNode() instanceof ListSchemaNode) {
+                    prepareNodeWithPredicates(qname, path, variables);
                 } else {
-                    throw new IllegalArgumentException(
-                            "Bad char " + currentChar(variables.getOffset(), variables.getData()) + " on position "
-                                    + variables.getOffset() + ".");
+                    prepareNodeWithValue(qname, path, variables);
                 }
+            } else {
+                throw new IllegalArgumentException(
+                        "Bad char " + currentChar(variables.getOffset(), variables.getData()) + " on position "
+                                + variables.getOffset() + ".");
             }
         }
 
@@ -287,11 +283,18 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private static void validArg(final MainVarsWrapper variables) {
-        checkValid(RestconfConstants.SLASH == currentChar(variables.getOffset(), variables.getData()),
-                "Identifier must start with '/'.", variables.getData(), variables.getOffset());
-        skipCurrentChar(variables);
-        checkValid(!allCharsConsumed(variables), "Identifier cannot end with '/'.",
-                variables.getData(), variables.getOffset());
+        // every identifier except of the first MUST start with slash
+        if (variables.getOffset() != MainVarsWrapper.STARTING_OFFSET) {
+            checkValid(RestconfConstants.SLASH == currentChar(variables.getOffset(), variables.getData()),
+                    "Identifier must start with '/'.", variables.getData(), variables.getOffset());
+
+            // skip slash
+            skipCurrentChar(variables);
+
+            // check if slash is not also the last char in identifier
+            checkValid(!allCharsConsumed(variables), "Identifier cannot end with '/'.",
+                    variables.getData(), variables.getOffset());
+        }
     }
 
     private static void skipCurrentChar(final MainVarsWrapper variables) {
