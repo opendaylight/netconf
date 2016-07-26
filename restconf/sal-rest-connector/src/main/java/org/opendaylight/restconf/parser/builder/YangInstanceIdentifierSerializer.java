@@ -49,10 +49,7 @@ public final class YangInstanceIdentifierSerializer {
     public static String create(final SchemaContext schemaContext, final YangInstanceIdentifier data) {
         final DataSchemaContextNode<?> current = DataSchemaContextTree.from(schemaContext).getRoot();
         final MainVarsWrapper variables = new MainVarsWrapper(current);
-
-        // for empty data return slash
-        final StringBuilder path = (data.getPathArguments().size() == 0) ?
-                new StringBuilder(String.valueOf(RestconfConstants.SLASH)) : new StringBuilder();
+        final StringBuilder path = new StringBuilder();
 
         QNameModule parentModule = null;
         for (int i = 0; i < data.getPathArguments().size(); i++) {
@@ -74,9 +71,13 @@ public final class YangInstanceIdentifierSerializer {
             // append namespace before every node which is defined in other module than its parent
             // condition is satisfied also for the first path argument
             if (!arg.getNodeType().getModule().equals(parentModule)) {
-                path.append(RestconfConstants.SLASH
-                        + prefixForNamespace(arg.getNodeType(), schemaContext)
-                        + ParserBuilderConstants.Deserializer.COLON);
+                // append slash if it is not the first path argument
+                if (path.length() > 0) {
+                    path.append(RestconfConstants.SLASH);
+                }
+
+                path.append(prefixForNamespace(arg.getNodeType(), schemaContext));
+                path.append(ParserBuilderConstants.Deserializer.COLON);
             } else {
                 path.append(RestconfConstants.SLASH);
             }

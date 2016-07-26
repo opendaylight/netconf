@@ -14,6 +14,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
@@ -55,10 +56,10 @@ public final class ParserIdentifier {
      *            - {@link SchemaContext}
      * @return {@link InstanceIdentifierContext}
      */
-    public static InstanceIdentifierContext<?> toInstanceIdentifier(final String identifier,
+    public static InstanceIdentifierContext<?> toInstanceIdentifier(@Nullable final String identifier,
             final SchemaContext schemaContext) {
         final YangInstanceIdentifier deserialize;
-        if (identifier.contains(RestconfConstants.MOUNT)) {
+        if (identifier != null && identifier.contains(RestconfConstants.MOUNT)) {
             final String mountPointId = identifier.substring(0, identifier.indexOf("/" + RestconfConstants.MOUNT));
             deserialize = IdentifierCodec.deserialize(mountPointId, schemaContext);
         } else {
@@ -155,11 +156,18 @@ public final class ParserIdentifier {
             final StringBuilder pathBuilder = new StringBuilder();
             while (componentIter.hasNext()) {
                 final String current = componentIter.next();
-                pathBuilder.append("/");
-                pathBuilder.append(current);
+
                 if (RestconfConstants.MOUNT.equals(current)) {
+                    pathBuilder.append("/");
+                    pathBuilder.append(RestconfConstants.MOUNT);
                     break;
                 }
+
+                if (pathBuilder.length() != 0) {
+                    pathBuilder.append("/");
+                }
+
+                pathBuilder.append(current);
             }
             final InstanceIdentifierContext<?> point = ParserIdentifier
                     .toInstanceIdentifier(pathBuilder.toString(), schemaContext);
