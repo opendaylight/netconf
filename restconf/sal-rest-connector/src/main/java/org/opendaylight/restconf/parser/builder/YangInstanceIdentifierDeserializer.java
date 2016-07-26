@@ -287,11 +287,18 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private static void validArg(final MainVarsWrapper variables) {
-        checkValid(RestconfConstants.SLASH == currentChar(variables.getOffset(), variables.getData()),
-                "Identifier must start with '/'.", variables.getData(), variables.getOffset());
-        skipCurrentChar(variables);
-        checkValid(!allCharsConsumed(variables), "Identifier cannot end with '/'.",
-                variables.getData(), variables.getOffset());
+        // every identifier except of the first MUST start with slash
+        if (variables.getOffset() != MainVarsWrapper.STARTING_OFFSET) {
+            checkValid(RestconfConstants.SLASH == currentChar(variables.getOffset(), variables.getData()),
+                    "Identifier must start with '/'.", variables.getData(), variables.getOffset());
+
+            // skip slash
+            skipCurrentChar(variables);
+
+            // check if slash is not also the last char in identifier
+            checkValid(!allCharsConsumed(variables), "Identifier cannot end with '/'.",
+                    variables.getData(), variables.getOffset());
+        }
     }
 
     private static void skipCurrentChar(final MainVarsWrapper variables) {

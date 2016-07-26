@@ -10,6 +10,7 @@ package org.opendaylight.restconf.restful.utils;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
+import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
@@ -116,6 +117,25 @@ public final class ReadDataTransactionUtil {
         transactionNode.setLogicalDatastoreType(LogicalDatastoreType.CONFIGURATION);
         final NormalizedNode<?, ?> configDataNode = readDataViaTransaction(transactionNode);
 
+        // if no data exists
+        if (stateDataNode == null && configDataNode == null) {
+            throw new RestconfDocumentedException(
+                    "Request could not be completed because the relevant data model content does not exist",
+                    ErrorType.PROTOCOL,
+                    ErrorTag.DATA_MISSING);
+        }
+
+        // return config data
+        if (stateDataNode == null) {
+            return configDataNode;
+        }
+
+        // return state data
+        if (configDataNode == null) {
+            return stateDataNode;
+        }
+
+        // merge data from config and state
         return mapNode(stateDataNode, configDataNode);
     }
 
@@ -267,8 +287,8 @@ public final class ReadDataTransactionUtil {
      * @param configDataNode
      *            - data node of config data
      */
-    private static void validPossibilityOfMergeNodes(final NormalizedNode<?, ?> stateDataNode,
-            final NormalizedNode<?, ?> configDataNode) {
+    private static void validPossibilityOfMergeNodes(@Nonnull final NormalizedNode<?, ?> stateDataNode,
+            @Nonnull final NormalizedNode<?, ?> configDataNode) {
         final QNameModule moduleOfStateData = stateDataNode.getIdentifier().getNodeType().getModule();
         final QNameModule moduleOfConfigData = configDataNode.getIdentifier().getNodeType().getModule();
         if (moduleOfStateData != moduleOfConfigData) {
