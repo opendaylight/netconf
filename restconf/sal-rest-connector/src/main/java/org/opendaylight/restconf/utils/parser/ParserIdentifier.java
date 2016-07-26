@@ -155,11 +155,18 @@ public final class ParserIdentifier {
             final StringBuilder pathBuilder = new StringBuilder();
             while (componentIter.hasNext()) {
                 final String current = componentIter.next();
-                pathBuilder.append("/");
-                pathBuilder.append(current);
+
                 if (RestconfConstants.MOUNT.equals(current)) {
+                    pathBuilder.append("/");
+                    pathBuilder.append(RestconfConstants.MOUNT);
                     break;
                 }
+
+                if (pathBuilder.length() != 0) {
+                    pathBuilder.append("/");
+                }
+
+                pathBuilder.append(current);
             }
             final InstanceIdentifierContext<?> point = ParserIdentifier
                     .toInstanceIdentifier(pathBuilder.toString(), schemaContext);
