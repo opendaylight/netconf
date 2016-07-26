@@ -155,7 +155,9 @@ public final class ParserIdentifier {
             final StringBuilder pathBuilder = new StringBuilder();
             while (componentIter.hasNext()) {
                 final String current = componentIter.next();
-                pathBuilder.append("/");
+                if (pathBuilder.length() != 0) {
+                    pathBuilder.append("/");
+                }
                 pathBuilder.append(current);
                 if (RestconfConstants.MOUNT.equals(current)) {
                     break;
