@@ -48,8 +48,8 @@ import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangStatementSourceIm
 import org.opendaylight.yangtools.yang.parser.util.NamedFileInputStream;
 
 class RestconfModulesServiceTestUtils {
-    static final String MOUNT_POINT = "/mount-point-1:cont/" + RestconfConstants.MOUNT + "/";
-    static final String NOT_REGISTERED_MOUNT_POINT = "/mount-point-1:listA/" + RestconfConstants.MOUNT + "/";
+    static final String MOUNT_POINT = "mount-point-1:cont/" + RestconfConstants.MOUNT + "/";
+    static final String NOT_REGISTERED_MOUNT_POINT = "mount-point-1:listA/" + RestconfConstants.MOUNT + "/";
 
     static final String TEST_MODULE = "module1/2014-01-01";
     static final String NOT_EXISTING_MODULE = "not-existing/2016-01-01";
