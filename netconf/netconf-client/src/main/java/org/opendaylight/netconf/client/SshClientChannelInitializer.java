@@ -9,6 +9,7 @@ package org.opendaylight.netconf.client;
 
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
+import java.io.IOException;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler;
@@ -20,9 +21,9 @@ final class SshClientChannelInitializer extends AbstractChannelInitializer<Netco
     private final NetconfClientSessionNegotiatorFactory negotiatorFactory;
     private final NetconfClientSessionListener sessionListener;
 
-    SshClientChannelInitializer(final AuthenticationHandler authHandler,
-                                final NetconfClientSessionNegotiatorFactory negotiatorFactory,
-                                final NetconfClientSessionListener sessionListener) {
+    public SshClientChannelInitializer(final AuthenticationHandler authHandler,
+                                       final NetconfClientSessionNegotiatorFactory negotiatorFactory,
+                                       final NetconfClientSessionListener sessionListener) {
         this.authenticationHandler = authHandler;
         this.negotiatorFactory = negotiatorFactory;
         this.sessionListener = sessionListener;
@@ -30,9 +31,13 @@ final class SshClientChannelInitializer extends AbstractChannelInitializer<Netco
 
     @Override
     public void initialize(final Channel ch, final Promise<NetconfClientSession> promise) {
-        // ssh handler has to be the first handler in pipeline
-        ch.pipeline().addFirst(AsyncSshHandler.createForNetconfSubsystem(authenticationHandler, promise));
-        super.initialize(ch,promise);
+        try {
+            // ssh handler has to be the first handler in pipeline
+            ch.pipeline().addFirst(AsyncSshHandler.createForNetconfSubsystem(authenticationHandler, promise));
+            super.initialize(ch,promise);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

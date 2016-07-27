@@ -13,8 +13,7 @@ import io.netty.buffer.Unpooled;
 import org.apache.sshd.common.future.SshFutureListener;
 import org.apache.sshd.common.io.IoInputStream;
 import org.apache.sshd.common.io.IoReadFuture;
-import org.apache.sshd.common.util.buffer.Buffer;
-import org.apache.sshd.common.util.buffer.ByteArrayBuffer;
+import org.apache.sshd.common.util.Buffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +40,7 @@ public final class AsyncSshHandlerReader implements SshFutureListener<IoReadFutu
         this.readHandler = readHandler;
         this.channelId = channelId;
         this.asyncOut = asyncOut;
-        buf = new ByteArrayBuffer(BUFFER_SIZE);
+        buf = new Buffer(BUFFER_SIZE);
         asyncOut.read(buf).addListener(this);
     }
 
@@ -72,7 +71,7 @@ public final class AsyncSshHandlerReader implements SshFutureListener<IoReadFutu
             readHandler.onMessageRead(msg);
 
             // Schedule next read
-            buf = new ByteArrayBuffer(BUFFER_SIZE);
+            buf = new Buffer(BUFFER_SIZE);
             currentReadFuture = asyncOut.read(buf);
             currentReadFuture.addListener(this);
         }

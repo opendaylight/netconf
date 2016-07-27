@@ -11,6 +11,7 @@ package org.opendaylight.netconf.netty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import com.google.common.base.Stopwatch;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -25,7 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import org.apache.sshd.common.util.SecurityUtils;
+import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -72,18 +73,13 @@ public class SSHTest {
 
         final InetSocketAddress addr = new InetSocketAddress("127.0.0.1", 10831);
         final SshProxyServer sshProxyServer = new SshProxyServer(minaTimerEx, nettyGroup, nioExec);
-        sshProxyServer.bind(new SshProxyServerConfigurationBuilder()
-            .setBindingAddress(addr)
-            .setLocalAddress(NetconfConfigUtil.getNetconfLocalAddress())
-            .setAuthenticator(new AuthProvider() {
+        sshProxyServer.bind(
+                new SshProxyServerConfigurationBuilder().setBindingAddress(addr).setLocalAddress(NetconfConfigUtil.getNetconfLocalAddress()).setAuthenticator(new AuthProvider() {
                     @Override
                     public boolean authenticated(final String username, final String password) {
                         return true;
                     }
-            })
-            .setKeyPairProvider(SecurityUtils.createGeneratorHostKeyProvider(sshKeyPair.toPath()))
-            .setIdleTimeout(Integer.MAX_VALUE)
-            .createSshProxyServerConfiguration());
+                }).setKeyPairProvider(new PEMGeneratorHostKeyProvider(sshKeyPair.toPath().toAbsolutePath().toString())).setIdleTimeout(Integer.MAX_VALUE).createSshProxyServerConfiguration());
 
         final EchoClientHandler echoClientHandler = connectClient(addr);
 

@@ -16,25 +16,22 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.Executors;
-import org.apache.sshd.common.util.SecurityUtils;
-import org.opendaylight.controller.config.api.DependencyResolver;
-import org.opendaylight.controller.config.api.ModuleIdentifier;
+import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
 import org.opendaylight.netconf.api.NetconfServerDispatcher;
 import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfNorthboundSshModule extends AbstractNetconfNorthboundSshModule {
+public class NetconfNorthboundSshModule extends org.opendaylight.controller.config.yang.netconf.northbound.ssh.AbstractNetconfNorthboundSshModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNorthboundSshModule.class);
 
-    public NetconfNorthboundSshModule(final ModuleIdentifier identifier, final DependencyResolver dependencyResolver) {
+    public NetconfNorthboundSshModule(final org.opendaylight.controller.config.api.ModuleIdentifier identifier, final org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
         super(identifier, dependencyResolver);
     }
 
-    public NetconfNorthboundSshModule(final ModuleIdentifier identifier, final DependencyResolver dependencyResolver,
-            final NetconfNorthboundSshModule oldModule, final java.lang.AutoCloseable oldInstance) {
+    public NetconfNorthboundSshModule(final org.opendaylight.controller.config.api.ModuleIdentifier identifier, final org.opendaylight.controller.config.api.DependencyResolver dependencyResolver, final org.opendaylight.controller.config.yang.netconf.northbound.ssh.NetconfNorthboundSshModule oldModule, final java.lang.AutoCloseable oldInstance) {
         super(identifier, dependencyResolver, oldModule, oldInstance);
     }
 
@@ -50,8 +47,7 @@ public class NetconfNorthboundSshModule extends AbstractNetconfNorthboundSshModu
         final LocalAddress localAddress = new LocalAddress(getPort().toString());
         final ChannelFuture localServer = dispatch.createLocalServer(localAddress);
 
-        final SshProxyServer sshProxyServer = new SshProxyServer(Executors.newScheduledThreadPool(1),
-            getWorkerThreadGroupDependency(), getEventExecutorDependency());
+        final SshProxyServer sshProxyServer = new SshProxyServer(Executors.newScheduledThreadPool(1), getWorkerThreadGroupDependency(), getEventExecutorDependency());
 
         final InetSocketAddress bindingAddress = getInetAddress();
         final SshProxyServerConfigurationBuilder sshProxyServerConfigurationBuilder = new SshProxyServerConfigurationBuilder();
@@ -59,7 +55,7 @@ public class NetconfNorthboundSshModule extends AbstractNetconfNorthboundSshModu
         sshProxyServerConfigurationBuilder.setLocalAddress(localAddress);
         sshProxyServerConfigurationBuilder.setAuthenticator(getAuthProviderDependency());
         sshProxyServerConfigurationBuilder.setIdleTimeout(Integer.MAX_VALUE);
-        sshProxyServerConfigurationBuilder.setKeyPairProvider(SecurityUtils.createGeneratorHostKeyProvider(null));
+        sshProxyServerConfigurationBuilder.setKeyPairProvider(new PEMGeneratorHostKeyProvider());
 
         localServer.addListener(new GenericFutureListener<ChannelFuture>() {
 
@@ -84,8 +80,7 @@ public class NetconfNorthboundSshModule extends AbstractNetconfNorthboundSshModu
 
     private InetSocketAddress getInetAddress() {
         try {
-            final InetAddress inetAd = InetAddress.getByName(getBindingAddress().getIpv4Address() == null ?
-                    getBindingAddress().getIpv6Address().getValue() : getBindingAddress().getIpv4Address().getValue());
+            final InetAddress inetAd = InetAddress.getByName(getBindingAddress().getIpv4Address() == null ? getBindingAddress().getIpv6Address().getValue() : getBindingAddress().getIpv4Address().getValue());
             return new InetSocketAddress(inetAd, getPort().getValue());
         } catch (final UnknownHostException e) {
             throw new IllegalArgumentException("Unable to bind netconf endpoint to address " + getBindingAddress(), e);
