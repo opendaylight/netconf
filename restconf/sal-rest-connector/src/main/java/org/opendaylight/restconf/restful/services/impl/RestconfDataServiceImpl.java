@@ -133,7 +133,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 schemaContextRef.get());
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
-        DOMDataReadWriteTransaction transaction = null;
+        final DOMDataReadWriteTransaction transaction;
         if (mountPoint == null) {
             transaction = this.transactionChainHandler.get().newReadWriteTransaction();
         } else {
