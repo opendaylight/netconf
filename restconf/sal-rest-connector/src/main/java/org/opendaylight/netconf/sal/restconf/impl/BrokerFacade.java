@@ -303,14 +303,14 @@ public class BrokerFacade {
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataDelete(
             final YangInstanceIdentifier path) {
         checkPreconditions();
-        return deleteDataViaTransaction(this.domDataBroker.newWriteOnlyTransaction(), CONFIGURATION, path);
+        return deleteDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path);
     }
 
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataDelete(
             final DOMMountPoint mountPoint, final YangInstanceIdentifier path) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
-            return deleteDataViaTransaction(domDataBrokerService.get().newWriteOnlyTransaction(), CONFIGURATION, path);
+            return deleteDataViaTransaction(domDataBrokerService.get().newReadWriteTransaction(), CONFIGURATION, path);
         }
         final String errMsg = "DOM data broker service isn't available for mount point " + path;
         LOG.warn(errMsg);
@@ -435,11 +435,28 @@ public class BrokerFacade {
         }
     }
 
-    private void checkItemDoesNotExists(final DOMDataReadWriteTransaction rWTransaction,final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+    private void checkItemExists(final DOMDataReadWriteTransaction rWTransaction,
+                                 final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        final ListenableFuture<Boolean> futureDatastoreData = rWTransaction.exists(store, path);
+        try {
+            if (!futureDatastoreData.get()) {
+                final String errMsg = "Operation via Restconf was not executed because data does not exist";
+                LOG.trace("{}:{}", errMsg, path);
+                rWTransaction.cancel();
+                throw new RestconfDocumentedException("Data does not exist for path: " + path, ErrorType.PROTOCOL,
+                        ErrorTag.DATA_MISSING);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            LOG.warn("It wasn't possible to get data loaded from datastore at path {}", path, e);
+        }
+    }
+
+    private void checkItemDoesNotExists(final DOMDataReadWriteTransaction rWTransaction,
+                                        final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         final ListenableFuture<Boolean> futureDatastoreData = rWTransaction.exists(store, path);
         try {
             if (futureDatastoreData.get()) {
-                final String errMsg = "Post Configuration via Restconf was not executed because data already exists";
+                final String errMsg = "Operation via Restconf was not executed because data already exists";
                 LOG.trace("{}:{}", errMsg, path);
                 rWTransaction.cancel();
                 throw new RestconfDocumentedException("Data already exists for path: " + path, ErrorType.PROTOCOL,
@@ -448,7 +465,6 @@ public class BrokerFacade {
         } catch (InterruptedException | ExecutionException e) {
             LOG.warn("It wasn't possible to get data loaded from datastore at path {}", path, e);
         }
-
     }
 
     private CheckedFuture<Void, TransactionCommitFailedException> putDataViaTransaction(
@@ -469,11 +485,12 @@ public class BrokerFacade {
     }
 
     private CheckedFuture<Void, TransactionCommitFailedException> deleteDataViaTransaction(
-            final DOMDataWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
+            final DOMDataReadWriteTransaction readWriteTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path) {
         LOG.trace("Delete {} via Restconf: {}", datastore.name(), path);
-        writeTransaction.delete(datastore, path);
-        return writeTransaction.submit();
+        checkItemExists(readWriteTransaction, datastore, path);
+        readWriteTransaction.delete(datastore, path);
+        return readWriteTransaction.submit();
     }
 
     private void deleteDataWithinTransaction(
@@ -487,7 +504,7 @@ public class BrokerFacade {
             final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         LOG.trace("Merge {} within Restconf PATCH: {} with payload {}", datastore.name(), path, payload);
-        ensureParentsByMerge(datastore, path, writeTransaction, schemaContext);
+        TransactionUtil.ensureParentsByMerge(path, schemaContext, writeTransaction);
 
         // merging is necessary only for lists otherwise we can call put method
         if (payload instanceof MapNode) {
