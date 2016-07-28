@@ -8,9 +8,7 @@
 package org.opendaylight.restconf.restful.utils;
 
 import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.ListenableFuture;
 import java.net.URI;
-import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -18,9 +16,6 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
@@ -136,30 +131,9 @@ public final class PostDataTransactionUtil {
     private static void putChild(final NormalizedNode<?, ?> child, final DOMDataReadWriteTransaction readWriteTx,
             final YangInstanceIdentifier path) {
         final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
-        checkItemDesNotExits(childPath, readWriteTx);
+        TransactionUtil.checkItemDoesNotExists(readWriteTx, LogicalDatastoreType.CONFIGURATION, childPath,
+                RestconfDataServiceConstant.PostData.POST_TX_TYPE);
         readWriteTx.put(LogicalDatastoreType.CONFIGURATION, childPath, child);
-    }
-
-    /**
-     * Check if data posted to create doesn't exits.
-     *
-     * @param path
-     *            - path to data
-     * @param readWriteTx
-     *            - read write transaction
-     */
-    private static void checkItemDesNotExits(final YangInstanceIdentifier path,
-            final DOMDataReadWriteTransaction readWriteTx) {
-        final ListenableFuture<Boolean> existData = readWriteTx.exists(LogicalDatastoreType.CONFIGURATION, path);
-        try {
-            if (existData.get()) {
-                readWriteTx.cancel();
-                throw new RestconfDocumentedException("Data already exists for path: " + path, ErrorType.PROTOCOL,
-                        ErrorTag.DATA_EXISTS);
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            LOG.warn("It wasn't possible to get data loaded from datastore at path {}", path, e);
-        }
     }
 
     /**
@@ -187,4 +161,3 @@ public final class PostDataTransactionUtil {
         return uriBuilder.build();
     }
 }
-
