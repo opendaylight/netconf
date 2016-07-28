@@ -11,10 +11,8 @@ package org.opendaylight.netconf.sal.restconf.impl;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -78,7 +76,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.ModifiedNodeDoesNotExistException;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
@@ -930,7 +927,7 @@ public class RestconfImpl implements RestconfService {
         final DOMMountPoint mountPoint = iiWithData.getMountPoint();
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
 
-        CheckedFuture<Void, TransactionCommitFailedException> future;
+        final CheckedFuture<Void, TransactionCommitFailedException> future;
         if (mountPoint != null) {
             future = this.broker.commitConfigurationDataDelete(mountPoint, normalizedII);
         } else {
@@ -961,16 +958,12 @@ public class RestconfImpl implements RestconfService {
             LOG.warn(msg);
             throw new RestconfDocumentedException(msg, e);
         }
+
         return Response.status(Status.OK).build();
     }
 
     protected void handlerLoggerDelete(final Throwable t) {
         if (t != null) {
-            final Optional<Throwable> searchedException = Iterables.tryFind(Throwables.getCausalChain(t),
-                    Predicates.instanceOf(ModifiedNodeDoesNotExistException.class));
-            if (searchedException.isPresent()) {
-                throw new RestconfDocumentedException("Data specified for deleting doesn't exist.", ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
-            }
             final String errMsg = "Error while deleting data";
             LOG.info(errMsg, t);
             throw new RestconfDocumentedException(errMsg, t);
