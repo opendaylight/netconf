@@ -930,7 +930,7 @@ public class RestconfImpl implements RestconfService {
         final DOMMountPoint mountPoint = iiWithData.getMountPoint();
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
 
-        CheckedFuture<Void, TransactionCommitFailedException> future;
+        final CheckedFuture<Void, TransactionCommitFailedException> future;
         if (mountPoint != null) {
             future = this.broker.commitConfigurationDataDelete(mountPoint, normalizedII);
         } else {
@@ -961,6 +961,7 @@ public class RestconfImpl implements RestconfService {
             LOG.warn(msg);
             throw new RestconfDocumentedException(msg, e);
         }
+
         return Response.status(Status.OK).build();
     }
 
@@ -969,7 +970,8 @@ public class RestconfImpl implements RestconfService {
             final Optional<Throwable> searchedException = Iterables.tryFind(Throwables.getCausalChain(t),
                     Predicates.instanceOf(ModifiedNodeDoesNotExistException.class));
             if (searchedException.isPresent()) {
-                throw new RestconfDocumentedException("Data specified for deleting doesn't exist.", ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
+                throw new RestconfDocumentedException("Data specified for deleting doesn't exist.",
+                        ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
             }
             final String errMsg = "Error while deleting data";
             LOG.info(errMsg, t);

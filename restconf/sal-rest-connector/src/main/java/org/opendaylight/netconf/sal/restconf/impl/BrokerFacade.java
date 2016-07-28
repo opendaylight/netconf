@@ -20,10 +20,11 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
+import javax.annotation.Nullable;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
@@ -303,14 +304,14 @@ public class BrokerFacade {
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataDelete(
             final YangInstanceIdentifier path) {
         checkPreconditions();
-        return deleteDataViaTransaction(this.domDataBroker.newWriteOnlyTransaction(), CONFIGURATION, path);
+        return deleteDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path);
     }
 
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataDelete(
             final DOMMountPoint mountPoint, final YangInstanceIdentifier path) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
-            return deleteDataViaTransaction(domDataBrokerService.get().newWriteOnlyTransaction(), CONFIGURATION, path);
+            return deleteDataViaTransaction(domDataBrokerService.get().newReadWriteTransaction(), CONFIGURATION, path);
         }
         final String errMsg = "DOM data broker service isn't available for mount point " + path;
         LOG.warn(errMsg);
@@ -346,21 +347,21 @@ public class BrokerFacade {
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
         LOG.trace("Read {} via Restconf: {}", datastore.name(), path);
         final ListenableFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = transaction.read(datastore, path);
-        final ReadDataResult readData = new ReadDataResult();
+        final ReadDataResult<NormalizedNode<?, ?>> readData = new ReadDataResult<>();
         final CountDownLatch responseWaiter = new CountDownLatch(1);
 
         Futures.addCallback(listenableFuture, new FutureCallback<Optional<NormalizedNode<?, ?>>>() {
 
             @Override
             public void onSuccess(final Optional<NormalizedNode<?, ?>> result) {
-                handlingCallback(null, datastore, path, result, readData);
                 responseWaiter.countDown();
+                handlingCallback(null, datastore, path, result, readData);
             }
 
             @Override
             public void onFailure(final Throwable t) {
-                handlingCallback(t, datastore, path, null, null);
                 responseWaiter.countDown();
+                handlingCallback(t, datastore, path, null, null);
             }
         });
 
@@ -372,22 +373,6 @@ public class BrokerFacade {
             throw new RestconfDocumentedException(msg, e);
         }
         return readData.getResult();
-    }
-
-    protected static void handlingCallback(final Throwable t, final LogicalDatastoreType datastore,
-            final YangInstanceIdentifier path, final Optional<NormalizedNode<?, ?>> result,
-            final ReadDataResult readData) {
-        if (t != null) {
-            LOG.warn("Exception by reading {} via Restconf: {}", datastore.name(), path, t);
-            throw new RestconfDocumentedException("Problem to get data from transaction.", t);
-        } else {
-            LOG.debug("Reading result data from transaction.");
-            if (result != null) {
-                if (result.isPresent()) {
-                    readData.setResult(result.get());
-                }
-            }
-        }
     }
 
     private CheckedFuture<Void, TransactionCommitFailedException> postDataViaTransaction(
@@ -435,20 +420,90 @@ public class BrokerFacade {
         }
     }
 
-    private void checkItemDoesNotExists(final DOMDataReadWriteTransaction rWTransaction,final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        final ListenableFuture<Boolean> futureDatastoreData = rWTransaction.exists(store, path);
-        try {
-            if (futureDatastoreData.get()) {
-                final String errMsg = "Post Configuration via Restconf was not executed because data already exists";
-                LOG.trace("{}:{}", errMsg, path);
-                rWTransaction.cancel();
-                throw new RestconfDocumentedException("Data already exists for path: " + path, ErrorType.PROTOCOL,
-                        ErrorTag.DATA_EXISTS);
+    /**
+     * Check if item already exists. Throws error if it does NOT already exist.
+     * @param rWTransaction Current transaction
+     * @param store Used datastore
+     * @param path Path to item to verify its existence
+     */
+    private void checkItemExists(final DOMDataReadWriteTransaction rWTransaction,
+                                 final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        final CountDownLatch responseWaiter = new CountDownLatch(1);
+        final ReadDataResult<Boolean> readData = new ReadDataResult<>();
+        final CheckedFuture<Boolean, ReadFailedException> future = rWTransaction.exists(store, path);
+
+        Futures.addCallback(future, new FutureCallback<Boolean>() {
+            @Override
+            public void onSuccess(@Nullable final Boolean result) {
+                responseWaiter.countDown();
+                handlingCallback(null, store, path, Optional.of(result), readData);
             }
-        } catch (InterruptedException | ExecutionException e) {
-            LOG.warn("It wasn't possible to get data loaded from datastore at path {}", path, e);
+
+            @Override
+            public void onFailure(final Throwable t) {
+                responseWaiter.countDown();
+                handlingCallback(t, store, path, null, null);
+            }
+        });
+
+        try {
+            responseWaiter.await();
+        } catch (final InterruptedException e) {
+            final String msg = "Problem while waiting for response";
+            LOG.warn(msg);
+            throw new RestconfDocumentedException(msg, e);
         }
 
+        if (!readData.getResult()) {
+            final String errMsg = "Operation via Restconf was not executed because data does not exist";
+            LOG.trace("{}:{}", errMsg, path);
+            rWTransaction.cancel();
+            throw new RestconfDocumentedException("Data does not exist for path: " + path, ErrorType.PROTOCOL,
+                    ErrorTag.DATA_MISSING);
+        }
+    }
+
+    /**
+     * Check if item does NOT already exist. Throws error if it already exists.
+     * @param rWTransaction Current transaction
+     * @param store Used datastore
+     * @param path Path to item to verify its existence
+     */
+    private void checkItemDoesNotExists(final DOMDataReadWriteTransaction rWTransaction,
+                                        final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        final CountDownLatch responseWaiter = new CountDownLatch(1);
+        final ReadDataResult<Boolean> readData = new ReadDataResult<>();
+        final CheckedFuture<Boolean, ReadFailedException> future = rWTransaction.exists(store, path);
+
+        Futures.addCallback(future, new FutureCallback<Boolean>() {
+            @Override
+            public void onSuccess(@Nullable final Boolean result) {
+                responseWaiter.countDown();
+                handlingCallback(null, store, path, Optional.of(result), readData);
+            }
+
+            @Override
+            public void onFailure(final Throwable t) {
+                responseWaiter.countDown();
+                handlingCallback(t, store, path, null, null);
+            }
+        });
+
+        try {
+            responseWaiter.await();
+        } catch (final InterruptedException e) {
+            final String msg = "Problem while waiting for response";
+            LOG.warn(msg);
+            throw new RestconfDocumentedException(msg, e);
+        }
+
+        if (readData.getResult()) {
+            final String errMsg = "Operation via Restconf was not executed because data already exists";
+            LOG.trace("{}:{}", errMsg, path);
+            rWTransaction.cancel();
+            throw new RestconfDocumentedException("Data already exists for path: " + path, ErrorType.PROTOCOL,
+                    ErrorTag.DATA_EXISTS);
+        }
     }
 
     private CheckedFuture<Void, TransactionCommitFailedException> putDataViaTransaction(
@@ -469,11 +524,12 @@ public class BrokerFacade {
     }
 
     private CheckedFuture<Void, TransactionCommitFailedException> deleteDataViaTransaction(
-            final DOMDataWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
+            final DOMDataReadWriteTransaction readWriteTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path) {
         LOG.trace("Delete {} via Restconf: {}", datastore.name(), path);
-        writeTransaction.delete(datastore, path);
-        return writeTransaction.submit();
+        checkItemExists(readWriteTransaction, datastore, path);
+        readWriteTransaction.delete(datastore, path);
+        return readWriteTransaction.submit();
     }
 
     private void deleteDataWithinTransaction(
@@ -501,15 +557,44 @@ public class BrokerFacade {
         this.domDataBroker = domDataBroker;
     }
 
-    private class ReadDataResult {
-        NormalizedNode<?, ?> result = null;
+    /**
+     * Helper class for result of transaction commit callback.
+     * @param <T> Type of result
+     */
+    private final class ReadDataResult<T> {
+        T result = null;
 
-        NormalizedNode<?, ?> getResult() {
+        T getResult() {
             return this.result;
         }
 
-        void setResult(final NormalizedNode<?, ?> result) {
+        void setResult(final T result) {
             this.result = result;
+        }
+    }
+
+    /**
+     * Set result from transaction commit callback.
+     * @param t Throwable if transaction commit failed
+     * @param datastore Datastore from which data are read
+     * @param path Path from which data are read
+     * @param result Result of read from {@code datastore}
+     * @param readData Result value which will be set
+     * @param <X> Result type
+     */
+    protected final static <X> void handlingCallback(final Throwable t, final LogicalDatastoreType datastore,
+                                                     final YangInstanceIdentifier path, final Optional<X> result,
+                                                     final ReadDataResult<X> readData) {
+        if (t != null) {
+            LOG.warn("Exception by reading {} via Restconf: {}", datastore.name(), path, t);
+            throw new RestconfDocumentedException("Problem to get data from transaction.", t);
+        } else {
+            LOG.debug("Reading result data from transaction.");
+            if (result != null) {
+                if (result.isPresent()) {
+                    readData.setResult(result.get());
+                }
+            }
         }
     }
 
