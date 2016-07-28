@@ -11,7 +11,7 @@ import com.google.common.util.concurrent.CheckedFuture;
 import javax.ws.rs.core.Response;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -32,7 +32,6 @@ public final class DeleteDataTransactionUtil {
      *            - Wrapper for data of transaction
      * @return {@link Response}
      */
-
     public static Response deleteData(final TransactionVarsWrapper transactionNode) {
         final CheckedFuture<Void, TransactionCommitFailedException> future = submitData(
                 transactionNode.getTransaction(), transactionNode.getInstanceIdentifier().getInstanceIdentifier());
@@ -42,17 +41,18 @@ public final class DeleteDataTransactionUtil {
     }
 
     /**
-     * Delete data via transaction
+     * Delete data via transaction. Return error id data does not exist.
      *
-     * @param writeTx
-     *            - write transaction
+     * @param readWriteTx
+     *            - read and write transaction
      * @param path
      *            - path of data to delete
      * @return {@link CheckedFuture}
      */
     private static CheckedFuture<Void, TransactionCommitFailedException> submitData(
-            final DOMDataWriteTransaction writeTx, final YangInstanceIdentifier path) {
-        writeTx.delete(LogicalDatastoreType.CONFIGURATION, path);
-        return writeTx.submit();
+            final DOMDataReadWriteTransaction readWriteTx, final YangInstanceIdentifier path) {
+        TransactionUtil.checkItemExists(readWriteTx, LogicalDatastoreType.CONFIGURATION, path);
+        readWriteTx.delete(LogicalDatastoreType.CONFIGURATION, path);
+        return readWriteTx.submit();
     }
 }
