@@ -11,10 +11,8 @@ package org.opendaylight.netconf.sal.restconf.impl;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -76,7 +74,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.ModifiedNodeDoesNotExistException;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
@@ -870,20 +867,16 @@ public class RestconfImpl implements RestconfService {
 
         try {
             if (mountPoint != null) {
-                this.broker.commitConfigurationDataDelete(mountPoint, normalizedII);
+                this.broker.commitConfigurationDataDelete(mountPoint, normalizedII).checkedGet();
             } else {
-                this.broker.commitConfigurationDataDelete(normalizedII).get();
+                this.broker.commitConfigurationDataDelete(normalizedII).checkedGet();
             }
-        } catch (final Exception e) {
-            final Optional<Throwable> searchedException = Iterables.tryFind(Throwables.getCausalChain(e),
-                    Predicates.instanceOf(ModifiedNodeDoesNotExistException.class));
-            if (searchedException.isPresent()) {
-                throw new RestconfDocumentedException("Data specified for deleting doesn't exist.", ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
-            }
+        } catch (final TransactionCommitFailedException e) {
             final String errMsg = "Error while deleting data";
             LOG.info(errMsg, e);
             throw new RestconfDocumentedException(errMsg, e);
         }
+
         return Response.status(Status.OK).build();
     }
 
