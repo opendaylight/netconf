@@ -17,7 +17,7 @@ import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
-import org.opendaylight.restconf.common.wrapper.services.Draft11ServicesWrapperImpl;
+import org.opendaylight.restconf.common.wrapper.services.Draft15ServicesWrapperImpl;
 
 public class RestconfApplication extends Application {
 
@@ -33,7 +33,7 @@ public class RestconfApplication extends Application {
     @Override
     public Set<Object> getSingletons() {
         final Set<Object> singletons = new HashSet<>();
-        singletons.add(Draft11ServicesWrapperImpl.getInstance());
+        singletons.add(Draft15ServicesWrapperImpl.getInstance());
         return singletons;
     }
 }
