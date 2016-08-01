@@ -14,7 +14,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
-import org.opendaylight.restconf.Draft11;
+import org.opendaylight.restconf.Draft15;
 import org.opendaylight.restconf.utils.RestconfConstants;
 
 /**
@@ -33,7 +33,7 @@ public interface RestconfStreamsService {
      */
     @GET
     @Path("data/ietf-restconf-monitoring:restconf-state/streams")
-    @Produces({ Draft11.MediaTypes.API + RestconfConstants.JSON, Draft11.MediaTypes.API + RestconfConstants.XML,
+    @Produces({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA,
             MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public NormalizedNodeContext getAvailableStreams(@Context UriInfo uriInfo);
 }

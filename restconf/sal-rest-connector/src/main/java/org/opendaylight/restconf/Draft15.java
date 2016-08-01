@@ -20,13 +20,13 @@ import org.opendaylight.yangtools.yang.common.QName;
  * </ul>
  * </ul>
  *
- * We used old revision {@link Draft11.RestconfModule#REVISION} of restconf yang
+ * We used old revision {@link Draft15.RestconfModule#REVISION} of restconf yang
  * because the latest restconf draft has to be supported by Yang 1.1 and we are
  * not. Then, this is only partial implementation of the latest restconf draft.
  */
-public final class Draft11 {
+public final class Draft15 {
 
-    private Draft11() {
+    private Draft15() {
         throw new UnsupportedOperationException("Util class");
     }
 
@@ -40,15 +40,11 @@ public final class Draft11 {
             throw new UnsupportedOperationException("Util class");
         }
 
-        public static final String API = "application/yang.api";
-        public static final String DATASTORE = "application/yang.datastore";
-        public static final String DATA = "application/yang.data";
-        public static final String OPERATION = "application/yang.operation";
-        public static final String PATCH = "application/yang.patch";
-        public static final String PATCH_STATUS = "application/yang.patch-status";
-        public static final String ERRORS = "application/yang.errors";
+        public static final String DATA = "application/yang-data";
         public static final String YIN = "application/yin";
         public static final String YANG = "application/yang";
+        public static final String PATCH = "application/yang.patch";
+        public static final String PATCH_STATUS = "application/yang.patch-status";
     }
 
     /**
@@ -83,8 +79,8 @@ public final class Draft11 {
 
         public static final String ERROR_LIST_SCHEMA_NODE = "error";
 
-        public static final QName IETF_RESTCONF_QNAME = QName.create(Draft11.RestconfModule.NAMESPACE, Draft11.RestconfModule.REVISION,
-                Draft11.RestconfModule.NAME);
+        public static final QName IETF_RESTCONF_QNAME = QName.create(Draft15.RestconfModule.NAMESPACE, Draft15.RestconfModule.REVISION,
+                Draft15.RestconfModule.NAME);
 
         public static final QName ERRORS_CONTAINER_QNAME = QName.create(IETF_RESTCONF_QNAME, ERRORS_CONTAINER_SCHEMA_NODE);
 
