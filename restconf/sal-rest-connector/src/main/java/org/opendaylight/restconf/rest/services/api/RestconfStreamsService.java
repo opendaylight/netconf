@@ -33,7 +33,7 @@ public interface RestconfStreamsService {
      */
     @GET
     @Path("data/ietf-restconf-monitoring:restconf-state/streams")
-    @Produces({ Draft15.MediaTypes.API + RestconfConstants.JSON, Draft15.MediaTypes.API + RestconfConstants.XML,
-            MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA, MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public NormalizedNodeContext getAvailableStreams(@Context UriInfo uriInfo);
 }
