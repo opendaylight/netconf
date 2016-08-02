@@ -34,7 +34,7 @@ import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
-import org.opendaylight.restconf.Draft11;
+import org.opendaylight.restconf.Draft15;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -57,8 +57,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 @Provider
-@Consumes({ Draft02.MediaTypes.DATA + RestconfService.XML, Draft11.MediaTypes.DATA + RestconfConstants.XML,
-        Draft02.MediaTypes.OPERATION + RestconfService.XML, Draft11.MediaTypes.OPERATION + RestconfConstants.XML,
+@Consumes({ Draft02.MediaTypes.DATA + RestconfService.XML, Draft15.MediaTypes.DATA + RestconfConstants.XML,
+        Draft02.MediaTypes.OPERATION + RestconfService.XML, Draft15.MediaTypes.OPERATION + RestconfConstants.XML,
     MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsProvider implements MessageBodyReader<NormalizedNodeContext> {
 
