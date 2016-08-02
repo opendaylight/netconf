@@ -31,7 +31,7 @@ public interface RestconfModulesService {
      * @return {@link NormalizedNodeContext}
      */
     @GET
-    @Path("data/ietf-yang-library:modules")
+    @Path("data/ietf-yang-library:modules-state")
     @Produces({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public NormalizedNodeContext getModules(@Context UriInfo uriInfo);
@@ -47,7 +47,7 @@ public interface RestconfModulesService {
      * @return {@link NormalizedNodeContext}
      */
     @GET
-    @Path("data/ietf-yang-library:modules/{identifier:.+}")
+    @Path("data/ietf-yang-library:modules-state/{identifier:.+}")
     @Produces({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public NormalizedNodeContext getModules(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
@@ -64,7 +64,7 @@ public interface RestconfModulesService {
      * @return {@link NormalizedNodeContext}
      */
     @GET
-    @Path("data/ietf-yang-library:modules/module/{identifier:.+}")
+    @Path("data/ietf-yang-library:modules-state/module/{identifier:.+}")
     @Produces({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public NormalizedNodeContext getModule(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
