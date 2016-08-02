@@ -43,12 +43,12 @@
       <dependency>
         <groupId>openexi</groupId>
         <artifactId>nagasena</artifactId>
-        <version>0000.0002.0053.0</version>
+        <version>0000.0002.0062.0</version>
       </dependency>
       <dependency>
         <groupId>openexi</groupId>
         <artifactId>nagasena-rta</artifactId>
-        <version>0000.0002.0053.0</version>
+        <version>0000.0002.0062.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
