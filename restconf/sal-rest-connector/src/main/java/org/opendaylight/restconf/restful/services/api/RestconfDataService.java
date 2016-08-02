@@ -45,8 +45,8 @@ public interface RestconfDataService {
      */
     @GET
     @Path("/data/{identifier:.+}")
-    @Produces({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA + RestconfConstants.XML,
-            MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA, MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     NormalizedNodeContext readData(@Encoded @PathParam("identifier") String identifier,
             @Context UriInfo uriInfo);
 
@@ -61,8 +61,8 @@ public interface RestconfDataService {
      */
     @PUT
     @Path("/data/{identifier:.+}")
-    @Consumes({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA + RestconfConstants.XML,
-            MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Consumes({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA, MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     Response putData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload);
 
     /**
@@ -78,8 +78,8 @@ public interface RestconfDataService {
      */
     @POST
     @Path("/data/{identifier:.+}")
-    @Consumes({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA + RestconfConstants.XML,
-            MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Consumes({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA, MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     Response postData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
             @Context UriInfo uriInfo);
 
@@ -94,8 +94,8 @@ public interface RestconfDataService {
      */
     @POST
     @Path("/data")
-    @Consumes({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA + RestconfConstants.XML,
-            MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Consumes({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA, MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     Response postData(NormalizedNodeContext payload, @Context UriInfo uriInfo);
 
     /**

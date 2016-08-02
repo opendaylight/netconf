@@ -34,8 +34,8 @@ public interface RestconfOperationsService {
      */
     @GET
     @Path("/operations")
-    @Produces({ Draft15.MediaTypes.API + RestconfConstants.JSON, Draft15.MediaTypes.API + RestconfConstants.XML,
-            MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA, MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public NormalizedNodeContext getOperations(@Context UriInfo uriInfo);
 
     /**
@@ -49,7 +49,7 @@ public interface RestconfOperationsService {
      */
     @GET
     @Path("/operations/{identifier:.+}")
-    @Produces({ Draft15.MediaTypes.API + RestconfConstants.JSON, Draft15.MediaTypes.API + RestconfConstants.XML,
-            MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA, MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public NormalizedNodeContext getOperations(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 }
