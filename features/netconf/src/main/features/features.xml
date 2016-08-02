@@ -83,7 +83,7 @@
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/{{VERSION}}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/{{VERSION}}</bundle>
     <bundle>mvn:org.apache.sshd/sshd-core/{{VERSION}}</bundle>
-    <bundle>mvn:openexi/nagasena/{{VERSION}}</bundle>
+    <bundle>mvn:wrap:openexi/nagasena/{{VERSION}}</bundle>
   </feature>
 
   <feature name='odl-netconf-client' version='${project.version}' description="OpenDaylight :: Netconf :: Client">
