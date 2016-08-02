@@ -17,19 +17,19 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
-final class Draft11StringModuleInstanceIdentifierCodec extends AbstractModuleStringInstanceIdentifierCodec {
+final class Draft15StringModuleInstanceIdentifierCodec extends AbstractModuleStringInstanceIdentifierCodec {
 
     private final DataSchemaContextTree dataContextTree;
     private final SchemaContext context;
     private final String defaultPrefix;
 
-    Draft11StringModuleInstanceIdentifierCodec(SchemaContext context) {
+    Draft15StringModuleInstanceIdentifierCodec(SchemaContext context) {
         this.context = Preconditions.checkNotNull(context);
         this.dataContextTree = DataSchemaContextTree.from(context);
         this.defaultPrefix = "";
     }
 
-    Draft11StringModuleInstanceIdentifierCodec(SchemaContext context, @Nonnull String defaultPrefix) {
+    Draft15StringModuleInstanceIdentifierCodec(SchemaContext context, @Nonnull String defaultPrefix) {
         this.context = Preconditions.checkNotNull(context);
         this.dataContextTree = DataSchemaContextTree.from(context);
         this.defaultPrefix = defaultPrefix;
