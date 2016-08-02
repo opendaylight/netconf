@@ -24,7 +24,7 @@ import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
-import org.opendaylight.restconf.utils.patch.Draft11AbstractIdentifierAwareJaxRsProvider;
+import org.opendaylight.restconf.utils.patch.Draft15AbstractIdentifierAwareJaxRsProvider;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public abstract class Draft11AbstractBodyReaderTest {
@@ -36,10 +36,10 @@ public abstract class Draft11AbstractBodyReaderTest {
 
     public Draft11AbstractBodyReaderTest() throws NoSuchFieldException,
             SecurityException {
-        uriField = Draft11AbstractIdentifierAwareJaxRsProvider.class
+        uriField = Draft15AbstractIdentifierAwareJaxRsProvider.class
                 .getDeclaredField("uriInfo");
         uriField.setAccessible(true);
-        requestField = Draft11AbstractIdentifierAwareJaxRsProvider.class
+        requestField = Draft15AbstractIdentifierAwareJaxRsProvider.class
                 .getDeclaredField("request");
         requestField.setAccessible(true);
         mediaType = getMediaType();
@@ -52,7 +52,7 @@ public abstract class Draft11AbstractBodyReaderTest {
         return TestRestconfUtils.loadSchemaContext(yangPath, schemaContext);
     }
 
-    protected static <T extends Draft11AbstractIdentifierAwareJaxRsProvider> void mockBodyReader(
+    protected static <T extends Draft15AbstractIdentifierAwareJaxRsProvider> void mockBodyReader(
             final String identifier, final T normalizedNodeProvider,
             final boolean isPost) throws NoSuchFieldException,
             SecurityException, IllegalArgumentException, IllegalAccessException {
