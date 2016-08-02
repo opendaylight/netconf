@@ -16,21 +16,21 @@ import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 
 /**
- * Wrapping providers from restconf draft02 and draft11.
+ * Wrapping providers from restconf draft02 and draft15.
  *
  */
 public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
 
     // DRAFT02
     private final RestconfProviderImpl providerDraft02;
-    // DRAFT11
-    private final RestConnectorProvider providerDraft11;
+    // DRAFT15
+    private final RestConnectorProvider providerDraft15;
 
     /**
      * Init both providers:
      * <ul>
      * <li>draft02 - {@link RestconfProviderImpl}
-     * <li>draft11 - {@link RestConnectorProvider}
+     * <li>draft15 - {@link RestConnectorProvider}
      * </ul>
      *
      * @param port
@@ -41,15 +41,14 @@ public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
         this.providerDraft02 = new RestconfProviderImpl();
         this.providerDraft02.setWebsocketPort(port);
 
-        // Init draft11 provider
-        this.providerDraft11 = new RestConnectorProvider();
+        this.providerDraft15 = new RestConnectorProvider();
     }
 
     /**
      * Register both providers, which will use the SAL layer:
      * <ul>
      * <li>draft02 - {@link RestconfProviderImpl}
-     * <li>draft11 - {@link RestConnectorProvider}
+     * <li>draft15 - {@link RestConnectorProvider}
      * </ul>
      *
      * @param broker
@@ -59,8 +58,8 @@ public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
         // Register draft02 provider
         broker.registerProvider(this.providerDraft02);
 
-        // Register draft11 provider
-        broker.registerProvider(this.providerDraft11);
+        // Register draft15 provider
+        broker.registerProvider(this.providerDraft15);
     }
 
     /**
@@ -78,7 +77,7 @@ public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
     @Override
     public void close() throws Exception {
         this.providerDraft02.close();
-        this.providerDraft11.close();
+        this.providerDraft15.close();
     }
 
 }
