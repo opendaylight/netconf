@@ -20,9 +20,9 @@ import org.opendaylight.netconf.sal.rest.impl.PATCHJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.PATCHXmlBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.RestconfDocumentedExceptionMapper;
 import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
-import org.opendaylight.restconf.common.wrapper.services.Draft11ServicesWrapperImpl;
-import org.opendaylight.restconf.utils.patch.Draft11JsonToPATCHBodyReader;
-import org.opendaylight.restconf.utils.patch.Draft11XmlToPATCHBodyReader;
+import org.opendaylight.restconf.common.wrapper.services.Draft15ServicesWrapperImpl;
+import org.opendaylight.restconf.utils.patch.Draft15JsonToPATCHBodyReader;
+import org.opendaylight.restconf.utils.patch.Draft15XmlToPATCHBodyReader;
 
 public class RestconfApplication extends Application {
 
@@ -31,7 +31,7 @@ public class RestconfApplication extends Application {
         return ImmutableSet.<Class<?>> builder().add(NormalizedNodeJsonBodyWriter.class)
                 .add(NormalizedNodeXmlBodyWriter.class).add(JsonNormalizedNodeBodyReader.class)
                 .add(XmlNormalizedNodeBodyReader.class).add(SchemaExportContentYinBodyWriter.class)
-                .add(Draft11JsonToPATCHBodyReader.class).add(Draft11XmlToPATCHBodyReader.class)
+                .add(Draft15JsonToPATCHBodyReader.class).add(Draft15XmlToPATCHBodyReader.class)
                 .add(PATCHJsonBodyWriter.class).add(PATCHXmlBodyWriter.class)
                 .add(SchemaExportContentYangBodyWriter.class).add(RestconfDocumentedExceptionMapper.class)
                 .build();
@@ -40,7 +40,7 @@ public class RestconfApplication extends Application {
     @Override
     public Set<Object> getSingletons() {
         final Set<Object> singletons = new HashSet<>();
-        singletons.add(Draft11ServicesWrapperImpl.getInstance());
+        singletons.add(Draft15ServicesWrapperImpl.getInstance());
         return singletons;
     }
 }

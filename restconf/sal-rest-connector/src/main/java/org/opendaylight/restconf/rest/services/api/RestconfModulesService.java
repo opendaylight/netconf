@@ -15,7 +15,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
-import org.opendaylight.restconf.Draft11;
+import org.opendaylight.restconf.Draft15;
 import org.opendaylight.restconf.utils.RestconfConstants;
 
 /**
@@ -32,7 +32,7 @@ public interface RestconfModulesService {
      */
     @GET
     @Path("data/ietf-yang-library:modules")
-    @Produces({ Draft11.MediaTypes.API + RestconfConstants.JSON, Draft11.MediaTypes.API + RestconfConstants.XML,
+    @Produces({ Draft15.MediaTypes.API + RestconfConstants.JSON, Draft15.MediaTypes.API + RestconfConstants.XML,
             MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public NormalizedNodeContext getModules(@Context UriInfo uriInfo);
 
@@ -48,7 +48,7 @@ public interface RestconfModulesService {
      */
     @GET
     @Path("data/ietf-yang-library:modules/{identifier:.+}")
-    @Produces({ Draft11.MediaTypes.API + RestconfConstants.JSON, Draft11.MediaTypes.API + RestconfConstants.XML,
+    @Produces({ Draft15.MediaTypes.API + RestconfConstants.JSON, Draft15.MediaTypes.API + RestconfConstants.XML,
             MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public NormalizedNodeContext getModules(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 
@@ -65,7 +65,7 @@ public interface RestconfModulesService {
      */
     @GET
     @Path("data/ietf-yang-library:modules/module/{identifier:.+}")
-    @Produces({ Draft11.MediaTypes.API + RestconfConstants.JSON, Draft11.MediaTypes.API + RestconfConstants.XML,
+    @Produces({ Draft15.MediaTypes.API + RestconfConstants.JSON, Draft15.MediaTypes.API + RestconfConstants.XML,
             MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public NormalizedNodeContext getModule(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 }
