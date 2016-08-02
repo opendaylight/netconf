@@ -7,12 +7,12 @@
  */
 package org.opendaylight.netconf.sal.rest.api;
 
-import org.opendaylight.restconf.Draft11;
+import org.opendaylight.restconf.Draft15;
 import org.opendaylight.yangtools.yang.common.QName;
 
 /**
  * @deprecated Do not use old implementation of restconf draft. It will be
- *             replaced by {@link Draft11}.
+ *             replaced by {@link Draft15}.
  *
  */
 @Deprecated
