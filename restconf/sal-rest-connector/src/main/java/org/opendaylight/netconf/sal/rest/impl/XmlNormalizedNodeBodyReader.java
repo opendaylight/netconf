@@ -58,8 +58,8 @@ import org.w3c.dom.Element;
 
 @Provider
 @Consumes({ Draft02.MediaTypes.DATA + RestconfService.XML, Draft15.MediaTypes.DATA + RestconfConstants.XML,
-        Draft02.MediaTypes.OPERATION + RestconfService.XML, Draft15.MediaTypes.OPERATION + RestconfConstants.XML,
-    MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+        Draft02.MediaTypes.OPERATION + RestconfService.XML, Draft15.MediaTypes.DATA, MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML })
 public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsProvider implements MessageBodyReader<NormalizedNodeContext> {
 
     private final static Logger LOG = LoggerFactory.getLogger(XmlNormalizedNodeBodyReader.class);
