@@ -47,9 +47,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 @Provider
 @Produces({ Draft02.MediaTypes.API + RestconfService.JSON, Draft02.MediaTypes.DATA + RestconfService.JSON,
-        Draft02.MediaTypes.OPERATION + RestconfService.JSON,
-        Draft15.MediaTypes.API + RestconfConstants.JSON, Draft15.MediaTypes.DATA + RestconfConstants.JSON,
-        Draft15.MediaTypes.OPERATION + RestconfConstants.JSON, MediaType.APPLICATION_JSON })
+        Draft02.MediaTypes.OPERATION + RestconfService.JSON, Draft15.MediaTypes.DATA + RestconfConstants.JSON,
+        MediaType.APPLICATION_JSON })
 public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<NormalizedNodeContext> {
 
     private static final int DEFAULT_INDENT_SPACES_NUM = 2;

@@ -41,14 +41,10 @@ public interface RestconfInvokeOperationsService {
      */
     @POST
     @Path("/operations/{identifier:.+}")
-    @Produces({ Draft15.MediaTypes.OPERATION + RestconfConstants.JSON,
-            Draft15.MediaTypes.OPERATION + RestconfConstants.XML, Draft15.MediaTypes.DATA + RestconfConstants.JSON,
-            Draft15.MediaTypes.DATA + RestconfConstants.XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML,
-            MediaType.TEXT_XML })
-    @Consumes({ Draft15.MediaTypes.OPERATION + RestconfConstants.JSON,
-            Draft15.MediaTypes.OPERATION + RestconfConstants.XML, Draft15.MediaTypes.DATA + RestconfConstants.JSON,
-            Draft15.MediaTypes.DATA + RestconfConstants.XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML,
-            MediaType.TEXT_XML })
+    @Produces({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA, MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Consumes({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA, MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     NormalizedNodeContext invokeRpc(@Encoded @PathParam("identifier") String identifier,
             NormalizedNodeContext payload, @Context UriInfo uriInfo);
 }
