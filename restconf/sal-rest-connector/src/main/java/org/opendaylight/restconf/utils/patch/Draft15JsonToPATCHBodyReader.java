@@ -35,7 +35,7 @@ import org.opendaylight.netconf.sal.restconf.impl.PATCHEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
-import org.opendaylight.restconf.Draft11;
+import org.opendaylight.restconf.Draft15;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -51,11 +51,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Provider
-@Consumes({Draft11.MediaTypes.PATCH + RestconfConstants.JSON})
-public class Draft11JsonToPATCHBodyReader extends Draft11AbstractIdentifierAwareJaxRsProvider
+@Consumes({Draft15.MediaTypes.PATCH + RestconfConstants.JSON})
+public class Draft15JsonToPATCHBodyReader extends Draft15AbstractIdentifierAwareJaxRsProvider
         implements MessageBodyReader<PATCHContext> {
 
-    private final static Logger LOG = LoggerFactory.getLogger(Draft11JsonToPATCHBodyReader.class);
+    private final static Logger LOG = LoggerFactory.getLogger(Draft15JsonToPATCHBodyReader.class);
     private String patchId;
 
     @Override
@@ -115,9 +115,9 @@ public class Draft11JsonToPATCHBodyReader extends Draft11AbstractIdentifierAware
 
     private List<PATCHEntity> read(final JsonReader in, final InstanceIdentifierContext path) throws IOException {
         final List<PATCHEntity> resultCollection = new ArrayList<>();
-        final Draft11StringModuleInstanceIdentifierCodec codec = new Draft11StringModuleInstanceIdentifierCodec(
+        final Draft15StringModuleInstanceIdentifierCodec codec = new Draft15StringModuleInstanceIdentifierCodec(
                 path.getSchemaContext());
-        final Draft11JsonToPATCHBodyReader.PatchEdit edit = new Draft11JsonToPATCHBodyReader.PatchEdit();
+        final Draft15JsonToPATCHBodyReader.PatchEdit edit = new Draft15JsonToPATCHBodyReader.PatchEdit();
 
         while (in.hasNext()) {
             switch (in.peek()) {
@@ -169,7 +169,7 @@ public class Draft11JsonToPATCHBodyReader extends Draft11AbstractIdentifierAware
      */
     private void parseByName(@Nonnull final String name, @Nonnull final PatchEdit edit,
                              @Nonnull final JsonReader in, @Nonnull final InstanceIdentifierContext path,
-                             @Nonnull final Draft11StringModuleInstanceIdentifierCodec codec,
+                             @Nonnull final Draft15StringModuleInstanceIdentifierCodec codec,
                              @Nonnull final List<PATCHEntity> resultCollection) throws IOException {
         switch (name) {
             case "edit" :
@@ -208,7 +208,7 @@ public class Draft11JsonToPATCHBodyReader extends Draft11AbstractIdentifierAware
      */
     private void readEditDefinition(@Nonnull final PatchEdit edit, @Nonnull final JsonReader in,
                                     @Nonnull final InstanceIdentifierContext path,
-                                    @Nonnull final Draft11StringModuleInstanceIdentifierCodec codec) throws IOException {
+                                    @Nonnull final Draft15StringModuleInstanceIdentifierCodec codec) throws IOException {
         final StringBuffer value = new StringBuffer();
         in.beginObject();
 
