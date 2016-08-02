@@ -16,7 +16,7 @@ import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 
-public class Draft11AbstractIdentifierAwareJaxRsProvider {
+public class Draft15AbstractIdentifierAwareJaxRsProvider {
 
     private static final String POST = "POST";
 
