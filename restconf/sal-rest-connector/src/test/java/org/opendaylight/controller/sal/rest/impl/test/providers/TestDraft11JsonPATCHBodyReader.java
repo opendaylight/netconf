@@ -18,17 +18,17 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
-import org.opendaylight.restconf.utils.patch.Draft11JsonToPATCHBodyReader;
+import org.opendaylight.restconf.utils.patch.Draft15JsonToPATCHBodyReader;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class TestDraft11JsonPATCHBodyReader extends Draft11AbstractBodyReaderTest {
 
-    private final Draft11JsonToPATCHBodyReader jsonPATCHBodyReader;
+    private final Draft15JsonToPATCHBodyReader jsonPATCHBodyReader;
     private static SchemaContext schemaContext;
 
     public TestDraft11JsonPATCHBodyReader() throws NoSuchFieldException, SecurityException {
         super();
-        jsonPATCHBodyReader = new Draft11JsonToPATCHBodyReader();
+        jsonPATCHBodyReader = new Draft15JsonToPATCHBodyReader();
     }
 
     @Override
