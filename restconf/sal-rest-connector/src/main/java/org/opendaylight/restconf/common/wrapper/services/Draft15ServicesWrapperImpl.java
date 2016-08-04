@@ -102,7 +102,7 @@ public class Draft15ServicesWrapperImpl implements Draft15BaseServicesWrapper, D
     }
 
     @Override
-    public NormalizedNodeContext readData(final String identifier, final UriInfo uriInfo) {
+    public Response readData(final String identifier, final UriInfo uriInfo) {
         return this.delegRestconfDataService.readData(identifier, uriInfo);
     }
 
