@@ -26,6 +26,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.restconf.restful.utils.RestconfDataServiceConstant.PatchData;
@@ -56,6 +57,7 @@ public final class PatchDataTransactionUtil {
                                                final SchemaContextRef schemaContextRef) {
         final List<PATCHStatusEntity> editCollection = new ArrayList<>();
         int errorCounter = 0;
+        final DOMDataReadWriteTransaction tx = transactionNode.getTransactionChain().newReadWriteTransaction();
 
         for (final PATCHEntity patchEntity : context.getData()) {
             final PATCHEditOperation operation = PATCHEditOperation.valueOf(patchEntity.getOperation().toUpperCase());
@@ -65,8 +67,7 @@ public final class PatchDataTransactionUtil {
                     if (errorCounter == 0) {
                         try {
                             createDataWithinTransaction(LogicalDatastoreType.CONFIGURATION,
-                                    patchEntity.getTargetNode(), patchEntity.getNode(),
-                                    transactionNode.getTransaction(), schemaContextRef);
+                                    patchEntity.getTargetNode(), patchEntity.getNode(), tx, schemaContextRef);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(),
@@ -78,8 +79,8 @@ public final class PatchDataTransactionUtil {
                 case DELETE:
                     if (errorCounter == 0) {
                         try {
-                            deleteDataWithinTransaction(LogicalDatastoreType.CONFIGURATION,
-                                    patchEntity.getTargetNode(), transactionNode.getTransaction());
+                            deleteDataWithinTransaction(LogicalDatastoreType.CONFIGURATION, patchEntity.getTargetNode(),
+                                    tx);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(),
@@ -92,8 +93,7 @@ public final class PatchDataTransactionUtil {
                     if (errorCounter == 0) {
                         try {
                             mergeDataWithinTransaction(LogicalDatastoreType.CONFIGURATION,
-                                    patchEntity.getTargetNode(), patchEntity.getNode(), transactionNode.getTransaction(),
-                                    schemaContextRef);
+                                    patchEntity.getTargetNode(), patchEntity.getNode(), tx, schemaContextRef);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(),
@@ -106,8 +106,7 @@ public final class PatchDataTransactionUtil {
                     if (errorCounter == 0) {
                         try {
                             replaceDataWithinTransaction(LogicalDatastoreType.CONFIGURATION,
-                                    patchEntity.getTargetNode(), patchEntity.getNode(), schemaContextRef,
-                                    transactionNode.getTransaction());
+                                    patchEntity.getTargetNode(), patchEntity.getNode(), schemaContextRef, tx);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(),
@@ -119,8 +118,8 @@ public final class PatchDataTransactionUtil {
                 case REMOVE:
                     if (errorCounter == 0) {
                         try {
-                            removeDataWithinTransaction(LogicalDatastoreType.CONFIGURATION,
-                                    patchEntity.getTargetNode(), transactionNode.getTransaction());
+                            removeDataWithinTransaction(LogicalDatastoreType.CONFIGURATION, patchEntity.getTargetNode(),
+                                    tx);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(),
@@ -141,8 +140,7 @@ public final class PatchDataTransactionUtil {
         // if no errors then submit transaction, otherwise cancel
         if (errorCounter == 0) {
             final ResponseFactory response = new ResponseFactory();
-            final CheckedFuture<Void, TransactionCommitFailedException> future = transactionNode
-                    .getTransaction().submit();
+            final CheckedFuture<Void, TransactionCommitFailedException> future = tx.submit();
 
             try {
                 FutureCallbackTx.addCallback(future, PatchData.PATCH_TX_TYPE, response);
@@ -154,7 +152,8 @@ public final class PatchDataTransactionUtil {
 
             return new PATCHStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), true, null);
         } else {
-            transactionNode.getTransaction().cancel();
+            tx.cancel();
+            RestConnectorProvider.resetTransactionChainForAdapaters(transactionNode.getTransactionChain());
             return new PATCHStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), false, null);
         }
     }
