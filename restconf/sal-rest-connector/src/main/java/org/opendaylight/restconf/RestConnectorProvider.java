@@ -5,6 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
+
 package org.opendaylight.restconf;
 
 import com.google.common.base.Preconditions;
@@ -16,7 +17,6 @@ import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListen
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.sal.core.api.Broker.ProviderSession;
 import org.opendaylight.controller.sal.core.api.Provider;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
@@ -57,8 +57,8 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
     };
 
     private ListenerRegistration<SchemaContextListener> listenerRegistration;
+    private static TransactionChainHandler transactionChainHandler;
     private static DOMDataBroker dataBroker;
-    private static DOMTransactionChain transactionChain;
 
     @Override
     public void onSessionInitiated(final ProviderSession session) {
@@ -72,30 +72,32 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         final DOMMountPointServiceHandler domMountPointServiceHandler = new DOMMountPointServiceHandler(
                 session.getService(DOMMountPointService.class));
 
-        dataBroker = session.getService(DOMDataBroker.class);
-        final DOMDataBrokerHandler brokerHandler = new DOMDataBrokerHandler(dataBroker);
+        RestConnectorProvider.dataBroker = session.getService(DOMDataBroker.class);
+        final DOMDataBrokerHandler brokerHandler = new DOMDataBrokerHandler(RestConnectorProvider.dataBroker);
 
-        transactionChain = dataBroker.createTransactionChain(transactionListener);
-        final TransactionChainHandler transactionChainHandler = new TransactionChainHandler(transactionChain);
+        RestConnectorProvider.transactionChainHandler = new TransactionChainHandler(RestConnectorProvider.dataBroker
+                .createTransactionChain(RestConnectorProvider.transactionListener));
 
         final DOMRpcService rpcService = session.getService(DOMRpcService.class);
         final RpcServiceHandler rpcServiceHandler = new RpcServiceHandler(rpcService);
 
-        wrapperServices.setHandlers(schemaCtxHandler, domMountPointServiceHandler, transactionChainHandler,
-                brokerHandler, rpcServiceHandler);
+        wrapperServices.setHandlers(schemaCtxHandler, domMountPointServiceHandler,
+                RestConnectorProvider.transactionChainHandler, brokerHandler, rpcServiceHandler);
     }
 
     /**
-     * After {@link TransactionChain} failed, this is creating new transaction
-     * with listener.
+     * After {@link TransactionChain} failed, this updates {@link TransactionChainHandler} with new transaction chain.
      *
      * @param chain
      *            - old {@link TransactionChain}
      */
     public static void resetTransactionChainForAdapaters(final TransactionChain<?, ?> chain) {
-        LOG.trace("Resetting TransactionChain({}) to {}", chain, transactionChain);
+        LOG.trace("Resetting TransactionChain({})", chain);
         chain.close();
-        transactionChain = Preconditions.checkNotNull(dataBroker).createTransactionChain(transactionListener);
+        RestConnectorProvider.transactionChainHandler.update(
+                Preconditions.checkNotNull(RestConnectorProvider.dataBroker).createTransactionChain(
+                        RestConnectorProvider.transactionListener)
+        );
     }
 
     @Override
@@ -105,11 +107,14 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
 
     @Override
     public void close() throws Exception {
+        // close registration
         if (this.listenerRegistration != null) {
             this.listenerRegistration.close();
         }
-        if (transactionChain != null) {
-            transactionChain.close();
+
+        // close transaction chain
+        if (RestConnectorProvider.transactionChainHandler != null) {
+            RestConnectorProvider.transactionChainHandler.get().close();
         }
     }
 }

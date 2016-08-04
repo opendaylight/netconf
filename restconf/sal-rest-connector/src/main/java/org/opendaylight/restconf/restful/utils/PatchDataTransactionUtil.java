@@ -14,6 +14,7 @@ import com.google.common.util.concurrent.CheckedFuture;
 import java.util.ArrayList;
 import java.util.List;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
@@ -185,7 +186,7 @@ public final class PatchDataTransactionUtil {
                                                     final YangInstanceIdentifier path,
                                                     final DOMDataReadWriteTransaction readWriteTransaction) {
         LOG.trace("Delete {} within Restconf PATCH: {}", dataStore.name(), path);
-        TransactionUtil.checkItemExists(readWriteTransaction, dataStore, path, PatchData.PATCH_TX_TYPE);
+        checkItemExistsWithinTransaction(readWriteTransaction, dataStore, path);
         readWriteTransaction.delete(dataStore, path);
     }
 
@@ -264,20 +265,62 @@ public final class PatchDataTransactionUtil {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
 
                 if (errorIfExists) {
-                    TransactionUtil.checkItemDoesNotExists(
-                            rWTransaction, dataStore, childPath, PatchData.PATCH_TX_TYPE);
+                    checkItemDoesNotExistsWithinTransaction(rWTransaction, dataStore, childPath);
                 }
 
                 rWTransaction.put(dataStore, childPath, child);
             }
         } else {
             if (errorIfExists) {
-                TransactionUtil.checkItemDoesNotExists(
-                        rWTransaction, dataStore, path, PatchData.PATCH_TX_TYPE);
+                checkItemDoesNotExistsWithinTransaction(rWTransaction, dataStore, path);
             }
 
             TransactionUtil.ensureParentsByMerge(path, schemaContext, rWTransaction);
             rWTransaction.put(dataStore, path, payload);
+        }
+    }
+
+    /**
+     * Check if items already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
+     * data does NOT already exists.
+     * @param rWTransaction Transaction
+     * @param store Datastore
+     * @param path Path to be checked
+     */
+    public static void checkItemExistsWithinTransaction(final DOMDataReadWriteTransaction rWTransaction,
+                                       final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        final CheckedFuture<Boolean, ReadFailedException> future = rWTransaction.exists(store, path);
+        final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
+
+        FutureCallbackTx.addCallback(future, PatchData.PATCH_TX_TYPE, response);
+
+        if (!response.result) {
+            final String errMsg = "Operation via Restconf was not executed because data does not exist";
+            LOG.trace("{}:{}", errMsg, path);
+            throw new RestconfDocumentedException(
+                    "Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, path);
+        }
+    }
+
+    /**
+     * Check if items do NOT already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
+     * data already exists.
+     * @param rWTransaction Transaction
+     * @param store Datastore
+     * @param path Path to be checked
+     */
+    public static void checkItemDoesNotExistsWithinTransaction(final DOMDataReadWriteTransaction rWTransaction,
+                                              final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        final CheckedFuture<Boolean, ReadFailedException> future = rWTransaction.exists(store, path);
+        final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
+
+        FutureCallbackTx.addCallback(future, PatchData.PATCH_TX_TYPE, response);
+
+        if (response.result) {
+            final String errMsg = "Operation via Restconf was not executed because data already exists";
+            LOG.trace("{}:{}", errMsg, path);
+            throw new RestconfDocumentedException(
+                    "Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, path);
         }
     }
 }
