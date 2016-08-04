@@ -89,7 +89,7 @@ public final class PostDataTransactionUtil {
     private static CheckedFuture<Void, TransactionCommitFailedException> submitData(final YangInstanceIdentifier path,
             final NormalizedNode<?, ?> data, final TransactionVarsWrapper transactionNode,
             final SchemaContext schemaContext) {
-        final DOMDataReadWriteTransaction transaction = transactionNode.getTransaction();
+        final DOMDataReadWriteTransaction transaction = transactionNode.getTransactionChain().newReadWriteTransaction();
         final NormalizedNode<?, ?> node = ImmutableNodes.fromInstanceId(schemaContext, path);
         transaction.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(node.getIdentifier()), node);
         TransactionUtil.ensureParentsByMerge(path, schemaContext, transaction);
