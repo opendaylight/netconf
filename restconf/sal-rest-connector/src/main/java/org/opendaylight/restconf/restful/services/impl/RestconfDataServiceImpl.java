@@ -9,16 +9,20 @@ package org.opendaylight.restconf.restful.services.impl;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
+import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
@@ -53,25 +57,36 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public NormalizedNodeContext readData(final String identifier, final UriInfo uriInfo) {
+    public Response readData(final String identifier, final UriInfo uriInfo) {
         Preconditions.checkNotNull(identifier);
         final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
 
-        final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier, schemaContextRef.get());
+        final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
+                schemaContextRef.get());
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final String value = uriInfo.getQueryParameters().getFirst(RestconfDataServiceConstant.CONTENT);
 
-        DOMDataReadWriteTransaction transaction = null;
+        DOMTransactionChain transaction = null;
         if (mountPoint == null) {
-            transaction = this.transactionChainHandler.get().newReadWriteTransaction();
+            transaction = this.transactionChainHandler.get();
         } else {
             transaction = transactionOfMountPoint(mountPoint);
         }
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(instanceIdentifier, mountPoint,
                 transaction);
         final NormalizedNode<?, ?> node = ReadDataTransactionUtil.readData(value, transactionNode);
-
-        return new NormalizedNodeContext(instanceIdentifier, node);
+        final SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
+        dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
+        final String etag = '"' + node.getNodeType().getModule().getFormattedRevision()
+                + node.getNodeType().getLocalName() + '"';
+        Response resp = null;
+        if ((value == null) || value.contains(RestconfDataServiceConstant.ReadData.CONFIG)) {
+            resp = Response.status(200).entity(new NormalizedNodeContext(instanceIdentifier, node)).header("ETag", etag)
+                    .header("Last-Modified", dateFormatGmt.toString()).build();
+        } else {
+            resp = Response.status(200).entity(new NormalizedNodeContext(instanceIdentifier, node)).build();
+        }
+        return resp;
     }
 
     @Override
@@ -87,10 +102,10 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         PutDataTransactionUtil.validateListKeysEqualityInPayloadAndUri(payload);
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        DOMDataReadWriteTransaction transaction = null;
+        DOMTransactionChain transaction = null;
         SchemaContextRef ref = null;
         if (mountPoint == null) {
-            transaction = this.transactionChainHandler.get().newReadWriteTransaction();
+            transaction = this.transactionChainHandler.get();
             ref = new SchemaContextRef(this.schemaContextHandler.get());
         } else {
             transaction = transactionOfMountPoint(mountPoint);
@@ -112,10 +127,10 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         Preconditions.checkNotNull(payload);
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        DOMDataReadWriteTransaction transaction = null;
+        DOMTransactionChain transaction = null;
         SchemaContextRef ref = null;
         if (mountPoint == null) {
-            transaction = this.transactionChainHandler.get().newReadWriteTransaction();
+            transaction = this.transactionChainHandler.get();
             ref = new SchemaContextRef(this.schemaContextHandler.get());
         } else {
             transaction = transactionOfMountPoint(mountPoint);
@@ -133,9 +148,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 schemaContextRef.get());
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
-        final DOMDataReadWriteTransaction transaction;
+        final DOMTransactionChain transaction;
         if (mountPoint == null) {
-            transaction = this.transactionChainHandler.get().newReadWriteTransaction();
+            transaction = this.transactionChainHandler.get();
         } else {
             transaction = transactionOfMountPoint(mountPoint);
         }
@@ -156,10 +171,10 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         Preconditions.checkNotNull(context);
         final DOMMountPoint mountPoint = context.getInstanceIdentifierContext().getMountPoint();
 
-        final DOMDataReadWriteTransaction transaction;
+        final DOMTransactionChain transaction;
         final SchemaContextRef ref;
         if (mountPoint == null) {
-            transaction = this.transactionChainHandler.get().newReadWriteTransaction();
+            transaction = this.transactionChainHandler.get();
             ref = new SchemaContextRef(this.schemaContextHandler.get());
         } else {
             transaction = transactionOfMountPoint(mountPoint);
@@ -178,10 +193,10 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      * @param mountPoint
      * @return {@link DOMDataReadWriteTransaction}
      */
-    private static DOMDataReadWriteTransaction transactionOfMountPoint(final DOMMountPoint mountPoint) {
+    private static DOMTransactionChain transactionOfMountPoint(final DOMMountPoint mountPoint) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
-            return domDataBrokerService.get().newReadWriteTransaction();
+            return domDataBrokerService.get().createTransactionChain(RestConnectorProvider.transactionListener);
         } else {
             final String errMsg = "DOM data broker service isn't available for mount point "
                     + mountPoint.getIdentifier();
