@@ -171,5 +171,6 @@ public class RestConnectorProviderTest {
 
         // verify interaction
         verify(this.mockRegistration, times(1)).close();
+        verify(mockTransactionChain, times(1)).close();
     }
 }

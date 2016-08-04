@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -34,7 +35,7 @@ public final class DeleteDataTransactionUtil {
      */
     public static Response deleteData(final TransactionVarsWrapper transactionNode) {
         final CheckedFuture<Void, TransactionCommitFailedException> future = submitData(
-                transactionNode.getTransaction().newReadWriteTransaction(),
+                transactionNode.getTransaction(), transactionNode.getTransaction().newReadWriteTransaction(),
                 transactionNode.getInstanceIdentifier().getInstanceIdentifier());
         final ResponseFactory response = new ResponseFactory();
         FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE, response);
@@ -44,6 +45,8 @@ public final class DeleteDataTransactionUtil {
     /**
      * Delete data via transaction. Return error if data to delete does not exist.
      *
+     * @param transactionChain
+     *            - transaction chain
      * @param readWriteTx
      *            - read and write transaction
      * @param path
@@ -51,8 +54,9 @@ public final class DeleteDataTransactionUtil {
      * @return {@link CheckedFuture}
      */
     private static CheckedFuture<Void, TransactionCommitFailedException> submitData(
-            final DOMDataReadWriteTransaction readWriteTx, final YangInstanceIdentifier path) {
-        TransactionUtil.checkItemExists(readWriteTx, LogicalDatastoreType.CONFIGURATION, path,
+            final DOMTransactionChain transactionChain, final DOMDataReadWriteTransaction readWriteTx,
+            final YangInstanceIdentifier path) {
+        TransactionUtil.checkItemExists(transactionChain, readWriteTx, LogicalDatastoreType.CONFIGURATION, path,
                 RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE);
         readWriteTx.delete(LogicalDatastoreType.CONFIGURATION, path);
         return readWriteTx.submit();
