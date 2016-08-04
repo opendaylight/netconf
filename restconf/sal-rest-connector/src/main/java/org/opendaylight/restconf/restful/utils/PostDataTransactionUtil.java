@@ -15,6 +15,7 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
@@ -89,32 +90,34 @@ public final class PostDataTransactionUtil {
     private static CheckedFuture<Void, TransactionCommitFailedException> submitData(final YangInstanceIdentifier path,
             final NormalizedNode<?, ?> data, final TransactionVarsWrapper transactionNode,
             final SchemaContext schemaContext) {
-        final DOMDataReadWriteTransaction transaction = transactionNode.getTransaction().newReadWriteTransaction();
+        final DOMTransactionChain transactionChain = transactionNode.getTransaction();
+        final DOMDataReadWriteTransaction transaction = transactionChain.newReadWriteTransaction();
         final NormalizedNode<?, ?> node = ImmutableNodes.fromInstanceId(schemaContext, path);
         transaction.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(node.getIdentifier()), node);
         TransactionUtil.ensureParentsByMerge(path, schemaContext, transaction);
 
         if (data instanceof MapNode) {
             for (final MapEntryNode child : ((MapNode) data).getValue()) {
-                putChild(child, transaction, path);
+                putChild(child, transactionChain, transaction, path);
             }
         } else if (data instanceof AugmentationNode) {
             for (final DataContainerChild<? extends PathArgument, ?> child : ((AugmentationNode) data).getValue()) {
-                putChild(child, transaction, path);
+                putChild(child, transactionChain, transaction, path);
             }
         } else if (data instanceof ChoiceNode) {
             for (final DataContainerChild<? extends PathArgument, ?> child : ((ChoiceNode) data).getValue()) {
-                putChild(child, transaction, path);
+                putChild(child, transactionChain, transaction, path);
             }
         } else if (data instanceof LeafSetNode<?>) {
             for (final LeafSetEntryNode<?> child : ((LeafSetNode<?>) data).getValue()) {
-                putChild(child, transaction, path);
+                putChild(child, transactionChain, transaction, path);
             }
         } else if (data instanceof ContainerNode) {
             for (final DataContainerChild<? extends PathArgument, ?> child : ((ContainerNode) data).getValue()) {
-                putChild(child, transaction, path);
+                putChild(child, transactionChain, transaction, path);
             }
         }
+
         return transaction.submit();
     }
 
@@ -123,15 +126,18 @@ public final class PostDataTransactionUtil {
      *
      * @param child
      *            - data
+     * @param transactionChain
+     *            - transaction chain
      * @param readWriteTx
      *            - transaction
      * @param path
      *            - path to data
      */
-    private static void putChild(final NormalizedNode<?, ?> child, final DOMDataReadWriteTransaction readWriteTx,
-            final YangInstanceIdentifier path) {
+    private static void putChild(final NormalizedNode<?, ?> child, final DOMTransactionChain transactionChain,
+                                 final DOMDataReadWriteTransaction readWriteTx, final YangInstanceIdentifier path) {
         final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
-        TransactionUtil.checkItemDoesNotExists(readWriteTx, LogicalDatastoreType.CONFIGURATION, childPath,
+        TransactionUtil.checkItemDoesNotExists(
+                transactionChain, readWriteTx, LogicalDatastoreType.CONFIGURATION, childPath,
                 RestconfDataServiceConstant.PostData.POST_TX_TYPE);
         readWriteTx.put(LogicalDatastoreType.CONFIGURATION, childPath, child);
     }
