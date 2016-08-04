@@ -10,6 +10,7 @@ package org.opendaylight.restconf.restful.transaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
+import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 
 /**
@@ -21,7 +22,7 @@ public final class TransactionVarsWrapper {
     private final InstanceIdentifierContext<?> instanceIdentifier;
     private final DOMMountPoint mountPoint;
     private LogicalDatastoreType configuration = null;
-    private final DOMDataReadWriteTransaction transaction;
+    private final DOMTransactionChain transactionChain;
 
     /**
      * Set base type of variables, which ones we need for transaction.
@@ -32,15 +33,15 @@ public final class TransactionVarsWrapper {
      *            - {@link InstanceIdentifierContext} of data for transaction
      * @param mountPoint
      *            - mount point if is present
-     * @param transaction
+     * @param transactionChain
      *            - {@link DOMDataReadWriteTransaction} transaction for
      *            operations
      */
     public TransactionVarsWrapper(final InstanceIdentifierContext<?> instanceIdentifier, final DOMMountPoint mountPoint,
-            final DOMDataReadWriteTransaction transaction) {
+            final DOMTransactionChain transactionChain) {
         this.instanceIdentifier = instanceIdentifier;
         this.mountPoint = mountPoint;
-        this.transaction = transaction;
+        this.transactionChain = transactionChain;
     }
 
     /**
@@ -86,7 +87,7 @@ public final class TransactionVarsWrapper {
      *
      * @return specific type transaction
      */
-    public DOMDataReadWriteTransaction getTransaction() {
-        return this.transaction;
+    public DOMTransactionChain getTransaction() {
+        return this.transactionChain;
     }
 }

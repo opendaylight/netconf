@@ -47,7 +47,7 @@ public interface RestconfDataService {
     @Path("/data/{identifier:.+}")
     @Produces({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    NormalizedNodeContext readData(@Encoded @PathParam("identifier") String identifier,
+    Response readData(@Encoded @PathParam("identifier") String identifier,
             @Context UriInfo uriInfo);
 
     /**
