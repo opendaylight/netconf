@@ -83,6 +83,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         jsonWriter.flush();
     }
 
+
     private void writeNormalizedNode(final JsonWriter jsonWriter, SchemaPath path,
             final InstanceIdentifierContext<SchemaNode> context, NormalizedNode<?, ?> data, final Optional<Integer> depth) throws
             IOException {

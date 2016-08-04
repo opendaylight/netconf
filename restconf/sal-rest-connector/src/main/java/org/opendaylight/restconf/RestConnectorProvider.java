@@ -41,12 +41,11 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
 
     private static final Logger LOG = LoggerFactory.getLogger(RestConnectorProvider.class);
 
-    private final TransactionChainListener transactionListener = new TransactionChainListener() {
+    public static final TransactionChainListener transactionListener = new TransactionChainListener() {
         @Override
         public void onTransactionChainFailed(final TransactionChain<?, ?> chain,
                 final AsyncTransaction<?, ?> transaction, final Throwable cause) {
             LOG.warn("TransactionChain({}) {} FAILED!", chain, transaction.getIdentifier(), cause);
-            chain.close();
             resetTransactionChainForAdapaters(chain);
             throw new RestconfDocumentedException("TransactionChain(" + chain + ") not committed correctly", cause);
         }
@@ -58,8 +57,8 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
     };
 
     private ListenerRegistration<SchemaContextListener> listenerRegistration;
-    private DOMDataBroker dataBroker;
-    private DOMTransactionChain transactionChain;
+    private static DOMDataBroker dataBroker;
+    private static DOMTransactionChain transactionChain;
 
     @Override
     public void onSessionInitiated(final ProviderSession session) {
@@ -73,11 +72,11 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         final DOMMountPointServiceHandler domMountPointServiceHandler = new DOMMountPointServiceHandler(
                 session.getService(DOMMountPointService.class));
 
-        this.dataBroker = session.getService(DOMDataBroker.class);
-        final DOMDataBrokerHandler brokerHandler = new DOMDataBrokerHandler(this.dataBroker);
+        dataBroker = session.getService(DOMDataBroker.class);
+        final DOMDataBrokerHandler brokerHandler = new DOMDataBrokerHandler(dataBroker);
 
-        this.transactionChain = this.dataBroker.createTransactionChain(this.transactionListener);
-        final TransactionChainHandler transactionChainHandler = new TransactionChainHandler(this.transactionChain);
+        transactionChain = dataBroker.createTransactionChain(transactionListener);
+        final TransactionChainHandler transactionChainHandler = new TransactionChainHandler(transactionChain);
 
         final DOMRpcService rpcService = session.getService(DOMRpcService.class);
         final RpcServiceHandler rpcServiceHandler = new RpcServiceHandler(rpcService);
@@ -93,10 +92,10 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
      * @param chain
      *            - old {@link TransactionChain}
      */
-    private void resetTransactionChainForAdapaters(final TransactionChain<?, ?> chain) {
-        LOG.trace("Resetting TransactionChain({}) to {}", chain, this.transactionChain);
-        this.transactionChain = Preconditions.checkNotNull(this.dataBroker)
-                .createTransactionChain(this.transactionListener);
+    public static void resetTransactionChainForAdapaters(final TransactionChain<?, ?> chain) {
+        LOG.trace("Resetting TransactionChain({}) to {}", chain, transactionChain);
+        chain.close();
+        transactionChain = Preconditions.checkNotNull(dataBroker).createTransactionChain(transactionListener);
     }
 
     @Override
@@ -109,8 +108,8 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         if (this.listenerRegistration != null) {
             this.listenerRegistration.close();
         }
-        if (this.transactionChain != null) {
-            this.transactionChain.close();
+        if (transactionChain != null) {
+            transactionChain.close();
         }
     }
 }

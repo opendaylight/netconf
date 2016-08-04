@@ -10,6 +10,7 @@ package org.opendaylight.restconf.restful.utils;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
+import java.util.Collection;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
@@ -18,6 +19,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
@@ -30,7 +32,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 
@@ -90,7 +94,7 @@ public final class ReadDataTransactionUtil {
     private static NormalizedNode<?, ?> readDataViaTransaction(final TransactionVarsWrapper transactionNode) {
         if (transactionNode.getLogicalDatastoreType() != null) {
             final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> listenableFuture = transactionNode
-                    .getTransaction().read(transactionNode.getLogicalDatastoreType(),
+                    .getTransaction().newReadOnlyTransaction().read(transactionNode.getLogicalDatastoreType(),
                             transactionNode.getInstanceIdentifier().getInstanceIdentifier());
             final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
             FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
@@ -118,7 +122,7 @@ public final class ReadDataTransactionUtil {
         final NormalizedNode<?, ?> configDataNode = readDataViaTransaction(transactionNode);
 
         // if no data exists
-        if (stateDataNode == null && configDataNode == null) {
+        if ((stateDataNode == null) && (configDataNode == null)) {
             throw new RestconfDocumentedException(
                     "Request could not be completed because the relevant data model content does not exist",
                     ErrorType.PROTOCOL,
@@ -209,21 +213,38 @@ public final class ReadDataTransactionUtil {
      */
     private static NormalizedNode<?, ?> prepareData(final NormalizedNode<?, ?> configDataNode,
             final NormalizedNode<?, ?> stateDataNode) {
-        final MapNode immutableStateData = ImmutableNodes.mapNodeBuilder(stateDataNode.getNodeType())
+
+        if (configDataNode instanceof MapNode) {
+            final MapNode immutableStateData = ImmutableNodes.mapNodeBuilder(stateDataNode.getNodeType())
                 .addChild((MapEntryNode) stateDataNode).build();
-        final MapNode immutableConfigData = ImmutableNodes.mapNodeBuilder(configDataNode.getNodeType())
+            final MapNode immutableConfigData = ImmutableNodes.mapNodeBuilder(configDataNode.getNodeType())
                 .addChild((MapEntryNode) configDataNode).build();
-
-        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder = ImmutableNodes
+            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder = ImmutableNodes
                 .mapEntryBuilder();
-        mapEntryBuilder.withNodeIdentifier((NodeIdentifierWithPredicates) configDataNode.getIdentifier());
+            mapEntryBuilder.withNodeIdentifier((NodeIdentifierWithPredicates) configDataNode.getIdentifier());
 
-        // MAP CONFIG DATA
-        mapDataNode(immutableConfigData, mapEntryBuilder);
-        // MAP STATE DATA
-        mapDataNode(immutableStateData, mapEntryBuilder);
+            // MAP CONFIG DATA
+            mapDataNode(immutableConfigData, mapEntryBuilder);
+            // MAP STATE DATA
+            mapDataNode(immutableStateData, mapEntryBuilder);
+            return ImmutableNodes.mapNodeBuilder(configDataNode.getNodeType()).addChild(mapEntryBuilder.build()).build();
+        } else if(configDataNode instanceof ContainerNode){
+            final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder = Builders
+                    .containerBuilder((ContainerNode) configDataNode);
+            mapCont(containerBuilder, ((ContainerNode) configDataNode).getValue());
+            mapCont(containerBuilder, ((ContainerNode) stateDataNode).getValue());
 
-        return ImmutableNodes.mapNodeBuilder(configDataNode.getNodeType()).addChild(mapEntryBuilder.build()).build();
+            return containerBuilder.build();
+        } else {
+            return null;
+        }
+    }
+
+    private static void mapCont(final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder,
+            final Collection<DataContainerChild<? extends PathArgument, ?>> childs) {
+        for (final DataContainerChild<? extends PathArgument, ?> child : childs) {
+            containerBuilder.addChild(child);
+        }
     }
 
     /**
