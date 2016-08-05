@@ -183,7 +183,8 @@ public class RestconfDataServiceImplTest {
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(txHandler);
 
         schemaContextHandler.onGlobalContextUpdated(this.contextRef.get());
-        this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler, this.mountPointServiceHandler);
+        this.dataService = new RestconfDataServiceImpl(
+                schemaContextHandler, this.transactionChainHandler, this.mountPointServiceHandler, null); //FIXME
         doReturn(this.domTransactionChain).when(this.transactionChainHandler).get();
         doReturn(this.read).when(this.domTransactionChain).newReadOnlyTransaction();
         doReturn(this.readWrite).when(this.domTransactionChain).newReadWriteTransaction();

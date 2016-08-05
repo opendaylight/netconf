@@ -132,7 +132,8 @@ public class PostDataTransactionUtilTest {
         doReturn(Futures.immediateCheckedFuture(false)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain);
+        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(
+                payload.getInstanceIdentifierContext(), null, this.transactionChain, null);
         final Response response =
                 PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);
         assertEquals(201, response.getStatus());
@@ -151,7 +152,8 @@ public class PostDataTransactionUtilTest {
         doReturn(Futures.immediateCheckedFuture(false)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain);
+        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(
+                payload.getInstanceIdentifierContext(), null, this.transactionChain, null);
         final Response response =
                 PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);
         assertEquals(201, response.getStatus());
@@ -171,7 +173,8 @@ public class PostDataTransactionUtilTest {
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node,
                 payload.getData());
         doReturn(Futures.immediateFailedCheckedFuture(new DOMException((short) 414, "Post request failed"))).when(this.readWrite).submit();
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain);
+        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(
+                payload.getInstanceIdentifierContext(), null, this.transactionChain, null);
         final Response response =
                 PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR, response.getStatusInfo());

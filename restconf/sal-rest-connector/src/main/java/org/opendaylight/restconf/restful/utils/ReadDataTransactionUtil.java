@@ -9,26 +9,29 @@ package org.opendaylight.restconf.restful.utils;
 
 import com.google.common.base.Optional;
 import com.google.common.primitives.Ints;
-import com.google.common.util.concurrent.CheckedFuture;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.netconf.sal.restconf.impl.WriterParameters;
 import org.opendaylight.netconf.sal.restconf.impl.WriterParameters.WriterParametersBuilder;
+import org.opendaylight.restconf.data.reader.ListenerReader;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.restconf.utils.parser.ParserFieldsParameter;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -354,26 +357,6 @@ public final class ReadDataTransactionUtil {
     }
 
     /**
-     * If is set specific {@link LogicalDatastoreType} in
-     * {@link TransactionVarsWrapper}, then read this type of data from DS. If
-     * don't, we have to read all data from DS (state + config)
-     *
-     * @param transactionNode
-     *            - {@link TransactionVarsWrapper} - wrapper for variables
-     * @return {@link NormalizedNode}
-     */
-    private static @Nullable NormalizedNode<?, ?> readDataViaTransaction(
-            @Nonnull final TransactionVarsWrapper transactionNode) {
-        final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> listenableFuture = transactionNode
-                .getTransactionChain().newReadOnlyTransaction().read(transactionNode.getLogicalDatastoreType(),
-                        transactionNode.getInstanceIdentifier().getInstanceIdentifier());
-        final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
-        FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
-                dataFactory);
-        return dataFactory.build();
-    }
-
-    /**
      * Read config and state data, then map them.
      *
      * @param transactionNode
@@ -390,6 +373,7 @@ public final class ReadDataTransactionUtil {
         // PREPARE CONFIG DATA NODE
         transactionNode.setLogicalDatastoreType(LogicalDatastoreType.CONFIGURATION);
         final NormalizedNode<?, ?> configDataNode;
+
         if (withDefa == null) {
             configDataNode = readDataViaTransaction(transactionNode);
         } else {
@@ -414,6 +398,25 @@ public final class ReadDataTransactionUtil {
 
         // merge data from config and state
         return mapNode(stateDataNode, configDataNode);
+    }
+
+    private static @Nullable NormalizedNode<?, ?> readDataViaTransaction(/*@NonNull final YangInstanceIdentifier path,*/
+                                                                         @Nonnull final TransactionVarsWrapper transactionNode) {
+        final ListenerReader reader = new ListenerReader();
+        final Future<Optional<NormalizedNode<?, ?>>> future = reader.readNode(
+                YangInstanceIdentifier.EMPTY, //FIXME specify path
+                transactionNode.getDataBroker(),
+                transactionNode.getLogicalDatastoreType());
+
+        NormalizedNode<?, ?> result = null;
+        try {
+            // FIXME use callback or something else?
+            result = future.get().get();
+        } catch (final InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
     /**
