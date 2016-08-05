@@ -85,7 +85,6 @@ public final class NetconfBaseOps {
         return future;
     }
 
-
     public ListenableFuture<DOMRpcResult> lockRunning(final FutureCallback<DOMRpcResult> callback) {
         final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(toPath(NETCONF_LOCK_QNAME), getLockContent(NETCONF_RUNNING_QNAME));
         Futures.addCallback(future, callback);
