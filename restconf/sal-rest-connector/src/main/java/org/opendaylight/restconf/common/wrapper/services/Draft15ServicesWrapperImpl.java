@@ -155,7 +155,8 @@ public class Draft15ServicesWrapperImpl implements Draft15BaseServicesWrapper, D
         this.delegRestOpsService = new RestconfOperationsServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
         this.delegRestSchService = new RestconfSchemaServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
         this.delegRestStrsService = new RestconfStreamsServiceImpl(schemaCtxHandler);
-        this.delegRestconfDataService = new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler);
+        this.delegRestconfDataService = new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler,
+                domDataBrokerHandler.get());
         this.delegRestconfInvokeOpsService = new RestconfInvokeOperationsServiceImpl(rpcServiceHandler,
                 schemaCtxHandler);
         this.delegRestconfSubscrService = new RestconfStreamsSubscriptionServiceImpl(domDataBrokerHandler);
