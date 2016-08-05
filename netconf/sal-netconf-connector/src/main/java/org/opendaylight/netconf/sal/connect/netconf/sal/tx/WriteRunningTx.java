@@ -11,7 +11,6 @@ package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
@@ -58,29 +57,14 @@ public class WriteRunningTx extends AbstractWriteTx {
 
     @Override
     protected synchronized void init() {
-        lock();
-    }
+        try {
+            final String operation = "lock running";
 
-    private void lock() {
-        final FutureCallback<DOMRpcResult> lockCallback = new FutureCallback<DOMRpcResult>() {
-            @Override
-            public void onSuccess(DOMRpcResult result) {
-                if (isSuccess(result)) {
-                    if (LOG.isTraceEnabled()) {
-                        LOG.trace("Lock running succesfull");
-                    }
-                } else {
-                    LOG.warn("{}: lock running invoked unsuccessfully: {}", id, result.getErrors());
-                }
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                LOG.warn("Lock running operation failed. {}", t);
-                throw new RuntimeException(id + ": Failed to lock running datastore", t);
-            }
-        };
-        netOps.lockRunning(lockCallback);
+            ListenableFuture<DOMRpcResult> lockFuture = netOps.lockRunning(new NetconfRpcFutureCallback(operation, id));
+            listenableFutureToCheckedFuture(lockFuture, operation).checkedGet();
+        } catch (NetconfDocumentedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -93,6 +77,13 @@ public class WriteRunningTx extends AbstractWriteTx {
         LOG.warn("{}: Error {} data to (running){}, data: {}, canceling", id, editType, path, data, e);
         cancel();
         throw new RuntimeException(id + ": Error while " + editType + ": (running)" + path, e);
+    }
+
+    @Override
+    protected void handleDeleteException(final YangInstanceIdentifier path, final NetconfDocumentedException e) {
+        LOG.warn("{}: Error deleting data (running){}, canceling", id, path, e);
+        cancel();
+        throw new RuntimeException(id + ": Error while deleting (running)" + path, e);
     }
 
     @Override
@@ -123,32 +114,18 @@ public class WriteRunningTx extends AbstractWriteTx {
                               final Optional<NormalizedNode<?, ?>> data,
                               final DataContainerChild<?, ?> editStructure,
                               final Optional<ModifyAction> defaultOperation,
-                              final String operation) {
-        FutureCallback<DOMRpcResult> editConfigCallback = new FutureCallback<DOMRpcResult>() {
-            @Override
-            public void onSuccess(DOMRpcResult result) {
-                if (isSuccess(result)) {
-                    if (LOG.isTraceEnabled()) {
-                        LOG.trace("Edit running succesfull");
-                    }
-                } else {
-                    LOG.warn("{}: Edit running invoked unsuccessfully: {}", id, result.getErrors());
-                }
-            }
+                              final String operationType) throws NetconfDocumentedException {
 
-            @Override
-            public void onFailure(Throwable t) {
-                LOG.warn("Edit running operation failed. {}", t);
-                NetconfDocumentedException e = new NetconfDocumentedException(id + ": Edit running operation failed.", NetconfDocumentedException.ErrorType.application,
-                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
-                handleEditException(path, data.orNull(), e, operation);
-            }
-        };
+        final String operation = "edit running - " + operationType;
+
+        ListenableFuture<DOMRpcResult> editConfigFuture = null;
         if (defaultOperation.isPresent()) {
-            netOps.editConfigRunning(editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport);
+            editConfigFuture  = netOps.editConfigRunning(new NetconfRpcFutureCallback(operation, id), editStructure, defaultOperation.get(), rollbackSupport);
         } else {
-            netOps.editConfigRunning(editConfigCallback, editStructure, rollbackSupport);
+            editConfigFuture = netOps.editConfigRunning(new NetconfRpcFutureCallback(operation, id), editStructure, rollbackSupport);
         }
+
+        listenableFutureToCheckedFuture(editConfigFuture, operation).checkedGet();
     }
 
     private void unlock() {

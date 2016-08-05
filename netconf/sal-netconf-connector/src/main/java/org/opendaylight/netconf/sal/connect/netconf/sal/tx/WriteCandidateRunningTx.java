@@ -8,13 +8,12 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
-import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Tx implementation for netconf devices that support only candidate datastore and writable running
@@ -24,8 +23,6 @@ import org.slf4j.LoggerFactory;
  * </ul>
  */
 public class WriteCandidateRunningTx extends WriteCandidateTx {
-
-    private static final Logger LOG  = LoggerFactory.getLogger(WriteCandidateRunningTx.class);
 
     public WriteCandidateRunningTx(final RemoteDeviceId id, final NetconfBaseOps netOps, final boolean rollbackSupport) {
         super(id, netOps, rollbackSupport);
@@ -44,25 +41,14 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
     }
 
     private void lockRunning() {
-        final FutureCallback<DOMRpcResult> lockRunningCallback = new FutureCallback<DOMRpcResult>() {
-            @Override
-            public void onSuccess(DOMRpcResult result) {
-                if (isSuccess(result)) {
-                    if (LOG.isTraceEnabled()) {
-                        LOG.trace("Lock running succesfull");
-                    }
-                } else {
-                    LOG.warn("{}: lock running invoked unsuccessfully: {}", id, result.getErrors());
-                }
-            }
+        try {
+            final String operation = "lock running";
 
-            @Override
-            public void onFailure(Throwable t) {
-                LOG.warn("{}: Failed to lock running. Failed to initialize transaction", id, t);
-                throw new RuntimeException(id + ": Failed to lock running. Failed to initialize transaction", t);
-            }
-        };
-        netOps.lockRunning(lockRunningCallback);
+            ListenableFuture<DOMRpcResult> lockFuture = netOps.lockRunning(new NetconfRpcFutureCallback(operation, id));
+            listenableFutureToCheckedFuture(lockFuture, operation).checkedGet();
+        } catch (NetconfDocumentedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

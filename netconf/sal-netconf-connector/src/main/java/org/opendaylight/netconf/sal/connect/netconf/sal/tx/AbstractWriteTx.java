@@ -8,9 +8,13 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
@@ -44,32 +48,15 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
         init();
     }
 
-    protected static boolean isSuccess(final DOMRpcResult result) {
-        return result.getErrors().isEmpty();
-    }
-
-    protected void checkNotFinished() {
-        Preconditions.checkState(!isFinished(), "%s: Transaction %s already finished", id, getIdentifier());
-    }
-
-    protected boolean isFinished() {
-        return finished;
-    }
-
-    @Override
-    public synchronized boolean cancel() {
-        if(isFinished()) {
-            return false;
-        }
-
-        finished = true;
-        cleanup();
-        return true;
-    }
-
     protected abstract void init();
-
     protected abstract void cleanup();
+
+    protected abstract void editConfig(final YangInstanceIdentifier path, final Optional<NormalizedNode<?, ?>> data, final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> defaultOperation, final String operation)  throws NetconfDocumentedException;
+    protected abstract ListenableFuture<RpcResult<TransactionStatus>> performCommit();
+
+    protected abstract void handleEditException(YangInstanceIdentifier path, NormalizedNode<?, ?> data, NetconfDocumentedException e, String editType);
+    protected abstract void handleDeleteException(YangInstanceIdentifier path, NetconfDocumentedException e);
+
 
     @Override
     public Object getIdentifier() {
@@ -87,10 +74,13 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
         }
 
         final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>fromNullable(data), Optional.of(ModifyAction.REPLACE), path);
-        editConfig(path, Optional.fromNullable(data), editStructure, Optional.of(ModifyAction.NONE), "put");
-    }
 
-    protected abstract void handleEditException(YangInstanceIdentifier path, NormalizedNode<?, ?> data, NetconfDocumentedException e, String editType);
+        try {
+            editConfig(path, Optional.fromNullable(data), editStructure, Optional.of(ModifyAction.NONE), "put");
+        } catch (NetconfDocumentedException e) {
+            handleEditException(path, data, e, "put");
+        }
+    }
 
     @Override
     public synchronized void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode<?, ?> data) {
@@ -103,7 +93,60 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
         }
 
         final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>fromNullable(data), Optional.<ModifyAction>absent(), path);
-        editConfig(path, Optional.fromNullable(data), editStructure, Optional.<ModifyAction>absent(), "merge");
+
+        try {
+            editConfig(path, Optional.fromNullable(data), editStructure, Optional.<ModifyAction>absent(), "merge");
+        } catch (NetconfDocumentedException e) {
+            handleEditException(path, data, e, "merge");
+        }
+    }
+
+    @Override
+    public synchronized void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        checkEditable(store);
+        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>absent(), Optional.of(ModifyAction.DELETE), path);
+
+        try {
+            editConfig(path, Optional.<NormalizedNode<?, ?>>absent(), editStructure, Optional.of(ModifyAction.NONE), "delete");
+        } catch (NetconfDocumentedException e) {
+            handleDeleteException(path, e);
+        }
+    }
+
+    @Override
+    public final ListenableFuture<RpcResult<TransactionStatus>> commit() {
+        checkNotFinished();
+        finished = true;
+
+        return performCommit();
+    }
+
+    @Override
+    public synchronized boolean cancel() {
+        if(isFinished()) {
+            return false;
+        }
+
+        finished = true;
+        cleanup();
+        return true;
+    }
+
+    protected static boolean isSuccess(final DOMRpcResult result) {
+        return result.getErrors().isEmpty();
+    }
+
+    protected void checkNotFinished() {
+        Preconditions.checkState(!isFinished(), "%s: Transaction %s already finished", id, getIdentifier());
+    }
+
+    protected boolean isFinished() {
+        return finished;
+    }
+
+    private void checkEditable(final LogicalDatastoreType store) {
+        checkNotFinished();
+        Preconditions.checkArgument(store == LogicalDatastoreType.CONFIGURATION, "Can edit only configuration data, not %s", store);
     }
 
     /**
@@ -115,27 +158,42 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
         return path.getPathArguments().size() == 1 && data instanceof MixinNode;
     }
 
-    @Override
-    public synchronized void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        checkEditable(store);
-        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>absent(), Optional.of(ModifyAction.DELETE), path);
-        editConfig(path, Optional.<NormalizedNode<?, ?>>absent(), editStructure, Optional.of(ModifyAction.NONE), "delete");
+    /**
+     * Check the status of an asynchronous transaction and return a CheckdFuture
+     * filled with an NetconfDocumentedException if the transaction was
+     * unsuccessful or failed. This allows to propagate to failure to the caller
+     * thread.
+     *
+     * @param future
+     *            The {@link ListenableFuture} of the asynchronous transaction.
+     * @param transaction
+     *            The name of the transaction being performed.
+     * @return A instance of {@link CheckedFuture}, filled with an
+     *         NetconfDocumentedException if the operation failed or was
+     *         unsuccessful.
+     */
+    protected CheckedFuture<Void, NetconfDocumentedException> listenableFutureToCheckedFuture(final ListenableFuture<DOMRpcResult> future, final String transaction) {
+        final ListenableFuture<Void> lockAsVoid = Futures.transform(future, new Function<DOMRpcResult, Void>() {
+            @Override
+            public Void apply(final DOMRpcResult input) {
+                if (isSuccess(input)) {
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("{} succesfull", transaction);
+                    }
+                } else {
+                    // no need to log as the NetconfRpcFutureCallback will log the result
+                    throw new RuntimeException(id + ": " + transaction + " invoked unsuccessfully.");
+                }
+                return null;
+            }
+        });
+
+      return Futures.makeChecked(lockAsVoid, new Function<Exception, NetconfDocumentedException>() {
+          @Override
+          public NetconfDocumentedException apply(Exception cause) {
+              return new NetconfDocumentedException(new DocumentedException(id + ": " + transaction + " operation failed.", cause, NetconfDocumentedException.ErrorType.application,
+                      NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.error));
+          }
+      });
     }
-
-    @Override
-    public final ListenableFuture<RpcResult<TransactionStatus>> commit() {
-        checkNotFinished();
-        finished = true;
-
-        return performCommit();
-    }
-
-    protected abstract ListenableFuture<RpcResult<TransactionStatus>> performCommit();
-
-    private void checkEditable(final LogicalDatastoreType store) {
-        checkNotFinished();
-        Preconditions.checkArgument(store == LogicalDatastoreType.CONFIGURATION, "Can edit only configuration data, not %s", store);
-    }
-
-    protected abstract void editConfig(final YangInstanceIdentifier path, final Optional<NormalizedNode<?, ?>> data, final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> defaultOperation, final String operation);
 }
