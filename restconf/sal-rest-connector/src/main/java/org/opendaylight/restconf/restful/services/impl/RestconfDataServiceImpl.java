@@ -49,11 +49,13 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     private final SchemaContextHandler schemaContextHandler;
     private final TransactionChainHandler transactionChainHandler;
+    private final DOMDataBroker broker;
 
     public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
-            final TransactionChainHandler transactionChainHandler) {
+            final TransactionChainHandler transactionChainHandler, final DOMDataBroker broker) {
         this.schemaContextHandler = schemaContextHandler;
         this.transactionChainHandler = transactionChainHandler;
+        this.broker = broker;
     }
 
     @Override
@@ -72,8 +74,10 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         } else {
             transaction = transactionOfMountPoint(mountPoint);
         }
+
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(instanceIdentifier, mountPoint,
                 transaction);
+        transactionNode.setBroker(this.broker);
         final NormalizedNode<?, ?> node = ReadDataTransactionUtil.readData(value, transactionNode);
         final SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
         dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -114,6 +118,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
                 payload.getInstanceIdentifierContext(), mountPoint, transaction);
+        transactionNode.setBroker(this.broker);
         return PutDataTransactionUtil.putData(payload, ref, transactionNode);
     }
 
@@ -138,6 +143,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
                 payload.getInstanceIdentifierContext(), mountPoint, transaction);
+        transactionNode.getBroker();
         return PostDataTransactionUtil.postData(uriInfo, payload, transactionNode, ref);
     }
 
@@ -157,6 +163,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(instanceIdentifier, mountPoint,
                 transaction);
+        transactionNode.setBroker(this.broker);
         return DeleteDataTransactionUtil.deleteData(transactionNode);
     }
 
@@ -183,7 +190,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
                 context.getInstanceIdentifierContext(), mountPoint, transaction);
-
+        transactionNode.setBroker(this.broker);
         return PatchDataTransactionUtil.patchData(context, transactionNode, ref);
     }
 

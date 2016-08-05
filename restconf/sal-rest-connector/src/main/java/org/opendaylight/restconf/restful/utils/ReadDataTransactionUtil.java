@@ -17,6 +17,7 @@ import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.restconf.data.reader.ListenerReader;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -93,6 +94,10 @@ public final class ReadDataTransactionUtil {
      */
     private static NormalizedNode<?, ?> readDataViaTransaction(final TransactionVarsWrapper transactionNode) {
         if (transactionNode.getLogicalDatastoreType() != null) {
+            final ListenerReader list = new ListenerReader();
+            list.readNode(transactionNode.getInstanceIdentifier().getInstanceIdentifier(), transactionNode.getBroker(),
+                    transactionNode.getLogicalDatastoreType());
+
             final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> listenableFuture = transactionNode
                     .getTransaction().newReadOnlyTransaction().read(transactionNode.getLogicalDatastoreType(),
                             transactionNode.getInstanceIdentifier().getInstanceIdentifier());
