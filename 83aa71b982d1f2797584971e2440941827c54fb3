@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_dadd8916",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteRunningTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-08-05T12:06:02Z",
+      "side": 1,
+      "message": "should this be error? warning?",
+      "range": {
+        "startLine": 75,
+        "startChar": 123,
+        "endLine": 75,
+        "endChar": 128
+      },
+      "revId": "83aa71b982d1f2797584971e2440941827c54fb3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
