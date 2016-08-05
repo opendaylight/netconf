@@ -91,7 +91,11 @@ public class WriteCandidateTx extends AbstractWriteTx {
                         LOG.trace("Lock candidate succesfull");
                     }
                 } else {
-                    LOG.warn("{}: lock candidate invoked unsuccessfully: {}", id, result.getErrors());
+                    LOG.warn("{}: Lock candidate invoked unsuccessfully. {}", id, result.getErrors());
+                    NetconfDocumentedException e = new NetconfDocumentedException(id + ": Lock candidate inovked unsuccessfully.", NetconfDocumentedException.ErrorType.application,
+                            NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
+                    discardChanges();
+                    throw new RuntimeException(e);
                 }
             }
 
@@ -99,7 +103,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
             public void onFailure(Throwable t) {
                 LOG.warn("Lock candidate operation failed. {}", t);
                 NetconfDocumentedException e = new NetconfDocumentedException(id + ": Lock candidate operation failed.", NetconfDocumentedException.ErrorType.application,
-                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
+                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.error);
                 discardChanges();
                 throw new RuntimeException(e);
             }
@@ -114,7 +118,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
     }
 
     @Override
-    protected void handleEditException(final YangInstanceIdentifier path, final NormalizedNode<?, ?> data, final NetconfDocumentedException e, final String editType) {
+    protected void handleEditConfigException(final YangInstanceIdentifier path, final NormalizedNode<?, ?> data, final NetconfDocumentedException e, final String editType) {
         LOG.warn("{}: Error {} data to (candidate){}, data: {}, canceling", id, editType, path, data, e);
         cancel();
         throw new RuntimeException(id + ": Error while " + editType + ": (candidate)" + path, e);
@@ -190,6 +194,9 @@ public class WriteCandidateTx extends AbstractWriteTx {
                     }
                 } else {
                     LOG.warn("{}: Edit candidate invoked unsuccessfully: {}", id, result.getErrors());
+                    NetconfDocumentedException e = new NetconfDocumentedException(id + ": Edit candidate invoked unsuccessfully.", NetconfDocumentedException.ErrorType.application,
+                            NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
+                    handleEditConfigException(path, data.orNull(), e, operation);
                 }
             }
 
@@ -197,8 +204,8 @@ public class WriteCandidateTx extends AbstractWriteTx {
             public void onFailure(Throwable t) {
                 LOG.warn("Edit candidate operation failed. {}", t);
                 NetconfDocumentedException e = new NetconfDocumentedException(id + ": Edit candidate operation failed.", NetconfDocumentedException.ErrorType.application,
-                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
-                handleEditException(path, data.orNull(), e, operation);
+                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.error);
+                handleEditConfigException(path, data.orNull(), e, operation);
             }
         };
         if (defaultOperation.isPresent()) {

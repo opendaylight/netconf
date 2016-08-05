@@ -18,6 +18,7 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.util.concurrent.MappingCheckedFuture;
@@ -47,6 +48,9 @@ public final class ReadOnlyTx implements DOMDataReadOnlyTransaction {
                     LOG.trace("{}: Reading data successful", id);
                 } else {
                     LOG.warn("{}: Reading data unsuccessful: {}", id, result.getErrors());
+                    NetconfDocumentedException e = new NetconfDocumentedException(id + ": Reading data unsuccessful.", NetconfDocumentedException.ErrorType.application,
+                            NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
+                    throw new RuntimeException(e);
                 }
 
             }
@@ -54,6 +58,9 @@ public final class ReadOnlyTx implements DOMDataReadOnlyTransaction {
             @Override
             public void onFailure(final Throwable t) {
                 LOG.warn("{}: Reading data failed", id, t);
+                NetconfDocumentedException e = new NetconfDocumentedException(id + ": Reading data failed.", NetconfDocumentedException.ErrorType.application,
+                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.error);
+                throw new RuntimeException(e);
             }
         };
     }

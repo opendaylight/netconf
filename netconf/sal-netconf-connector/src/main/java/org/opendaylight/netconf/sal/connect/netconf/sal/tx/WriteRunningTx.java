@@ -71,13 +71,18 @@ public class WriteRunningTx extends AbstractWriteTx {
                     }
                 } else {
                     LOG.warn("{}: lock running invoked unsuccessfully: {}", id, result.getErrors());
+                    NetconfDocumentedException e = new NetconfDocumentedException(id + ": Lock running invoked unsuccessfully.", NetconfDocumentedException.ErrorType.application,
+                            NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.error);
+                    throw new RuntimeException(e);
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
                 LOG.warn("Lock running operation failed. {}", t);
-                throw new RuntimeException(id + ": Failed to lock running datastore", t);
+                NetconfDocumentedException e = new NetconfDocumentedException(id + ": Lock running operation failed.", NetconfDocumentedException.ErrorType.application,
+                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.error);
+                throw new RuntimeException(e);
             }
         };
         netOps.lockRunning(lockCallback);
@@ -89,7 +94,7 @@ public class WriteRunningTx extends AbstractWriteTx {
     }
 
     @Override
-    protected void handleEditException(final YangInstanceIdentifier path, final NormalizedNode<?, ?> data, final NetconfDocumentedException e, final String editType) {
+    protected void handleEditConfigException(final YangInstanceIdentifier path, final NormalizedNode<?, ?> data, final NetconfDocumentedException e, final String editType) {
         LOG.warn("{}: Error {} data to (running){}, data: {}, canceling", id, editType, path, data, e);
         cancel();
         throw new RuntimeException(id + ": Error while " + editType + ": (running)" + path, e);
@@ -133,6 +138,9 @@ public class WriteRunningTx extends AbstractWriteTx {
                     }
                 } else {
                     LOG.warn("{}: Edit running invoked unsuccessfully: {}", id, result.getErrors());
+                    NetconfDocumentedException e = new NetconfDocumentedException(id + ": Edit running invoked unsuccessfully.", NetconfDocumentedException.ErrorType.application,
+                            NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
+                    handleEditConfigException(path, data.orNull(), e, operation);
                 }
             }
 
@@ -140,8 +148,8 @@ public class WriteRunningTx extends AbstractWriteTx {
             public void onFailure(Throwable t) {
                 LOG.warn("Edit running operation failed. {}", t);
                 NetconfDocumentedException e = new NetconfDocumentedException(id + ": Edit running operation failed.", NetconfDocumentedException.ErrorType.application,
-                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
-                handleEditException(path, data.orNull(), e, operation);
+                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.error);
+                handleEditConfigException(path, data.orNull(), e, operation);
             }
         };
         if (defaultOperation.isPresent()) {
