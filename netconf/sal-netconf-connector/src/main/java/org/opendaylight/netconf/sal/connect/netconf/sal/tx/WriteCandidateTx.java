@@ -12,7 +12,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
@@ -78,33 +77,14 @@ public class WriteCandidateTx extends AbstractWriteTx {
 
     @Override
     protected synchronized void init() {
-        LOG.trace("{}: Initializing {} transaction", id, getClass().getSimpleName());
-        lock();
-    }
+        try {
+            final String operation = "lock candidate";
 
-    private void lock() {
-        final FutureCallback<DOMRpcResult> lockCandidateCallback = new FutureCallback<DOMRpcResult>() {
-            @Override
-            public void onSuccess(DOMRpcResult result) {
-                if (isSuccess(result)) {
-                    if (LOG.isTraceEnabled()) {
-                        LOG.trace("Lock candidate succesfull");
-                    }
-                } else {
-                    LOG.warn("{}: lock candidate invoked unsuccessfully: {}", id, result.getErrors());
-                }
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                LOG.warn("Lock candidate operation failed. {}", t);
-                NetconfDocumentedException e = new NetconfDocumentedException(id + ": Lock candidate operation failed.", NetconfDocumentedException.ErrorType.application,
-                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
-                discardChanges();
-                throw new RuntimeException(e);
-            }
-        };
-        netOps.lockCandidate(lockCandidateCallback);
+            ListenableFuture<DOMRpcResult> lockFuture = netOps.lockCandidate(new NetconfRpcFutureCallback(operation, id));
+            listenableFutureToCheckedFuture(lockFuture, operation).checkedGet();
+        } catch (NetconfDocumentedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -118,6 +98,13 @@ public class WriteCandidateTx extends AbstractWriteTx {
         LOG.warn("{}: Error {} data to (candidate){}, data: {}, canceling", id, editType, path, data, e);
         cancel();
         throw new RuntimeException(id + ": Error while " + editType + ": (candidate)" + path, e);
+    }
+
+    @Override
+    protected void handleDeleteException(final YangInstanceIdentifier path, final NetconfDocumentedException e) {
+        LOG.warn("{}: Error deleting data (candidate){}, canceling", id, path, e);
+        cancel();
+        throw new RuntimeException(id + ": Error while deleting (candidate)" + path, e);
     }
 
     @Override
@@ -180,32 +167,18 @@ public class WriteCandidateTx extends AbstractWriteTx {
                               final Optional<NormalizedNode<?, ?>> data,
                               final DataContainerChild<?, ?> editStructure,
                               final Optional<ModifyAction> defaultOperation,
-                              final String operation) {
-        FutureCallback<DOMRpcResult> editConfigCallback = new FutureCallback<DOMRpcResult>() {
-            @Override
-            public void onSuccess(DOMRpcResult result) {
-                if (isSuccess(result)) {
-                    if (LOG.isTraceEnabled()) {
-                        LOG.trace("Edit candidate succesfull");
-                    }
-                } else {
-                    LOG.warn("{}: Edit candidate invoked unsuccessfully: {}", id, result.getErrors());
-                }
-            }
+                              final String operationType) throws NetconfDocumentedException {
 
-            @Override
-            public void onFailure(Throwable t) {
-                LOG.warn("Edit candidate operation failed. {}", t);
-                NetconfDocumentedException e = new NetconfDocumentedException(id + ": Edit candidate operation failed.", NetconfDocumentedException.ErrorType.application,
-                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
-                handleEditException(path, data.orNull(), e, operation);
-            }
-        };
+        final String operation = "edit candidate - " + operationType;
+
+        ListenableFuture<DOMRpcResult> editConfigFuture = null;
         if (defaultOperation.isPresent()) {
-            netOps.editConfigCandidate(editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport);
+            netOps.editConfigCandidate(new NetconfRpcFutureCallback(operation, id), editStructure, defaultOperation.get(), rollbackSupport);
         } else {
-            netOps.editConfigCandidate(editConfigCallback, editStructure, rollbackSupport);
+            netOps.editConfigCandidate(new NetconfRpcFutureCallback(operation, id), editStructure, rollbackSupport);
         }
+
+        listenableFutureToCheckedFuture(editConfigFuture, operation).checkedGet();
     }
 
     /**
