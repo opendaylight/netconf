@@ -11,12 +11,15 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.restconf.data.reader.ListenerReader;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -93,6 +96,21 @@ public final class ReadDataTransactionUtil {
      */
     private static NormalizedNode<?, ?> readDataViaTransaction(final TransactionVarsWrapper transactionNode) {
         if (transactionNode.getLogicalDatastoreType() != null) {
+            final ListenerReader reader = new ListenerReader();
+            final Future<Optional<NormalizedNode<?, ?>>> readNode =
+                    reader.readNode(
+                    transactionNode.getInstanceIdentifier().getInstanceIdentifier(), transactionNode.getBroker(),
+                    transactionNode.getLogicalDatastoreType());
+            try {
+                readNode.get();
+            } catch (final InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (final ExecutionException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            Preconditions.checkNotNull(readNode);
             final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> listenableFuture = transactionNode
                     .getTransactionChain().newReadOnlyTransaction().read(transactionNode.getLogicalDatastoreType(),
                             transactionNode.getInstanceIdentifier().getInstanceIdentifier());
