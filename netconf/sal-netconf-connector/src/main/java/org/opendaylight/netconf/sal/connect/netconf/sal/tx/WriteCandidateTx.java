@@ -91,7 +91,11 @@ public class WriteCandidateTx extends AbstractWriteTx {
                         LOG.trace("Lock candidate succesfull");
                     }
                 } else {
-                    LOG.warn("{}: lock candidate invoked unsuccessfully: {}", id, result.getErrors());
+                    LOG.warn("{}: Lock candidate invoked unsuccessfully. {}", id, result.getErrors());
+                    NetconfDocumentedException e = new NetconfDocumentedException(id + ": Lock candidate inovked unsuccessfully.", NetconfDocumentedException.ErrorType.application,
+                            NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
+                    discardChanges();
+                    throw new RuntimeException(e);
                 }
             }
 
@@ -99,7 +103,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
             public void onFailure(Throwable t) {
                 LOG.warn("Lock candidate operation failed. {}", t);
                 NetconfDocumentedException e = new NetconfDocumentedException(id + ": Lock candidate operation failed.", NetconfDocumentedException.ErrorType.application,
-                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
+                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.error);
                 discardChanges();
                 throw new RuntimeException(e);
             }

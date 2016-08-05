@@ -71,13 +71,18 @@ public class WriteRunningTx extends AbstractWriteTx {
                     }
                 } else {
                     LOG.warn("{}: lock running invoked unsuccessfully: {}", id, result.getErrors());
+                    NetconfDocumentedException e = new NetconfDocumentedException(id + ": Lock running invoked unsuccessfully.", NetconfDocumentedException.ErrorType.application,
+                            NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.error);
+                    throw new RuntimeException(e);
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
                 LOG.warn("Lock running operation failed. {}", t);
-                throw new RuntimeException(id + ": Failed to lock running datastore", t);
+                NetconfDocumentedException e = new NetconfDocumentedException(id + ": Lock running operation failed.", NetconfDocumentedException.ErrorType.application,
+                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.error);
+                throw new RuntimeException(e);
             }
         };
         netOps.lockRunning(lockCallback);
