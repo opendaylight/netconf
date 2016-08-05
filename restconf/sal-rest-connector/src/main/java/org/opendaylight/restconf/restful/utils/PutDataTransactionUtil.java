@@ -282,7 +282,7 @@ public final class PutDataTransactionUtil {
         final InstanceIdentifierContext<?> iid = new InstanceIdentifierContext<SchemaNode>(
                 path.getParent(), schemaNode, null, schemaContext);
         final TransactionVarsWrapper transactionNode =
-                new TransactionVarsWrapper(iid, null, domTransactionChain);
+                new TransactionVarsWrapper(iid, null, domTransactionChain, null);
         final NormalizedNode<?, ?> readData = ReadDataTransactionUtil
                 .readData(RestconfDataServiceConstant.ReadData.CONFIG, transactionNode);
         return readData;

@@ -89,7 +89,7 @@ public class DeleteDataTransactionUtilTest {
 
         // test
         final Response response = DeleteDataTransactionUtil.deleteData(
-                new TransactionVarsWrapper(this.context, null, this.transactionChain));
+                new TransactionVarsWrapper(this.context, null, this.transactionChain, null));
 
         // assert success
         assertEquals("Not expected response received", Status.OK.getStatusCode(), response.getStatus());
@@ -107,7 +107,8 @@ public class DeleteDataTransactionUtilTest {
 
         // test and assert error
         try {
-            DeleteDataTransactionUtil.deleteData(new TransactionVarsWrapper(this.context, null, this.transactionChain));
+            DeleteDataTransactionUtil.deleteData(
+                    new TransactionVarsWrapper(this.context, null, this.transactionChain, null));
             fail("Delete operation should fail due to missing data");
         } catch (final RestconfDocumentedException e) {
             assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());

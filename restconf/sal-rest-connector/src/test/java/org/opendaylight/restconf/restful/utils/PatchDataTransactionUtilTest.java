@@ -181,7 +181,8 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iIDMerge, null, null, this.refSchemaCtx.get());
         final PATCHContext patchContext = new PATCHContext(iidContext, entities, "patchRMRm");
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, this.transactionChain);
+        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(
+                iidContext, null, this.transactionChain, null);
         final PATCHStatusContext patchStatusContext =
                 PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
 
@@ -208,7 +209,8 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iIDCreateAndDelete, null, null, this.refSchemaCtx.get());
         final PATCHContext patchContext = new PATCHContext(iidContext, entities, "patchCD");
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, this.transactionChain);
+        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(
+                iidContext, null, this.transactionChain, null);
         final PATCHStatusContext patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
 
         for (final PATCHStatusEntity entity : patchStatusContext.getEditCollection()) {
@@ -231,7 +233,8 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iIDCreateAndDelete, null, null, this.refSchemaCtx.get());
         final PATCHContext patchContext = new PATCHContext(iidContext, entities, "patchD");
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, this.transactionChain);
+        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(
+                iidContext, null, this.transactionChain, null);
         final PATCHStatusContext patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
 
         assertFalse(patchStatusContext.isOk());
@@ -255,7 +258,8 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iIDCreateAndDelete, null, null, this.refSchemaCtx.get());
         final PATCHContext patchContext = new PATCHContext(iidContext, entities, "patchM");
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, this.transactionChain);
+        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(
+                iidContext, null, this.transactionChain, null);
         final PATCHStatusContext patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
 
         for (final PATCHStatusEntity entity : patchStatusContext.getEditCollection()) {

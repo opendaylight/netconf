@@ -207,9 +207,8 @@ public class PutDataTransactionUtilTest {
                 payload.getData());
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
 
-        PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain), null,
-                null);
+        PutDataTransactionUtil.putData(payload, this.refSchemaCtx, new TransactionVarsWrapper(
+                payload.getInstanceIdentifierContext(), null, this.transactionChain, null), null, null);
         verify(this.read).read(LogicalDatastoreType.CONFIGURATION, payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
@@ -229,8 +228,8 @@ public class PutDataTransactionUtilTest {
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
 
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain), null,
-                null);
+                new TransactionVarsWrapper(
+                        payload.getInstanceIdentifierContext(), null, this.transactionChain, null), null, null);
         verify(this.read).read(LogicalDatastoreType.CONFIGURATION, payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
@@ -249,8 +248,8 @@ public class PutDataTransactionUtilTest {
                 payload.getData());
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain), null,
-                null);
+                new TransactionVarsWrapper(
+                        payload.getInstanceIdentifierContext(), null, this.transactionChain, null), null, null);
         verify(this.read).read(LogicalDatastoreType.CONFIGURATION, this.iid2);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, this.iid2, payload.getData());
     }
