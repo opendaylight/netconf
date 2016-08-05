@@ -78,7 +78,7 @@ public class ReadDataTransactionUtilTest {
         when(containerChildNode.getQName()).thenReturn(containerChildQName);
         when(containerSchemaNode.getDataChildByName(containerChildQName)).thenReturn(containerChildNode);
 
-        wrapper = new TransactionVarsWrapper(this.context, null, this.transactionChain);
+        wrapper = new TransactionVarsWrapper(this.context, null, this.transactionChain, null);
     }
 
     @Test
