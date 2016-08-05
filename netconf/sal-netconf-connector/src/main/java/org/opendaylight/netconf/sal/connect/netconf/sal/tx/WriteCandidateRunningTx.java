@@ -10,6 +10,7 @@ package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
 import com.google.common.util.concurrent.FutureCallback;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -53,16 +54,26 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
                     }
                 } else {
                     LOG.warn("{}: lock running invoked unsuccessfully: {}", id, result.getErrors());
+                    setException(new NetconfDocumentedException(id + ": lock running invoked unsuccessfully.", NetconfDocumentedException.ErrorType.application,
+                            NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning));
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
                 LOG.warn("{}: Failed to lock running. Failed to initialize transaction", id, t);
-                throw new RuntimeException(id + ": Failed to lock running. Failed to initialize transaction", t);
+                setException(new NetconfDocumentedException(id + ": Failed to lock running. Failed to initialize transaction.", NetconfDocumentedException.ErrorType.application,
+                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.error));
             }
         };
         netOps.lockRunning(lockRunningCallback);
+
+        // handle exception
+        NetconfDocumentedException exception = getException();
+        if (exception != null) {
+            resetException();
+            throw new RuntimeException(exception);
+        }
     }
 
     /**

@@ -37,10 +37,13 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
     // Allow commit to be called only once
     protected boolean finished = false;
 
+    protected NetconfDocumentedException exception;
+
     public AbstractWriteTx(final NetconfBaseOps netOps, final RemoteDeviceId id, final boolean rollbackSupport) {
         this.netOps = netOps;
         this.id = id;
         this.rollbackSupport = rollbackSupport;
+        this.exception = null;
         init();
     }
 
@@ -54,6 +57,18 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
 
     protected boolean isFinished() {
         return finished;
+    }
+
+    protected synchronized void setException(NetconfDocumentedException e) {
+        this.exception = e;
+    }
+
+    protected synchronized NetconfDocumentedException getException() {
+        return this.exception;
+    }
+
+    protected synchronized void resetException() {
+        this.exception = null;
     }
 
     @Override
@@ -88,9 +103,10 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
 
         final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>fromNullable(data), Optional.of(ModifyAction.REPLACE), path);
         editConfig(path, Optional.fromNullable(data), editStructure, Optional.of(ModifyAction.NONE), "put");
+
     }
 
-    protected abstract void handleEditException(YangInstanceIdentifier path, NormalizedNode<?, ?> data, NetconfDocumentedException e, String editType);
+    protected abstract void handleException(YangInstanceIdentifier path, NormalizedNode<?, ?> data, NetconfDocumentedException e, String editType);
 
     @Override
     public synchronized void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode<?, ?> data) {
