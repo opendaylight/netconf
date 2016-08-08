@@ -9,7 +9,6 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.OPERATIONAL;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -19,6 +18,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import javax.annotation.Nullable;
@@ -43,9 +43,9 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
-import org.opendaylight.restconf.restful.utils.TransactionUtil;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -406,7 +406,7 @@ public class BrokerFacade {
             LOG.trace("POST {} via Restconf: {} with payload {}", datastore.name(), path, payload);
             final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
             rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-            TransactionUtil.ensureParentsByMerge(path, schemaContext, rWTransaction);
+            ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
             for(final MapEntryNode child : ((MapNode) payload).getValue()) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
                 checkItemDoesNotExists(rWTransaction, datastore, childPath);
@@ -414,7 +414,7 @@ public class BrokerFacade {
             }
         } else {
             checkItemDoesNotExists(rWTransaction,datastore, path);
-            TransactionUtil.ensureParentsByMerge(path, schemaContext, rWTransaction);
+            ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
             rWTransaction.put(datastore, path, payload);
         }
         return rWTransaction.submit();
@@ -429,7 +429,7 @@ public class BrokerFacade {
             LOG.trace("POST {} within Restconf PATCH: {} with payload {}", datastore.name(), path, payload);
             final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
             rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-            TransactionUtil.ensureParentsByMerge(path, schemaContext, rWTransaction);
+            ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
             for(final MapEntryNode child : ((MapNode) payload).getValue()) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
                 checkItemDoesNotExists(rWTransaction, datastore, childPath);
@@ -437,7 +437,7 @@ public class BrokerFacade {
             }
         } else {
             checkItemDoesNotExists(rWTransaction,datastore, path);
-            TransactionUtil.ensureParentsByMerge(path, schemaContext, rWTransaction);
+            ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
             rWTransaction.put(datastore, path, payload);
         }
     }
@@ -532,7 +532,7 @@ public class BrokerFacade {
             final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         LOG.trace("Put {} via Restconf: {} with payload {}", datastore.name(), path, payload);
-        TransactionUtil.ensureParentsByMerge(path, schemaContext, writeTransaction);
+        ensureParentsByMerge(datastore, path, writeTransaction, schemaContext);
         writeTransaction.put(datastore, path, payload);
         return writeTransaction.submit();
     }
@@ -541,7 +541,7 @@ public class BrokerFacade {
             final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         LOG.trace("Put {} within Restconf PATCH: {} with payload {}", datastore.name(), path, payload);
-        TransactionUtil.ensureParentsByMerge(path, schemaContext, writeTransaction);
+        ensureParentsByMerge(datastore, path, writeTransaction, schemaContext);
         writeTransaction.put(datastore, path, payload);
     }
 
@@ -565,7 +565,7 @@ public class BrokerFacade {
             final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         LOG.trace("Merge {} within Restconf PATCH: {} with payload {}", datastore.name(), path, payload);
-        TransactionUtil.ensureParentsByMerge(path, schemaContext, writeTransaction);
+        ensureParentsByMerge(datastore, path, writeTransaction, schemaContext);
 
         // merging is necessary only for lists otherwise we can call put method
         if (payload instanceof MapNode) {
@@ -641,8 +641,37 @@ public class BrokerFacade {
             return this.status;
         }
 
-        public void setStatus(PATCHStatusContext status) {
+        public void setStatus(final PATCHStatusContext status) {
             this.status = status;
         }
+    }
+
+    private void ensureParentsByMerge(final LogicalDatastoreType store, final YangInstanceIdentifier normalizedPath,
+            final DOMDataReadWriteTransaction rwTx, final SchemaContext schemaContext) {
+        final List<PathArgument> normalizedPathWithoutChildArgs = new ArrayList<>();
+        YangInstanceIdentifier rootNormalizedPath = null;
+
+        final Iterator<PathArgument> it = normalizedPath.getPathArguments().iterator();
+
+        while (it.hasNext()) {
+            final PathArgument pathArgument = it.next();
+            if (rootNormalizedPath == null) {
+                rootNormalizedPath = YangInstanceIdentifier.create(pathArgument);
+            }
+
+            if (it.hasNext()) {
+                normalizedPathWithoutChildArgs.add(pathArgument);
+            }
+        }
+
+        if (normalizedPathWithoutChildArgs.isEmpty()) {
+            return;
+        }
+
+        Preconditions.checkArgument(rootNormalizedPath != null, "Empty path received");
+
+        final NormalizedNode<?, ?> parentStructure = ImmutableNodes.fromInstanceId(schemaContext,
+                YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));
+        rwTx.merge(store, rootNormalizedPath, parentStructure);
     }
 }
