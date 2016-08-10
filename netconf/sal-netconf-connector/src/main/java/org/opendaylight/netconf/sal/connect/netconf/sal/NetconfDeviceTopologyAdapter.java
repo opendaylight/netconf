@@ -122,13 +122,13 @@ final class NetconfDeviceTopologyAdapter implements AutoCloseable {
     }
 
     public void updateDeviceData(boolean up, NetconfDeviceCapabilities capabilities) {
-        final Node data = buildDataForNetconfNode(up, capabilities);
+        final NetconfNode data = buildDataForNetconfNode(up, capabilities);
 
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace(
                 "{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
-        writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath(), data);
+        writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath().augmentation(NetconfNode.class), data, true);
         LOG.trace(
                 "{}: Update device state transaction {} merging operational data ended.",
                 id, writeTx.getIdentifier());
@@ -154,7 +154,7 @@ final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         commitTransaction(writeTx, "update-failed-device");
     }
 
-    private Node buildDataForNetconfNode(boolean up, NetconfDeviceCapabilities capabilities) {
+    private NetconfNode buildDataForNetconfNode(boolean up, NetconfDeviceCapabilities capabilities) {
         List<String> capabilityList = new ArrayList<>();
         capabilityList.addAll(capabilities.getNonModuleBasedCapabilities());
         capabilityList.addAll(FluentIterable.from(capabilities.getResolvedCapabilities()).transform(AVAILABLE_CAPABILITY_TRANSFORMER).toList());
@@ -172,9 +172,7 @@ final class NetconfDeviceTopologyAdapter implements AutoCloseable {
                 .setAvailableCapabilities(avCapabalitiesBuilder.build())
                 .setUnavailableCapabilities(unavailableCapabilities);
 
-        final NodeBuilder nodeBuilder = getNodeIdBuilder(id);
-
-        return nodeBuilder.addAugmentation(NetconfNode.class, netconfNodeBuilder.build()).build();
+        return netconfNodeBuilder.build();
     }
 
     public void removeDeviceConfiguration() {
@@ -206,6 +204,7 @@ final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         final Topology topology = new TopologyBuilder().setTopologyId(new TopologyId(TopologyNetconf.QNAME.getLocalName())).build();
         LOG.trace("{}: Merging {} container to ensure its presence", id,
                 topology.QNAME, writeTx.getIdentifier());
+
         writeTx.merge(LogicalDatastoreType.OPERATIONAL, topologyListPath, topology);
     }
 
