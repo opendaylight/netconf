@@ -19,6 +19,8 @@ import org.junit.Test;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlUtils;
@@ -35,7 +37,9 @@ public class NetconfStateSchemasTest {
     @Test
     public void testCreate() throws Exception {
         final SchemaContext schemaContext = BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext();
-        final DataSchemaNode schemasNode = ((ContainerSchemaNode) schemaContext.getDataChildByName("netconf-state")).getDataChildByName("schemas");
+        final DataSchemaNode schemasNode =
+                ((ContainerSchemaNode) schemaContext
+                        .getDataChildByName(NetconfState.QNAME)).getDataChildByName(Schemas.QNAME);
 
         final Document schemasXml = XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/netconf-state.schemas.payload.xml"));
         final ToNormalizedNodeParser<Element, ContainerNode, ContainerSchemaNode> containerNodeParser = DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, schemaContext, false).getContainerNodeParser();
