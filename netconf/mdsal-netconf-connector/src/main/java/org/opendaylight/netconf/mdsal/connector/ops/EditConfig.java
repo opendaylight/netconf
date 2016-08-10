@@ -29,6 +29,7 @@ import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.mdsal.connector.ops.DataTreeChangeTracker.DataTreeChange;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -171,9 +172,10 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
                 throw new NetconfDocumentedException("Unable to find module by namespace: " + namespace,
                         ErrorType.application, ErrorTag.unknown_namespace, ErrorSeverity.error);
             }
-            DataSchemaNode schemaNode = module.getDataChildByName(element.getName());
+            DataSchemaNode schemaNode =
+                    module.getDataChildByName(QName.create(module.getQNameModule(), element.getName()));
             if (schemaNode != null) {
-                dataSchemaNode = Optional.of(module.getDataChildByName(element.getName()));
+                dataSchemaNode = Optional.of(schemaNode);
             } else {
                 throw new DocumentedException("Unable to find node with namespace: " + namespace + "in module: " + module.toString(),
                         ErrorType.application,
