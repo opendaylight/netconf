@@ -116,6 +116,50 @@ public class NetconfDeviceTest {
     };
 
     @Test
+    public void testNetconfDeviceFlawedModelFailedResolution() throws Exception {
+        final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
+        final NetconfDeviceCommunicator listener = getListener();
+
+        final SchemaContextFactory schemaFactory = getSchemaFactory();
+        final SchemaContext schema = getSchema();
+
+        final SchemaResolutionException schemaResolutionException =
+                new SchemaResolutionException("fail first", TEST_SID, new Throwable("YangTools parser fail"));
+        doAnswer(invocation -> {
+            if (((Collection<?>) invocation.getArguments()[0]).size() == 2) {
+                return Futures.immediateFailedCheckedFuture(schemaResolutionException);
+            } else {
+                return Futures.immediateCheckedFuture(schema);
+            }
+        }).when(schemaFactory).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
+
+        final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id) -> {
+            final Module first = Iterables.getFirst(schema.getModules(), null);
+            final QName qName = QName.create(first.getQNameModule(), first.getName());
+            final NetconfStateSchemas.RemoteYangSchema source1 = new NetconfStateSchemas.RemoteYangSchema(qName);
+            final NetconfStateSchemas.RemoteYangSchema source2 = new NetconfStateSchemas.RemoteYangSchema(QName.create(first.getQNameModule(), "test-module2"));
+            return new NetconfStateSchemas(Sets.newHashSet(source1, source2));
+        };
+
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO
+                = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), schemaFactory, stateSchemasResolver);
+
+        final NetconfDevice device = new NetconfDeviceBuilder()
+                .setReconnectOnSchemasChange(true)
+                .setSchemaResourcesDTO(schemaResourcesDTO)
+                .setGlobalProcessingExecutor(getExecutor())
+                .setId(getId())
+                .setSalFacade(facade)
+                .build();
+        // Monitoring supported
+        final NetconfSessionPreferences sessionCaps = getSessionCaps(true, Lists.newArrayList(TEST_CAPABILITY, TEST_CAPABILITY2));
+        device.onRemoteSessionUp(sessionCaps, listener);
+
+        Mockito.verify(facade, Mockito.timeout(5000)).onDeviceConnected(any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class));
+        Mockito.verify(schemaFactory, times(2)).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
+    }
+
+    @Test
     public void testNetconfDeviceFailFirstSchemaFailSecondEmpty() throws Exception {
         final ArrayList<String> capList = Lists.newArrayList(TEST_CAPABILITY);
 
