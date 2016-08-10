@@ -21,6 +21,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -489,11 +490,23 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
             if (!qNameOfMissingSource.isEmpty()) {
                 capabilities.addUnresolvedCapabilities(qNameOfMissingSource, UnavailableCapability.FailureReason.MissingSource);
             }
-            return stripMissingSource(requiredSources, missingSource);
+            return stripUnavailableSource(requiredSources, missingSource);
         }
 
         private Collection<SourceIdentifier> handleSchemaResolutionException(final Collection<SourceIdentifier> requiredSources, final SchemaResolutionException resolutionException) {
             // In case resolution error, try only with resolved sources
+            // There are two options why schema resolution exception occurred : unsatisfied imports or flawed model
+            // FIXME Do we really have assurance that these two cases cannot happen at once?
+            if (resolutionException.getFailedSource() != null) {
+                // flawed model - exclude it
+                final SourceIdentifier failedSourceId = resolutionException.getFailedSource();
+                LOG.warn("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it", id, failedSourceId);
+                LOG.warn("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it", id, resolutionException);
+                capabilities.addUnresolvedCapabilities(getQNameFromSourceIdentifiers(Collections.singleton(failedSourceId)),
+                        UnavailableCapability.FailureReason.UnableToResolve);
+                return stripUnavailableSource(requiredSources, resolutionException.getFailedSource());
+            }
+            // unsatisfied imports
             final Set<SourceIdentifier> unresolvedSources = resolutionException.getUnsatisfiedImports().keySet();
             capabilities.addUnresolvedCapabilities(getQNameFromSourceIdentifiers(unresolvedSources), UnavailableCapability.FailureReason.UnableToResolve);
             LOG.warn("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only", id, resolutionException.getUnsatisfiedImports());
@@ -505,7 +518,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
             return new NetconfDeviceRpc(result, listener, new NetconfMessageTransformer(result, true));
         }
 
-        private Collection<SourceIdentifier> stripMissingSource(final Collection<SourceIdentifier> requiredSources, final SourceIdentifier sIdToRemove) {
+        private Collection<SourceIdentifier> stripUnavailableSource(final Collection<SourceIdentifier> requiredSources, final SourceIdentifier sIdToRemove) {
             final LinkedList<SourceIdentifier> sourceIdentifiers = Lists.newLinkedList(requiredSources);
             final boolean removed = sourceIdentifiers.remove(sIdToRemove);
             Preconditions.checkState(removed, "{}: Trying to remove {} from {} failed", id, sIdToRemove, requiredSources);
