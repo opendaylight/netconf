@@ -14,12 +14,10 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
-
 import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -122,13 +120,13 @@ final class NetconfDeviceTopologyAdapter implements AutoCloseable {
     }
 
     public void updateDeviceData(boolean up, NetconfDeviceCapabilities capabilities) {
-        final Node data = buildDataForNetconfNode(up, capabilities);
+        final NetconfNode data = buildDataForNetconfNode(up, capabilities);
 
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace(
                 "{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
-        writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath(), data);
+        writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath().augmentation(NetconfNode.class), data, true);
         LOG.trace(
                 "{}: Update device state transaction {} merging operational data ended.",
                 id, writeTx.getIdentifier());
@@ -139,14 +137,13 @@ final class NetconfDeviceTopologyAdapter implements AutoCloseable {
     public void setDeviceAsFailed(Throwable throwable) {
         String reason = (throwable != null && throwable.getMessage() != null) ? throwable.getMessage() : UNKNOWN_REASON;
 
-        final NetconfNode netconfNode = new NetconfNodeBuilder().setConnectionStatus(ConnectionStatus.UnableToConnect).setConnectedMessage(reason).build();
-        final Node data = getNodeIdBuilder(id).addAugmentation(NetconfNode.class, netconfNode).build();
+        final NetconfNode data = new NetconfNodeBuilder().setConnectionStatus(ConnectionStatus.UnableToConnect).setConnectedMessage(reason).build();
 
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace(
                 "{}: Setting device state as failed {} putting operational data started.",
                 id, writeTx.getIdentifier());
-        writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath(), data);
+        writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath().augmentation(NetconfNode.class), data, true);
         LOG.trace(
                 "{}: Setting device state as failed {} putting operational data ended.",
                 id, writeTx.getIdentifier());
@@ -154,7 +151,7 @@ final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         commitTransaction(writeTx, "update-failed-device");
     }
 
-    private Node buildDataForNetconfNode(boolean up, NetconfDeviceCapabilities capabilities) {
+    private NetconfNode buildDataForNetconfNode(boolean up, NetconfDeviceCapabilities capabilities) {
         List<String> capabilityList = new ArrayList<>();
         capabilityList.addAll(capabilities.getNonModuleBasedCapabilities());
         capabilityList.addAll(FluentIterable.from(capabilities.getResolvedCapabilities()).transform(AVAILABLE_CAPABILITY_TRANSFORMER).toList());
@@ -172,9 +169,7 @@ final class NetconfDeviceTopologyAdapter implements AutoCloseable {
                 .setAvailableCapabilities(avCapabalitiesBuilder.build())
                 .setUnavailableCapabilities(unavailableCapabilities);
 
-        final NodeBuilder nodeBuilder = getNodeIdBuilder(id);
-
-        return nodeBuilder.addAugmentation(NetconfNode.class, netconfNodeBuilder.build()).build();
+        return netconfNodeBuilder.build();
     }
 
     public void removeDeviceConfiguration() {
