@@ -10,6 +10,7 @@ package org.opendaylight.netconf.sal.connect.netconf;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
+import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
@@ -49,13 +51,16 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
+import org.opendaylight.yangtools.yang.parser.util.ASTSchemaSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,6 +85,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     private final RemoteDeviceHandler<NetconfSessionPreferences> salFacade;
     private final ListeningExecutorService processingExecutor;
     protected final SchemaSourceRegistry schemaRegistry;
+    protected final SchemaRepository schemaRepository;
     private final NetconfStateSchemas.NetconfStateSchemasResolver stateSchemasResolver;
     private final NotificationHandler notificationHandler;
     protected final List<SchemaSourceRegistration<? extends SchemaSourceRepresentation>> sourceRegistrations = Lists.newArrayList();
@@ -110,6 +116,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
         this.id = id;
         this.reconnectOnSchemasChange = reconnectOnSchemasChange;
         this.schemaRegistry = schemaResourcesDTO.getSchemaRegistry();
+        this.schemaRepository = schemaResourcesDTO.getSchemaRepository();
         this.schemaContextFactory = schemaResourcesDTO.getSchemaContextFactory();
         this.salFacade = salFacade;
         this.stateSchemasResolver = schemaResourcesDTO.getStateSchemasResolver();
@@ -263,17 +270,23 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
      */
     public static class SchemaResourcesDTO {
         private final SchemaSourceRegistry schemaRegistry;
+        private final SchemaRepository schemaRepository;
         private final SchemaContextFactory schemaContextFactory;
         private final NetconfStateSchemas.NetconfStateSchemasResolver stateSchemasResolver;
 
-        public SchemaResourcesDTO(final SchemaSourceRegistry schemaRegistry, final SchemaContextFactory schemaContextFactory, final NetconfStateSchemas.NetconfStateSchemasResolver stateSchemasResolver) {
+        public SchemaResourcesDTO(final SchemaSourceRegistry schemaRegistry, final SchemaRepository schemaRepository, final SchemaContextFactory schemaContextFactory, final NetconfStateSchemas.NetconfStateSchemasResolver stateSchemasResolver) {
             this.schemaRegistry = Preconditions.checkNotNull(schemaRegistry);
+            this.schemaRepository = Preconditions.checkNotNull(schemaRepository);
             this.schemaContextFactory = Preconditions.checkNotNull(schemaContextFactory);
             this.stateSchemasResolver = Preconditions.checkNotNull(stateSchemasResolver);
         }
 
         public SchemaSourceRegistry getSchemaRegistry() {
             return schemaRegistry;
+        }
+
+        public SchemaRepository getSchemaRepository() {
+            return schemaRepository;
         }
 
         public SchemaContextFactory getSchemaContextFactory() {
@@ -387,7 +400,33 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
 
         @Override
         public void run() {
-            setUpSchema(deviceSources.getRequiredSources());
+
+            final Collection<SourceIdentifier> requiredSources = deviceSources.getRequiredSources();
+            final Collection<SourceIdentifier> missingSources = filterMissingSources(requiredSources);
+
+            capabilities.addUnresolvedCapabilities(getQNameFromSourceIdentifiers(missingSources),
+                    UnavailableCapability.FailureReason.MissingSource);
+
+            requiredSources.removeAll(missingSources);
+            setUpSchema(requiredSources);
+        }
+
+        private Collection<SourceIdentifier> filterMissingSources(final Collection<SourceIdentifier> requiredSources) {
+
+            final Predicate<SourceIdentifier> missingSources = new Predicate<SourceIdentifier>() {
+                @Override
+                public boolean apply(@Nullable SourceIdentifier input) {
+                    boolean remove = false;
+                    try {
+                        schemaRepository.getSchemaSource(input, ASTSchemaSource.class).checkedGet();
+                    } catch (SchemaSourceException e) {
+                        remove = true;
+                    }
+                    return remove;
+                }
+            };
+
+            return Collections2.filter(requiredSources, missingSources);
         }
 
         /**
