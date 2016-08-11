@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_f9baf6df",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/NetconfStateSchemasTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-08-11T07:49:01Z",
+      "side": 1,
+      "message": "are you sure we can rely on this? Are you able to get module in different way? Please elaborate if you can. Thanks.",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 120
+      },
+      "revId": "78d09921d86bdbd91624010fb4cd872d487c9e49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
