@@ -12,19 +12,22 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
-
 import javax.ws.rs.core.MediaType;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -34,9 +37,6 @@ import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.Sets;
 
 /**
  * sal-rest-connector
@@ -52,6 +52,16 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
 
     private final XmlNormalizedNodeBodyReader xmlBodyReader;
     private static SchemaContext schemaContext;
+    private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = initializeInstanceIdentifierModule();
+
+    private static QNameModule initializeInstanceIdentifierModule() {
+        try {
+            return QNameModule.create(URI.create("instance:identifier:module"),
+                    new SimpleDateFormat("yyyy-MM-dd").parse("2014-01-17"));
+        } catch (final ParseException e) {
+            throw new Error(e);
+        }
+    }
 
     public TestXmlBodyReader () throws NoSuchFieldException, SecurityException {
         super();
@@ -65,7 +75,7 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
 
     @BeforeClass
     public static void initialization() throws Exception {
-        Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
+        final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
         schemaContext = TestRestconfUtils.parseYangSources(testFiles);
@@ -74,7 +84,8 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
 
     @Test
     public void moduleDataTest() throws Exception {
-        final DataSchemaNode dataSchemaNode = schemaContext.getDataChildByName("cont");
+        final DataSchemaNode dataSchemaNode =
+                schemaContext.getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName());
         final String uri = "instance-identifier-module:cont";
         mockBodyReader(uri, xmlBodyReader, false);
@@ -88,8 +99,9 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
 
     @Test
     public void moduleSubContainerDataPutTest() throws Exception {
-        final DataSchemaNode dataSchemaNode = schemaContext.getDataChildByName("cont");
-        QName cont1QName = QName.create(dataSchemaNode.getQName(), "cont1");
+        final DataSchemaNode dataSchemaNode =
+                schemaContext.getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
+        final QName cont1QName = QName.create(dataSchemaNode.getQName(), "cont1");
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName()).node(cont1QName);
         final DataSchemaNode dataSchemaNodeOnPath = ((DataNodeContainer) dataSchemaNode).getDataChildByName(cont1QName);
         final String uri = "instance-identifier-module:cont/cont1";
@@ -104,8 +116,9 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
 
     @Test
     public void moduleSubContainerDataPostTest() throws Exception {
-        final DataSchemaNode dataSchemaNode = schemaContext.getDataChildByName("cont");
-        QName cont1QName = QName.create(dataSchemaNode.getQName(), "cont1");
+        final DataSchemaNode dataSchemaNode =
+                schemaContext.getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
+        final QName cont1QName = QName.create(dataSchemaNode.getQName(), "cont1");
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName()).node(cont1QName);
         final String uri = "instance-identifier-module:cont";
         mockBodyReader(uri, xmlBodyReader, true);
@@ -119,10 +132,11 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
 
     @Test
     public void moduleSubContainerAugmentDataPostTest() throws Exception {
-        final DataSchemaNode dataSchemaNode = schemaContext.getDataChildByName("cont");
+        final DataSchemaNode dataSchemaNode =
+                schemaContext.getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final Module augmentModule = schemaContext.findModuleByNamespace(new URI("augment:module")).iterator().next();
-        QName contAugmentQName = QName.create(augmentModule.getQNameModule(), "cont-augment");
-        YangInstanceIdentifier.AugmentationIdentifier augII = new YangInstanceIdentifier.AugmentationIdentifier(
+        final QName contAugmentQName = QName.create(augmentModule.getQNameModule(), "cont-augment");
+        final YangInstanceIdentifier.AugmentationIdentifier augII = new YangInstanceIdentifier.AugmentationIdentifier(
                 Sets.newHashSet(contAugmentQName));
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName())
                 .node(augII).node(contAugmentQName);
@@ -138,14 +152,15 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
 
     @Test
     public void moduleSubContainerChoiceAugmentDataPostTest() throws Exception {
-        final DataSchemaNode dataSchemaNode = schemaContext.getDataChildByName("cont");
+        final DataSchemaNode dataSchemaNode =
+                schemaContext.getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final Module augmentModule = schemaContext.findModuleByNamespace(new URI("augment:module")).iterator().next();
-        QName augmentChoice1QName = QName.create(augmentModule.getQNameModule(), "augment-choice1");
-        QName augmentChoice2QName = QName.create(augmentChoice1QName, "augment-choice2");
+        final QName augmentChoice1QName = QName.create(augmentModule.getQNameModule(), "augment-choice1");
+        final QName augmentChoice2QName = QName.create(augmentChoice1QName, "augment-choice2");
         final QName containerQName = QName.create(augmentChoice1QName, "case-choice-case-container1");
-        YangInstanceIdentifier.AugmentationIdentifier augChoice1II = new YangInstanceIdentifier.AugmentationIdentifier(
+        final YangInstanceIdentifier.AugmentationIdentifier augChoice1II = new YangInstanceIdentifier.AugmentationIdentifier(
                 Sets.newHashSet(augmentChoice1QName));
-        YangInstanceIdentifier.AugmentationIdentifier augChoice2II = new YangInstanceIdentifier.AugmentationIdentifier(
+        final YangInstanceIdentifier.AugmentationIdentifier augChoice2II = new YangInstanceIdentifier.AugmentationIdentifier(
                 Sets.newHashSet(augmentChoice2QName));
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName())
                 .node(augChoice1II).node(augmentChoice1QName).node(augChoice2II).node(augmentChoice2QName)
