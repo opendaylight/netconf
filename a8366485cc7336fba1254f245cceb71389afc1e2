@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_9490e7ed",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-11T11:07:17Z",
+      "side": 1,
+      "message": "Maybe you can give at least some info in commit message how you fixed this bug",
+      "revId": "a8366485cc7336fba1254f245cceb71389afc1e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_14a5f752",
+        "filename": "netconf/sal-netconf-connector/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-11T11:07:17Z",
+      "side": 1,
+      "message": "Do not specify version here, get this form dependency management",
+      "revId": "a8366485cc7336fba1254f245cceb71389afc1e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_54864fba",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-11T11:07:17Z",
+      "side": 1,
+      "message": "I think we should do the same for device failed. That is writing only to netconf node augmentation",
+      "revId": "a8366485cc7336fba1254f245cceb71389afc1e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_34e91381",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-11T11:07:17Z",
+      "side": 1,
+      "message": "No need for unrelated changes in code",
+      "revId": "a8366485cc7336fba1254f245cceb71389afc1e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_345bd388",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapterTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-11T11:07:17Z",
+      "side": 1,
+      "message": "Wildcards imports are not used, please see https://wiki.opendaylight.org/view/BestPractices/Coding_Guidelines#Java and https://google.github.io/styleguide/javaguide.html#s3.3-import-statements",
+      "revId": "a8366485cc7336fba1254f245cceb71389afc1e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_74542b54",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapterTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-11T11:07:17Z",
+      "side": 1,
+      "message": "No need for blank line",
+      "revId": "a8366485cc7336fba1254f245cceb71389afc1e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_d4cc1f38",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapterTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-11T11:07:17Z",
+      "side": 1,
+      "message": "Please replace wildcard import with imports for specific required package members",
+      "revId": "a8366485cc7336fba1254f245cceb71389afc1e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_54512f61",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapterTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-11T11:07:17Z",
+      "side": 1,
+      "message": "no need for blank line",
+      "revId": "a8366485cc7336fba1254f245cceb71389afc1e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_54d80fef",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapterTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-11T11:07:17Z",
+      "side": 1,
+      "message": "no need for blank line",
+      "revId": "a8366485cc7336fba1254f245cceb71389afc1e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_b4e523aa",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapterTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-11T11:07:17Z",
+      "side": 1,
+      "message": "Is this really required?",
+      "revId": "a8366485cc7336fba1254f245cceb71389afc1e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_94e2a79d",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapterTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-11T11:07:17Z",
+      "side": 1,
+      "message": "You should also test presence of pre-existing node data after setDeviceAsFailed",
+      "revId": "a8366485cc7336fba1254f245cceb71389afc1e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_f4ee7b8a",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapterTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-11T11:07:17Z",
+      "side": 1,
+      "message": "typo augmenNode -\u003e agumentNode",
+      "revId": "a8366485cc7336fba1254f245cceb71389afc1e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_d4f37f71",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapterTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-11T11:07:17Z",
+      "side": 1,
+      "message": "You add some timeout to checkedGet to avoid waiting indefinitely",
+      "revId": "a8366485cc7336fba1254f245cceb71389afc1e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
