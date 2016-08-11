@@ -148,7 +148,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     // directory cache/schema is used.
     static {
         schemaResourcesDTOs.put(DEFAULT_CACHE_DIRECTORY,
-                new NetconfDevice.SchemaResourcesDTO(DEFAULT_SCHEMA_REPOSITORY,
+                new NetconfDevice.SchemaResourcesDTO(DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY,
                         DEFAULT_SCHEMA_CONTEXT_FACTORY,
                         new NetconfStateSchemasResolverImpl()));
         DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(DEFAULT_CACHE);
@@ -166,6 +166,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     protected final SharedSchemaRepository sharedSchemaRepository;
 
     protected SchemaSourceRegistry schemaRegistry = DEFAULT_SCHEMA_REPOSITORY;
+    protected SchemaRepository schemaRepository = DEFAULT_SCHEMA_REPOSITORY;
     protected SchemaContextFactory schemaContextFactory = DEFAULT_SCHEMA_CONTEXT_FACTORY;
 
     protected DOMMountPointService mountPointService = null;
@@ -371,7 +372,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         }
 
         if (schemaResourcesDTO == null) {
-            schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(schemaRegistry, schemaContextFactory,
+            schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(schemaRegistry, schemaRepository, schemaContextFactory,
                     new NetconfStateSchemasResolverImpl());
         }
 
@@ -393,7 +394,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         final FilesystemSchemaSourceCache<YangTextSchemaSource> deviceCache =
                 createDeviceFilesystemCache(moduleSchemaCacheDirectory);
         repository.registerSchemaSourceListener(deviceCache);
-        return new NetconfDevice.SchemaResourcesDTO(repository, schemaContextFactory,
+        return new NetconfDevice.SchemaResourcesDTO(repository, repository, schemaContextFactory,
                 new NetconfStateSchemasResolverImpl());
     }
 
