@@ -46,6 +46,30 @@
       "revId": "b5e35c6efa8c5da2f8f9f4c8661578c3edabf351",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_2d738116",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-12T07:42:07Z",
+      "side": 1,
+      "message": "Yeah, I have consulted this with Yangtools team. But anyway, SchemaResolutionException has public constructor with parameters for unsatisfied imports and also for failed source.\n\nThat\u0027s why added this FIXME above if statement",
+      "parentUuid": "7a6b29fe_679f58b5",
+      "range": {
+        "startLine": 507,
+        "startChar": 16,
+        "endLine": 507,
+        "endChar": 22
+      },
+      "revId": "b5e35c6efa8c5da2f8f9f4c8661578c3edabf351",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
