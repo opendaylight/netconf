@@ -240,7 +240,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
                         schemaResourcesDTO = dto;
                     }
                     if (userCapabilities.isPresent()) {
-                        for (QName qname : userCapabilities.get().getModuleBasedCaps()) {
+                        for (QName qname : userCapabilities.get().getModuleBasedCaps().keySet()) {
                             final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier
                                     .create(qname.getLocalName(), qname.getFormattedRevision());
                             dto.getSchemaRegistry().registerSchemaSource(DEFAULT_CACHE, PotentialSchemaSource

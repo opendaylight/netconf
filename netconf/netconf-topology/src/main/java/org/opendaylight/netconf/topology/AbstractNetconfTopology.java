@@ -63,10 +63,12 @@ import org.opendaylight.protocol.framework.ReconnectStrategyFactory;
 import org.opendaylight.protocol.framework.TimedReconnectStrategy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev160811.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev160811.netconf.node.connection.status.available.capabilities.AvailableCapability.SchemaLoading;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev160811.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
@@ -424,10 +426,10 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
 
         final AuthenticationHandler authHandler;
         final Credentials credentials = node.getCredentials();
-        if (credentials instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) {
+        if (credentials instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev160811.netconf.node.credentials.credentials.LoginPassword) {
             authHandler = new LoginPassword(
-                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getUsername(),
-                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getPassword());
+                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev160811.netconf.node.credentials.credentials.LoginPassword) credentials).getUsername(),
+                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev160811.netconf.node.credentials.credentials.LoginPassword) credentials).getPassword());
         } else {
             throw new IllegalStateException("Only login/password authentification is supported");
         }
@@ -484,8 +486,11 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         Preconditions.checkState(parsedOverrideCapabilities.getNonModuleCaps().isEmpty(), "Capabilities to override can " +
                 "only contain module based capabilities, non-module capabilities will be retrieved from the device," +
                 " configured non-module capabilities: " + parsedOverrideCapabilities.getNonModuleCaps());
-
-        return Optional.of(parsedOverrideCapabilities);
+        Map<QName, SchemaLoading> flaggedModuleBasedCaps = new HashMap<>();
+        parsedOverrideCapabilities.getModuleBasedCaps().entrySet().forEach(entry -> flaggedModuleBasedCaps.put(entry.getKey(), SchemaLoading.SideLoading));
+        LOG.debug("Side loaded modules are transformed with appropriate flag 'SchemaLoading.SideLoading': {}",
+                flaggedModuleBasedCaps.toString());
+        return Optional.of(parsedOverrideCapabilities.replaceModuleCaps(flaggedModuleBasedCaps));
     }
 
     private static final class TimedReconnectStrategyFactory implements ReconnectStrategyFactory {

@@ -42,10 +42,10 @@ public class NetconfSessionPreferencesTest {
 
         final NetconfSessionPreferences merged = sessionCaps1.addModuleCaps(sessionCaps2);
         assertCaps(merged, 2, 2 + 1 /*Preserved monitoring*/ + 2 /*already present*/);
-        for (final QName qName : sessionCaps2.getModuleBasedCaps()) {
-            assertThat(merged.getModuleBasedCaps(), hasItem(qName));
+        for (final QName qName : sessionCaps2.getModuleBasedCaps().keySet()) {
+            assertThat(merged.getModuleBasedCaps().keySet(), hasItem(qName));
         }
-        assertThat(merged.getModuleBasedCaps(), hasItem(NetconfMessageTransformUtil.IETF_NETCONF_MONITORING));
+        assertThat(merged.getModuleBasedCaps().keySet(), hasItem(NetconfMessageTransformUtil.IETF_NETCONF_MONITORING));
 
         assertThat(merged.getNonModuleCaps(), hasItem("urn:ietf:params:netconf:base:1.0"));
         assertThat(merged.getNonModuleCaps(), hasItem("urn:ietf:params:netconf:capability:rollback-on-error:1.0"));

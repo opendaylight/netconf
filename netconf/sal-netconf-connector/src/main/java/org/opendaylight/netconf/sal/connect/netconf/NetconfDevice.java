@@ -12,6 +12,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.CheckedFuture;
@@ -48,7 +49,9 @@ import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessag
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev160811.netconf.node.connection.status.available.capabilities.AvailableCapability;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev160811.netconf.node.connection.status.available.capabilities.AvailableCapabilityBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev160811.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
@@ -314,7 +317,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
             final NetconfDeviceSchemas availableSchemas = stateSchemasResolver.resolve(deviceRpc, remoteSessionCapabilities, id);
             LOG.debug("{}: Schemas exposed by ietf-netconf-monitoring: {}", id, availableSchemas.getAvailableYangSchemasQNames());
 
-            final Set<QName> requiredSources = Sets.newHashSet(remoteSessionCapabilities.getModuleBasedCaps());
+            final Set<QName> requiredSources = Sets.newHashSet(remoteSessionCapabilities.getModuleBasedCaps().keySet());
             final Set<QName> providedSources = availableSchemas.getAvailableYangSchemasQNames();
 
             final Set<QName> requiredSourcesNotProvided = Sets.difference(requiredSources, providedSources);
@@ -417,8 +420,12 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
                     final SchemaContext result = schemaBuilderFuture.checkedGet();
                     LOG.debug("{}: Schema context built successfully from {}", id, requiredSources);
                     final Collection<QName> filteredQNames = Sets.difference(deviceSources.getRequiredSourcesQName(), capabilities.getUnresolvedCapabilites().keySet());
-                    capabilities.addCapabilities(filteredQNames);
-                    capabilities.addNonModuleBasedCapabilities(remoteSessionCapabilities.getNonModuleCaps());
+                    capabilities.addCapabilities(FluentIterable.from(filteredQNames).transform(entry -> new AvailableCapabilityBuilder()
+                            .setCapability(entry.toString()).setSchemaLoading(remoteSessionCapabilities.getModuleBasedCaps().get(entry)).build()).toList());
+
+                    capabilities.addNonModuleBasedCapabilities(FluentIterable.from(remoteSessionCapabilities.getNonModuleCaps()).transform(entry -> new AvailableCapabilityBuilder()
+                            .setCapability(entry).setSchemaLoading(AvailableCapability.SchemaLoading.NetconfLoading).build()).toList());
+
                     handleSalInitializationSuccess(result, remoteSessionCapabilities, getDeviceSpecificRpc(result));
                     return;
                 } catch (final Throwable t) {
