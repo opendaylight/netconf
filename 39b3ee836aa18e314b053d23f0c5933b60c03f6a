@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_60a9f0de",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-08-15T21:36:23Z",
+      "side": 1,
+      "message": "I\u0027ll cut it",
+      "parentUuid": "7a6b29fe_64863667",
+      "revId": "39b3ee836aa18e314b053d23f0c5933b60c03f6a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_c47d8a70",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
         "patchSetId": 5
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_40831456",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-08-15T21:36:23Z",
+      "side": 1,
+      "message": "No, I\u0027ll revert it. Initial reason why I wanted to create a handleDeleteException.",
+      "parentUuid": "7a6b29fe_c47d8a70",
+      "revId": "39b3ee836aa18e314b053d23f0c5933b60c03f6a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_d821eda0",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteRunningTx.java",
         "patchSetId": 5
@@ -47,6 +83,24 @@
       "writtenOn": "2016-08-12T08:46:10Z",
       "side": 1,
       "message": "We are loosing information about exception t here. Is logging it enough? This applies also to two other write tx implementation you have changed",
+      "revId": "39b3ee836aa18e314b053d23f0c5933b60c03f6a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_2086d865",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteRunningTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-08-15T21:36:23Z",
+      "side": 1,
+      "message": "I know, but I don\u0027t think it matters since it\u0027s logged. NetconfDocumentedException can\u0027t hold any Exception or Throwable.",
+      "parentUuid": "7a6b29fe_d821eda0",
       "revId": "39b3ee836aa18e314b053d23f0c5933b60c03f6a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -82,6 +136,42 @@
       "side": 1,
       "message": "You are setting exception in future callback, but you are handling exception outside this callback. Future does not have to be finished at this point, so you can handle some unrelated exception or no exception at all.",
       "parentUuid": "7a6b29fe_cd13ed64",
+      "revId": "39b3ee836aa18e314b053d23f0c5933b60c03f6a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_6080d046",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteRunningTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-08-15T21:36:23Z",
+      "side": 1,
+      "message": "Correct, something can be done in the AbstractWriteTx",
+      "parentUuid": "7a6b29fe_cd13ed64",
+      "revId": "39b3ee836aa18e314b053d23f0c5933b60c03f6a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_a0d82880",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteRunningTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-08-15T21:36:23Z",
+      "side": 1,
+      "message": "Right, you\u0027re absolutely correct. The thing is, the exception will be thrown from the FutureCallback thread, which is wrong, it should be handled by the caller thread, to make sure we fail the request accordingly.\nSo far I can\u0027t find anyway to propagate and retrieve the exception from the FutureCallback to the caller thread.\nI might have to use Futures.makeChecked, I haven\u0027t tried it yet, and I\u0027m not yet sure this will work.\nPreviously, we were using blocking transactions, thus the main thread was blocked, and throwing exception on failure. Since we\u0027re using non-blocking transactions, exception has to be handled differently",
+      "parentUuid": "7a6b29fe_0f08322c",
       "revId": "39b3ee836aa18e314b053d23f0c5933b60c03f6a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
