@@ -96,16 +96,6 @@ class ModuleImpl implements Module {
     }
 
     @Override
-    public DataSchemaNode getDataChildByName(final String name) {
-        for (final DataSchemaNode node : this.listChild) {
-            if (node.getQName().getLocalName().equals(name)) {
-                return node;
-            }
-        }
-        throw new RestconfDocumentedException(name + " is not in child of " + ModuleImpl.moduleQName);
-    }
-
-    @Override
     public Set<UsesNode> getUses() {
         throw new UnsupportedOperationException("Not supported operations.");
     }
