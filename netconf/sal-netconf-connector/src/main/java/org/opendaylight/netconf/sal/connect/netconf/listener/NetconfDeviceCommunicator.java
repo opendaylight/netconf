@@ -96,6 +96,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             LOG.trace("{}: Session advertised capabilities: {}", id,
                     netconfSessionPreferences);
 
+
             if(overrideNetconfCapabilities.isPresent()) {
                 netconfSessionPreferences = overrideNetconfCapabilities.get().isOverride() ?
                         netconfSessionPreferences.replaceModuleCaps(overrideNetconfCapabilities.get().getSessionPreferences()) :

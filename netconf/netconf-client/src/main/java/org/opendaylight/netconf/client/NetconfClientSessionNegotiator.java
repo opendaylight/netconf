@@ -143,7 +143,6 @@ public class NetconfClientSessionNegotiator extends
 
         // Copy here is important: it disconnects the strings from the document
         Set<String> capabilities = ImmutableSet.copyOf(NetconfMessageUtil.extractCapabilitiesFromHello(message.getDocument()));
-
         capabilities = INTERNER.intern(capabilities);
 
         return new NetconfClientSession(sessionListener, channel, sessionId, capabilities);

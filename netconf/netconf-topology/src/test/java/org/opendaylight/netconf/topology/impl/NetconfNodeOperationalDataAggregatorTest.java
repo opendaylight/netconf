@@ -20,13 +20,14 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.AvailableCapabilitiesBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.ClusteredConnectionStatusBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.clustered.connection.status.NodeStatus;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.clustered.connection.status.NodeStatusBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev160811.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev160811.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev160811.NetconfNodeConnectionStatus;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev160811.netconf.node.connection.status.AvailableCapabilitiesBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev160811.netconf.node.connection.status.ClusteredConnectionStatusBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev160811.netconf.node.connection.status.available.capabilities.AvailableCapability;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev160811.netconf.node.connection.status.clustered.connection.status.NodeStatus;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev160811.netconf.node.connection.status.clustered.connection.status.NodeStatusBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 
@@ -45,7 +46,7 @@ public class NetconfNodeOperationalDataAggregatorTest {
     @Test
     public void testCombineCreateAttempts() throws ExecutionException, InterruptedException {
         NetconfNode testingNode = new NetconfNodeBuilder().setAvailableCapabilities(
-                new AvailableCapabilitiesBuilder().setAvailableCapability(Lists.<String>newArrayList()).build())
+                new AvailableCapabilitiesBuilder().setAvailableCapability(Lists.<AvailableCapability>newArrayList()).build())
                 .setClusteredConnectionStatus(new ClusteredConnectionStatusBuilder().setNodeStatus(Lists.newArrayList(
                         new NodeStatusBuilder().setStatus(NodeStatus.Status.Connected).build())).build())
                 .setConnectionStatus(NetconfNodeConnectionStatus.ConnectionStatus.Connected).build();
@@ -62,7 +63,7 @@ public class NetconfNodeOperationalDataAggregatorTest {
     @Test
     public void testSuccessfulCombineUpdateAttempts() throws ExecutionException, InterruptedException {
         NetconfNode testingNode = new NetconfNodeBuilder().setAvailableCapabilities(
-                new AvailableCapabilitiesBuilder().setAvailableCapability(Lists.<String>newArrayList()).build())
+                new AvailableCapabilitiesBuilder().setAvailableCapability(Lists.<AvailableCapability>newArrayList()).build())
                 .setClusteredConnectionStatus(new ClusteredConnectionStatusBuilder().setNodeStatus(Lists.newArrayList(
                         new NodeStatusBuilder().setStatus(NodeStatus.Status.Connected).build())).build())
                 .setConnectionStatus(NetconfNodeConnectionStatus.ConnectionStatus.Connected).build();
