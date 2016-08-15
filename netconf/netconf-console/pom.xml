@@ -40,5 +40,15 @@ and is available at http://www.eclipse.org/legal/epl-v10.html INTERNAL
       <artifactId>sal-netconf-connector</artifactId>
       <version>${mdsal.version}</version>
     </dependency>
+      <dependency>
+          <groupId>org.opendaylight.controller</groupId>
+          <artifactId>sal-distributed-datastore</artifactId>
+          <scope>test</scope>
+      </dependency>
+      <dependency>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-all</artifactId>
+          <scope>test</scope>
+      </dependency>
   </dependencies>
 </project>
