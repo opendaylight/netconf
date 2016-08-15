@@ -67,6 +67,24 @@
       "revId": "39b3ee836aa18e314b053d23f0c5933b60c03f6a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_0f08322c",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteRunningTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-15T08:37:36Z",
+      "side": 1,
+      "message": "You are setting exception in future callback, but you are handling exception outside this callback. Future does not have to be finished at this point, so you can handle some unrelated exception or no exception at all.",
+      "parentUuid": "7a6b29fe_cd13ed64",
+      "revId": "39b3ee836aa18e314b053d23f0c5933b60c03f6a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
