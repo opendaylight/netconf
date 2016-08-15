@@ -6,7 +6,7 @@ module netconf-node-topology {
     import yang-ext { prefix ext; revision-date "2013-07-09";}
     import ietf-inet-types { prefix inet; revision-date "2013-07-15"; }
 
-    revision "2015-01-14" {
+    revision "2016-08-11" {
         description "Initial revision of Topology model";
     }
 
@@ -162,8 +162,16 @@ module netconf-node-topology {
 
         container available-capabilities {
             config false;
-            leaf-list available-capability {
-                type string;
+            list available-capability {
+                leaf capability {
+                    type string;
+                }
+                leaf schema-loading {
+                    type enumeration {
+                        enum side-loading;
+                        enum netconf-loading;
+                    }
+                }
             }
         }
 
@@ -173,7 +181,6 @@ module netconf-node-topology {
                 leaf capability {
                     type string;
                 }
-
                 leaf failure-reason {
                     type enumeration {
                         enum missing-source;
