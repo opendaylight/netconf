@@ -52,6 +52,8 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.AvailableCapabilities;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.AvailableCapabilitiesBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.network.topology.topology.topology.types.TopologyNetconf;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -248,8 +250,10 @@ public class NetconfCommandsImplTest {
         final Host host = HostBuilder.getDefaultInstance(ip);
         final PortNumber port = new PortNumber(portNumber);
 
-        final List<String> avCapList = new ArrayList<>();
-        avCapList.add(notificationCapabilityPrefix + "_availableCapabilityString1");
+        final List<AvailableCapability> avCapList = new ArrayList<>();
+        avCapList.add(new AvailableCapabilityBuilder()
+                .setCapabilityOrigin(AvailableCapability.CapabilityOrigin.UserDefined)
+                .setCapability(notificationCapabilityPrefix + "_availableCapabilityString1").build());
         final AvailableCapabilities avCaps = new AvailableCapabilitiesBuilder().setAvailableCapability(avCapList).build();
 
         final NetconfNode nn = new NetconfNodeBuilder().setConnectionStatus(cs).setHost(host).setPort(port).
@@ -290,7 +294,9 @@ public class NetconfCommandsImplTest {
 
     private List<InputStream> getYangSchemas() {
         final List<String> schemaPaths = Arrays.asList("/schemas/network-topology@2013-10-21.yang",
-                "/schemas/ietf-inet-types@2013-07-15.yang", "/schemas/yang-ext.yang", "/schemas/netconf-node-topology.yang");
+                "/schemas/ietf-inet-types@2013-07-15.yang", "/schemas/yang-ext.yang",
+                "/schemas/netconf-node-topology.yang");
+
         final List<InputStream> schemas = new ArrayList<>();
         for (String schemaPath : schemaPaths) {
             final InputStream resourceAsStream = getClass().getResourceAsStream(schemaPath);

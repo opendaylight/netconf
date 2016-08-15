@@ -50,6 +50,8 @@ import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessag
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -452,8 +454,14 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
                     final SchemaContext result = schemaBuilderFuture.checkedGet();
                     LOG.debug("{}: Schema context built successfully from {}", id, requiredSources);
                     final Collection<QName> filteredQNames = Sets.difference(deviceSources.getRequiredSourcesQName(), capabilities.getUnresolvedCapabilites().keySet());
-                    capabilities.addCapabilities(filteredQNames);
-                    capabilities.addNonModuleBasedCapabilities(remoteSessionCapabilities.getNonModuleCaps());
+                    capabilities.addCapabilities(filteredQNames.stream().map(entry -> new AvailableCapabilityBuilder()
+                            .setCapability(entry.toString()).setCapabilityOrigin(remoteSessionCapabilities.getModuleBasedCapsOrigin().get(entry)).build())
+                            .collect(Collectors.toList()));
+
+                    capabilities.addNonModuleBasedCapabilities(remoteSessionCapabilities.getNonModuleCaps().stream().map(entry -> new AvailableCapabilityBuilder()
+                            .setCapability(entry).setCapabilityOrigin(AvailableCapability.CapabilityOrigin.DeviceAdvertised).build())
+                            .collect(Collectors.toList()));
+
                     handleSalInitializationSuccess(result, remoteSessionCapabilities, getDeviceSpecificRpc(result));
                     return;
                 } catch (final Throwable t) {

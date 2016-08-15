@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.sal.connect.netconf;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyCollectionOf;
 import static org.mockito.Matchers.eq;
@@ -30,10 +31,13 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -48,11 +52,13 @@ import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -65,8 +71,8 @@ import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
+import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
@@ -327,6 +333,40 @@ public class NetconfDeviceTest {
 
         verify(schemaContextProviderFactory, timeout(5000).times(2)).createSchemaContext(any(Collection.class));
         verify(facade, timeout(5000).times(2)).onDeviceConnected(any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
+    }
+
+    @Test
+    public void testNetconfDeviceAvailableCapabilitiesBuilding() throws Exception {
+        final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
+        final NetconfDeviceCommunicator listener = getListener();
+
+        final SchemaContextFactory schemaContextProviderFactory = getSchemaFactory();
+
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO
+                = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), getSchemaRepository(), schemaContextProviderFactory, stateSchemasResolver);
+        final NetconfDevice device = new NetconfDeviceBuilder()
+                .setReconnectOnSchemasChange(true)
+                .setSchemaResourcesDTO(schemaResourcesDTO)
+                .setGlobalProcessingExecutor(getExecutor())
+                .setId(getId())
+                .setSalFacade(facade)
+                .build();
+        NetconfDevice netconfSpy = Mockito.spy(device);
+
+        final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
+                Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
+        Map<QName, AvailableCapability.CapabilityOrigin> moduleBasedCaps = new HashMap<>();
+        moduleBasedCaps.putAll(sessionCaps.getModuleBasedCapsOrigin());
+        moduleBasedCaps.put(QName.create("test:qname:side:loading"), AvailableCapability.CapabilityOrigin.UserDefined);
+
+        netconfSpy.onRemoteSessionUp(sessionCaps.replaceModuleCaps(moduleBasedCaps), listener);
+
+        ArgumentCaptor argument = ArgumentCaptor.forClass(NetconfSessionPreferences.class);
+        verify(netconfSpy, timeout(5000)).handleSalInitializationSuccess(any(SchemaContext.class), (NetconfSessionPreferences) argument.capture(), any(DOMRpcService.class));
+        NetconfDeviceCapabilities netconfDeviceCaps = ((NetconfSessionPreferences) argument.getValue()).getNetconfDeviceCapabilities();
+
+        netconfDeviceCaps.getResolvedCapabilities().forEach(entry -> assertEquals("Builded 'AvailableCapability' schemas should match input capabilities.",
+                moduleBasedCaps.get(QName.create(entry.getCapability())).getName(), entry.getCapabilityOrigin().getName()));
     }
 
     private SchemaContextFactory getSchemaFactory() {
