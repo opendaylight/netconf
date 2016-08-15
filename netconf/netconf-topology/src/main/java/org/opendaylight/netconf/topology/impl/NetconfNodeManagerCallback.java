@@ -55,6 +55,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.ClusteredConnectionStatusBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.UnavailableCapabilities;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.UnavailableCapabilitiesBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.clustered.connection.status.NodeStatus.Status;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.clustered.connection.status.NodeStatusBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability;
@@ -80,13 +81,6 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
             return new UnavailableCapabilityBuilder()
                     .setCapability(input.getKey().toString())
                     .setFailureReason(input.getValue()).build();
-        }
-    };
-    public static final Function<QName, String> AVAILABLE_CAPABILITY_TRANSFORMER = new Function<QName, String>() {
-        @Override
-        public String apply(QName qName) {
-            // intern string representation of a capability to avoid duplicates
-            return qName.toString().intern();
         }
     };
 
@@ -168,7 +162,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
                                 .setHost(netconfNode.getHost())
                                 .setPort(netconfNode.getPort())
                                 .setConnectionStatus(ConnectionStatus.Connecting)
-                                .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<AvailableCapability>()).build())
                                 .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                 .setClusteredConnectionStatus(
                                         new ClusteredConnectionStatusBuilder()
@@ -200,7 +194,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
                                 .setHost(netconfNode.getHost())
                                 .setPort(netconfNode.getPort())
                                 .setConnectionStatus(ConnectionStatus.UnableToConnect)
-                                .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<AvailableCapability>()).build())
                                 .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                 .setClusteredConnectionStatus(
                                         new ClusteredConnectionStatusBuilder()
@@ -268,7 +262,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
                                                         .build())
                                         .setHost(netconfNode.getHost())
                                         .setPort(netconfNode.getPort())
-                                        .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                        .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<AvailableCapability>()).build())
                                         .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                         .build()).build();
                 return currentOperationalNode;
@@ -326,7 +320,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
                                                         .build())
                                         .setHost(netconfNode.getHost())
                                         .setPort(netconfNode.getPort())
-                                        .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                        .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<AvailableCapability>()).build())
                                         .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                         .build())
                         .build();
@@ -371,9 +365,9 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
             topologyDispatcher.registerMountPoint(cachedContext, new NodeId(nodeId), masterDataBrokerRef);
         }
 
-        List<String> capabilityList = new ArrayList<>();
+        List<AvailableCapability> capabilityList = new ArrayList<>();
         capabilityList.addAll(netconfSessionPreferences.getNetconfDeviceCapabilities().getNonModuleBasedCapabilities());
-        capabilityList.addAll(FluentIterable.from(netconfSessionPreferences.getNetconfDeviceCapabilities().getResolvedCapabilities()).transform(AVAILABLE_CAPABILITY_TRANSFORMER).toList());
+        capabilityList.addAll(netconfSessionPreferences.getNetconfDeviceCapabilities().getResolvedCapabilities());
         final AvailableCapabilitiesBuilder avCapabalitiesBuilder = new AvailableCapabilitiesBuilder();
         avCapabalitiesBuilder.setAvailableCapability(capabilityList);
 
@@ -421,7 +415,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
                 .addAugmentation(NetconfNode.class,
                         new NetconfNodeBuilder()
                                 .setConnectionStatus(ConnectionStatus.Connecting)
-                                .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<AvailableCapability>()).build())
                                 .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                 .setClusteredConnectionStatus(
                                         new ClusteredConnectionStatusBuilder()
@@ -450,7 +444,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
                 .addAugmentation(NetconfNode.class,
                         new NetconfNodeBuilder()
                                 .setConnectionStatus(ConnectionStatus.UnableToConnect)
-                                .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<AvailableCapability>()).build())
                                 .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                 .setClusteredConnectionStatus(
                                         new ClusteredConnectionStatusBuilder()

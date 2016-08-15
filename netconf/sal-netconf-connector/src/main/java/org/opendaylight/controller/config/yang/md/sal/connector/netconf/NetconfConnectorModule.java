@@ -7,7 +7,6 @@
  */
 package org.opendaylight.controller.config.yang.md.sal.connector.netconf;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static org.opendaylight.controller.config.api.JmxAttributeValidationException.checkCondition;
 import static org.opendaylight.controller.config.api.JmxAttributeValidationException.checkNotNull;
 
@@ -46,13 +45,14 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPrefe
 import org.opendaylight.netconf.sal.connect.netconf.listener.UserPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
+import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.protocol.framework.ReconnectStrategy;
 import org.opendaylight.protocol.framework.ReconnectStrategyFactory;
 import org.opendaylight.protocol.framework.TimedReconnectStrategy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
@@ -241,7 +241,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
                         schemaResourcesDTO = dto;
                     }
                     if (userCapabilities.isPresent()) {
-                        for (QName qname : userCapabilities.get().getModuleBasedCaps()) {
+                        for (QName qname : userCapabilities.get().getModuleBasedCaps().keySet()) {
                             final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier
                                     .create(qname.getLocalName(), qname.getFormattedRevision());
                             dto.getSchemaRegistry().registerSchemaSource(DEFAULT_CACHE, PotentialSchemaSource
@@ -386,7 +386,8 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
             return Optional.absent();
         }
 
-        final NetconfSessionPreferences parsedOverrideCapabilities = NetconfSessionPreferences.fromStrings(capabilities);
+        final NetconfSessionPreferences parsedOverrideCapabilities = NetconfSessionPreferences.fromStrings(capabilities,
+                AvailableCapability.CapabilityOrigin.UserDefined);
         JmxAttributeValidationException.checkCondition(
                 parsedOverrideCapabilities.getNonModuleCaps().isEmpty(),
                 "Capabilities to override can only contain module based capabilities, non-module capabilities will be retrieved from the device," +
