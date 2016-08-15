@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.MountPoint;
 import org.opendaylight.controller.md.sal.binding.api.MountPointService;
@@ -97,7 +98,8 @@ public class NetconfCommandsImpl implements NetconfCommands {
                     attributes.put(NetconfConsoleConstants.NETCONF_IP, ImmutableList.of(netconfNode.getHost().getIpAddress().getIpv4Address().getValue()));
                     attributes.put(NetconfConsoleConstants.NETCONF_PORT, ImmutableList.of(netconfNode.getPort().getValue().toString()));
                     attributes.put(NetconfConsoleConstants.STATUS, ImmutableList.of(netconfNode.getConnectionStatus().name()));
-                    attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES, netconfNode.getAvailableCapabilities().getAvailableCapability());
+                    attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES,
+                            netconfNode.getAvailableCapabilities().getAvailableCapability().stream().map(c -> c.getCapability() + "/" + c.getSchemaLoading()).collect(Collectors.toList()));
                     device.put(node.getNodeId().getValue(), attributes);
                 }
             }
@@ -117,7 +119,8 @@ public class NetconfCommandsImpl implements NetconfCommands {
                 attributes.put(NetconfConsoleConstants.NETCONF_IP, ImmutableList.of(netconfNode.getHost().getIpAddress().getIpv4Address().getValue()));
                 attributes.put(NetconfConsoleConstants.NETCONF_PORT, ImmutableList.of(netconfNode.getPort().getValue().toString()));
                 attributes.put(NetconfConsoleConstants.STATUS, ImmutableList.of(netconfNode.getConnectionStatus().name()));
-                attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES, netconfNode.getAvailableCapabilities().getAvailableCapability());
+                attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES,
+                        netconfNode.getAvailableCapabilities().getAvailableCapability().stream().map(c -> c.getCapability() + "/" + c.getSchemaLoading()).collect(Collectors.toList()));
                 device.put(node.getNodeId().getValue(), attributes);
             }
         }

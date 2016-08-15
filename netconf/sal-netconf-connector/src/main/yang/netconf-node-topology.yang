@@ -162,8 +162,16 @@ module netconf-node-topology {
 
         container available-capabilities {
             config false;
-            leaf-list available-capability {
-                type string;
+            list available-capability {
+                leaf capability {
+                    type string;
+                }
+                leaf schema-loading {
+                    type enumeration {
+                        enum side-loading;
+                        enum netconf-loading;
+                    }
+                }
             }
         }
 
@@ -173,7 +181,6 @@ module netconf-node-topology {
                 leaf capability {
                     type string;
                 }
-
                 leaf failure-reason {
                     type enumeration {
                         enum missing-source;

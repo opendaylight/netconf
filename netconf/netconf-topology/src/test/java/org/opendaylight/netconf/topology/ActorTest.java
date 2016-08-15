@@ -73,6 +73,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.AvailableCapabilitiesBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.ClusteredConnectionStatusBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.UnavailableCapabilitiesBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.clustered.connection.status.NodeStatus.Status;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.clustered.connection.status.NodeStatusBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability;
@@ -405,7 +406,7 @@ public class ActorTest {
                                     .setHost(netconfNode.getHost())
                                     .setPort(netconfNode.getPort())
                                     .setConnectionStatus(ConnectionStatus.Connecting)
-                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<AvailableCapability>()).build())
                                     .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                     .setClusteredConnectionStatus(
                                             new ClusteredConnectionStatusBuilder()
@@ -431,7 +432,7 @@ public class ActorTest {
                                     .setHost(netconfNode.getHost())
                                     .setPort(netconfNode.getPort())
                                     .setConnectionStatus(ConnectionStatus.UnableToConnect)
-                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<AvailableCapability>()).build())
                                     .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                     .setClusteredConnectionStatus(
                                             new ClusteredConnectionStatusBuilder()
@@ -458,7 +459,7 @@ public class ActorTest {
                                     .setConnectionStatus(ConnectionStatus.Connected)
                                     .setHost(augmentation.getHost())
                                     .setPort(augmentation.getPort())
-                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<AvailableCapability>()).build())
                                     .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                     .setClusteredConnectionStatus(
                                             new ClusteredConnectionStatusBuilder()
@@ -485,7 +486,7 @@ public class ActorTest {
                                     .setConnectionStatus(ConnectionStatus.Connected)
                                     .setHost(augmentation.getHost())
                                     .setPort(augmentation.getPort())
-                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<AvailableCapability>()).build())
                                     .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                     .setClusteredConnectionStatus(
                                             new ClusteredConnectionStatusBuilder()
@@ -565,7 +566,7 @@ public class ActorTest {
                                     .setConnectionStatus(ConnectionStatus.Connected)
                                     .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                                     .setPort(new PortNumber(2555))
-                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<AvailableCapability>()).build())
                                     .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                     .build())
                     .build());
@@ -582,7 +583,7 @@ public class ActorTest {
                                     .setConnectionStatus(ConnectionStatus.Connected)
                                     .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                                     .setPort(new PortNumber(65535))
-                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<AvailableCapability>()).build())
                                     .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                     .build())
                     .build());
@@ -620,7 +621,7 @@ public class ActorTest {
                                     .setConnectionStatus(ConnectionStatus.Connecting)
                                     .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                                     .setPort(new PortNumber(65535))
-                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<AvailableCapability>()).build())
                                     .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                     .build())
                     .build();
@@ -636,7 +637,7 @@ public class ActorTest {
                                     .setConnectionStatus(ConnectionStatus.UnableToConnect)
                                     .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                                     .setPort(new PortNumber(65535))
-                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<String>()).build())
+                                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder().setAvailableCapability(new ArrayList<AvailableCapability>()).build())
                                     .setUnavailableCapabilities(new UnavailableCapabilitiesBuilder().setUnavailableCapability(new ArrayList<UnavailableCapability>()).build())
                                     .build())
                     .build();
