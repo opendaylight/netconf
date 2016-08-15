@@ -35,6 +35,8 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.util.NetconfTopologyPathCreator;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.ModuleIdentifier;
@@ -135,12 +137,15 @@ public class ClusteredNetconfDevice extends NetconfDevice implements EntityOwner
                 LOG.debug("{}: Schema context built successfully.", id);
 
                 final NetconfDeviceCapabilities deviceCap = sessionPreferences.getNetconfDeviceCapabilities();
-                final Set<QName> providedSourcesQnames = Sets.newHashSet();
+                final Set<AvailableCapability> providedSourcesQnames = Sets.newHashSet();
+                final Set<AvailableCapability> providedSourcesNonModuleCaps = Sets.newHashSet();
                 for(ModuleIdentifier id : schemaContext.getAllModuleIdentifiers()) {
-                    providedSourcesQnames.add(QName.create(id.getQNameModule(), id.getName()));
+                    providedSourcesQnames.add(new AvailableCapabilityBuilder()
+                            .setCapability(QName.create(id.getQNameModule(), id.getName()).toString()).build());
                 }
-
-                deviceCap.addNonModuleBasedCapabilities(sessionPreferences.getNonModuleCaps());
+                sessionPreferences.getNonModuleCaps().forEach(e -> providedSourcesNonModuleCaps.add(new AvailableCapabilityBuilder()
+                        .setCapability(e).build()));
+                deviceCap.addNonModuleBasedCapabilities(providedSourcesNonModuleCaps);
                 deviceCap.addCapabilities(providedSourcesQnames);
 
                 ClusteredNetconfDevice.super.handleSalInitializationSuccess(

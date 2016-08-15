@@ -192,7 +192,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
 
     private boolean isHostAddressPresent(final Host address) {
         return address.getDomainName() != null ||
-               address.getIpAddress() != null && (address.getIpAddress().getIpv4Address() != null || address.getIpAddress().getIpv6Address() != null);
+                address.getIpAddress() != null && (address.getIpAddress().getIpv4Address() != null || address.getIpAddress().getIpv6Address() != null);
     }
 
     @Deprecated

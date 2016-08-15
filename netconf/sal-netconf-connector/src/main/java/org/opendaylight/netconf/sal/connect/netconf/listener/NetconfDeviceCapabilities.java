@@ -13,14 +13,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability.FailureReason;
 import org.opendaylight.yangtools.yang.common.QName;
 
 public final class NetconfDeviceCapabilities {
     private final Map<QName, FailureReason> unresolvedCapabilites;
-    private final Set<QName> resolvedCapabilities;
-
-    private final Set<String> nonModuleBasedCapabilities;
+    private final Set<AvailableCapability>  resolvedCapabilities;
+    private final Set<AvailableCapability> nonModuleBasedCapabilities;
 
     public NetconfDeviceCapabilities() {
         this.unresolvedCapabilites = new HashMap<>();
@@ -38,15 +38,15 @@ public final class NetconfDeviceCapabilities {
         }
     }
 
-    public void addCapabilities(Collection<QName> availableSchemas) {
+    public void addCapabilities(Collection<AvailableCapability>  availableSchemas) {
         resolvedCapabilities.addAll(availableSchemas);
     }
 
-    public void addNonModuleBasedCapabilities(Collection<String> nonModuleCapabilities) {
+    public void addNonModuleBasedCapabilities(Collection<AvailableCapability> nonModuleCapabilities) {
         this.nonModuleBasedCapabilities.addAll(nonModuleCapabilities);
     }
 
-    public Set<String> getNonModuleBasedCapabilities() {
+    public Set<AvailableCapability> getNonModuleBasedCapabilities() {
         return nonModuleBasedCapabilities;
     }
 
@@ -54,7 +54,7 @@ public final class NetconfDeviceCapabilities {
         return unresolvedCapabilites;
     }
 
-    public Set<QName> getResolvedCapabilities() {
+    public Set<AvailableCapability>  getResolvedCapabilities() {
         return resolvedCapabilities;
     }
 

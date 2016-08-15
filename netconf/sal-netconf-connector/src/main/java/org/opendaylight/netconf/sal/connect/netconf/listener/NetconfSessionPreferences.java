@@ -14,16 +14,20 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.net.URI;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,15 +71,19 @@ public final class NetconfSessionPreferences {
         }
     };
 
-    private final Set<QName> moduleBasedCaps;
+    private final Map<QName, CapabilityOrigin> moduleBasedCaps;
     private final Set<String> nonModuleCaps;
 
-    NetconfSessionPreferences(final Set<String> nonModuleCaps, final Set<QName> moduleBasedCaps) {
+    NetconfSessionPreferences(final Set<String> nonModuleCaps, final Map<QName, CapabilityOrigin> moduleBasedCaps) {
         this.nonModuleCaps = Preconditions.checkNotNull(nonModuleCaps);
         this.moduleBasedCaps = Preconditions.checkNotNull(moduleBasedCaps);
     }
 
     public Set<QName> getModuleBasedCaps() {
+        return moduleBasedCaps.keySet();
+    }
+
+    public Map<QName, CapabilityOrigin> getModuleBasedCapsOrigin() {
         return moduleBasedCaps;
     }
 
@@ -100,7 +108,7 @@ public final class NetconfSessionPreferences {
     }
 
     public boolean containsModuleCapability(final QName capability) {
-        return moduleBasedCaps.contains(capability);
+        return moduleBasedCaps.containsKey(capability);
     }
 
     @Override
@@ -145,9 +153,9 @@ public final class NetconfSessionPreferences {
      * @return new instance of preferences with merged module-based capabilities
      */
     public NetconfSessionPreferences addModuleCaps(final NetconfSessionPreferences netconfSessionModuleCapabilities) {
-        final HashSet<QName> mergedCaps = Sets.newHashSetWithExpectedSize(moduleBasedCaps.size() + netconfSessionModuleCapabilities.getModuleBasedCaps().size());
-        mergedCaps.addAll(moduleBasedCaps);
-        mergedCaps.addAll(netconfSessionModuleCapabilities.getModuleBasedCaps());
+        final Map<QName, CapabilityOrigin> mergedCaps = Maps.newHashMapWithExpectedSize(moduleBasedCaps.size() + netconfSessionModuleCapabilities.getModuleBasedCaps().size());
+        mergedCaps.putAll(moduleBasedCaps);
+        mergedCaps.putAll(netconfSessionModuleCapabilities.getModuleBasedCapsOrigin());
         return new NetconfSessionPreferences(getNonModuleCaps(), mergedCaps);
     }
 
@@ -159,7 +167,11 @@ public final class NetconfSessionPreferences {
      * @return new instance of preferences with replaced module-based capabilities
      */
     public NetconfSessionPreferences replaceModuleCaps(final NetconfSessionPreferences netconfSessionPreferences) {
-        return new NetconfSessionPreferences(getNonModuleCaps(), netconfSessionPreferences.getModuleBasedCaps());
+        return new NetconfSessionPreferences(getNonModuleCaps(), netconfSessionPreferences.getModuleBasedCapsOrigin());
+    }
+
+    public NetconfSessionPreferences replaceModuleCaps(Map<QName, CapabilityOrigin> newModuleBasedCaps) {
+        return new NetconfSessionPreferences(getNonModuleCaps(), newModuleBasedCaps);
     }
 
     public static NetconfSessionPreferences fromNetconfSession(final NetconfClientSession session) {
@@ -175,7 +187,12 @@ public final class NetconfSessionPreferences {
     }
 
     public static NetconfSessionPreferences fromStrings(final Collection<String> capabilities) {
-        final Set<QName> moduleBasedCaps = new HashSet<>();
+        // we do not know origin of capabilities from only Strings, so we set it to default value
+        return fromStrings(capabilities, CapabilityOrigin.DeviceAdvertised);
+    }
+
+    public static NetconfSessionPreferences fromStrings(final Collection<String> capabilities, CapabilityOrigin capabilityOrigin) {
+        final Map<QName, CapabilityOrigin> moduleBasedCaps = new HashMap<>();
         final Set<String> nonModuleCaps = Sets.newHashSet(capabilities);
 
         for (final String capability : capabilities) {
@@ -193,7 +210,7 @@ public final class NetconfSessionPreferences {
 
             String revision = REVISION_PARAM.from(queryParams);
             if (!Strings.isNullOrEmpty(revision)) {
-                addModuleQName(moduleBasedCaps, nonModuleCaps, capability, cachedQName(namespace, revision, moduleName));
+                addModuleQName(moduleBasedCaps, nonModuleCaps, capability, cachedQName(namespace, revision, moduleName), capabilityOrigin);
                 continue;
             }
 
@@ -207,23 +224,22 @@ public final class NetconfSessionPreferences {
                 revision = BROKEN_REVISON_PARAM.from(queryParams);
                 if (Strings.isNullOrEmpty(revision)) {
                     LOG.warn("Netconf device returned revision incorrectly escaped for {}, ignoring it", capability);
-                    addModuleQName(moduleBasedCaps, nonModuleCaps, capability, cachedQName(namespace, moduleName));
+                    addModuleQName(moduleBasedCaps, nonModuleCaps, capability, cachedQName(namespace, moduleName), capabilityOrigin);
                 } else {
-                    addModuleQName(moduleBasedCaps, nonModuleCaps, capability, cachedQName(namespace, revision, moduleName));
+                    addModuleQName(moduleBasedCaps, nonModuleCaps, capability, cachedQName(namespace, revision, moduleName), capabilityOrigin);
                 }
                 continue;
             }
 
             // Fallback, no revision provided for module
-            addModuleQName(moduleBasedCaps, nonModuleCaps, capability, cachedQName(namespace, moduleName));
+            addModuleQName(moduleBasedCaps, nonModuleCaps, capability, cachedQName(namespace, moduleName), capabilityOrigin);
         }
 
-        return new NetconfSessionPreferences(ImmutableSet.copyOf(nonModuleCaps), ImmutableSet.copyOf(moduleBasedCaps));
+        return new NetconfSessionPreferences(ImmutableSet.copyOf(nonModuleCaps), ImmutableMap.copyOf(moduleBasedCaps));
     }
 
-
-    private static void addModuleQName(final Set<QName> moduleBasedCaps, final Set<String> nonModuleCaps, final String capability, final QName qName) {
-        moduleBasedCaps.add(qName);
+    private static void addModuleQName(final Map<QName, CapabilityOrigin> moduleBasedCaps, final Set<String> nonModuleCaps, final String capability, final QName qName, CapabilityOrigin capabilityOrigin) {
+        moduleBasedCaps.put(qName, capabilityOrigin);
         nonModuleCaps.remove(capability);
     }
 
