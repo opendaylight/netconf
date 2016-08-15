@@ -81,11 +81,6 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     }
 
     @Override
-    public DataSchemaNode getDataChildByName(final String s) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Set<UsesNode> getUses() {
         return Collections.emptySet();
     }

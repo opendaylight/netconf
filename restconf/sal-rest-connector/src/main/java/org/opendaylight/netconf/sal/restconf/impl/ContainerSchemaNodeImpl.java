@@ -60,16 +60,6 @@ class ContainerSchemaNodeImpl implements ContainerSchemaNode {
     }
 
     @Override
-    public DataSchemaNode getDataChildByName(final String name) {
-        for (final DataSchemaNode node : this.child) {
-            if (node.getQName().getLocalName().equals(name)) {
-                return node;
-            }
-        }
-        throw new RestconfDocumentedException(name + " is not in child of " + this.qname);
-    }
-
-    @Override
     public Set<UsesNode> getUses() {
         throw new UnsupportedOperationException("Not supported.");
     }
