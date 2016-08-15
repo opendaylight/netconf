@@ -162,8 +162,16 @@ module netconf-node-topology {
 
         container available-capabilities {
             config false;
-            leaf-list available-capability {
-                type string;
+            list available-capability {
+                leaf capability {
+                    type string;
+                }
+                leaf capability-origin {
+                    type enumeration {
+                        enum user-defined;
+                        enum device-advertised;
+                    }
+                }
             }
         }
 
