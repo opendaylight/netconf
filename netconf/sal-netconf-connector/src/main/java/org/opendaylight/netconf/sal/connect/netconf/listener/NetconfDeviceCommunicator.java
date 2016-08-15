@@ -105,7 +105,6 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                         id, netconfSessionPreferences);
             }
 
-
             remoteDevice.onRemoteSessionUp(netconfSessionPreferences, this);
             if (!firstConnectionFuture.isDone()) {
                 firstConnectionFuture.set(netconfSessionPreferences.getNetconfDeviceCapabilities());
