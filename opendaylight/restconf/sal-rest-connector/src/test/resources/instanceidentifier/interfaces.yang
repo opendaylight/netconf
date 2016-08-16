@@ -1,0 +1,27 @@
+module interface-module{
+    namespace "http://example.com/schema/interfaces";
+    prefix interf;
+
+    revision "2016-10-07" {
+        description
+                "Initial revision.";
+    }
+    container interfaces {
+         list ifEntry {
+             key "ifIndex";
+
+             leaf ifIndex {
+                 type uint32;
+             }
+             leaf ifDescr {
+                 type string;
+             }
+             leaf ifType {
+                 type string;
+             }
+             leaf ifMtu {
+                 type int32;
+             }
+         }
+     }
+}

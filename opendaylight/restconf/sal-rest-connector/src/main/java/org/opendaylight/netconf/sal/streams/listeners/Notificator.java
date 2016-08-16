@@ -158,7 +158,6 @@ public class Notificator {
     }
 
     public static boolean existNotificationListenerFor(final String streamName) {
-        // TODO Auto-generated method stub
         return false;
     }
 
