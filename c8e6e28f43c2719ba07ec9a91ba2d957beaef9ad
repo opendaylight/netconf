@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_6f5ba32e",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-16T11:35:29Z",
+      "side": 1,
+      "message": "Please remove this new line",
+      "revId": "c8e6e28f43c2719ba07ec9a91ba2d957beaef9ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
