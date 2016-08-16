@@ -24,7 +24,7 @@ import org.opendaylight.netconf.sal.rest.impl.PATCH;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
-import org.opendaylight.restconf.Draft11;
+import org.opendaylight.restconf.Draft15;
 import org.opendaylight.restconf.utils.RestconfConstants;
 
 /**
@@ -45,9 +45,9 @@ public interface RestconfDataService {
      */
     @GET
     @Path("/data/{identifier:.+}")
-    @Produces({ Draft11.MediaTypes.DATA + RestconfConstants.JSON, Draft11.MediaTypes.DATA + RestconfConstants.XML,
-            MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    NormalizedNodeContext readData(@Encoded @PathParam("identifier") String identifier,
+    @Produces({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA, MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    Response readData(@Encoded @PathParam("identifier") String identifier,
             @Context UriInfo uriInfo);
 
     /**
@@ -61,8 +61,8 @@ public interface RestconfDataService {
      */
     @PUT
     @Path("/data/{identifier:.+}")
-    @Consumes({ Draft11.MediaTypes.DATA + RestconfConstants.JSON, Draft11.MediaTypes.DATA + RestconfConstants.XML,
-            MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Consumes({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA, MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     Response putData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload);
 
     /**
@@ -78,8 +78,8 @@ public interface RestconfDataService {
      */
     @POST
     @Path("/data/{identifier:.+}")
-    @Consumes({ Draft11.MediaTypes.DATA + RestconfConstants.JSON, Draft11.MediaTypes.DATA + RestconfConstants.XML,
-            MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Consumes({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA, MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     Response postData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
             @Context UriInfo uriInfo);
 
@@ -94,8 +94,8 @@ public interface RestconfDataService {
      */
     @POST
     @Path("/data")
-    @Consumes({ Draft11.MediaTypes.DATA + RestconfConstants.JSON, Draft11.MediaTypes.DATA + RestconfConstants.XML,
-            MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Consumes({ Draft15.MediaTypes.DATA + RestconfConstants.JSON, Draft15.MediaTypes.DATA, MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     Response postData(NormalizedNodeContext payload, @Context UriInfo uriInfo);
 
     /**
@@ -123,9 +123,9 @@ public interface RestconfDataService {
      */
     @PATCH
     @Path("/data/{identifier:.+}")
-    @Consumes({ Draft11.MediaTypes.PATCH + RestconfConstants.JSON, Draft11.MediaTypes.PATCH + RestconfConstants.XML })
-    @Produces({ Draft11.MediaTypes.PATCH_STATUS + RestconfConstants.JSON,
-            Draft11.MediaTypes.PATCH_STATUS + RestconfConstants.XML })
+    @Consumes({ Draft15.MediaTypes.PATCH + RestconfConstants.JSON, Draft15.MediaTypes.PATCH + RestconfConstants.XML })
+    @Produces({ Draft15.MediaTypes.PATCH_STATUS + RestconfConstants.JSON,
+            Draft15.MediaTypes.PATCH_STATUS + RestconfConstants.XML })
     PATCHStatusContext patchData(@Encoded @PathParam("identifier") String identifier, PATCHContext context,
             @Context UriInfo uriInfo);
 
@@ -140,8 +140,8 @@ public interface RestconfDataService {
      */
     @PATCH
     @Path("/data")
-    @Consumes({ Draft11.MediaTypes.PATCH + RestconfConstants.JSON, Draft11.MediaTypes.PATCH + RestconfConstants.XML })
-    @Produces({ Draft11.MediaTypes.PATCH_STATUS + RestconfConstants.JSON,
-            Draft11.MediaTypes.PATCH_STATUS + RestconfConstants.XML })
+    @Consumes({ Draft15.MediaTypes.PATCH + RestconfConstants.JSON, Draft15.MediaTypes.PATCH + RestconfConstants.XML })
+    @Produces({ Draft15.MediaTypes.PATCH_STATUS + RestconfConstants.JSON,
+            Draft15.MediaTypes.PATCH_STATUS + RestconfConstants.XML })
     PATCHStatusContext patchData(PATCHContext context, @Context UriInfo uriInfo);
 }

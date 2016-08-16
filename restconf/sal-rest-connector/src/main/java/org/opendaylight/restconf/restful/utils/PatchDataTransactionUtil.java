@@ -14,6 +14,7 @@ import com.google.common.util.concurrent.CheckedFuture;
 import java.util.ArrayList;
 import java.util.List;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
@@ -26,6 +27,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.restconf.restful.utils.RestconfDataServiceConstant.PatchData;
@@ -56,6 +58,7 @@ public final class PatchDataTransactionUtil {
                                                final SchemaContextRef schemaContextRef) {
         final List<PATCHStatusEntity> editCollection = new ArrayList<>();
         int errorCounter = 0;
+        final DOMDataReadWriteTransaction tx = transactionNode.getTransactionChain().newReadWriteTransaction();
 
         for (final PATCHEntity patchEntity : context.getData()) {
             final PATCHEditOperation operation = PATCHEditOperation.valueOf(patchEntity.getOperation().toUpperCase());
@@ -65,8 +68,7 @@ public final class PatchDataTransactionUtil {
                     if (errorCounter == 0) {
                         try {
                             createDataWithinTransaction(LogicalDatastoreType.CONFIGURATION,
-                                    patchEntity.getTargetNode(), patchEntity.getNode(),
-                                    transactionNode.getTransaction(), schemaContextRef);
+                                    patchEntity.getTargetNode(), patchEntity.getNode(), tx, schemaContextRef);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(),
@@ -78,8 +80,8 @@ public final class PatchDataTransactionUtil {
                 case DELETE:
                     if (errorCounter == 0) {
                         try {
-                            deleteDataWithinTransaction(LogicalDatastoreType.CONFIGURATION,
-                                    patchEntity.getTargetNode(), transactionNode.getTransaction());
+                            deleteDataWithinTransaction(LogicalDatastoreType.CONFIGURATION, patchEntity.getTargetNode(),
+                                    tx);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(),
@@ -92,8 +94,7 @@ public final class PatchDataTransactionUtil {
                     if (errorCounter == 0) {
                         try {
                             mergeDataWithinTransaction(LogicalDatastoreType.CONFIGURATION,
-                                    patchEntity.getTargetNode(), patchEntity.getNode(), transactionNode.getTransaction(),
-                                    schemaContextRef);
+                                    patchEntity.getTargetNode(), patchEntity.getNode(), tx, schemaContextRef);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(),
@@ -106,8 +107,7 @@ public final class PatchDataTransactionUtil {
                     if (errorCounter == 0) {
                         try {
                             replaceDataWithinTransaction(LogicalDatastoreType.CONFIGURATION,
-                                    patchEntity.getTargetNode(), patchEntity.getNode(), schemaContextRef,
-                                    transactionNode.getTransaction());
+                                    patchEntity.getTargetNode(), patchEntity.getNode(), schemaContextRef, tx);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(),
@@ -119,8 +119,8 @@ public final class PatchDataTransactionUtil {
                 case REMOVE:
                     if (errorCounter == 0) {
                         try {
-                            removeDataWithinTransaction(LogicalDatastoreType.CONFIGURATION,
-                                    patchEntity.getTargetNode(), transactionNode.getTransaction());
+                            removeDataWithinTransaction(LogicalDatastoreType.CONFIGURATION, patchEntity.getTargetNode(),
+                                    tx);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(),
@@ -141,8 +141,7 @@ public final class PatchDataTransactionUtil {
         // if no errors then submit transaction, otherwise cancel
         if (errorCounter == 0) {
             final ResponseFactory response = new ResponseFactory();
-            final CheckedFuture<Void, TransactionCommitFailedException> future = transactionNode
-                    .getTransaction().submit();
+            final CheckedFuture<Void, TransactionCommitFailedException> future = tx.submit();
 
             try {
                 FutureCallbackTx.addCallback(future, PatchData.PATCH_TX_TYPE, response);
@@ -154,7 +153,8 @@ public final class PatchDataTransactionUtil {
 
             return new PATCHStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), true, null);
         } else {
-            transactionNode.getTransaction().cancel();
+            tx.cancel();
+            RestConnectorProvider.resetTransactionChainForAdapaters(transactionNode.getTransactionChain());
             return new PATCHStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), false, null);
         }
     }
@@ -186,7 +186,7 @@ public final class PatchDataTransactionUtil {
                                                     final YangInstanceIdentifier path,
                                                     final DOMDataReadWriteTransaction readWriteTransaction) {
         LOG.trace("Delete {} within Restconf PATCH: {}", dataStore.name(), path);
-        TransactionUtil.checkItemExists(readWriteTransaction, dataStore, path, PatchData.PATCH_TX_TYPE);
+        checkItemExistsWithinTransaction(readWriteTransaction, dataStore, path);
         readWriteTransaction.delete(dataStore, path);
     }
 
@@ -265,20 +265,62 @@ public final class PatchDataTransactionUtil {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
 
                 if (errorIfExists) {
-                    TransactionUtil.checkItemDoesNotExists(
-                            rWTransaction, dataStore, childPath, PatchData.PATCH_TX_TYPE);
+                    checkItemDoesNotExistsWithinTransaction(rWTransaction, dataStore, childPath);
                 }
 
                 rWTransaction.put(dataStore, childPath, child);
             }
         } else {
             if (errorIfExists) {
-                TransactionUtil.checkItemDoesNotExists(
-                        rWTransaction, dataStore, path, PatchData.PATCH_TX_TYPE);
+                checkItemDoesNotExistsWithinTransaction(rWTransaction, dataStore, path);
             }
 
             TransactionUtil.ensureParentsByMerge(path, schemaContext, rWTransaction);
             rWTransaction.put(dataStore, path, payload);
+        }
+    }
+
+    /**
+     * Check if items already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
+     * data does NOT already exists.
+     * @param rWTransaction Transaction
+     * @param store Datastore
+     * @param path Path to be checked
+     */
+    public static void checkItemExistsWithinTransaction(final DOMDataReadWriteTransaction rWTransaction,
+                                       final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        final CheckedFuture<Boolean, ReadFailedException> future = rWTransaction.exists(store, path);
+        final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
+
+        FutureCallbackTx.addCallback(future, PatchData.PATCH_TX_TYPE, response);
+
+        if (!response.result) {
+            final String errMsg = "Operation via Restconf was not executed because data does not exist";
+            LOG.trace("{}:{}", errMsg, path);
+            throw new RestconfDocumentedException(
+                    "Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, path);
+        }
+    }
+
+    /**
+     * Check if items do NOT already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
+     * data already exists.
+     * @param rWTransaction Transaction
+     * @param store Datastore
+     * @param path Path to be checked
+     */
+    public static void checkItemDoesNotExistsWithinTransaction(final DOMDataReadWriteTransaction rWTransaction,
+                                              final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        final CheckedFuture<Boolean, ReadFailedException> future = rWTransaction.exists(store, path);
+        final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
+
+        FutureCallbackTx.addCallback(future, PatchData.PATCH_TX_TYPE, response);
+
+        if (response.result) {
+            final String errMsg = "Operation via Restconf was not executed because data already exists";
+            LOG.trace("{}:{}", errMsg, path);
+            throw new RestconfDocumentedException(
+                    "Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, path);
         }
     }
 }
