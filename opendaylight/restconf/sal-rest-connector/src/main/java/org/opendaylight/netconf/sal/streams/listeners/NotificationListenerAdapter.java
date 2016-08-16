@@ -9,18 +9,19 @@ package org.opendaylight.netconf.sal.streams.listeners;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.util.internal.ConcurrentSet;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import javax.xml.stream.XMLOutputFactory;
@@ -33,28 +34,48 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.XML;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
+import org.opendaylight.netconf.sal.rest.impl.RestUtil;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
+import org.opendaylight.netconf.sal.restconf.impl.RestCodec;
+import org.opendaylight.yangtools.concepts.Codec;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
+import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlDocumentUtils;
+import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
+import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.util.internal.ConcurrentSet;
 
 /**
  * {@link NotificationListenerAdapter} is responsible to track events on
@@ -65,15 +86,18 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(NotificationListenerAdapter.class);
     private static final TransformerFactory FACTORY = TransformerFactory.newInstance();
+    private static final List<PathArgument> pathOfNode = new LinkedList<>();
 
     private final String streamName;
-    private ListenerRegistration<DOMNotificationListener> registration;
-    private Set<Channel> subscribers = new ConcurrentSet<>();
     private final EventBus eventBus;
     private final EventBusChangeRecorder eventBusChangeRecorder;
-
     private final SchemaPath path;
     private final String outputType;
+
+    private SchemaContext schemaContext;
+    private DOMNotification notification;
+    private ListenerRegistration<DOMNotificationListener> registration;
+    private Set<Channel> subscribers = new ConcurrentSet<>();
 
     /**
      * Set path of listener and stream name, register event bus.
@@ -98,15 +122,263 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
 
     @Override
     public void onNotification(final DOMNotification notification) {
-        final String xml = prepareXmlFrom(notification);
+        this.schemaContext = ControllerContext.getInstance().getGlobalSchema();
+        this.notification = notification;
         final Event event = new Event(EventType.NOTIFY);
         if (this.outputType.equals("JSON")) {
-            final JSONObject jsonObject = XML.toJSONObject(xml);
-            event.setData(jsonObject.toString());
+            event.setData(prepareJson());
         } else {
-            event.setData(xml);
+            event.setData(prepareXmlFrom());
         }
         this.eventBus.post(event);
+    }
+
+    /**
+     * Prepare json from notification data
+     *
+     * @return json as {@link String}
+     */
+    private String prepareJson() {
+        final JSONObject json = new JSONObject();
+        final QName compQName = this.notification.getType().getLastComponent();
+        final Module compModule =
+                this.schemaContext.findModuleByNamespaceAndRevision(compQName.getNamespace(), compQName.getRevision());
+        json.put("ietf-restconf:notification",
+                new JSONObject().put("event-time", ListenerAdapter.toRFC3339(new Date()))
+                        .put(compModule.getName() + ":" + compQName.getLocalName(),
+                                addContainerNodeToJSON(this.notification.getBody(), new JSONObject(),
+                                        new ArrayList<PathArgument>())));
+        return json.toString();
+    }
+
+    /**
+     * Add container to json object
+     *
+     * @param child
+     *            - {@link ContainerNode} - container with data
+     * @param dataJSON
+     *            - {@link JSONObject} for data in {@link ContainerNode}
+     * @param list
+     *            - path of data - List of {@link PathArgument}
+     * @return {@link JSONObject} with data from container
+     */
+    private JSONObject addContainerNodeToJSON(final ContainerNode child, final JSONObject dataJSON,
+            final List<PathArgument> list) {
+        if (child == null) {
+            return dataJSON;
+        }
+        list.add(child.getIdentifier());
+        innerChildToJSON(child.getValue(), dataJSON, list);
+
+        return dataJSON;
+    }
+
+    /**
+     * Filling json object with data from container
+     *
+     * @param collection
+     *            - child of container
+     * @param dataJSON
+     *            - {@link JSONObject} for fill with data
+     * @param list
+     *            - list of {@link PathArgument} of data
+     */
+    private void innerChildToJSON(final Collection<DataContainerChild<? extends PathArgument, ?>> collection,
+            final JSONObject dataJSON, final List<PathArgument> list) {
+        for (final DataContainerChild<? extends PathArgument, ?> innerChild : collection) {
+            final List<PathArgument> innerList = Lists.newArrayList(list);
+            if(innerChild instanceof AugmentationNode){
+                addAugmentNodeToJSON((AugmentationNode) innerChild, dataJSON, innerList);
+            } else if (innerChild instanceof MapNode) {
+                dataJSON.put(innerChild.getNodeType().getLocalName(),
+                        addMapNodeToJSON((MapNode) innerChild, innerList));
+            } else if(innerChild instanceof LeafNode){
+                dataJSON.put(innerChild.getNodeType().getLocalName(), prepareValueByType(innerChild, innerList));
+            } else if (innerChild instanceof ContainerNode) {
+                dataJSON.put(
+                        this.schemaContext.findModuleByNamespaceAndRevision(innerChild.getNodeType().getNamespace(),
+                                innerChild.getNodeType().getRevision()).getName() + ":"
+                                + innerChild.getNodeType().getLocalName(),
+                        addContainerNodeToJSON((ContainerNode) innerChild, new JSONObject(), innerList));
+            } else if (innerChild instanceof ChoiceNode) {
+                addChoiceNodeToJSON((ChoiceNode) innerChild, dataJSON, innerList);
+            }
+        }
+    }
+
+    /**
+     * Adding data of choice {@link ChoiceNode}
+     *
+     * @param child
+     *            - {@link ChoiceNode} with data
+     * @param dataJSON
+     *            - {@link JSONObject} for fill with data
+     * @param list
+     *            - list of {@link PathArgument} of data
+     */
+    private void addChoiceNodeToJSON(final ChoiceNode child, final JSONObject dataJSON, final List<PathArgument> list) {
+        list.add(child.getIdentifier());
+        innerChildToJSON(child.getValue(), dataJSON, list);
+    }
+
+    /**
+     * Adding data of list {@link MapNode} to {@link JSONArray}
+     *
+     * @param child
+     *            - {@link MapNode}
+     * @param list
+     *            - list of {@link PathArgument} of data
+     * @return {@link JSONArray} with data from child
+     */
+    private JSONArray addMapNodeToJSON(final MapNode child, final List<PathArgument> list) {
+        list.add(child.getIdentifier());
+        final JSONArray jsonArry = new JSONArray();
+        for (final MapEntryNode mapEntryNode : child.getValue()) {
+            for (final DataContainerChild<? extends PathArgument, ?> innerChild : mapEntryNode.getValue()) {
+                final List<PathArgument> innerList = Lists.newArrayList(list);
+                if (innerChild instanceof LeafNode) {
+                    jsonArry.put(new JSONObject().put(innerChild.getNodeType().getLocalName(),
+                            prepareValueByType(innerChild, innerList)));
+                } else if (innerChild instanceof AugmentationNode) {
+                    addAugmentNodeToJSON((AugmentationNode) innerChild, new JSONObject(), innerList);
+                } else if (innerChild instanceof MapNode) {
+                    jsonArry.put(new JSONObject().put(innerChild.getNodeType().getLocalName(),
+                            addMapNodeToJSON((MapNode) innerChild, innerList)));
+                } else if (innerChild instanceof ContainerNode) {
+                    jsonArry.put(new JSONObject().put(
+                            this.schemaContext.findModuleByNamespaceAndRevision(innerChild.getNodeType().getNamespace(),
+                                    innerChild.getNodeType().getRevision()).getName() + ":"
+                                    + innerChild.getNodeType().getLocalName(),
+                            addContainerNodeToJSON((ContainerNode) innerChild, new JSONObject(), innerList)));
+                } else if (innerChild instanceof ChoiceNode) {
+                    addChoiceNodeToJSON((ChoiceNode) innerChild, new JSONObject(), innerList);
+                }
+            }
+        }
+        return jsonArry;
+    }
+
+    /**
+     * Adding data of {@link AugmentationNode} to {@link JSONObject}
+     *
+     * @param child
+     *            - {@link AugmentationNode} with data
+     * @param dataJSON
+     *            - {@link JSONObject} for fill with data
+     * @param list
+     *            - list of {@link PathArgument} of data
+     * @return
+     */
+    private JSONObject addAugmentNodeToJSON(final AugmentationNode child, final JSONObject dataJSON,
+            final List<PathArgument> list) {
+        for (final DataContainerChild<? extends PathArgument, ?> innerChild : child.getValue()) {
+            final List<PathArgument> innerList = Lists.newArrayList(list);
+            final String moduleName =
+                    this.schemaContext.findModuleByNamespaceAndRevision(innerChild.getNodeType().getNamespace(),
+                            innerChild.getNodeType().getRevision()).getName();
+            if (innerChild instanceof MapNode) {
+                dataJSON.put(moduleName + ":" + innerChild.getNodeType().getLocalName(),
+                        addMapNodeToJSON((MapNode) innerChild, innerList));
+            } else if (innerChild instanceof LeafNode) {
+                dataJSON.put(moduleName + ":" + innerChild.getNodeType().getLocalName(),
+                        prepareValueByType(innerChild, innerList));
+            } else if (innerChild instanceof ContainerNode) {
+                dataJSON.put(moduleName + ":" + innerChild.getNodeType().getLocalName(),
+                        addContainerNodeToJSON((ContainerNode) innerChild, new JSONObject(), innerList));
+            } else if (innerChild instanceof ChoiceNode) {
+                addChoiceNodeToJSON((ChoiceNode) innerChild, new JSONObject(), innerList);
+            }
+        }
+        return dataJSON;
+    }
+
+    /**
+     * Prepare value by type from {@link LeafSchemaNode} of specific data from
+     * {@link String}
+     *
+     * @param innerChild
+     *            - {@link LeafNode} with data
+     * @param list
+     *            - list of {@link PathArgument} of data
+     * @return {@link Object} as value of {@link LeafNode} of specific type by
+     *         {@link LeafNode}
+     */
+    private Object prepareValueByType(final DataContainerChild<? extends PathArgument, ?> innerChild,
+            final List<PathArgument> list) {
+        Object decoded = null;
+
+        list.add(innerChild.getIdentifier());
+
+        final SchemaNode dataSchemaNode = ParserOfSchemaNode.parseFrom(list, this.schemaContext);
+        TypeDefinition<?> typedef = ((LeafSchemaNode) dataSchemaNode).getType();
+        final TypeDefinition<?> baseType = RestUtil.resolveBaseTypeFrom(typedef);
+        if (baseType instanceof LeafrefTypeDefinition) {
+            typedef = SchemaContextUtil.getBaseTypeForLeafRef((LeafrefTypeDefinition) baseType, this.schemaContext,
+                    dataSchemaNode);
+        }
+        final Codec<Object, Object> codec = RestCodec.from(typedef, null);
+        decoded = codec.deserialize(((LeafNode) innerChild).getValue());
+        if (decoded == null) {
+            if ((baseType instanceof IdentityrefTypeDefinition)) {
+                decoded =
+                        toQName(((LeafNode) innerChild).getValue().toString());
+            }
+        }
+        return decoded;
+    }
+
+    /**
+     * Parse part of QName - "module-name:local-name"
+     *
+     * @param name
+     *            - {@link String} of identity ref value
+     * @return
+     */
+    private String toQName(final String name) {
+        final String module = toModuleName(name);
+        final String node = toNodeName(name);
+        final Module m = this.schemaContext.findModuleByName(module, null);
+        return m == null ? null : (module + ":" + QName.create(m.getQNameModule(), node).getLocalName());
+    }
+
+    /**
+     * Get module name from identity ref value
+     *
+     * @param str
+     *            - value of identity ref
+     * @return module name
+     */
+    private static String toModuleName(final String str) {
+        final int idx = str.indexOf(':');
+        if (idx == -1) {
+            return null;
+        }
+
+        if (str.indexOf(':', idx + 1) != -1) {
+            return null;
+        }
+
+        return str.substring(0, idx);
+    }
+
+    /**
+     * Get node name from identity ref value
+     *
+     * @param str
+     *            - value of identity ref
+     * @return node name
+     */
+    private static String toNodeName(final String str) {
+        final int idx = str.indexOf(':');
+        if (idx == -1) {
+            return str;
+        }
+
+        if (str.indexOf(':', idx + 1) != -1) {
+            return str;
+        }
+
+        return str.substring(idx + 1);
     }
 
     /**
@@ -197,8 +469,7 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
         this.eventBus.post(event);
     }
 
-    private String prepareXmlFrom(final DOMNotification notification) {
-        final SchemaContext schemaContext = ControllerContext.getInstance().getGlobalSchema();
+    private String prepareXmlFrom() {
         final Document doc = ListenerAdapter.createDocument();
         final Element notificationElement = doc.createElementNS("urn:ietf:params:xml:ns:netconf:notification:1.0",
                 "notification");
@@ -210,7 +481,7 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
 
         final Element notificationEventElement = doc.createElementNS(
                 "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "create-notification-stream");
-        addValuesToNotificationEventElement(doc, notificationEventElement, notification, schemaContext);
+        addValuesToNotificationEventElement(doc, notificationEventElement, this.notification, this.schemaContext);
         notificationElement.appendChild(notificationEventElement);
 
         try {
