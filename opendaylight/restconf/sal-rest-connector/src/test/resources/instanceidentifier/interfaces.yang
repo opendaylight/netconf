@@ -1,0 +1,52 @@
+module interface-module{
+    namespace "http://example.com/schema/interfaces";
+    prefix interf;
+
+    revision "2016-10-07" {
+        description
+                "Initial revision.";
+    }
+    
+    grouping interfaces-us{
+        container interfaces {
+            list ifEntry {
+                key "ifIndex";
+
+                leaf ifIndex {
+                    type uint32;
+                }
+                leaf ifDescr {
+                    type string;
+                }
+                leaf ifType {
+                    type string;
+                }
+                leaf ifMtu {
+                    type int32;
+                }
+            }
+        }
+    }
+
+    grouping interfaces-ch{
+        container c{
+            choice ch{
+                case a{
+                    leaf l{
+                        type string;
+                    }
+                }
+                case b{
+                    leaf l{
+                        type string;
+                    }
+                }
+            }
+        }
+    }
+
+    notification notifi{
+        uses interfaces-us;
+        uses interfaces-ch;
+    }
+}
