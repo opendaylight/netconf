@@ -93,6 +93,10 @@
       <artifactId>netconf-client</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -118,10 +122,10 @@
           </execution>
         </executions>
       </plugin>
-        <plugin>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-maven-plugin</artifactId>
-        </plugin>
+      <plugin>
+          <groupId>org.opendaylight.yangtools</groupId>
+          <artifactId>yang-maven-plugin</artifactId>
+      </plugin>
     </plugins>
   </build>
 
