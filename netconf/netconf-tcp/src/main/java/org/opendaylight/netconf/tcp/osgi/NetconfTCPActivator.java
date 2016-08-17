@@ -8,11 +8,11 @@
 
 package org.opendaylight.netconf.tcp.osgi;
 
-import com.google.common.base.Optional;
 import java.net.InetSocketAddress;
 import org.opendaylight.netconf.tcp.netty.ProxyServer;
 import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
 import org.opendaylight.netconf.util.osgi.NetconfConfigUtil.InfixProp;
+import org.opendaylight.netconf.util.osgi.NetconfConfiguration;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -27,13 +27,10 @@ public class NetconfTCPActivator implements BundleActivator {
 
     @Override
     public void start(BundleContext context) {
-        final Optional<InetSocketAddress> maybeAddress = NetconfConfigUtil.extractNetconfServerAddress(context, InfixProp.tcp);
-        if (maybeAddress.isPresent() == false) {
-            LOG.warn("Netconf tcp server is not configured. Using default value {}",
-                    NetconfConfigUtil.DEFAULT_TCP_SERVER_ADRESS);
-        }
+        final NetconfConfiguration netconfConfiguration = NetconfConfigUtil.getNetconfConfigurationService(context).
+                        orElseThrow(() -> new IllegalStateException("Configuration for TCP not found."));
 
-        InetSocketAddress address = maybeAddress.or(NetconfConfigUtil.DEFAULT_TCP_SERVER_ADRESS);
+        final InetSocketAddress address = netconfConfiguration.getTcpServerAddress();
 
         if (address.getAddress().isAnyLocalAddress()) {
             LOG.warn("Unprotected netconf TCP address is configured to ANY local address. This is a security risk. Consider changing {} to 127.0.0.1",
