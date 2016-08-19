@@ -89,7 +89,7 @@ public final class CreateStreamUtil {
             final SchemaContextRef refSchemaCtx) {
         final ContainerNode data = (ContainerNode) payload.getData();
         final QName qname = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
-        final YangInstanceIdentifier path = preparePath(payload, data, qname);
+        final YangInstanceIdentifier path = preparePath(data, qname);
         final String streamName = prepareStream(path, refSchemaCtx.get(), data);
 
         final QName outputQname = QName.create(qname, "output");
@@ -118,11 +118,6 @@ public final class CreateStreamUtil {
         final String streamName = Notificator
                 .createStreamNameFromUri(ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContext)
                 + RestconfStreamsConstants.DS_URI + ds + RestconfStreamsConstants.SCOPE_URI + scope);
-        if((streamName == null) || streamName.equals("")){
-            final String errMsg = "Path is empty or contains value node which is not Container or List build-in type.";
-            LOG.debug(errMsg + path);
-            throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-        }
         return streamName;
     }
 
@@ -146,8 +141,7 @@ public final class CreateStreamUtil {
         return StreamUtil.resolveEnum(clazz, (String) value);
     }
 
-    private static YangInstanceIdentifier preparePath(final NormalizedNodeContext payload, final ContainerNode data,
-            final QName qName) {
+    private static YangInstanceIdentifier preparePath(final ContainerNode data, final QName qName) {
         final Optional<DataContainerChild<? extends PathArgument, ?>> path = data
                 .getChild(new YangInstanceIdentifier.NodeIdentifier(QName.create(qName, "path")));
         Object pathValue = null;
