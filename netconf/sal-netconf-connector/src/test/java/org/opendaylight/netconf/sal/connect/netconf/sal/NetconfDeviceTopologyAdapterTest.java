@@ -78,4 +78,16 @@ public class NetconfDeviceTopologyAdapterTest {
         verify(writeTx, times(2)).put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(Node.class));
     }
 
+    @Test
+    public void removeDeviceConfiguration() throws Exception {
+        doReturn(Futures.immediateCheckedFuture(null)).when(writeTx).submit();
+
+        NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, txChain);
+        adapter.close();
+
+        verify(txChain, times(2)).newWriteOnlyTransaction();
+        verify(writeTx).delete(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath());
+        verify(writeTx, times(2)).submit();
+    }
+
 }
