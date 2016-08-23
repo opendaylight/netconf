@@ -38,11 +38,10 @@ public interface NetconfTopology {
 
     /**
      * register slave mountpoint with the provided ActorRef
-     * @param context
      * @param nodeId
      * @param masterRef
      */
-    void registerMountPoint(ActorContext context, NodeId nodeId, ActorRef masterRef);
+    void registerMountPoint(NodeId nodeId, ActorRef masterRef);
 
     void unregisterMountPoint(NodeId nodeId);
 

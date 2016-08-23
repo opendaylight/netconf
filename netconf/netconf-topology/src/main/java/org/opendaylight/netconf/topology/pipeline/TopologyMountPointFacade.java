@@ -139,7 +139,7 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
         }
     }
 
-    public void registerMountPoint(final ActorSystem actorSystem, final ActorContext context, final ActorRef masterRef) {
+    public void registerMountPoint(final ActorSystem actorSystem, final ActorRef masterRef) {
         if (remoteSchemaContext == null || netconfSessionPreferences == null) {
             LOG.debug("Slave mount point does not have schemas ready yet, delaying registration");
             return;
