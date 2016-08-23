@@ -30,8 +30,8 @@
       <artifactId>sal-core-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>sal-remote</artifactId>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>sal-rest-connector</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
