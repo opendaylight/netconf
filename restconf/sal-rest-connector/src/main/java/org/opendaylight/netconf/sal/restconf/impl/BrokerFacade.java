@@ -188,7 +188,7 @@ public class BrokerFacade {
 
     public PATCHStatusContext patchConfigurationDataWithinTransaction(final PATCHContext context,
                                                                       final SchemaContext globalSchema)
-            throws InterruptedException {
+            throws Exception {
         final DOMDataReadWriteTransaction patchTransaction = this.domDataBroker.newReadWriteTransaction();
         final List<PATCHStatusEntity> editCollection = new ArrayList<>();
 
@@ -389,7 +389,7 @@ public class BrokerFacade {
 
         try {
             responseWaiter.await();
-        } catch (final InterruptedException e) {
+        } catch (final Exception e) {
             final String msg = "Problem while waiting for response";
             LOG.warn(msg);
             throw new RestconfDocumentedException(msg, e);
@@ -470,13 +470,13 @@ public class BrokerFacade {
 
         try {
             responseWaiter.await();
-        } catch (final InterruptedException e) {
+        } catch (final Exception e) {
             final String msg = "Problem while waiting for response";
             LOG.warn(msg);
             throw new RestconfDocumentedException(msg, e);
         }
 
-        if (!readData.getResult()) {
+        if ((readData.getResult() == null) || !readData.getResult()) {
             final String errMsg = "Operation via Restconf was not executed because data does not exist";
             LOG.trace("{}:{}", errMsg, path);
             rWTransaction.cancel();
@@ -513,7 +513,7 @@ public class BrokerFacade {
 
         try {
             responseWaiter.await();
-        } catch (final InterruptedException e) {
+        } catch (final Exception e) {
             final String msg = "Problem while waiting for response";
             LOG.warn(msg);
             throw new RestconfDocumentedException(msg, e);
