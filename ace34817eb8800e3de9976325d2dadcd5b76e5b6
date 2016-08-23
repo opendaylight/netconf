@@ -1,0 +1,395 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_8bd701bf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "Subsequent lines in commit message should be wrapped at 72 characters. Please see:\nhttps://wiki.openstack.org/wiki/GitCommitMessages#Summary_of_Git_commit_message_structure",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_9fc9ed7a",
+        "filename": "features/netconf/src/main/features/features.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "Maybe we can use ${karaf.etc} variable.",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_91abb2d5",
+        "filename": "netconf/netconf-ssh/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "Please get version from dependency management mechanism",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_717096a5",
+        "filename": "netconf/netconf-ssh/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "No need for unrelated changes.",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_d1b52a32",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/osgi/NetconfSSHActivator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "No need for new line",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_31845e5d",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/osgi/NetconfSSHActivator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "no need for new line",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_bfe149d2",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/osgi/NetconfSSHActivator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "Same comments as for TCPActivator applies here. I think we should rework this configuration logic.",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_5fcbd552",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/osgi/NetconfSSHActivator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "Shouldn\u0027t we get netconf configuration service from bundle context?",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_91c0d27d",
+        "filename": "netconf/netconf-tcp/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "Version here is redundant and can cause problems in dependency management later.",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_7fc0512a",
+        "filename": "netconf/netconf-tcp/src/main/java/org/opendaylight/netconf/tcp/osgi/NetconfTCPActivator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "Is this really necessary?",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_dfdec510",
+        "filename": "netconf/netconf-tcp/src/main/java/org/opendaylight/netconf/tcp/osgi/NetconfTCPActivator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "I think, actually it is configured. You are reading configuration from NetconfConfigurationService...",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_71437614",
+        "filename": "netconf/netconf-util/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "Again, without version",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ffb461d2",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "Maybe, this could be some immutable object. On update we can always create new holder",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_51463a24",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "P_SSH_PORT \u003d \"ssh-port\"; space before \u003d",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_b14cee43",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "P_TCP_PORT \u003d \"tcp-port\"; space before \u003d",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_f15666d1",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "This can be final",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_11d84252",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "null) { space after )",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_d151aad9",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "final\n\nAlso please see https://wiki.opendaylight.org/view/OpenDaylight_Java_Style_Guide_-_Proposed#Java\n\nIf possible, lines should be 120 character long",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_3160dea4",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "final",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_1f9b1d68",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationActivator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "This can be final",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_df908545",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationActivator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "Again, please do not use such long lines.\n\nWhy are you wrapping return value in Optional?",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ffebc1ad",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationHolder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "Maybe this would be better as immutable class",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_1fe95db8",
+        "filename": "netconf/netconf-util/src/main/resources/netconf.cfg",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:36:47Z",
+      "side": 1,
+      "message": "Maybe some comments that delimit tcp section from ssh section would be useful",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
