@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_5f55954e",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/SchemalessNetconfDeviceTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T10:35:06Z",
+      "side": 1,
+      "message": "You have unused imports, please remove them",
+      "revId": "37640aedf12b1030d546f5f01d22ef32571d3edc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ca78c191",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/SchemalessNetconfDeviceTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T10:35:06Z",
+      "side": 1,
+      "message": "Please see https://wiki.opendaylight.org/view/GettingStarted:_Eclipse_Setup#Import_ordering\n\nStatic imports should go first",
+      "revId": "37640aedf12b1030d546f5f01d22ef32571d3edc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_9f4f2dbd",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/SchemalessNetconfDeviceTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T10:35:06Z",
+      "side": 1,
+      "message": "What mocks do you want to init here?",
+      "revId": "37640aedf12b1030d546f5f01d22ef32571d3edc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_2a7055a4",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceSalFacadeTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T10:35:06Z",
+      "side": 1,
+      "message": "It\u0027s 2016 already",
+      "revId": "37640aedf12b1030d546f5f01d22ef32571d3edc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_0a73d9b1",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceSalFacadeTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T10:35:06Z",
+      "side": 1,
+      "message": "Static imports should go first",
+      "revId": "37640aedf12b1030d546f5f01d22ef32571d3edc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ca9f21b3",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/util/RemoteDeviceIdTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T10:35:06Z",
+      "side": 1,
+      "message": "Static imports should go first",
+      "revId": "37640aedf12b1030d546f5f01d22ef32571d3edc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
