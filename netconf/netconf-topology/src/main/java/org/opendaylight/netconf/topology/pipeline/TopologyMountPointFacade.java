@@ -139,7 +139,26 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
         }
     }
 
+    @Deprecated
     public void registerMountPoint(final ActorSystem actorSystem, final ActorContext context, final ActorRef masterRef) {
+        if (remoteSchemaContext == null || netconfSessionPreferences == null) {
+            LOG.debug("Slave mount point does not have schemas ready yet, delaying registration");
+            return;
+        }
+
+        Preconditions.checkNotNull(id);
+        Preconditions.checkNotNull(remoteSchemaContext, "Device has no remote schema context yet. Probably not fully connected.");
+        Preconditions.checkNotNull(netconfSessionPreferences, "Device has no capabilities yet. Probably not fully connected.");
+        this.actorSystem = actorSystem;
+        final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
+
+        final ProxyNetconfDeviceDataBroker masterDataBroker = TypedActor.get(actorSystem).typedActorOf(new TypedProps<>(ProxyNetconfDeviceDataBroker.class, NetconfDeviceMasterDataBroker.class), masterRef);
+        LOG.warn("Creating slave data broker for device {}", id);
+        final DOMDataBroker deviceDataBroker = new NetconfDeviceSlaveDataBroker(actorSystem, id, masterDataBroker);
+        salProvider.getMountInstance().onTopologyDeviceConnected(remoteSchemaContext, deviceDataBroker, deviceRpc, notificationService);
+    }
+
+    public void registerMountPoint(final ActorSystem actorSystem, final ActorRef masterRef) {
         if (remoteSchemaContext == null || netconfSessionPreferences == null) {
             LOG.debug("Slave mount point does not have schemas ready yet, delaying registration");
             return;

@@ -44,6 +44,8 @@ public interface NetconfTopology {
      */
     void registerMountPoint(ActorContext context, NodeId nodeId, ActorRef masterRef);
 
+    void registerMountPoint(NodeId nodeId, ActorRef masterRef);
+
     void unregisterMountPoint(NodeId nodeId);
 
     ConnectionStatusListenerRegistration registerConnectionStatusListener(NodeId node, RemoteDeviceHandler<NetconfSessionPreferences> listener);
