@@ -58,7 +58,7 @@ final class FutureCallbackTx {
         });
         try {
             responseWaiter.await();
-        } catch (final InterruptedException e) {
+        } catch (final Exception e) {
             final String msg = "Problem while waiting for response";
             LOG.warn(msg);
             throw new RestconfDocumentedException(msg, e);
