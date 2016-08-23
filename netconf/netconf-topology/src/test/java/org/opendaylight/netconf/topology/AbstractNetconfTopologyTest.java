@@ -311,6 +311,11 @@ public class AbstractNetconfTopologyTest {
         }
 
         @Override
+        public void registerMountPoint(NodeId nodeId, ActorRef masterRef) {
+
+        }
+
+        @Override
         public void unregisterMountPoint(NodeId nodeId) {
 
         }

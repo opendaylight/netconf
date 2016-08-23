@@ -115,7 +115,13 @@ public class TestingTopologyDispatcher implements NetconfTopology{
     }
 
     @Override
+    @Deprecated
     public void registerMountPoint(ActorContext context, NodeId nodeId, ActorRef masterRef) {
+        LOG.debug("Registering mount point for node {}", nodeId.getValue());
+    }
+
+    @Override
+    public void registerMountPoint(NodeId nodeId, ActorRef masterRef) {
         LOG.debug("Registering mount point for node {}", nodeId.getValue());
     }
 
