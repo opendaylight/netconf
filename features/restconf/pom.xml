@@ -94,11 +94,6 @@
       <classifier>features</classifier>
       <type>xml</type>
     </dependency>
-    <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>sal-remote</artifactId>
-      <version>${controller.mdsal.version}</version>
-    </dependency>
 
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
