@@ -20,7 +20,6 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
-import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -470,10 +469,6 @@ public class RestconfImpl implements RestconfService {
             }
             LOG.debug("RpcError message", retValue.getErrors());
             throw new RestconfDocumentedException("RpcError message", null, retValue.getErrors());
-        } catch (final InterruptedException e) {
-            final String errMsg = "The operation was interrupted while executing and did not complete.";
-            LOG.debug("Rpc Interrupt - " + errMsg, e);
-            throw new RestconfDocumentedException(errMsg, ErrorType.RPC, ErrorTag.PARTIAL_OPERATION);
         } catch (final ExecutionException e) {
             LOG.debug("Execution RpcError: ", e);
             Throwable cause = e.getCause();
@@ -496,6 +491,10 @@ public class RestconfImpl implements RestconfService {
             final String errMsg = "The operation was cancelled while executing.";
             LOG.debug("Cancel RpcExecution: " + errMsg, e);
             throw new RestconfDocumentedException(errMsg, ErrorType.RPC, ErrorTag.PARTIAL_OPERATION);
+        } catch (final Exception e) {
+            final String errMsg = "The operation was interrupted while executing and did not complete.";
+            LOG.debug("Unexcpected internal exception - " + errMsg, e);
+            throw new RestconfDocumentedException(errMsg, ErrorType.RPC, ErrorTag.OPERATION_FAILED);
         }
     }
 
@@ -735,7 +734,7 @@ public class RestconfImpl implements RestconfService {
 
             try {
                 waiter.await();
-            } catch (final InterruptedException e) {
+            } catch (final Exception e) {
                 final String msg = "Problem while waiting for response";
                 LOG.warn(msg);
                 throw new RestconfDocumentedException(msg, e);
@@ -915,7 +914,7 @@ public class RestconfImpl implements RestconfService {
 
         try {
             waiter.await();
-        } catch (final InterruptedException e) {
+        } catch (final Exception e) {
             final String msg = "Problem while waiting for response";
             LOG.warn(msg);
             throw new RestconfDocumentedException(msg, e);
@@ -989,7 +988,7 @@ public class RestconfImpl implements RestconfService {
 
         try {
             waiter.await();
-        } catch (final InterruptedException e) {
+        } catch (final Exception e) {
             final String msg = "Problem while waiting for response";
             LOG.warn(msg);
             throw new RestconfDocumentedException(msg, e);
@@ -1125,7 +1124,7 @@ public class RestconfImpl implements RestconfService {
         try {
             return this.broker.patchConfigurationDataWithinTransaction(context,
                     this.controllerContext.getGlobalSchema());
-        } catch (final InterruptedException e) {
+        } catch (final Exception e) {
             LOG.debug("Patch transaction failed", e);
             throw new RestconfDocumentedException(e.getMessage());
         }
@@ -1140,7 +1139,7 @@ public class RestconfImpl implements RestconfService {
         try {
             return this.broker.patchConfigurationDataWithinTransaction(context,
                     this.controllerContext.getGlobalSchema());
-        } catch (final InterruptedException e) {
+        } catch (final Exception e) {
             LOG.debug("Patch transaction failed", e);
             throw new RestconfDocumentedException(e.getMessage());
         }
