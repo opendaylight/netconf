@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_7f45f1b1",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapterTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:55:38Z",
+      "side": 1,
+      "message": "nTestLeafQName",
+      "revId": "d2560db24951aa1104c5beeb4e818441d85ab0b5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_5f40f5a4",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapterTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:55:38Z",
+      "side": 1,
+      "message": "should be inserted -\u003e should be still present",
+      "revId": "d2560db24951aa1104c5beeb4e818441d85ab0b5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_3f3b7939",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapterTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-23T08:55:38Z",
+      "side": 1,
+      "message": "should be inserted -\u003e should be still present",
+      "revId": "d2560db24951aa1104c5beeb4e818441d85ab0b5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
