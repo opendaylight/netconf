@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.topology;
 
+import akka.actor.ActorRef;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;

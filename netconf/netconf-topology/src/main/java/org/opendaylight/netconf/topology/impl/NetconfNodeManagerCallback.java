@@ -103,8 +103,6 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
     private String topologyId;
     private TopologyManager topologyManager;
     private NodeManager nodeManager;
-    // cached context so that we can use it in callbacks from topology
-    private ActorContext cachedContext;
 
     private Node currentConfig;
     private Node currentOperationalNode;
@@ -223,7 +221,6 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
 
     @Nonnull @Override public ListenableFuture<Node> onNodeCreated(@Nonnull final NodeId nodeId,
                                                                    @Nonnull final Node configNode) {
-        cachedContext = TypedActor.context();
         this.nodeId = nodeId.getValue();
         this.currentConfig = configNode;
         // set initial state before anything happens
@@ -368,7 +365,7 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
             topologyDispatcher.registerMountPoint(TypedActor.context(), new NodeId(nodeId));
         } else if (masterDataBrokerRef != null) {
             LOG.warn("Device connected, master already present in topology, registering mount point");
-            topologyDispatcher.registerMountPoint(cachedContext, new NodeId(nodeId), masterDataBrokerRef);
+            topologyDispatcher.registerMountPoint(new NodeId(nodeId), masterDataBrokerRef);
         }
 
         List<String> capabilityList = new ArrayList<>();
