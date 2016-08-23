@@ -183,8 +183,14 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
     }
 
     @Override
+    @Deprecated
     public void registerMountPoint(final ActorContext context, final NodeId nodeId, final ActorRef masterRef) {
         ((TopologyMountPointFacade) activeConnectors.get(nodeId).getFacade()).registerMountPoint(actorSystem, context, masterRef);
+    }
+
+    @Override
+    public void registerMountPoint(final NodeId nodeId, final ActorRef masterRef) {
+        ((TopologyMountPointFacade) activeConnectors.get(nodeId).getFacade()).registerMountPoint(actorSystem, masterRef);
     }
 
     @Override
