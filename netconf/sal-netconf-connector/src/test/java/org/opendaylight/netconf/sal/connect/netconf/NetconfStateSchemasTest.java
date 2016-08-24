@@ -47,7 +47,7 @@ public class NetconfStateSchemasTest {
         final NetconfStateSchemas schemas = NetconfStateSchemas.create(new RemoteDeviceId("device", new InetSocketAddress(99)), compositeNodeSchemas);
 
         final Set<QName> availableYangSchemasQNames = schemas.getAvailableYangSchemasQNames();
-        assertEquals(73, availableYangSchemasQNames.size());
+        assertEquals(72, availableYangSchemasQNames.size());
 
         assertThat(availableYangSchemasQNames,
                 hasItem(QName.create("urn:TBD:params:xml:ns:yang:network-topology", "2013-07-12", "network-topology")));
