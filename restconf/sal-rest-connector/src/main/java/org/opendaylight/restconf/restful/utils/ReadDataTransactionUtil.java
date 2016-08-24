@@ -63,23 +63,29 @@ public final class ReadDataTransactionUtil {
      * @return {@link NormalizedNode}
      */
     public static NormalizedNode<?, ?> readData(final String valueOfContent, final TransactionVarsWrapper transactionNode) {
+        final NormalizedNode<?, ?> data;
         if (valueOfContent != null) {
             switch (valueOfContent) {
                 case RestconfDataServiceConstant.ReadData.CONFIG:
                     transactionNode.setLogicalDatastoreType(LogicalDatastoreType.CONFIGURATION);
-                    return readDataViaTransaction(transactionNode);
+                    data = readDataViaTransaction(transactionNode);
+                    break;
                 case RestconfDataServiceConstant.ReadData.NONCONFIG:
                     transactionNode.setLogicalDatastoreType(LogicalDatastoreType.OPERATIONAL);
-                    return readDataViaTransaction(transactionNode);
+                    data = readDataViaTransaction(transactionNode);
+                    break;
                 case RestconfDataServiceConstant.ReadData.ALL:
-                    return readDataViaTransaction(transactionNode);
+                    data = readAllData(transactionNode);
+                    break;
                 default:
                     throw new RestconfDocumentedException("Bad querry parameter for content.", ErrorType.APPLICATION,
                             ErrorTag.INVALID_VALUE);
             }
         } else {
-            return readDataViaTransaction(transactionNode);
+            data = readAllData(transactionNode);
         }
+
+        return data;
     }
 
     /**
@@ -92,7 +98,6 @@ public final class ReadDataTransactionUtil {
      * @return {@link NormalizedNode}
      */
     private static NormalizedNode<?, ?> readDataViaTransaction(final TransactionVarsWrapper transactionNode) {
-        if (transactionNode.getLogicalDatastoreType() != null) {
             final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> listenableFuture = transactionNode
                     .getTransactionChain().newReadOnlyTransaction().read(transactionNode.getLogicalDatastoreType(),
                             transactionNode.getInstanceIdentifier().getInstanceIdentifier());
@@ -100,9 +105,6 @@ public final class ReadDataTransactionUtil {
             FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
                     dataFactory);
             return dataFactory.build();
-        } else {
-            return readAllData(transactionNode);
-        }
     }
 
     /**
@@ -123,10 +125,7 @@ public final class ReadDataTransactionUtil {
 
         // if no data exists
         if ((stateDataNode == null) && (configDataNode == null)) {
-            throw new RestconfDocumentedException(
-                    "Request could not be completed because the relevant data model content does not exist",
-                    ErrorType.PROTOCOL,
-                    ErrorTag.DATA_MISSING);
+            return null;
         }
 
         // return config data
@@ -150,8 +149,6 @@ public final class ReadDataTransactionUtil {
      *            - data node of state data
      * @param configDataNode
      *            - data node of config data
-     * @param transactionNode
-     *            - {@link TransactionVarsWrapper} - wrapper for variables
      * @return {@link NormalizedNode}
      */
     private static NormalizedNode<?, ?> mapNode(final NormalizedNode<?, ?> stateDataNode,
@@ -215,29 +212,24 @@ public final class ReadDataTransactionUtil {
             final NormalizedNode<?, ?> stateDataNode) {
 
         if (configDataNode instanceof MapNode) { // part for lists mapping
-            final MapNode immutableStateData = ImmutableNodes.mapNodeBuilder(stateDataNode.getNodeType())
-                .addChild((MapEntryNode) stateDataNode).build();
-            final MapNode immutableConfigData = ImmutableNodes.mapNodeBuilder(configDataNode.getNodeType())
-                .addChild((MapEntryNode) configDataNode).build();
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder = ImmutableNodes
                 .mapEntryBuilder();
-            mapEntryBuilder.withNodeIdentifier((NodeIdentifierWithPredicates) configDataNode.getIdentifier());
+            final NodeIdentifierWithPredicates node = ((MapNode) configDataNode).getValue().iterator().next().getIdentifier();
+            mapEntryBuilder.withNodeIdentifier(node);
 
             // MAP CONFIG DATA
-            mapDataNode(immutableConfigData, mapEntryBuilder);
+            mapDataNode((MapNode) configDataNode, mapEntryBuilder);
             // MAP STATE DATA
-            mapDataNode(immutableStateData, mapEntryBuilder);
+            mapDataNode((MapNode) stateDataNode, mapEntryBuilder);
             return ImmutableNodes.mapNodeBuilder(configDataNode.getNodeType()).addChild(mapEntryBuilder.build()).build();
-        } else if (configDataNode instanceof ContainerNode) { // part for
-                                                              // containers
-                                                              // mapping
+        } else if (configDataNode instanceof ContainerNode) { // part for containers mapping
             final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder = Builders
                     .containerBuilder((ContainerNode) configDataNode);
+
             // MAP CONFIG DATA
             mapCont(containerBuilder, ((ContainerNode) configDataNode).getValue());
             // MAP STATE DATA
             mapCont(containerBuilder, ((ContainerNode) stateDataNode).getValue());
-
             return containerBuilder.build();
         } else {
             throw new RestconfDocumentedException("Bad type of node.");

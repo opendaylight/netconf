@@ -22,6 +22,7 @@ import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
@@ -75,6 +76,12 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(instanceIdentifier, mountPoint,
                 transaction);
         final NormalizedNode<?, ?> node = ReadDataTransactionUtil.readData(value, transactionNode);
+        if (node == null) {
+            throw new RestconfDocumentedException(
+                    "Request could not be completed because the relevant data model content does not exist",
+                    RestconfError.ErrorType.PROTOCOL,
+                    RestconfError.ErrorTag.DATA_MISSING);
+        }
         final SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
         dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
         final String etag = '"' + node.getNodeType().getModule().getFormattedRevision()
