@@ -376,8 +376,8 @@ public class BrokerFacade {
 
             @Override
             public void onSuccess(final Optional<NormalizedNode<?, ?>> result) {
-                responseWaiter.countDown();
                 handlingCallback(null, datastore, path, result, readData);
+                responseWaiter.countDown();
             }
 
             @Override
@@ -457,8 +457,8 @@ public class BrokerFacade {
         Futures.addCallback(future, new FutureCallback<Boolean>() {
             @Override
             public void onSuccess(@Nullable final Boolean result) {
-                responseWaiter.countDown();
                 handlingCallback(null, store, path, Optional.of(result), readData);
+                responseWaiter.countDown();
             }
 
             @Override
@@ -500,8 +500,8 @@ public class BrokerFacade {
         Futures.addCallback(future, new FutureCallback<Boolean>() {
             @Override
             public void onSuccess(@Nullable final Boolean result) {
-                responseWaiter.countDown();
                 handlingCallback(null, store, path, Optional.of(result), readData);
+                responseWaiter.countDown();
             }
 
             @Override
