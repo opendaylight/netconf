@@ -16,6 +16,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 class TestData {
 
@@ -32,6 +33,10 @@ class TestData {
     final LeafNode contentLeaf;
     final LeafNode contentLeaf2;
     final MapEntryNode checkData;
+    final SchemaPath rpc;
+    final SchemaPath errorRpc;
+    final ContainerNode input;
+    final ContainerNode output;
 
     TestData() {
         final QName base = QName.create("ns", "2016-02-28", "base");
@@ -108,6 +113,28 @@ class TestData {
         data4 = Builders.containerBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(base, "container2")))
                 .withChild(contentLeaf2)
+                .build();
+
+
+        final QName rpcQname = QName.create("ns", "2015-02-28", "test-rpc");
+        final QName errorRpcQname = QName.create(rpcQname, "error-rpc");
+        rpc = SchemaPath.create(true, rpcQname);
+        errorRpc = SchemaPath.create(true, errorRpcQname);
+        final LeafNode contentLeafNode = Builders.leafBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(rpcQname, "content")))
+                .withValue("test")
+                .build();
+        input = Builders.containerBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(rpcQname, "input")))
+                .withChild(contentLeafNode)
+                .build();
+        final LeafNode resultLeafNode = Builders.leafBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(rpcQname, "content")))
+                .withValue("operation result")
+                .build();
+        output = Builders.containerBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(rpcQname, "output")))
+                .withChild(resultLeafNode)
                 .build();
     }
 }
