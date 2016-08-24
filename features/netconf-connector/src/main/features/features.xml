@@ -34,6 +34,7 @@
         <feature version='${project.version}'>odl-netconf-notifications-api</feature>
         <feature version='${project.version}'>odl-netconf-client</feature>
         <feature version='${mdsal.model.version}'>odl-mdsal-models</feature>
+        <bundle>mvn:com.google.code.gson/gson/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.netconf/sal-netconf-connector/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.controller.model/model-inventory/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.netconf/netconf-topology/{{VERSION}}</bundle>
