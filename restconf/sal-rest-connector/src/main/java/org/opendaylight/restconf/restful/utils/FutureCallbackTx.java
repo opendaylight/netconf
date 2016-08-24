@@ -10,9 +10,15 @@ package org.opendaylight.restconf.restful.utils;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import javax.annotation.Nullable;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
+import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.yangtools.yang.common.RpcError;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +52,7 @@ final class FutureCallbackTx {
             @Override
             public void onFailure(final Throwable t) {
                 responseWaiter.countDown();
-                handlingLoggerAndValues(t, txType, null, null);
+                handlingLoggerAndValues(t, txType, null, dataFactory);
             }
 
             @Override
@@ -85,7 +91,13 @@ final class FutureCallbackTx {
             final T result, final FutureDataFactory<T> dataFactory) {
         if (t != null) {
             LOG.warn("Transaction({}) FAILED!", txType, t);
-            throw new RestconfDocumentedException("  Transaction(" + txType + ") not committed correctly", t);
+            if (t instanceof DOMRpcException) {
+                final List<RpcError> rpcErrorList = new ArrayList<>();
+                rpcErrorList.add(RpcResultBuilder.newError(RpcError.ErrorType.RPC, "operation-failed", t.getMessage()));
+                dataFactory.setResult((T) new DefaultDOMRpcResult(rpcErrorList));
+            } else {
+                throw new RestconfDocumentedException("  Transaction(" + txType + ") not committed correctly", t);
+            }
         } else {
             LOG.trace("Transaction({}) SUCCESSFUL!", txType);
             dataFactory.setResult(result);

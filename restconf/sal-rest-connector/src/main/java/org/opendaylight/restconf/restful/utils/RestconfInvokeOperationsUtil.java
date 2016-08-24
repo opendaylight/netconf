@@ -94,7 +94,7 @@ public class RestconfInvokeOperationsUtil {
             return null;
         }
         try {
-            if ((response.getErrors() == null) || response.getErrors().isEmpty()) {
+            if (response.getErrors().isEmpty()) {
                 return response;
             }
             LOG.debug("RpcError message", response.getErrors());
