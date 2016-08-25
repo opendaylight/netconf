@@ -139,4 +139,24 @@ public class NetconfDeviceWriteOnlyTxTest {
         inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME), NetconfBaseOps.getUnLockContent(NETCONF_RUNNING_QNAME));
     }
 
+    @Test
+    public void testFailedLockRunning() throws Exception {
+        final CheckedFuture<DefaultDOMRpcResult, Exception> rpcErrorFuture =
+                Futures.immediateCheckedFuture(new DefaultDOMRpcResult(RpcResultBuilder.newError(RpcError.ErrorType.APPLICATION, "a", "m")));
+
+        doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("Failed to lock")))
+                .doReturn(rpcErrorFuture)
+                .when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+
+        try {
+            WriteRunningTx tx = new WriteRunningTx(id, new NetconfBaseOps(rpc, mock(SchemaContext.class)), false);
+            tx.submit().get();
+        } catch (final Exception e) {
+            e.printStackTrace();
+            verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME), NetconfBaseOps.getLockContent(NETCONF_RUNNING_QNAME));
+            return;
+        }
+
+        fail("Lock should fail");
+    }
 }

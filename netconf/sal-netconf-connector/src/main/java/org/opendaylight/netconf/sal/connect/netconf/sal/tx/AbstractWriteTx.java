@@ -18,6 +18,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.util.ContainerException;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -30,7 +31,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
 
     private static final Logger LOG  = LoggerFactory.getLogger(AbstractWriteTx.class);
-
+    protected final ContainerException containerException = new ContainerException();
     protected final RemoteDeviceId id;
     protected final NetconfBaseOps netOps;
     protected final boolean rollbackSupport;
@@ -90,7 +91,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
         editConfig(path, Optional.fromNullable(data), editStructure, Optional.of(ModifyAction.NONE), "put");
     }
 
-    protected abstract void handleEditException(YangInstanceIdentifier path, NormalizedNode<?, ?> data, NetconfDocumentedException e, String editType);
+    protected abstract RuntimeException handleEditException(YangInstanceIdentifier path, NormalizedNode<?, ?> data, NetconfDocumentedException e, String editType);
 
     @Override
     public synchronized void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode<?, ?> data) {
