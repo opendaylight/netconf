@@ -101,7 +101,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
                 NetconfDocumentedException e = new NetconfDocumentedException(id + ": Lock candidate operation failed.", NetconfDocumentedException.ErrorType.application,
                         NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
                 discardChanges();
-                throw new RuntimeException(e);
+                containerException.add(e);
             }
         };
         netOps.lockCandidate(lockCandidateCallback);
@@ -114,14 +114,19 @@ public class WriteCandidateTx extends AbstractWriteTx {
     }
 
     @Override
-    protected void handleEditException(final YangInstanceIdentifier path, final NormalizedNode<?, ?> data, final NetconfDocumentedException e, final String editType) {
+    protected RuntimeException handleEditException(final YangInstanceIdentifier path, final NormalizedNode<?, ?> data, final NetconfDocumentedException e, final String editType) {
         LOG.warn("{}: Error {} data to (candidate){}, data: {}, canceling", id, editType, path, data, e);
         cancel();
-        throw new RuntimeException(id + ": Error while " + editType + ": (candidate)" + path, e);
+        return new RuntimeException(id + ": Error while " + editType + ": (candidate)" + path, e);
     }
 
     @Override
     public synchronized CheckedFuture<Void, TransactionCommitFailedException> submit() {
+        final java.util.Optional<CheckedFuture> checkedExceptions = containerException.getFutureException();
+        if (checkedExceptions.isPresent()) {
+            return checkedExceptions.get();
+        };
+
         final ListenableFuture<Void> commitFutureAsVoid = Futures.transform(commit(), new Function<RpcResult<TransactionStatus>, Void>() {
             @Override
             public Void apply(final RpcResult<TransactionStatus> input) {
@@ -198,7 +203,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
                 LOG.warn("Edit candidate operation failed. {}", t);
                 NetconfDocumentedException e = new NetconfDocumentedException(id + ": Edit candidate operation failed.", NetconfDocumentedException.ErrorType.application,
                         NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
-                handleEditException(path, data.orNull(), e, operation);
+                containerException.add(handleEditException(path, data.orNull(), e, operation));
             }
         };
         if (defaultOperation.isPresent()) {

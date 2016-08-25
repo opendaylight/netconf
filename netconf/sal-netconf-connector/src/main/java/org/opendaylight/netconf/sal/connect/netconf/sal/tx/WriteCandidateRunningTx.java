@@ -59,7 +59,7 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
             @Override
             public void onFailure(Throwable t) {
                 LOG.warn("{}: Failed to lock running. Failed to initialize transaction", id, t);
-                throw new RuntimeException(id + ": Failed to lock running. Failed to initialize transaction", t);
+                containerException.add(new RuntimeException(id + ": Failed to lock running. Failed to initialize transaction", t));
             }
         };
         netOps.lockRunning(lockRunningCallback);
