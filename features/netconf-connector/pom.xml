@@ -58,6 +58,7 @@
       <version>${yangtools.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.controller</groupId>
@@ -80,29 +81,35 @@
       <artifactId>features-netconf</artifactId>
       <classifier>features</classifier>
       <type>xml</type>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>sal-netconf-connector</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>messagebus-netconf</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>messagebus-netconf</artifactId>
       <type>xml</type>
       <classifier>config</classifier>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-config-dispatcher</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-console</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -110,42 +117,56 @@
       <version>${project.version}</version>
       <classifier>config</classifier>
       <type>xml</type>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>abstract-topology</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-topology</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-topology-config</artifactId>
       <classifier>config</classifier>
       <type>xml</type>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
        <groupId>${project.groupId}</groupId>
        <artifactId>netconf-topology-config</artifactId>
        <classifier>clustered-config</classifier>
        <type>xml</type>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-tcp</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-ssh</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-jdk15on</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk15on</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
@@ -154,6 +175,7 @@
       <version>${netconf.version}</version>
       <type>xml</type>
       <classifier>config</classifier>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 
