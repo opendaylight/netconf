@@ -22,6 +22,23 @@
       "revId": "fada1988b14c81ca4cb27679551e80168f462972",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_06dc6a72",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteCandidateRunningTx.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-25T08:18:01Z",
+      "side": 1,
+      "message": "I think, with this you are actually introducing blocking lock and edit config. And we wanted transaction to be asynchronous, so I don\u0027t think this is the best approach.\n\nThis also applies to other two tx implementations",
+      "revId": "fada1988b14c81ca4cb27679551e80168f462972",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
