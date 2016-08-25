@@ -143,6 +143,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_c777333a",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteRunningTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-25T08:18:01Z",
+      "side": 1,
+      "message": "Sorry, turns out you were right. I had in mind, for example this constructor:\nhttps://github.com/opendaylight/netconf/blob/3062d9b5a6704075b4b10a8e1ad481738ca370c7/netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/NetconfDocumentedException.java#L33\n\nBut, we have to deal with Throwables here, not just Exceptions, so this won\u0027t be that straightforward.",
+      "parentUuid": "7a6b29fe_a1682a22",
+      "revId": "39b3ee836aa18e314b053d23f0c5933b60c03f6a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_cd13ed64",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteRunningTx.java",
         "patchSetId": 5
