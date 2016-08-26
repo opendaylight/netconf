@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_3a41b9a9",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/impl/ClusteredNetconfTopology.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-08-26T10:07:09Z",
+      "side": 1,
+      "message": "This is just our interal api so we don\u0027t need to go through the deprecation process, just delete the metho. And for future reference @Deprecated should go to the api definition so that all implementations inherit it and not to the implemented method.",
+      "range": {
+        "startLine": 186,
+        "startChar": 4,
+        "endLine": 186,
+        "endChar": 15
+      },
+      "revId": "02e854745b4c8da412bf6f5ad913033aaf36fb58",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
