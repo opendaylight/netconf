@@ -85,12 +85,6 @@ public final class ReadDataTransactionUtil {
             data = readAllData(transactionNode);
         }
 
-        if (data == null) {
-            throw new RestconfDocumentedException(
-                    "Request could not be completed because the relevant data model content does not exist",
-                    ErrorType.PROTOCOL,
-                    ErrorTag.DATA_MISSING);
-        }
         return data;
     }
 
