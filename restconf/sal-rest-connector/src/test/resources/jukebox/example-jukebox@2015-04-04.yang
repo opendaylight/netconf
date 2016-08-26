@@ -2,12 +2,11 @@ module example-jukebox {
 
       namespace "http://example.com/ns/example-jukebox";
       prefix "jbox";
-      import ietf-restconf { prefix rc; }
 
       organization "Example, Inc.";
       contact "support at example.com";
       description "Example Jukebox Data Model Module";
-      revision "2013-12-21" {
+      revision "2015-04-04" {
         description "Initial version.";
         reference "example.com document 1-4673";
       }
@@ -55,46 +54,6 @@ module example-jukebox {
 
           description "Represents the jukebox library resource.";
 
-          list listVal1 {
-            key "keyVal1 keyVal2 keyVal3";
-            leaf keyVal1 {
-               type string {
-                      length "1 .. max";
-                  }
-             }
-            leaf keyVal2 {
-               type string {
-                      length "1 .. max";
-                  }
-             }
-            leaf keyVal3 {
-               type string {
-                      length "1 .. max";
-                  }
-             }
-
-             list listVal2 {
-               key "keyVal1 keyVal2 keyVal3";
-               leaf keyVal1 {
-                  type string {
-                         length "1 .. max";
-                     }
-                }
-               leaf keyVal2 {
-                  type string {
-                         length "1 .. max";
-                     }
-                }
-               leaf keyVal3 {
-                  type string {
-                         length "1 .. max";
-                     }
-                }
-             }
-          }
-
-
-
           list artist {
             key name;
 
@@ -135,6 +94,20 @@ module example-jukebox {
                   range "1900 .. max";
                 }
                 description "The year the album was released";
+              }
+
+              container admin {
+                description
+                  "Administrative information for the album.";
+
+                leaf label {
+                  type string;
+                  description "The label that released the album.";
+                }
+                leaf catalogue-number {
+                  type string;
+                  description "The album's catalogue number.";
+                }
               }
 
               list song {
@@ -189,7 +162,6 @@ module example-jukebox {
           leaf song-count {
              type uint32;
              units "songs";
-
              config false;
              description "Number of songs in the library";
           }
@@ -211,6 +183,7 @@ module example-jukebox {
             description
               "A comment describing the playlist.";
           }
+
           list song {
             key index;
             ordered-by user;
@@ -221,11 +194,13 @@ module example-jukebox {
             leaf index {    // not really needed
               type uint32;
               description
-                "An arbitrary integer index for this
-                 playlist song.";
+                "An arbitrary integer index for this playlist song.";
             }
             leaf id {
-              type rc:data-resource-identifier;
+              type leafref {
+                path "/jbox:jukebox/jbox:library/jbox:artist/" +
+                     "jbox:album/jbox:song/jbox:name";
+              }
               mandatory true;
               description
                 "Song identifier. Must identify an instance of
@@ -257,6 +232,7 @@ module example-jukebox {
             mandatory true;
             description "playlist name";
           }
+
           leaf song-number {
             type uint32;
             mandatory true;
