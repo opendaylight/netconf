@@ -26,8 +26,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,35 +55,30 @@ public final class TransactionUtil {
     public static void ensureParentsByMerge(final YangInstanceIdentifier path, final SchemaContext schemaContext,
             final DOMDataWriteTransaction writeTx) {
         final List<PathArgument> normalizedPathWithoutChildArgs = new ArrayList<>();
-        boolean hasList = false;
         YangInstanceIdentifier rootNormalizedPath = null;
 
         final Iterator<PathArgument> it = path.getPathArguments().iterator();
-        final Module module = schemaContext.findModuleByNamespaceAndRevision(
-                path.getLastPathArgument().getNodeType().getModule().getNamespace(),
-                path.getLastPathArgument().getNodeType().getModule().getRevision());
 
         while (it.hasNext()) {
             final PathArgument pathArgument = it.next();
             if (rootNormalizedPath == null) {
                 rootNormalizedPath = YangInstanceIdentifier.create(pathArgument);
             }
+
             if (it.hasNext()) {
                 normalizedPathWithoutChildArgs.add(pathArgument);
-                if (module.getDataChildByName(pathArgument.getNodeType()) instanceof ListSchemaNode) {
-                    hasList = true;
-                }
             }
         }
+
         if (normalizedPathWithoutChildArgs.isEmpty()) {
             return;
         }
-        if (hasList) {
-            Preconditions.checkArgument(rootNormalizedPath != null, "Empty path received");
-            final NormalizedNode<?, ?> parentStructure = ImmutableNodes.fromInstanceId(schemaContext,
-                    YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));
-            writeTx.merge(LogicalDatastoreType.CONFIGURATION, rootNormalizedPath, parentStructure);
-        }
+
+        Preconditions.checkArgument(rootNormalizedPath != null, "Empty path received");
+
+        final NormalizedNode<?, ?> parentStructure = ImmutableNodes.fromInstanceId(schemaContext,
+                YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));
+        writeTx.merge(LogicalDatastoreType.CONFIGURATION, rootNormalizedPath, parentStructure);
     }
 
     /**
