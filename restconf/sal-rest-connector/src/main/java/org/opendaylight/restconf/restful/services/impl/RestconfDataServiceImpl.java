@@ -80,6 +80,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final String etag = '"' + node.getNodeType().getModule().getFormattedRevision()
                 + node.getNodeType().getLocalName() + '"';
         Response resp = null;
+
         if ((value == null) || value.contains(RestconfDataServiceConstant.ReadData.CONFIG)) {
             resp = Response.status(200).entity(new NormalizedNodeContext(instanceIdentifier, node)).header("ETag", etag)
                     .header("Last-Modified", dateFormatGmt.toString()).build();
