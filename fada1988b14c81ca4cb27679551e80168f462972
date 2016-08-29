@@ -39,6 +39,24 @@
       "revId": "fada1988b14c81ca4cb27679551e80168f462972",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_c3f09969",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteCandidateRunningTx.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-08-29T17:23:29Z",
+      "side": 1,
+      "message": "Yes, well I can return the CheckedFuture instead of checkedGet() here.",
+      "parentUuid": "7a6b29fe_06dc6a72",
+      "revId": "fada1988b14c81ca4cb27679551e80168f462972",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
