@@ -57,6 +57,29 @@
       "revId": "fada1988b14c81ca4cb27679551e80168f462972",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_d4f04e00",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteCandidateTx.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-08-30T19:58:54Z",
+      "side": 1,
+      "message": "need to assign the editConfigFuture here",
+      "range": {
+        "startLine": 175,
+        "startChar": 0,
+        "endLine": 179,
+        "endChar": 9
+      },
+      "revId": "fada1988b14c81ca4cb27679551e80168f462972",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
