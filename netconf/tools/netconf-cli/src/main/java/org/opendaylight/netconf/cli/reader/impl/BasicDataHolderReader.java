@@ -201,12 +201,7 @@ public abstract class BasicDataHolderReader<T extends DataSchemaNode> extends Ab
         @Override
         public int complete(final String buffer, final int cursor, final List<CharSequence> candidates) {
             return new StringsCompleter(Collections2.transform(((EnumTypeDefinition) getType()).getValues(),
-                    new Function<EnumPair, String>() {
-                        @Override
-                        public String apply(final EnumPair input) {
-                            return input.getName();
-                        }
-                    })).complete(buffer, cursor, candidates);
+                        EnumPair::getName)).complete(buffer, cursor, candidates);
         }
     }
 
