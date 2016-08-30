@@ -17,6 +17,9 @@ import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFaile
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
+import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
@@ -67,9 +70,7 @@ public final class PostDataTransactionUtil {
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(),
                 transactionNode, schemaContextRef.get());
         final URI location = PostDataTransactionUtil.resolveLocation(uriInfo, transactionNode, schemaContextRef);
-        final ResponseFactory dataFactory = new ResponseFactory(
-                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.CONFIG, transactionNode),
-                location);
+        final ResponseFactory dataFactory = new ResponseFactory(null, location);
         FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.PostData.POST_TX_TYPE, dataFactory);
         return dataFactory.build();
     }
@@ -116,6 +117,14 @@ public final class PostDataTransactionUtil {
             for (final DataContainerChild<? extends PathArgument, ?> child : ((ContainerNode) data).getValue()) {
                 putChild(child, transactionChain, transaction, path);
             }
+        } else {
+            transaction.cancel();
+            RestConnectorProvider.resetTransactionChainForAdapaters(transactionChain);
+
+            final String errMsg = "Only Map, Choice, Augmentation, LeafSet and Container nodes are supported";
+            LOG.trace("{}:{}", errMsg, path);
+            throw new RestconfDocumentedException(
+                    "Node not supported", RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT, path);
         }
 
         return transaction.submit();
