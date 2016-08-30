@@ -46,7 +46,7 @@ final class FutureCallbackTx {
             @Override
             public void onFailure(final Throwable t) {
                 responseWaiter.countDown();
-                handlingLoggerAndValues(t, txType, null, null);
+                handlingLoggerAndValues(t, txType, null, dataFactory);
             }
 
             @Override
@@ -84,6 +84,7 @@ final class FutureCallbackTx {
     protected static <T> void handlingLoggerAndValues(@Nullable final Throwable t, final String txType,
             final T result, final FutureDataFactory<T> dataFactory) {
         if (t != null) {
+            dataFactory.setFailureStatus();
             LOG.warn("Transaction({}) FAILED!", txType, t);
             throw new RestconfDocumentedException("  Transaction(" + txType + ") not committed correctly", t);
         } else {
