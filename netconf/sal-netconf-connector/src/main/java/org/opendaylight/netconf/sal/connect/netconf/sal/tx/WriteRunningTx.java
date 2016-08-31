@@ -17,12 +17,10 @@ import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.common.RpcResult;
-import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -47,6 +45,7 @@ import org.slf4j.LoggerFactory;
  *   <li>Unlock running datastore on tx commit</li>
  * </ol>
  */
+//TODO replace custom RPCs future callbacks with NetconfRpcFutureCallback
 public class WriteRunningTx extends AbstractWriteTx {
 
     private static final Logger LOG  = LoggerFactory.getLogger(WriteRunningTx.class);
@@ -76,23 +75,15 @@ public class WriteRunningTx extends AbstractWriteTx {
 
             @Override
             public void onFailure(Throwable t) {
-                LOG.warn("Lock running operation failed. {}", t);
-                throw new RuntimeException(id + ": Failed to lock running datastore", t);
+                LOG.warn("{}: Lock running operation failed. {}", id, t);
             }
         };
-        netOps.lockRunning(lockCallback);
+        resultsFutures.add(netOps.lockRunning(lockCallback));
     }
 
     @Override
     protected void cleanup() {
         unlock();
-    }
-
-    @Override
-    protected void handleEditException(final YangInstanceIdentifier path, final NormalizedNode<?, ?> data, final NetconfDocumentedException e, final String editType) {
-        LOG.warn("{}: Error {} data to (running){}, data: {}, canceling", id, editType, path, data, e);
-        cancel();
-        throw new RuntimeException(id + ": Error while " + editType + ": (running)" + path, e);
     }
 
     @Override
@@ -115,7 +106,8 @@ public class WriteRunningTx extends AbstractWriteTx {
     @Override
     public synchronized ListenableFuture<RpcResult<TransactionStatus>> performCommit() {
         unlock();
-        return Futures.immediateFuture(RpcResultBuilder.success(TransactionStatus.COMMITED).build());
+
+        return resultsToTxStatus();
     }
 
     @Override
@@ -138,16 +130,14 @@ public class WriteRunningTx extends AbstractWriteTx {
 
             @Override
             public void onFailure(Throwable t) {
-                LOG.warn("Edit running operation failed. {}", t);
-                NetconfDocumentedException e = new NetconfDocumentedException(id + ": Edit running operation failed.", NetconfDocumentedException.ErrorType.application,
-                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
-                handleEditException(path, data.orNull(), e, operation);
+                LOG.warn("{}: Error {} data to (running){}, data: {}", id, operation, path, data.orNull(), t);
             }
         };
         if (defaultOperation.isPresent()) {
-            netOps.editConfigRunning(editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport);
+            resultsFutures.add(
+                    netOps.editConfigRunning(editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport));
         } else {
-            netOps.editConfigRunning(editConfigCallback, editStructure, rollbackSupport);
+            resultsFutures.add(netOps.editConfigRunning(editConfigCallback, editStructure, rollbackSupport));
         }
     }
 
