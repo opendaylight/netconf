@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_3d6c0508",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-31T16:04:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_bd9db568",
+      "range": {
+        "startLine": 158,
+        "startChar": 49,
+        "endLine": 158,
+        "endChar": 71
+      },
+      "revId": "013984f57f19b082ed35ab32a577c13d93149aaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_1d866913",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
         "patchSetId": 12
@@ -36,6 +60,30 @@
       "writtenOn": "2016-08-31T15:43:19Z",
       "side": 1,
       "message": "I don\u0027t think you should call cleanup() as the performCommit will",
+      "range": {
+        "startLine": 159,
+        "startChar": 24,
+        "endLine": 159,
+        "endChar": 31
+      },
+      "revId": "013984f57f19b082ed35ab32a577c13d93149aaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_1d7149e0",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-31T16:04:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_1d866913",
       "range": {
         "startLine": 159,
         "startChar": 24,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_7d795dc7",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-31T16:04:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_7d7e7d1a",
+      "range": {
+        "startLine": 165,
+        "startChar": 20,
+        "endLine": 165,
+        "endChar": 27
+      },
+      "revId": "013984f57f19b082ed35ab32a577c13d93149aaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_9d9a796c",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
         "patchSetId": 12
@@ -82,6 +154,30 @@
       "writtenOn": "2016-08-31T15:43:19Z",
       "side": 1,
       "message": "I think it should wrap a NetconfDocumentedException",
+      "range": {
+        "startLine": 171,
+        "startChar": 41,
+        "endLine": 171,
+        "endChar": 50
+      },
+      "revId": "013984f57f19b082ed35ab32a577c13d93149aaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_bd7f75aa",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-31T16:04:22Z",
+      "side": 1,
+      "message": "Added this as TODO for now",
+      "parentUuid": "7a6b29fe_9d9a796c",
       "range": {
         "startLine": 171,
         "startChar": 41,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_3d43656d",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteCandidateRunningTx.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-31T16:04:22Z",
+      "side": 1,
+      "message": "Yeah I was looking at this, I can add this as TODO for now.",
+      "parentUuid": "7a6b29fe_fd91ed47",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 63,
+        "endChar": 10
+      },
+      "revId": "013984f57f19b082ed35ab32a577c13d93149aaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_3daa4585",
         "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/NetconfDeviceWriteOnlyTxTest.java",
         "patchSetId": 12
@@ -140,6 +260,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_9d01d908",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/NetconfDeviceWriteOnlyTxTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-31T16:04:22Z",
+      "side": 1,
+      "message": "Yeah, but since we want transaction to be asynchronous, without API change, we do not have an option to let the caller thread know about the failure. \n\nMoreover I do not think, this is guaranteed or intended behavior according do data broker API. I see it as you make some changes in Tx and then you submit the Tx. If Tx fails, you will see this in submit result.",
+      "parentUuid": "7a6b29fe_3daa4585",
+      "range": {
+        "startLine": 134,
+        "startChar": 11,
+        "endLine": 134,
+        "endChar": 17
+      },
+      "revId": "013984f57f19b082ed35ab32a577c13d93149aaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_3de6c5e8",
         "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/NetconfDeviceWriteOnlyTxTest.java",
         "patchSetId": 12
@@ -151,6 +295,30 @@
       "writtenOn": "2016-08-31T15:43:19Z",
       "side": 1,
       "message": "does this mean we now have to submit every transaction?",
+      "range": {
+        "startLine": 135,
+        "startChar": 0,
+        "endLine": 135,
+        "endChar": 20
+      },
+      "revId": "013984f57f19b082ed35ab32a577c13d93149aaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_dd1fd16a",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/NetconfDeviceWriteOnlyTxTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-31T16:04:22Z",
+      "side": 1,
+      "message": "You can also cancel it or do nothing with it. But in most cases, you want to actually submit the transaction, to see the your changes applied to device. \n\n(WriteRunnigTx is somehow corner case, which makes changes to device instanlty, but in my opinion this is wrong behaviour and it does not conform to data broker API)",
+      "parentUuid": "7a6b29fe_3de6c5e8",
       "range": {
         "startLine": 135,
         "startChar": 0,
