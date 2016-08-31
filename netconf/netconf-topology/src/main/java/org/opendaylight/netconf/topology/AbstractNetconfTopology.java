@@ -20,6 +20,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -137,7 +138,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
      * Netconf mount.  Access to <code>schemaResourcesDTOs</code> should be surrounded by appropriate
      * synchronization locks.
      */
-    private static volatile Map<String, NetconfDevice.SchemaResourcesDTO> schemaResourcesDTOs = new HashMap<>();
+    private static final Map<String, NetconfDevice.SchemaResourcesDTO> schemaResourcesDTOs = new HashMap<>();
 
     // Initializes default constant instances for the case when the default schema repository
     // directory cache/schema is used.
@@ -192,13 +193,13 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     }
 
     @Override
-    public ListenableFuture<NetconfDeviceCapabilities> connectNode(NodeId nodeId, Node configNode) {
+    public ListenableFuture<NetconfDeviceCapabilities> connectNode(final NodeId nodeId, final Node configNode) {
         LOG.info("Connecting RemoteDevice{{}} , with config {}", nodeId, configNode);
         return setupConnection(nodeId, configNode);
     }
 
     @Override
-    public ListenableFuture<Void> disconnectNode(NodeId nodeId) {
+    public ListenableFuture<Void> disconnectNode(final NodeId nodeId) {
         LOG.debug("Disconnecting RemoteDevice{{}}", nodeId.getValue());
         if (!activeConnectors.containsKey(nodeId)) {
             return Futures.immediateFailedFuture(new IllegalStateException("Unable to disconnect device that is not connected"));
@@ -229,12 +230,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         Futures.addCallback(future, new FutureCallback<NetconfDeviceCapabilities>() {
             @Override
-            public void onSuccess(NetconfDeviceCapabilities result) {
+            public void onSuccess(final NetconfDeviceCapabilities result) {
                 LOG.debug("Connector for : " + nodeId.getValue() + " started succesfully");
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFailure(final Throwable t) {
                 LOG.error("Connector for : " + nodeId.getValue() + " failed");
                 // remove this node from active connectors?
             }
@@ -250,11 +251,11 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         final Long keepaliveDelay = node.getKeepaliveDelay() == null ? DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay();
         final Boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null ? DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
 
-        IpAddress ipAddress = node.getHost().getIpAddress();
-        InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null ?
+        final IpAddress ipAddress = node.getHost().getIpAddress();
+        final InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null ?
                 ipAddress.getIpv4Address().getValue() : ipAddress.getIpv6Address().getValue(),
                 node.getPort().getValue());
-        RemoteDeviceId remoteDeviceId = new RemoteDeviceId(nodeId.getValue(), address);
+        final RemoteDeviceId remoteDeviceId = new RemoteDeviceId(nodeId.getValue(), address);
 
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade =
                 createSalFacade(remoteDeviceId, domBroker, bindingAwareBroker);
@@ -265,13 +266,13 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
 
         // pre register yang library sources as fallback schemas to schema registry
-        List<SchemaSourceRegistration<YangTextSchemaSource>> registeredYangLibSources = Lists.newArrayList();
+        final List<SchemaSourceRegistration<YangTextSchemaSource>> registeredYangLibSources = Lists.newArrayList();
         if (node.getYangLibrary() != null) {
             final String yangLibURL = node.getYangLibrary().getYangLibraryUrl().getValue();
             final String yangLibUsername = node.getYangLibrary().getUsername();
             final String yangLigPassword = node.getYangLibrary().getPassword();
 
-            LibraryModulesSchemas libraryModulesSchemas;
+            final LibraryModulesSchemas libraryModulesSchemas;
             if(yangLibURL != null) {
                 if(yangLibUsername != null && yangLigPassword != null) {
                     libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL, yangLibUsername, yangLigPassword);
@@ -279,7 +280,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                     libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL);
                 }
 
-                for (Map.Entry<SourceIdentifier, URL> sourceIdentifierURLEntry : libraryModulesSchemas.getAvailableModels().entrySet()) {
+                for (final Map.Entry<SourceIdentifier, URL> sourceIdentifierURLEntry : libraryModulesSchemas.getAvailableModels().entrySet()) {
                     registeredYangLibSources.
                             add(schemaRegistry.registerSchemaSource(
                                     new YangLibrarySchemaYangSourceProvider(remoteDeviceId, libraryModulesSchemas.getAvailableModels()),
@@ -304,7 +305,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                     .build();
         }
 
-        final Optional<NetconfSessionPreferences> userCapabilities = getUserCapabilities(node);
+        final Optional<UserPreferences> userCapabilities = getUserCapabilities(node);
         final int rpcMessageLimit =
                 node.getConcurrentRpcLimit() == null ? DEFAULT_CONCURRENT_RPC_LIMIT : node.getConcurrentRpcLimit();
 
@@ -315,7 +316,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         return new NetconfConnectorDTO(
                 userCapabilities.isPresent() ?
                         new NetconfDeviceCommunicator(
-                                remoteDeviceId, device, new UserPreferences(userCapabilities.get(), node.getYangModuleCapabilities().isOverride()), rpcMessageLimit):
+                                remoteDeviceId, device, userCapabilities.get(), rpcMessageLimit):
                         new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit), salFacade);
     }
 
@@ -387,7 +388,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         return new FilesystemSchemaSourceCache<>(schemaRegistry, YangTextSchemaSource.class, new File(relativeSchemaCacheDirectory));
     }
 
-    public NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener, NetconfNode node) {
+    public NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener, final NetconfNode node) {
 
         //setup default values since default value is not supported in mdsal
         final long clientConnectionTimeoutMillis = node.getConnectionTimeoutMillis() == null ? DEFAULT_CONNECTION_TIMEOUT_MILLIS : node.getConnectionTimeoutMillis();
@@ -426,7 +427,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
     protected abstract RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id, final Broker domBroker, final BindingAwareBroker bindingBroker);
 
-    private InetSocketAddress getSocketAddress(final Host host, int port) {
+    private InetSocketAddress getSocketAddress(final Host host, final int port) {
         if(host.getDomainName() != null) {
             return new InetSocketAddress(host.getDomainName().getValue(), port);
         } else {
@@ -436,22 +437,35 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
     }
 
-    private Optional<NetconfSessionPreferences> getUserCapabilities(final NetconfNode node) {
-        if(node.getYangModuleCapabilities() == null) {
+    private Optional<UserPreferences> getUserCapabilities(final NetconfNode node) {
+        // if none of yang-module-capabilities or non-module-capabilities is specified
+        // just return absent
+        if (node.getYangModuleCapabilities() == null && node.getNonModuleCapabilities() == null) {
             return Optional.absent();
         }
 
-        final List<String> capabilities = node.getYangModuleCapabilities().getCapability();
-        if(capabilities == null || capabilities.isEmpty()) {
-            return Optional.absent();
+        final List<String> capabilities = new ArrayList<>();
+
+        boolean overrideYangModuleCaps = false;
+        if (node.getYangModuleCapabilities() != null) {
+            capabilities.addAll(node.getYangModuleCapabilities().getCapability());
+            overrideYangModuleCaps = node.getYangModuleCapabilities().isOverride();
         }
 
-        final NetconfSessionPreferences parsedOverrideCapabilities = NetconfSessionPreferences.fromStrings(capabilities, CapabilityOrigin.UserDefined);
-        Preconditions.checkState(parsedOverrideCapabilities.getNonModuleCaps().isEmpty(), "Capabilities to override can " +
-                "only contain module based capabilities, non-module capabilities will be retrieved from the device," +
-                " configured non-module capabilities: " + parsedOverrideCapabilities.getNonModuleCaps());
+        //non-module capabilities should not exist in yang module capabilities
+        final NetconfSessionPreferences netconfSessionPreferences = NetconfSessionPreferences.fromStrings(capabilities);
+        Preconditions.checkState(netconfSessionPreferences.getNonModuleCaps().isEmpty(), "List yang-module-capabilities/capability " +
+                "should contain only module based capabilities. Non-module capabilities used: " +
+                netconfSessionPreferences.getNonModuleCaps());
 
-        return Optional.of(parsedOverrideCapabilities);
+        boolean overrideNonModuleCaps = false;
+        if (node.getNonModuleCapabilities() != null) {
+            capabilities.addAll(node.getNonModuleCapabilities().getCapability());
+            overrideNonModuleCaps = node.getNonModuleCapabilities().isOverride();
+        }
+
+        return Optional.of(new UserPreferences(NetconfSessionPreferences.fromStrings(capabilities, CapabilityOrigin.UserDefined),
+                overrideYangModuleCaps, overrideNonModuleCaps));
     }
 
     private static final class TimedReconnectStrategyFactory implements ReconnectStrategyFactory {
@@ -510,5 +524,4 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             facade.close();
         }
     }
-
 }
