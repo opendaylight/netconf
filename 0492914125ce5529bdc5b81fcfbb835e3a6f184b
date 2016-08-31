@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "7a6b29fe_f7846c5f",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteCandidateTx.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-31T06:18:50Z",
+      "side": 1,
+      "message": "Is this enough, what if some operations have not already finished? Are you sure you cannot miss some errors?",
+      "revId": "0492914125ce5529bdc5b81fcfbb835e3a6f184b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_77b17c46",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteCandidateTx.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-31T06:18:50Z",
+      "side": 1,
+      "message": "Unchecked assignment, you should either wrap ContainerException in TransactionCommitFailedException or ContainerException should extend TransactionCommitFailedException",
+      "revId": "0492914125ce5529bdc5b81fcfbb835e3a6f184b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_03e731ad",
         "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/NetconfDeviceWriteOnlyTxTest.java",
         "patchSetId": 11
