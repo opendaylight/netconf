@@ -7,7 +7,6 @@
  */
 package org.opendaylight.controller.config.yang.md.sal.connector.netconf;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static org.opendaylight.controller.config.api.JmxAttributeValidationException.checkCondition;
 import static org.opendaylight.controller.config.api.JmxAttributeValidationException.checkNotNull;
 
@@ -19,6 +18,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +26,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
-import org.opendaylight.controller.config.api.JmxAttributeValidationException;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
@@ -46,8 +45,8 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPrefe
 import org.opendaylight.netconf.sal.connect.netconf.listener.UserPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
+import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.protocol.framework.ReconnectStrategy;
 import org.opendaylight.protocol.framework.ReconnectStrategyFactory;
 import org.opendaylight.protocol.framework.TimedReconnectStrategy;
@@ -300,10 +299,11 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
             LOG.info("Concurrent rpc limit is smaller than 1, no limit will be enforced for device {}", id);
         }
 
-        final NetconfDeviceCommunicator listener = userCapabilities.isPresent() ?
-                new NetconfDeviceCommunicator(id, device,
-                        new UserPreferences(userCapabilities.get(), getYangModuleCapabilities().getOverride()), getConcurrentRpcLimit()):
-                new NetconfDeviceCommunicator(id, device, getConcurrentRpcLimit());
+        final NetconfDeviceCommunicator listener = userCapabilities.isPresent()
+                ? new NetconfDeviceCommunicator(id, device, new UserPreferences(userCapabilities.get(),
+                        getYangModuleCapabilities().getOverride(), getYangNonModuleCapabilities().getOverride()),
+                        getConcurrentRpcLimit())
+                : new NetconfDeviceCommunicator(id, device, getConcurrentRpcLimit());
 
         if (shouldSendKeepalive()) {
             ((KeepaliveSalFacade) salFacade).setListener(listener);
@@ -377,22 +377,29 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
     }
 
     private Optional<NetconfSessionPreferences> getUserCapabilities() {
-        if(getYangModuleCapabilities() == null) {
+        if (getYangModuleCapabilities() == null && getYangNonModuleCapabilities() == null) {
             return Optional.absent();
         }
 
-        final List<String> capabilities = getYangModuleCapabilities().getCapability();
-        if(capabilities == null || capabilities.isEmpty()) {
+        if ((getYangModuleCapabilities().getCapability() == null
+                || getYangModuleCapabilities().getCapability().isEmpty())
+                && (getYangNonModuleCapabilities().getCapability() == null
+                        || getYangNonModuleCapabilities().getCapability().isEmpty())) {
             return Optional.absent();
         }
 
-        final NetconfSessionPreferences parsedOverrideCapabilities = NetconfSessionPreferences.fromStrings(capabilities);
-        JmxAttributeValidationException.checkCondition(
-                parsedOverrideCapabilities.getNonModuleCaps().isEmpty(),
-                "Capabilities to override can only contain module based capabilities, non-module capabilities will be retrieved from the device," +
-                        " configured non-module capabilities: " + parsedOverrideCapabilities.getNonModuleCaps(),
-                yangModuleCapabilitiesJmxAttribute);
+        final List<String> capabilities = new ArrayList<>();
+        if (!(getYangModuleCapabilities().getCapability() == null
+                || getYangModuleCapabilities().getCapability().isEmpty())) {
+            capabilities.addAll(getYangModuleCapabilities().getCapability());
+        }
+        if (!(getYangNonModuleCapabilities().getCapability() == null
+                || getYangNonModuleCapabilities().getCapability().isEmpty())) {
+            capabilities.addAll(getYangNonModuleCapabilities().getCapability());
+        }
 
+        final NetconfSessionPreferences parsedOverrideCapabilities =
+                NetconfSessionPreferences.fromStrings(capabilities);
         return Optional.of(parsedOverrideCapabilities);
     }
 
@@ -490,4 +497,5 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
     public void setInstanceName(final String instanceName) {
         this.instanceName = instanceName;
     }
+
 }
