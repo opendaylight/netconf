@@ -20,6 +20,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -337,7 +338,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         return new NetconfConnectorDTO(
                 userCapabilities.isPresent() ?
                         new NetconfDeviceCommunicator(
-                                remoteDeviceId, device, new UserPreferences(userCapabilities.get(), node.getYangModuleCapabilities().isOverride()), rpcMessageLimit):
+                                remoteDeviceId, device, new UserPreferences(userCapabilities.get(), node.getYangModuleCapabilities().isOverride(), node.getYangNonModuleCapabilities().isOverride()), rpcMessageLimit):
                         new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit), salFacade);
     }
 
@@ -472,19 +473,23 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     }
 
     private Optional<NetconfSessionPreferences> getUserCapabilities(final NetconfNode node) {
-        if(node.getYangModuleCapabilities() == null) {
+        if (isNull(node.getYangModuleCapabilities()) && isNull(node.getYangNonModuleCapabilities())) {
             return Optional.absent();
         }
 
-        final List<String> capabilities = node.getYangModuleCapabilities().getCapability();
-        if(capabilities == null || capabilities.isEmpty()) {
+        if ((isNull(node.getYangModuleCapabilities().getCapability())) && isNull(node.getYangNonModuleCapabilities().getCapability())) {
             return Optional.absent();
+        }
+
+        final List<String> capabilities= new ArrayList<String>();
+        if (!isNull(node.getYangModuleCapabilities().getCapability())) {
+            capabilities.addAll(node.getYangModuleCapabilities().getCapability());
+        }
+        if (!isNull(node.getYangNonModuleCapabilities().getCapability())) {
+            capabilities.addAll(node.getYangNonModuleCapabilities().getCapability());
         }
 
         final NetconfSessionPreferences parsedOverrideCapabilities = NetconfSessionPreferences.fromStrings(capabilities);
-        Preconditions.checkState(parsedOverrideCapabilities.getNonModuleCaps().isEmpty(), "Capabilities to override can " +
-                "only contain module based capabilities, non-module capabilities will be retrieved from the device," +
-                " configured non-module capabilities: " + parsedOverrideCapabilities.getNonModuleCaps());
 
         return Optional.of(parsedOverrideCapabilities);
     }
@@ -538,6 +543,14 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         public NetconfClientSessionListener getSessionListener() {
             return communicator;
         }
+    }
+
+    public static boolean isNull(Object v) {
+        if (v == null)
+            return true;
+        if (v instanceof List && (v==null ||((List) v).isEmpty()))
+            return true;
+        return false;
     }
 
 }
