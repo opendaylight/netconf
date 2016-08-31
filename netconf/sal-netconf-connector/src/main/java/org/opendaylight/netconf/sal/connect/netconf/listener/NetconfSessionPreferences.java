@@ -22,6 +22,7 @@ import com.google.common.collect.Sets;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -170,8 +171,36 @@ public final class NetconfSessionPreferences {
         return new NetconfSessionPreferences(getNonModuleCaps(), netconfSessionPreferences.getModuleBasedCapsOrigin());
     }
 
-    public NetconfSessionPreferences replaceModuleCaps(Map<QName, CapabilityOrigin> newModuleBasedCaps) {
+    public NetconfSessionPreferences replaceModuleCaps(final Map<QName, CapabilityOrigin> newModuleBasedCaps) {
         return new NetconfSessionPreferences(getNonModuleCaps(), newModuleBasedCaps);
+    }
+
+
+    /**
+     * Merge list of non-module based capabilities with current list of non-module based capabilities
+     *
+     * @param netconfSessionNonModuleCapabilities capabilities to merge into this
+     *
+     * @return new instance of preferences with merged non-module based capabilities
+     */
+    public NetconfSessionPreferences addNonModuleCaps(
+            final NetconfSessionPreferences netconfSessionNonModuleCapabilities) {
+        final HashSet<String> mergedCaps = Sets.newHashSetWithExpectedSize(
+                nonModuleCaps.size() + netconfSessionNonModuleCapabilities.getNonModuleCaps().size());
+        mergedCaps.addAll(nonModuleCaps);
+        mergedCaps.addAll(netconfSessionNonModuleCapabilities.getNonModuleCaps());
+        return new NetconfSessionPreferences(mergedCaps, getModuleBasedCapsOrigin());
+    }
+
+    /**
+     * Override current list of non-module based capabilities
+     *
+     * @param netconfSessionPreferences capabilities to override in this
+     *
+     * @return new instance of preferences with replaced non-module based capabilities
+     */
+    public NetconfSessionPreferences replaceNonModuleCaps(final NetconfSessionPreferences netconfSessionPreferences) {
+        return new NetconfSessionPreferences(netconfSessionPreferences.getNonModuleCaps(), getModuleBasedCapsOrigin());
     }
 
     public static NetconfSessionPreferences fromNetconfSession(final NetconfClientSession session) {
@@ -191,7 +220,7 @@ public final class NetconfSessionPreferences {
         return fromStrings(capabilities, CapabilityOrigin.DeviceAdvertised);
     }
 
-    public static NetconfSessionPreferences fromStrings(final Collection<String> capabilities, CapabilityOrigin capabilityOrigin) {
+    public static NetconfSessionPreferences fromStrings(final Collection<String> capabilities, final CapabilityOrigin capabilityOrigin) {
         final Map<QName, CapabilityOrigin> moduleBasedCaps = new HashMap<>();
         final Set<String> nonModuleCaps = Sets.newHashSet(capabilities);
 
@@ -238,12 +267,12 @@ public final class NetconfSessionPreferences {
         return new NetconfSessionPreferences(ImmutableSet.copyOf(nonModuleCaps), ImmutableMap.copyOf(moduleBasedCaps));
     }
 
-    private static void addModuleQName(final Map<QName, CapabilityOrigin> moduleBasedCaps, final Set<String> nonModuleCaps, final String capability, final QName qName, CapabilityOrigin capabilityOrigin) {
+    private static void addModuleQName(final Map<QName, CapabilityOrigin> moduleBasedCaps, final Set<String> nonModuleCaps, final String capability, final QName qName, final CapabilityOrigin capabilityOrigin) {
         moduleBasedCaps.put(qName, capabilityOrigin);
         nonModuleCaps.remove(capability);
     }
 
-    private NetconfDeviceCapabilities capabilities = new NetconfDeviceCapabilities();
+    private final NetconfDeviceCapabilities capabilities = new NetconfDeviceCapabilities();
 
     public NetconfDeviceCapabilities getNetconfDeviceCapabilities() {
         return capabilities;
