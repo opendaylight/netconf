@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
  *     <li>Running datastore is locked as the first thing and this lock has to succeed</li>
  * </ul>
  */
+//TODO replace custom RPCs future callbacks with NetconfRpcFutureCallback
 public class WriteCandidateRunningTx extends WriteCandidateTx {
 
     private static final Logger LOG  = LoggerFactory.getLogger(WriteCandidateRunningTx.class);
@@ -59,10 +60,9 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
             @Override
             public void onFailure(Throwable t) {
                 LOG.warn("{}: Failed to lock running. Failed to initialize transaction", id, t);
-                throw new RuntimeException(id + ": Failed to lock running. Failed to initialize transaction", t);
             }
         };
-        netOps.lockRunning(lockRunningCallback);
+        resultsFutures.add(netOps.lockRunning(lockRunningCallback));
     }
 
     /**
