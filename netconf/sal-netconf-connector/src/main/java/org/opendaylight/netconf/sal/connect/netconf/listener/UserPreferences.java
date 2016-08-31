@@ -15,26 +15,46 @@ import javax.annotation.Nonnull;
 public class UserPreferences {
 
     private final NetconfSessionPreferences sessionPreferences;
-    private final boolean override;
+    private final boolean overrideModuleCapabilities;
+    private final boolean overrideNonModuleCapabilities;
 
-    public UserPreferences(@Nonnull final NetconfSessionPreferences sessionPreferences, boolean override) {
+    public UserPreferences(@Nonnull final NetconfSessionPreferences sessionPreferences,
+            boolean overrideModuleCapabilities, boolean overrideNonModuleCapabilities) {
+
+        if (overrideModuleCapabilities && sessionPreferences.getModuleBasedCaps() == null
+                || sessionPreferences.getModuleBasedCaps().isEmpty()) {
+            throw new IllegalStateException(
+                    "Module Based override flag is true but module based capability is null or empty");
+        }
+        if (overrideNonModuleCapabilities && sessionPreferences.getNonModuleCaps() == null
+                || sessionPreferences.getNonModuleCaps().isEmpty()) {
+            throw new IllegalStateException(
+                    "Non-Module Based override flag is true but non-module based capability is null or empty");
+        }
+
         this.sessionPreferences = sessionPreferences;
-        this.override = override;
+        this.overrideModuleCapabilities = overrideModuleCapabilities;
+        this.overrideNonModuleCapabilities = overrideNonModuleCapabilities;
     }
 
     public NetconfSessionPreferences getSessionPreferences() {
         return sessionPreferences;
     }
 
-    public boolean isOverride() {
-        return override;
+    public boolean isOverrideModuleCapabilities() {
+        return overrideModuleCapabilities;
+    }
+
+    public boolean isOverrideNonModuleCapabilities() {
+        return overrideNonModuleCapabilities;
     }
 
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("UserPreferences{");
         sb.append("sessionPreferences=").append(sessionPreferences);
-        sb.append(", override=").append(override);
+        sb.append(", overrideModuleCapabilities=").append(overrideModuleCapabilities);
+        sb.append(", overrideNonModuleCapabilities=").append(overrideNonModuleCapabilities);
         sb.append('}');
         return sb.toString();
     }

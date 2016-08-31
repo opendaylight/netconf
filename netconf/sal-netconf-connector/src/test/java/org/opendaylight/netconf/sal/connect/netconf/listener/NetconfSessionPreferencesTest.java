@@ -10,7 +10,9 @@ package org.opendaylight.netconf.sal.connect.netconf.listener;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Lists;
 import java.util.List;
@@ -73,6 +75,76 @@ public class NetconfSessionPreferencesTest {
 
         final NetconfSessionPreferences replaced = sessionCaps1.replaceModuleCaps(sessionCaps2);
         assertCaps(replaced, 2, 2);
+    }
+
+    @Test
+    public void testNonModuleMerge() throws Exception {
+        final List<String> caps1 = Lists.newArrayList(
+                "namespace:1?module=module1&revision=2012-12-12",
+                "namespace:2?module=module2&amp;revision=2012-12-12",
+                "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04",
+                "urn:ietf:params:netconf:base:1.0",
+                "urn:ietf:params:netconf:capability:rollback-on-error:1.0",
+                "urn:ietf:params:netconf:capability:candidate:1.0"
+        );
+        final NetconfSessionPreferences sessionCaps1 = NetconfSessionPreferences.fromStrings(caps1);
+        assertCaps(sessionCaps1, 3, 3);
+        assertTrue(sessionCaps1.isCandidateSupported());
+
+        final List<String> caps2 = Lists.newArrayList(
+                "namespace:3?module=module3&revision=2012-12-12",
+                "namespace:4?module=module4&revision=2012-12-12",
+                "urn:ietf:params:netconf:capability:writable-running:1.0",
+                "urn:ietf:params:netconf:capability:notification:1.0"
+        );
+        final NetconfSessionPreferences sessionCaps2 = NetconfSessionPreferences.fromStrings(caps2);
+        assertCaps(sessionCaps2, 2, 2);
+        assertTrue(sessionCaps2.isRunningWritable());
+
+        final NetconfSessionPreferences merged = sessionCaps1.addNonModuleCaps(sessionCaps2);
+
+        assertCaps(merged, 3+2, 3);
+        for (final String capability : sessionCaps2.getNonModuleCaps()) {
+            assertThat(merged.getNonModuleCaps(), hasItem(capability));
+        }
+
+        assertThat(merged.getNonModuleCaps(), hasItem("urn:ietf:params:netconf:base:1.0"));
+        assertThat(merged.getNonModuleCaps(), hasItem("urn:ietf:params:netconf:capability:rollback-on-error:1.0"));
+        assertThat(merged.getNonModuleCaps(), hasItem("urn:ietf:params:netconf:capability:writable-running:1.0"));
+        assertThat(merged.getNonModuleCaps(), hasItem("urn:ietf:params:netconf:capability:notification:1.0"));
+
+        assertTrue(merged.isCandidateSupported());
+        assertTrue(merged.isRunningWritable());
+    }
+
+    @Test
+    public void testNonmoduleReplace() throws Exception {
+        final List<String> caps1 = Lists.newArrayList(
+                "namespace:1?module=module1&revision=2012-12-12",
+                "namespace:2?module=module2&amp;revision=2012-12-12",
+                "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04",
+                "urn:ietf:params:netconf:base:1.0",
+                "urn:ietf:params:netconf:capability:rollback-on-error:1.0",
+                "urn:ietf:params:netconf:capability:candidate:1.0"
+        );
+        final NetconfSessionPreferences sessionCaps1 = NetconfSessionPreferences.fromStrings(caps1);
+        assertCaps(sessionCaps1, 3, 3);
+        assertTrue(sessionCaps1.isCandidateSupported());
+
+        final List<String> caps2 = Lists.newArrayList(
+                "namespace:3?module=module3&revision=2012-12-12",
+                "namespace:4?module=module4&revision=2012-12-12",
+                "randomNonModuleCap",
+                "urn:ietf:params:netconf:capability:writable-running:1.0"
+        );
+        final NetconfSessionPreferences sessionCaps2 = NetconfSessionPreferences.fromStrings(caps2);
+        assertCaps(sessionCaps2, 2, 2);
+        assertTrue(sessionCaps2.isRunningWritable());
+
+        final NetconfSessionPreferences replaced = sessionCaps1.replaceNonModuleCaps(sessionCaps2);
+        assertCaps(replaced, 2, 3);
+        assertFalse(replaced.isCandidateSupported());
+        assertTrue(replaced.isRunningWritable());
     }
 
     @Test
