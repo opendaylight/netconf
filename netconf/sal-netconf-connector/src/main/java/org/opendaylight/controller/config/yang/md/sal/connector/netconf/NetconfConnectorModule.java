@@ -23,6 +23,8 @@ import org.opendaylight.controller.sal.binding.api.BindingAwareConsumer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.NonModuleCapabilities;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.NonModuleCapabilitiesBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.YangModuleCapabilities;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.YangModuleCapabilitiesBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
@@ -144,15 +146,27 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
                 .setUsername(getUsername())
                 .setPassword(getPassword())
                 .build();
-        final YangModuleCapabilities capabilities;
+
+        final YangModuleCapabilities moduleCapabilities;
         if (getYangModuleCapabilities() != null) {
-            capabilities = new YangModuleCapabilitiesBuilder()
+            moduleCapabilities = new YangModuleCapabilitiesBuilder()
                     .setOverride(getYangModuleCapabilities().getOverride())
                     .setCapability(getYangModuleCapabilities().getCapability())
                     .build();
         } else {
-            capabilities = null;
+            moduleCapabilities = null;
         }
+
+        final NonModuleCapabilities nonModuleCapabilities;
+        if(getNonModuleCapabilities() != null) {
+            nonModuleCapabilities = new NonModuleCapabilitiesBuilder()
+                    .setOverride(getNonModuleCapabilities().getOverride())
+                    .setCapability(getNonModuleCapabilities().getCapability())
+                    .build();
+        } else {
+            nonModuleCapabilities = null;
+        }
+
         final YangLibrary yangLibrary;
         if (getYangLibrary() != null) {
             yangLibrary = new YangLibraryBuilder()
@@ -177,7 +191,8 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
                 .setSchemaCacheDirectory(getSchemaCacheDirectory())
                 .setSleepFactor(getSleepFactor())
                 .setTcpOnly(getTcpOnly())
-                .setYangModuleCapabilities(capabilities)
+                .setYangModuleCapabilities(moduleCapabilities)
+                .setNonModuleCapabilities(nonModuleCapabilities)
                 .setYangLibrary(yangLibrary)
                 .build();
         return new NodeBuilder()
