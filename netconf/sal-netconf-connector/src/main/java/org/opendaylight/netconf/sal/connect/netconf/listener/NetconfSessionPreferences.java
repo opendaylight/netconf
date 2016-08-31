@@ -162,6 +162,32 @@ public final class NetconfSessionPreferences {
         return new NetconfSessionPreferences(getNonModuleCaps(), netconfSessionPreferences.getModuleBasedCaps());
     }
 
+
+    /**
+     * Merge non module-based list of capabilities with current list of non module-based capabilities
+     *
+     * @param netconfSessionModuleCapabilities capabilities to merge into this
+     *
+     * @return new instance of preferences with merged non module-based capabilities
+     */
+    public NetconfSessionPreferences addNonModuleCaps(final NetconfSessionPreferences netconfSessionModuleCapabilities) {
+        final HashSet<String> mergedCaps = Sets.newHashSetWithExpectedSize(nonModuleCaps.size() + netconfSessionModuleCapabilities.getNonModuleCaps().size());
+        mergedCaps.addAll(nonModuleCaps);
+        mergedCaps.addAll(netconfSessionModuleCapabilities.getNonModuleCaps());
+        return new NetconfSessionPreferences(mergedCaps, getModuleBasedCaps());
+    }
+
+    /**
+     * Override current list of non module-based capabilities
+     *
+     * @param netconfSessionPreferences capabilities to override in this
+     *
+     * @return new instance of preferences with replaced non module-based capabilities
+     */
+    public NetconfSessionPreferences replaceNonModuleCaps(final NetconfSessionPreferences netconfSessionPreferences) {
+        return new NetconfSessionPreferences(netconfSessionPreferences.getNonModuleCaps(), getModuleBasedCaps());
+    }
+
     public static NetconfSessionPreferences fromNetconfSession(final NetconfClientSession session) {
         return fromStrings(session.getServerCapabilities());
     }
