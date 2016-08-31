@@ -328,6 +328,30 @@
       "revId": "013984f57f19b082ed35ab32a577c13d93149aaa",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_28a4c106",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/NetconfDeviceWriteOnlyTxTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-08-31T16:23:12Z",
+      "side": 1,
+      "message": "Ok I understnad Shouldn\u0027t we make it consistent. And also, I guess we  need to explicitly call submit for the other operation to get the Exception, if any. Should this be done in the AbstractWriteTx?",
+      "parentUuid": "7a6b29fe_dd1fd16a",
+      "range": {
+        "startLine": 135,
+        "startChar": 0,
+        "endLine": 135,
+        "endChar": 20
+      },
+      "revId": "013984f57f19b082ed35ab32a577c13d93149aaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
