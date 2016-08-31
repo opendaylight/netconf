@@ -19,6 +19,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -302,7 +303,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
 
         final NetconfDeviceCommunicator listener = userCapabilities.isPresent() ?
                 new NetconfDeviceCommunicator(id, device,
-                        new UserPreferences(userCapabilities.get(), getYangModuleCapabilities().getOverride()), getConcurrentRpcLimit()):
+                        new UserPreferences(userCapabilities.get(), getYangModuleCapabilities().getOverride(), getYangNonModuleCapabilities().getOverride()), getConcurrentRpcLimit()):
                 new NetconfDeviceCommunicator(id, device, getConcurrentRpcLimit());
 
         if (shouldSendKeepalive()) {
@@ -377,22 +378,19 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
     }
 
     private Optional<NetconfSessionPreferences> getUserCapabilities() {
-        if(getYangModuleCapabilities() == null) {
+        if(isNull(getYangModuleCapabilities()) && isNull(getYangNonModuleCapabilities())) {
             return Optional.absent();
         }
 
-        final List<String> capabilities = getYangModuleCapabilities().getCapability();
-        if(capabilities == null || capabilities.isEmpty()) {
+        if((isNull(getYangModuleCapabilities().getCapability())) && isNull(getYangNonModuleCapabilities().getCapability())) {
             return Optional.absent();
         }
+
+        final List<String> capabilities= new ArrayList<String>();
+        capabilities.addAll(getYangModuleCapabilities().getCapability());
+        capabilities.addAll(getYangNonModuleCapabilities().getCapability());
 
         final NetconfSessionPreferences parsedOverrideCapabilities = NetconfSessionPreferences.fromStrings(capabilities);
-        JmxAttributeValidationException.checkCondition(
-                parsedOverrideCapabilities.getNonModuleCaps().isEmpty(),
-                "Capabilities to override can only contain module based capabilities, non-module capabilities will be retrieved from the device," +
-                        " configured non-module capabilities: " + parsedOverrideCapabilities.getNonModuleCaps(),
-                yangModuleCapabilitiesJmxAttribute);
-
         return Optional.of(parsedOverrideCapabilities);
     }
 
@@ -489,5 +487,13 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
 
     public void setInstanceName(final String instanceName) {
         this.instanceName = instanceName;
+    }
+
+    public static boolean isNull(Object v) {
+        if (v == null)
+            return true;
+        if (v instanceof List && (v==null ||((List) v).isEmpty()))
+            return true;
+        return false;
     }
 }
