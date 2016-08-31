@@ -15,26 +15,33 @@ import javax.annotation.Nonnull;
 public class UserPreferences {
 
     private final NetconfSessionPreferences sessionPreferences;
-    private final boolean override;
+    private final boolean overrideModularCapability;
+    private final boolean overrideNonModularCapability;
 
-    public UserPreferences(@Nonnull final NetconfSessionPreferences sessionPreferences, boolean override) {
+    public UserPreferences(@Nonnull final NetconfSessionPreferences sessionPreferences, boolean overrideModularCapability, boolean overrideNonModularCapability) {
         this.sessionPreferences = sessionPreferences;
-        this.override = override;
+        this.overrideModularCapability = overrideModularCapability;
+        this.overrideNonModularCapability = overrideNonModularCapability;
     }
 
     public NetconfSessionPreferences getSessionPreferences() {
         return sessionPreferences;
     }
 
-    public boolean isOverride() {
-        return override;
+    public boolean isOverrideModularCapability() {
+        return overrideModularCapability;
+    }
+
+    public boolean isOverrideNonModularCapability() {
+        return overrideNonModularCapability;
     }
 
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("UserPreferences{");
         sb.append("sessionPreferences=").append(sessionPreferences);
-        sb.append(", override=").append(override);
+        sb.append(", overrideModularCapability=").append(overrideModularCapability);
+        sb.append(", overrideNonModularCapability=").append(overrideNonModularCapability);
         sb.append('}');
         return sb.toString();
     }
