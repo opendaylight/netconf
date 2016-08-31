@@ -87,15 +87,6 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
      */
     private static final Map<String, NetconfDevice.SchemaResourcesDTO> schemaResourcesDTOs = new HashMap<>();
 
-    private SchemaSourceRegistry schemaRegistry = NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
-    private SchemaRepository schemaRepository = NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
-
-    private final NetconfTopologySetup netconfTopologyDeviceSetup;
-    private final RemoteDeviceId remoteDeviceId;
-
-    private SchemaContextFactory schemaContextFactory = NetconfTopologyUtils.DEFAULT_SCHEMA_CONTEXT_FACTORY;
-    private NetconfConnectorDTO deviceCommunicatorDTO;
-
     // Initializes default constant instances for the case when the default schema repository
     // directory cache/schema is used.
     static {
@@ -109,6 +100,13 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                 TextToASTTransformer.create(NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY,
                         NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY));
     }
+
+    private final NetconfTopologySetup netconfTopologyDeviceSetup;
+    private final RemoteDeviceId remoteDeviceId;
+    private SchemaSourceRegistry schemaRegistry = NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
+    private final SchemaRepository schemaRepository = NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
+    private SchemaContextFactory schemaContextFactory = NetconfTopologyUtils.DEFAULT_SCHEMA_CONTEXT_FACTORY;
+    private NetconfConnectorDTO deviceCommunicatorDTO;
 
     public RemoteDeviceConnectorImpl(final NetconfTopologySetup netconfTopologyDeviceSetup,
                                      final RemoteDeviceId remoteDeviceId) {
@@ -136,12 +134,12 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         Futures.addCallback(future, new FutureCallback<NetconfDeviceCapabilities>() {
             @Override
-            public void onSuccess(NetconfDeviceCapabilities result) {
+            public void onSuccess(final NetconfDeviceCapabilities result) {
                 LOG.debug("{}: Connector started successfully", remoteDeviceId);
             }
 
             @Override
-            public void onFailure(@Nullable Throwable throwable) {
+            public void onFailure(@Nullable final Throwable throwable) {
                 LOG.error("{}: Connector failed, {}", remoteDeviceId, throwable);
             }
         });
@@ -152,14 +150,14 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         Preconditions.checkNotNull(deviceCommunicatorDTO, remoteDeviceId + ": Device communicator was not created.");
         try {
             deviceCommunicatorDTO.close();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOG.error("{}: Error at closing device communicator.", remoteDeviceId, e);
         }
     }
 
     @VisibleForTesting
     NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
-                                                         final ActorRef deviceContextActorRef) {
+                                                 final ActorRef deviceContextActorRef) {
         //setup default values since default value is not supported in mdsal
         final Long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null
                 ? NetconfTopologyUtils.DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
@@ -168,7 +166,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         final Boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null
                 ? NetconfTopologyUtils.DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
 
-        RemoteDeviceHandler<NetconfSessionPreferences> salFacade =  new MasterSalFacade(remoteDeviceId,
+        RemoteDeviceHandler<NetconfSessionPreferences> salFacade = new MasterSalFacade(remoteDeviceId,
                 netconfTopologyDeviceSetup.getDomBroker(), netconfTopologyDeviceSetup.getBindingAwareBroker(),
                 netconfTopologyDeviceSetup.getActorSystem(), deviceContextActorRef);
         if (keepaliveDelay > 0) {
@@ -179,13 +177,13 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         }
 
         // pre register yang library sources as fallback schemas to schema registry
-        List<SchemaSourceRegistration<YangTextSchemaSource>> registeredYangLibSources = Lists.newArrayList();
+        final List<SchemaSourceRegistration<YangTextSchemaSource>> registeredYangLibSources = Lists.newArrayList();
         if (node.getYangLibrary() != null) {
             final String yangLibURL = node.getYangLibrary().getYangLibraryUrl().getValue();
             final String yangLibUsername = node.getYangLibrary().getUsername();
             final String yangLigPassword = node.getYangLibrary().getPassword();
 
-            LibraryModulesSchemas libraryModulesSchemas;
+            final LibraryModulesSchemas libraryModulesSchemas;
             if (yangLibURL != null) {
                 if (yangLibUsername != null && yangLigPassword != null) {
                     libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL, yangLibUsername, yangLigPassword);
@@ -193,7 +191,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                     libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL);
                 }
 
-                for (Map.Entry<SourceIdentifier, URL> sourceIdentifierURLEntry :
+                for (final Map.Entry<SourceIdentifier, URL> sourceIdentifierURLEntry :
                         libraryModulesSchemas.getAvailableModels().entrySet()) {
                     registeredYangLibSources
                             .add(schemaRegistry.registerSchemaSource(
@@ -232,8 +230,9 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         return new NetconfConnectorDTO(
                 userCapabilities.isPresent()
                         ? new NetconfDeviceCommunicator(
-                                remoteDeviceId, device, new UserPreferences(userCapabilities.get(),
-                                node.getYangModuleCapabilities().isOverride()), rpcMessageLimit) :
+                        remoteDeviceId, device, new UserPreferences(userCapabilities.get(),
+                        node.getYangModuleCapabilities().isOverride(), node.getNonModuleCapabilities().isOverride()),
+                        rpcMessageLimit) :
                         new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit), salFacade);
     }
 
@@ -251,8 +250,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                 NetconfSessionPreferences.fromStrings(capabilities);
         Preconditions.checkState(parsedOverrideCapabilities.getNonModuleCaps().isEmpty(), remoteDeviceId +
                 ": Capabilities to override can only contain module based capabilities, non-module capabilities "
-                        + "will be retrieved from the device, configured non-module capabilities: "
-                        + parsedOverrideCapabilities.getNonModuleCaps());
+                + "will be retrieved from the device, configured non-module capabilities: "
+                + parsedOverrideCapabilities.getNonModuleCaps());
 
         return Optional.of(parsedOverrideCapabilities);
     }
@@ -334,7 +333,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     }
 
     //TODO: duplicate code
-    private InetSocketAddress getSocketAddress(final Host host, int port) {
+    private InetSocketAddress getSocketAddress(final Host host, final int port) {
         if (host.getDomainName() != null) {
             return new InetSocketAddress(host.getDomainName().getValue(), port);
         } else {
@@ -345,38 +344,9 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         }
     }
 
-    private static final class TimedReconnectStrategyFactory implements ReconnectStrategyFactory {
-        private final Long connectionAttempts;
-        private final EventExecutor executor;
-        private final double sleepFactor;
-        private final int minSleep;
-
-        TimedReconnectStrategyFactory(final EventExecutor executor, final Long maxConnectionAttempts,
-                                      final int minSleep, final BigDecimal sleepFactor) {
-            if (maxConnectionAttempts != null && maxConnectionAttempts > 0) {
-                connectionAttempts = maxConnectionAttempts;
-            } else {
-                connectionAttempts = null;
-            }
-
-            this.sleepFactor = sleepFactor.doubleValue();
-            this.executor = executor;
-            this.minSleep = minSleep;
-        }
-
-        @Override
-        public ReconnectStrategy createReconnectStrategy() {
-            final Long maxSleep = null;
-            final Long deadline = null;
-
-            return new TimedReconnectStrategy(executor, minSleep,
-                    minSleep, sleepFactor, maxSleep, connectionAttempts, deadline);
-        }
-    }
-
     @VisibleForTesting
     NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener,
-                                                                   final NetconfNode node) {
+                                                           final NetconfNode node) {
 
         //setup default values since default value is not supported in mdsal
         final long clientConnectionTimeoutMillis = node.getConnectionTimeoutMillis() == null
@@ -421,5 +391,34 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     @VisibleForTesting
     Map<String, NetconfDevice.SchemaResourcesDTO> getSchemaResourcesDTOs() {
         return schemaResourcesDTOs;
+    }
+
+    private static final class TimedReconnectStrategyFactory implements ReconnectStrategyFactory {
+        private final Long connectionAttempts;
+        private final EventExecutor executor;
+        private final double sleepFactor;
+        private final int minSleep;
+
+        TimedReconnectStrategyFactory(final EventExecutor executor, final Long maxConnectionAttempts,
+                                      final int minSleep, final BigDecimal sleepFactor) {
+            if (maxConnectionAttempts != null && maxConnectionAttempts > 0) {
+                connectionAttempts = maxConnectionAttempts;
+            } else {
+                connectionAttempts = null;
+            }
+
+            this.sleepFactor = sleepFactor.doubleValue();
+            this.executor = executor;
+            this.minSleep = minSleep;
+        }
+
+        @Override
+        public ReconnectStrategy createReconnectStrategy() {
+            final Long maxSleep = null;
+            final Long deadline = null;
+
+            return new TimedReconnectStrategy(executor, minSleep,
+                    minSleep, sleepFactor, maxSleep, connectionAttempts, deadline);
+        }
     }
 }
