@@ -352,6 +352,30 @@
       "revId": "013984f57f19b082ed35ab32a577c13d93149aaa",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_28404106",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/NetconfDeviceWriteOnlyTxTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-08-31T16:31:49Z",
+      "side": 1,
+      "message": "Yeah, but this is out of the scope of this fix. You would have to somehow cache all operations and construct one \"aggregated\" editconfig, and on submit send this big edit config to device. But this can be done as an improvement in next releases.\n\nI think submit should call user. Why do you want to do it in AbstractTx?",
+      "parentUuid": "7a6b29fe_28a4c106",
+      "range": {
+        "startLine": 135,
+        "startChar": 0,
+        "endLine": 135,
+        "endChar": 20
+      },
+      "revId": "013984f57f19b082ed35ab32a577c13d93149aaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
