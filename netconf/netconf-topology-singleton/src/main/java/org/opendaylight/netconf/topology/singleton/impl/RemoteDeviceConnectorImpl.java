@@ -21,6 +21,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +58,7 @@ import org.opendaylight.protocol.framework.TimedReconnectStrategy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
@@ -87,15 +89,6 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
      */
     private static final Map<String, NetconfDevice.SchemaResourcesDTO> schemaResourcesDTOs = new HashMap<>();
 
-    private SchemaSourceRegistry schemaRegistry = NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
-    private SchemaRepository schemaRepository = NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
-
-    private final NetconfTopologySetup netconfTopologyDeviceSetup;
-    private final RemoteDeviceId remoteDeviceId;
-
-    private SchemaContextFactory schemaContextFactory = NetconfTopologyUtils.DEFAULT_SCHEMA_CONTEXT_FACTORY;
-    private NetconfConnectorDTO deviceCommunicatorDTO;
-
     // Initializes default constant instances for the case when the default schema repository
     // directory cache/schema is used.
     static {
@@ -109,6 +102,13 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                 TextToASTTransformer.create(NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY,
                         NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY));
     }
+
+    private final NetconfTopologySetup netconfTopologyDeviceSetup;
+    private final RemoteDeviceId remoteDeviceId;
+    private SchemaSourceRegistry schemaRegistry = NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
+    private final SchemaRepository schemaRepository = NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
+    private SchemaContextFactory schemaContextFactory = NetconfTopologyUtils.DEFAULT_SCHEMA_CONTEXT_FACTORY;
+    private NetconfConnectorDTO deviceCommunicatorDTO;
 
     public RemoteDeviceConnectorImpl(final NetconfTopologySetup netconfTopologyDeviceSetup,
                                      final RemoteDeviceId remoteDeviceId) {
@@ -136,12 +136,12 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         Futures.addCallback(future, new FutureCallback<NetconfDeviceCapabilities>() {
             @Override
-            public void onSuccess(NetconfDeviceCapabilities result) {
+            public void onSuccess(final NetconfDeviceCapabilities result) {
                 LOG.debug("{}: Connector started successfully", remoteDeviceId);
             }
 
             @Override
-            public void onFailure(@Nullable Throwable throwable) {
+            public void onFailure(@Nullable final Throwable throwable) {
                 LOG.error("{}: Connector failed, {}", remoteDeviceId, throwable);
             }
         });
@@ -152,14 +152,14 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         Preconditions.checkNotNull(deviceCommunicatorDTO, remoteDeviceId + ": Device communicator was not created.");
         try {
             deviceCommunicatorDTO.close();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOG.error("{}: Error at closing device communicator.", remoteDeviceId, e);
         }
     }
 
     @VisibleForTesting
     NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
-                                                         final ActorRef deviceContextActorRef) {
+                                                 final ActorRef deviceContextActorRef) {
         //setup default values since default value is not supported in mdsal
         final Long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null
                 ? NetconfTopologyUtils.DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
@@ -168,7 +168,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         final Boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null
                 ? NetconfTopologyUtils.DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
 
-        RemoteDeviceHandler<NetconfSessionPreferences> salFacade =  new MasterSalFacade(remoteDeviceId,
+        RemoteDeviceHandler<NetconfSessionPreferences> salFacade = new MasterSalFacade(remoteDeviceId,
                 netconfTopologyDeviceSetup.getDomBroker(), netconfTopologyDeviceSetup.getBindingAwareBroker(),
                 netconfTopologyDeviceSetup.getActorSystem(), deviceContextActorRef);
         if (keepaliveDelay > 0) {
@@ -179,13 +179,13 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         }
 
         // pre register yang library sources as fallback schemas to schema registry
-        List<SchemaSourceRegistration<YangTextSchemaSource>> registeredYangLibSources = Lists.newArrayList();
+        final List<SchemaSourceRegistration<YangTextSchemaSource>> registeredYangLibSources = Lists.newArrayList();
         if (node.getYangLibrary() != null) {
             final String yangLibURL = node.getYangLibrary().getYangLibraryUrl().getValue();
             final String yangLibUsername = node.getYangLibrary().getUsername();
             final String yangLigPassword = node.getYangLibrary().getPassword();
 
-            LibraryModulesSchemas libraryModulesSchemas;
+            final LibraryModulesSchemas libraryModulesSchemas;
             if (yangLibURL != null) {
                 if (yangLibUsername != null && yangLigPassword != null) {
                     libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL, yangLibUsername, yangLigPassword);
@@ -193,7 +193,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                     libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL);
                 }
 
-                for (Map.Entry<SourceIdentifier, URL> sourceIdentifierURLEntry :
+                for (final Map.Entry<SourceIdentifier, URL> sourceIdentifierURLEntry :
                         libraryModulesSchemas.getAvailableModels().entrySet()) {
                     registeredYangLibSources
                             .add(schemaRegistry.registerSchemaSource(
@@ -232,29 +232,33 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         return new NetconfConnectorDTO(
                 userCapabilities.isPresent()
                         ? new NetconfDeviceCommunicator(
-                                remoteDeviceId, device, new UserPreferences(userCapabilities.get(),
-                                node.getYangModuleCapabilities().isOverride()), rpcMessageLimit) :
+                        remoteDeviceId, device, new UserPreferences(userCapabilities.get(),
+                        node.getYangModuleCapabilities().isOverride(), node.getNonModuleCapabilities().isOverride()),
+                        rpcMessageLimit) :
                         new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit), salFacade);
     }
 
     private Optional<NetconfSessionPreferences> getUserCapabilities(final NetconfNode node) {
-        if (node.getYangModuleCapabilities() == null) {
+        if (node.getYangModuleCapabilities() == null && node.getNonModuleCapabilities() == null) {
             return Optional.empty();
         }
+        final List<String> capabilities = new ArrayList<>();
 
-        final List<String> capabilities = node.getYangModuleCapabilities().getCapability();
-        if (capabilities == null || capabilities.isEmpty()) {
-            return Optional.empty();
+        if (node.getYangModuleCapabilities() != null) {
+            capabilities.addAll(node.getYangModuleCapabilities().getCapability());
         }
 
-        final NetconfSessionPreferences parsedOverrideCapabilities =
-                NetconfSessionPreferences.fromStrings(capabilities);
-        Preconditions.checkState(parsedOverrideCapabilities.getNonModuleCaps().isEmpty(), remoteDeviceId +
-                ": Capabilities to override can only contain module based capabilities, non-module capabilities "
-                        + "will be retrieved from the device, configured non-module capabilities: "
-                        + parsedOverrideCapabilities.getNonModuleCaps());
+        //non-module capabilities should not exist in yang module capabilities
+        final NetconfSessionPreferences netconfSessionPreferences = NetconfSessionPreferences.fromStrings(capabilities);
+        Preconditions.checkState(netconfSessionPreferences.getNonModuleCaps().isEmpty(), "List yang-module-capabilities/capability " +
+                "should contain only module based capabilities. Non-module capabilities used: " +
+                netconfSessionPreferences.getNonModuleCaps());
 
-        return Optional.of(parsedOverrideCapabilities);
+        if (node.getNonModuleCapabilities() != null) {
+            capabilities.addAll(node.getNonModuleCapabilities().getCapability());
+        }
+
+        return Optional.of(NetconfSessionPreferences.fromStrings(capabilities, CapabilityOrigin.UserDefined));
     }
 
     private NetconfDevice.SchemaResourcesDTO setupSchemaCacheDTO(final NodeId nodeId, final NetconfNode node) {
@@ -334,7 +338,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     }
 
     //TODO: duplicate code
-    private InetSocketAddress getSocketAddress(final Host host, int port) {
+    private InetSocketAddress getSocketAddress(final Host host, final int port) {
         if (host.getDomainName() != null) {
             return new InetSocketAddress(host.getDomainName().getValue(), port);
         } else {
@@ -345,38 +349,9 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         }
     }
 
-    private static final class TimedReconnectStrategyFactory implements ReconnectStrategyFactory {
-        private final Long connectionAttempts;
-        private final EventExecutor executor;
-        private final double sleepFactor;
-        private final int minSleep;
-
-        TimedReconnectStrategyFactory(final EventExecutor executor, final Long maxConnectionAttempts,
-                                      final int minSleep, final BigDecimal sleepFactor) {
-            if (maxConnectionAttempts != null && maxConnectionAttempts > 0) {
-                connectionAttempts = maxConnectionAttempts;
-            } else {
-                connectionAttempts = null;
-            }
-
-            this.sleepFactor = sleepFactor.doubleValue();
-            this.executor = executor;
-            this.minSleep = minSleep;
-        }
-
-        @Override
-        public ReconnectStrategy createReconnectStrategy() {
-            final Long maxSleep = null;
-            final Long deadline = null;
-
-            return new TimedReconnectStrategy(executor, minSleep,
-                    minSleep, sleepFactor, maxSleep, connectionAttempts, deadline);
-        }
-    }
-
     @VisibleForTesting
     NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener,
-                                                                   final NetconfNode node) {
+                                                           final NetconfNode node) {
 
         //setup default values since default value is not supported in mdsal
         final long clientConnectionTimeoutMillis = node.getConnectionTimeoutMillis() == null
@@ -421,5 +396,34 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     @VisibleForTesting
     Map<String, NetconfDevice.SchemaResourcesDTO> getSchemaResourcesDTOs() {
         return schemaResourcesDTOs;
+    }
+
+    private static final class TimedReconnectStrategyFactory implements ReconnectStrategyFactory {
+        private final Long connectionAttempts;
+        private final EventExecutor executor;
+        private final double sleepFactor;
+        private final int minSleep;
+
+        TimedReconnectStrategyFactory(final EventExecutor executor, final Long maxConnectionAttempts,
+                                      final int minSleep, final BigDecimal sleepFactor) {
+            if (maxConnectionAttempts != null && maxConnectionAttempts > 0) {
+                connectionAttempts = maxConnectionAttempts;
+            } else {
+                connectionAttempts = null;
+            }
+
+            this.sleepFactor = sleepFactor.doubleValue();
+            this.executor = executor;
+            this.minSleep = minSleep;
+        }
+
+        @Override
+        public ReconnectStrategy createReconnectStrategy() {
+            final Long maxSleep = null;
+            final Long deadline = null;
+
+            return new TimedReconnectStrategy(executor, minSleep,
+                    minSleep, sleepFactor, maxSleep, connectionAttempts, deadline);
+        }
     }
 }
