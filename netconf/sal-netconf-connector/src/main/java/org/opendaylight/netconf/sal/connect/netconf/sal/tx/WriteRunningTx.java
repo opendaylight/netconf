@@ -14,6 +14,9 @@ import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
+import java.util.List;
+import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
@@ -76,11 +79,10 @@ public class WriteRunningTx extends AbstractWriteTx {
 
             @Override
             public void onFailure(Throwable t) {
-                LOG.warn("Lock running operation failed. {}", t);
-                throw new RuntimeException(id + ": Failed to lock running datastore", t);
+                LOG.warn("{}: Lock running operation failed. {}", id, t);
             }
         };
-        netOps.lockRunning(lockCallback);
+        operationsList.add(netOps.lockRunning(lockCallback));
     }
 
     @Override
@@ -115,7 +117,8 @@ public class WriteRunningTx extends AbstractWriteTx {
     @Override
     public synchronized ListenableFuture<RpcResult<TransactionStatus>> performCommit() {
         unlock();
-        return Futures.immediateFuture(RpcResultBuilder.success(TransactionStatus.COMMITED).build());
+
+        return transform(Futures.allAsList(operationsList));
     }
 
     @Override
@@ -138,16 +141,14 @@ public class WriteRunningTx extends AbstractWriteTx {
 
             @Override
             public void onFailure(Throwable t) {
-                LOG.warn("Edit running operation failed. {}", t);
-                NetconfDocumentedException e = new NetconfDocumentedException(id + ": Edit running operation failed.", NetconfDocumentedException.ErrorType.application,
-                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
-                handleEditException(path, data.orNull(), e, operation);
+                LOG.warn("{}: Error {} data to (running){}, data: {}", id, operation, path, data.orNull(), t);
             }
         };
         if (defaultOperation.isPresent()) {
-            netOps.editConfigRunning(editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport);
+            operationsList.add(
+                    netOps.editConfigRunning(editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport));
         } else {
-            netOps.editConfigRunning(editConfigCallback, editStructure, rollbackSupport);
+            operationsList.add(netOps.editConfigRunning(editConfigCallback, editStructure, rollbackSupport));
         }
     }
 

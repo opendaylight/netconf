@@ -10,7 +10,12 @@ package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
+import java.util.List;
 import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
@@ -19,6 +24,7 @@ import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.common.RpcResult;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -34,6 +40,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
     protected final RemoteDeviceId id;
     protected final NetconfBaseOps netOps;
     protected final boolean rollbackSupport;
+    protected final List<ListenableFuture<DOMRpcResult>> operationsList;
     // Allow commit to be called only once
     protected boolean finished = false;
 
@@ -41,6 +48,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
         this.netOps = netOps;
         this.id = id;
         this.rollbackSupport = rollbackSupport;
+        this.operationsList = Lists.newArrayList();
         init();
     }
 
@@ -138,4 +146,32 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
     }
 
     protected abstract void editConfig(final YangInstanceIdentifier path, final Optional<NormalizedNode<?, ?>> data, final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> defaultOperation, final String operation);
+
+    protected ListenableFuture<RpcResult<TransactionStatus>> transform(final ListenableFuture<List<DOMRpcResult>> list) {
+        final SettableFuture<RpcResult<TransactionStatus>> transformed = SettableFuture.create();
+
+        Futures.addCallback(list, new FutureCallback<List<DOMRpcResult>>() {
+            @Override
+            public void onSuccess(final List<DOMRpcResult> domRpcResults) {
+                domRpcResults.forEach(domRpcResult -> {
+                    if(!domRpcResult.getErrors().isEmpty() && !transformed.isDone()) {
+                        transformed.setException(new RuntimeException());
+                        cleanup();
+                    }
+                });
+
+                if(!transformed.isDone()) {
+                    transformed.set(RpcResultBuilder.success(TransactionStatus.COMMITED).build());
+                    cleanup();
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                transformed.setException(throwable);
+            }
+        });
+
+        return transformed;
+    }
 }
