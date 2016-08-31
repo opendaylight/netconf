@@ -66,6 +66,23 @@ module netconf-node-topology {
             }
         }
 
+        container non-module-capabilities {
+            config true;
+            leaf override {
+                type boolean;
+                default false;
+                description "Whether to override or merge this list of non-module based capabilities with non-module
+                             based capabilities from device";
+            }
+
+            leaf-list capability {
+                type string;
+                description "Set a list of non-module based capabilities to override or merge non-module capabilities
+                             provided in device's hello message. Can be used for devices that do not report or
+                             incorrectly report non-module based capabilities in their hello message";
+            }
+        }
+
         leaf reconnect-on-changed-schema {
             config true;
             type boolean;

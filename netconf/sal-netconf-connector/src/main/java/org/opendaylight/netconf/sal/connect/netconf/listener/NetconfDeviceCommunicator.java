@@ -108,15 +108,19 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             LOG.trace("{}: Session advertised capabilities: {}", id,
                     netconfSessionPreferences);
 
-            if(overrideNetconfCapabilities.isPresent()) {
-                netconfSessionPreferences = overrideNetconfCapabilities.get().isOverride() ?
-                        netconfSessionPreferences.replaceModuleCaps(overrideNetconfCapabilities.get().getSessionPreferences()) :
-                        netconfSessionPreferences.addModuleCaps(overrideNetconfCapabilities.get().getSessionPreferences());
-                LOG.debug(
-                        "{}: Session capabilities overridden, capabilities that will be used: {}",
-                        id, netconfSessionPreferences);
-            }
+            if (overrideNetconfCapabilities.isPresent()) {
+                final NetconfSessionPreferences sessionPreferences = overrideNetconfCapabilities
+                        .get().getSessionPreferences();
+                netconfSessionPreferences = overrideNetconfCapabilities.get().moduleBasedCapsOverrided()
+                        ? netconfSessionPreferences.replaceModuleCaps(sessionPreferences)
+                        : netconfSessionPreferences.addModuleCaps(sessionPreferences);
 
+                netconfSessionPreferences = overrideNetconfCapabilities.get().nonModuleBasedCapsOverrided()
+                        ? netconfSessionPreferences.replaceNonModuleCaps(sessionPreferences)
+                        : netconfSessionPreferences.addNonModuleCaps(sessionPreferences);
+                LOG.debug("{}: Session capabilities overridden, capabilities that will be used: {}", id,
+                        netconfSessionPreferences);
+            }
 
             remoteDevice.onRemoteSessionUp(netconfSessionPreferences, this);
             if (!firstConnectionFuture.isDone()) {
@@ -361,8 +365,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             return Futures.immediateFuture( createSessionDownRpcResult() );
         }
 
-        final Request req = new Request( new UncancellableFuture<RpcResult<NetconfMessage>>(true),
-                                         message );
+        final Request req = new Request(new UncancellableFuture<>(true), message);
         requests.add(req);
 
         session.sendMessage(req.request).addListener(new FutureListener<Void>() {
