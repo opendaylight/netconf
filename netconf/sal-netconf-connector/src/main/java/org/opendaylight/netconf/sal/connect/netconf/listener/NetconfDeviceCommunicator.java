@@ -108,13 +108,20 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             LOG.trace("{}: Session advertised capabilities: {}", id,
                     netconfSessionPreferences);
 
-            if(overrideNetconfCapabilities.isPresent()) {
-                netconfSessionPreferences = overrideNetconfCapabilities.get().isOverride() ?
-                        netconfSessionPreferences.replaceModuleCaps(overrideNetconfCapabilities.get().getSessionPreferences()) :
-                        netconfSessionPreferences.addModuleCaps(overrideNetconfCapabilities.get().getSessionPreferences());
-                LOG.debug(
-                        "{}: Session capabilities overridden, capabilities that will be used: {}",
-                        id, netconfSessionPreferences);
+            if (overrideNetconfCapabilities.isPresent()) {
+                netconfSessionPreferences = overrideNetconfCapabilities.get().moduleBasedCapsOverrided()
+                        ? netconfSessionPreferences
+                                .replaceModuleCaps(overrideNetconfCapabilities.get().getSessionPreferences())
+                        : netconfSessionPreferences
+                                .addModuleCaps(overrideNetconfCapabilities.get().getSessionPreferences());
+
+                netconfSessionPreferences = overrideNetconfCapabilities.get().nonModuleBasedCapsOverrided()
+                        ? netconfSessionPreferences
+                                .replaceNonModuleCaps(overrideNetconfCapabilities.get().getSessionPreferences())
+                        : netconfSessionPreferences
+                                .addNonModuleCaps(overrideNetconfCapabilities.get().getSessionPreferences());
+                LOG.debug("{}: Session capabilities overridden, capabilities that will be used: {}", id,
+                        netconfSessionPreferences);
             }
 
 

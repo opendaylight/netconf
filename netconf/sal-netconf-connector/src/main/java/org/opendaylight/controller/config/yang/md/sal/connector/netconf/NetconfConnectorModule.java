@@ -10,10 +10,8 @@ package org.opendaylight.controller.config.yang.md.sal.connector.netconf;
 import static org.opendaylight.controller.config.api.JmxAttributeValidationException.checkCondition;
 import static org.opendaylight.controller.config.api.JmxAttributeValidationException.checkNotNull;
 
-import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import javax.annotation.Nullable;
+
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -25,6 +23,8 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.YangModuleCapabilities;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.YangModuleCapabilitiesBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.YangNonModuleCapabilities;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.YangNonModuleCapabilitiesBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.schema.storage.YangLibrary;
@@ -40,6 +40,10 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 
 /**
  *
@@ -135,7 +139,6 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
                     LOG.error("Node {} deletion failed: {}", instanceName, t);
                 }
             });
-
         }
     }
 
@@ -153,6 +156,17 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         } else {
             capabilities = null;
         }
+
+        final YangNonModuleCapabilities nonModuleCapabilities;
+        if (getYangNonModuleCapabilities() != null) {
+            nonModuleCapabilities = new YangNonModuleCapabilitiesBuilder()
+                    .setOverride(getYangNonModuleCapabilities().getOverride())
+                    .setCapability(getYangNonModuleCapabilities().getCapability())
+                    .build();
+        } else {
+            nonModuleCapabilities = null;
+        }
+
         final YangLibrary yangLibrary;
         if (getYangLibrary() != null) {
             yangLibrary = new YangLibraryBuilder()
@@ -163,6 +177,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         } else {
             yangLibrary = null;
         }
+
         final NetconfNode netconfNode = new NetconfNodeBuilder()
                 .setHost(getAddress())
                 .setPort(getPort())
@@ -178,6 +193,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
                 .setSleepFactor(getSleepFactor())
                 .setTcpOnly(getTcpOnly())
                 .setYangModuleCapabilities(capabilities)
+                .setYangNonModuleCapabilities(nonModuleCapabilities)
                 .setYangLibrary(yangLibrary)
                 .build();
         return new NodeBuilder()
@@ -186,4 +202,5 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
                 .addAugmentation(NetconfNode.class, netconfNode)
                 .build();
     }
+
 }
