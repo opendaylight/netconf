@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
@@ -52,6 +53,7 @@ import org.slf4j.LoggerFactory;
  *   <li>Commit and Unlock candidate datastore async</li>
  * </ol>
  */
+//TODO replace custom RPCs future callbacks with NetconfRpcFutureCallback
 public class WriteCandidateTx extends AbstractWriteTx {
 
     private static final Logger LOG  = LoggerFactory.getLogger(WriteCandidateTx.class);
@@ -104,20 +106,13 @@ public class WriteCandidateTx extends AbstractWriteTx {
                 throw new RuntimeException(e);
             }
         };
-        netOps.lockCandidate(lockCandidateCallback);
+        resultsFutures.add(netOps.lockCandidate(lockCandidateCallback));
     }
 
     @Override
     protected void cleanup() {
         discardChanges();
         cleanupOnSuccess();
-    }
-
-    @Override
-    protected void handleEditException(final YangInstanceIdentifier path, final NormalizedNode<?, ?> data, final NetconfDocumentedException e, final String editType) {
-        LOG.warn("{}: Error {} data to (candidate){}, data: {}, canceling", id, editType, path, data, e);
-        cancel();
-        throw new RuntimeException(id + ": Error while " + editType + ": (candidate)" + path, e);
     }
 
     @Override
@@ -147,28 +142,24 @@ public class WriteCandidateTx extends AbstractWriteTx {
 
     @Override
     public synchronized ListenableFuture<RpcResult<TransactionStatus>> performCommit() {
-        final ListenableFuture<DOMRpcResult> rpcResult = netOps.commit(new NetconfRpcFutureCallback("Commit", id) {
+        resultsFutures.add(netOps.commit(new NetconfRpcFutureCallback("Commit", id)));
+        ListenableFuture<RpcResult<TransactionStatus>> txResult = resultsToTxStatus();
+
+        Futures.addCallback(txResult, new FutureCallback<RpcResult<TransactionStatus>>() {
             @Override
-            public void onSuccess(final DOMRpcResult result) {
-                super.onSuccess(result);
-                LOG.debug("{}: Write successful, transaction: {}. Unlocking", id, getIdentifier());
+            public void onSuccess(@Nullable RpcResult<TransactionStatus> result) {
                 cleanupOnSuccess();
             }
 
             @Override
-            protected void onUnsuccess(final DOMRpcResult result) {
-                LOG.error("{}: Write failed, transaction {}, discarding changes, unlocking: {}", id, getIdentifier(), result.getErrors());
-                cleanup();
-            }
-
-            @Override
-            public void onFailure(final Throwable t) {
-                LOG.error("{}: Write failed, transaction {}, discarding changes, unlocking", id, getIdentifier(), t);
+            public void onFailure(Throwable t) {
+                // TODO If lock is cause of this failure cleanup will issue warning log
+                // cleanup is trying to do unlock, but this will fail
                 cleanup();
             }
         });
 
-        return Futures.transform(rpcResult, RPC_RESULT_TO_TX_STATUS);
+        return txResult;
     }
 
     protected void cleanupOnSuccess() {
@@ -196,15 +187,13 @@ public class WriteCandidateTx extends AbstractWriteTx {
             @Override
             public void onFailure(Throwable t) {
                 LOG.warn("Edit candidate operation failed. {}", t);
-                NetconfDocumentedException e = new NetconfDocumentedException(id + ": Edit candidate operation failed.", NetconfDocumentedException.ErrorType.application,
-                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
-                handleEditException(path, data.orNull(), e, operation);
             }
         };
         if (defaultOperation.isPresent()) {
-            netOps.editConfigCandidate(editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport);
+            resultsFutures.add(netOps.editConfigCandidate(
+                    editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport));
         } else {
-            netOps.editConfigCandidate(editConfigCallback, editStructure, rollbackSupport);
+            resultsFutures.add(netOps.editConfigCandidate(editConfigCallback, editStructure, rollbackSupport));
         }
     }
 
