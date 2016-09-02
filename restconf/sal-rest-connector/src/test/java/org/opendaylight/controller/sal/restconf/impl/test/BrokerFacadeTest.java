@@ -9,8 +9,10 @@
 package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -48,6 +50,9 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.sal.core.api.Broker.ConsumerSession;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
+import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
+import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
+import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.PutResult;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
@@ -71,11 +76,23 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
  * @author Thomas Pantelis
  */
 public class BrokerFacadeTest {
-    @Mock private DOMDataBroker domDataBroker;
-    @Mock private DOMNotificationService domNotification;
-    @Mock private ConsumerSession context;
-    @Mock private DOMRpcService mockRpcService;
-    @Mock private DOMMountPoint mockMountInstance;
+
+    @Mock
+    private DOMDataBroker domDataBroker;
+    @Mock
+    private DOMNotificationService domNotification;
+    @Mock
+    private ConsumerSession context;
+    @Mock
+    private DOMRpcService mockRpcService;
+    @Mock
+    private DOMMountPoint mockMountInstance;
+    @Mock
+    private DOMDataReadOnlyTransaction rTransaction;
+    @Mock
+    private DOMDataWriteTransaction wTransaction;
+    @Mock
+    private DOMDataReadWriteTransaction rwTransaction;
 
     private final BrokerFacade brokerFacade = BrokerFacade.getInstance();
     private final NormalizedNode<?, ?> dummyNode = createDummyNode("test:module", "2014-01-09", "interfaces");
@@ -84,10 +101,6 @@ public class BrokerFacadeTest {
     private final QName qname = TestUtils.buildQName("interfaces","test:module", "2014-01-09");
     private final SchemaPath type = SchemaPath.create(true, qname);
     private final YangInstanceIdentifier instanceID = YangInstanceIdentifier.builder().node(qname).build();
-
-    @Mock private DOMDataReadOnlyTransaction rTransaction;
-    @Mock private DOMDataWriteTransaction wTransaction;
-    @Mock private DOMDataReadWriteTransaction rwTransaction;
 
     @Before
     public void setUp() throws Exception {
@@ -338,5 +351,92 @@ public class BrokerFacadeTest {
         // close and remove test notification listener
         listener.close();
         Notificator.removeNotificationListenerIfNoSubscriberExists(listener);
+    }
+
+    /**
+     * Test PATCH method on the server with no data
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testPatchConfigurationDataWithinTransactionServer() throws Exception {
+        final PATCHContext patchContext = mock(PATCHContext.class);
+        final InstanceIdentifierContext identifierContext = mock(InstanceIdentifierContext.class);
+        final CheckedFuture<Void, TransactionCommitFailedException> expFuture = Futures.immediateCheckedFuture(null);
+
+        when(patchContext.getData()).thenReturn(Lists.newArrayList());
+        when(patchContext.getInstanceIdentifierContext()).thenReturn(identifierContext);
+
+        // no mount point
+        when(identifierContext.getMountPoint()).thenReturn(null);
+
+        when(this.rwTransaction.submit()).thenReturn(expFuture);
+
+        final PATCHStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
+
+        // assert success
+        assertTrue("PATCH operation should be successful on server", status.isOk());
+    }
+
+    /**
+     * Test PATCH method on mounted device with no data
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testPatchConfigurationDataWithinTransactionMount() throws Exception {
+        final PATCHContext patchContext = mock(PATCHContext.class);
+        final InstanceIdentifierContext identifierContext = mock(InstanceIdentifierContext.class);
+        final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
+        final DOMDataBroker mountDataBroker = mock(DOMDataBroker.class);
+        final DOMDataReadWriteTransaction transaction = mock(DOMDataReadWriteTransaction.class);
+        final CheckedFuture<Void, TransactionCommitFailedException> expFuture = Futures.immediateCheckedFuture(null);
+
+        when(patchContext.getData()).thenReturn(Lists.newArrayList());
+        when(patchContext.getInstanceIdentifierContext()).thenReturn(identifierContext);
+
+        // return mount point with broker
+        when(identifierContext.getMountPoint()).thenReturn(mountPoint);
+        when(mountPoint.getService(DOMDataBroker.class)).thenReturn(Optional.of(mountDataBroker));
+        when(mountDataBroker.newReadWriteTransaction()).thenReturn(transaction);
+        when(transaction.submit()).thenReturn(expFuture);
+
+        final PATCHStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
+
+        // assert success
+        assertTrue("PATCH operation should be successful on mounted device", status.isOk());
+    }
+
+    /**
+     * Negative test for PATCH operation when mounted device does not support {@link DOMDataBroker service.
+     * PATCH operation should fail with global error.
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testPatchConfigurationDataWithinTransactionMountFail() throws Exception {
+        final PATCHContext patchContext = mock(PATCHContext.class);
+        final InstanceIdentifierContext identifierContext = mock(InstanceIdentifierContext.class);
+        final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
+        final DOMDataBroker mountDataBroker = mock(DOMDataBroker.class);
+        final DOMDataReadWriteTransaction transaction = mock(DOMDataReadWriteTransaction.class);
+        final CheckedFuture<Void, TransactionCommitFailedException> expFuture = Futures.immediateCheckedFuture(null);
+
+        when(patchContext.getData()).thenReturn(Lists.newArrayList());
+        when(patchContext.getInstanceIdentifierContext()).thenReturn(identifierContext);
+        when(identifierContext.getMountPoint()).thenReturn(mountPoint);
+
+        // missing broker on mounted device
+        when(mountPoint.getService(DOMDataBroker.class)).thenReturn(Optional.absent());
+
+        when(mountDataBroker.newReadWriteTransaction()).thenReturn(transaction);
+        when(transaction.submit()).thenReturn(expFuture);
+
+        final PATCHStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
+
+        // assert not successful operation with error
+        assertNotNull(status.getGlobalErrors());
+        assertEquals(1, status.getGlobalErrors().size());
+        assertEquals(ErrorType.APPLICATION, status.getGlobalErrors().get(0).getErrorType());
+        assertEquals(ErrorTag.OPERATION_FAILED, status.getGlobalErrors().get(0).getErrorTag());
+
+        assertFalse("PATCH operation should fail on mounted device without Broker", status.isOk());
     }
 }
