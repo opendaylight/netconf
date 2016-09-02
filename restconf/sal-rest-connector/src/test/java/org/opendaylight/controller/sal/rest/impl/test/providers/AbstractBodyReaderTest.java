@@ -100,4 +100,10 @@ public abstract class AbstractBodyReaderTest {
         assertNotNull(patchContext.getInstanceIdentifierContext().getSchemaContext());
         assertNotNull(patchContext.getInstanceIdentifierContext().getSchemaNode());
     }
+
+    protected static void checkPATCHContextMountPoint(final PATCHContext patchContext) {
+        checkPATCHContext(patchContext);
+        assertNotNull(patchContext.getInstanceIdentifierContext().getMountPoint());
+        assertNotNull(patchContext.getInstanceIdentifierContext().getMountPoint().getSchemaContext());
+    }
 }
