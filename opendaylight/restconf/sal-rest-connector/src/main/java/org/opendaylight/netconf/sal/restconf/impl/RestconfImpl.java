@@ -1056,8 +1056,8 @@ public class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
         try {
-            return broker.patchConfigurationDataWithinTransaction(context, controllerContext.getGlobalSchema());
-        } catch (TransactionCommitFailedException e) {
+            return broker.patchConfigurationDataWithinTransaction(context);
+        } catch (Exception e) {
             LOG.debug("Patch transaction failed", e);
             throw new RestconfDocumentedException(e.getMessage());
         }
@@ -1069,8 +1069,8 @@ public class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
         try {
-            return broker.patchConfigurationDataWithinTransaction(context, controllerContext.getGlobalSchema());
-        } catch (TransactionCommitFailedException e) {
+            return broker.patchConfigurationDataWithinTransaction(context);
+        } catch (Exception e) {
             LOG.debug("Patch transaction failed", e);
             throw new RestconfDocumentedException(e.getMessage());
         }
