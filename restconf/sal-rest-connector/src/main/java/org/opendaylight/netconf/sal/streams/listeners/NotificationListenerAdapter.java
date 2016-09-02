@@ -207,9 +207,9 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
         final Element eventTimeElement = doc.createElement("eventTime");
         eventTimeElement.setTextContent(ListenerAdapter.toRFC3339(new Date()));
         notificationElement.appendChild(eventTimeElement);
-
+        final String notificationNamespace = notification.getType().getLastComponent().getNamespace().toString();
         final Element notificationEventElement = doc.createElementNS(
-                "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "create-notification-stream");
+                notificationNamespace, "event");
         addValuesToNotificationEventElement(doc, notificationEventElement, notification, schemaContext);
         notificationElement.appendChild(notificationEventElement);
 
@@ -243,9 +243,7 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
             final DOMResult domResult = writeNormalizedNode(body,
                     YangInstanceIdentifier.create(body.getIdentifier()), schemaContext);
             final Node result = doc.importNode(domResult.getNode().getFirstChild(), true);
-            final Element dataElement = doc.createElement("notification");
-            dataElement.appendChild(result);
-            element.appendChild(dataElement);
+            element.appendChild(result);
         } catch (final IOException e) {
             LOG.error("Error in writer ", e);
         } catch (final XMLStreamException e) {
@@ -385,6 +383,6 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
      * Type of the event.
      */
     private enum EventType {
-        REGISTER, DEREGISTER, NOTIFY;
+        REGISTER, DEREGISTER, NOTIFY
     }
 }
