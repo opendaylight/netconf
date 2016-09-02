@@ -186,16 +186,34 @@ public class BrokerFacade {
         throw new RestconfDocumentedException(errMsg);
     }
 
-    public PATCHStatusContext patchConfigurationDataWithinTransaction(final PATCHContext context,
-                                                                      final SchemaContext globalSchema)
-            throws Exception {
-        final DOMDataReadWriteTransaction patchTransaction = this.domDataBroker.newReadWriteTransaction();
+    public PATCHStatusContext patchConfigurationDataWithinTransaction(final PATCHContext patchContext) throws Exception
+    {
+        final DOMMountPoint mountPoint = patchContext.getInstanceIdentifierContext().getMountPoint();
+
+        // get new transaction and schema context on server or on mounted device
+        final SchemaContext schemaContext;
+        final DOMDataReadWriteTransaction patchTransaction;
+        if (mountPoint == null) {
+            schemaContext = patchContext.getInstanceIdentifierContext().getSchemaContext();
+            patchTransaction = this.domDataBroker.newReadWriteTransaction();
+        } else {
+            schemaContext = mountPoint.getSchemaContext();
+
+            final Optional<DOMDataBroker> optional = mountPoint.getService(DOMDataBroker.class);
+
+            if (optional.isPresent()) {
+                patchTransaction = optional.get().newReadWriteTransaction();
+            } else {
+                return null;
+            }
+        }
+
         final List<PATCHStatusEntity> editCollection = new ArrayList<>();
 
         List<RestconfError> editErrors;
         int errorCounter = 0;
 
-        for (final PATCHEntity patchEntity : context.getData()) {
+        for (final PATCHEntity patchEntity : patchContext.getData()) {
             final PATCHEditOperation operation = PATCHEditOperation.valueOf(patchEntity.getOperation().toUpperCase());
 
             switch (operation) {
@@ -203,7 +221,7 @@ public class BrokerFacade {
                     if (errorCounter == 0) {
                         try {
                             postDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity.getTargetNode(),
-                                    patchEntity.getNode(), globalSchema);
+                                    patchEntity.getNode(), schemaContext);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editErrors = new ArrayList<>();
@@ -217,7 +235,7 @@ public class BrokerFacade {
                     if (errorCounter == 0) {
                         try {
                             putDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
-                                    .getTargetNode(), patchEntity.getNode(), globalSchema);
+                                    .getTargetNode(), patchEntity.getNode(), schemaContext);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editErrors = new ArrayList<>();
@@ -257,7 +275,7 @@ public class BrokerFacade {
                     if (errorCounter == 0) {
                         try {
                             mergeDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity.getTargetNode(),
-                                    patchEntity.getNode(), globalSchema);
+                                    patchEntity.getNode(), schemaContext);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
                             editErrors = new ArrayList<>();
@@ -273,7 +291,7 @@ public class BrokerFacade {
         // if errors then cancel transaction and return error status
         if (errorCounter != 0) {
             patchTransaction.cancel();
-            return new PATCHStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), false, null);
+            return new PATCHStatusContext(patchContext.getPatchId(), ImmutableList.copyOf(editCollection), false, null);
         }
 
         // if no errors commit transaction
@@ -284,7 +302,7 @@ public class BrokerFacade {
         Futures.addCallback(future, new FutureCallback<Void>() {
             @Override
             public void onSuccess(@Nullable final Void result) {
-                status.setStatus(new PATCHStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection),
+                status.setStatus(new PATCHStatusContext(patchContext.getPatchId(), ImmutableList.copyOf(editCollection),
                         true, null));
                 waiter.countDown();
             }
@@ -292,7 +310,7 @@ public class BrokerFacade {
             @Override
             public void onFailure(final Throwable t) {
                 // if commit failed it is global error
-                status.setStatus(new PATCHStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection),
+                status.setStatus(new PATCHStatusContext(patchContext.getPatchId(), ImmutableList.copyOf(editCollection),
                         false, Lists.newArrayList(
                         new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, t.getMessage()))));
                 waiter.countDown();
