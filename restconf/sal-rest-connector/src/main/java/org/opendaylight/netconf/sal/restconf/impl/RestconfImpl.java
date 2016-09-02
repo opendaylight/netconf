@@ -1122,9 +1122,8 @@ public class RestconfImpl implements RestconfService {
         }
 
         try {
-            return this.broker.patchConfigurationDataWithinTransaction(context,
-                    this.controllerContext.getGlobalSchema());
-        } catch (final Exception e) {
+            return this.broker.patchConfigurationDataWithinTransaction(context);
+        } catch (final InterruptedException e) {
             LOG.debug("Patch transaction failed", e);
             throw new RestconfDocumentedException(e.getMessage());
         }
@@ -1137,9 +1136,8 @@ public class RestconfImpl implements RestconfService {
         }
 
         try {
-            return this.broker.patchConfigurationDataWithinTransaction(context,
-                    this.controllerContext.getGlobalSchema());
-        } catch (final Exception e) {
+            return this.broker.patchConfigurationDataWithinTransaction(context);
+        } catch (final InterruptedException e) {
             LOG.debug("Patch transaction failed", e);
             throw new RestconfDocumentedException(e.getMessage());
         }
