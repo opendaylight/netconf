@@ -136,84 +136,135 @@ public class BrokerFacade {
         throw new RestconfDocumentedException(errMsg);
     }
 
-    public PATCHStatusContext patchConfigurationDataWithinTransaction(final PATCHContext context,
-                                                                      final SchemaContext globalSchema)
+    public PATCHStatusContext patchConfigurationDataWithinTransaction(final PATCHContext patchContext)
             throws TransactionCommitFailedException {
-        final DOMDataReadWriteTransaction patchTransaction = this.domDataBroker.newReadWriteTransaction();
+        final DOMMountPoint mountPoint = patchContext.getInstanceIdentifierContext().getMountPoint();
+
+        // get new transaction and schema context on server or on mounted device
+        final SchemaContext schemaContext;
+        final DOMDataReadWriteTransaction patchTransaction;
+        if (mountPoint == null) {
+            schemaContext = patchContext.getInstanceIdentifierContext().getSchemaContext();
+            patchTransaction = this.domDataBroker.newReadWriteTransaction();
+        } else {
+            schemaContext = mountPoint.getSchemaContext();
+
+            final Optional<DOMDataBroker> optional = mountPoint.getService(DOMDataBroker.class);
+
+            if (optional.isPresent()) {
+                patchTransaction = optional.get().newReadWriteTransaction();
+            } else {
+                // if mount point does not have broker it is not possible to continue and global error is reported
+                LOG.error("Http PATCH {} has failed - device {} does not support broker service",
+                        patchContext.getPatchId(), mountPoint.getIdentifier());
+                return new PATCHStatusContext(
+                        patchContext.getPatchId(),
+                        null,
+                        false,
+                        ImmutableList.of(new RestconfError(
+                                ErrorType.APPLICATION,
+                                ErrorTag.OPERATION_FAILED,
+                                "DOM data broker service isn't available for mount point "
+                                        + mountPoint.getIdentifier()))
+                );
+            }
+        }
+
         final List<PATCHStatusEntity> editCollection = new ArrayList<>();
         List<RestconfError> editErrors;
-        final List<RestconfError> globalErrors = null;
-        int errorCounter = 0;
+        boolean withoutError = true;
 
-        for (final PATCHEntity patchEntity : context.getData()) {
+        for (final PATCHEntity patchEntity : patchContext.getData()) {
             final PATCHEditOperation operation = PATCHEditOperation.valueOf(patchEntity.getOperation().toUpperCase());
 
             switch (operation) {
                 case CREATE:
-                    if (errorCounter == 0) {
+                    if (withoutError) {
                         try {
                             postDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity.getTargetNode(),
-                                    patchEntity.getNode(), globalSchema);
+                                    patchEntity.getNode(), schemaContext);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
+                            LOG.error("Error call http PATCH operation {} on target {}",
+                                    operation,
+                                    patchEntity.getTargetNode().toString());
+
                             editErrors = new ArrayList<>();
                             editErrors.addAll(e.getErrors());
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
-                            errorCounter++;
+                            withoutError = false;
                         }
                     }
                     break;
                 case REPLACE:
-                    if (errorCounter == 0) {
+                    if (withoutError) {
                         try {
                             putDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
-                                    .getTargetNode(), patchEntity.getNode(), globalSchema);
+                                    .getTargetNode(), patchEntity.getNode(), schemaContext);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
+                            LOG.error("Error call http PATCH operation {} on target {}",
+                                    operation,
+                                    patchEntity.getTargetNode().toString());
+
                             editErrors = new ArrayList<>();
                             editErrors.addAll(e.getErrors());
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
-                            errorCounter++;
+                            withoutError = false;
                         }
                     }
                     break;
                 case DELETE:
-                    if (errorCounter == 0) {
+                    if (withoutError) {
                         try {
                             deleteDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
                                     .getTargetNode());
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
+                            LOG.error("Error call http PATCH operation {} on target {}",
+                                    operation,
+                                    patchEntity.getTargetNode().toString());
+
                             editErrors = new ArrayList<>();
                             editErrors.addAll(e.getErrors());
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
-                            errorCounter++;
+                            withoutError = false;
                         }
                     }
                     break;
                 case REMOVE:
-                    if (errorCounter == 0) {
+                    if (withoutError) {
                         try {
                             deleteDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
                                     .getTargetNode());
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
-                            LOG.error("Error removing {} by {} operation", patchEntity.getTargetNode().toString(),
-                                    patchEntity.getEditId(), e);
+                            LOG.error("Error call http PATCH operation {} on target {}",
+                                    operation,
+                                    patchEntity.getTargetNode().toString());
+
+                            editErrors = new ArrayList<>();
+                            editErrors.addAll(e.getErrors());
+                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
+                            withoutError = false;
                         }
                     }
                     break;
                 case MERGE:
-                    if (errorCounter == 0) {
+                    if (withoutError) {
                         try {
                             mergeDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity.getTargetNode(),
-                                    patchEntity.getNode(), globalSchema);
+                                    patchEntity.getNode(), schemaContext);
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
+                            LOG.error("Error call http PATCH operation {} on target {}",
+                                    operation,
+                                    patchEntity.getTargetNode().toString());
+
                             editErrors = new ArrayList<>();
                             editErrors.addAll(e.getErrors());
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
-                            errorCounter++;
+                            withoutError = false;
                         }
                     }
                     break;
@@ -221,15 +272,12 @@ public class BrokerFacade {
         }
 
         //TODO: make sure possible global errors are filled up correctly and decide transaction submission based on that
-        //globalErrors = new ArrayList<>();
-        if (errorCounter == 0) {
+        if (withoutError) {
             patchTransaction.submit().checkedGet();
-            return new PATCHStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), true,
-                    globalErrors);
+            return new PATCHStatusContext(patchContext.getPatchId(), ImmutableList.copyOf(editCollection), true, null);
         } else {
             patchTransaction.cancel();
-            return new PATCHStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), false,
-                    globalErrors);
+            return new PATCHStatusContext(patchContext.getPatchId(), ImmutableList.copyOf(editCollection), false, null);
         }
     }
 
@@ -366,13 +414,13 @@ public class BrokerFacade {
             final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
             rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
             ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
-            for(final MapEntryNode child : ((MapNode) payload).getValue()) {
+            for (final MapEntryNode child : ((MapNode) payload).getValue()) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
                 checkItemDoesNotExists(rWTransaction, datastore, childPath);
                 rWTransaction.put(datastore, childPath, child);
             }
         } else {
-            checkItemDoesNotExists(rWTransaction,datastore, path);
+            checkItemDoesNotExists(rWTransaction, datastore, path);
             ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
             rWTransaction.put(datastore, path, payload);
         }
