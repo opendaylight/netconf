@@ -28,6 +28,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPrefe
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.util.messages.AnnounceMasterMountPoint;
+import org.opendaylight.netconf.topology.pipeline.messages.MasterMountPointRequest;
 import org.opendaylight.netconf.topology.util.messages.AnnounceMasterMountPointDown;
 import org.opendaylight.netconf.util.NetconfTopologyPathCreator;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -106,10 +107,10 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
         salProvider.getMountInstance().publish(domNotification);
     }
 
-    public void registerMountPoint(final ActorSystem actorSystem, final ActorContext context) {
+    public ActorRef registerMountPoint(final ActorSystem actorSystem, final ActorContext context) {
         if (remoteSchemaContext == null || netconfSessionPreferences == null) {
             LOG.debug("Master mount point does not have schemas ready yet, delaying registration");
-            return;
+            return null;
         }
 
         Preconditions.checkNotNull(id);
@@ -137,6 +138,7 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
                 actorSystem.actorSelection(path).tell(new AnnounceMasterMountPoint(), deviceDataBrokerRef);
             }
         }
+        return deviceDataBrokerRef;
     }
 
     public void registerMountPoint(final ActorSystem actorSystem, final ActorContext context, final ActorRef masterRef) {
@@ -190,6 +192,19 @@ public class TopologyMountPointFacade implements AutoCloseable, RemoteDeviceHand
                 resource.close();
             } catch (final Exception e) {
                 LOG.warn("{}: Ignoring exception while closing {}", id, resource, e);
+            }
+        }
+    }
+
+    public void askForMasterMountPoint(final ActorSystem actorSystem, final ActorContext context) {
+        final Cluster cluster = Cluster.get(actorSystem);
+        final Iterable<Member> members = cluster.state().getMembers();
+        // we do not know who is master, we ask all members of cluster
+        for (final Member member : members) {
+            if (!member.address().equals(cluster.selfAddress())) {
+                final NetconfTopologyPathCreator pathCreator = new NetconfTopologyPathCreator(member.address().toString(),topologyId);
+                final String path = pathCreator.withSuffix(id.getName()).build();
+                actorSystem.actorSelection(path).tell(new MasterMountPointRequest(), context.self());
             }
         }
     }
