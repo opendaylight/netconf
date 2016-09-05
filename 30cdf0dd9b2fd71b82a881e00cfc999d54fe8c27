@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_b9a13796",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/SchemalessNetconfDeviceTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T17:27:08Z",
+      "side": 1,
+      "message": "Why also 2015?",
+      "revId": "30cdf0dd9b2fd71b82a881e00cfc999d54fe8c27",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_59b8e3c7",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/SchemalessNetconfDeviceTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T17:27:08Z",
+      "side": 1,
+      "message": "You can annotate just problematic statements, not the whole class.",
+      "revId": "30cdf0dd9b2fd71b82a881e00cfc999d54fe8c27",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_19ab0b76",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapterTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T17:27:08Z",
+      "side": 1,
+      "message": "testRemoveDeviceConfiguration()",
+      "revId": "30cdf0dd9b2fd71b82a881e00cfc999d54fe8c27",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
