@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_b9e5b70a",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T17:04:30Z",
+      "side": 1,
+      "message": "unused import",
+      "revId": "9a048350bc4d686dba3289747ff0642801851cdd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_39c1a754",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/NetconfTopology.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T17:04:30Z",
+      "side": 1,
+      "message": "remove whitespaces and *",
+      "revId": "9a048350bc4d686dba3289747ff0642801851cdd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_99b27b04",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/NetconfTopology.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T17:04:30Z",
+      "side": 1,
+      "message": "I don\u0027t think new line is needed here",
+      "revId": "9a048350bc4d686dba3289747ff0642801851cdd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_39a8878c",
+        "filename": "netconf/netconf-topology/src/test/java/org/opendaylight/netconf/topology/impl/NetconfNodeManagerCallbackTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T17:04:30Z",
+      "side": 1,
+      "message": "Some comments about what happens in each test would be helpful",
+      "revId": "9a048350bc4d686dba3289747ff0642801851cdd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
