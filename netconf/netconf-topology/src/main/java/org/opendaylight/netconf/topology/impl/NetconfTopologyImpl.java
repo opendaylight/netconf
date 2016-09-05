@@ -85,13 +85,18 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
     }
 
     @Override
-    public void registerMountPoint(ActorContext context, NodeId nodeId) {
+    public ActorRef registerMountPoint(ActorContext context, NodeId nodeId) {
         throw new UnsupportedOperationException("MountPoint registration is not supported in regular topology, this happens automaticaly in the netconf pipeline");
     }
 
     @Override
     public void registerMountPoint(ActorContext context, NodeId nodeId, ActorRef masterRef) {
         throw new UnsupportedOperationException("MountPoint registration is not supported in regular topology, this happens automaticaly in the netconf pipeline");
+    }
+
+    @Override
+    public void askForMasterMountPoint(ActorContext self, NodeId nodeId) {
+        throw new UnsupportedOperationException("Ask for MountPoint registration is not supported in regular topology, this happens automaticaly in the netconf pipeline");
     }
 
     @Override

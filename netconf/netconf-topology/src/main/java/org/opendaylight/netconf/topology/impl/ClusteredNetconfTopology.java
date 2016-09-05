@@ -178,8 +178,8 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
     }
 
     @Override
-    public void registerMountPoint(final ActorContext context, final NodeId nodeId) {
-        ((TopologyMountPointFacade) activeConnectors.get(nodeId).getFacade()).registerMountPoint(actorSystem, context);
+    public ActorRef registerMountPoint(final ActorContext context, final NodeId nodeId) {
+        return ((TopologyMountPointFacade) activeConnectors.get(nodeId).getFacade()).registerMountPoint(actorSystem, context);
     }
 
     @Override
@@ -188,9 +188,17 @@ public class ClusteredNetconfTopology extends AbstractNetconfTopology implements
     }
 
     @Override
+    public void askForMasterMountPoint(final ActorContext context, final NodeId nodeId){
+        ((TopologyMountPointFacade) activeConnectors.get(nodeId).getFacade()).askForMasterMountPoint(actorSystem, context);
+    }
+
+    @Override
     public void unregisterMountPoint(final NodeId nodeId) {
-        Preconditions.checkState(activeConnectors.containsKey(nodeId), "Cannot unregister nonexistent mountpoint");
-        ((TopologyMountPointFacade) activeConnectors.get(nodeId).getFacade()).unregisterMountPoint();
+        if (activeConnectors.containsKey(nodeId)) {
+            ((TopologyMountPointFacade) activeConnectors.get(nodeId).getFacade()).unregisterMountPoint();
+            return;
+        }
+        LOG.warn("Tried to unregister nonexistent mountpoint.");
     }
 
     @Override
