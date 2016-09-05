@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_9efc2174",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientSessionNegotiator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T14:15:19Z",
+      "side": 1,
+      "message": "Please add this new line back",
+      "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_5e14499f",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/impl/NetconfCommandsImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T14:15:19Z",
+      "side": 1,
+      "message": "I think, list of available capabilities is enough. Don\u0027t know if there is a need for information about sideloading.",
+      "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_1e1e51bb",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/impl/NetconfCommandsImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T14:15:19Z",
+      "side": 1,
+      "message": "Same applies here",
+      "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_7e5dc578",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T14:15:19Z",
+      "side": 1,
+      "message": "Why not use Java 8 stream API?",
+      "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_f3a46e4c",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T14:15:19Z",
+      "side": 1,
+      "message": "No need for a new line, please remove it",
+      "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_7ed4a5bc",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T14:15:19Z",
+      "side": 1,
+      "message": "There are usages of this method, that want just list of QNames of module based capabilities. Aren\u0027t there option of keeping this method intact? Adding some other method which will return overrided capabilities or something similliar?",
+      "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_7e85c505",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T14:15:19Z",
+      "side": 1,
+      "message": "return moduleBasedCaps.containsKey(capability);",
+      "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_3e96ad3f",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T14:15:19Z",
+      "side": 1,
+      "message": "Since, the behavior is somehow different now, maybe you should rename this method, to reflect this new behavior.",
+      "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_be7abd21",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T14:15:19Z",
+      "side": 1,
+      "message": "Please add comment, why this is adding just NetconfLoading capabilities.",
+      "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_5ec9e924",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 5
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T14:15:19Z",
+      "side": 1,
+      "message": "Is this really the best name? This is more related to overriding capabilities from hello message than about schema loading",
+      "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_3380a6bf",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 5
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T14:15:19Z",
+      "side": 1,
+      "message": "Are there not better names then side-loading and netconf-loading? Also please add description to these enums, so we know, what do they mean.",
+      "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
