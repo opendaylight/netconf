@@ -43,7 +43,6 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -301,12 +300,17 @@ public class AbstractNetconfTopologyTest {
         }
 
         @Override
-        public void registerMountPoint(ActorContext context, NodeId nodeId) {
-
+        public ActorRef registerMountPoint(ActorContext context, NodeId nodeId) {
+            return null;
         }
 
         @Override
         public void registerMountPoint(ActorContext context, NodeId nodeId, ActorRef masterRef) {
+
+        }
+
+        @Override
+        public void askForMountPoint(ActorContext context, NodeId nodeId) {
 
         }
 
