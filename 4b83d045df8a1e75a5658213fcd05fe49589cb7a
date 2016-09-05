@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_799cbf5d",
+        "filename": "netconf/mdsal-netconf-notification/src/test/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/OperationalDatastoreListenerTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-05T17:13:32Z",
+      "side": 1,
+      "message": "You don\u0027t have to annotate whole class, just specific asigment should be enough. But anyway, can  you just create or reuse some InstanceIdentifier for testing purposes?",
+      "revId": "4b83d045df8a1e75a5658213fcd05fe49589cb7a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
