@@ -10,6 +10,7 @@ package org.opendaylight.restconf.restful.services.impl;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.TimeZone;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -52,7 +53,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private final TransactionChainHandler transactionChainHandler;
 
     public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
-            final TransactionChainHandler transactionChainHandler) {
+                                   final TransactionChainHandler transactionChainHandler) {
         this.schemaContextHandler = schemaContextHandler;
         this.transactionChainHandler = transactionChainHandler;
     }
@@ -67,12 +68,13 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final String value = uriInfo.getQueryParameters().getFirst(RestconfDataServiceConstant.CONTENT);
 
-        DOMTransactionChain transaction = null;
+        final DOMTransactionChain transaction;
         if (mountPoint == null) {
             transaction = this.transactionChainHandler.get();
         } else {
             transaction = transactionOfMountPoint(mountPoint);
         }
+
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(instanceIdentifier, mountPoint,
                 transaction);
         final NormalizedNode<?, ?> node = ReadDataTransactionUtil.readData(value, transactionNode);
@@ -86,11 +88,11 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
         final String etag = '"' + node.getNodeType().getModule().getFormattedRevision()
                 + node.getNodeType().getLocalName() + '"';
-        Response resp = null;
+        final Response resp;
 
         if ((value == null) || value.contains(RestconfDataServiceConstant.ReadData.CONFIG)) {
             resp = Response.status(200).entity(new NormalizedNodeContext(instanceIdentifier, node)).header("ETag", etag)
-                    .header("Last-Modified", dateFormatGmt.toString()).build();
+                    .header("Last-Modified", dateFormatGmt.format(new Date())).build();
         } else {
             resp = Response.status(200).entity(new NormalizedNodeContext(instanceIdentifier, node)).build();
         }
@@ -99,7 +101,6 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response putData(final String identifier, final NormalizedNodeContext payload) {
-        Preconditions.checkNotNull(identifier);
         Preconditions.checkNotNull(payload);
 
         final InstanceIdentifierContext<? extends SchemaNode> iid = payload
@@ -110,8 +111,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         PutDataTransactionUtil.validateListKeysEqualityInPayloadAndUri(payload);
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        DOMTransactionChain transaction = null;
-        SchemaContextRef ref = null;
+        final DOMTransactionChain transaction;
+        final SchemaContextRef ref;
         if (mountPoint == null) {
             transaction = this.transactionChainHandler.get();
             ref = new SchemaContextRef(this.schemaContextHandler.get());
@@ -135,8 +136,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         Preconditions.checkNotNull(payload);
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        DOMTransactionChain transaction = null;
-        SchemaContextRef ref = null;
+        final DOMTransactionChain transaction;
+        final SchemaContextRef ref;
         if (mountPoint == null) {
             transaction = this.transactionChainHandler.get();
             ref = new SchemaContextRef(this.schemaContextHandler.get());
@@ -170,7 +171,6 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public PATCHStatusContext patchData(final String identifier, final PATCHContext context, final UriInfo uriInfo) {
-        Preconditions.checkNotNull(identifier);
         return patchData(context, uriInfo);
     }
 
