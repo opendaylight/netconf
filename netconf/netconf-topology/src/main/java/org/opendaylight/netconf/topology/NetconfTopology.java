@@ -33,8 +33,9 @@ public interface NetconfTopology {
      * register master mount point
      * @param context
      * @param nodeId
+     * @return master data broker ref
      */
-    void registerMountPoint(ActorContext context, NodeId nodeId);
+    ActorRef registerMountPoint(ActorContext context, NodeId nodeId);
 
     /**
      * register slave mountpoint with the provided ActorRef
@@ -43,6 +44,13 @@ public interface NetconfTopology {
      * @param masterRef
      */
     void registerMountPoint(ActorContext context, NodeId nodeId, ActorRef masterRef);
+
+    /**
+     * ask for registering mount point for provided ActorContext
+     * @param context
+     * @param nodeId
+     */
+    void askForMountPoint(ActorContext context, NodeId nodeId);
 
     void unregisterMountPoint(NodeId nodeId);
 

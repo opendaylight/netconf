@@ -46,6 +46,7 @@ import org.opendaylight.netconf.topology.pipeline.TopologyMountPointFacade.Conne
 import org.opendaylight.netconf.topology.util.BaseNodeManager;
 import org.opendaylight.netconf.topology.util.BaseTopologyManager;
 import org.opendaylight.netconf.topology.util.messages.AnnounceMasterMountPoint;
+import org.opendaylight.netconf.topology.util.messages.AnnounceMasterMountPointAsk;
 import org.opendaylight.netconf.topology.util.messages.AnnounceMasterMountPointDown;
 import org.opendaylight.netconf.util.NetconfTopologyPathCreator;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
@@ -365,10 +366,9 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
         connected = true;
         if (isMaster) {
             LOG.debug("Master is done with schema resolution, registering mount point");
-            topologyDispatcher.registerMountPoint(TypedActor.context(), new NodeId(nodeId));
-        } else if (masterDataBrokerRef != null) {
-            LOG.warn("Device connected, master already present in topology, registering mount point");
-            topologyDispatcher.registerMountPoint(cachedContext, new NodeId(nodeId), masterDataBrokerRef);
+            masterDataBrokerRef = topologyDispatcher.registerMountPoint(TypedActor.context(), new NodeId(nodeId));
+        } else {
+            topologyDispatcher.askForMountPoint(cachedContext, new NodeId(nodeId));
         }
 
         List<String> capabilityList = new ArrayList<>();
@@ -478,11 +478,12 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
 
     @Override
     public void onReceive(Object message, ActorRef actorRef) {
-        LOG.debug("Netconf node callback received message {}", message);
+        LOG.warn("Netconf node callback received message {}", message);
         if (message instanceof AnnounceMasterMountPoint) {
             masterDataBrokerRef = actorRef;
             // candidate gets registered when mount point is already prepared so we can go ahead a register it
             if (connected) {
+                topologyDispatcher.unregisterMountPoint(new NodeId(nodeId));
                 topologyDispatcher.registerMountPoint(TypedActor.context(), new NodeId(nodeId), masterDataBrokerRef);
             } else {
                 LOG.debug("Announce master mount point msg received but mount point is not ready yet");
@@ -491,6 +492,15 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
             LOG.debug("Master mountpoint went down");
             masterDataBrokerRef = null;
             topologyDispatcher.unregisterMountPoint(new NodeId(nodeId));
+        } else if (message instanceof AnnounceMasterMountPointAsk) {
+            // if node ask, master sends message for registering mount point
+            if (isMaster){
+                LOG.warn("Node with path: {} ask for mount point. Sending message for registering mount point. ",
+                        actorRef.path());
+                if (masterDataBrokerRef != null) {
+                    actorRef.tell(new AnnounceMasterMountPoint(), masterDataBrokerRef);
+                }
+            }
         }
     }
 
@@ -517,4 +527,5 @@ public class NetconfNodeManagerCallback implements NodeManagerCallback, NetconfC
     public void onMessage(NetconfClientSession netconfClientSession, NetconfMessage netconfMessage) {
         //NOOP
     }
+
 }
