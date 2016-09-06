@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.restful.services.impl;
 
-import com.google.common.base.Strings;
 import java.net.URI;
 import java.util.Map;
 import javax.ws.rs.core.Response;
@@ -63,11 +62,6 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         }
 
         final String streamName = Notificator.createStreamNameFromUri(identifier);
-        if (Strings.isNullOrEmpty(streamName)) {
-            final String msg = "Stream name is empty.";
-            LOG.warn(msg);
-            throw new RestconfDocumentedException(msg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-        }
 
         final ListenerAdapter listener = Notificator.getListenerFor(streamName);
         SubscribeToStreamUtil.registration(ds, scope, listener, this.domDataBrokerHandler.get());
