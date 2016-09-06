@@ -74,7 +74,52 @@ public class NetconfToNotificationTest {
         assertNotNull(root);
         assertEquals(6, Iterables.size(root.getValue()));
         assertEquals("user-visited-page", root.getNodeType().getLocalName());
-        assertEquals(new SimpleDateFormat(NetconfNotification.RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT).parse("2015-10-23T09:42:27.67175+00:00"),
+        assertEquals(new SimpleDateFormat(NetconfNotification.RFC3339DateFormatWithMillisBlueprint(6)).parse("2015-10-23T09:42:27.67175+00:00"),
+                ((DOMEvent) domNotification).getEventTime());
+    }
+
+    @Test
+    public void testEventTimeWithNoMilliSecond() throws Exception {
+        final NetconfMessage message = new NetconfMessage(XmlUtil.readXmlToDocument(
+                "<notification xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\">" +
+                "<eventTime>2015-10-23T09:42:27Z</eventTime>" +
+                "<user-visited-page xmlns=\"org:opendaylight:notification:test:ns:yang:user-notification\">" +
+                "</user-visited-page>" +
+                "</notification>"
+        ));
+
+        final DOMNotification domNotification = messageTransformer.toNotification(message);
+        assertEquals(new SimpleDateFormat(NetconfNotification.RFC3339_DATE_FORMAT_BLUEPRINT).parse("2015-10-23T09:42:27Z"),
+                ((DOMEvent) domNotification).getEventTime());
+    }
+
+    @Test
+    public void testEventTimeWith2DigitsMilliSecond() throws Exception {
+        final NetconfMessage message = new NetconfMessage(XmlUtil.readXmlToDocument(
+                "<notification xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\">" +
+                "<eventTime>2015-10-23T09:42:27.20Z</eventTime>" +
+                "<user-visited-page xmlns=\"org:opendaylight:notification:test:ns:yang:user-notification\">" +
+                "</user-visited-page>" +
+                "</notification>"
+        ));
+
+        final DOMNotification domNotification = messageTransformer.toNotification(message);
+        assertEquals(new SimpleDateFormat(NetconfNotification.RFC3339DateFormatWithMillisBlueprint(2)).parse("2015-10-23T09:42:27.20Z"),
+                ((DOMEvent) domNotification).getEventTime());
+    }
+
+    @Test
+    public void testEventTimeWith6DigitsMilliSecond() throws Exception {
+        final NetconfMessage message = new NetconfMessage(XmlUtil.readXmlToDocument(
+                "<notification xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\">" +
+                "<eventTime>2015-10-23T09:42:27.200001Z</eventTime>" +
+                "<user-visited-page xmlns=\"org:opendaylight:notification:test:ns:yang:user-notification\">" +
+                "</user-visited-page>" +
+                "</notification>"
+        ));
+
+        final DOMNotification domNotification = messageTransformer.toNotification(message);
+        assertEquals(new SimpleDateFormat(NetconfNotification.RFC3339DateFormatWithMillisBlueprint(6)).parse("2015-10-23T09:42:27.200001Z"),
                 ((DOMEvent) domNotification).getEventTime());
     }
 }
