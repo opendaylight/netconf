@@ -25,7 +25,7 @@ public final class AsyncSshHandlerReader implements SshFutureListener<IoReadFutu
 
     private static final Logger LOG = LoggerFactory.getLogger(AsyncSshHandlerReader.class);
 
-    private static final int BUFFER_SIZE = 8192;
+    private static final int BUFFER_SIZE = 2048;
 
     private final AutoCloseable connectionClosedCallback;
     private final ReadMsgHandler readHandler;
