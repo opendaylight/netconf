@@ -9,6 +9,8 @@
 package org.opendaylight.netconf.notifications;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -23,10 +25,6 @@ public final class NetconfNotification extends NetconfMessage {
     public static final String NOTIFICATION = "notification";
     public static final String NOTIFICATION_NAMESPACE = "urn:ietf:params:netconf:capability:notification:1.0";
     public static final String RFC3339_DATE_FORMAT_BLUEPRINT = "yyyy-MM-dd'T'HH:mm:ssXXX";
-    // The format with milliseconds is a bit fragile, it cannot be used for timestamps without millis (thats why its a separate format)
-    // + it might not work properly with more than 6 digits
-    // TODO try to find a better solution with Java8
-    public static final String RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX";
     public static final String EVENT_TIME = "eventTime";
 
     /**
@@ -46,6 +44,10 @@ public final class NetconfNotification extends NetconfMessage {
      */
     public NetconfNotification(final Document notificationContent, final Date eventTime) {
         super(wrapNotification(notificationContent, eventTime));
+    }
+
+    public static final String RFC3339DateFormatWithMillisBlueprint(int digits) {
+        return "yyyy-MM-dd'T'HH:mm:ss." + Strings.repeat("S", digits) + "XXX";
     }
 
     private static Document wrapNotification(final Document notificationContent, final Date eventTime) {
