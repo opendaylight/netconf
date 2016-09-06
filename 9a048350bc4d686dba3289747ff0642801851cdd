@@ -67,6 +67,24 @@
       "revId": "9a048350bc4d686dba3289747ff0642801851cdd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_3106db86",
+        "filename": "netconf/netconf-topology/src/test/java/org/opendaylight/netconf/topology/impl/NetconfNodeManagerCallbackTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T11:47:41Z",
+      "side": 1,
+      "message": "I added few comments but I do not mean that they are needed.",
+      "parentUuid": "7a6b29fe_39a8878c",
+      "revId": "9a048350bc4d686dba3289747ff0642801851cdd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
