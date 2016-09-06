@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_bf7ab721",
+        "filename": "features/netconf/pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "I tested it before but it did not work, no config file was created in karaf etc folder.",
+      "parentUuid": "7a6b29fe_390c07ed",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_590743ca",
         "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/osgi/NetconfSSHActivator.java",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-05T16:46:59Z",
       "side": 1,
       "message": "Again, netconfConfiguration can be null. I think we should do something about it.",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_bfc8f755",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/osgi/NetconfSSHActivator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Possible solutions:\n1. throw exception,\n2. make default config object.\nIn my opinion, default configuration is in the file so I added throwing exception. But it can be changed.",
+      "parentUuid": "7a6b29fe_590743ca",
       "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -70,6 +106,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_3f54e7fd",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigUtil.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_59010304",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_b9493733",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigUtil.java",
         "patchSetId": 3
@@ -81,6 +135,24 @@
       "writtenOn": "2016-09-05T16:46:59Z",
       "side": 1,
       "message": "Isn\u0027t there better method from OSGI API to get service reference we need?",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_1f600bce",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigUtil.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "No or I do not know about it. There can be many services registered as ManagedService, so we have to find the right. All managed services are registered with name: ManagedService.class.getName(), if not it is not registered as Managed Service. This is the problem, we cannot identify exactly the one according name.",
+      "parentUuid": "7a6b29fe_b9493733",
       "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -104,6 +176,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_3fd7c74c",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Yes, but I do not want immutable attributes, it should be possible to set new values with karaf (in code: through update method) and when we restart bundle, it starts with new config values.",
+      "parentUuid": "7a6b29fe_1ea8111f",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_beae3d2c",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
         "patchSetId": 3
@@ -115,6 +205,24 @@
       "writtenOn": "2016-09-05T16:46:59Z",
       "side": 1,
       "message": "What does this P_ prefix mean?",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_3f0ce7ec",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "I forgot and I have no idea what I thought. Maybe pass in meaning like key word. I change it for KEY.",
+      "parentUuid": "7a6b29fe_beae3d2c",
       "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -155,6 +263,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_dffa13bc",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationActivator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_7eb94578",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_7ea2e54b",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationActivator.java",
         "patchSetId": 3
@@ -166,6 +292,24 @@
       "writtenOn": "2016-09-05T16:46:59Z",
       "side": 1,
       "message": "You haven\u0027t clarified use of Optional type.",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ff142fea",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationActivator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Because it can be/become null, and we should assure if it is not null before stopping service.",
+      "parentUuid": "7a6b29fe_7ea2e54b",
       "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -195,6 +339,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_bff757d2",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationActivator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_9eb42183",
+      "range": {
+        "startLine": 30,
+        "startChar": 62,
+        "endLine": 30,
+        "endChar": 63
+      },
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_3e9ced0e",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationActivator.java",
         "patchSetId": 3
@@ -206,6 +374,24 @@
       "writtenOn": "2016-09-05T16:46:59Z",
       "side": 1,
       "message": "configService.ifPresent(ServiceRegistration::unregister);",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_bfe5970a",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationActivator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_3e9ced0e",
       "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -229,6 +415,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_7fe01ffa",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationActivator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_9e9d410d",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_be875db4",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationHolder.java",
         "patchSetId": 3
@@ -240,6 +444,24 @@
       "writtenOn": "2016-09-05T16:46:59Z",
       "side": 1,
       "message": "final modifier won\u0027t make class immutable\n\nAlso this does not have to be public",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_3fa8678c",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationHolder.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "I am not sure if we want to allow to inherit this class, but yes it may be package-protected.",
+      "parentUuid": "7a6b29fe_be875db4",
       "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
