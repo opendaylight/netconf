@@ -87,6 +87,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_6a788dc4",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/osgi/NetconfSSHActivator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_d1b52a32",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_31845e5d",
         "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/osgi/NetconfSSHActivator.java",
         "patchSetId": 1
@@ -98,6 +116,24 @@
       "writtenOn": "2016-08-23T08:36:47Z",
       "side": 1,
       "message": "no need for new line",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_0a72b9e4",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/osgi/NetconfSSHActivator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_31845e5d",
       "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -121,6 +157,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_ca672124",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/osgi/NetconfSSHActivator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_bfe149d2",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_5fcbd552",
         "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/osgi/NetconfSSHActivator.java",
         "patchSetId": 1
@@ -132,6 +186,24 @@
       "writtenOn": "2016-08-23T08:36:47Z",
       "side": 1,
       "message": "Shouldn\u0027t we get netconf configuration service from bundle context?",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_2a6fb5fe",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/osgi/NetconfSSHActivator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_5fcbd552",
       "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -155,6 +227,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_050e2a34",
+        "filename": "netconf/netconf-tcp/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_91c0d27d",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_7fc0512a",
         "filename": "netconf/netconf-tcp/src/main/java/org/opendaylight/netconf/tcp/osgi/NetconfTCPActivator.java",
         "patchSetId": 1
@@ -166,6 +256,24 @@
       "writtenOn": "2016-08-23T08:36:47Z",
       "side": 1,
       "message": "Is this really necessary?",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ea649d23",
+        "filename": "netconf/netconf-tcp/src/main/java/org/opendaylight/netconf/tcp/osgi/NetconfTCPActivator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_7fc0512a",
       "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -189,6 +297,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_8aa6c951",
+        "filename": "netconf/netconf-tcp/src/main/java/org/opendaylight/netconf/tcp/osgi/NetconfTCPActivator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_dfdec510",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_71437614",
         "filename": "netconf/netconf-util/pom.xml",
         "patchSetId": 1
@@ -200,6 +326,24 @@
       "writtenOn": "2016-08-23T08:36:47Z",
       "side": 1,
       "message": "Again, without version",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_65143e44",
+        "filename": "netconf/netconf-util/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_71437614",
       "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -223,6 +367,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_aa30e501",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_ffb461d2",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_51463a24",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
         "patchSetId": 1
@@ -234,6 +396,24 @@
       "writtenOn": "2016-08-23T08:36:47Z",
       "side": 1,
       "message": "P_SSH_PORT \u003d \"ssh-port\"; space before \u003d",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_aa82a591",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_51463a24",
       "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -257,6 +437,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_8a7d29b4",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_b14cee43",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_f15666d1",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
         "patchSetId": 1
@@ -268,6 +466,24 @@
       "writtenOn": "2016-08-23T08:36:47Z",
       "side": 1,
       "message": "This can be final",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ea4bfd84",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_f15666d1",
       "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -291,6 +507,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_ca4e0196",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_11d84252",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_d151aad9",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
         "patchSetId": 1
@@ -308,6 +542,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_0a49198b",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_d151aad9",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_3160dea4",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
         "patchSetId": 1
@@ -319,6 +571,24 @@
       "writtenOn": "2016-08-23T08:36:47Z",
       "side": 1,
       "message": "final",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_6a5fed41",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_3160dea4",
       "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -359,6 +629,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_653b9ed1",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationActivator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "due to stop method",
+      "parentUuid": "7a6b29fe_df908545",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_ffebc1ad",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationHolder.java",
         "patchSetId": 1
@@ -376,6 +664,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_6a26cdcf",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationHolder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_ffebc1ad",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_1fe95db8",
         "filename": "netconf/netconf-util/src/main/resources/netconf.cfg",
         "patchSetId": 1
@@ -387,6 +693,24 @@
       "writtenOn": "2016-08-23T08:36:47Z",
       "side": 1,
       "message": "Maybe some comments that delimit tcp section from ssh section would be useful",
+      "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ca3561f8",
+        "filename": "netconf/netconf-util/src/main/resources/netconf.cfg",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_1fe95db8",
       "revId": "ace34817eb8800e3de9976325d2dadcd5b76e5b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
