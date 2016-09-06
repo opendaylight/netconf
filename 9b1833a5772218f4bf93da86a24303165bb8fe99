@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_10a7870d",
+        "filename": "netconf/mdsal-netconf-notification/src/test/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/NotificationToMdsalWriterTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_ff10e1a9",
+      "revId": "9b1833a5772218f4bf93da86a24303165bb8fe99",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_5f275512",
         "filename": "netconf/mdsal-netconf-notification/src/test/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/NotificationToMdsalWriterTest.java",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-08-23T09:13:15Z",
       "side": 1,
       "message": "Also these three imports are unused",
+      "revId": "9b1833a5772218f4bf93da86a24303165bb8fe99",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_b09fb3b3",
+        "filename": "netconf/mdsal-netconf-notification/src/test/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/NotificationToMdsalWriterTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_5f275512",
       "revId": "9b1833a5772218f4bf93da86a24303165bb8fe99",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_f0a92be0",
+        "filename": "netconf/mdsal-netconf-notification/src/test/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/NotificationToMdsalWriterTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_3f225901",
+      "revId": "9b1833a5772218f4bf93da86a24303165bb8fe99",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_df61a53a",
         "filename": "netconf/mdsal-netconf-notification/src/test/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/OperationalDatastoreListenerTest.java",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-08-23T09:13:15Z",
       "side": 1,
       "message": "You have unchecked calls here",
+      "revId": "9b1833a5772218f4bf93da86a24303165bb8fe99",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_b0d4d347",
+        "filename": "netconf/mdsal-netconf-notification/src/test/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/OperationalDatastoreListenerTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-06T10:34:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_df61a53a",
       "revId": "9b1833a5772218f4bf93da86a24303165bb8fe99",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
