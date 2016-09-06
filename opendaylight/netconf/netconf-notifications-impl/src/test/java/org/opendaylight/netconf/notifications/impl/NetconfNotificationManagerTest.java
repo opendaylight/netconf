@@ -16,8 +16,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import com.google.common.collect.Lists;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -47,8 +48,6 @@ public class NetconfNotificationManagerTest {
     @Test public void testEventTime() throws Exception {
         final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
             NetconfNotification.RFC3339_DATE_FORMAT_BLUEPRINT);
-        final SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat(
-            NetconfNotification.RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT);
 
         for (String time : Lists.newArrayList(
             "2001-07-04T12:08:56.235-07:00",
@@ -58,13 +57,21 @@ public class NetconfNotificationManagerTest {
             "1990-12-31T15:59:60-08:00",
             "1990-12-31T23:59:60Z",
             "1996-12-19T16:39:57-08:00"
-//          ,"1985-04-12T23:20:50.52Z"
+           ,"1985-04-12T23:20:50.52Z"
         )) {
-            try {
-                simpleDateFormat.parse(time);
-            } catch (ParseException e) {
-                simpleDateFormat2.parse(time);
-            }
+
+                final Pattern DATE_WITH_MILLISECOND = Pattern.compile("[^\\.]+\\.(\\d+).*");
+                final Matcher matcher = DATE_WITH_MILLISECOND.matcher(time);
+
+                if (matcher.matches()) {
+                    // Parse with milliseconds
+                    final String millisecond = matcher.group(1);
+                    final SimpleDateFormat withMillis = new SimpleDateFormat(NetconfNotification.RFC3339DateFormatWithMillisBlueprint(millisecond.length()));
+                    withMillis.parse(time);
+                }
+                else {
+                    simpleDateFormat.parse(time);
+                }
         }
     }
 
