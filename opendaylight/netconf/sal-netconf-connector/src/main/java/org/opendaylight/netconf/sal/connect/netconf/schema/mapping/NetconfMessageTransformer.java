@@ -15,6 +15,7 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -28,6 +29,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -116,6 +119,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     private static final Logger LOG= LoggerFactory.getLogger(NetconfMessageTransformer.class);
 
+    private static final Pattern DATE_WITH_MILLISECOND = Pattern.compile("[^\\.]+\\.(\\d+).*");
 
     private static final Function<SchemaNode, QName> QNAME_FUNCTION = new Function<SchemaNode, QName>() {
         @Override
@@ -187,18 +191,19 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         @Override
         protected SimpleDateFormat initialValue() {
 
-            final SimpleDateFormat withMillis = new SimpleDateFormat(
-                NetconfNotification.RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT);
-
             return new SimpleDateFormat(NetconfNotification.RFC3339_DATE_FORMAT_BLUEPRINT) {
-                private static final long serialVersionUID = 1L;
+                @Override
+                public Date parse(final String source) throws ParseException {
 
-                @Override public Date parse(final String source) throws ParseException {
-                    try {
-                        return super.parse(source);
-                    } catch (ParseException e) {
-                        // In case of failure, try to parse with milliseconds
+                    final Matcher matcher = DATE_WITH_MILLISECOND.matcher(source);
+
+                    if (matcher.matches()) {
+                        // Parse with milliseconds
+                        final String millisecond = matcher.group(1);
+                        final SimpleDateFormat withMillis = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss." + Strings.repeat("S", millisecond.length()) + "XXX");
                         return withMillis.parse(source);
+                    } else {
+                        return super.parse(source);
                     }
                 }
             };
