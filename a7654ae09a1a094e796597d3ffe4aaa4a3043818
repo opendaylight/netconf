@@ -16,6 +16,24 @@
       "revId": "a7654ae09a1a094e796597d3ffe4aaa4a3043818",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_74a9618f",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapter.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-07T08:05:19Z",
+      "side": 0,
+      "message": "It is useless, now. We have to have capability in type AvailableCapability due to model extension.",
+      "parentUuid": "7a6b29fe_fe48b5b4",
+      "revId": "a7654ae09a1a094e796597d3ffe4aaa4a3043818",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }

@@ -70,6 +70,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_14a2adfc",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-07T08:05:19Z",
+      "side": 1,
+      "message": "Because I did it in the same way as before. I also prefer java 8 solution. I changed it.",
+      "parentUuid": "7a6b29fe_7e5dc578",
+      "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_f3a46e4c",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
         "patchSetId": 5
@@ -104,6 +122,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_d4e1552b",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-07T08:05:19Z",
+      "side": 1,
+      "message": "Class NetconfDevice, method setUpSchema(...), here we build available capabilities from moduleBasedCaps from class NetconfSessionPreferences, it holds this information for us.",
+      "parentUuid": "7a6b29fe_7ed4a5bc",
+      "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_7e85c505",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
         "patchSetId": 5
@@ -115,6 +151,24 @@
       "writtenOn": "2016-09-05T14:15:19Z",
       "side": 1,
       "message": "return moduleBasedCaps.containsKey(capability);",
+      "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_34d2495c",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-07T08:05:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_7e85c505",
       "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -138,6 +192,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_74c841a8",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-07T08:05:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_3e96ad3f",
+      "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_be7abd21",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
         "patchSetId": 5
@@ -155,6 +227,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_d4fdd5b2",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-07T08:05:19Z",
+      "side": 1,
+      "message": "Instead of changing logic \"fromString\" we use default value and later if we need, we can change it. But I changed the logic, little bit, for clearer solution.",
+      "parentUuid": "7a6b29fe_be7abd21",
+      "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_5ec9e924",
         "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
         "patchSetId": 5
@@ -166,6 +256,24 @@
       "writtenOn": "2016-09-05T14:15:19Z",
       "side": 1,
       "message": "Is this really the best name? This is more related to overriding capabilities from hello message than about schema loading",
+      "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_348a491b",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 5
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-07T08:05:19Z",
+      "side": 1,
+      "message": "ok, we changed it for: user-defined and device-advertised.",
+      "parentUuid": "7a6b29fe_5ec9e924",
       "revId": "881d6cb7bc36050baac27218b0460e83053096dd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
