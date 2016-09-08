@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_21567e5c",
+        "filename": "features/netconf/pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T11:08:25Z",
+      "side": 1,
+      "message": "Oh, my bad, sorry. Then you can use your original solution and remove this.",
+      "parentUuid": "7a6b29fe_bf7ab721",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_590743ca",
         "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/osgi/NetconfSSHActivator.java",
         "patchSetId": 3
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "Possible solutions:\n1. throw exception,\n2. make default config object.\nIn my opinion, default configuration is in the file so I added throwing exception. But it can be changed.",
       "parentUuid": "7a6b29fe_590743ca",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_0153826b",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/osgi/NetconfSSHActivator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T11:08:25Z",
+      "side": 1,
+      "message": "Ok, but there is no need in defining new type of exceptions",
+      "parentUuid": "7a6b29fe_bfc8f755",
       "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -159,6 +195,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_a1f0ce67",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigUtil.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T11:08:25Z",
+      "side": 1,
+      "message": "Cannot we somehow mark needed ManagedService when we are constructing it?",
+      "parentUuid": "7a6b29fe_1f600bce",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_1ea8111f",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
         "patchSetId": 3
@@ -188,6 +242,24 @@
       "side": 1,
       "message": "Yes, but I do not want immutable attributes, it should be possible to set new values with karaf (in code: through update method) and when we restart bundle, it starts with new config values.",
       "parentUuid": "7a6b29fe_1ea8111f",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_0101c237",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T11:08:25Z",
+      "side": 1,
+      "message": "Yeah, but you can construct new one when configuration changes.",
+      "parentUuid": "7a6b29fe_3fd7c74c",
       "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -310,6 +382,24 @@
       "side": 1,
       "message": "Because it can be/become null, and we should assure if it is not null before stopping service.",
       "parentUuid": "7a6b29fe_7ea2e54b",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_e19da60b",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationActivator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T11:08:25Z",
+      "side": 1,
+      "message": "I don\u0027t really get it. Are you trying to say that registerService method can return null?",
+      "parentUuid": "7a6b29fe_ff142fea",
       "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
