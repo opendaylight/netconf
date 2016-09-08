@@ -11,8 +11,8 @@ package org.opendaylight.restconf.utils.schema.context;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import static org.opendaylight.restconf.Draft15.MonitoringModule;
-import static org.opendaylight.restconf.Draft15.RestconfModule;
+import static org.opendaylight.restconf.Draft16.MonitoringModule;
+import static org.opendaylight.restconf.Draft16.RestconfModule;
 
 import com.google.common.collect.Sets;
 import java.util.NoSuchElementException;
@@ -23,7 +23,7 @@ import org.junit.rules.ExpectedException;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
-import org.opendaylight.restconf.Draft15;
+import org.opendaylight.restconf.Draft16;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -389,6 +389,6 @@ public class RestconfSchemaUtilTest {
      * @return Restconf module
      */
     private Module getTestingRestconfModule(final String s) {
-        return schemaContext.findModuleByName(s, Draft15.RestconfModule.IETF_RESTCONF_QNAME.getRevision());
+        return schemaContext.findModuleByName(s, Draft16.RestconfModule.IETF_RESTCONF_QNAME.getRevision());
     }
 }
