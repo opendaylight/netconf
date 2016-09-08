@@ -30,7 +30,7 @@ import org.opendaylight.netconf.sal.rest.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
-import org.opendaylight.restconf.Draft15;
+import org.opendaylight.restconf.Draft16;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -44,7 +44,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 @Provider
 @Produces({ Draft02.MediaTypes.API + RestconfService.XML, Draft02.MediaTypes.DATA + RestconfService.XML,
-        Draft02.MediaTypes.OPERATION + RestconfService.XML, Draft15.MediaTypes.DATA, MediaType.APPLICATION_XML,
+        Draft02.MediaTypes.OPERATION + RestconfService.XML, Draft16.MediaTypes.DATA, MediaType.APPLICATION_XML,
         MediaType.TEXT_XML })
 public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<NormalizedNodeContext> {
 

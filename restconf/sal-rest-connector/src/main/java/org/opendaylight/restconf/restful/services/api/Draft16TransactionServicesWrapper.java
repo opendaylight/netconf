@@ -16,7 +16,7 @@ package org.opendaylight.restconf.restful.services.api;
  * </ul>
  *
  */
-public interface Draft15TransactionServicesWrapper
+public interface Draft16TransactionServicesWrapper
         extends RestconfDataService, RestconfInvokeOperationsService, RestconfStreamsSubscriptionService {
 
 }

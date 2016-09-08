@@ -13,7 +13,7 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
-import org.opendaylight.restconf.Draft15;
+import org.opendaylight.restconf.Draft16;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.rest.services.api.RestconfStreamsService;
@@ -56,7 +56,7 @@ public class RestconfStreamsServiceImpl implements RestconfStreamsService {
         final Set<String> availableStreams = Notificator.getStreamNames();
 
         final DataSchemaNode streamListSchemaNode = RestconfSchemaUtil.getRestconfSchemaNode(
-                schemaContextRef.getRestconfModule(), Draft15.MonitoringModule.STREAM_LIST_SCHEMA_NODE);
+                schemaContextRef.getRestconfModule(), Draft16.MonitoringModule.STREAM_LIST_SCHEMA_NODE);
         Preconditions.checkState(streamListSchemaNode instanceof ListSchemaNode);
         final CollectionNodeBuilder<MapEntryNode, MapNode> listStreamBuilder = Builders
                 .mapBuilder((ListSchemaNode) streamListSchemaNode);
@@ -66,7 +66,7 @@ public class RestconfStreamsServiceImpl implements RestconfStreamsService {
         }
 
         final DataSchemaNode streamContSchemaNode = RestconfSchemaUtil.getRestconfSchemaNode(
-                schemaContextRef.getRestconfModule(), Draft15.MonitoringModule.STREAMS_CONTAINER_SCHEMA_NODE);
+                schemaContextRef.getRestconfModule(), Draft16.MonitoringModule.STREAMS_CONTAINER_SCHEMA_NODE);
         Preconditions.checkState(streamContSchemaNode instanceof ContainerSchemaNode);
         final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> streamsContainerBuilder = Builders
                 .containerBuilder((ContainerSchemaNode) streamContSchemaNode);

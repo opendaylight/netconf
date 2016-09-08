@@ -37,7 +37,7 @@ import org.opendaylight.netconf.sal.restconf.impl.PATCHEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
-import org.opendaylight.restconf.utils.patch.Draft15XmlToPATCHBodyReader;
+import org.opendaylight.restconf.utils.patch.Draft16XmlToPATCHBodyReader;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -59,7 +59,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * @deprecated This class will be replaced by {@link Draft15XmlToPATCHBodyReader}
+ * @deprecated This class will be replaced by {@link Draft16XmlToPATCHBodyReader}
  */
 @Deprecated
 @Provider

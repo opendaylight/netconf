@@ -17,17 +17,17 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
-import org.opendaylight.restconf.utils.patch.Draft15XmlToPATCHBodyReader;
+import org.opendaylight.restconf.utils.patch.Draft16XmlToPATCHBodyReader;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class TestDraft11XmlPATCHBodyReader extends Draft11AbstractBodyReaderTest {
 
-    private final Draft15XmlToPATCHBodyReader xmlPATCHBodyReader;
+    private final Draft16XmlToPATCHBodyReader xmlPATCHBodyReader;
     private static SchemaContext schemaContext;
 
     public TestDraft11XmlPATCHBodyReader() throws NoSuchFieldException, SecurityException {
         super();
-        xmlPATCHBodyReader = new Draft15XmlToPATCHBodyReader();
+        xmlPATCHBodyReader = new Draft16XmlToPATCHBodyReader();
     }
 
     @Override

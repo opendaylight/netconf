@@ -35,7 +35,7 @@ import org.opendaylight.netconf.sal.restconf.impl.PATCHEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
-import org.opendaylight.restconf.Draft15;
+import org.opendaylight.restconf.Draft16;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -58,11 +58,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @Provider
-@Consumes({Draft15.MediaTypes.PATCH + RestconfConstants.XML})
-public class Draft15XmlToPATCHBodyReader extends Draft15AbstractIdentifierAwareJaxRsProvider implements
+@Consumes({Draft16.MediaTypes.PATCH + RestconfConstants.XML})
+public class Draft16XmlToPATCHBodyReader extends Draft16AbstractIdentifierAwareJaxRsProvider implements
         MessageBodyReader<PATCHContext> {
 
-    private final static Logger LOG = LoggerFactory.getLogger(Draft15XmlToPATCHBodyReader.class);
+    private final static Logger LOG = LoggerFactory.getLogger(Draft16XmlToPATCHBodyReader.class);
     private static final DocumentBuilderFactory BUILDERFACTORY;
 
     static {
@@ -148,7 +148,7 @@ public class Draft15XmlToPATCHBodyReader extends Draft15AbstractIdentifierAwareJ
                     URI.create(namespace)).iterator().next();
 
             // initialize codec + set default prefix derived from module name
-            final Draft15StringModuleInstanceIdentifierCodec codec = new Draft15StringModuleInstanceIdentifierCodec(
+            final Draft16StringModuleInstanceIdentifierCodec codec = new Draft16StringModuleInstanceIdentifierCodec(
                     pathContext.getSchemaContext(), module.getName());
 
             // find complete path to target and target schema node
@@ -235,7 +235,7 @@ public class Draft15XmlToPATCHBodyReader extends Draft15AbstractIdentifierAwareJ
 
     /**
      * Prepare non-conditional XPath suitable for deserialization
-     * with {@link Draft15StringModuleInstanceIdentifierCodec}
+     * with {@link Draft16StringModuleInstanceIdentifierCodec}
      * @param schemaNode Top schema node
      * @param target Edit operation target
      * @param value Element with value

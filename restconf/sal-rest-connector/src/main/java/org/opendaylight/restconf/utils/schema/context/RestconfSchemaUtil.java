@@ -13,7 +13,7 @@ import java.util.Set;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
-import org.opendaylight.restconf.Draft15;
+import org.opendaylight.restconf.Draft16;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.GroupingDefinition;
@@ -44,7 +44,7 @@ public final class RestconfSchemaUtil {
 
         final Set<GroupingDefinition> groupings = restconfModule.getGroupings();
         final GroupingDefinition restGroup = findSchemaNodeInCollection(groupings,
-                Draft15.RestconfModule.RESTCONF_GROUPING_SCHEMA_NODE);
+                Draft16.RestconfModule.RESTCONF_GROUPING_SCHEMA_NODE);
         final Collection<DataSchemaNode> childNodes = restGroup.getChildNodes();
         final DataSchemaNode restCont = childNodes.iterator().next();
 
@@ -64,31 +64,31 @@ public final class RestconfSchemaUtil {
     private static DataSchemaNode findSchemaNode(final DataSchemaNode restCont, final String schemaNodeName) {
         switch (schemaNodeName) {
             //MODULES
-            case Draft15.RestconfModule.MODULE_LIST_SCHEMA_NODE:
+            case Draft16.RestconfModule.MODULE_LIST_SCHEMA_NODE:
                 final DataSchemaNode moduleListSchNode = findSchemaNodeInCollection(
                         ((DataNodeContainer) findSchemaNode(restCont,
-                                Draft15.RestconfModule.MODULES_CONTAINER_SCHEMA_NODE)).getChildNodes(),
-                        Draft15.RestconfModule.MODULE_LIST_SCHEMA_NODE);
+                                Draft16.RestconfModule.MODULES_CONTAINER_SCHEMA_NODE)).getChildNodes(),
+                        Draft16.RestconfModule.MODULE_LIST_SCHEMA_NODE);
                 Preconditions.checkNotNull(moduleListSchNode);
                 return moduleListSchNode;
-            case Draft15.RestconfModule.MODULES_CONTAINER_SCHEMA_NODE:
+            case Draft16.RestconfModule.MODULES_CONTAINER_SCHEMA_NODE:
                 final DataSchemaNode modulesContSchNode = findSchemaNodeInCollection(((DataNodeContainer) restCont).getChildNodes(),
-                        Draft15.RestconfModule.MODULES_CONTAINER_SCHEMA_NODE);
+                        Draft16.RestconfModule.MODULES_CONTAINER_SCHEMA_NODE);
                 Preconditions.checkNotNull(modulesContSchNode);
                 return modulesContSchNode;
 
             //STREAMS
-            case Draft15.MonitoringModule.STREAM_LIST_SCHEMA_NODE:
+            case Draft16.MonitoringModule.STREAM_LIST_SCHEMA_NODE:
                 final DataSchemaNode streamListSchNode = findSchemaNodeInCollection(
                         ((DataNodeContainer) findSchemaNode(restCont,
-                                Draft15.MonitoringModule.STREAMS_CONTAINER_SCHEMA_NODE)).getChildNodes(),
-                        Draft15.MonitoringModule.STREAM_LIST_SCHEMA_NODE);
+                                Draft16.MonitoringModule.STREAMS_CONTAINER_SCHEMA_NODE)).getChildNodes(),
+                        Draft16.MonitoringModule.STREAM_LIST_SCHEMA_NODE);
                 Preconditions.checkNotNull(streamListSchNode);
                 return streamListSchNode;
-            case Draft15.MonitoringModule.STREAMS_CONTAINER_SCHEMA_NODE:
+            case Draft16.MonitoringModule.STREAMS_CONTAINER_SCHEMA_NODE:
                 final DataSchemaNode streamsContSchNode = findSchemaNodeInCollection(
                         ((DataNodeContainer) restCont).getChildNodes(),
-                        Draft15.MonitoringModule.STREAMS_CONTAINER_SCHEMA_NODE);
+                        Draft16.MonitoringModule.STREAMS_CONTAINER_SCHEMA_NODE);
                 Preconditions.checkNotNull(streamsContSchNode);
                 return streamsContSchNode;
             default:
