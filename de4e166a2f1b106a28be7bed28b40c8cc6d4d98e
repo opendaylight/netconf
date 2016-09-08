@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_cc426167",
+        "filename": "netconf/netconf-topology/src/test/java/org/opendaylight/netconf/topology/impl/NetconfNodeManagerCallbackTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T14:08:16Z",
+      "side": 1,
+      "message": "Don\u0027t know if annotating the whole class is the best idea..",
+      "revId": "de4e166a2f1b106a28be7bed28b40c8cc6d4d98e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
