@@ -12,7 +12,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.Maps;
 import java.io.File;
@@ -30,7 +29,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.broker.impl.mount.DOMMountPointServiceImpl;
 import org.opendaylight.controller.md.sal.dom.broker.spi.mount.SimpleDOMMountPoint;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
-import org.opendaylight.restconf.Draft15;
+import org.opendaylight.restconf.Draft16;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.utils.RestconfConstants;
@@ -194,8 +193,8 @@ class RestconfModulesServiceTestUtils {
 
         when(schemaContext.findModuleByNamespaceAndRevision(any(URI.class), any(Date.class))).thenAnswer(invocation -> {
             final Object[] args = invocation.getArguments();
-            if (args[0] == Draft15.RestconfModule.IETF_RESTCONF_QNAME.getNamespace()
-                    && args[1] == Draft15.RestconfModule.IETF_RESTCONF_QNAME.getRevision()) {
+            if ((args[0] == Draft16.RestconfModule.IETF_RESTCONF_QNAME.getNamespace())
+                    && (args[1] == Draft16.RestconfModule.IETF_RESTCONF_QNAME.getRevision())) {
                 return parseCustomRestconfSource(restconfModuleName).findModuleByName(
                         restconfModuleName, (Date) args[1]);
             } else {
@@ -332,7 +331,7 @@ class RestconfModulesServiceTestUtils {
      * @param restconfName File name of custom Restconf module
      * @return <code>SchemaContext</code> containing custom Restconf module with one mount point
      */
-    private static SchemaContext parseCustomRestconfSourceMountPoint(String restconfName) throws Exception {
+    private static SchemaContext parseCustomRestconfSourceMountPoint(final String restconfName) throws Exception {
         final String restconf = TestRestconfUtils.class.getResource(
                 CUSTOM_RESTCONF_MODULES_MOUNT_POINT_PATH
                         + restconfName + "/" + restconfName + ".yang").getPath();
@@ -363,54 +362,62 @@ class RestconfModulesServiceTestUtils {
 
         TestModule() {}
 
-        TestModule(String name, URI namespace, Date revision) {
+        TestModule(final String name, final URI namespace, final Date revision) {
             this.name = name;
             this.namespace = namespace.toString();
             this.revision = SimpleDateFormatUtil.getRevisionFormat().format(revision);
         }
 
         String getName() {
-            return name;
+            return this.name;
         }
 
-        void setName(String name) {
+        void setName(final String name) {
             this.name = name;
         }
 
         String getNamespace() {
-            return namespace;
+            return this.namespace;
         }
 
-        void setNamespace(String namespace) {
+        void setNamespace(final String namespace) {
             this.namespace = namespace;
         }
 
         String getRevision() {
-            return revision;
+            return this.revision;
         }
 
-        void setRevision(String revision) {
+        void setRevision(final String revision) {
             this.revision = revision;
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if ((o == null) || (getClass() != o.getClass())) {
+                return false;
+            }
 
-            TestModule that = (TestModule) o;
+            final TestModule that = (TestModule) o;
 
-            if (name != null ? !name.equals(that.name) : that.name != null) return false;
-            if (namespace != null ? !namespace.equals(that.namespace) : that.namespace != null) return false;
-            return revision != null ? revision.equals(that.revision) : that.revision == null;
+            if (this.name != null ? !this.name.equals(that.name) : that.name != null) {
+                return false;
+            }
+            if (this.namespace != null ? !this.namespace.equals(that.namespace) : that.namespace != null) {
+                return false;
+            }
+            return this.revision != null ? this.revision.equals(that.revision) : that.revision == null;
 
         }
 
         @Override
         public int hashCode() {
-            int result = name != null ? name.hashCode() : 0;
-            result = 31 * result + (namespace != null ? namespace.hashCode() : 0);
-            result = 31 * result + (revision != null ? revision.hashCode() : 0);
+            int result = this.name != null ? this.name.hashCode() : 0;
+            result = (31 * result) + (this.namespace != null ? this.namespace.hashCode() : 0);
+            result = (31 * result) + (this.revision != null ? this.revision.hashCode() : 0);
             return result;
         }
     }
