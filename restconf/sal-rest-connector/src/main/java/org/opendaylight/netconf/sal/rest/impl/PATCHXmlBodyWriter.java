@@ -28,12 +28,12 @@ import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
-import org.opendaylight.restconf.Draft15;
+import org.opendaylight.restconf.Draft16;
 import org.opendaylight.restconf.utils.RestconfConstants;
 
 @Provider
 @Produces({Draft02.MediaTypes.PATCH_STATUS + RestconfService.XML,
-        Draft15.MediaTypes.PATCH_STATUS + RestconfConstants.XML})
+        Draft16.MediaTypes.PATCH_STATUS + RestconfConstants.XML})
 public class PATCHXmlBodyWriter implements MessageBodyWriter<PATCHStatusContext> {
 
     private static final XMLOutputFactory XML_FACTORY;
