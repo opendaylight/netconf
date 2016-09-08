@@ -20,13 +20,13 @@ import org.opendaylight.yangtools.yang.common.QName;
  * </ul>
  * </ul>
  *
- * We used old revision {@link Draft15.RestconfModule#REVISION} of restconf yang
+ * We used old revision {@link Draft16.RestconfModule#REVISION} of restconf yang
  * because the latest restconf draft has to be supported by Yang 1.1 and we are
  * not. Then, this is only partial implementation of the latest restconf draft.
  */
-public final class Draft15 {
+public final class Draft16 {
 
-    private Draft15() {
+    private Draft16() {
         throw new UnsupportedOperationException("Util class");
     }
 
@@ -79,8 +79,8 @@ public final class Draft15 {
 
         public static final String ERROR_LIST_SCHEMA_NODE = "error";
 
-        public static final QName IETF_RESTCONF_QNAME = QName.create(Draft15.RestconfModule.NAMESPACE, Draft15.RestconfModule.REVISION,
-                Draft15.RestconfModule.NAME);
+        public static final QName IETF_RESTCONF_QNAME = QName.create(Draft16.RestconfModule.NAMESPACE, Draft16.RestconfModule.REVISION,
+                Draft16.RestconfModule.NAME);
 
         public static final QName ERRORS_CONTAINER_QNAME = QName.create(IETF_RESTCONF_QNAME, ERRORS_CONTAINER_SCHEMA_NODE);
 
