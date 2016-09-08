@@ -12,7 +12,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
-import org.opendaylight.restconf.Draft15;
+import org.opendaylight.restconf.Draft16;
 import org.opendaylight.restconf.utils.RestconfConstants;
 
 /**
@@ -30,7 +30,7 @@ public interface RestconfSchemaService {
      * @return {@link SchemaExportContext}
      */
     @GET
-    @Produces({ Draft15.MediaTypes.YANG, Draft15.MediaTypes.YIN + RestconfConstants.XML })
+    @Produces({ Draft16.MediaTypes.YANG, Draft16.MediaTypes.YIN + RestconfConstants.XML })
     @Path("data/ietf-yang-library:modules/module/{identifier:.+}/schema")
     SchemaExportContext getSchema(@PathParam("identifier") String identifier);
 }

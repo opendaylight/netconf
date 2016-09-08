@@ -22,7 +22,7 @@ import org.opendaylight.controller.sal.core.api.Provider;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.netconf.sal.rest.api.RestConnector;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
-import org.opendaylight.restconf.common.wrapper.services.Draft15ServicesWrapperImpl;
+import org.opendaylight.restconf.common.wrapper.services.Draft16ServicesWrapperImpl;
 import org.opendaylight.restconf.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.RpcServiceHandler;
@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Provider for restconf draft15.
+ * Provider for restconf draft16.
  *
  */
 public class RestConnectorProvider implements Provider, RestConnector, AutoCloseable {
@@ -64,7 +64,7 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
     public void onSessionInitiated(final ProviderSession session) {
         final SchemaService schemaService = Preconditions.checkNotNull(session.getService(SchemaService.class));
 
-        final Draft15ServicesWrapperImpl wrapperServices = Draft15ServicesWrapperImpl.getInstance();
+        final Draft16ServicesWrapperImpl wrapperServices = Draft16ServicesWrapperImpl.getInstance();
 
         final SchemaContextHandler schemaCtxHandler = new SchemaContextHandler();
         this.listenerRegistration = schemaService.registerSchemaContextListener(schemaCtxHandler);

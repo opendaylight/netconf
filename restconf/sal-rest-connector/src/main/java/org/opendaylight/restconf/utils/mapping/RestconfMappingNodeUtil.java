@@ -10,7 +10,7 @@ package org.opendaylight.restconf.utils.mapping;
 import com.google.common.base.Preconditions;
 import java.util.Collection;
 import java.util.Set;
-import org.opendaylight.restconf.Draft15;
+import org.opendaylight.restconf.Draft16;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.restconf.utils.schema.context.RestconfSchemaUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -50,7 +50,7 @@ public final class RestconfMappingNodeUtil {
      */
     public static MapNode restconfMappingNode(final Module restconfModule, final Set<Module> modules) {
         final DataSchemaNode modulListSchemaNode = RestconfSchemaUtil.getRestconfSchemaNode(restconfModule,
-                Draft15.RestconfModule.MODULE_LIST_SCHEMA_NODE);
+                Draft16.RestconfModule.MODULE_LIST_SCHEMA_NODE);
         Preconditions.checkState(modulListSchemaNode instanceof ListSchemaNode);
 
         final CollectionNodeBuilder<MapEntryNode, MapNode> listModuleBuilder = Builders
