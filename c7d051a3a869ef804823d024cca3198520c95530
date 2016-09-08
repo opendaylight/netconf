@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_4cf01191",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T13:39:11Z",
+      "side": 1,
+      "message": "Since you parametrized this method also with origin, the name can remain as it was. This new name is somehow strange",
+      "revId": "c7d051a3a869ef804823d024cca3198520c95530",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
