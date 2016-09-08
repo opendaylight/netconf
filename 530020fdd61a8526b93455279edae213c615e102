@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_4101fa04",
+        "filename": "netconf/mdsal-netconf-notification/src/test/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/OperationalDatastoreListenerTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T12:04:34Z",
+      "side": 1,
+      "message": "I think it would be better to check if listener was registered on desired subtree. So you should either catch the argument or construct DataTreeIdentifier and verify that it equals to DataTreeIdentifier used as method parameter in registerDataTreeChangeListener invocation.",
+      "revId": "530020fdd61a8526b93455279edae213c615e102",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
