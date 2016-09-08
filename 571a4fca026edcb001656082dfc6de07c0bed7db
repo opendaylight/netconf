@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_81ce722c",
+        "filename": "netconf/netconf-tcp/src/main/java/org/opendaylight/netconf/tcp/osgi/NetconfTCPActivator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T11:08:25Z",
+      "side": 1,
+      "message": "I think IllegalStateException should be fine",
+      "revId": "571a4fca026edcb001656082dfc6de07c0bed7db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_c1d4eabe",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/ConfigurationNotFoundException.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T11:08:25Z",
+      "side": 1,
+      "message": "I think, there is no need for new Exception",
+      "revId": "571a4fca026edcb001656082dfc6de07c0bed7db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_61e356a4",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigUtil.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T11:08:25Z",
+      "side": 1,
+      "message": "Is it good idea to use both Guava Optional and Java 8 Optional types in one class?",
+      "revId": "571a4fca026edcb001656082dfc6de07c0bed7db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
