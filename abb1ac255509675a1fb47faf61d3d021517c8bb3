@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_c707da16",
+        "filename": "netconf/abstract-topology/src/main/java/org/opendaylight/netconf/topology/util/messages/AnnounceMasterMountPointAsk.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T14:44:56Z",
+      "side": 1,
+      "message": "I guess this is send if follower is up and wants to register mount point. I think better name would be something like AnnounceSlave(something)Up.\n\nI don\u0027t find AnnounceMasterMountPointAsk like the best name.\n\nAlso I think this can go to netconf-topology module not to abstract-topology.",
+      "revId": "abb1ac255509675a1fb47faf61d3d021517c8bb3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_672d2695",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/NetconfTopology.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T14:44:56Z",
+      "side": 1,
+      "message": "askForMasterMountPoint",
+      "revId": "abb1ac255509675a1fb47faf61d3d021517c8bb3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_e73816d5",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/impl/ClusteredNetconfTopology.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T14:44:56Z",
+      "side": 1,
+      "message": "Unnecessary semicolon",
+      "revId": "abb1ac255509675a1fb47faf61d3d021517c8bb3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
