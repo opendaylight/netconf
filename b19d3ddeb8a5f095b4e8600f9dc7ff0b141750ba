@@ -1,0 +1,463 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_01dc2272",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "non-module",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_21c67e9a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "override",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_01c38289",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "I think the last sentence is unnecessary",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_214dde3e",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 477,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "Comments from NetconfConnectorModule apply also here.",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_c1018a6b",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/controller/config/yang/md/sal/connector/netconf/NetconfConnectorModule.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "I think \u003d\u003d operator here is fine. No need for isNull method.",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_e1fc8674",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/controller/config/yang/md/sal/connector/netconf/NetconfConnectorModule.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 502,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "Maybe this could be called nullOrEmpty and it should safely check just Collection instances. But I do not think this method is necessary, I think you can inline expression v \u003d\u003d null || v.isEmpty() where needed.",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_61d99621",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "What happens, if for example someone specify one non module based capability no module based and also set override module based caps to true?\n\nI think now it will clears all module based caps advertised by device. Do not know if this is desired behavior, such device wouldn\u0027t be useful at all.\n\nI think we should add some preconditions to prevent such cases. That is, empty or no capability list and override set to true. And it can be checked, when constructing UserPreferences object.",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_a1072ec9",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "Merge list of non-module based capabilities with current list of non-module based capabilities",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_813312aa",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "netconfSessionNonModuleCapabilities",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_e1248661",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "non-module based",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_c1298a38",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "please wrap this line as it is exceeding 120 characters line length",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_2122fe51",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "non-module based",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_011f0209",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfSessionPreferences.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "non-module based",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_21a5dea1",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/UserPreferences.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "overrideModuleCapabilities",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_01a26298",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/UserPreferences.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "overrideNonModuleCapabilities",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_61ab5675",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/UserPreferences.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "Can you please wrap this line?\n\noverrideModuleCapabilities and overrideNonModuleCapabilities",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_41a8da76",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/UserPreferences.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "moduleBasedCapsOverrided()",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_a1b8cec8",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/UserPreferences.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "nonModuleBasedCapsOverrided()",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_81bdd2b9",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/UserPreferences.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "overrideModuleCapabilities",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_e1ae4680",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/UserPreferences.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "overrideNonModuleCapabilities",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_21e95ee6",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 8
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "I think the description is copied from yang-module-capabilities. Can you please reformulate this for non-module based capabilities?",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_01e6e214",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 8
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "Same as above",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_e1976638",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/odl-sal-netconf-connector-cfg.yang",
+        "patchSetId": 8
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "Comments from netconf-node-topology apply also here",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_41ec5af3",
+        "filename": "netconf/sal-netconf-connector/src/test/resources/schemas/netconf-node-topology.yang",
+        "patchSetId": 8
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "I think this should be exactly same model as sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_a1d56e1d",
+        "filename": "netconf/sal-netconf-connector/src/test/resources/schemas/netconf-node-topology.yang",
+        "patchSetId": 8
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "non-module based capabilities with non-module based capabilities from device",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_81daf249",
+        "filename": "netconf/sal-netconf-connector/src/test/resources/schemas/netconf-node-topology.yang",
+        "patchSetId": 8
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "non-module based capabilities to override or merge non-module based capabilities",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_e1dbe64c",
+        "filename": "netconf/sal-netconf-connector/src/test/resources/schemas/netconf-node-topology.yang",
+        "patchSetId": 8
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T10:18:13Z",
+      "side": 1,
+      "message": "Can be used for devices that does not report or incorrectly report non-module based capabilities in their hello message",
+      "revId": "b19d3ddeb8a5f095b4e8600f9dc7ff0b141750ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
