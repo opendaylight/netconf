@@ -19,7 +19,7 @@ import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.rest.services.api.Draft15BaseServicesWrapper;
+import org.opendaylight.restconf.rest.services.api.Draft16BaseServicesWrapper;
 import org.opendaylight.restconf.rest.services.api.RestconfModulesService;
 import org.opendaylight.restconf.rest.services.api.RestconfOperationsService;
 import org.opendaylight.restconf.rest.services.api.RestconfSchemaService;
@@ -28,7 +28,7 @@ import org.opendaylight.restconf.rest.services.impl.RestconfModulesServiceImpl;
 import org.opendaylight.restconf.rest.services.impl.RestconfOperationsServiceImpl;
 import org.opendaylight.restconf.rest.services.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.restconf.rest.services.impl.RestconfStreamsServiceImpl;
-import org.opendaylight.restconf.restful.services.api.Draft15TransactionServicesWrapper;
+import org.opendaylight.restconf.restful.services.api.Draft16TransactionServicesWrapper;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
 import org.opendaylight.restconf.restful.services.api.RestconfInvokeOperationsService;
 import org.opendaylight.restconf.restful.services.api.RestconfStreamsSubscriptionService;
@@ -39,13 +39,13 @@ import org.opendaylight.restconf.restful.services.impl.RestconfStreamsSubscripti
 /**
  * Wrapper for services:
  * <ul>
- * <li>{@link Draft15BaseServicesWrapper}
- * <li>{@link Draft15TransactionServicesWrapper}
+ * <li>{@link Draft16BaseServicesWrapper}
+ * <li>{@link Draft16TransactionServicesWrapper}
  * </ul>
  *
  */
 @Path("/")
-public class Draft15ServicesWrapperImpl implements Draft15BaseServicesWrapper, Draft15TransactionServicesWrapper {
+public class Draft16ServicesWrapperImpl implements Draft16BaseServicesWrapper, Draft16TransactionServicesWrapper {
 
     private RestconfDataService delegRestconfDataService;
     private RestconfInvokeOperationsService delegRestconfInvokeOpsService;
@@ -55,14 +55,14 @@ public class Draft15ServicesWrapperImpl implements Draft15BaseServicesWrapper, D
     private RestconfStreamsService delegRestStrsService;
     private RestconfSchemaService delegRestSchService;
 
-    private Draft15ServicesWrapperImpl() {
+    private Draft16ServicesWrapperImpl() {
     }
 
     private static class InstanceHolder {
-        public static final Draft15ServicesWrapperImpl INSTANCE = new Draft15ServicesWrapperImpl();
+        public static final Draft16ServicesWrapperImpl INSTANCE = new Draft16ServicesWrapperImpl();
     }
 
-    public static Draft15ServicesWrapperImpl getInstance() {
+    public static Draft16ServicesWrapperImpl getInstance() {
         return InstanceHolder.INSTANCE;
     }
 
