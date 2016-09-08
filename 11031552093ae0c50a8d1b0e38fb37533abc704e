@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_ac70c5dc",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/SchemalessNetconfDeviceTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T14:04:32Z",
+      "side": 1,
+      "message": "For future you can annotate just the problematic assignment. Don\u0027t have to annotate whole method, but here it can stay as is",
+      "revId": "11031552093ae0c50a8d1b0e38fb37533abc704e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_6cc34ded",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/util/RemoteDeviceIdTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-08T14:04:32Z",
+      "side": 1,
+      "message": "I think the contract of hashCode should be tested. What if implementation changes?\n\nYou should do something like if some objects are equal then they have same has code.",
+      "revId": "11031552093ae0c50a8d1b0e38fb37533abc704e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
