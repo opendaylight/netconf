@@ -213,6 +213,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_cd56dbcd",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigUtil.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-09T11:15:21Z",
+      "side": 1,
+      "message": "I know what u want to say:\nbundleContext.registerService(ManagedService.class.getName()\nNetconfConfiguration.getInstance(), getNetconfConfigProperties());\nI tried also, with name of concrete class. But it not working, it does not register managed service. I am not sure if it is possible to mark service with another way, because there is instance of concrete class (NetconfConfiguration.class). \nBut with this concrete class I am also unable to get the right service. \nNext, I am able to get one service reference with ManagedService.class, but it got me only only one service at the top and it is not correct solution.",
+      "parentUuid": "7a6b29fe_a1f0ce67",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_1ea8111f",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
         "patchSetId": 3
@@ -260,6 +278,24 @@
       "side": 1,
       "message": "Yeah, but you can construct new one when configuration changes.",
       "parentUuid": "7a6b29fe_3fd7c74c",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ad01df6b",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-09T11:15:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_0101c237",
       "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -400,6 +436,24 @@
       "side": 1,
       "message": "I don\u0027t really get it. Are you trying to say that registerService method can return null?",
       "parentUuid": "7a6b29fe_ff142fea",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_6da8678d",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationActivator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-09T11:15:21Z",
+      "side": 1,
+      "message": "No,\n\"A service can be dynamically started and stopped\"\nSo I want to say, when stop is called at the end of application, we cannot be sure that service is still running.\nI do not say that it should happen in this case but just for sure.",
+      "parentUuid": "7a6b29fe_e19da60b",
       "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
