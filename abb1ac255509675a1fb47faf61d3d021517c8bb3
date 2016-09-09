@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_f20a9624",
+        "filename": "netconf/abstract-topology/src/main/java/org/opendaylight/netconf/topology/util/messages/AnnounceMasterMountPointAsk.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-09T08:12:02Z",
+      "side": 1,
+      "message": "Ok, I simplified it and I called it: MasterMountPointRequest.",
+      "parentUuid": "7a6b29fe_c707da16",
+      "revId": "abb1ac255509675a1fb47faf61d3d021517c8bb3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_672d2695",
         "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/NetconfTopology.java",
         "patchSetId": 2
