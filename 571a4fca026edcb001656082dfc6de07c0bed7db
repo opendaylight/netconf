@@ -50,6 +50,24 @@
       "revId": "571a4fca026edcb001656082dfc6de07c0bed7db",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_adb71ff4",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigUtil.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-09T11:15:21Z",
+      "side": 1,
+      "message": "Yes, because I need functionality of Optional from Java 8. \nFor my opinion, guava is aimed only for lower versions of Java. So I think that I did it much better.",
+      "parentUuid": "7a6b29fe_61e356a4",
+      "revId": "571a4fca026edcb001656082dfc6de07c0bed7db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
