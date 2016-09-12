@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.sal.rest.impl.RestUtil;
+import org.opendaylight.netconf.sal.rest.impl.StringModuleInstanceIdentifierCodec;
 import org.opendaylight.netconf.sal.restconf.impl.IdentityValuesDTO.IdentityValue;
 import org.opendaylight.netconf.sal.restconf.impl.IdentityValuesDTO.Predicate;
 import org.opendaylight.yangtools.concepts.Codec;
@@ -63,16 +64,16 @@ public class RestCodec {
         private final TypeDefinition<?> type;
 
         private ObjectCodec(final TypeDefinition<?> typeDefinition, final DOMMountPoint mountPoint) {
-            type = RestUtil.resolveBaseTypeFrom(typeDefinition);
-            if (type instanceof IdentityrefTypeDefinition) {
-                identityrefCodec = new IdentityrefCodecImpl(mountPoint);
+            this.type = RestUtil.resolveBaseTypeFrom(typeDefinition);
+            if (this.type instanceof IdentityrefTypeDefinition) {
+                this.identityrefCodec = new IdentityrefCodecImpl(mountPoint);
             } else {
-                identityrefCodec = null;
+                this.identityrefCodec = null;
             }
-            if (type instanceof InstanceIdentifierTypeDefinition) {
-                instanceIdentifier = new InstanceIdentifierCodecImpl(mountPoint);
+            if (this.type instanceof InstanceIdentifierTypeDefinition) {
+                this.instanceIdentifier = new InstanceIdentifierCodecImpl(mountPoint);
             } else {
-                instanceIdentifier = null;
+                this.instanceIdentifier = null;
             }
         }
 
@@ -80,9 +81,9 @@ public class RestCodec {
         @Override
         public Object deserialize(final Object input) {
             try {
-                if (type instanceof IdentityrefTypeDefinition) {
+                if (this.type instanceof IdentityrefTypeDefinition) {
                     if (input instanceof IdentityValuesDTO) {
-                        return identityrefCodec.deserialize(input);
+                        return this.identityrefCodec.deserialize(input);
                     }
                     if(LOG.isDebugEnabled()) {
                         LOG.debug(
@@ -90,24 +91,27 @@ public class RestCodec {
                             input == null ? "null" : input.getClass(), String.valueOf(input));
                     }
                     return null;
-                } else if (type instanceof InstanceIdentifierTypeDefinition) {
+                } else if (this.type instanceof InstanceIdentifierTypeDefinition) {
                     if (input instanceof IdentityValuesDTO) {
-                        return instanceIdentifier.deserialize(input);
+                        return this.instanceIdentifier.deserialize(input);
+                    } else {
+                        final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
+                                ControllerContext.getInstance().getGlobalSchema());
+                        return codec.deserialize((String) input);
+                        // return
+                        // ControllerContext.getInstance().toInstanceIdentifier((String)
+                        // input);
                     }
-                    LOG.info(
-                            "Value is not instance of InstanceIdentifierTypeDefinition but is {}. Therefore NULL is used as translation of  - {}",
-                            input == null ? "null" : input.getClass(), String.valueOf(input));
-                    return null;
                 } else {
                     final TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>> typeAwarecodec = TypeDefinitionAwareCodec
-                            .from(type);
+                            .from(this.type);
                     if (typeAwarecodec != null) {
                         if (input instanceof IdentityValuesDTO) {
                             return typeAwarecodec.deserialize(((IdentityValuesDTO) input).getOriginValue());
                         }
                         return typeAwarecodec.deserialize(String.valueOf(input));
                     } else {
-                        LOG.debug("Codec for type \"" + type.getQName().getLocalName()
+                        LOG.debug("Codec for type \"" + this.type.getQName().getLocalName()
                                 + "\" is not implemented yet.");
                         return null;
                     }
@@ -124,20 +128,20 @@ public class RestCodec {
         @Override
         public Object serialize(final Object input) {
             try {
-                if (type instanceof IdentityrefTypeDefinition) {
-                    return identityrefCodec.serialize(input);
-                } else if (type instanceof LeafrefTypeDefinition) {
+                if (this.type instanceof IdentityrefTypeDefinition) {
+                    return this.identityrefCodec.serialize(input);
+                } else if (this.type instanceof LeafrefTypeDefinition) {
                     return LEAFREF_DEFAULT_CODEC.serialize(input);
-                } else if (type instanceof InstanceIdentifierTypeDefinition) {
-                    return instanceIdentifier.serialize(input);
+                } else if (this.type instanceof InstanceIdentifierTypeDefinition) {
+                    return this.instanceIdentifier.serialize(input);
                 } else {
                     final TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>> typeAwarecodec = TypeDefinitionAwareCodec
-                            .from(type);
+                            .from(this.type);
                     if (typeAwarecodec != null) {
                         return typeAwarecodec.serialize(input);
                     } else {
                         if(LOG.isDebugEnabled()) {
-                            LOG.debug("Codec for type \"" + type.getQName().getLocalName()
+                            LOG.debug("Codec for type \"" + this.type.getQName().getLocalName()
                                 + "\" is not implemented yet.");
                         }
                         return null;
@@ -171,7 +175,7 @@ public class RestCodec {
         @Override
         public QName deserialize(final IdentityValuesDTO data) {
             final IdentityValue valueWithNamespace = data.getValuesWithNamespaces().get(0);
-            final Module module = getModuleByNamespace(valueWithNamespace.getNamespace(), mountPoint);
+            final Module module = getModuleByNamespace(valueWithNamespace.getNamespace(), this.mountPoint);
             if (module == null) {
                 LOG.info("Module was not found for namespace {}", valueWithNamespace.getNamespace());
                 LOG.info("Idenetityref will be translated as NULL for data - {}", String.valueOf(valueWithNamespace));
@@ -210,11 +214,11 @@ public class RestCodec {
             final IdentityValuesDTO identityValuesDTO = new IdentityValuesDTO();
             for (final PathArgument pathArgument : data.getPathArguments()) {
                 final IdentityValue identityValue = qNameToIdentityValue(pathArgument.getNodeType());
-                if (pathArgument instanceof NodeIdentifierWithPredicates && identityValue != null) {
+                if ((pathArgument instanceof NodeIdentifierWithPredicates) && (identityValue != null)) {
                     final List<Predicate> predicates = keyValuesToPredicateList(((NodeIdentifierWithPredicates) pathArgument)
                             .getKeyValues());
                     identityValue.setPredicates(predicates);
-                } else if (pathArgument instanceof NodeWithValue && identityValue != null) {
+                } else if ((pathArgument instanceof NodeWithValue) && (identityValue != null)) {
                     final List<Predicate> predicates = new ArrayList<>();
                     final String value = String.valueOf(((NodeWithValue) pathArgument).getValue());
                     predicates.add(new Predicate(null, value));
@@ -229,7 +233,7 @@ public class RestCodec {
         public YangInstanceIdentifier deserialize(final IdentityValuesDTO data) {
             final List<PathArgument> result = new ArrayList<PathArgument>();
             final IdentityValue valueWithNamespace = data.getValuesWithNamespaces().get(0);
-            final Module module = getModuleByNamespace(valueWithNamespace.getNamespace(), mountPoint);
+            final Module module = getModuleByNamespace(valueWithNamespace.getNamespace(), this.mountPoint);
             if (module == null) {
                 LOG.info("Module by namespace '{}' of first node in instance-identifier was not found.",
                         valueWithNamespace.getNamespace());
@@ -242,7 +246,7 @@ public class RestCodec {
             final List<IdentityValue> identities = data.getValuesWithNamespaces();
             for (int i = 0; i < identities.size(); i++) {
                 final IdentityValue identityValue = identities.get(i);
-                URI validNamespace = resolveValidNamespace(identityValue.getNamespace(), mountPoint);
+                URI validNamespace = resolveValidNamespace(identityValue.getNamespace(), this.mountPoint);
                 final DataSchemaNode node = ControllerContext.findInstanceDataChildByNameAndNamespace(
                         parentContainer, identityValue.getValue(), validNamespace);
                 if (node == null) {
@@ -269,7 +273,7 @@ public class RestCodec {
                         final DataNodeContainer listNode = (DataNodeContainer) node;
                         final Map<QName, Object> predicatesMap = new HashMap<>();
                         for (final Predicate predicate : identityValue.getPredicates()) {
-                            validNamespace = resolveValidNamespace(predicate.getName().getNamespace(), mountPoint);
+                            validNamespace = resolveValidNamespace(predicate.getName().getNamespace(), this.mountPoint);
                             final DataSchemaNode listKey = ControllerContext
                                     .findInstanceDataChildByNameAndNamespace(listNode, predicate.getName().getValue(),
                                             validNamespace);
@@ -284,7 +288,7 @@ public class RestCodec {
                     }
                 }
                 result.add(pathArgument);
-                if (i < identities.size() - 1) { // last element in instance-identifier can be other than
+                if (i < (identities.size() - 1)) { // last element in instance-identifier can be other than
                     // DataNodeContainer
                     if (node instanceof DataNodeContainer) {
                         parentContainer = (DataNodeContainer) node;

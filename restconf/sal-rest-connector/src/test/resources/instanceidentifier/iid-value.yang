@@ -1,0 +1,23 @@
+module iid-value-module {
+    namespace "iid:value:module";
+
+    prefix "iidvm";
+    revision 2016-09-12 {
+    }
+
+    container cont-iid {
+        list iid-list{
+            key "iid-leaf";
+            leaf iid-leaf{
+                type instance-identifier;
+            }
+        }
+
+        list values-iid{
+            key "value-iid";
+            leaf value-iid{
+                type string;
+            }
+        }
+    }
+}
