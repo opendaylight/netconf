@@ -17,26 +17,26 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
-final class Draft15StringModuleInstanceIdentifierCodec extends AbstractModuleStringInstanceIdentifierCodec {
+public final class Draft15StringModuleInstanceIdentifierCodec extends AbstractModuleStringInstanceIdentifierCodec {
 
     private final DataSchemaContextTree dataContextTree;
     private final SchemaContext context;
     private final String defaultPrefix;
 
-    Draft15StringModuleInstanceIdentifierCodec(SchemaContext context) {
+    public Draft15StringModuleInstanceIdentifierCodec(final SchemaContext context) {
         this.context = Preconditions.checkNotNull(context);
         this.dataContextTree = DataSchemaContextTree.from(context);
         this.defaultPrefix = "";
     }
 
-    Draft15StringModuleInstanceIdentifierCodec(SchemaContext context, @Nonnull String defaultPrefix) {
+    Draft15StringModuleInstanceIdentifierCodec(final SchemaContext context, @Nonnull final String defaultPrefix) {
         this.context = Preconditions.checkNotNull(context);
         this.dataContextTree = DataSchemaContextTree.from(context);
         this.defaultPrefix = defaultPrefix;
     }
 
     @Override
-    protected Module moduleForPrefix(@Nonnull String prefix) {
+    protected Module moduleForPrefix(@Nonnull final String prefix) {
         if (prefix.isEmpty() && !this.defaultPrefix.isEmpty()) {
             return this.context.findModuleByName(this.defaultPrefix, null);
         } else {
@@ -52,7 +52,7 @@ final class Draft15StringModuleInstanceIdentifierCodec extends AbstractModuleStr
 
     @Nullable
     @Override
-    protected String prefixForNamespace(@Nonnull URI namespace) {
+    protected String prefixForNamespace(@Nonnull final URI namespace) {
         final Module module = this.context.findModuleByNamespaceAndRevision(namespace, null);
         return module == null ? null : module.getName();
     }
