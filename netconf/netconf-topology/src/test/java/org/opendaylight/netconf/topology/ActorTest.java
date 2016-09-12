@@ -157,10 +157,6 @@ public class ActorTest {
         when(dataBroker.newReadOnlyTransaction()).thenReturn(mockedReadOnlyTx);
     }
 
-    private void setMaster(final TopologyManager manager) {
-
-    }
-
     @Test
     public void testRealActors() throws Exception {
 
