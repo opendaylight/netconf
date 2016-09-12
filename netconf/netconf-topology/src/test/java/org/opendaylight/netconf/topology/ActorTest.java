@@ -161,6 +161,7 @@ public class ActorTest {
     }
 
     @Test
+    @Ignore("Unstable")
     public void testRealActors() throws Exception {
 
         EntityOwnershipService topoOwnership = new TestingEntityOwnershipService();
