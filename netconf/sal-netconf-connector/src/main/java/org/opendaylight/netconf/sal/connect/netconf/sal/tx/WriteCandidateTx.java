@@ -53,7 +53,6 @@ import org.slf4j.LoggerFactory;
  *   <li>Commit and Unlock candidate datastore async</li>
  * </ol>
  */
-//TODO replace custom RPCs future callbacks with NetconfRpcFutureCallback
 public class WriteCandidateTx extends AbstractWriteTx {
 
     private static final Logger LOG  = LoggerFactory.getLogger(WriteCandidateTx.class);
@@ -90,7 +89,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
             public void onSuccess(DOMRpcResult result) {
                 if (isSuccess(result)) {
                     if (LOG.isTraceEnabled()) {
-                        LOG.trace("Lock candidate succesfull");
+                        LOG.trace("Lock candidate successful");
                     }
                 } else {
                     LOG.warn("{}: lock candidate invoked unsuccessfully: {}", id, result.getErrors());
@@ -100,10 +99,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
             @Override
             public void onFailure(Throwable t) {
                 LOG.warn("Lock candidate operation failed. {}", t);
-                NetconfDocumentedException e = new NetconfDocumentedException(id + ": Lock candidate operation failed.", NetconfDocumentedException.ErrorType.application,
-                        NetconfDocumentedException.ErrorTag.operation_failed, NetconfDocumentedException.ErrorSeverity.warning);
                 discardChanges();
-                throw new RuntimeException(e);
             }
         };
         resultsFutures.add(netOps.lockCandidate(lockCandidateCallback));
@@ -172,23 +168,9 @@ public class WriteCandidateTx extends AbstractWriteTx {
                               final DataContainerChild<?, ?> editStructure,
                               final Optional<ModifyAction> defaultOperation,
                               final String operation) {
-        FutureCallback<DOMRpcResult> editConfigCallback = new FutureCallback<DOMRpcResult>() {
-            @Override
-            public void onSuccess(DOMRpcResult result) {
-                if (isSuccess(result)) {
-                    if (LOG.isTraceEnabled()) {
-                        LOG.trace("Edit candidate succesfull");
-                    }
-                } else {
-                    LOG.warn("{}: Edit candidate invoked unsuccessfully: {}", id, result.getErrors());
-                }
-            }
 
-            @Override
-            public void onFailure(Throwable t) {
-                LOG.warn("Edit candidate operation failed. {}", t);
-            }
-        };
+        NetconfRpcFutureCallback editConfigCallback = new NetconfRpcFutureCallback("Edit candidate", id);
+
         if (defaultOperation.isPresent()) {
             resultsFutures.add(netOps.editConfigCandidate(
                     editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport));

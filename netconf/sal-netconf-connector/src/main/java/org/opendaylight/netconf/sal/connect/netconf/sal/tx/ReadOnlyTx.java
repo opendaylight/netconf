@@ -19,6 +19,7 @@ import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
+import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.util.concurrent.MappingCheckedFuture;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -33,41 +34,22 @@ public final class ReadOnlyTx implements DOMDataReadOnlyTransaction {
 
     private final NetconfBaseOps netconfOps;
     private final RemoteDeviceId id;
-    private final FutureCallback<DOMRpcResult> loggingCallback;
 
     public ReadOnlyTx(final NetconfBaseOps netconfOps, final RemoteDeviceId id) {
         this.netconfOps = netconfOps;
         this.id = id;
-
-        // Simple logging callback to log result of read operation
-        loggingCallback = new FutureCallback<DOMRpcResult>() {
-            @Override
-            public void onSuccess(final DOMRpcResult result) {
-                if(AbstractWriteTx.isSuccess(result)) {
-                    LOG.trace("{}: Reading data successful", id);
-                } else {
-                    LOG.warn("{}: Reading data unsuccessful: {}", id, result.getErrors());
-                }
-
-            }
-
-            @Override
-            public void onFailure(final Throwable t) {
-                LOG.warn("{}: Reading data failed", id, t);
-            }
-        };
     }
 
     private CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> readConfigurationData(
             final YangInstanceIdentifier path) {
-        final ListenableFuture<Optional<NormalizedNode<?, ?>>> configRunning = netconfOps.getConfigRunningData(loggingCallback, Optional.fromNullable(path));
+        final ListenableFuture<Optional<NormalizedNode<?, ?>>> configRunning = netconfOps.getConfigRunningData(new NetconfRpcFutureCallback("Read data", id), Optional.fromNullable(path));
 
         return MappingCheckedFuture.create(configRunning, ReadFailedException.MAPPER);
     }
 
     private CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> readOperationalData(
             final YangInstanceIdentifier path) {
-        final ListenableFuture<Optional<NormalizedNode<?, ?>>> configCandidate = netconfOps.getData(loggingCallback, Optional.fromNullable(path));
+        final ListenableFuture<Optional<NormalizedNode<?, ?>>> configCandidate = netconfOps.getData(new NetconfRpcFutureCallback("Read data", id), Optional.fromNullable(path));
 
         return MappingCheckedFuture.create(configCandidate, ReadFailedException.MAPPER);
     }

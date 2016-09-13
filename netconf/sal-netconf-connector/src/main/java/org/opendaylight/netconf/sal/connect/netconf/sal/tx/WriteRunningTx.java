@@ -45,7 +45,6 @@ import org.slf4j.LoggerFactory;
  *   <li>Unlock running datastore on tx commit</li>
  * </ol>
  */
-//TODO replace custom RPCs future callbacks with NetconfRpcFutureCallback
 public class WriteRunningTx extends AbstractWriteTx {
 
     private static final Logger LOG  = LoggerFactory.getLogger(WriteRunningTx.class);
@@ -61,24 +60,7 @@ public class WriteRunningTx extends AbstractWriteTx {
     }
 
     private void lock() {
-        final FutureCallback<DOMRpcResult> lockCallback = new FutureCallback<DOMRpcResult>() {
-            @Override
-            public void onSuccess(DOMRpcResult result) {
-                if (isSuccess(result)) {
-                    if (LOG.isTraceEnabled()) {
-                        LOG.trace("Lock running succesfull");
-                    }
-                } else {
-                    LOG.warn("{}: lock running invoked unsuccessfully: {}", id, result.getErrors());
-                }
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                LOG.warn("{}: Lock running operation failed. {}", id, t);
-            }
-        };
-        resultsFutures.add(netOps.lockRunning(lockCallback));
+        resultsFutures.add(netOps.lockRunning(new NetconfRpcFutureCallback("Lock running", id)));
     }
 
     @Override
@@ -116,23 +98,9 @@ public class WriteRunningTx extends AbstractWriteTx {
                               final DataContainerChild<?, ?> editStructure,
                               final Optional<ModifyAction> defaultOperation,
                               final String operation) {
-        FutureCallback<DOMRpcResult> editConfigCallback = new FutureCallback<DOMRpcResult>() {
-            @Override
-            public void onSuccess(DOMRpcResult result) {
-                if (isSuccess(result)) {
-                    if (LOG.isTraceEnabled()) {
-                        LOG.trace("Edit running succesfull");
-                    }
-                } else {
-                    LOG.warn("{}: Edit running invoked unsuccessfully: {}", id, result.getErrors());
-                }
-            }
 
-            @Override
-            public void onFailure(Throwable t) {
-                LOG.warn("{}: Error {} data to (running){}, data: {}", id, operation, path, data.orNull(), t);
-            }
-        };
+        NetconfRpcFutureCallback editConfigCallback = new NetconfRpcFutureCallback("Edit running", id);
+
         if (defaultOperation.isPresent()) {
             resultsFutures.add(
                     netOps.editConfigRunning(editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport));
