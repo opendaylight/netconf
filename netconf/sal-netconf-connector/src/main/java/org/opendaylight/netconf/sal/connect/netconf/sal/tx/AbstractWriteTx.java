@@ -170,8 +170,14 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
 
             @Override
             public void onFailure(Throwable throwable) {
-                // TODO should we wrap throwable in NetconfDocumentedException
-                transformed.setException(throwable);
+                NetconfDocumentedException exception =
+                        new NetconfDocumentedException(
+                                new DocumentedException(id + ":RPC during tx returned an exception",
+                                        new Exception(throwable),
+                                        DocumentedException.ErrorType.application,
+                                        DocumentedException.ErrorTag.operation_failed,
+                                        DocumentedException.ErrorSeverity.error) );
+                transformed.setException(exception);
             }
         });
 
