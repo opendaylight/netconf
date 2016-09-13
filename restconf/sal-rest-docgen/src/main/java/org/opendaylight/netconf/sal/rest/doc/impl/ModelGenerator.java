@@ -151,26 +151,31 @@ public class ModelGenerator {
      */
     private void processRPCs(final Module module, final JSONObject models, final SchemaContext schemaContext) throws JSONException,
             IOException {
-
         final Set<RpcDefinition> rpcs = module.getRpcs();
         final String moduleName = module.getName();
         for (final RpcDefinition rpc : rpcs) {
-
             final ContainerSchemaNode input = rpc.getInput();
             if (input != null) {
-                final JSONObject inputJSON = processDataNodeContainer(input, moduleName, models, schemaContext);
+                final JSONObject properties = processChildren(input.getChildNodes(), input.getQName(), moduleName,
+                        models, true, schemaContext);
                 final String filename = "(" + rpc.getQName().getLocalName() + ")input";
-                inputJSON.put("id", filename);
-                // writeToFile(filename, inputJSON.toString(2), moduleName);
-                models.put(filename, inputJSON);
+                final JSONObject childSchema = getSchemaTemplate();
+                childSchema.put(TYPE_KEY, OBJECT_TYPE);
+                childSchema.put(PROPERTIES_KEY, properties);
+                childSchema.put("id", filename);
+                models.put(filename, childSchema);
             }
 
             final ContainerSchemaNode output = rpc.getOutput();
             if (output != null) {
-                final JSONObject outputJSON = processDataNodeContainer(output, moduleName, models, schemaContext);
+                final JSONObject properties = processChildren(output.getChildNodes(), output.getQName(), moduleName,
+                        models, true, schemaContext);
                 final String filename = "(" + rpc.getQName().getLocalName() + ")output";
-                outputJSON.put("id", filename);
-                models.put(filename, outputJSON);
+                final JSONObject childSchema = getSchemaTemplate();
+                childSchema.put(TYPE_KEY, OBJECT_TYPE);
+                childSchema.put(PROPERTIES_KEY, properties);
+                childSchema.put("id", filename);
+                models.put(filename, childSchema);
             }
         }
     }
@@ -225,14 +230,6 @@ public class ModelGenerator {
             identityObj.put(PROPERTIES_KEY, props);
             models.put(identityName, identityObj);
         }
-    }
-
-    /**
-     * Processes the container and list nodes and populates the moduleJSON.
-     */
-    private JSONObject processDataNodeContainer(final DataNodeContainer dataNode, final String moduleName, final JSONObject models,
-            final SchemaContext schemaContext) throws JSONException, IOException {
-        return processDataNodeContainer(dataNode, moduleName, models, true, schemaContext);
     }
 
     private JSONObject processDataNodeContainer(final DataNodeContainer dataNode, final String moduleName, final JSONObject models,
