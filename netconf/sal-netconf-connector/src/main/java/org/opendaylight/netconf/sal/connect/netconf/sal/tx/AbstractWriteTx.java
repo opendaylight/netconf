@@ -45,7 +45,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
     // Allow commit to be called only once
     protected boolean finished = false;
 
-    public AbstractWriteTx(final NetconfBaseOps netOps, final RemoteDeviceId id, final boolean rollbackSupport) {
+    AbstractWriteTx(final NetconfBaseOps netOps, final RemoteDeviceId id, final boolean rollbackSupport) {
         this.netOps = netOps;
         this.id = id;
         this.rollbackSupport = rollbackSupport;
@@ -53,15 +53,15 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
         init();
     }
 
-    protected static boolean isSuccess(final DOMRpcResult result) {
+    static boolean isSuccess(final DOMRpcResult result) {
         return result.getErrors().isEmpty();
     }
 
-    protected void checkNotFinished() {
+    private void checkNotFinished() {
         Preconditions.checkState(!isFinished(), "%s: Transaction %s already finished", id, getIdentifier());
     }
 
-    protected boolean isFinished() {
+    private boolean isFinished() {
         return finished;
     }
 
