@@ -45,44 +45,12 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
     // Allow commit to be called only once
     protected boolean finished = false;
 
-    public AbstractWriteTx(final NetconfBaseOps netOps, final RemoteDeviceId id, final boolean rollbackSupport) {
+    AbstractWriteTx(final NetconfBaseOps netOps, final RemoteDeviceId id, final boolean rollbackSupport) {
         this.netOps = netOps;
         this.id = id;
         this.rollbackSupport = rollbackSupport;
         this.resultsFutures = Lists.newArrayList();
         init();
-    }
-
-    protected static boolean isSuccess(final DOMRpcResult result) {
-        return result.getErrors().isEmpty();
-    }
-
-    protected void checkNotFinished() {
-        Preconditions.checkState(!isFinished(), "%s: Transaction %s already finished", id, getIdentifier());
-    }
-
-    protected boolean isFinished() {
-        return finished;
-    }
-
-    @Override
-    public synchronized boolean cancel() {
-        if(isFinished()) {
-            return false;
-        }
-
-        finished = true;
-        cleanup();
-        return true;
-    }
-
-    protected abstract void init();
-
-    protected abstract void cleanup();
-
-    @Override
-    public Object getIdentifier() {
-        return this;
     }
 
     @Override
@@ -113,14 +81,6 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
         editConfig(path, Optional.fromNullable(data), editStructure, Optional.<ModifyAction>absent(), "merge");
     }
 
-    /**
-     * Check whether the data to be written consists only from mixins
-     */
-    private static boolean containsOnlyNonVisibleData(final YangInstanceIdentifier path, final NormalizedNode<?, ?> data) {
-        // There's only one such case:top level list (pathArguments == 1 && data is Mixin)
-        // any other mixin nodes are contained by a "regular" node thus visible when serialized
-        return path.getPathArguments().size() == 1 && data instanceof MixinNode;
-    }
 
     @Override
     public synchronized void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
@@ -137,16 +97,23 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
         return performCommit();
     }
 
-    protected abstract ListenableFuture<RpcResult<TransactionStatus>> performCommit();
-
-    private void checkEditable(final LogicalDatastoreType store) {
-        checkNotFinished();
-        Preconditions.checkArgument(store == LogicalDatastoreType.CONFIGURATION, "Can edit only configuration data, not %s", store);
+    @Override
+    public Object getIdentifier() {
+        return this;
     }
 
-    protected abstract void editConfig(final YangInstanceIdentifier path, final Optional<NormalizedNode<?, ?>> data, final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> defaultOperation, final String operation);
+    @Override
+    public synchronized boolean cancel() {
+        if(isFinished()) {
+            return false;
+        }
 
-    protected ListenableFuture<RpcResult<TransactionStatus>> resultsToTxStatus() {
+        finished = true;
+        cleanup();
+        return true;
+    }
+
+    ListenableFuture<RpcResult<TransactionStatus>> resultsToTxStatus() {
         final SettableFuture<RpcResult<TransactionStatus>> transformed = SettableFuture.create();
 
         Futures.addCallback(Futures.allAsList(resultsFutures), new FutureCallback<List<DOMRpcResult>>() {
@@ -176,5 +143,39 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
         });
 
         return transformed;
+    }
+
+    private boolean isFinished() {
+        return finished;
+    }
+
+    private void checkNotFinished() {
+        Preconditions.checkState(!isFinished(), "%s: Transaction %s already finished", id, getIdentifier());
+    }
+
+    private void checkEditable(final LogicalDatastoreType store) {
+        checkNotFinished();
+        Preconditions.checkArgument(store == LogicalDatastoreType.CONFIGURATION, "Can edit only configuration data, not %s", store);
+    }
+
+    protected abstract void init();
+
+    protected abstract void cleanup();
+
+    protected abstract ListenableFuture<RpcResult<TransactionStatus>> performCommit();
+
+    protected abstract void editConfig(final YangInstanceIdentifier path, final Optional<NormalizedNode<?, ?>> data, final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> defaultOperation, final String operation);
+
+    static boolean isSuccess(final DOMRpcResult result) {
+        return result.getErrors().isEmpty();
+    }
+
+    /**
+     * Check whether the data to be written consists only from mixins
+     */
+    private static boolean containsOnlyNonVisibleData(final YangInstanceIdentifier path, final NormalizedNode<?, ?> data) {
+        // There's only one such case:top level list (pathArguments == 1 && data is Mixin)
+        // any other mixin nodes are contained by a "regular" node thus visible when serialized
+        return path.getPathArguments().size() == 1 && data instanceof MixinNode;
     }
 }
