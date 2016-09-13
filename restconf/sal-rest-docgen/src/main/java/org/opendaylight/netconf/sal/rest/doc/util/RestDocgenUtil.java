@@ -22,7 +22,7 @@ public class RestDocgenUtil {
     private RestDocgenUtil() {
     }
 
-    private static Map<URI, Map<Date, Module>> namespaceAndRevisionToModule = new HashMap<>();
+    private static final Map<URI, Map<Date, Module>> namespaceAndRevisionToModule = new HashMap<>();
 
     /**
      * Resolve path argument name for {@code node}.
@@ -34,9 +34,9 @@ public class RestDocgenUtil {
      * @return name of {@code node}
      */
     public static String resolvePathArgumentsName(final SchemaNode node, final SchemaContext schemaContext) {
-        Iterable<QName> schemaPath = node.getPath().getPathTowardsRoot();
-        Iterator<QName> it = schemaPath.iterator();
-        QName nodeQName = it.next();
+        final Iterable<QName> schemaPath = node.getPath().getPathTowardsRoot();
+        final Iterator<QName> it = schemaPath.iterator();
+        final QName nodeQName = it.next();
 
         QName parentQName = null;
         if (it.hasNext()) {
@@ -80,7 +80,7 @@ public class RestDocgenUtil {
         }
     }
 
-    private static boolean isEqualNamespaceAndRevision(QName parentQName, QName nodeQName) {
+    private static boolean isEqualNamespaceAndRevision(final QName parentQName, final QName nodeQName) {
         if (parentQName == null) {
             if (nodeQName == null) {
                 return true;
@@ -90,4 +90,5 @@ public class RestDocgenUtil {
         return parentQName.getNamespace().equals(nodeQName.getNamespace())
                 && parentQName.getRevision().equals(nodeQName.getRevision());
     }
+
 }

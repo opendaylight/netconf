@@ -31,7 +31,7 @@ public class JaxbContextResolver implements ContextResolver<ObjectMapper> {
     }
 
     @Override
-    public ObjectMapper getContext(Class<?> klass) {
+    public ObjectMapper getContext(final Class<?> klass) {
         if (ApiDeclaration.class.isAssignableFrom(klass)) {
             return ctx;
         }
