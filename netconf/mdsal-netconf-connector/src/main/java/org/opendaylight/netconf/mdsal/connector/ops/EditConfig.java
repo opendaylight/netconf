@@ -87,7 +87,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
             executeOperations(changeTracker);
         }
 
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
     }
 
     private void executeOperations(final DataTreeChangeTracker changeTracker) throws DocumentedException {
