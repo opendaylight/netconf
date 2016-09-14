@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_d4693cfa",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/TxChain.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-09-14T13:10:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_941a24c4",
+      "range": {
+        "startLine": 33,
+        "startChar": 12,
+        "endLine": 33,
+        "endChar": 28
+      },
+      "revId": "7401a376cd15504d8b61d91a4073256a3be69336",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_b44da0c6",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/TxChain.java",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2016-09-14T12:50:55Z",
       "side": 1,
       "message": "keep the ListenerRegistration to close it in setLastFinishedTxStatus",
+      "range": {
+        "startLine": 67,
+        "startChar": 23,
+        "endLine": 67,
+        "endChar": 34
+      },
+      "revId": "7401a376cd15504d8b61d91a4073256a3be69336",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_1470d4da",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/TxChain.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-09-14T13:10:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_b44da0c6",
       "range": {
         "startLine": 67,
         "startChar": 23,
