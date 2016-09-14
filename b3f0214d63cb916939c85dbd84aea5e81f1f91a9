@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_77fcaab8",
+        "filename": "distributed-tx/api/pom.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-14T15:00:13Z",
+      "side": 1,
+      "message": "should be 0.6.0-SNAPSHOT",
+      "range": {
+        "startLine": 6,
+        "startChar": 13,
+        "endLine": 6,
+        "endChar": 27
+      },
+      "revId": "b3f0214d63cb916939c85dbd84aea5e81f1f91a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_57f7eed2",
+        "filename": "distributed-tx/pom.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-14T15:00:13Z",
+      "side": 1,
+      "message": "should be 1.8.0-SNAPSHOT",
+      "range": {
+        "startLine": 8,
+        "startChar": 13,
+        "endLine": 8,
+        "endChar": 27
+      },
+      "revId": "b3f0214d63cb916939c85dbd84aea5e81f1f91a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
