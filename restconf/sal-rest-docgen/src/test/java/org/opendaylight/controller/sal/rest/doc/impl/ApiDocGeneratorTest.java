@@ -94,12 +94,12 @@ public class ApiDocGeneratorTest {
         final Api lstApi = findApi("/config/toaster2:lst/", doc);
         assertNotNull("Api /config/toaster2:lst/ wasn't found", lstApi);
         assertTrue("POST for cont1 in lst is missing",
-                findOperation(lstApi.getOperations(), "POST", "(config)lstPOST", "(config)lst1", "(config)cont1"));
+                findOperation(lstApi.getOperations(), "POST", "(config)lstPOST", "(config)lst1-TOP", "(config)cont1-TOP"));
 
         final Api cont1Api = findApi("/config/toaster2:lst/cont1/", doc);
         assertNotNull("Api /config/toaster2:lst/cont1/ wasn't found", cont1Api);
         assertTrue("POST for cont11 in cont1 is missing",
-                findOperation(cont1Api.getOperations(), "POST", "(config)cont1POST", "(config)cont11", "(config)lst11"));
+                findOperation(cont1Api.getOperations(), "POST", "(config)cont1POST", "(config)cont11-TOP", "(config)lst11-TOP"));
 
         // no POST URI
         final Api cont11Api = findApi("/config/toaster2:lst/cont1/cont11/", doc);
@@ -224,7 +224,7 @@ public class ApiDocGeneratorTest {
                 // testing bugs.opendaylight.org bug 1290. UnionType model type.
                 final String jsonString = doc.getModels().toString();
                 assertTrue(jsonString.contains(
-                        "testUnion\":{\"minItems\":0,\"maxItems\":2147483647,\"type\":\"integer or string\",\"required\":false}"));
+                        "testUnion\":{\"type\":\"integer or string\",\"required\":false}"));
             }
         }
     }
