@@ -15,6 +15,7 @@ import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_CANDIDATE_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_QNAME;
@@ -140,4 +141,42 @@ public class NetconfDeviceWriteOnlyTxTest {
         inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME), NetconfBaseOps.getUnLockContent(NETCONF_RUNNING_QNAME));
     }
 
+    @Test
+    public void testListenerSuccess() throws Exception {
+        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null)))
+                .when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+        final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX.getSchemaContext()), false);
+        final TxListener listener = mock(TxListener.class);
+        tx.addListener(listener);
+        tx.delete(LogicalDatastoreType.CONFIGURATION, yangIId);
+        tx.submit();
+        verify(listener).onTransactionSuccessful(tx);
+    }
+
+    @Test
+    public void testListenerCancellation() throws Exception {
+        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null)))
+                .when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+        final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX.getSchemaContext()), false);
+        final TxListener listener = mock(TxListener.class);
+        tx.addListener(listener);
+        tx.delete(LogicalDatastoreType.CONFIGURATION, yangIId);
+        tx.cancel();
+        verify(listener).onTransactionCancelled(tx);
+    }
+
+    @Test
+    public void testListenerFailure() throws Exception {
+        final IllegalStateException cause = new IllegalStateException("Failed tx");
+        doReturn(Futures.immediateFailedCheckedFuture(cause))
+                .when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+        final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX.getSchemaContext()), false);
+        final TxListener listener = mock(TxListener.class);
+        tx.addListener(listener);
+        tx.delete(LogicalDatastoreType.CONFIGURATION, yangIId);
+        tx.submit();
+        verify(listener).onTransactionFailed(tx, cause);
+        verify(listener, never()).onTransactionSuccessful(tx);
+        verify(listener, never()).onTransactionCancelled(tx);
+    }
 }
