@@ -84,11 +84,6 @@ public class TopologyRoleChangeStrategy implements RoleChangeStrategy, Clustered
     }
 
     @Override
-    public boolean isCandidateRegistered() {
-        return entityOwnershipService.isCandidateRegistered(entity);
-    }
-
-    @Override
     public void onRoleChanged(RoleChangeDTO roleChangeDTO) {
         if (roleChangeDTO.isOwner()) {
             LOG.warn("Gained ownership of entity, registering datastore listener");

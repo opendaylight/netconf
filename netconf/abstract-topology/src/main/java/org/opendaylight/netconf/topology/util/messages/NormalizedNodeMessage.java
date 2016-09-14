@@ -20,7 +20,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 
-public class NormalizedNodeMessage implements Externalizable{
+public class NormalizedNodeMessage implements Externalizable {
     private static final long serialVersionUID = 1L;
 
     private YangInstanceIdentifier identifier = null;

@@ -105,11 +105,6 @@ public final class BaseNodeManager implements NodeManager {
     }
 
     @Override
-    public Future<NormalizedNodeMessage> onRemoteNodeUpdated(final NormalizedNodeMessage message) {
-        return null;
-    }
-
-    @Override
     public Future<Void> onRemoteNodeDeleted(final NodeId nodeId) {
         return null;
     }

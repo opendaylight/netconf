@@ -19,9 +19,8 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
  */
 @Beta
 public interface InitialStateProvider {
-    @Nonnull
-    Node getInitialState(@Nonnull final NodeId nodeId, @Nonnull final Node configNode);
 
-    @Nonnull
-    Node getFailedState(@Nonnull final NodeId nodeId, @Nullable final Node configNode);
+    @Nonnull Node getInitialState(@Nonnull final NodeId nodeId, @Nonnull final Node configNode);
+
+    @Nonnull Node getFailedState(@Nonnull final NodeId nodeId, @Nullable final Node configNode);
 }

@@ -28,13 +28,6 @@ public interface RemoteNodeListener {
     Future<NormalizedNodeMessage> onRemoteNodeCreated(NormalizedNodeMessage message);
 
     /**
-     * This is called when a remote node is informing you that a configuration was updated.
-     * @param message - serializable message to send
-     * @return response from the remote node
-     */
-    Future<NormalizedNodeMessage> onRemoteNodeUpdated(NormalizedNodeMessage message);
-
-    /**
      * This is called when a remote node is informing you that a new configuration was deleted.
      * @param nodeId - id of the node which was deleted
      * @return void future success if delete succeed, failure otherwise
