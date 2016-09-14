@@ -1,0 +1,113 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_948d04d6",
+        "filename": "distributed-tx/spi/src/main/java/org/opendaylight/distributed/tx/spi/DTXReadWriteTransaction.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-14T14:00:33Z",
+      "side": 1,
+      "message": "extra space",
+      "range": {
+        "startLine": 25,
+        "startChar": 17,
+        "endLine": 25,
+        "endChar": 18
+      },
+      "revId": "8bd2a55fb270346110b28497f384770f878f3be3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_d4c2dce7",
+        "filename": "distributed-tx/spi/src/main/java/org/opendaylight/distributed/tx/spi/DTXReadWriteTransaction.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-14T14:00:33Z",
+      "side": 1,
+      "message": "missing space",
+      "revId": "8bd2a55fb270346110b28497f384770f878f3be3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_b4a92026",
+        "filename": "distributed-tx/spi/src/main/java/org/opendaylight/distributed/tx/spi/TransactionLock.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-14T14:00:33Z",
+      "side": 1,
+      "message": "why release and not unlock? I beleive using unlock would be consistent with the used terminology",
+      "range": {
+        "startLine": 57,
+        "startChar": 9,
+        "endLine": 57,
+        "endChar": 16
+      },
+      "revId": "8bd2a55fb270346110b28497f384770f878f3be3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_3709922c",
+        "filename": "distributed-tx/spi/src/main/java/org/opendaylight/distributed/tx/spi/TxProvider.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-14T14:00:33Z",
+      "side": 1,
+      "message": "Unlock",
+      "range": {
+        "startLine": 52,
+        "startChar": 7,
+        "endLine": 52,
+        "endChar": 11
+      },
+      "revId": "8bd2a55fb270346110b28497f384770f878f3be3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_170c563a",
+        "filename": "distributed-tx/spi/src/main/java/org/opendaylight/distributed/tx/spi/TxProvider.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-14T14:00:33Z",
+      "side": 1,
+      "message": "unlock might be more accurate",
+      "range": {
+        "startLine": 56,
+        "startChar": 9,
+        "endLine": 56,
+        "endChar": 16
+      },
+      "revId": "8bd2a55fb270346110b28497f384770f878f3be3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
