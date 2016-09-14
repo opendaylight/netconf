@@ -30,10 +30,4 @@ public interface RoleChangeStrategy extends RoleChangeListener {
      */
     void unregisterRoleCandidate();
 
-    /**
-     *
-     * @return True/False based on if this candidate is already registered into ownership service
-     */
-    boolean isCandidateRegistered();
-
 }

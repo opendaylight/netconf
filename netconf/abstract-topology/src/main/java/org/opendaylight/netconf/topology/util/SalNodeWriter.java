@@ -32,8 +32,8 @@ public final class SalNodeWriter implements NodeWriter {
     private static final Logger LOG = LoggerFactory.getLogger(SalNodeWriter.class);
 
     private final String topologyId;
-
     private final BindingTransactionChain transactionChain;
+
     public SalNodeWriter(final DataBroker dataBroker, final String topologyId) {
         this.topologyId = topologyId;
         this.transactionChain = Preconditions.checkNotNull(dataBroker).createTransactionChain(new TransactionChainListener() {
@@ -72,12 +72,14 @@ public final class SalNodeWriter implements NodeWriter {
         commitTransaction(wTx, id, "delete");
     }
 
+    // FIXME duplicated code. Also present in:
+    // netconf/netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/impl/TopologyNodeWriter.java
+    // netconf/netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapter.java
     private void commitTransaction(final WriteTransaction transaction, final NodeId id, final String txType) {
         LOG.debug("{}: Committing Transaction {}:{}", id.getValue(), txType,
                 transaction.getIdentifier());
-        final CheckedFuture<Void, TransactionCommitFailedException> result = transaction.submit();
 
-        Futures.addCallback(result, new FutureCallback<Void>() {
+        Futures.addCallback(transaction.submit(), new FutureCallback<Void>() {
             @Override
             public void onSuccess(final Void result) {
                 LOG.debug("{}: Transaction({}) {} SUCCESSFUL", id.getValue(), txType,
