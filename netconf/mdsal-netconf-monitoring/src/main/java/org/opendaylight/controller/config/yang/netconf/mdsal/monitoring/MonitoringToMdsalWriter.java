@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * Writes netconf server state changes received from NetconfMonitoringService to netconf-state datastore subtree.
  */
 final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMonitoringService.CapabilitiesListener,
-        NetconfMonitoringService.SessionsListener, BindingAwareProvider {
+        NetconfMonitoringService.SessionsListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(MonitoringToMdsalWriter.class);
 
@@ -45,10 +45,12 @@ final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMonitoringS
             InstanceIdentifier.create(NetconfState.class).child(Sessions.class);
 
     private final NetconfMonitoringService serverMonitoringDependency;
-    private DataBroker dataBroker;
+    private final DataBroker dataBroker;
 
-    public MonitoringToMdsalWriter(final NetconfMonitoringService serverMonitoringDependency) {
+    public MonitoringToMdsalWriter(final NetconfMonitoringService serverMonitoringDependency,
+                                   final DataBroker dataBroker) {
         this.serverMonitoringDependency = serverMonitoringDependency;
+        this.dataBroker = dataBroker;
     }
 
     @Override
@@ -85,9 +87,10 @@ final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMonitoringS
         runTransaction((tx) -> tx.put(LogicalDatastoreType.OPERATIONAL, SCHEMAS_INSTANCE_IDENTIFIER, schemas));
     }
 
-    @Override
-    public void onSessionInitiated(final BindingAwareBroker.ProviderContext providerContext) {
-        dataBroker = providerContext.getSALService(DataBroker.class);
+    /**
+     * Invoke using blueprint
+     */
+    public void start() {
         serverMonitoringDependency.registerCapabilitiesListener(this);
         serverMonitoringDependency.registerSessionsListener(this);
     }
