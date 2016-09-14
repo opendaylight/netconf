@@ -24,6 +24,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.ReadOnlyTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.ReadWriteTx;
+import org.opendaylight.netconf.sal.connect.netconf.sal.tx.TxChain;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteCandidateRunningTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteCandidateTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteRunningTx;
@@ -38,8 +39,8 @@ public final class NetconfDeviceDataBroker implements DOMDataBroker {
     private final NetconfBaseOps netconfOps;
 
     private final boolean rollbackSupport;
-    private boolean candidateSupported;
-    private boolean runningWritable;
+    private final boolean candidateSupported;
+    private final boolean runningWritable;
 
     public NetconfDeviceDataBroker(final RemoteDeviceId id, final SchemaContext schemaContext, final DOMRpcService rpc, final NetconfSessionPreferences netconfSessionPreferences) {
         this.id = id;
@@ -83,7 +84,7 @@ public final class NetconfDeviceDataBroker implements DOMDataBroker {
 
     @Override
     public DOMTransactionChain createTransactionChain(final TransactionChainListener listener) {
-        throw new UnsupportedOperationException(id + ": Transaction chains not supported for netconf mount point");
+        return new TxChain(this, listener);
     }
 
     @Override
