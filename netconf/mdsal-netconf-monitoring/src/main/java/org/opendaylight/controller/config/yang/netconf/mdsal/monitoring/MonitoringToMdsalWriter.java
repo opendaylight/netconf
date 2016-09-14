@@ -17,8 +17,6 @@ import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
-import org.opendaylight.controller.sal.binding.api.BindingAwareProvider;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
@@ -32,8 +30,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Writes netconf server state changes received from NetconfMonitoringService to netconf-state datastore subtree.
  */
-final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMonitoringService.CapabilitiesListener,
-        NetconfMonitoringService.SessionsListener, BindingAwareProvider {
+public final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMonitoringService.CapabilitiesListener,
+        NetconfMonitoringService.SessionsListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(MonitoringToMdsalWriter.class);
 
@@ -45,12 +43,17 @@ final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMonitoringS
             InstanceIdentifier.create(NetconfState.class).child(Sessions.class);
 
     private final NetconfMonitoringService serverMonitoringDependency;
-    private DataBroker dataBroker;
+    private final DataBroker dataBroker;
 
-    public MonitoringToMdsalWriter(final NetconfMonitoringService serverMonitoringDependency) {
+    public MonitoringToMdsalWriter(final NetconfMonitoringService serverMonitoringDependency,
+                                   final DataBroker dataBroker) {
         this.serverMonitoringDependency = serverMonitoringDependency;
+        this.dataBroker = dataBroker;
     }
 
+    /**
+     * Invoke using blueprint
+     */
     @Override
     public void close() {
         runTransaction((tx) -> tx.delete(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(NetconfState.class)));
@@ -85,9 +88,10 @@ final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMonitoringS
         runTransaction((tx) -> tx.put(LogicalDatastoreType.OPERATIONAL, SCHEMAS_INSTANCE_IDENTIFIER, schemas));
     }
 
-    @Override
-    public void onSessionInitiated(final BindingAwareBroker.ProviderContext providerContext) {
-        dataBroker = providerContext.getSALService(DataBroker.class);
+    /**
+     * Invoke using blueprint
+     */
+    public void start() {
         serverMonitoringDependency.registerCapabilitiesListener(this);
         serverMonitoringDependency.registerSessionsListener(this);
     }
