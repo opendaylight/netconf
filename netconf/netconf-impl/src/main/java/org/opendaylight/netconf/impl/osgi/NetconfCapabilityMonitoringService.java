@@ -16,14 +16,15 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import io.netty.util.internal.ConcurrentSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.opendaylight.controller.config.util.capability.BasicCapability;
 import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
@@ -57,13 +58,13 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
         }
     };
 
-    private final Set<NetconfManagementSession> sessions = new HashSet<>();
+    private final Set<NetconfManagementSession> sessions = new ConcurrentSet<>();
     private final NetconfOperationServiceFactory netconfOperationProvider;
-    private final Map<Uri, Capability> capabilities = new HashMap<>();
-    private final Map<String, Map<String, String>> mappedModulesToRevisionToSchema = Maps.newHashMap();
+    private final Map<Uri, Capability> capabilities = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, String>> mappedModulesToRevisionToSchema = new ConcurrentHashMap<>();
 
 
-    private final Set<NetconfMonitoringService.CapabilitiesListener> listeners = Sets.newHashSet();
+    private final Set<NetconfMonitoringService.CapabilitiesListener> listeners = new ConcurrentSet<>();
     private volatile BaseNotificationPublisherRegistration notificationPublisher;
 
     NetconfCapabilityMonitoringService(final NetconfOperationServiceFactory netconfOperationProvider) {
@@ -81,7 +82,7 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
         }
     }
 
-    synchronized String getSchemaForModuleRevision(final String moduleName, final Optional<String> revision) {
+    String getSchemaForModuleRevision(final String moduleName, final Optional<String> revision) {
 
         Map<String, String> revisionMapRequest = mappedModulesToRevisionToSchema.get(moduleName);
         Preconditions.checkState(revisionMapRequest != null, "Capability for module %s not present, " + ""
@@ -213,14 +214,14 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
     }
 
     @Override
-    public synchronized void close() throws Exception {
+    public void close() throws Exception {
         listeners.clear();
         sessions.clear();
         capabilities.clear();
     }
 
     @Override
-    public synchronized void onCapabilitiesChanged(Set<Capability> added, Set<Capability> removed) {
+    public void onCapabilitiesChanged(Set<Capability> added, Set<Capability> removed) {
         onCapabilitiesAdded(added);
         onCapabilitiesRemoved(removed);
         updateCapabilityToSchemaMap(added, removed);

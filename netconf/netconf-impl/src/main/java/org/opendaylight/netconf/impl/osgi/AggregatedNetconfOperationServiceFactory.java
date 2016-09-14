@@ -13,11 +13,14 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
+import io.netty.util.internal.ConcurrentSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListMap;
 import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
@@ -35,9 +38,9 @@ public class AggregatedNetconfOperationServiceFactory implements NetconfOperatio
 
     private static final Logger LOG = LoggerFactory.getLogger(AggregatedNetconfOperationServiceFactory.class);
 
-    private final Set<NetconfOperationServiceFactory> factories = new HashSet<>();
-    private final Multimap<NetconfOperationServiceFactory, AutoCloseable> registrations = HashMultimap.create();
-    private final Set<CapabilityListener> listeners = Sets.newHashSet();
+    private final Set<NetconfOperationServiceFactory> factories = new ConcurrentSet<>();
+    private final Multimap<NetconfOperationServiceFactory, AutoCloseable> registrations = Multimaps.synchronizedMultimap(HashMultimap.create());
+    private final Set<CapabilityListener> listeners = new ConcurrentSet<>();
 
     public AggregatedNetconfOperationServiceFactory() {
     }
@@ -47,7 +50,7 @@ public class AggregatedNetconfOperationServiceFactory implements NetconfOperatio
     }
 
     @Override
-    public synchronized void onAddNetconfOperationServiceFactory(NetconfOperationServiceFactory service) {
+    public void onAddNetconfOperationServiceFactory(NetconfOperationServiceFactory service) {
         factories.add(service);
 
         for (final CapabilityListener listener : listeners) {
@@ -57,7 +60,7 @@ public class AggregatedNetconfOperationServiceFactory implements NetconfOperatio
     }
 
     @Override
-    public synchronized void onRemoveNetconfOperationServiceFactory(NetconfOperationServiceFactory service) {
+    public void onRemoveNetconfOperationServiceFactory(NetconfOperationServiceFactory service) {
         factories.remove(service);
 
         for (final AutoCloseable autoCloseable : registrations.get(service)) {
@@ -72,7 +75,7 @@ public class AggregatedNetconfOperationServiceFactory implements NetconfOperatio
     }
 
     @Override
-    public synchronized Set<Capability> getCapabilities() {
+    public Set<Capability> getCapabilities() {
         final HashSet<Capability> capabilities = Sets.newHashSet();
         for (final NetconfOperationServiceFactory factory : factories) {
             capabilities.addAll(factory.getCapabilities());
@@ -81,7 +84,7 @@ public class AggregatedNetconfOperationServiceFactory implements NetconfOperatio
     }
 
     @Override
-    public synchronized AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
+    public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
         final Map<NetconfOperationServiceFactory, AutoCloseable> regs = Maps.newHashMap();
 
         for (final NetconfOperationServiceFactory factory : factories) {
@@ -105,12 +108,12 @@ public class AggregatedNetconfOperationServiceFactory implements NetconfOperatio
     }
 
     @Override
-    public synchronized NetconfOperationService createService(final String netconfSessionIdForReporting) {
+    public NetconfOperationService createService(final String netconfSessionIdForReporting) {
         return new AggregatedNetconfOperation(factories, netconfSessionIdForReporting);
     }
 
     @Override
-    public synchronized void close() throws Exception {
+    public void close() throws Exception {
         factories.clear();
         for (AutoCloseable reg : registrations.values()) {
             reg.close();
