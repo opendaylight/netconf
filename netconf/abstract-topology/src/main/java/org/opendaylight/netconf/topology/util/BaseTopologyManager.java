@@ -84,8 +84,6 @@ public final class BaseTopologyManager
 
     private final BindingNormalizedNodeCodecRegistry codecRegistry;
 
-    private static final String PATH = "/user/";
-
     private final DataBroker dataBroker;
     private final RoleChangeStrategy roleChangeStrategy;
     private final StateAggregator aggregator;
@@ -428,32 +426,6 @@ public final class BaseTopologyManager
             }
         });
 
-        return promise.future();
-    }
-
-    @Override
-    public Future<NormalizedNodeMessage> onRemoteNodeUpdated(final NormalizedNodeMessage message) {
-        final Entry<InstanceIdentifier<?>, DataObject> fromNormalizedNode =
-                codecRegistry.fromNormalizedNode(message.getIdentifier(), message.getNode());
-        final InstanceIdentifier<Node> iid = (InstanceIdentifier<Node>) fromNormalizedNode.getKey();
-        final Node value = (Node) fromNormalizedNode.getValue();
-
-        LOG.debug("TopologyManager({}) onRemoteNodeUpdated received, nodeid: {}", id, value.getNodeId());
-
-        final ListenableFuture<Node> nodeListenableFuture = onNodeUpdated(value.getNodeId(), value);
-        final DefaultPromise<NormalizedNodeMessage> promise = new DefaultPromise<>();
-        Futures.addCallback(nodeListenableFuture, new FutureCallback<Node>() {
-            @Override
-            public void onSuccess(Node result) {
-                final Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> entry = codecRegistry.toNormalizedNode(iid, result);
-                promise.success(new NormalizedNodeMessage(entry.getKey(), entry.getValue()));
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                promise.failure(t);
-            }
-        });
         return promise.future();
     }
 

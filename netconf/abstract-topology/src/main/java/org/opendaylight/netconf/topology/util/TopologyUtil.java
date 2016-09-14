@@ -40,7 +40,7 @@ public final class TopologyUtil {
                 return ((NodeKey) key).getNodeId();
             }
         }
-        throw new IllegalStateException("Unable to create NodeId from: " + pathArgument);
+        throw new IllegalStateException("Unable to get NodeId from: " + pathArgument);
     }
 
     public static KeyedInstanceIdentifier<Topology, TopologyKey> createTopologyListPath(final String topologyId) {
@@ -49,7 +49,7 @@ public final class TopologyUtil {
     }
 
     public static InstanceIdentifier<Node> createTopologyNodeListPath(final NodeKey key, final String topologyId) {
-        return createTopologyListPath(topologyId).child(Node.class, new NodeKey(new NodeId(key.getNodeId().getValue())));
+        return createTopologyListPath(topologyId).child(Node.class, key);
     }
 
     public static InstanceIdentifier<Node> createTopologyNodePath(final String topologyId) {

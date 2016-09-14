@@ -29,7 +29,7 @@ public class LoggingSalNodeWriter implements NodeWriter{
 
     @Override
     public void init(@Nonnull NodeId id, @Nonnull Node operationalDataNode) {
-        LOG.warn("Init recieved");
+        LOG.warn("Init received");
         LOG.warn("NodeId: {}", id.getValue());
         LOG.warn("Node: {}", operationalDataNode);
         for (final NodeWriter delegate : delegates) {
@@ -39,7 +39,7 @@ public class LoggingSalNodeWriter implements NodeWriter{
 
     @Override
     public void update(@Nonnull NodeId id, @Nonnull Node operationalDataNode) {
-        LOG.warn("Update recieved");
+        LOG.warn("Update received");
         LOG.warn("NodeId: {}", id.getValue());
         LOG.warn("Node: {}", operationalDataNode);
         for (final NodeWriter delegate : delegates) {
@@ -49,7 +49,7 @@ public class LoggingSalNodeWriter implements NodeWriter{
 
     @Override
     public void delete(@Nonnull NodeId id) {
-        LOG.warn("Delete recieved");
+        LOG.warn("Delete received");
         LOG.warn("NodeId: {}", id.getValue());
         for (final NodeWriter delegate : delegates) {
             delegate.delete(id);
