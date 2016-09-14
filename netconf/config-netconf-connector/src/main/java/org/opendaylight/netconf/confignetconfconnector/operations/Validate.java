@@ -80,6 +80,6 @@ public class Validate extends AbstractConfigNetconfOperation {
 
         LOG.trace("Datastore {} validated successfully", Datastore.candidate);
 
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
     }
 }

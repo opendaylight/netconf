@@ -54,7 +54,7 @@ public class Commit extends AbstractConfigNetconfOperation {
         }
         LOG.trace("Datastore {} committed successfully: {}", Datastore.candidate, status);
 
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
     }
 
 }

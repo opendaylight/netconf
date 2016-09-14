@@ -16,12 +16,12 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 public class NetconfOperationServiceImpl implements NetconfOperationService {
 
     private final NetconfOperationProvider operationProvider;
-    private ConfigSubsystemFacade configSubsystemFacade;
+    private final ConfigSubsystemFacade configSubsystemFacade;
 
     public NetconfOperationServiceImpl(final ConfigSubsystemFacade configSubsystemFacade,
             final String netconfSessionIdForReporting) {
         this.configSubsystemFacade = configSubsystemFacade;
-        operationProvider = new NetconfOperationProvider(configSubsystemFacade, netconfSessionIdForReporting);
+        this.operationProvider = new NetconfOperationProvider(configSubsystemFacade, netconfSessionIdForReporting);
     }
 
     @Override
