@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_d4cdbc32",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/TxChain.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-14T12:53:37Z",
+      "side": 1,
+      "message": "txStatus would be more accurate",
+      "range": {
+        "startLine": 119,
+        "startChar": 55,
+        "endLine": 119,
+        "endChar": 65
+      },
+      "revId": "a8b26864f0302636829d9e89764762de6a9f49d3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
