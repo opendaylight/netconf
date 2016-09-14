@@ -15,27 +15,6 @@
       <modules xmlns="urn:opendaylight:params:xml:ns:yang:controller:config">
 
           <module>
-              <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:mapper">prefix:netconf-mdsal-mapper</type>
-              <name>netconf-mdsal-mapper</name>
-              <root-schema-service>
-                  <type xmlns:dom="urn:opendaylight:params:xml:ns:yang:controller:md:sal:dom">dom:schema-service</type>
-                  <name>yang-schema-service</name>
-              </root-schema-service>
-              <root-schema-source-provider>
-                  <type xmlns:dom="urn:opendaylight:params:xml:ns:yang:controller:md:sal:dom">dom:yang-text-source-provider</type>
-                  <name>yang-text-source-provider</name>
-              </root-schema-source-provider>
-              <dom-broker xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:mapper">
-                  <type xmlns:dom="urn:opendaylight:params:xml:ns:yang:controller:md:sal:dom">dom:dom-broker-osgi-registry</type>
-                  <name>dom-broker</name>
-              </dom-broker>
-              <mapper-aggregator xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:mapper">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:north:mapper">prefix:netconf-mapper-registry</type>
-                  <name>mapper-aggregator-registry</name>
-              </mapper-aggregator>
-          </module>
-
-          <module>
               <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound:impl">prefix:netconf-server-dispatcher-impl</type>
               <name>netconf-mdsal-server-dispatcher</name>
               <mappers xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound:impl">
@@ -241,7 +220,6 @@
     </data>
   </configuration>
   <required-capabilities>
-      <capability>urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:mapper?module=netconf-mdsal-mapper&amp;revision=2015-01-14</capability>
       <capability>urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:monitoring?module=netconf-mdsal-monitoring&amp;revision=2015-02-18</capability>
       <capability>urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:ssh?module=netconf-northbound-ssh&amp;revision=2015-01-14</capability>
       <capability>urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:tcp?module=netconf-northbound-tcp&amp;revision=2015-04-23</capability>
