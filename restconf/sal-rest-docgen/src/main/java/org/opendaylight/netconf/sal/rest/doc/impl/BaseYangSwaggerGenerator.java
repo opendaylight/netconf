@@ -238,7 +238,7 @@ public class BaseYangSwaggerGenerator {
     }
 
     private void addRootPostLink(final Module module, final DataNodeContainer node, final List<Parameter> pathParams,
-            final String resourcePath, final List<Api> apis) {
+                                 final String resourcePath, final List<Api> apis) {
         if (containsListOrContainer(module.getChildNodes())) {
             final Api apiForRootPostUri = new Api();
             apiForRootPostUri.setPath(resourcePath);
@@ -372,12 +372,12 @@ public class BaseYangSwaggerGenerator {
         operationSpec.setNotes(rpcDefn.getDescription());
         operationSpec.setNickname(rpcDefn.getQName().getLocalName());
         if (rpcDefn.getOutput() != null) {
-            operationSpec.setType("(" + rpcDefn.getQName().getLocalName() + ")output");
+            operationSpec.setType("(" + rpcDefn.getQName().getLocalName() + ")output" + OperationBuilder.TOP);
         }
         if (rpcDefn.getInput() != null) {
             final Parameter payload = new Parameter();
             payload.setParamType("body");
-            payload.setType("(" + rpcDefn.getQName().getLocalName() + ")input");
+            payload.setType("(" + rpcDefn.getQName().getLocalName() + ")input" + OperationBuilder.TOP);
             operationSpec.setParameters(Collections.singletonList(payload));
             operationSpec.setConsumes(OperationBuilder.CONSUMES_PUT_POST);
         }
