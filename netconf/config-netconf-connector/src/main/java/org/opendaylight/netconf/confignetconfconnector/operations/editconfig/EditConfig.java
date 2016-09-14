@@ -33,7 +33,7 @@ public class EditConfig extends AbstractConfigNetconfOperation {
 
     private static final Logger LOG = LoggerFactory.getLogger(EditConfig.class);
 
-    private EditConfigXmlParser editConfigXmlParser;
+    private final EditConfigXmlParser editConfigXmlParser;
 
     public EditConfig(final ConfigSubsystemFacade configSubsystemFacade, final String netconfSessionIdForReporting) {
         super(configSubsystemFacade, netconfSessionIdForReporting);
@@ -66,11 +66,10 @@ public class EditConfig extends AbstractConfigNetconfOperation {
 
     @Override
     protected Element handleWithNoSubsequentOperations(Document document, XmlElement xml) throws DocumentedException {
-        ConfigExecution configExecution;
         // FIXME config mapping getter works on dynamic yang store service and so does later executeConfigExecution method
         // They might have different view of current yangs in ODL and might cause race conditions
         Config cfg = getConfigSubsystemFacade().getConfigMapping();
-        configExecution = editConfigXmlParser.fromXml(xml, cfg);
+        ConfigExecution configExecution = editConfigXmlParser.fromXml(xml, cfg);
 
         return getResponseInternal(document, configExecution);
     }
