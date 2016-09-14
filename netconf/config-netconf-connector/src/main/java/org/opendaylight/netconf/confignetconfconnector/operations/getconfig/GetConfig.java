@@ -43,11 +43,10 @@ public class GetConfig extends AbstractConfigNetconfOperation {
         XmlElement sourceNode = sourceElement.getOnlyChildElement();
         String sourceParsed = sourceNode.getName();
         LOG.debug("Setting source datastore to '{}'", sourceParsed);
-        Datastore sourceDatastore = Datastore.valueOf(sourceParsed);
 
         // Filter option: ignore for now, TODO only load modules specified by the filter
 
-        return sourceDatastore;
+        return Datastore.valueOf(sourceParsed);
 
     }
 
