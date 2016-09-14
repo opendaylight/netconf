@@ -63,6 +63,6 @@ public class DiscardChanges extends AbstractConfigNetconfOperation {
         LOG.trace("Changes discarded successfully from datastore {}", Datastore.candidate);
 
 
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
     }
 }
