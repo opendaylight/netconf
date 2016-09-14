@@ -20,6 +20,7 @@ public final class OperationBuilder {
 
     public static final String OPERATIONAL = "(operational)";
     public static final String CONFIG = "(config)";
+    public static final String TOP = "-TOP";
 
     public static final List<String> CONSUMES_PUT_POST = new ArrayList<>();
 
@@ -71,7 +72,8 @@ public final class OperationBuilder {
             final List<Parameter> parameters = new ArrayList<>(params);
             final Parameter payload = new Parameter();
             payload.setParamType("body");
-            payload.setType(CONFIG + nodeName);
+            payload.setType(CONFIG + nodeName + TOP);
+            payload.setName(CONFIG + nodeName);
             parameters.add(payload);
             spec.setParameters(parameters);
             return this;
@@ -110,7 +112,7 @@ public final class OperationBuilder {
                 if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
                     final Parameter payload = new Parameter();
                     payload.setParamType("body");
-                    payload.setType(CONFIG + node.getQName().getLocalName());
+                    payload.setType(CONFIG + node.getQName().getLocalName() + TOP);
                     payload.setName("**" + CONFIG + node.getQName().getLocalName());
                     parameters.add(payload);
                 }
