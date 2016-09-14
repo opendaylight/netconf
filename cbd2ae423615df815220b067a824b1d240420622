@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "7a6b29fe_e2d91658",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-14T22:45:53Z",
+      "side": 1,
+      "message": "Could return an AutoCloseable, as we don\u0027t use the ListenerRegistration#getInstance() method.",
+      "range": {
+        "startLine": 204,
+        "startChar": 37,
+        "endLine": 204,
+        "endChar": 48
+      },
+      "revId": "cbd2ae423615df815220b067a824b1d240420622",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_f7027a08",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/TxChain.java",
         "patchSetId": 4
