@@ -6,7 +6,6 @@
   ~ terms of the Eclipse Public License v1.0 which accompanies this distribution,
   ~ and is available at http://www.eclipse.org/legal/epl-v10.html
   -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -23,34 +22,19 @@
   <name>${project.artifactId}</name>
   <packaging>bundle</packaging>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.opendaylight.netconf</groupId>
-        <artifactId>netconf-subsystem</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>ietf-netconf</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.mdsal.model</groupId>
       <artifactId>ietf-yang-types-20130715</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <groupId>org.opendaylight.mdsal.model</groupId>
+      <artifactId>ietf-inet-types-2013-07-15</artifactId>
     </dependency>
   </dependencies>
 </project>
