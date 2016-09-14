@@ -112,21 +112,6 @@ public class TransactionProvider implements AutoCloseable{
         return runningTransaction;
     }
 
-    public synchronized boolean commitRunningTransaction(DOMDataReadWriteTransaction tx) throws DocumentedException {
-        allOpenReadWriteTransactions.remove(tx);
-
-        CheckedFuture<Void, TransactionCommitFailedException> future = tx.submit();
-        try {
-            future.checkedGet();
-        } catch (TransactionCommitFailedException e) {
-            LOG.debug("Transaction {} failed on", tx, e);
-            throw new DocumentedException("Transaction commit failed on " + e.getMessage() + " " + netconfSessionIdForReporting,
-                    ErrorType.application, ErrorTag.operation_failed, ErrorSeverity.error);
-        }
-
-        return true;
-    }
-
     public synchronized void abortRunningTransaction(DOMDataReadWriteTransaction tx) {
         LOG.debug("Aborting current running Transaction");
         Preconditions.checkState(runningTransaction != null, NO_TRANSACTION_FOUND_FOR_SESSION + netconfSessionIdForReporting);

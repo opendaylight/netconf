@@ -96,7 +96,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
             final Module module, final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency) {
 
         final SourceIdentifier moduleSourceIdentifier = SourceIdentifier.create(module.getName(),
-                (SimpleDateFormatUtil.DEFAULT_DATE_REV == module.getRevision() ? Optional.<String>absent() :
+                (SimpleDateFormatUtil.DEFAULT_DATE_REV == module.getRevision() ? Optional.absent() :
                         Optional.of(SimpleDateFormatUtil.getRevisionFormat().format(module.getRevision()))));
 
         InputStream sourceStream = null;

@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+// FIXME duplicated code
+// netconf/netconf/config-netconf-connector/src/main/java/org/opendaylight/netconf/confignetconfconnector/Commit.java
 public class Commit extends AbstractSingletonNetconfOperation {
 
     private static final Logger LOG = LoggerFactory.getLogger(Commit.class);
@@ -39,7 +41,7 @@ public class Commit extends AbstractSingletonNetconfOperation {
         boolean commitStatus = transactionProvider.commitTransaction();
         LOG.trace("Commit completed successfully {}", commitStatus);
 
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
     }
 
     @Override
