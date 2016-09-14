@@ -11,7 +11,6 @@ package org.opendaylight.netconf.confignetconfconnector.osgi;
 import java.util.Set;
 import org.opendaylight.controller.config.facade.xml.ConfigSubsystemFacadeFactory;
 import org.opendaylight.controller.config.util.capability.Capability;
-import org.opendaylight.controller.config.util.capability.ModuleListener;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 
@@ -35,11 +34,6 @@ public class NetconfOperationServiceFactoryImpl implements NetconfOperationServi
 
     @Override
     public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
-        return configFacadeFactory.getYangStoreService().registerModuleListener(new ModuleListener() {
-            @Override
-            public void onCapabilitiesChanged(Set<Capability> added, Set<Capability> removed) {
-                listener.onCapabilitiesChanged(added, removed);
-            }
-        });
+        return configFacadeFactory.getYangStoreService().registerModuleListener(listener::onCapabilitiesChanged);
     }
 }

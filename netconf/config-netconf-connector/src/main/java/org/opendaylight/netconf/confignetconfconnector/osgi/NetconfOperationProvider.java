@@ -39,7 +39,7 @@ final class NetconfOperationProvider {
             String netconfSessionIdForReporting) {
         Set<NetconfOperation> ops = Sets.newHashSet();
 
-        GetConfig getConfigOp = new GetConfig(configSubsystemFacade, Optional.<String> absent(), netconfSessionIdForReporting);
+        GetConfig getConfigOp = new GetConfig(configSubsystemFacade, Optional.absent(), netconfSessionIdForReporting);
 
         ops.add(getConfigOp);
         ops.add(new EditConfig(configSubsystemFacade, netconfSessionIdForReporting));
