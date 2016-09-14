@@ -52,7 +52,7 @@ public class DiscardChanges extends AbstractSingletonNetconfOperation {
             throw new DocumentedException(e.getMessage(), e, ErrorType.application, ErrorTag.operation_failed,
                     ErrorSeverity.error, errorInfo);
         }
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
     }
 
     @Override

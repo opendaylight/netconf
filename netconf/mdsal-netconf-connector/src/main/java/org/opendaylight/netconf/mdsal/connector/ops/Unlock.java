@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+// FIXME Duplicated code
+// netconf/netconf/config-netconf-connector/src/main/java/org/opendaylight/netconf/confignetconfconnector/operations/UnLock.java
 public class Unlock extends AbstractSingletonNetconfOperation {
 
     private static final Logger LOG = LoggerFactory.getLogger(Unlock.class);

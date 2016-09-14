@@ -40,7 +40,7 @@ final class OperationProvider {
     }
 
     Set<NetconfOperation> getOperations() {
-        return Sets.<NetconfOperation>newHashSet(
+        return Sets.newHashSet(
                 new Commit(netconfSessionIdForReporting, transactionProvider),
                 new DiscardChanges(netconfSessionIdForReporting, transactionProvider),
                 new EditConfig(netconfSessionIdForReporting, schemaContext, transactionProvider),
