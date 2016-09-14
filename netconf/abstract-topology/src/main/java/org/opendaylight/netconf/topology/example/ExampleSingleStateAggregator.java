@@ -24,7 +24,7 @@ public final class ExampleSingleStateAggregator implements StateAggregator {
     }
 
     private <T> ListenableFuture<T> getSingleFuture(final List<ListenableFuture<T>> stateFutures) {
-        Preconditions.checkArgument(stateFutures.size() == 1, "Recieved multiple results, Single result is enforced here");
+        Preconditions.checkArgument(stateFutures.size() == 1, "Received multiple results, Single result is enforced here");
         return stateFutures.get(0);
     }
 

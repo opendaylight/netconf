@@ -28,11 +28,6 @@ public class NoopRoleChangeStrategy implements RoleChangeStrategy {
     }
 
     @Override
-    public boolean isCandidateRegistered() {
-        return false;
-    }
-
-    @Override
     public void onRoleChanged(RoleChangeDTO roleChangeDTO) {
 
     }

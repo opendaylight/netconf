@@ -72,11 +72,6 @@ public class NodeRoleChangeStrategy implements RoleChangeStrategy, EntityOwnersh
     }
 
     @Override
-    public boolean isCandidateRegistered() {
-        return entityOwnershipService.isCandidateRegistered(entity);
-    }
-
-    @Override
     public void onRoleChanged(RoleChangeDTO roleChangeDTO) {
         LOG.debug("Role was changed {}", roleChangeDTO);
         ownershipCandidate.onRoleChanged(roleChangeDTO);
