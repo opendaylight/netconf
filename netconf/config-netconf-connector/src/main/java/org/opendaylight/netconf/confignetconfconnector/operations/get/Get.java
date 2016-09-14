@@ -41,8 +41,7 @@ public class Get extends AbstractConfigNetconfOperation {
     @Override
     protected Element handleWithNoSubsequentOperations(Document document, XmlElement xml) throws DocumentedException {
         checkXml(xml);
-        final Element element = getConfigSubsystemFacade().get(document);
         LOG.trace("{} operation successful", XmlNetconfConstants.GET);
-        return element;
+        return getConfigSubsystemFacade().get(document);
     }
 }

@@ -42,7 +42,7 @@ public class Lock extends AbstractLastNetconfOperation {
             // Since candidate datastore instances are allocated per session and not accessible anywhere else, no need to lock
             LOG.debug("Locking {} datastore on session: {}", targetDatastore, getNetconfSessionIdForReporting());
             // TODO should this fail if we are already locked ?
-            return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
+            return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
         }
 
         // Not supported running lock
