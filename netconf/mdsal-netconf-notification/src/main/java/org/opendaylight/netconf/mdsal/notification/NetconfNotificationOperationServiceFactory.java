@@ -11,6 +11,7 @@ package org.opendaylight.netconf.mdsal.notification;
 import java.util.Collections;
 import java.util.Set;
 import org.opendaylight.controller.config.util.capability.Capability;
+import org.opendaylight.controller.sal.common.util.NoopAutoCloseable;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
@@ -19,13 +20,6 @@ import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
 public class NetconfNotificationOperationServiceFactory implements NetconfOperationServiceFactory, AutoCloseable {
 
     private final NetconfNotificationRegistry netconfNotificationRegistry;
-
-    private static final AutoCloseable AUTO_CLOSEABLE = new AutoCloseable() {
-        @Override
-        public void close() throws Exception {
-            // NOOP
-        }
-    };
 
     public NetconfNotificationOperationServiceFactory(NetconfNotificationRegistry netconfNotificationRegistry) {
         this.netconfNotificationRegistry = netconfNotificationRegistry;
@@ -46,7 +40,7 @@ public class NetconfNotificationOperationServiceFactory implements NetconfOperat
 
     @Override
     public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
-        return AUTO_CLOSEABLE;
+        return NoopAutoCloseable.INSTANCE;
     }
 
     @Override
