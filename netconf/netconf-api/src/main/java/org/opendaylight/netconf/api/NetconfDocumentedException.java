@@ -39,7 +39,7 @@ public class NetconfDocumentedException extends DocumentedException {
     }
 
     public NetconfDocumentedException(DocumentedException e) {
-        super(e.getMessage(), e.getErrorType(), e.getErrorTag(), e.getErrorSeverity(), e.getErrorInfo());
+        super(e.getMessage(), (Exception) e.getCause(), e.getErrorType(), e.getErrorTag(), e.getErrorSeverity(), e.getErrorInfo());
     }
 
     public static NetconfDocumentedException fromXMLDocument( Document fromDoc) {
