@@ -25,7 +25,9 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.controller.config.yang.messagebus.netconf.NamespaceToStream;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.InjectMocks;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.MountPointService;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker;
@@ -62,6 +64,7 @@ public class NetconfEventSourceManagerTest {
     AsyncDataChangeEvent asyncDataChangeEventMock;
     RpcProviderRegistry rpcProviderRegistryMock;
     EventSourceRegistry eventSourceRegistry;
+
     @BeforeClass
     public static void initTestClass() throws IllegalAccessException, InstantiationException {
     }
@@ -74,7 +77,6 @@ public class NetconfEventSourceManagerTest {
         eventSourceTopologyMock = mock(EventSourceRegistry.class);
         rpcProviderRegistryMock = mock(RpcProviderRegistry.class);
         eventSourceRegistry = mock(EventSourceRegistry.class);
-        List<NamespaceToStream> namespaceToStreamList = new ArrayList<>();
 
         listenerRegistrationMock = mock(ListenerRegistration.class);
         doReturn(listenerRegistrationMock).when(dataBrokerMock).registerDataChangeListener(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class), any(NetconfEventSourceManager.class), eq(
@@ -95,10 +97,9 @@ public class NetconfEventSourceManagerTest {
         YangInstanceIdentifier pathStream = YangInstanceIdentifier.builder().node(Netconf.QNAME).node(Streams.QNAME).build();
         doReturn(checkFeature).when(rtx).read(LogicalDatastoreType.OPERATIONAL, pathStream);
 
-        netconfEventSourceManager =
-                NetconfEventSourceManager
-                    .create(dataBrokerMock, domNotificationPublishServiceMock, domMountPointServiceMock,
-                        mountPointServiceMock, eventSourceRegistry, namespaceToStreamList);
+        netconfEventSourceManager = new NetconfEventSourceManager(dataBrokerMock,
+                domNotificationPublishServiceMock, domMountPointServiceMock, eventSourceRegistry);
+        netconfEventSourceManager.streamMap = new HashMap();
     }
 
     @Test

@@ -90,12 +90,6 @@
       <artifactId>messagebus-netconf</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>messagebus-netconf</artifactId>
-      <type>xml</type>
-      <classifier>config</classifier>
-    </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-config-dispatcher</artifactId>
     </dependency>

@@ -8,12 +8,10 @@
 
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.opendaylight.controller.config.yang.messagebus.netconf.NamespaceToStream;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.DataChangeListener;
 import org.opendaylight.controller.md.sal.binding.api.MountPointService;
@@ -48,57 +46,38 @@ public final class NetconfEventSourceManager implements DataChangeListener, Auto
     private static final InstanceIdentifier<Node> NETCONF_DEVICE_PATH = InstanceIdentifier.create(NetworkTopology.class)
         .child(Topology.class, NETCONF_TOPOLOGY_KEY).child(Node.class);
 
-    private final Map<String, String> streamMap;
+    @VisibleForTesting
+    Map<String, String> streamMap;
     private final ConcurrentHashMap<InstanceIdentifier<?>, NetconfEventSourceRegistration> registrationMap = new ConcurrentHashMap<>();
     private final DOMNotificationPublishService publishService;
     private final DOMMountPointService domMounts;
     private ListenerRegistration<DataChangeListener> listenerRegistration;
     private final EventSourceRegistry eventSourceRegistry;
+    private final DataBroker dataBroker;
 
-    public static NetconfEventSourceManager create(final DataBroker dataBroker,
-        final DOMNotificationPublishService domPublish, final DOMMountPointService domMount,
-        final MountPointService bindingMount, final EventSourceRegistry eventSourceRegistry,
-        final List<NamespaceToStream> namespaceMapping) {
-
-        final NetconfEventSourceManager eventSourceManager = new NetconfEventSourceManager(domPublish, domMount,
-            bindingMount, eventSourceRegistry, namespaceMapping);
-
-        eventSourceManager.initialize(dataBroker);
-
-        return eventSourceManager;
-
-    }
-
-    private NetconfEventSourceManager(final DOMNotificationPublishService domPublish,
-        final DOMMountPointService domMount, final MountPointService bindingMount,
-        final EventSourceRegistry eventSourceRegistry, final List<NamespaceToStream> namespaceMapping) {
-
+    public NetconfEventSourceManager(final DataBroker dataBroker,
+                                     final DOMNotificationPublishService domPublish,
+                                     final DOMMountPointService domMount,
+                                     final EventSourceRegistry eventSourceRegistry) {
+        Preconditions.checkNotNull(dataBroker);
         Preconditions.checkNotNull(domPublish);
         Preconditions.checkNotNull(domMount);
         Preconditions.checkNotNull(eventSourceRegistry);
-        Preconditions.checkNotNull(namespaceMapping);
-        this.streamMap = namespaceToStreamMapping(namespaceMapping);
+        this.dataBroker = dataBroker;
         this.domMounts = domMount;
         this.publishService = domPublish;
         this.eventSourceRegistry = eventSourceRegistry;
     }
 
-    private void initialize(final DataBroker dataBroker) {
+    /**
+     * Inovke by blueprint
+     */
+    public void initialize() {
         Preconditions.checkNotNull(dataBroker);
         listenerRegistration = dataBroker
             .registerDataChangeListener(LogicalDatastoreType.OPERATIONAL, NETCONF_DEVICE_PATH, this,
                 DataChangeScope.SUBTREE);
         LOG.info("NetconfEventSourceManager initialized.");
-    }
-
-    private Map<String, String> namespaceToStreamMapping(final List<NamespaceToStream> namespaceMapping) {
-        final Map<String, String> streamMap = new HashMap<>(namespaceMapping.size());
-
-        for (final NamespaceToStream nToS : namespaceMapping) {
-            streamMap.put(nToS.getUrnPrefix(), nToS.getStreamName());
-        }
-
-        return streamMap;
     }
 
     @Override public void onDataChanged(final AsyncDataChangeEvent<InstanceIdentifier<?>, DataObject> event) {
@@ -187,6 +166,10 @@ public final class NetconfEventSourceManager implements DataChangeListener, Auto
 
     EventSourceRegistry getEventSourceRegistry() {
         return eventSourceRegistry;
+    }
+
+    public void setStreamMap(Map<String, String> streamMap) {
+        this.streamMap = streamMap;
     }
 
     private boolean isNetconfNode(final Node node) {
