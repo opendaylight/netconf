@@ -15,8 +15,6 @@ import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
-import org.opendaylight.controller.sal.binding.api.BindingAwareProvider;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.notifications.NotificationRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
@@ -32,16 +30,18 @@ import org.slf4j.LoggerFactory;
  * Listens on changes in netconf notification stream availability and writes
  * changes to the data store.
  */
-final class NotificationToMdsalWriter implements AutoCloseable, NetconfNotificationCollector.NetconfNotificationStreamListener, BindingAwareProvider {
+final class NotificationToMdsalWriter implements AutoCloseable, NetconfNotificationCollector.NetconfNotificationStreamListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(NotificationToMdsalWriter.class);
 
     private final NetconfNotificationCollector netconfNotificationCollector;
+    private final DataBroker dataBroker;
     private NotificationRegistration notificationRegistration;
-    private DataBroker dataBroker;
 
-    public NotificationToMdsalWriter(NetconfNotificationCollector netconfNotificationCollector) {
+    public NotificationToMdsalWriter(final NetconfNotificationCollector netconfNotificationCollector,
+                                     final DataBroker dataBroker) {
         this.netconfNotificationCollector = netconfNotificationCollector;
+        this.dataBroker = dataBroker;
     }
 
     @Override
@@ -65,9 +65,10 @@ final class NotificationToMdsalWriter implements AutoCloseable, NetconfNotificat
         notificationRegistration.close();
     }
 
-    @Override
-    public void onSessionInitiated(BindingAwareBroker.ProviderContext session) {
-        dataBroker = session.getSALService(DataBroker.class);
+    /**
+     * Inovke by blueprint
+     */
+    public void start() {
         notificationRegistration = netconfNotificationCollector.registerStreamListener(this);
     }
 

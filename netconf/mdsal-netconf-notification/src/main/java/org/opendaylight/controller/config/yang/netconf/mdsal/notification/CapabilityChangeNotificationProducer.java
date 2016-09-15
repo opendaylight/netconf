@@ -15,15 +15,19 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
+
+import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
+import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.ChangedByBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.changed.by.server.or.user.ServerBuilder;
+import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 
@@ -35,11 +39,15 @@ final class CapabilityChangeNotificationProducer extends OperationalDatastoreLis
 
     private static final InstanceIdentifier<Capabilities> CAPABILITIES_INSTANCE_IDENTIFIER =
             InstanceIdentifier.create(NetconfState.class).child(Capabilities.class);
-    private final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
 
-    public CapabilityChangeNotificationProducer(BaseNotificationPublisherRegistration baseNotificationPublisherRegistration) {
+    private final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
+    private final ListenerRegistration capabilityChangeListenerRegistration;
+
+    public CapabilityChangeNotificationProducer(final NetconfNotificationCollector netconfNotificationCollector,
+                                                final DataBroker dataBroker) {
         super(CAPABILITIES_INSTANCE_IDENTIFIER);
-        this.baseNotificationPublisherRegistration = baseNotificationPublisherRegistration;
+        this.baseNotificationPublisherRegistration = netconfNotificationCollector.registerBaseNotificationPublisher();
+        this.capabilityChangeListenerRegistration = registerOnChanges(dataBroker);
     }
 
     @Override
@@ -79,5 +87,17 @@ final class CapabilityChangeNotificationProducer extends OperationalDatastoreLis
         // TODO modified should be computed ... but why ?
         netconfCapabilityChangeBuilder.setModifiedCapability(Collections.<Uri>emptyList());
         baseNotificationPublisherRegistration.onCapabilityChanged(netconfCapabilityChangeBuilder.build());
+    }
+
+    /**
+     * Invoke by blueprint
+     */
+    public void close() {
+        if (baseNotificationPublisherRegistration != null) {
+            baseNotificationPublisherRegistration.close();
+        }
+        if (capabilityChangeListenerRegistration != null) {
+            capabilityChangeListenerRegistration.close();
+        }
     }
 }

@@ -56,8 +56,8 @@ public class NotificationToMdsalWriterTest {
         doReturn(Futures.immediateCheckedFuture(null)).when(tx).submit();
         doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
 
-        writer = new NotificationToMdsalWriter(notificationCollector);
-        writer.onSessionInitiated(session);
+        writer = new NotificationToMdsalWriter(notificationCollector, dataBroker);
+        writer.start();
     }
 
     @Test
