@@ -128,31 +128,6 @@
           </module>
 
           <module>
-              <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:notification">prefix:netconf-mdsal-notification-mapper</type>
-              <name>netconf-mdsal-notification-mapper</name>
-              <data-broker xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:notification">
-                  <type xmlns:binding="urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding">binding:binding-async-data-broker</type>
-                  <name>binding-data-broker</name>
-              </data-broker>
-              <binding-aware-broker xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:notification">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding">prefix:binding-broker-osgi-registry</type>
-                  <name>binding-osgi-broker</name>
-              </binding-aware-broker>
-              <aggregator xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:notification">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:north:mapper">prefix:netconf-mapper-registry</type>
-                  <name>mapper-aggregator-registry</name>
-              </aggregator>
-              <notification-registry xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:notification">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:notification">prefix:netconf-notification-registry</type>
-                  <name>netconf-notification-manager</name>
-              </notification-registry>
-              <notification-collector>
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:notification">prefix:netconf-notification-collector</type>
-                  <name>netconf-notification-manager</name>
-              </notification-collector>
-          </module>
-
-          <module>
               <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:yang:library">prefix:netconf-mdsal-yanglib</type>
               <name>netconf-mdsal-yanglib</name>
               <binding-aware-broker xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:yang:library">
@@ -247,7 +222,6 @@
       <capability>urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:tcp?module=netconf-northbound-tcp&amp;revision=2015-04-23</capability>
       <capability>urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound:impl?module=netconf-northbound-impl&amp;revision=2015-01-12</capability>
       <capability>urn:opendaylight:params:xml:ns:yang:controller:threadpool:impl:scheduled?module=threadpool-impl-scheduled&amp;revision=2013-12-01</capability>
-      <capability>urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:notification?module=netconf-mdsal-notification&amp;revision=2015-08-03</capability>
       <capability>urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:yang:library?module=netconf-mdsal-yang-library&amp;revision=2016-06-17</capability>
   </required-capabilities>
 </snapshot>
