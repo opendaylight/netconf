@@ -122,6 +122,7 @@ CONTROLLER_CONFIG_MOUNT = ('/restconf/config/network-topology:'
 CONFIG_API = '/restconf/config'
 OPERATIONAL_API = '/restconf/operational'
 MODULES_API = '/restconf/modules'
+VTN_INVENTORY_NODE_API = '/restconf/operational/vtn-inventory:vtn-nodes'
 
 # NEMO Variables
 PREDEFINE_ROLE_URI = '/restconf/config/nemo-user:user-roles'
