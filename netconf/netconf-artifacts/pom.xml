@@ -274,13 +274,6 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>yanglib-config</artifactId>
-                <version>${project.version}</version>
-                <classifier>config</classifier>
-                <type>xml</type>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-client</artifactId>
                 <version>${project.version}</version>
                 <type>test-jar</type>
