@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_c82ebba4",
+        "filename": "netconf/messagebus-netconf/src/main/resources/org/opendaylight/blueprint/messagebus-netconf.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-15T20:47:23Z",
+      "side": 1,
+      "message": "Hello Tom, would you please confirm that this definition in the bean will call NetconfEventSourceManager#setStreamMap() in order to setup that map when this bean is going to be instantiated? And thus it is not required to have it as argument of the class.",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 19
+      },
+      "revId": "aafe16e4ab575faac5a6f3a7feaccad11050d828",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
