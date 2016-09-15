@@ -157,13 +157,6 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>messagebus-netconf</artifactId>
-                <version>${project.version}</version>
-                <classifier>config</classifier>
-                <type>xml</type>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>features-netconf-connector</artifactId>
                 <version>${project.version}</version>
                 <classifier>features</classifier>

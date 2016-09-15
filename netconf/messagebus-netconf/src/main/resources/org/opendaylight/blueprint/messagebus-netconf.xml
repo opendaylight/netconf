@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2016 Inocybe Technologies Inc. and others.  All rights reserved.
+
+ This program and the accompanying materials are made available under the
+ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ and is available at http://www.eclipse.org/legal/epl-v10.html
+-->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           odl:use-default-for-reference-types="true">
+
+    <reference id="dataBroker"
+               interface="org.opendaylight.controller.md.sal.binding.api.DataBroker"
+               odl:type="default"/>
+    <reference id="domMountPointService"
+               interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService" />
+    <reference id="domNotificationPublishService"
+               interface="org.opendaylight.controller.md.sal.dom.api.DOMNotificationPublishService" />
+    <reference id="eventSourceRegistry"
+               interface="org.opendaylight.controller.messagebus.spi.EventSourceRegistry" />
+
+    <bean id="netconfEventSourceManager"
+          class="org.opendaylight.netconf.messagebus.eventsources.netconf.NetconfEventSourceManager"
+          init-method="initialize"
+          destroy-method="close">
+        <argument ref="dataBroker" />
+        <argument ref="domNotificationPublishService" />
+        <argument ref="domMountPointService" />
+        <argument ref="eventSourceRegistry" />
+        <property name="streamMap">
+            <map>
+                <entry key="urn:ietf:params:xml:ns:yang:smiv2" value="SNMP"/>
+                <entry key="urn:ietf:params:xml:ns:yang:ietf-syslog-notification" value="SYSLOG"/>
+            </map>
+        </property>
+    </bean>
+
+</blueprint>
