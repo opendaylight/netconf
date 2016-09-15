@@ -10,9 +10,12 @@ package org.opendaylight.controller.config.yang.netconf.mdsal.notification;
 import com.google.common.base.Preconditions;
 import java.util.Collection;
 import javax.annotation.Nonnull;
+
+import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
+import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdOrZeroType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
@@ -21,6 +24,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionEndBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionStart;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionStartBuilder;
+import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -31,11 +35,16 @@ public class SessionNotificationProducer extends OperationalDatastoreListener<Se
 
     private static final InstanceIdentifier<Session> SESSION_INSTANCE_IDENTIFIER =
             InstanceIdentifier.create(NetconfState.class).child(Sessions.class).child(Session.class);
-    private final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
 
-    public SessionNotificationProducer(BaseNotificationPublisherRegistration baseNotificationPublisherRegistration) {
+    private final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
+    private final ListenerRegistration sessionListenerRegistration;
+
+    public SessionNotificationProducer(final NetconfNotificationCollector netconfNotificationCollector,
+                                       final DataBroker dataBroker) {
         super(SESSION_INSTANCE_IDENTIFIER);
-        this.baseNotificationPublisherRegistration = baseNotificationPublisherRegistration;
+
+        this.baseNotificationPublisherRegistration = netconfNotificationCollector.registerBaseNotificationPublisher();
+        this.sessionListenerRegistration = registerOnChanges(dataBroker);
     }
 
     @Override
@@ -82,4 +91,15 @@ public class SessionNotificationProducer extends OperationalDatastoreListener<Se
         baseNotificationPublisherRegistration.onSessionEnded(sessionEnd);
     }
 
+    /**
+     * Invoke by blueprint
+     */
+    public void close() {
+        if (baseNotificationPublisherRegistration != null) {
+            baseNotificationPublisherRegistration.close();
+        }
+        if (sessionListenerRegistration != null) {
+            sessionListenerRegistration.close();
+        }
+    }
 }
