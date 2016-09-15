@@ -81,12 +81,12 @@ public class SchemaServiceToMdsalWriterTest {
                 return null;
             }
         });
-        schemaServiceToMdsalWriter = new SchemaServiceToMdsalWriter(schemaService);
+        schemaServiceToMdsalWriter = new SchemaServiceToMdsalWriter(schemaService, dataBroker);
     }
 
     @Test
     public void testOnGlobalContextUpdated() {
-        schemaServiceToMdsalWriter.onSessionInitiated(context);
+        schemaServiceToMdsalWriter.start();
 
         schemaServiceToMdsalWriter.onGlobalContextUpdated(getSchema());
         verify(writeTransaction).put(eq(LogicalDatastoreType.OPERATIONAL), eq(MODULES_STATE_INSTANCE_IDENTIFIER), eq(createTestModuleState()));
