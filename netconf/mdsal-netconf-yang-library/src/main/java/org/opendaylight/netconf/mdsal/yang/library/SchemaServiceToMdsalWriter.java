@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * Listens for updates on global schema context, transforms context to ietf-yang-library:modules-state and
  * writes this state to operational data store
  */
-public class SchemaServiceToMdsalWriter implements SchemaContextListener, BindingAwareProvider, AutoCloseable {
+public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(SchemaServiceToMdsalWriter.class);
 
@@ -53,10 +53,12 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, Bindin
 
     private final SchemaService schemaService;
     private final AtomicInteger moduleSetId;
-    private DataBroker dataBroker;
+    private final DataBroker dataBroker;
 
-    public SchemaServiceToMdsalWriter(final SchemaService schemaService) {
+    public SchemaServiceToMdsalWriter(final SchemaService schemaService,
+                                      final DataBroker dataBroker) {
         this.schemaService = schemaService;
+        this.dataBroker = dataBroker;
         this.moduleSetId = new AtomicInteger(0);
     }
 
@@ -65,9 +67,10 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, Bindin
         // TODO Delete modules-state from operational data store
     }
 
-    @Override
-    public void onSessionInitiated(final BindingAwareBroker.ProviderContext providerContext) {
-        dataBroker = providerContext.getSALService(DataBroker.class);
+    /**
+     * Invoke by blueprint
+     */
+    public void start() {
         schemaService.registerSchemaContextListener(this);
     }
 

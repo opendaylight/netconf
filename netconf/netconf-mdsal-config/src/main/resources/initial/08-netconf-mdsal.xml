@@ -39,21 +39,6 @@
               <name>netconf-mdsal-notification-mapper</name>
           </module>
 
-          <module>
-              <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:yang:library">prefix:netconf-mdsal-yanglib</type>
-              <name>netconf-mdsal-yanglib</name>
-              <binding-aware-broker xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:yang:library">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding">prefix:binding-broker-osgi-registry</type>
-                  <name>binding-osgi-broker</name>
-              </binding-aware-broker>
-              <root-schema-service xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:yang:library">
-              <type xmlns:dom="urn:opendaylight:params:xml:ns:yang:controller:md:sal:dom">dom:schema-service</type>
-              <name>yang-schema-service</name>
-          </root-schema-service>
-          </module>
-
-
-
           <!--TCP endpoint for MD-SAL netconf server -->
           <!--<module>-->
               <!--<type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:tcp">prefix:netconf-northbound-tcp</type>-->
@@ -63,7 +48,6 @@
                   <!--<name>netconf-mdsal-server-dispatcher</name>-->
               <!--</dispatcher>-->
           <!--</module>-->
-
       </modules>
 
         <services xmlns="urn:opendaylight:params:xml:ns:yang:controller:config">
@@ -112,6 +96,5 @@
       <capability>urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound:impl?module=netconf-northbound-impl&amp;revision=2015-01-12</capability>
       <capability>urn:opendaylight:params:xml:ns:yang:controller:threadpool:impl:scheduled?module=threadpool-impl-scheduled&amp;revision=2013-12-01</capability>
       <capability>urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:notification?module=netconf-mdsal-notification&amp;revision=2015-08-03</capability>
-      <capability>urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:yang:library?module=netconf-mdsal-yang-library&amp;revision=2016-06-17</capability>
   </required-capabilities>
 </snapshot>
