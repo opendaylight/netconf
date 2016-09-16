@@ -13,15 +13,17 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
-import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeverity;
-import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
-import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorType;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
@@ -44,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
 
@@ -82,7 +85,6 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         return result.getNode();
     }
 
-
     private XMLStreamWriter getXmlStreamWriter(final DOMResult result) {
         try {
             return XML_OUTPUT_FACTORY.createXMLStreamWriter(result);
@@ -118,11 +120,22 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         }
     }
 
-    protected Element serializeNodeWithParentStructure(final Document document, final YangInstanceIdentifier dataRoot, final NormalizedNode node) {
+
+    protected Element mergeDataNodesToOneElement(final List<Element> nodes) {
+        final Node mainNode = nodes.get(0);
+        for (Element node : nodes) {
+            final NodeList childNodes = node.getChildNodes();
+            for (int j = 0; j < childNodes.getLength(); j++) {
+                mainNode.insertBefore(childNodes.item(j), null);
+            }
+        }
+        return (Element) mainNode;
+    }
+
+    protected Element serializeNodeWithParentStructure(Document document, YangInstanceIdentifier dataRoot, NormalizedNode node) {
         if (!dataRoot.equals(ROOT)) {
             return (Element) transformNormalizedNode(document,
-                    ImmutableNodes.fromInstanceId(schemaContext.getCurrentContext(), dataRoot, node),
-                    ROOT);
+                    ImmutableNodes.fromInstanceId(schemaContext.getCurrentContext(), dataRoot, node), ROOT);
         }
         return  (Element) transformNormalizedNode(document, node, ROOT);
     }
@@ -130,33 +143,86 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
     /**
      *
      * @param operationElement operation element
-     * @return if Filter is present and not empty returns Optional of the InstanceIdentifier to the read location in datastore.
-     *          empty filter returns Optional.absent() which should equal an empty &lt;data/&gt; container in the response.
-     *         if filter is not present we want to read the entire datastore - return ROOT.
+     * @return if Filter is present and not empty returns List of the InstanceIdentifiers to the read locations in datastore.
+     *          empty filter returns empty list which should equal an empty &lt;data/&gt; container in the response.
+     *         if filter is not present we want to read the entire datastore - return list of single element ROOT.
      * @throws DocumentedException
      */
-    protected Optional<YangInstanceIdentifier> getDataRootFromFilter(final XmlElement operationElement) throws DocumentedException {
-        final Optional<XmlElement> filterElement = operationElement.getOnlyChildElementOptionally(FILTER);
+    protected List<YangInstanceIdentifier> getDataRootsFromFilter(XmlElement operationElement) throws DocumentedException {
+        Optional<XmlElement> filterElement = operationElement.getOnlyChildElementOptionally(FILTER);
         if (filterElement.isPresent()) {
-            if (filterElement.get().getChildElements().size() == 0) {
-                return Optional.absent();
-            }
-            return Optional.of(getInstanceIdentifierFromFilter(filterElement.get()));
+            final List<YangInstanceIdentifier> yangInstanceIdentifiers =
+                    getInstanceIdentifiersFromFilter(filterElement.get());
+            // find common sub-paths if exists and return these unique sub-paths, except of first path argument
+            return mergeInstanceIdentifiers(yangInstanceIdentifiers);
         } else {
-            return Optional.of(ROOT);
+            return Lists.newArrayList(ROOT);
+        }
+    }
+
+    /**
+     * Method takes list of instance identifiers and constructs trees with included path arguments. The aim of this step
+     * is merge common path arguments. Tree ensure to us tree. For us is important return only common paths for each
+     * tree and this common paths should be returned as new instance identifiers.
+     * @param instanceIdentifiers list of instance identifiers
+     * @return instace identifiers of common paths
+     */
+    private List<YangInstanceIdentifier> mergeInstanceIdentifiers(
+            final List<YangInstanceIdentifier> instanceIdentifiers) {
+
+        final HashMap<PathArgument, HashMap> pathArgumentsTree = new HashMap<>();
+        // create multiple trees from given path arguments
+        for (final YangInstanceIdentifier instanceIdentifier : instanceIdentifiers) {
+            HashMap<PathArgument, HashMap> workingTree = pathArgumentsTree;
+            for (final PathArgument pathArgument : instanceIdentifier.getPathArguments()) {
+                if (!workingTree.containsKey(pathArgument)) {
+                    workingTree.put(pathArgument, new HashMap<>());
+                }
+                workingTree = workingTree.get(pathArgument);
+            }
+        }
+
+        final List<YangInstanceIdentifier> finalIdentifiers = new ArrayList<>();
+        // resolve common sub-paths for each tree in the initial hash map
+        pathArgumentsTree.keySet().forEach(firstLevelPathArg -> {
+            @SuppressWarnings("unchecked")
+            final HashMap<PathArgument, HashMap> secondLevelTree = pathArgumentsTree.get(firstLevelPathArg);
+            if (secondLevelTree == null) {
+                finalIdentifiers.add(YangInstanceIdentifier.create(Lists.newArrayList(firstLevelPathArg)));
+            } else {
+                secondLevelTree.keySet().forEach(secondLevelPathArg -> finalIdentifiers.add(
+                        selectSubPaths(secondLevelTree.get(secondLevelPathArg), Lists.newArrayList(firstLevelPathArg,
+                                secondLevelPathArg))));
+            }
+        });
+
+        return finalIdentifiers;
+    }
+
+    /**
+     * Tail recursion.
+     * Traverse tree and return only paths until reach fork or last element (leaf)
+     */
+    private YangInstanceIdentifier selectSubPaths(final HashMap pathArgumentsTree,
+                                                  final List<PathArgument> finalList) {
+        if (pathArgumentsTree.keySet().size() == 1) {
+            final PathArgument pathArgument = (PathArgument) pathArgumentsTree.keySet().iterator().next();
+            finalList.add(pathArgument);
+            return selectSubPaths((HashMap) pathArgumentsTree.get(pathArgument), finalList);
+        } else {
+            return YangInstanceIdentifier.create(finalList);
         }
     }
 
     @VisibleForTesting
-    protected YangInstanceIdentifier getInstanceIdentifierFromFilter(final XmlElement filterElement) throws DocumentedException {
-
-        if (filterElement.getChildElements().size() != 1) {
-            throw new DocumentedException("Multiple filter roots not supported yet",
-                    ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED, ErrorSeverity.ERROR);
-        }
-
-        final XmlElement element = filterElement.getOnlyChildElement();
-        return validator.validate(element);
+    protected List<YangInstanceIdentifier> getInstanceIdentifiersFromFilter(final XmlElement filterElement) {
+        return filterElement.getChildElements().stream().map(element -> {
+            try {
+                return validator.validate(element);
+            } catch (DocumentedException exception) {
+                throw new RuntimeException(exception);
+            }
+        }).collect(Collectors.toList());
     }
 
     protected static final class GetConfigExecution {
