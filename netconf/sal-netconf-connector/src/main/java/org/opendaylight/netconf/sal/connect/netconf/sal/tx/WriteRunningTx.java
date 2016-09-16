@@ -13,8 +13,11 @@ import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import java.util.ArrayList;
+import java.util.List;
 import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -46,6 +49,7 @@ import org.slf4j.LoggerFactory;
 public class WriteRunningTx extends AbstractWriteTx {
 
     private static final Logger LOG  = LoggerFactory.getLogger(WriteRunningTx.class);
+    private final List<Change> changes = new ArrayList<>();
 
     public WriteRunningTx(final RemoteDeviceId id, final NetconfBaseOps netOps,
                           final boolean rollbackSupport) {
@@ -85,8 +89,10 @@ public class WriteRunningTx extends AbstractWriteTx {
 
     @Override
     public synchronized ListenableFuture<RpcResult<TransactionStatus>> performCommit() {
+        for (final Change change : changes) {
+            resultsFutures.add(change.execute(id, netOps, rollbackSupport));
+        }
         unlock();
-
         return resultsToTxStatus();
     }
 
@@ -96,18 +102,31 @@ public class WriteRunningTx extends AbstractWriteTx {
                               final DataContainerChild<?, ?> editStructure,
                               final Optional<ModifyAction> defaultOperation,
                               final String operation) {
-
-        NetconfRpcFutureCallback editConfigCallback = new NetconfRpcFutureCallback("Edit running", id);
-
-        if (defaultOperation.isPresent()) {
-            resultsFutures.add(
-                    netOps.editConfigRunning(editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport));
-        } else {
-            resultsFutures.add(netOps.editConfigRunning(editConfigCallback, editStructure, rollbackSupport));
-        }
+        changes.add(new Change(editStructure, defaultOperation));
     }
 
     private void unlock() {
         netOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
+    }
+
+    private static class Change {
+
+        private final DataContainerChild<?, ?> editStructure;
+        private final Optional<ModifyAction> defaultOperation;
+
+        private Change(final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> defaultOperation) {
+            this.editStructure = editStructure;
+            this.defaultOperation = defaultOperation;
+        }
+
+        private ListenableFuture<DOMRpcResult> execute(final RemoteDeviceId id, final NetconfBaseOps netOps,
+                                                       final boolean rollbackSupport) {
+            final NetconfRpcFutureCallback editConfigCallback = new NetconfRpcFutureCallback("Edit running", id);
+            if (defaultOperation.isPresent()) {
+                return netOps.editConfigRunning(editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport);
+            } else {
+                return netOps.editConfigRunning(editConfigCallback, editStructure, rollbackSupport);
+            }
+        }
     }
 }
