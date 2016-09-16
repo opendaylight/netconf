@@ -55,6 +55,13 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
     protected NetconfServerSessionNegotiatorFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
                                                  final SessionIdProvider idProvider, final long connectionTimeoutMillis,
                                                  final NetconfMonitoringService monitoringService, final Set<String> baseCapabilities) {
+
+        Preconditions.checkNotNull(timer, "timer not initialized");
+        Preconditions.checkNotNull(netconfOperationProvider, "NetconfOperationServiceFactory not initialized");
+        Preconditions.checkNotNull(idProvider, "SessionIdProvider not initialized");
+        Preconditions.checkArgument(connectionTimeoutMillis > 0, "connection time out <=0");
+        Preconditions.checkNotNull(monitoringService, "NetconfMonitoringService not initialized");
+
         this.timer = timer;
         this.aggregatedOpService = netconfOperationProvider;
         this.idProvider = idProvider;
@@ -62,7 +69,6 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
         this.monitoringService = monitoringService;
         this.baseCapabilities = validateBaseCapabilities(baseCapabilities == null ? DEFAULT_BASE_CAPABILITIES : baseCapabilities);
     }
-
 
     private static ImmutableSet<String> validateBaseCapabilities(final Set<String> baseCapabilities) {
         // Check base capabilities to be supported by the server

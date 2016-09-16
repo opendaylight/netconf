@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           odl:restart-dependents-on-updates="true">
+
+    <bean id="aggregatedNetconfOperationServiceFactory"
+          class="org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory"
+          destroy-method="close">
+    </bean>
+    <service>
+        <interfaces>
+            <value>org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener</value>
+            <value>org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory</value>
+        </interfaces>
+    </service>
+
+    <bean id="netconfImplActivator"
+          class="org.opendaylight.netconf.impl.osgi.NetconfImplActivator"
+          init-method="start"
+          destroy-method="stop">
+        <argument ref="blueprintBundleContext" />
+        <argument ref="aggregatedNetconfOperationServiceFactory" />
+    </bean>
+
+<!--
+    &lt;!&ndash; Obtains the specific list of BmpExtensionProviderActivator OSGi services announced via
+       META-INF/services/org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory resources.
+    &ndash;&gt;
+    <odl:specific-reference-list id="mappers"
+                                 interface="org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory"/>
+
+    <cm:property-placeholder persistent-id="org.opendaylight.netconf.impl" update-strategy="none">
+        <cm:default-properties>
+            <cm:property name="connection-timeout-millis" value="20000"/>
+            <cm:property name="monitoring-update-interval" value="0"/>
+        </cm:default-properties>
+    </cm:property-placeholder>
+
+    <reference id="globalBossGroup" interface="io.netty.channel.EventLoopGroup" odl:type="global-boss-group"/>
+    <reference id="globalWorkerGroup" interface="io.netty.channel.EventLoopGroup" odl:type="global-worker-group"/>
+    <reference id="global-timer" interface="io.netty.util.Timer" odl:type="global-timer"/>
+    <reference id="netconfMonitoringService"
+               interface="org.opendaylight.netconf.api.monitoring.NetconfMonitoringService"/>
+    <reference id="scheduledThreadPool" interface="org.opendaylight.controller.config.threadpool.ScheduledThreadPool" />
+
+    &lt;!&ndash; NetconfOperationServiceFactory &ndash;&gt;
+
+    <bean id="sessionIdProvider"
+          class="org.opendaylight.netconf.impl.SessionIdProvider"/>
+
+    <bean id="aggregatedNetconfOperationServiceFactory"
+          class="org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory"
+          destroy-method="close">
+        <argument ref="mappers" />
+    </bean>
+    <service ref="aggregatedNetconfOperationServiceFactory"
+             interface="org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory"
+             odl:type="org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory"/>
+    <service ref="aggregatedNetconfOperationServiceFactory"
+             interface="org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener"/>
+
+    <bean id="netconfServerSessionNegotiatorFactory"
+          class="org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory">
+        <argument ref="global-timer"/>
+        <argument ref="aggregatedNetconfOperationServiceFactory"/>
+        <argument ref="sessionIdProvider"/>
+        <argument value="${connection-timeout-millis}"/>
+        <argument ref="netconfMonitoringService"/>
+        <argument><null/></argument> &lt;!&ndash; Base capabilities &ndash;&gt;
+    </bean>
+
+    &lt;!&ndash; NetconfServerDispatcher &ndash;&gt;
+
+    <bean id="serverChannelInitializer"
+          class="org.opendaylight.netconf.impl.NetconfServerDispatcherImpl.ServerChannelInitializer">
+        <argument ref="netconfServerSessionNegotiatorFactory"/>
+    </bean>
+
+    <bean id="netconfServerDispatcherImpl"
+          class="org.opendaylight.netconf.impl.NetconfServerDispatcherImpl">
+        <argument ref="serverChannelInitializer"/>
+        <argument ref="globalBossGroup"/>
+        <argument ref="globalWorkerGroup"/>
+    </bean>
+    <service ref="netconfServerDispatcherImpl"
+             interface="org.opendaylight.netconf.api.NetconfServerDispatcher"/>
+
+    &lt;!&ndash; NetconfServerMonitoring &ndash;&gt;
+
+    <bean id="netconfMonitoringServiceImpl"
+          class="org.opendaylight.netconf.impl.osgi.NetconfMonitoringServiceImpl">
+        <argument ref="aggregatedNetconfOperationServiceFactory"/>
+        <argument ref="scheduledThreadPool"/>
+        <argument value="${monitoring-update-interval}"/>
+    </bean>
+    <service ref="netconfMonitoringService"
+             interface="org.opendaylight.netconf.api.monitoring.NetconfMonitoringService"/>-->
+
+</blueprint>
