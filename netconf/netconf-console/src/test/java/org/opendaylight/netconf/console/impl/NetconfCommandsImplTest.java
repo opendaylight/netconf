@@ -121,8 +121,7 @@ public class NetconfCommandsImplTest {
         bindingToNormalized.onGlobalContextUpdated(schemaContext);
         dataBroker = new BindingDOMDataBrokerAdapter(cDOMDataBroker, bindingToNormalized);
 
-        final MountPointService mountPointService = mock(MountPointService.class);
-        netconfCommands = new NetconfCommandsImpl(dataBroker, mountPointService);
+        netconfCommands = new NetconfCommandsImpl(dataBroker);
     }
 
     @Test

@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.MountPointService;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
@@ -50,17 +49,18 @@ public class NetconfCommandsImpl implements NetconfCommands {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfCommandsImpl.class);
 
     private final DataBroker dataBroker;
-    private final MountPointService mountPointService;
 
-    public NetconfCommandsImpl(final DataBroker db, final MountPointService mountPointService) {
+    public NetconfCommandsImpl(final DataBroker db) {
         LOG.debug("NetconfConsoleProviderImpl initialized");
         this.dataBroker = db;
-        this.mountPointService = mountPointService;
     }
 
     @Override
     public Map<String, Map<String, String>> listDevices() {
         final Topology topology = NetconfConsoleUtils.read(LogicalDatastoreType.OPERATIONAL, NetconfIidFactory.NETCONF_TOPOLOGY_IID, dataBroker);
+        if (topology == null) {
+            return new HashMap<>();
+        }
         final Map<String, Map<String, String>> netconfNodes = new HashMap<>();
         for (final Node node : topology.getNode()) {
             final NetconfNode netconfNode = node.getAugmentation(NetconfNode.class);
