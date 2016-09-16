@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_4e359044",
+        "filename": "netconf/netconf-client/src/main/resources/org/opendaylight/blueprint/netconf-client.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-16T15:44:08Z",
+      "side": 1,
+      "message": "Use this instead: \n\n  \u003creference id\u003d\"globalBossGroup\" interface\u003d\"io.netty.channel.EventLoopGroup\" odl:type\u003d\"global-boss-group\"/\u003e\n  \u003creference id\u003d\"globalWorkerGroup\" interface\u003d\"io.netty.channel.EventLoopGroup\" odl:type\u003d\"global-worker-group\"/\u003e",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 60
+      },
+      "revId": "7bc882db5c6aaedb2fe656021619bba651fedcfc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
