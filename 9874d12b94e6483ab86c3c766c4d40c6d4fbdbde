@@ -46,6 +46,30 @@
       "revId": "9874d12b94e6483ab86c3c766c4d40c6d4fbdbde",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_4b9f4203",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-16T13:19:06Z",
+      "side": 1,
+      "message": "Right, you\u0027re referring to this:\n\n\u003e\"Yeah, but this is out of the scope of this fix. You would have to somehow cache all operations and construct one \"aggregated\" editconfig, and on submit send this big edit config to device. But this can be done as an improvement in next releases.\"\n\nI have misread the commit message. I thought you were saying to send on each operation (put/merge) rather than on submit.\n\nAnyway, got it now, it\u0027s clear.",
+      "parentUuid": "7a6b29fe_6b52fe67",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 46
+      },
+      "revId": "9874d12b94e6483ab86c3c766c4d40c6d4fbdbde",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
