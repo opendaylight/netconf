@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.notifications.impl.osgi;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -106,5 +107,10 @@ public class Activator implements BundleActivator {
             operationaServiceRegistration.unregister();
             operationaServiceRegistration = null;
         }
+    }
+
+    @VisibleForTesting
+    NetconfNotificationManager getNetconfNotificationManager() {
+        return netconfNotificationManager;
     }
 }
