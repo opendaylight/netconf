@@ -1,7 +1,22 @@
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-    <reference id="netconfConsoleProvider" availability="mandatory"
-        activation="eager" interface="org.opendaylight.netconf.console.api.NetconfCommands">
-    </reference>
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           odl:use-default-for-reference-types="true">
+
+    <reference id="dataBroker"
+               interface="org.opendaylight.controller.md.sal.binding.api.DataBroker"
+               odl:type="default"/>
+    <reference id="mountPoint"
+               interface="org.opendaylight.controller.md.sal.binding.api.MountPointService" />
+
+    <bean id="netconfConsoleProvider" class="org.opendaylight.netconf.console.impl.NetconfConsoleProvider">
+        <argument ref="dataBroker"/>
+        <argument ref="blueprintBundleContext" />
+        <argument ref="mountPoint"/>
+    </bean>
+
+    <!--Karaf CLI-->
+
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="netconf:connect-device">
             <action class="org.opendaylight.netconf.console.commands.NetconfConnectDeviceCommand">
@@ -29,4 +44,5 @@
             </action>
         </command>
     </command-bundle>
+
 </blueprint>
