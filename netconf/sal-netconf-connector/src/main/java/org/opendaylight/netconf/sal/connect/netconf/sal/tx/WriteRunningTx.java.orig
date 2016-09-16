@@ -11,6 +11,7 @@ package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
@@ -62,7 +63,28 @@ public class WriteRunningTx extends AbstractWriteTx {
     }
 
     private void lock() {
+<<<<<<< HEAD
         resultsFutures.add(netOps.lockRunning(new NetconfRpcFutureCallback("Lock running", id)));
+=======
+        final FutureCallback<DOMRpcResult> lockCallback = new FutureCallback<DOMRpcResult>() {
+            @Override
+            public void onSuccess(final DOMRpcResult result) {
+                if (isSuccess(result)) {
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("Lock running succesfull");
+                    }
+                } else {
+                    LOG.warn("{}: lock running invoked unsuccessfully: {}", id, result.getErrors());
+                }
+            }
+
+            @Override
+            public void onFailure(final Throwable t) {
+                LOG.warn("{}: Lock running operation failed. {}", id, t);
+            }
+        };
+        resultsFutures.add(netOps.lockRunning(lockCallback));
+>>>>>>> Bug 6635: Correct WriteRunningTx behavior
     }
 
     @Override
@@ -102,6 +124,16 @@ public class WriteRunningTx extends AbstractWriteTx {
                               final DataContainerChild<?, ?> editStructure,
                               final Optional<ModifyAction> defaultOperation,
                               final String operation) {
+<<<<<<< HEAD
+
+        NetconfRpcFutureCallback editConfigCallback = new NetconfRpcFutureCallback("Edit running", id);
+
+        if (defaultOperation.isPresent()) {
+            resultsFutures.add(
+                    netOps.editConfigRunning(editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport));
+        } else {
+            resultsFutures.add(netOps.editConfigRunning(editConfigCallback, editStructure, rollbackSupport));
+=======
         changes.add(new Change(path, data, editStructure, defaultOperation, operation));
     }
 
@@ -128,12 +160,29 @@ public class WriteRunningTx extends AbstractWriteTx {
 
         private ListenableFuture<DOMRpcResult> execute(final RemoteDeviceId id, final NetconfBaseOps netOps,
                                                        final boolean rollbackSupport) {
-            final NetconfRpcFutureCallback editConfigCallback = new NetconfRpcFutureCallback("Edit running", id);
+            final FutureCallback<DOMRpcResult> editConfigCallback = new FutureCallback<DOMRpcResult>() {
+                @Override
+                public void onSuccess(final DOMRpcResult result) {
+                    if (isSuccess(result)) {
+                        if (LOG.isTraceEnabled()) {
+                            LOG.trace("Edit running succesfull");
+                        }
+                    } else {
+                        LOG.warn("{}: Edit running invoked unsuccessfully: {}", id, result.getErrors());
+                    }
+                }
+
+                @Override
+                public void onFailure(final Throwable t) {
+                    LOG.warn("{}: Error {} data to (running){}, data: {}", id, operation, path, data.orNull(), t);
+                }
+            };
             if (defaultOperation.isPresent()) {
                 return netOps.editConfigRunning(editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport);
             } else {
                 return netOps.editConfigRunning(editConfigCallback, editStructure, rollbackSupport);
             }
+>>>>>>> Bug 6635: Correct WriteRunningTx behavior
         }
     }
 }
