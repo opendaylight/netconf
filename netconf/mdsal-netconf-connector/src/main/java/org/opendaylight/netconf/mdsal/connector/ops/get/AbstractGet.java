@@ -13,15 +13,15 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
-import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeverity;
-import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
-import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorType;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
 
@@ -82,7 +83,6 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         return result.getNode();
     }
 
-
     private XMLStreamWriter getXmlStreamWriter(final DOMResult result) {
         try {
             return XML_OUTPUT_FACTORY.createXMLStreamWriter(result);
@@ -118,8 +118,22 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         }
     }
 
+    protected Element mergeDataNodesToOneElement(List<Element> nodes) {
+        final Node mainNode = nodes.get(0);
+        for (int i = 1; i < nodes.size(); i++) {
+            final NodeList childNodes = nodes.get(i).getChildNodes();
+            for (int j = 0; j < childNodes.getLength(); j++) {
+                mainNode.insertBefore(childNodes.item(j), null);
+            }
+        }
+        return (Element) mainNode;
+    }
+
     protected Element serializeNodeWithParentStructure(Document document, YangInstanceIdentifier dataRoot, NormalizedNode node) {
         if (!dataRoot.equals(ROOT)) {
+            transformNormalizedNode(document,
+                    ImmutableNodes.fromInstanceId(schemaContext.getCurrentContext(), dataRoot, node),
+                    ROOT);
             return (Element) transformNormalizedNode(document,
                     ImmutableNodes.fromInstanceId(schemaContext.getCurrentContext(), dataRoot, node),
                     ROOT);
@@ -135,28 +149,24 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
      *         if filter is not present we want to read the entire datastore - return ROOT.
      * @throws DocumentedException
      */
-    protected Optional<YangInstanceIdentifier> getDataRootFromFilter(XmlElement operationElement) throws DocumentedException {
+    protected List<YangInstanceIdentifier> getDataRootsFromFilter(XmlElement operationElement) throws DocumentedException {
         Optional<XmlElement> filterElement = operationElement.getOnlyChildElementOptionally(FILTER);
         if (filterElement.isPresent()) {
-            if (filterElement.get().getChildElements().size() == 0) {
-                return Optional.absent();
-            }
-            return Optional.of(getInstanceIdentifierFromFilter(filterElement.get()));
+            return getInstanceIdentifiersFromFilter(filterElement.get());
         } else {
-            return Optional.of(ROOT);
+            return Lists.newArrayList(ROOT);
         }
     }
 
     @VisibleForTesting
-    protected YangInstanceIdentifier getInstanceIdentifierFromFilter(XmlElement filterElement) throws DocumentedException {
-
-        if (filterElement.getChildElements().size() != 1) {
-            throw new DocumentedException("Multiple filter roots not supported yet",
-                    ErrorType.application, ErrorTag.operation_not_supported, ErrorSeverity.error);
-        }
-
-        XmlElement element = filterElement.getOnlyChildElement();
-        return validator.validate(element);
+    protected List<YangInstanceIdentifier> getInstanceIdentifiersFromFilter(XmlElement filterElement) throws DocumentedException {
+        return filterElement.getChildElements().stream().map(element -> {
+            try {
+                return validator.validate(element);
+            } catch (DocumentedException exception) {
+                throw new RuntimeException(exception);
+            }
+        }).collect(Collectors.toList());
     }
 
     protected static final class GetConfigExecution {

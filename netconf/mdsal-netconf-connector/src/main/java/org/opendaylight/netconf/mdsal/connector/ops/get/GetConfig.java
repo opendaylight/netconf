@@ -10,6 +10,11 @@ package org.opendaylight.netconf.mdsal.connector.ops.get;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeverity;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
@@ -53,32 +58,45 @@ public class GetConfig extends AbstractGet {
             throw e;
         }
 
-        final Optional<YangInstanceIdentifier> dataRootOptional = getDataRootFromFilter(operationElement);
-        if (!dataRootOptional.isPresent()) {
+        final List<YangInstanceIdentifier> dataRootOptional = getDataRootsFromFilter(operationElement);
+        if (dataRootOptional.isEmpty()) {
             return XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.<String>absent());
         }
-
-        final YangInstanceIdentifier dataRoot = dataRootOptional.get();
-
-        // Proper exception should be thrown
+       // Proper exception should be thrown
         Preconditions.checkState(getConfigExecution.getDatastore().isPresent(), "Source element missing from request");
 
         DOMDataReadWriteTransaction rwTx = getTransaction(getConfigExecution.getDatastore().get());
-        try {
-            final Optional<NormalizedNode<?, ?>> normalizedNodeOptional = rwTx.read(LogicalDatastoreType.CONFIGURATION, dataRoot).checkedGet();
-            if (getConfigExecution.getDatastore().get() == Datastore.running) {
-                transactionProvider.abortRunningTransaction(rwTx);
-            }
 
-            if (!normalizedNodeOptional.isPresent()) {
-                return XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.<String>absent());
-            }
+        // Due to list, we need filter empty normalized nodes and preserve dataRootOptionals with normalizedNodes
+        final List<Map.Entry<YangInstanceIdentifier, Optional<NormalizedNode<?, ?>>>> rootNodeEntryList = new ArrayList<>();
 
-            return serializeNodeWithParentStructure(document, dataRoot, normalizedNodeOptional.get());
-        } catch (ReadFailedException e) {
-            LOG.warn("Unable to read data: {}", dataRoot, e);
-            throw new IllegalStateException("Unable to read data " + dataRoot, e);
+        dataRootOptional.forEach(element -> {
+            try {
+                final Optional<NormalizedNode<?, ?>> normalizedNodeOptional =
+                        rwTx.read(LogicalDatastoreType.CONFIGURATION, element).checkedGet();
+                if (normalizedNodeOptional.isPresent()) {
+                    rootNodeEntryList.add(new AbstractMap.SimpleEntry<>(element, normalizedNodeOptional));
+                }
+            } catch (ReadFailedException exception) {
+                LOG.warn("Unable to read data: {}", element, exception);
+                throw new RuntimeException(exception);
+            }
+        });
+
+        if (getConfigExecution.getDatastore().get() == Datastore.running) {
+            transactionProvider.abortRunningTransaction(rwTx);
         }
+        if (rootNodeEntryList.isEmpty()) {
+            return XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.absent());
+        }
+
+        // We can make this list at reading, but it may fail at exception
+        final List<Element> nodes = rootNodeEntryList.stream().map(element ->
+                serializeNodeWithParentStructure(document, element.getKey(), element.getValue().get())).
+                collect(Collectors.toList());
+
+        return mergeDataNodesToOneElement(nodes);
+
     }
 
     private DOMDataReadWriteTransaction getTransaction(Datastore datastore) throws DocumentedException{
