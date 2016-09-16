@@ -8,12 +8,11 @@
 
 package org.opendaylight.netconf.console.commands;
 
+import com.google.common.base.Strings;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.apache.karaf.shell.console.AbstractAction;
 import org.opendaylight.netconf.console.api.NetconfCommands;
-
-import com.google.common.base.Strings;
 
 @Command(name = "netconf:disconnect-device", scope = "netconf", description = "Disconnect netconf device.")
 public class NetconfDisconnectDeviceCommand extends AbstractAction {
