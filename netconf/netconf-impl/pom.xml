@@ -129,7 +129,6 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-Activator>org.opendaylight.netconf.impl.osgi.NetconfImplActivator</Bundle-Activator>
             <Export-Package>org.opendaylight.netconf.impl.*</Export-Package>
           </instructions>
         </configuration>

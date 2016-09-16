@@ -19,6 +19,7 @@ import java.util.Dictionary;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -54,9 +55,10 @@ public class NetconfImplActivatorTest {
 
     @Test
     public void testStart() throws Exception {
-        NetconfImplActivator activator = new NetconfImplActivator();
-        activator.start(bundle);
+        NetconfImplActivator activator = new NetconfImplActivator(bundle,
+                Mockito.mock(AggregatedNetconfOperationServiceFactory.class, Mockito.RETURNS_DEEP_STUBS));
+        activator.start();
         verify(bundle).registerService(any(Class.class), any(AggregatedNetconfOperationServiceFactory.class), any(Dictionary.class));
-        activator.stop(bundle);
+        activator.stop();
     }
 }
