@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_2beac6ab",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-16T12:38:31Z",
+      "side": 1,
+      "message": "because of this change https://git.opendaylight.org/gerrit/#/c/43229/\nI have mention this in the comment and I was told it\u0027s the user responsibility to call submit send the operation..",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 46
+      },
+      "revId": "9874d12b94e6483ab86c3c766c4d40c6d4fbdbde",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
