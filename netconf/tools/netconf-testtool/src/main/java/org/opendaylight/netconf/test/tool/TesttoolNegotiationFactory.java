@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory;
-import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactoryBuilder;
 import org.opendaylight.netconf.impl.SessionIdProvider;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;

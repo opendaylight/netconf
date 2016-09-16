@@ -36,6 +36,8 @@ public class NetconfImplActivatorTest {
     private ServiceReference<?> reference;
     @Mock
     private ServiceRegistration<?> registration;
+    @Mock
+    private AggregatedNetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory;
 
     @Before
     public void setUp() throws Exception {
@@ -54,9 +56,9 @@ public class NetconfImplActivatorTest {
 
     @Test
     public void testStart() throws Exception {
-        NetconfImplActivator activator = new NetconfImplActivator();
-        activator.start(bundle);
+        NetconfImplActivator activator = new NetconfImplActivator(bundle, aggregatedNetconfOperationServiceFactory);
+        activator.start();
         verify(bundle).registerService(any(Class.class), any(AggregatedNetconfOperationServiceFactory.class), any(Dictionary.class));
-        activator.stop(bundle);
+        activator.stop();
     }
 }
