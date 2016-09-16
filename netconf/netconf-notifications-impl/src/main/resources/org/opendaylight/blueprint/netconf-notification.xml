@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           odl:restart-dependents-on-updates="true">
+
+    <bean id="=netconfNotificationManager"
+          class="org.opendaylight.netconf.notifications.impl.NetconfNotificationManager"
+          destroy-method="close">
+    </bean>
+    <service ref="netconfNotificationManager" odl:type="default">
+        <interfaces>
+            <value>org.opendaylight.netconf.notifications.NetconfNotificationCollector</value>
+            <value>org.opendaylight.netconf.notifications.NetconfNotificationRegistry</value>
+        </interfaces>
+    </service>
+
+    <bean id="netconfMonitoringActivator"
+          class="org.opendaylight.netconf.notifications.impl.osgi.Activator"
+          init-method="start"
+          destroy-method="stop">
+        <argument ref="blueprintBundleContext" />
+        <argument ref="netconfNotificationManager" />
+    </bean>
+
+</blueprint>
