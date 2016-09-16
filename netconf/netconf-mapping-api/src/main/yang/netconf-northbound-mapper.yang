@@ -14,14 +14,23 @@ module netconf-northbound-mapper {
             "Initial revision.";
     }
 
+    // We keep those as netconf-tcp need it.
+    // Once it will be moved to blueprint, it will be safe to delete
+    // this yang files.
+    // Those APIs are now registered by blueprint in netconf-impl
+
     identity netconf-northbound-mapper {
         base "config:service-type";
         config:java-class "org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory";
+        config:disable-osgi-service-registration;
+        status deprecated;
     }
 
     identity netconf-mapper-registry {
         base "config:service-type";
         config:java-class "org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener";
+        config:disable-osgi-service-registration;
+        status deprecated;
     }
 
 }
