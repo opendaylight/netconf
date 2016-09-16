@@ -22,6 +22,30 @@
       "revId": "9874d12b94e6483ab86c3c766c4d40c6d4fbdbde",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_6b52fe67",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-09-16T13:13:13Z",
+      "side": 1,
+      "message": "I\u0027ve forgotten to add bug number to the commit message.\nIt is still user\u0027s responsibility to call submit. Only thing that has been changed is that all changes are transfered to the device only after user calling submit(), not after every put, merge or delete call, as it violates DOMDataWriteTransaction contract.\nIt is implementation of Jakub\u0027s idea, that was mentioned in your patch.",
+      "parentUuid": "7a6b29fe_2beac6ab",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 46
+      },
+      "revId": "9874d12b94e6483ab86c3c766c4d40c6d4fbdbde",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
