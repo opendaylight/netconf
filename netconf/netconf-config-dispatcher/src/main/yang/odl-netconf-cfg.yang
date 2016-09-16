@@ -23,9 +23,13 @@ module odl-netconf-cfg {
             "Initial revision.";
     }
 
+    // We keep this as sal-netconf-connector and netconf-topology need it.
+    // Once they will be moved to blueprint, it will be safe to delete all
+    // together the netconf-config-dispatcher bundle.
     identity netconf-client-dispatcher {
-
         base "config:service-type";
         config:java-class "org.opendaylight.netconf.client.NetconfClientDispatcher";
+        config:disable-osgi-service-registration;
+        status deprecated;
     }
 }
