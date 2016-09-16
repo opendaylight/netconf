@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           odl:restart-dependents-on-updates="true">
+
+    <bean id="aggregatedNetconfOperationServiceFactory"
+          class="org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory"
+          destroy-method="close">
+    </bean>
+    <service ref="aggregatedNetconfOperationServiceFactory" odl:type="default">
+        <interfaces>
+            <value>org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener</value>
+            <value>org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory</value>
+        </interfaces>
+    </service>
+
+    <bean id="netconfImplActivator"
+          class="org.opendaylight.netconf.impl.osgi.NetconfImplActivator"
+          init-method="start"
+          destroy-method="stop">
+        <argument ref="blueprintBundleContext" />
+        <argument ref="aggregatedNetconfOperationServiceFactory" />
+    </bean>
+
+</blueprint>
