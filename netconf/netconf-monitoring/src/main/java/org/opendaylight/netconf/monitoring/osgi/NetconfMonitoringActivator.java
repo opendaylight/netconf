@@ -11,28 +11,37 @@ package org.opendaylight.netconf.monitoring.osgi;
 import java.util.Collections;
 import java.util.Set;
 import org.opendaylight.controller.config.util.capability.Capability;
+import org.opendaylight.controller.sal.common.util.NoopAutoCloseable;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfMonitoringActivator implements BundleActivator {
+public class NetconfMonitoringActivator {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMonitoringActivator.class);
 
+    private final BundleContext context;
+
     private NetconfMonitoringServiceTracker monitor;
 
-    @Override
-    public void start(final BundleContext context)  {
+    public NetconfMonitoringActivator(final BundleContext bundleContext) {
+        this.context = bundleContext;
+    }
+    /**
+     * Invoke by blueprint
+     */
+    public void start()  {
         monitor = new NetconfMonitoringServiceTracker(context);
         monitor.open();
     }
 
-    @Override
-    public void stop(final BundleContext context) {
+    /**
+     * Invoke by blueprint
+     */
+    public void stop() {
         if(monitor!=null) {
             try {
                 monitor.close();
@@ -45,13 +54,6 @@ public class NetconfMonitoringActivator implements BundleActivator {
     public static class NetconfMonitoringOperationServiceFactory implements NetconfOperationServiceFactory, AutoCloseable {
 
         private final NetconfMonitoringOperationService operationService;
-
-        private static final AutoCloseable AUTO_CLOSEABLE = new AutoCloseable() {
-            @Override
-            public void close() throws Exception {
-                // NOOP
-            }
-        };
 
         public NetconfMonitoringOperationServiceFactory(final NetconfMonitoringOperationService operationService) {
             this.operationService = operationService;
@@ -69,7 +71,7 @@ public class NetconfMonitoringActivator implements BundleActivator {
 
         @Override
         public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
-            return AUTO_CLOSEABLE;
+            return NoopAutoCloseable.INSTANCE;
         }
 
         @Override
