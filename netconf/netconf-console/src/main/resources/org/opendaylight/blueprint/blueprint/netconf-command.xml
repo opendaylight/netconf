@@ -1,32 +1,47 @@
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-    <reference id="netconfConsoleProvider" availability="mandatory"
-        activation="eager" interface="org.opendaylight.netconf.console.api.NetconfCommands">
-    </reference>
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           odl:use-default-for-reference-types="true">
+
+    <reference id="dataBroker"
+               interface="org.opendaylight.controller.md.sal.binding.api.DataBroker"
+               odl:type="default"/>
+    <reference id="mountPoint"
+               interface="org.opendaylight.controller.md.sal.binding.api.MountPointService" />
+
+    <bean id="netconfCommandsImpl" class="org.opendaylight.netconf.console.impl.NetconfCommandsImpl">
+        <argument ref="dataBroker"/>
+        <argument ref="mountPoint"/>
+    </bean>
+
+    <!--Karaf CLI-->
+
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="netconf:connect-device">
             <action class="org.opendaylight.netconf.console.commands.NetconfConnectDeviceCommand">
-                <argument ref="netconfConsoleProvider"/>
+                <argument ref="netconfCommandsImpl"/>
             </action>
         </command>
         <command name="netconf:list-devices">
             <action class="org.opendaylight.netconf.console.commands.NetconfListDevicesCommand">
-                <argument ref="netconfConsoleProvider"/>
+                <argument ref="netconfCommandsImpl"/>
             </action>
         </command>
         <command name="netconf:show-device">
             <action class="org.opendaylight.netconf.console.commands.NetconfShowDeviceCommand">
-                <argument ref="netconfConsoleProvider"/>
+                <argument ref="netconfCommandsImpl"/>
             </action>
         </command>
         <command name="netconf:disconnect-device">
             <action class="org.opendaylight.netconf.console.commands.NetconfDisconnectDeviceCommand">
-                <argument ref="netconfConsoleProvider"/>
+                <argument ref="netconfCommandsImpl"/>
             </action>
         </command>
         <command name="netconf:update-device">
             <action class="org.opendaylight.netconf.console.commands.NetconfUpdateDeviceCommand">
-                <argument ref="netconfConsoleProvider"/>
+                <argument ref="netconfCommandsImpl"/>
             </action>
         </command>
     </command-bundle>
+
 </blueprint>

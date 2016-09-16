@@ -36,7 +36,6 @@
     <config.netconf.client.configfile>01-netconf.xml</config.netconf.client.configfile>
     <config.netconf.topology.configfile>02-netconf-topology.xml</config.netconf.topology.configfile>
     <config.netconf.connector.configfile>99-netconf-connector.xml</config.netconf.connector.configfile>
-    <config.netconf.console.configfile>100-netconf-console.xml</config.netconf.console.configfile>
   </properties>
 
   <dependencyManagement>
@@ -103,13 +102,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-console</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-console</artifactId>
-      <version>${project.version}</version>
-      <classifier>config</classifier>
-      <type>xml</type>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
