@@ -550,7 +550,6 @@ public class NetconfMDSalMappingTest {
 
         verifyResponse(getConfigWithFilter("messages/mapping/filters/get-filter-augmented-case.xml"),
                 XmlFileLoader.xmlFileToDocument("messages/mapping/filters/response-augmented-case.xml"));
-
         /*
          *  RFC6020 requires that at most once case inside a choice is present at any time.
          *  Therefore
@@ -583,12 +582,27 @@ public class NetconfMDSalMappingTest {
 
     }
 
-    private void verifyFilterIdentifier(final String resource, final YangInstanceIdentifier identifier)
-            throws Exception {
-        final TestingGetConfig getConfig = new TestingGetConfig(SESSION_ID_FOR_REPORTING, currentSchemaContext,
-                transactionProvider);
-        final Document request = XmlFileLoader.xmlFileToDocument(resource);
-        final YangInstanceIdentifier iid = getConfig.getInstanceIdentifierFromDocument(request);
+    @Test
+    public void testFilteringMultipleRoots() throws Exception {
+        edit("messages/mapping/editConfigs/editConfig-filtering-setup.xml");
+        commit();
+
+        verifyResponse(getConfigWithFilter("messages/mapping/filters/get-filter-augmented-case-two-roots.xml"),
+                XmlFileLoader.xmlFileToDocument("messages/mapping/filters/response-augmented-case-two-roots.xml"));
+
+        verifyResponse(getConfigWithFilter("messages/mapping/filters/get-filter-modules-four-roots.xml"),
+                XmlFileLoader.xmlFileToDocument("messages/mapping/filters/response-modules-four-roots.xml"));
+
+        verifyResponse(getConfigWithFilter("messages/mapping/filters/get-filter-first-level.xml"),
+                XmlFileLoader.xmlFileToDocument("messages/mapping/filters/response-first-level.xml"));
+    }
+
+    private void verifyFilterIdentifier(String resource, YangInstanceIdentifier identifier) throws Exception {
+        TestingGetConfig getConfig =
+                new TestingGetConfig(SESSION_ID_FOR_REPORTING, currentSchemaContext, transactionProvider);
+        Document request = XmlFileLoader.xmlFileToDocument(resource);
+        YangInstanceIdentifier iid = getConfig.getInstanceIdentifierFromDocument(request).get(0);
+
         assertEquals(identifier, iid);
     }
 
@@ -598,10 +612,12 @@ public class NetconfMDSalMappingTest {
             super(sessionId, schemaContext, transactionProvider);
         }
 
-        YangInstanceIdentifier getInstanceIdentifierFromDocument(final Document request) throws DocumentedException {
-            final XmlElement filterElement = XmlElement.fromDomDocument(request).getOnlyChildElement(GET_CONFIG)
-                    .getOnlyChildElement(FILTER_NODE);
-            return getInstanceIdentifierFromFilter(filterElement);
+        public List<YangInstanceIdentifier> getInstanceIdentifierFromDocument(Document request)
+                throws DocumentedException {
+            XmlElement filterElement = XmlElement.fromDomDocument(request)
+                    .getOnlyChildElement(GET_CONFIG).getOnlyChildElement(FILTER_NODE);
+            return getInstanceIdentifiersFromFilter(filterElement);
+
         }
     }
 
