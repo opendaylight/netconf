@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_18bac2c0",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-09-16T06:07:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_e2d91658",
+      "range": {
+        "startLine": 204,
+        "startChar": 37,
+        "endLine": 204,
+        "endChar": 48
+      },
+      "revId": "cbd2ae423615df815220b067a824b1d240420622",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_f7027a08",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/TxChain.java",
         "patchSetId": 4
@@ -36,6 +60,30 @@
       "writtenOn": "2016-09-14T13:55:28Z",
       "side": 1,
       "message": "it will be null if a newReadOnlyTransaction is used. I think it is safe to add a null check",
+      "range": {
+        "startLine": 123,
+        "startChar": 13,
+        "endLine": 123,
+        "endChar": 35
+      },
+      "revId": "cbd2ae423615df815220b067a824b1d240420622",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_b8a74ea6",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/TxChain.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-09-16T06:07:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_f7027a08",
       "range": {
         "startLine": 123,
         "startChar": 13,
