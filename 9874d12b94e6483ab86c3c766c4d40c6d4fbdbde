@@ -70,6 +70,29 @@
       "revId": "9874d12b94e6483ab86c3c766c4d40c6d4fbdbde",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_0b670a27",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteRunningTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-16T13:22:59Z",
+      "side": 1,
+      "message": "I know it\u0027s not this patch\u0027s scope, but because of those changes your patch and my patch (https://git.opendaylight.org/gerrit/#/c/45549/) are in conflict... \n\nAs you\u0027re going to edit the commit message with the BUG ID, maybe you could take the patch locally on rebase it on mine, if that works for you.\nElse I\u0027ll rebase mine later I guess",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 73
+      },
+      "revId": "9874d12b94e6483ab86c3c766c4d40c6d4fbdbde",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
