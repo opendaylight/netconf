@@ -25,7 +25,12 @@ public class NetconfCommandUtils {
         if (Strings.isNullOrEmpty(devicePort)) {
             return false;
         }
-        Integer port = Integer.parseInt(devicePort);
+        Integer port = null;
+        try {
+            port = Integer.parseInt(devicePort);
+        } catch (NumberFormatException e){
+          return false;
+        }
         if (port != null && port >= 0 && port <= 65535) {
             return true;
         }
