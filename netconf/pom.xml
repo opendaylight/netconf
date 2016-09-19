@@ -47,8 +47,8 @@
     <module>netconf-notifications-impl</module>
     <module>netconf-notifications-api</module>
     <module>netconf-topology</module>
+    <module>netconf-topology-clustered</module>
     <module>abstract-topology</module>
-    <module>netconf-topology-config</module>
     <module>sal-netconf-connector</module>
     <module>messagebus-netconf</module>
     <module>yanglib</module>

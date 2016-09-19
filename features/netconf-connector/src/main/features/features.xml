@@ -37,7 +37,6 @@
         <bundle>mvn:com.google.code.gson/gson/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.netconf/sal-netconf-connector/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.controller.model/model-inventory/{{VERSION}}</bundle>
-        <bundle>mvn:org.opendaylight.netconf/netconf-topology/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.netconf/abstract-topology/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.netconf/sal-netconf-connector/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.netconf/netconf-config-dispatcher/{{VERSION}}</bundle>
@@ -53,13 +52,13 @@
     <feature name='odl-netconf-topology' version='${project.version}' description="OpenDaylight :: Netconf Topology :: Netconf Connector + Netconf SSH Server + Netconf configuration via config topology datastore">
         <feature version='${project.version}'>odl-netconf-ssh</feature>
         <feature version='${project.version}'>odl-netconf-connector</feature>
-        <configfile finalname='${config.configfile.directory}/${config.netconf.topology.configfile}'>mvn:org.opendaylight.netconf/netconf-topology-config/{{VERSION}}/xml/config</configfile>
+        <bundle>mvn:org.opendaylight.netconf/netconf-topology/{{VERSION}}</bundle>
     </feature>
 
     <feature name='odl-netconf-clustered-topology' version='${project.version}' description="OpenDaylight :: Clustered Netconf Topology :: Netconf Connector + Netconf SSH Server + Clustered Netconf configuration via config topology datastore">
         <feature version='${netconf.version}'>odl-netconf-ssh</feature>
         <feature version='${project.version}'>odl-netconf-connector</feature>
-        <configfile finalname='${config.configfile.directory}/${config.netconf.topology.configfile}'>mvn:org.opendaylight.netconf/netconf-topology-config/{{VERSION}}/xml/clustered-config</configfile>
+        <bundle>mvn:org.opendaylight.netconf/netconf-topology-clustered/{{VERSION}}</bundle>
     </feature>
 
     <feature name='odl-netconf-console' version='${project.version}' description="OpenDaylight :: Netconf Console + Karaf CLI for netconf CRUD operations">

@@ -238,17 +238,8 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-topology-config</artifactId>
+                <artifactId>netconf-topology-clustered</artifactId>
                 <version>${project.version}</version>
-                <classifier>config</classifier>
-                <type>xml</type>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-topology-config</artifactId>
-                <version>${project.version}</version>
-                <classifier>clustered-config</classifier>
-                <type>xml</type>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>

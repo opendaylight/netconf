@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.3.0"
+           odl:restart-dependents-on-updates="true">
+
+    <!--Clustering -->
+
+    <reference id="eos" interface="org.opendaylight.controller.md.sal.common.api.clustering.EntityOwnershipService" />
+    <reference id="actorSystemProvider" interface="org.opendaylight.controller.cluster.ActorSystemProvider" />
+
+    <!--Netconf specific references-->
+
+    <reference id="netconfClientDispatcher" interface="org.opendaylight.netconf.client.NetconfClientDispatcher" odl:type="netconf-client-dispatcher"/>
+
+    <!--Brokers-->
+
+    <reference id="bindingAwareBroker" interface="org.opendaylight.controller.sal.binding.api.BindingAwareBroker" />
+    <reference id="domBroker" interface="org.opendaylight.controller.sal.core.api.Broker" />
+
+    <!--Concurrent-->
+
+    <reference id="executor" interface="io.netty.util.concurrent.EventExecutor" odl:type="global-event-executor" />
+    <reference id="scheduledThreadPool" interface="org.opendaylight.controller.config.threadpool.ScheduledThreadPool" />
+    <reference id="threadPool" interface="org.opendaylight.controller.config.threadpool.ThreadPool" />
+
+    <cm:property-placeholder persistent-id="org.opendaylight.netconf.topology" update-strategy="none">
+        <cm:default-properties>
+            <cm:property name="topology-id" value="topology-netconf"/>
+            <cm:property name="schema-repository-id" value="default-shared-schema-repository"/>
+        </cm:default-properties>
+    </cm:property-placeholder>
+
+    <!-- Cluster NETCONF topology -->
+
+    <bean id="sharedSchemaRepo" class="org.opendaylight.netconf.topology.schema.SchemaRepositoryProviderImpl">
+        <argument value="${schema-repository-id}"/>
+    </bean>
+    <service ref="sharedSchemaRepo" interface="org.opendaylight.netconf.topology.schema.SchemaRepositoryProvider" />
+
+    <bean id="clusteredNetconfTopology"
+          class="org.opendaylight.netconf.topology.impl.ClusteredNetconfTopology"
+          destroy-method="close">
+        <argument value="${topology-id}"/>
+        <argument ref="netconfClientDispatcher" />
+        <argument ref="bindingAwareBroker" />
+        <argument ref="domBroker" />
+        <argument ref="executor" />
+        <argument ref="scheduledThreadPool" />
+        <argument ref="threadPool" />
+        <argument ref="sharedSchemaRepo" />
+        <argument ref="actorSystemProvider" />
+        <argument ref="eos" />
+    </bean>
+    <service ref="clusteredNetconfTopology" odl:type="netconf-topology-cluster"
+             interface="org.opendaylight.netconf.topology.AbstractNetconfTopology" />
+
+</blueprint>
