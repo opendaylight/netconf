@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_bfbf2d60",
+        "filename": "netconf/messagebus-netconf/src/main/java/org/opendaylight/netconf/messagebus/eventsources/netconf/NetconfEventSourceManager.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-19T15:33:40Z",
+      "side": 1,
+      "message": "Done. NetconfEventSourceRegistration is using the getter to access this.",
+      "parentUuid": "7a6b29fe_fc7b7378",
+      "revId": "19aee64d053b053f92acaf86094bc6133aa602bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_bc857b5b",
         "filename": "netconf/messagebus-netconf/src/main/resources/org/opendaylight/blueprint/messagebus-netconf.xml",
         "patchSetId": 2
