@@ -138,7 +138,7 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
 
     @Override
     public NormalizedNodeContext invokeRpc(final String identifier, final NormalizedNodeContext payload,
-            final UriInfo uriInfo) {
+                                           final UriInfo uriInfo) {
         return this.delegRestconfInvokeOpsService.invokeRpc(identifier, payload, uriInfo);
     }
 
@@ -148,14 +148,16 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
     }
 
     public void setHandlers(final SchemaContextHandler schemaCtxHandler,
-            final DOMMountPointServiceHandler domMountPointServiceHandler,
-            final TransactionChainHandler transactionChainHandler, final DOMDataBrokerHandler domDataBrokerHandler,
-            final RpcServiceHandler rpcServiceHandler) {
+                            final DOMMountPointServiceHandler domMountPointServiceHandler,
+                            final TransactionChainHandler transactionChainHandler,
+                            final DOMDataBrokerHandler domDataBrokerHandler,
+                            final RpcServiceHandler rpcServiceHandler) {
         this.delegRestModService = new RestconfModulesServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
         this.delegRestOpsService = new RestconfOperationsServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
         this.delegRestSchService = new RestconfSchemaServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
         this.delegRestStrsService = new RestconfStreamsServiceImpl(schemaCtxHandler);
-        this.delegRestconfDataService = new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler);
+        this.delegRestconfDataService = new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler,
+                domMountPointServiceHandler);
         this.delegRestconfInvokeOpsService = new RestconfInvokeOperationsServiceImpl(rpcServiceHandler,
                 schemaCtxHandler);
         this.delegRestconfSubscrService = new RestconfStreamsSubscriptionServiceImpl(domDataBrokerHandler);

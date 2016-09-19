@@ -556,7 +556,8 @@ public class RestconfModulesServiceTest {
     /**
      * Negative test of getting specific module supported by the mount point when specified mount point is not found
      * (it is not registered in <code>DOMMountPointService</code>). Test is expected to fail with
-     * <code>IllegalStateException</code>.
+     * <code>RestconfDocumentedException</code> and error type, error tag and error status code are compared to
+     * expected values.
      */
     @Test
     public void getModuleMountPointNotFoundNegativeTest() throws Exception {
@@ -564,14 +565,21 @@ public class RestconfModulesServiceTest {
         final RestconfModulesService modulesService = setupNormalMountPoint();
 
         // make test
-        this.thrown.expect(IllegalStateException.class);
-        modulesService.getModule(TEST_MODULE_BEHIND_NOT_REGISTERED_MOUNT_POINT, null);
+        try {
+            modulesService.getModule(TEST_MODULE_BEHIND_NOT_REGISTERED_MOUNT_POINT, null);
+            fail("Test should fail due to missing mount point");
+        } catch (final RestconfDocumentedException e) {
+            assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals("Error tag is not correct", ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
+            assertEquals("Error code is not correct", 404, e.getErrors().get(0).getErrorTag().getStatusCode());
+        }
     }
 
     /**
      * Negative test of getting all modules supported by the mount point when specified mount point is not found (it
      * is not registered in <code>DOMMountPointService</code>). Test is expected to fail with
-     * <code>IllegalStateException</code>.
+     * <code>RestconfDocumentedException</code> and error type, error tag and error status code are compared to
+     * expected values.
      */
     @Test
     public void getModulesMountPointNotFoundNegativeTest() throws Exception {
@@ -579,7 +587,13 @@ public class RestconfModulesServiceTest {
         final RestconfModulesService modulesService = setupNormalMountPoint();
 
         // make test
-        this.thrown.expect(IllegalStateException.class);
-        modulesService.getModules(NOT_REGISTERED_MOUNT_POINT, null);
+        try {
+            modulesService.getModules(NOT_REGISTERED_MOUNT_POINT, null);
+            fail("Test should fail due to missing mount point");
+        } catch (final RestconfDocumentedException e) {
+            assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals("Error tag is not correct", ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
+            assertEquals("Error code is not correct", 404, e.getErrors().get(0).getErrorTag().getStatusCode());
+        }
     }
 }
