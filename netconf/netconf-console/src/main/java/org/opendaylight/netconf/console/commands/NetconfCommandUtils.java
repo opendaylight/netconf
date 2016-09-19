@@ -25,11 +25,13 @@ public class NetconfCommandUtils {
         if (Strings.isNullOrEmpty(devicePort)) {
             return false;
         }
-        Integer port = Integer.parseInt(devicePort);
-        if (port != null && port >= 0 && port <= 65535) {
-            return true;
+        Integer port;
+        try {
+            port = Integer.parseInt(devicePort);
+        } catch (NumberFormatException e) {
+          return false;
         }
-        return false;
+        return port >= 0 && port <= 65535;
     }
 
     public static boolean isIpValid(final String deviceIp) {

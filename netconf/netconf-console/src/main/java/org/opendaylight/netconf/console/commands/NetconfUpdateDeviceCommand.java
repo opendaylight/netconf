@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.console.commands;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +25,12 @@ public class NetconfUpdateDeviceCommand extends AbstractAction {
 
     public NetconfUpdateDeviceCommand(final NetconfCommands service) {
         this.service = service;
+    }
+
+    @VisibleForTesting
+    NetconfUpdateDeviceCommand(final NetconfCommands service, final String newIp) {
+        this.service = service;
+        this.newIp = newIp;
     }
 
     @Option(name = "-id",
