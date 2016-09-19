@@ -213,7 +213,7 @@ public final class ReadDataTransactionUtil {
 
         if (configDataNode instanceof MapNode) { // part for lists mapping
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder = ImmutableNodes
-                .mapEntryBuilder();
+                    .mapEntryBuilder();
             final NodeIdentifierWithPredicates node = ((MapNode) configDataNode).getValue().iterator().next().getIdentifier();
             mapEntryBuilder.withNodeIdentifier(node);
 
@@ -222,6 +222,12 @@ public final class ReadDataTransactionUtil {
             // MAP STATE DATA
             mapDataNode((MapNode) stateDataNode, mapEntryBuilder);
             return ImmutableNodes.mapNodeBuilder(configDataNode.getNodeType()).addChild(mapEntryBuilder.build()).build();
+        } else if (configDataNode instanceof MapEntryNode) {
+            // FIXME adds only operational
+            return ImmutableNodes.mapNodeBuilder(configDataNode.getNodeType())
+                    .addChild((MapEntryNode) configDataNode)
+                    .addChild((MapEntryNode) stateDataNode)
+                    .build();
         } else if (configDataNode instanceof ContainerNode) { // part for containers mapping
             final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder = Builders
                     .containerBuilder((ContainerNode) configDataNode);
