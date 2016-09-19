@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.utils.parser;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -14,6 +16,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
@@ -48,7 +51,8 @@ public final class ParserIdentifier {
     }
 
     /**
-     * Make {@link InstanceIdentifierContext} from identifier.
+     * Make {@link InstanceIdentifierContext} from identifier. Returned {@link InstanceIdentifierContext} refers only
+     * to context on the server, it never contains {@link DOMMountPoint}.
      *
      * @param identifier
      *            - path identifier
@@ -57,7 +61,7 @@ public final class ParserIdentifier {
      * @return {@link InstanceIdentifierContext}
      */
     public static InstanceIdentifierContext<?> toInstanceIdentifier(@Nullable final String identifier,
-            final SchemaContext schemaContext) {
+                                                                    @Nonnull final SchemaContext schemaContext) {
         final YangInstanceIdentifier deserialize;
         if (identifier != null && identifier.contains(RestconfConstants.MOUNT)) {
             final String mountPointId = identifier.substring(0, identifier.indexOf("/" + RestconfConstants.MOUNT));
@@ -67,6 +71,62 @@ public final class ParserIdentifier {
         }
         final DataSchemaContextNode<?> child = DataSchemaContextTree.from(schemaContext).getChild(deserialize);
         return new InstanceIdentifierContext<SchemaNode>(deserialize, child.getDataSchemaNode(), null, schemaContext);
+    }
+
+    /**
+     * Make {@link InstanceIdentifierContext} from {@link String} identifier
+     * <br>
+     * For identifiers of data NOT behind mount points returned
+     * {@link InstanceIdentifierContext} is prepared with {@code null} reference of {@link DOMMountPoint} and with
+     * controllers {@link SchemaContext}.
+     * <br>
+     * For identifiers of data behind mount points returned
+     * {@link InstanceIdentifierContext} is prepared with reference of {@link DOMMountPoint} and its
+     * own {@link SchemaContext}.
+     *
+     * @param identifier
+     *           - path identifier
+     * @param schemaContext
+     *           - controller schema context
+     * @param mountPointService
+     *           - mount point service
+     * @return {@link InstanceIdentifierContext}
+     */
+    public static InstanceIdentifierContext<?> toCompleteInstanceIdentifier(@Nullable final String identifier,
+                                                                            @Nonnull final SchemaContext schemaContext,
+                                                                            @Nullable final DOMMountPointService mountPointService) {
+        if (identifier != null && identifier.contains(RestconfConstants.MOUNT)) {
+            Preconditions.checkNotNull(mountPointService);
+
+            final Iterator<String> pathsIt = Splitter.on("/" + RestconfConstants.MOUNT).split(identifier).iterator();
+
+            final String mountPointId = pathsIt.next();
+            final YangInstanceIdentifier mountYangInstanceIdentifier = IdentifierCodec.deserialize(
+                    mountPointId, schemaContext);
+            final Optional<DOMMountPoint> mountPoint = mountPointService.getMountPoint(mountYangInstanceIdentifier);
+
+            if (!mountPoint.isPresent()) {
+                throw new RestconfDocumentedException(
+                        "Mount point does not exist.", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
+            }
+
+            final String pathId = pathsIt.next();
+            final YangInstanceIdentifier pathYangInstanceIdentifier = IdentifierCodec.deserialize(
+                    pathId, mountPoint.get().getSchemaContext());
+
+            final DataSchemaContextNode<?> child = DataSchemaContextTree.from(
+                    mountPoint.get().getSchemaContext()).getChild(pathYangInstanceIdentifier);
+
+            return new InstanceIdentifierContext<SchemaNode>(
+                    pathYangInstanceIdentifier, child.getDataSchemaNode(), mountPoint.get(),
+                    mountPoint.get().getSchemaContext());
+        } else {
+            final YangInstanceIdentifier deserialize = IdentifierCodec.deserialize(identifier, schemaContext);
+            final DataSchemaContextNode<?> child = DataSchemaContextTree.from(schemaContext).getChild(deserialize);
+
+            return new InstanceIdentifierContext<SchemaNode>(
+                    deserialize, child.getDataSchemaNode(), null, schemaContext);
+        }
     }
 
     /**

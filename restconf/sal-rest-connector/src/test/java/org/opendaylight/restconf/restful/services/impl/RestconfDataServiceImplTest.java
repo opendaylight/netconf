@@ -46,6 +46,7 @@ import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
+import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -85,6 +86,8 @@ public class RestconfDataServiceImplTest {
     private DOMDataReadOnlyTransaction read;
     @Mock
     private DOMDataWriteTransaction write;
+    @Mock
+    private DOMMountPointServiceHandler mountPointServiceHandler;
 
     @Before
     public void setUp() throws Exception {
@@ -126,7 +129,7 @@ public class RestconfDataServiceImplTest {
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler();
 
         schemaContextHandler.onGlobalContextUpdated(contextRef.get());
-        dataService = new RestconfDataServiceImpl(schemaContextHandler, transactionChainHandler);
+        dataService = new RestconfDataServiceImpl(schemaContextHandler, transactionChainHandler, mountPointServiceHandler);
         doReturn(domTransactionChain).when(transactionChainHandler).get();
         doReturn(read).when(domTransactionChain).newReadOnlyTransaction();
         doReturn(readWrite).when(domTransactionChain).newReadWriteTransaction();
@@ -311,5 +314,4 @@ public class RestconfDataServiceImplTest {
         final String errorMessage = status.getEditCollection().get(2).getEditErrors().get(0).getErrorMessage();
         assertEquals("Data does not exist", errorMessage);
     }
-
 }
