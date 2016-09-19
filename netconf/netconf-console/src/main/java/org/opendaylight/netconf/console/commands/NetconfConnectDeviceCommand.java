@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.console.commands;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.apache.karaf.shell.console.AbstractAction;
@@ -28,6 +29,13 @@ public class NetconfConnectDeviceCommand extends AbstractAction {
 
     public NetconfConnectDeviceCommand(final NetconfCommands service) {
         this.service = service;
+    }
+
+    @VisibleForTesting
+    NetconfConnectDeviceCommand(final NetconfCommands service, final String deviceIp, final String devicePort) {
+        this.service = service;
+        this.deviceIp = deviceIp;
+        this.devicePort = devicePort;
     }
 
     @Option(name = "-i",

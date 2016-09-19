@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.console.commands;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,15 @@ public class NetconfShowDeviceCommand extends AbstractAction {
 
     public NetconfShowDeviceCommand(final NetconfCommands service) {
         this.service = service;
+    }
+
+    @VisibleForTesting
+    NetconfShowDeviceCommand(final NetconfCommands service, final String deviceId, final String deviceIp,
+                             final String devicePort) {
+        this.service = service;
+        this.deviceId = deviceId;
+        this.deviceIp = deviceIp;
+        this.devicePort = devicePort;
     }
 
     @Option(name = "-id",

@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.console.commands;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.apache.karaf.shell.console.AbstractAction;
@@ -22,6 +23,15 @@ public class NetconfDisconnectDeviceCommand extends AbstractAction {
 
     public NetconfDisconnectDeviceCommand(final NetconfCommands service) {
         this.service = service;
+    }
+
+    @VisibleForTesting
+    NetconfDisconnectDeviceCommand(final NetconfCommands service, final String deviceId, final String deviceIp,
+                                   final String devicePort) {
+        this.service = service;
+        this.deviceId = deviceId;
+        this.deviceIp = deviceIp;
+        this.devicePort = devicePort;
     }
 
     @Option(name = "-i",
