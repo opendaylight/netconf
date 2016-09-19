@@ -8,6 +8,7 @@
 
 package org.opendaylight.restconf.utils.patch;
 
+import com.google.common.base.Optional;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
@@ -32,7 +33,7 @@ public class AbstractIdentifierAwareJaxRsProvider {
 
     protected InstanceIdentifierContext<?> getInstanceIdentifierContext() {
         return ParserIdentifier.toInstanceIdentifier(getIdentifier(),
-                ControllerContext.getInstance().getGlobalSchema());
+                ControllerContext.getInstance().getGlobalSchema(), Optional.absent());
     }
 
     protected UriInfo getUriInfo() {
