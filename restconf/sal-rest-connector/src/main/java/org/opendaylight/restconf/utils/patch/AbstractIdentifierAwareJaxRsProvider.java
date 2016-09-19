@@ -8,12 +8,14 @@
 
 package org.opendaylight.restconf.utils.patch;
 
+import com.google.common.base.Optional;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
+import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 
 public class AbstractIdentifierAwareJaxRsProvider {
@@ -31,8 +33,10 @@ public class AbstractIdentifierAwareJaxRsProvider {
     }
 
     protected InstanceIdentifierContext<?> getInstanceIdentifierContext() {
-        return ParserIdentifier.toInstanceIdentifier(getIdentifier(),
-                ControllerContext.getInstance().getGlobalSchema());
+        return ParserIdentifier.toInstanceIdentifier(
+                getIdentifier(),
+                ControllerContext.getInstance().getGlobalSchema(),
+                Optional.of(RestConnectorProvider.getMountPointService()));
     }
 
     protected UriInfo getUriInfo() {

@@ -11,7 +11,9 @@ package org.opendaylight.restconf.restful.services.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -31,11 +33,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
@@ -46,6 +50,7 @@ import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
+import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -54,6 +59,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -64,14 +70,18 @@ public class RestconfDataServiceImplTest {
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
 
     private ContainerNode buildBaseCont;
+    private ContainerNode buildBaseContConfig;
+    private ContainerNode buildBaseContOperational;
     private SchemaContextRef contextRef;
     private YangInstanceIdentifier iidBase;
     private DataSchemaNode schemaNode;
     private RestconfDataServiceImpl dataService;
     private QName baseQName;
-    private QName containerQname;
+    private QName containerPlayerQname;
     private QName leafQname;
-    private ContainerNode buildBaseContToReplace;
+    private ContainerNode buildPlayerCont;
+    private ContainerNode buildLibraryCont;
+    private MapNode buildPlaylistList;
 
     @Mock
     private TransactionChainHandler transactionChainHandler;
@@ -85,52 +95,87 @@ public class RestconfDataServiceImplTest {
     private DOMDataReadOnlyTransaction read;
     @Mock
     private DOMDataWriteTransaction write;
+    @Mock
+    private DOMMountPointServiceHandler mountPointServiceHandler;
+    @Mock
+    private DOMMountPointService mountPointService;
+    @Mock
+    private DOMMountPoint mountPoint;
+    @Mock
+    private DOMDataBroker mountDataBroker;
+    @Mock
+    private DOMTransactionChain transactionChain;
 
     @Before
     public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+
         baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
-        containerQname = QName.create(baseQName, "player");
+        containerPlayerQname = QName.create(baseQName, "player");
         leafQname = QName.create(baseQName, "gap");
-        LeafNode buildLeaf = Builders.leafBuilder()
+
+        final QName containerLibraryQName = QName.create(baseQName, "library");
+        final QName listPlaylistQName = QName.create(baseQName, "playlist");
+
+        final LeafNode buildLeaf = Builders.leafBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(leafQname))
                 .withValue(0.2)
                 .build();
 
-        ContainerNode buildPlayerCont = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(containerQname))
+        buildPlayerCont = Builders.containerBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(containerPlayerQname))
                 .withChild(buildLeaf)
                 .build();
+
+        buildLibraryCont = Builders.containerBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(containerLibraryQName))
+                .build();
+
+        buildPlaylistList = Builders.mapBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(listPlaylistQName))
+                .build();
+
         buildBaseCont = Builders.containerBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(baseQName))
                 .withChild(buildPlayerCont)
                 .build();
-        buildLeaf = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(leafQname))
-                .withValue(0.5)
-                .build();
-        buildPlayerCont = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(containerQname))
-                .withChild(buildLeaf)
-                .build();
-        buildBaseContToReplace = Builders.containerBuilder()
+
+        // config contains one child the same as in operational and one additional
+        buildBaseContConfig = Builders.containerBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(baseQName))
                 .withChild(buildPlayerCont)
+                .withChild(buildLibraryCont)
                 .build();
+
+        // operational contains one child the same as in config and one additional
+        buildBaseContOperational = Builders.containerBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(baseQName))
+                .withChild(buildPlayerCont)
+                .withChild(buildPlaylistList)
+                .build();
+
         iidBase = YangInstanceIdentifier.builder()
                 .node(baseQName)
                 .build();
 
         contextRef = new SchemaContextRef(TestRestconfUtils.loadSchemaContext(PATH_FOR_NEW_SCHEMA_CONTEXT));
         schemaNode = DataSchemaContextTree.from(contextRef.get()).getChild(iidBase).getDataSchemaNode();
-        MockitoAnnotations.initMocks(this);
+
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler();
 
         schemaContextHandler.onGlobalContextUpdated(contextRef.get());
-        dataService = new RestconfDataServiceImpl(schemaContextHandler, transactionChainHandler);
+        dataService = new RestconfDataServiceImpl(schemaContextHandler, transactionChainHandler, mountPointServiceHandler);
         doReturn(domTransactionChain).when(transactionChainHandler).get();
         doReturn(read).when(domTransactionChain).newReadOnlyTransaction();
         doReturn(readWrite).when(domTransactionChain).newReadWriteTransaction();
         doReturn(write).when(domTransactionChain).newWriteOnlyTransaction();
+        doReturn(mountPointService).when(mountPointServiceHandler).get();
+        doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
+        doReturn(contextRef.get()).when(mountPoint).getSchemaContext();
+        doReturn(Optional.of(mountDataBroker)).when(mountPoint).getService(DOMDataBroker.class);
+        doReturn(transactionChain).when(mountDataBroker).createTransactionChain(any(TransactionChainListener.class));
+        doReturn(read).when(transactionChain).newReadOnlyTransaction();
+        doReturn(readWrite).when(transactionChain).newReadWriteTransaction();
     }
 
     @Test
@@ -145,6 +190,33 @@ public class RestconfDataServiceImplTest {
         assertEquals(buildBaseCont, ((NormalizedNodeContext) response.getEntity()).getData());
     }
 
+    /**
+     * Test read data from mount point when both {@link LogicalDatastoreType#CONFIGURATION} and
+     * {@link LogicalDatastoreType#OPERATIONAL} contains the same data and some additional data to be merged.
+     */
+    @Test
+    public void testReadDataMountPoint() {
+        doReturn(new MultivaluedHashMap<String, String>()).when(uriInfo).getQueryParameters();
+        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseContConfig))).when(read)
+                .read(LogicalDatastoreType.CONFIGURATION, iidBase);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseContOperational))).when(read)
+                .read(LogicalDatastoreType.OPERATIONAL, iidBase);
+
+        final Response response = dataService.readData(
+                "example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox", uriInfo);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatus());
+
+        // response must contain all child nodes from config and operational containers merged in one container
+        final NormalizedNode<?, ?> data = ((NormalizedNodeContext) response.getEntity()).getData();
+        assertTrue(data instanceof ContainerNode);
+        assertEquals(3, ((ContainerNode) data).getValue().size());
+        assertTrue(((ContainerNode) data).getChild(buildPlayerCont.getIdentifier()).isPresent());
+        assertTrue(((ContainerNode) data).getChild(buildLibraryCont.getIdentifier()).isPresent());
+        assertTrue(((ContainerNode) data).getChild(buildPlaylistList.getIdentifier()).isPresent());
+    }
+
     @Test(expected = RestconfDocumentedException.class)
     public void testReadDataNoData() {
         doReturn(new MultivaluedHashMap<String, String>()).when(uriInfo).getQueryParameters();
@@ -152,7 +224,7 @@ public class RestconfDataServiceImplTest {
                 iidBase);
         doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(read).read(LogicalDatastoreType.OPERATIONAL,
                 iidBase);
-        final Response response = dataService.readData("example-jukebox:jukebox", uriInfo);
+        dataService.readData("example-jukebox:jukebox", uriInfo);
     }
 
     @Test
@@ -237,16 +309,29 @@ public class RestconfDataServiceImplTest {
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     }
 
+    /**
+     * Test of deleting data on mount point
+     */
+    @Test
+    public void testDeleteDataMountPoint() {
+        doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidBase);
+        doReturn(Futures.immediateCheckedFuture(null)).when(readWrite).submit();
+        doReturn(Futures.immediateCheckedFuture(true)).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidBase);
+        final Response response = dataService.deleteData("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox");
+        assertNotNull(response);
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    }
+
     @Test
     public void testPatchData() throws Exception {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext = new InstanceIdentifierContext<>(iidBase, schemaNode, null, contextRef.get());
         final List<PATCHEntity> entity = new ArrayList<>();
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
-                .node(containerQname)
+                .node(containerPlayerQname)
                 .node(leafQname)
                 .build();
         entity.add(new PATCHEntity("create data", "CREATE", iidBase, buildBaseCont));
-        entity.add(new PATCHEntity("replace data", "REPLACE", iidBase, buildBaseContToReplace));
+        entity.add(new PATCHEntity("replace data", "REPLACE", iidBase, buildBaseCont));
         entity.add(new PATCHEntity("delete data", "DELETE", iidleaf));
         final PATCHContext patch = new PATCHContext(iidContext, entity, "test patch id");
 
@@ -265,6 +350,35 @@ public class RestconfDataServiceImplTest {
     }
 
     @Test
+    public void testPatchDataMountPoint() throws Exception {
+        final InstanceIdentifierContext<? extends SchemaNode> iidContext = new InstanceIdentifierContext<>(
+                iidBase, schemaNode, mountPoint, contextRef.get());
+        final List<PATCHEntity> entity = new ArrayList<>();
+        final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
+                .node(containerPlayerQname)
+                .node(leafQname)
+                .build();
+        entity.add(new PATCHEntity("create data", "CREATE", iidBase, buildBaseCont));
+        entity.add(new PATCHEntity("replace data", "REPLACE", iidBase, buildBaseCont));
+        entity.add(new PATCHEntity("delete data", "DELETE", iidleaf));
+        final PATCHContext patch = new PATCHContext(iidContext, entity, "test patch id");
+
+        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseCont))).when(read)
+                .read(LogicalDatastoreType.CONFIGURATION, iidBase);
+        doNothing().when(write).put(LogicalDatastoreType.CONFIGURATION, iidBase, buildBaseCont);
+        doReturn(Futures.immediateCheckedFuture(null)).when(write).submit();
+        doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidleaf);
+        doReturn(Futures.immediateCheckedFuture(null)).when(readWrite).submit();
+        doReturn(Futures.immediateCheckedFuture(false)).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidBase);
+        doReturn(Futures.immediateCheckedFuture(true)).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
+
+        final PATCHStatusContext status = dataService.patchData(patch, uriInfo);
+        assertTrue(status.isOk());
+        assertEquals(3, status.getEditCollection().size());
+        assertNull(status.getGlobalErrors());
+    }
+
+    @Test
     public void testPatchDataDeleteNotExist() throws Exception {
         final Field handler = RestConnectorProvider.class.getDeclaredField("transactionChainHandler");
         final Field broker = RestConnectorProvider.class.getDeclaredField("dataBroker");
@@ -277,7 +391,7 @@ public class RestconfDataServiceImplTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext = new InstanceIdentifierContext<>(iidBase, schemaNode, null, contextRef.get());
         final List<PATCHEntity> entity = new ArrayList<>();
         final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
-                .node(containerQname)
+                .node(containerPlayerQname)
                 .node(leafQname)
                 .build();
         entity.add(new PATCHEntity("create data", "CREATE", iidBase, buildBaseCont));
@@ -311,5 +425,4 @@ public class RestconfDataServiceImplTest {
         final String errorMessage = status.getEditCollection().get(2).getEditErrors().get(0).getErrorMessage();
         assertEquals("Data does not exist", errorMessage);
     }
-
 }
