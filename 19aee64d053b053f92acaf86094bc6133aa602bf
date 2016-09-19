@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_fc7b7378",
+        "filename": "netconf/messagebus-netconf/src/main/java/org/opendaylight/netconf/messagebus/eventsources/netconf/NetconfEventSourceManager.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2016-09-19T11:26:27Z",
+      "side": 1,
+      "message": "should be private. I don\u0027t see where this is even used.",
+      "revId": "19aee64d053b053f92acaf86094bc6133aa602bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_bc857b5b",
+        "filename": "netconf/messagebus-netconf/src/main/resources/org/opendaylight/blueprint/messagebus-netconf.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2016-09-19T11:26:27Z",
+      "side": 1,
+      "message": "should be \"initialize\"",
+      "revId": "19aee64d053b053f92acaf86094bc6133aa602bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
