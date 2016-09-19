@@ -8,10 +8,12 @@
 package org.opendaylight.restconf.restful.utils;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
@@ -19,6 +21,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
@@ -26,16 +29,16 @@ import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeContainerBuilder;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 
 /**
@@ -62,7 +65,8 @@ public final class ReadDataTransactionUtil {
      *            - {@link TransactionVarsWrapper} - wrapper for variables
      * @return {@link NormalizedNode}
      */
-    public static NormalizedNode<?, ?> readData(final String valueOfContent, final TransactionVarsWrapper transactionNode) {
+    public static @Nullable NormalizedNode<?, ?> readData(@Nullable final String valueOfContent,
+                                                          @Nonnull final TransactionVarsWrapper transactionNode) {
         final NormalizedNode<?, ?> data;
         if (valueOfContent != null) {
             switch (valueOfContent) {
@@ -78,7 +82,7 @@ public final class ReadDataTransactionUtil {
                     data = readAllData(transactionNode);
                     break;
                 default:
-                    throw new RestconfDocumentedException("Bad querry parameter for content.", ErrorType.APPLICATION,
+                    throw new RestconfDocumentedException("Bad query parameter for content.", ErrorType.APPLICATION,
                             ErrorTag.INVALID_VALUE);
             }
         } else {
@@ -97,14 +101,15 @@ public final class ReadDataTransactionUtil {
      *            - {@link TransactionVarsWrapper} - wrapper for variables
      * @return {@link NormalizedNode}
      */
-    private static NormalizedNode<?, ?> readDataViaTransaction(final TransactionVarsWrapper transactionNode) {
-            final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> listenableFuture = transactionNode
-                    .getTransactionChain().newReadOnlyTransaction().read(transactionNode.getLogicalDatastoreType(),
-                            transactionNode.getInstanceIdentifier().getInstanceIdentifier());
-            final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
-            FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
-                    dataFactory);
-            return dataFactory.build();
+    private static @Nullable NormalizedNode<?, ?> readDataViaTransaction(
+            @Nonnull final TransactionVarsWrapper transactionNode) {
+        final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> listenableFuture = transactionNode
+                .getTransactionChain().newReadOnlyTransaction().read(transactionNode.getLogicalDatastoreType(),
+                        transactionNode.getInstanceIdentifier().getInstanceIdentifier());
+        final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
+        FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+                dataFactory);
+        return dataFactory.build();
     }
 
     /**
@@ -114,7 +119,7 @@ public final class ReadDataTransactionUtil {
      *            - {@link TransactionVarsWrapper} - wrapper for variables
      * @return {@link NormalizedNode}
      */
-    private static NormalizedNode<?, ?> readAllData(final TransactionVarsWrapper transactionNode) {
+    private static @Nullable NormalizedNode<?, ?> readAllData(@Nonnull final TransactionVarsWrapper transactionNode) {
         // PREPARE STATE DATA NODE
         transactionNode.setLogicalDatastoreType(LogicalDatastoreType.OPERATIONAL);
         final NormalizedNode<?, ?> stateDataNode = readDataViaTransaction(transactionNode);
@@ -151,13 +156,30 @@ public final class ReadDataTransactionUtil {
      *            - data node of config data
      * @return {@link NormalizedNode}
      */
-    private static NormalizedNode<?, ?> mapNode(final NormalizedNode<?, ?> stateDataNode,
-            final NormalizedNode<?, ?> configDataNode) {
+    private static @Nonnull NormalizedNode<?, ?> mapNode(@Nonnull final NormalizedNode<?, ?> stateDataNode,
+                                                         @Nonnull final NormalizedNode<?, ?> configDataNode) {
         validPossibilityOfMergeNodes(stateDataNode, configDataNode);
         if (configDataNode instanceof RpcDefinition) {
             return prepareRpcData(configDataNode, stateDataNode);
         } else {
             return prepareData(configDataNode, stateDataNode);
+        }
+    }
+
+    /**
+     * Valid of can be data merged together.
+     *
+     * @param stateDataNode
+     *            - data node of state data
+     * @param configDataNode
+     *            - data node of config data
+     */
+    private static void validPossibilityOfMergeNodes(@Nonnull final NormalizedNode<?, ?> stateDataNode,
+                                                     @Nonnull final NormalizedNode<?, ?> configDataNode) {
+        final QNameModule moduleOfStateData = stateDataNode.getIdentifier().getNodeType().getModule();
+        final QNameModule moduleOfConfigData = configDataNode.getIdentifier().getNodeType().getModule();
+        if (moduleOfStateData != moduleOfConfigData) {
+            throw new RestconfDocumentedException("It is not possible to merge ");
         }
     }
 
@@ -170,8 +192,8 @@ public final class ReadDataTransactionUtil {
      *            - data node of state data
      * @return {@link NormalizedNode}
      */
-    private static NormalizedNode<?, ?> prepareRpcData(final NormalizedNode<?, ?> configDataNode,
-            final NormalizedNode<?, ?> stateDataNode) {
+    private static @Nonnull NormalizedNode<?, ?> prepareRpcData(@Nonnull final NormalizedNode<?, ?> configDataNode,
+                                                                @Nonnull final NormalizedNode<?, ?> stateDataNode) {
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder = ImmutableNodes
                 .mapEntryBuilder();
         mapEntryBuilder.withNodeIdentifier((NodeIdentifierWithPredicates) configDataNode.getIdentifier());
@@ -192,8 +214,9 @@ public final class ReadDataTransactionUtil {
      * @param mapEntryBuilder
      *            - builder for mapping data
      */
-    private static void mapRpcDataNode(final NormalizedNode<?, ?> dataNode,
-            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder) {
+    private static void mapRpcDataNode(@Nonnull final NormalizedNode<?, ?> dataNode,
+                                       @Nonnull final DataContainerNodeBuilder<NodeIdentifierWithPredicates,
+                                               MapEntryNode> mapEntryBuilder) {
         for (final DataContainerChild<? extends PathArgument, ?> child : ((ContainerNode) dataNode).getValue()) {
             mapEntryBuilder.addChild(child);
         }
@@ -208,116 +231,118 @@ public final class ReadDataTransactionUtil {
      *            - data node of state data
      * @return {@link NormalizedNode}
      */
-    private static NormalizedNode<?, ?> prepareData(final NormalizedNode<?, ?> configDataNode,
-            final NormalizedNode<?, ?> stateDataNode) {
+    private static @Nonnull NormalizedNode<?, ?> prepareData(@Nonnull final NormalizedNode<?, ?> configDataNode,
+                                                             @Nonnull final NormalizedNode<?, ?> stateDataNode) {
+        if (configDataNode instanceof MapNode) {
+            final CollectionNodeBuilder<MapEntryNode, MapNode> builder = ImmutableNodes
+                    .mapNodeBuilder().withNodeIdentifier(((MapNode) configDataNode).getIdentifier());
 
-        if (configDataNode instanceof MapNode) { // part for lists mapping
-            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder = ImmutableNodes
-                .mapEntryBuilder();
-            final NodeIdentifierWithPredicates node = ((MapNode) configDataNode).getValue().iterator().next().getIdentifier();
-            mapEntryBuilder.withNodeIdentifier(node);
+            mapValueToBuilder(
+                    ((MapNode) configDataNode).getValue(), ((MapNode) stateDataNode).getValue(), builder);
 
-            // MAP CONFIG DATA
-            mapDataNode((MapNode) configDataNode, mapEntryBuilder);
-            // MAP STATE DATA
-            mapDataNode((MapNode) stateDataNode, mapEntryBuilder);
-            return ImmutableNodes.mapNodeBuilder(configDataNode.getNodeType()).addChild(mapEntryBuilder.build()).build();
-        } else if (configDataNode instanceof ContainerNode) { // part for containers mapping
-            final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder = Builders
-                    .containerBuilder((ContainerNode) configDataNode);
+            return builder.build();
+        } else if (configDataNode instanceof MapEntryNode) {
+            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder = ImmutableNodes
+                    .mapEntryBuilder().withNodeIdentifier(((MapEntryNode) configDataNode).getIdentifier());
 
-            // MAP CONFIG DATA
-            mapCont(containerBuilder, ((ContainerNode) configDataNode).getValue());
-            // MAP STATE DATA
-            mapCont(containerBuilder, ((ContainerNode) stateDataNode).getValue());
-            return containerBuilder.build();
+            mapValueToBuilder(
+                    ((MapEntryNode) configDataNode).getValue(), ((MapEntryNode) stateDataNode).getValue(), builder);
+
+            return builder.build();
+        } else if (configDataNode instanceof ContainerNode) {
+            final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builder = Builders
+                    .containerBuilder().withNodeIdentifier(((ContainerNode) configDataNode).getIdentifier());
+
+            mapValueToBuilder(
+                    ((ContainerNode) configDataNode).getValue(), ((ContainerNode) stateDataNode).getValue(), builder);
+
+            return builder.build();
+        } else if (configDataNode instanceof AugmentationNode) {
+            final DataContainerNodeBuilder<AugmentationIdentifier, AugmentationNode> builder = Builders
+                    .augmentationBuilder().withNodeIdentifier(((AugmentationNode) configDataNode).getIdentifier());
+
+            mapValueToBuilder(
+                    ((AugmentationNode) configDataNode).getValue(), ((AugmentationNode) stateDataNode).getValue(), builder);
+
+            return builder.build();
+        } else if (configDataNode instanceof ChoiceNode) {
+            final DataContainerNodeBuilder<NodeIdentifier, ChoiceNode> builder = Builders
+                    .choiceBuilder().withNodeIdentifier(((ChoiceNode) configDataNode).getIdentifier());
+
+            mapValueToBuilder(
+                    ((ChoiceNode) configDataNode).getValue(), ((ChoiceNode) stateDataNode).getValue(), builder);
+
+            return builder.build();
+        } else if (configDataNode instanceof LeafNode) {
+            return ImmutableNodes.leafNode(configDataNode.getNodeType(), configDataNode.getValue());
         } else {
             throw new RestconfDocumentedException("Bad type of node.");
         }
     }
 
     /**
-     * Map data to builder
+     * Map value from container node to builder.
      *
-     * @param containerBuilder
-     *            - builder for mapping data
-     * @param childs
-     *            - childs of data (container)
+     * @param configData
+     *            - collection of config data nodes
+     * @param stateData
+     *            - collection of state data nodes
+     * @param builder
+     *            - builder
      */
-    private static void mapCont(final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder,
-            final Collection<DataContainerChild<? extends PathArgument, ?>> childs) {
-        for (final DataContainerChild<? extends PathArgument, ?> child : childs) {
-            containerBuilder.addChild(child);
-        }
+    private static void mapValueToBuilder(@Nonnull final Collection<? extends NormalizedNode<?, ?>> configData,
+                                          @Nonnull final Collection<? extends NormalizedNode<?, ?>> stateData,
+                                          @Nonnull final NormalizedNodeContainerBuilder builder) {
+        final Map<PathArgument, NormalizedNode<?, ?>> configMap = configData.stream().collect(
+                Collectors.toMap(NormalizedNode::getIdentifier, x -> x));
+        final Map<PathArgument, NormalizedNode<?, ?>> stateMap = stateData.stream().collect(
+                Collectors.toMap(NormalizedNode::getIdentifier, x -> x));
+
+        // merge config and state data of children with different identifiers
+        mapDataToBuilder(configMap, stateMap, builder);
+
+        // merge config and state data of children with the same identifiers
+        mergeDataToBuilder(configMap, stateMap, builder);
     }
 
     /**
-     * Map data to builder
+     * Map data with different identifiers to builder. Data with different identifiers can be just added
+     * as childs to parent node.
      *
-     * @param immutableData
-     *            - immutable data - {@link MapNode}
-     * @param mapEntryBuilder
-     *            - builder for mapping data
+     * @param configMap
+     *            - map of config data nodes
+     * @param stateMap
+     *            - map of state data nodes
+     * @param builder
+     *           - builder
      */
-    private static void mapDataNode(final MapNode immutableData,
-            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder) {
-        for (final DataContainerChild<? extends PathArgument, ?> child : immutableData.getValue().iterator()
-                .next().getValue()) {
-            Preconditions.checkNotNull(child);
-            if (child instanceof ContainerNode) {
-                addChildToMap(ContainerNode.class, child, mapEntryBuilder);
-            } else if (child instanceof AugmentationNode) {
-                addChildToMap(AugmentationNode.class, child, mapEntryBuilder);
-            } else if(child instanceof MapNode){
-                final MapNode listNode = (MapNode) child;
-                for (final MapEntryNode listChild : listNode.getValue()) {
-                    for (final DataContainerChild<? extends PathArgument, ?> entryChild : listChild.getValue()) {
-                        addChildToMap(MapEntryNode.class, entryChild, mapEntryBuilder);
-                    }
-                }
-            } else if (child instanceof ChoiceNode) {
-                addChildToMap(ChoiceNode.class, child, mapEntryBuilder);
-            } else if ((child instanceof LeafSetNode<?>) || (child instanceof LeafNode)) {
-                mapEntryBuilder.addChild(child);
-            }
-
-        }
+    private static void mapDataToBuilder(@Nonnull final Map<PathArgument, NormalizedNode<?, ?>> configMap,
+                                         @Nonnull final Map<PathArgument, NormalizedNode<?, ?>> stateMap,
+                                         @Nonnull final NormalizedNodeContainerBuilder<PathArgument, PathArgument,
+                                                 NormalizedNode<?, ?>, ?> builder) {
+        configMap.entrySet().stream().filter(x -> !stateMap.containsKey(x.getKey())).forEach(
+                y -> builder.addChild(y.getValue()));
+        stateMap.entrySet().stream().filter(x -> !configMap.containsKey(x.getKey())).forEach(
+                y -> builder.addChild(y.getValue()));
     }
 
     /**
-     * Mapping child
+     * Map data with the same identifiers to builder. Data with the same identifiers cannot be just added but we need to
+     * go one level down with {@code prepareData} method.
      *
-     * @param type
-     *            - type of data
-     * @param child
-     *            - child to map
-     * @param mapEntryBuilder
-     *            - builder for mapping child
+     * @param configMap
+     *            - immutable config data
+     * @param stateMap
+     *            - immutable state data
+     * @param builder
+     *           - builder
      */
-    private static <T extends DataContainerNode<? extends PathArgument>> void addChildToMap(final Class<T> type,
-            final DataContainerChild<? extends PathArgument, ?> child,
-            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder) {
-        @SuppressWarnings("unchecked")
-        final T node = (T) child;
-        for (final DataContainerChild<? extends PathArgument, ?> childNode : node.getValue()) {
-            mapEntryBuilder.addChild(childNode);
-        }
-    }
-
-    /**
-     * Valid of can be data merged together.
-     *
-     * @param stateDataNode
-     *            - data node of state data
-     * @param configDataNode
-     *            - data node of config data
-     */
-    private static void validPossibilityOfMergeNodes(@Nonnull final NormalizedNode<?, ?> stateDataNode,
-            @Nonnull final NormalizedNode<?, ?> configDataNode) {
-        final QNameModule moduleOfStateData = stateDataNode.getIdentifier().getNodeType().getModule();
-        final QNameModule moduleOfConfigData = configDataNode.getIdentifier().getNodeType().getModule();
-        if (moduleOfStateData != moduleOfConfigData) {
-            throw new RestconfDocumentedException("It is not possible to merge ");
-        }
+    private static void mergeDataToBuilder(@Nonnull final Map<PathArgument, NormalizedNode<?, ?>> configMap,
+                                           @Nonnull final Map<PathArgument, NormalizedNode<?, ?>> stateMap,
+                                           @Nonnull final NormalizedNodeContainerBuilder<PathArgument, PathArgument,
+                                                   NormalizedNode<?, ?>, ?> builder) {
+        // it is enough to process only config data because operational contains the same data
+        configMap.entrySet().stream().filter(x -> stateMap.containsKey(x.getKey())).forEach(
+                y -> builder.addChild(prepareData(y.getValue(), stateMap.get(y.getKey()))));
     }
 }
