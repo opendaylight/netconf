@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.rest.services.impl;
 
+import com.google.common.base.Optional;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -73,12 +74,12 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
 
     @Override
     public NormalizedNodeContext getOperations(final String identifier, final UriInfo uriInfo) {
-        Set<Module> modules = null;
-        DOMMountPoint mountPoint = null;
+        final Set<Module> modules;
+        final DOMMountPoint mountPoint;
         final SchemaContextRef ref = new SchemaContextRef(this.schemaContextHandler.get());
         if (identifier.contains(RestconfConstants.MOUNT)) {
-            final InstanceIdentifierContext<?> mountPointIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
-                    ref.get());
+            final InstanceIdentifierContext<?> mountPointIdentifier = ParserIdentifier.toInstanceIdentifier(
+                    identifier, ref.get(), Optional.of(this.domMountPointServiceHandler.get()));
             mountPoint = mountPointIdentifier.getMountPoint();
             modules = ref.getModules(mountPoint);
 
