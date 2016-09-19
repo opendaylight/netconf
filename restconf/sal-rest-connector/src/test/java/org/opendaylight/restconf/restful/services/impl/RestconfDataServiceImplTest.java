@@ -36,6 +36,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
@@ -46,6 +47,7 @@ import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
+import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -85,6 +87,10 @@ public class RestconfDataServiceImplTest {
     private DOMDataReadOnlyTransaction read;
     @Mock
     private DOMDataWriteTransaction write;
+    @Mock
+    private DOMMountPointServiceHandler mountPointServiceHandler;
+    @Mock
+    private DOMMountPointService mountPointService;
 
     @Before
     public void setUp() throws Exception {
@@ -126,11 +132,12 @@ public class RestconfDataServiceImplTest {
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler();
 
         schemaContextHandler.onGlobalContextUpdated(contextRef.get());
-        dataService = new RestconfDataServiceImpl(schemaContextHandler, transactionChainHandler);
+        dataService = new RestconfDataServiceImpl(schemaContextHandler, transactionChainHandler, mountPointServiceHandler);
         doReturn(domTransactionChain).when(transactionChainHandler).get();
         doReturn(read).when(domTransactionChain).newReadOnlyTransaction();
         doReturn(readWrite).when(domTransactionChain).newReadWriteTransaction();
         doReturn(write).when(domTransactionChain).newWriteOnlyTransaction();
+        doReturn(mountPointService).when(mountPointServiceHandler).get();
     }
 
     @Test
@@ -311,5 +318,4 @@ public class RestconfDataServiceImplTest {
         final String errorMessage = status.getEditCollection().get(2).getEditErrors().get(0).getErrorMessage();
         assertEquals("Data does not exist", errorMessage);
     }
-
 }

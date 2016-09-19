@@ -7,12 +7,12 @@
  */
 package org.opendaylight.restconf.rest.services.impl;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.Set;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
@@ -80,11 +80,9 @@ public class RestconfModulesServiceImpl implements RestconfModulesService {
             throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
         final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
-        final InstanceIdentifierContext<?> mountPointIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
-                schemaContextRef.get());
-        final DOMMountPointService domMointPointService = this.domMountPointServiceHandler.get();
-        final DOMMountPoint mountPoint = domMointPointService
-                .getMountPoint(mountPointIdentifier.getInstanceIdentifier()).get();
+        final InstanceIdentifierContext<?> mountPointIdentifier = ParserIdentifier.toInstanceIdentifier(
+                identifier, schemaContextRef.get(), Optional.of(this.domMountPointServiceHandler.get()));
+        final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
         return getModules(mountPoint.getSchemaContext().getModules(), schemaContextRef, mountPoint);
     }
 
@@ -94,13 +92,12 @@ public class RestconfModulesServiceImpl implements RestconfModulesService {
         Preconditions.checkNotNull(identifier);
         final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
         final QName moduleQname = ParserIdentifier.makeQNameFromIdentifier(identifier);
-        Module module = null;
+        final Module module;
         DOMMountPoint mountPoint = null;
         if (identifier.contains(RestconfConstants.MOUNT)) {
-            final InstanceIdentifierContext<?> point = ParserIdentifier.toInstanceIdentifier(identifier,
-                    schemaContextRef.get());
-            final DOMMountPointService domMointPointService = this.domMountPointServiceHandler.get();
-            mountPoint = domMointPointService.getMountPoint(point.getInstanceIdentifier()).get();
+            final InstanceIdentifierContext<?> point = ParserIdentifier.toInstanceIdentifier(
+                    identifier, schemaContextRef.get(), Optional.of(this.domMountPointServiceHandler.get()));
+            mountPoint = point.getMountPoint();
             module = schemaContextRef.findModuleInMountPointByQName(mountPoint, moduleQname);
         } else {
             module = schemaContextRef.findModuleByQName(moduleQname);
