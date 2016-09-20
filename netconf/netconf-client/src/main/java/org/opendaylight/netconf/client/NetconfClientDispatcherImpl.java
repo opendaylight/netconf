@@ -9,10 +9,8 @@
 package org.opendaylight.netconf.client;
 
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.Promise;
 import java.io.Closeable;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
@@ -61,18 +59,8 @@ public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClien
     private Future<NetconfClientSession> createTcpClient(final NetconfClientConfiguration currentConfiguration) {
         LOG.debug("Creating TCP client with configuration: {}", currentConfiguration);
         return super.createClient(currentConfiguration.getAddress(), currentConfiguration.getReconnectStrategy(),
-                new PipelineInitializer<NetconfClientSession>() {
-
-                    @Override
-                    public void initializeChannel(final SocketChannel ch, final Promise<NetconfClientSession> promise) {
-                        initialize(ch, promise);
-                    }
-
-                    private void initialize(final SocketChannel ch, final Promise<NetconfClientSession> promise) {
-                        new TcpClientChannelInitializer(getNegotiatorFactory(currentConfiguration), currentConfiguration
-                                .getSessionListener()).initialize(ch, promise);
-                    }
-                });
+                (ch, promise) -> new TcpClientChannelInitializer(getNegotiatorFactory(currentConfiguration), currentConfiguration
+                                .getSessionListener()).initialize(ch, promise));
     }
 
     private Future<Void> createReconnectingTcpClient(final NetconfReconnectingClientConfiguration currentConfiguration) {
@@ -81,28 +69,15 @@ public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClien
                 currentConfiguration.getSessionListener());
 
         return super.createReconnectingClient(currentConfiguration.getAddress(), currentConfiguration.getConnectStrategyFactory(),
-                currentConfiguration.getReconnectStrategy(), new PipelineInitializer<NetconfClientSession>() {
-                    @Override
-                    public void initializeChannel(final SocketChannel ch, final Promise<NetconfClientSession> promise) {
-                        init.initialize(ch, promise);
-                    }
-                });
+                currentConfiguration.getReconnectStrategy(), init::initialize);
     }
 
     private Future<NetconfClientSession> createSshClient(final NetconfClientConfiguration currentConfiguration) {
         LOG.debug("Creating SSH client with configuration: {}", currentConfiguration);
         return super.createClient(currentConfiguration.getAddress(), currentConfiguration.getReconnectStrategy(),
-                new PipelineInitializer<NetconfClientSession>() {
-
-                    @Override
-                    public void initializeChannel(final SocketChannel ch,
-                                                  final Promise<NetconfClientSession> sessionPromise) {
-                        new SshClientChannelInitializer(currentConfiguration.getAuthHandler(),
-                                getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener())
-                                .initialize(ch, sessionPromise);
-                    }
-
-                });
+                (ch, sessionPromise) -> new SshClientChannelInitializer(currentConfiguration.getAuthHandler(),
+                        getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener())
+                        .initialize(ch, sessionPromise));
     }
 
     private Future<Void> createReconnectingSshClient(final NetconfReconnectingClientConfiguration currentConfiguration) {
@@ -111,12 +86,7 @@ public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClien
                 getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener());
 
         return super.createReconnectingClient(currentConfiguration.getAddress(), currentConfiguration.getConnectStrategyFactory(), currentConfiguration.getReconnectStrategy(),
-                new PipelineInitializer<NetconfClientSession>() {
-                    @Override
-                    public void initializeChannel(final SocketChannel ch, final Promise<NetconfClientSession> promise) {
-                        init.initialize(ch, promise);
-                    }
-                });
+                init::initialize);
     }
 
     protected NetconfClientSessionNegotiatorFactory getNegotiatorFactory(final NetconfClientConfiguration cfg) {
