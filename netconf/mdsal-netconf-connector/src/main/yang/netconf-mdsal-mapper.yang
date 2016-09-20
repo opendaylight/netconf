@@ -21,47 +21,13 @@ module netconf-mdsal-mapper {
     identity netconf-mdsal-mapper {
         base config:module-type;
         config:provided-service nnm:netconf-northbound-mapper;
+        status deprecated;
     }
 
     augment "/config:modules/config:module/config:configuration" {
+        status deprecated;
         case netconf-mdsal-mapper {
             when "/config:modules/config:module/config:type = 'netconf-mdsal-mapper'";
-
-            container root-schema-service {
-                uses config:service-ref {
-                    refine type {
-                        mandatory false;
-                        config:required-identity md-sal-dom:schema-service;
-                    }
-                }
-            }
-
-            container root-schema-source-provider {
-                uses config:service-ref {
-                    refine type {
-                        mandatory false;
-                        config:required-identity md-sal-dom:yang-text-source-provider;
-                    }
-                }
-            }
-
-            container dom-broker {
-                uses config:service-ref {
-                    refine type {
-                        mandatory true;
-                        config:required-identity md-sal-dom:dom-broker-osgi-registry;
-                    }
-                }
-            }
-
-            container mapper-aggregator {
-                uses config:service-ref {
-                    refine type {
-                        mandatory true;
-                        config:required-identity nnm:netconf-mapper-registry;
-                    }
-                }
-            }
         }
     }
 
