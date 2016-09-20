@@ -17,22 +17,6 @@
           <module>
               <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:mapper">prefix:netconf-mdsal-mapper</type>
               <name>netconf-mdsal-mapper</name>
-              <root-schema-service>
-                  <type xmlns:dom="urn:opendaylight:params:xml:ns:yang:controller:md:sal:dom">dom:schema-service</type>
-                  <name>yang-schema-service</name>
-              </root-schema-service>
-              <root-schema-source-provider>
-                  <type xmlns:dom="urn:opendaylight:params:xml:ns:yang:controller:md:sal:dom">dom:yang-text-source-provider</type>
-                  <name>yang-text-source-provider</name>
-              </root-schema-source-provider>
-              <dom-broker xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:mapper">
-                  <type xmlns:dom="urn:opendaylight:params:xml:ns:yang:controller:md:sal:dom">dom:dom-broker-osgi-registry</type>
-                  <name>dom-broker</name>
-              </dom-broker>
-              <mapper-aggregator xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:mapper">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:north:mapper">prefix:netconf-mapper-registry</type>
-                  <name>mapper-aggregator-registry</name>
-              </mapper-aggregator>
           </module>
 
           <module>
@@ -185,13 +169,6 @@
                 <instance>
                     <name>server-monitor</name>
                     <provider>/modules/module[type='netconf-server-monitoring-impl'][name='server-monitor']</provider>
-                </instance>
-            </service>
-            <service>
-                <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:north:mapper">prefix:netconf-northbound-mapper</type>
-                <instance>
-                    <name>netconf-mdsal-mapper</name>
-                    <provider>/modules/module[type='netconf-mdsal-mapper'][name='netconf-mdsal-mapper']</provider>
                 </instance>
             </service>
             <service>
