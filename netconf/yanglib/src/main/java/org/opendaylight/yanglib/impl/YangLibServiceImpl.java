@@ -15,10 +15,10 @@ import com.google.common.util.concurrent.CheckedFuture;
 import java.io.IOException;
 import org.opendaylight.yanglib.api.YangLibService;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
-import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,13 +28,13 @@ import org.slf4j.LoggerFactory;
 public class YangLibServiceImpl implements YangLibService {
     private static final Logger LOG = LoggerFactory.getLogger(YangLibServiceImpl.class);
 
-    private SharedSchemaRepository schemaRepository;
+    private SchemaRepository schemaRepository;
 
     public YangLibServiceImpl() {
 
     }
 
-    public void setSchemaRepository(final SharedSchemaRepository schemaRepository) {
+    public void setSchemaRepository(final SchemaRepository schemaRepository) {
         LOG.debug("Setting schema repository {}", schemaRepository);
         this.schemaRepository = schemaRepository;
     }
