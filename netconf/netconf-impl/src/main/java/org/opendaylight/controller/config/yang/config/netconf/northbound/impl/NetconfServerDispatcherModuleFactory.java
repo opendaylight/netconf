@@ -16,6 +16,30 @@
 * Do not modify this file unless it is present under src/main directory
 */
 package org.opendaylight.controller.config.yang.config.netconf.northbound.impl;
-public class NetconfServerDispatcherModuleFactory extends org.opendaylight.controller.config.yang.config.netconf.northbound.impl.AbstractNetconfServerDispatcherModuleFactory {
 
+import org.opendaylight.controller.config.api.DependencyResolver;
+import org.osgi.framework.BundleContext;
+
+/**
+ * @deprecated Replaced by blueprint wiring
+ */
+@Deprecated
+public class NetconfServerDispatcherModuleFactory extends AbstractNetconfServerDispatcherModuleFactory {
+
+    @Override
+    public NetconfServerDispatcherModule instantiateModule(String instanceName, DependencyResolver dependencyResolver,
+                                                           NetconfServerDispatcherModule oldModule, AutoCloseable oldInstance, BundleContext bundleContext) {
+        NetconfServerDispatcherModule module = super.instantiateModule(instanceName, dependencyResolver, oldModule,
+                oldInstance, bundleContext);
+        module.setBundleContext(bundleContext);
+        return module;
+    }
+
+    @Override
+    public NetconfServerDispatcherModule instantiateModule(String instanceName, DependencyResolver dependencyResolver,
+                                                           BundleContext bundleContext) {
+        NetconfServerDispatcherModule module = super.instantiateModule(instanceName, dependencyResolver, bundleContext);
+        module.setBundleContext(bundleContext);
+        return module;
+    }
 }
