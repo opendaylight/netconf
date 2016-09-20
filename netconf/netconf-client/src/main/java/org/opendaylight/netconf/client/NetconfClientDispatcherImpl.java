@@ -81,28 +81,15 @@ public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClien
                 currentConfiguration.getSessionListener());
 
         return super.createReconnectingClient(currentConfiguration.getAddress(), currentConfiguration.getConnectStrategyFactory(),
-                currentConfiguration.getReconnectStrategy(), new PipelineInitializer<NetconfClientSession>() {
-                    @Override
-                    public void initializeChannel(final SocketChannel ch, final Promise<NetconfClientSession> promise) {
-                        init.initialize(ch, promise);
-                    }
-                });
+                currentConfiguration.getReconnectStrategy(), init::initialize);
     }
 
     private Future<NetconfClientSession> createSshClient(final NetconfClientConfiguration currentConfiguration) {
         LOG.debug("Creating SSH client with configuration: {}", currentConfiguration);
         return super.createClient(currentConfiguration.getAddress(), currentConfiguration.getReconnectStrategy(),
-                new PipelineInitializer<NetconfClientSession>() {
-
-                    @Override
-                    public void initializeChannel(final SocketChannel ch,
-                                                  final Promise<NetconfClientSession> sessionPromise) {
-                        new SshClientChannelInitializer(currentConfiguration.getAuthHandler(),
-                                getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener())
-                                .initialize(ch, sessionPromise);
-                    }
-
-                });
+                (ch, sessionPromise) -> new SshClientChannelInitializer(currentConfiguration.getAuthHandler(),
+                        getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener())
+                        .initialize(ch, sessionPromise));
     }
 
     private Future<Void> createReconnectingSshClient(final NetconfReconnectingClientConfiguration currentConfiguration) {
@@ -111,12 +98,7 @@ public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClien
                 getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener());
 
         return super.createReconnectingClient(currentConfiguration.getAddress(), currentConfiguration.getConnectStrategyFactory(), currentConfiguration.getReconnectStrategy(),
-                new PipelineInitializer<NetconfClientSession>() {
-                    @Override
-                    public void initializeChannel(final SocketChannel ch, final Promise<NetconfClientSession> promise) {
-                        init.initialize(ch, promise);
-                    }
-                });
+                init::initialize);
     }
 
     protected NetconfClientSessionNegotiatorFactory getNegotiatorFactory(final NetconfClientConfiguration cfg) {
