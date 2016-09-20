@@ -167,24 +167,46 @@ public class ApiDocGeneratorTest {
         final JSONObject models = doc.getModels();
         assertNotNull(models);
         try {
+            final JSONObject configLstTop = models.getJSONObject("(config)lst-TOP");
+            assertNotNull(configLstTop);
+
+            containsReferences(configLstTop, "lst");
+
             final JSONObject configLst = models.getJSONObject("(config)lst");
             assertNotNull(configLst);
 
             containsReferences(configLst, "lst1");
             containsReferences(configLst, "cont1");
 
+            final JSONObject configLst1Top = models.getJSONObject("(config)lst1-TOP");
+            assertNotNull(configLst1Top);
+
+            containsReferences(configLst1Top, "lst1");
+
             final JSONObject configLst1 = models.getJSONObject("(config)lst1");
             assertNotNull(configLst1);
 
+            final JSONObject configCont1Top = models.getJSONObject("(config)cont1-TOP");
+            assertNotNull(configCont1Top);
+
+            containsReferences(configCont1Top, "cont1");
             final JSONObject configCont1 = models.getJSONObject("(config)cont1");
             assertNotNull(configCont1);
 
             containsReferences(configCont1, "cont11");
             containsReferences(configCont1, "lst11");
 
+            final JSONObject configCont11Top = models.getJSONObject("(config)cont11-TOP");
+            assertNotNull(configCont11Top);
+
+            containsReferences(configCont11Top, "cont11");
             final JSONObject configCont11 = models.getJSONObject("(config)cont11");
             assertNotNull(configCont11);
 
+            final JSONObject configlst11Top = models.getJSONObject("(config)lst11-TOP");
+            assertNotNull(configlst11Top);
+
+            containsReferences(configlst11Top, "lst11");
             final JSONObject configLst11 = models.getJSONObject("(config)lst11");
             assertNotNull(configLst11);
         } catch (final JSONException e) {
@@ -225,6 +247,29 @@ public class ApiDocGeneratorTest {
                 final String jsonString = doc.getModels().toString();
                 assertTrue(jsonString.contains(
                         "testUnion\":{\"type\":\"integer or string\",\"required\":false}"));
+            }
+        }
+    }
+
+    @Test
+    public void testRPCsModel() throws Exception {
+        Preconditions.checkArgument(this.helper.getModules() != null, "No modules found");
+
+        for (final Module m : this.helper.getModules()) {
+            if (m.getQNameModule().getNamespace().toString().equals(NAMESPACE_2)
+                    && m.getQNameModule().getRevision().equals(REVISION_2)) {
+                final ApiDeclaration doc = this.generator.getSwaggerDocSpec(m, "http://localhost:8080/restconf", "",
+                        this.schemaContext);
+                assertNotNull(doc);
+
+                final JSONObject models = doc.getModels();
+                final JSONObject inputTop = models.getJSONObject("(make-toast)input-TOP");
+                final String testString = "{\"input\":{\"type\":\"object\",\"items\":{\"$ref\":\"(make-toast)input\"}}}";
+                assertEquals(testString, inputTop.getJSONObject("properties").toString());
+                final JSONObject input = models.getJSONObject("(make-toast)input");
+                final JSONObject properties = input.getJSONObject("properties");
+                assertTrue(properties.has("toasterDoneness"));
+                assertTrue(properties.has("toasterToastType"));
             }
         }
     }
