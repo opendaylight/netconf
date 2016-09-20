@@ -31,59 +31,14 @@ module netconf-northbound-impl {
             base config:module-type;
             config:provided-service nn:netconf-server-dispatcher;
             config:java-name-prefix NetconfServerDispatcher;
+            status deprecated;
     }
 
     augment "/config:modules/config:module/config:configuration" {
+        status deprecated;
         case netconf-server-dispatcher-impl {
             when "/config:modules/config:module/config:type = 'netconf-server-dispatcher-impl'";
 
-            leaf connection-timeout-millis {
-                description "Specifies timeout in milliseconds after which connection must be established.";
-                type uint32;
-                default 20000;
-            }
-
-            container boss-thread-group {
-                uses config:service-ref {
-                    refine type {
-                        config:required-identity netty:netty-threadgroup;
-                    }
-                }
-            }
-
-            container worker-thread-group {
-                uses config:service-ref {
-                    refine type {
-                        config:required-identity netty:netty-threadgroup;
-                    }
-                }
-            }
-
-            list mappers {
-                uses config:service-ref {
-                    refine type {
-                        mandatory true;
-                        config:required-identity nnm:netconf-northbound-mapper;
-                    }
-                }
-            }
-
-            container server-monitor {
-                uses config:service-ref {
-                    refine type {
-                        mandatory true;
-                        config:required-identity nn:netconf-server-monitoring;
-                    }
-                }
-            }
-
-            container timer {
-                uses config:service-ref {
-                    refine type {
-                        config:required-identity netty:netty-timer;
-                    }
-                }
-            }
         }
     }
 
@@ -92,35 +47,15 @@ module netconf-northbound-impl {
             base config:module-type;
             config:provided-service nn:netconf-server-monitoring;
             config:java-name-prefix NetconfServerMonitoring;
+            status deprecated;
     }
 
     // TODO Monitoring could expose the monitoring data over JMX...
 
     augment "/config:modules/config:module/config:configuration" {
+        status deprecated;
         case netconf-server-monitoring-impl {
             when "/config:modules/config:module/config:type = 'netconf-server-monitoring-impl'";
-
-            container aggregator {
-                uses config:service-ref {
-                    refine type {
-                        config:required-identity nnm:netconf-northbound-mapper;
-                    }
-                }
-            }
-            container scheduled-threadpool {
-                uses config:service-ref {
-                    refine type {
-                        mandatory false;
-                        config:required-identity th:scheduled-threadpool;
-                    }
-                }
-                description "Dedicated to update netconf-state/sessions subtree on session change.";
-            }
-            leaf monitoring-update-interval {
-                description "Specifies interval in seconds after which session stats are updated. If zero, stats won't be updated.";
-                type uint32;
-                default 0;
-            }
 
         }
     }
@@ -131,9 +66,11 @@ module netconf-northbound-impl {
         config:provided-service nnm:netconf-mapper-registry;
         config:java-name-prefix NetconfMapperAggregator;
         description "Aggregated operation provider for netconf servers. Joins all the operations and capabilities of all the mappers it aggregates and exposes them as a single service. The dependency orientation is reversed in order to prevent cyclic dependencies when monitoring service is considered";
+        status deprecated;
     }
 
     augment "/config:modules/config:module/config:configuration" {
+        status deprecated;
         case netconf-mapper-aggregator {
             when "/config:modules/config:module/config:type = 'netconf-mapper-aggregator'";
 
