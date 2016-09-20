@@ -8,9 +8,21 @@
 
 package org.opendaylight.controller.config.yang.netconf.mdsal.mapper;
 
-import org.opendaylight.netconf.mdsal.connector.MdsalNetconfOperationServiceFactory;
+import com.google.common.reflect.AbstractInvocationHandler;
+import com.google.common.reflect.Reflection;
+import java.lang.reflect.Method;
+import org.opendaylight.controller.config.api.osgi.WaitingServiceTracker;
+import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.osgi.framework.BundleContext;
 
-public class NetconfMdsalMapperModule extends org.opendaylight.controller.config.yang.netconf.mdsal.mapper.AbstractNetconfMdsalMapperModule{
+/**
+ * @deprecated Replaced by blueprint wiring
+ */
+@Deprecated
+public class NetconfMdsalMapperModule extends org.opendaylight.controller.config.yang.netconf.mdsal.mapper.AbstractNetconfMdsalMapperModule {
+
+    private BundleContext bundleContext;
+
     public NetconfMdsalMapperModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier, org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
         super(identifier, dependencyResolver);
     }
@@ -26,17 +38,27 @@ public class NetconfMdsalMapperModule extends org.opendaylight.controller.config
 
     @Override
     public java.lang.AutoCloseable createInstance() {
-        final MdsalNetconfOperationServiceFactory mdsalNetconfOperationServiceFactory =
-            new MdsalNetconfOperationServiceFactory(getRootSchemaServiceDependency(), getRootSchemaSourceProviderDependency()) {
-                @Override
-                public void close() throws Exception {
-                    super.close();
-                    getMapperAggregatorDependency().onRemoveNetconfOperationServiceFactory(this);
+        final WaitingServiceTracker<NetconfOperationServiceFactory> tracker =
+                WaitingServiceTracker.create(NetconfOperationServiceFactory.class, bundleContext);
+        final NetconfOperationServiceFactory service = tracker.waitForService(WaitingServiceTracker.FIVE_MINUTES);
+
+        return Reflection.newProxy(AutoCloseableNetconfOperationServiceFactory.class, new AbstractInvocationHandler() {
+            @Override
+            protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable {
+                if (method.getName().equals("close")) {
+                    tracker.close();
+                    return null;
+                } else {
+                    return method.invoke(service, args);
                 }
-            };
-        getDomBrokerDependency().registerConsumer(mdsalNetconfOperationServiceFactory);
-        getMapperAggregatorDependency().onAddNetconfOperationServiceFactory(mdsalNetconfOperationServiceFactory);
-        return mdsalNetconfOperationServiceFactory;
+            }
+        });
     }
 
+    void setBundleContext(BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
+    }
+
+    private static interface AutoCloseableNetconfOperationServiceFactory extends NetconfOperationServiceFactory, AutoCloseable {
+    }
 }
