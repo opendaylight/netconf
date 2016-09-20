@@ -13,7 +13,6 @@ import java.io.IOException;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler;
-import org.opendaylight.protocol.framework.SessionListenerFactory;
 
 final class SshClientChannelInitializer extends AbstractChannelInitializer<NetconfClientSession> {
 
@@ -44,11 +43,6 @@ final class SshClientChannelInitializer extends AbstractChannelInitializer<Netco
     protected void initializeSessionNegotiator(final Channel ch,
                                                final Promise<NetconfClientSession> promise) {
         ch.pipeline().addAfter(NETCONF_MESSAGE_DECODER,  AbstractChannelInitializer.NETCONF_SESSION_NEGOTIATOR,
-                negotiatorFactory.getSessionNegotiator(new SessionListenerFactory<NetconfClientSessionListener>() {
-                    @Override
-                    public NetconfClientSessionListener getSessionListener() {
-                        return sessionListener;
-                    }
-                }, ch, promise));
+                negotiatorFactory.getSessionNegotiator(() -> sessionListener, ch, promise));
     }
 }
