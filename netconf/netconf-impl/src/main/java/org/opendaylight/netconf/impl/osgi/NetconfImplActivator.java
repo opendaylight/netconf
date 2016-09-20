@@ -24,7 +24,6 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListen
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
@@ -33,7 +32,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfImplActivator implements BundleActivator {
+public class NetconfImplActivator {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfImplActivator.class);
 
@@ -44,8 +43,16 @@ public class NetconfImplActivator implements BundleActivator {
 
     private BaseNotificationPublisherRegistration listenerReg;
 
-    @Override
-    public void start(final BundleContext context) {
+    private final BundleContext context;
+
+    public NetconfImplActivator(final BundleContext context) {
+        this.context = context;
+    }
+
+    /**
+     * Invoke by blueprint
+     */
+    public void start() {
         try {
             AggregatedNetconfOperationServiceFactory factoriesListener = new AggregatedNetconfOperationServiceFactory();
             startOperationServiceFactoryTracker(context, factoriesListener);
@@ -115,8 +122,10 @@ public class NetconfImplActivator implements BundleActivator {
         return netconfMonitoringServiceImpl;
     }
 
-    @Override
-    public void stop(final BundleContext context) {
+    /**
+     * Invoke by blueprint
+     */
+    public void stop() {
         LOG.info("Shutting down netconf because YangStoreService service was removed");
 
         eventLoopGroup.shutdownGracefully(0, 1, TimeUnit.SECONDS);
