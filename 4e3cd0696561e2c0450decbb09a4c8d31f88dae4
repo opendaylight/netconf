@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_8b05cf12",
+        "filename": "netconf/config-netconf-connector/src/main/resources/org/opendaylight/blueprint/config-netconf-connector.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-09-20T09:01:29Z",
+      "side": 1,
+      "message": "Seems like you might want to put stop here, since the Activator doesn\u0027t have a close() method.",
+      "range": {
+        "startLine": 9,
+        "startChar": 26,
+        "endLine": 9,
+        "endChar": 31
+      },
+      "revId": "4e3cd0696561e2c0450decbb09a4c8d31f88dae4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
