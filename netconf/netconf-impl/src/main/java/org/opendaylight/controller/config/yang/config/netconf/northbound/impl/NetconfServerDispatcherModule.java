@@ -8,16 +8,22 @@
 
 package org.opendaylight.controller.config.yang.config.netconf.northbound.impl;
 
-import org.opendaylight.controller.config.api.JmxAttributeValidationException;
-import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactoryBuilder;
+import com.google.common.reflect.AbstractInvocationHandler;
+import com.google.common.reflect.Reflection;
+import java.lang.reflect.Method;
+import org.opendaylight.controller.config.api.osgi.WaitingServiceTracker;
+import org.opendaylight.netconf.api.NetconfServerDispatcher;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
-import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
-import org.opendaylight.netconf.impl.NetconfServerDispatcherImpl;
-import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory;
-import org.opendaylight.netconf.impl.SessionIdProvider;
-import org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
+import org.osgi.framework.BundleContext;
 
+/**
+ * @deprecated Replaced by blueprint wiring
+ */
+@Deprecated
 public class NetconfServerDispatcherModule extends AbstractNetconfServerDispatcherModule {
+
+    private BundleContext bundleContext;
+
     public NetconfServerDispatcherModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier, org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
         super(identifier, dependencyResolver);
     }
@@ -27,43 +33,28 @@ public class NetconfServerDispatcherModule extends AbstractNetconfServerDispatch
     }
 
     @Override
-    public void customValidation() {
-        JmxAttributeValidationException.checkCondition(getConnectionTimeoutMillis() > 0, "Invalid connection timeout", connectionTimeoutMillisJmxAttribute);
-    }
-
-    @Override
     public AutoCloseable createInstance() {
+        final WaitingServiceTracker<NetconfServerDispatcher> tracker =
+                WaitingServiceTracker.create(NetconfServerDispatcher.class, bundleContext);
+        final NetconfServerDispatcher service = tracker.waitForService(WaitingServiceTracker.FIVE_MINUTES);
 
-        final AggregatedNetconfOperationServiceFactory aggregatedOpProvider = getAggregatedOpProvider();
-        final NetconfMonitoringService monitoringService = getServerMonitorDependency();
-
-        final NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new NetconfServerSessionNegotiatorFactoryBuilder()
-                .setAggregatedOpService(aggregatedOpProvider)
-                .setTimer(getTimerDependency())
-                .setIdProvider(new SessionIdProvider())
-                .setMonitoringService(monitoringService)
-                .setConnectionTimeoutMillis(getConnectionTimeoutMillis())
-                .build();
-        final NetconfServerDispatcherImpl.ServerChannelInitializer serverChannelInitializer = new NetconfServerDispatcherImpl.ServerChannelInitializer(
-                serverNegotiatorFactory);
-
-        return new NetconfServerDispatcherImpl(serverChannelInitializer, getBossThreadGroupDependency(), getWorkerThreadGroupDependency()) {
-
+        return Reflection.newProxy(AutoCloseableNetconfServerDispatcher.class, new AbstractInvocationHandler() {
             @Override
-            public void close() {
-                // NOOP, close should not be present here, the deprecated method closes injected evet loop groups
+            protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable {
+                if (method.getName().equals("close")) {
+                    tracker.close();
+                    return null;
+                } else {
+                    return method.invoke(service, args);
+                }
             }
-        };
-
+        });
     }
 
-    private AggregatedNetconfOperationServiceFactory getAggregatedOpProvider() {
-        final AggregatedNetconfOperationServiceFactory netconfOperationProvider = new AggregatedNetconfOperationServiceFactory();
-        for (final NetconfOperationServiceFactory netconfOperationServiceFactory : getMappersDependency()) {
-            netconfOperationProvider.onAddNetconfOperationServiceFactory(netconfOperationServiceFactory);
-        }
-        return netconfOperationProvider;
+    void setBundleContext(BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
     }
 
-
+    private static interface AutoCloseableNetconfServerDispatcher extends NetconfServerDispatcher, AutoCloseable {
+    }
 }
