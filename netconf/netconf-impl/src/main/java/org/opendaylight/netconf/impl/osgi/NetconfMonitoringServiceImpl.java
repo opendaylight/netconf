@@ -27,6 +27,12 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
     }
 
     public NetconfMonitoringServiceImpl(NetconfOperationServiceFactory opProvider,
+                                        ScheduledThreadPool threadPool,
+                                        long updateInterval) {
+        this(opProvider, Optional.fromNullable(threadPool), updateInterval);
+    }
+
+    public NetconfMonitoringServiceImpl(NetconfOperationServiceFactory opProvider,
                                         Optional<ScheduledThreadPool> threadPool,
                                         long updateInterval) {
         this.capabilityMonitoring = new NetconfCapabilityMonitoringService(opProvider);

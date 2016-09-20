@@ -15,6 +15,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opendaylight.controller.config.util.capability.Capability;
@@ -37,6 +38,13 @@ public class AggregatedNetconfOperationServiceFactory implements NetconfOperatio
     private final Set<NetconfOperationServiceFactory> factories = new HashSet<>();
     private final Multimap<NetconfOperationServiceFactory, AutoCloseable> registrations = HashMultimap.create();
     private final Set<CapabilityListener> listeners = Sets.newHashSet();
+
+    public AggregatedNetconfOperationServiceFactory() {
+    }
+
+    public AggregatedNetconfOperationServiceFactory(final List<NetconfOperationServiceFactory> mappers) {
+        mappers.forEach(this::onAddNetconfOperationServiceFactory);
+    }
 
     @Override
     public synchronized void onAddNetconfOperationServiceFactory(NetconfOperationServiceFactory service) {
