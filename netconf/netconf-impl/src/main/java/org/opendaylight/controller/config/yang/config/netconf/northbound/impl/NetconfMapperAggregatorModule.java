@@ -8,9 +8,21 @@
 
 package org.opendaylight.controller.config.yang.config.netconf.northbound.impl;
 
-import org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
+import com.google.common.reflect.AbstractInvocationHandler;
+import com.google.common.reflect.Reflection;
+import java.lang.reflect.Method;
+import org.opendaylight.controller.config.api.osgi.WaitingServiceTracker;
+import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.osgi.framework.BundleContext;
 
-public class NetconfMapperAggregatorModule extends org.opendaylight.controller.config.yang.config.netconf.northbound.impl.AbstractNetconfMapperAggregatorModule {
+/**
+ * @deprecated Replaced by blueprint wiring
+ */
+@Deprecated
+public class NetconfMapperAggregatorModule extends AbstractNetconfMapperAggregatorModule {
+
+    private BundleContext bundleContext;
+
     public NetconfMapperAggregatorModule(final org.opendaylight.controller.config.api.ModuleIdentifier identifier, final org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
         super(identifier, dependencyResolver);
     }
@@ -24,7 +36,28 @@ public class NetconfMapperAggregatorModule extends org.opendaylight.controller.c
 
     @Override
     public java.lang.AutoCloseable createInstance() {
-        return new AggregatedNetconfOperationServiceFactory();
+        final WaitingServiceTracker<NetconfOperationServiceFactory> tracker =
+                WaitingServiceTracker.create(NetconfOperationServiceFactory.class, bundleContext);
+        final NetconfOperationServiceFactory service = tracker.waitForService(WaitingServiceTracker.FIVE_MINUTES);
+
+        return Reflection.newProxy(AutoCloseableNetconfOperationServiceFactory.class, new AbstractInvocationHandler() {
+            @Override
+            protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable {
+                if (method.getName().equals("close")) {
+                    tracker.close();
+                    return null;
+                } else {
+                    return method.invoke(service, args);
+                }
+            }
+        });
+    }
+
+    void setBundleContext(BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
+    }
+
+    private static interface AutoCloseableNetconfOperationServiceFactory extends NetconfOperationServiceFactory, AutoCloseable {
     }
 
 }
