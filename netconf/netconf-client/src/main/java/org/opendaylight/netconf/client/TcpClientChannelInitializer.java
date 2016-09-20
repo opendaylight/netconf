@@ -17,7 +17,6 @@ import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
 import java.net.SocketAddress;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
-import org.opendaylight.protocol.framework.SessionListenerFactory;
 
 class TcpClientChannelInitializer extends AbstractChannelInitializer<NetconfClientSession> {
 
@@ -47,24 +46,18 @@ class TcpClientChannelInitializer extends AbstractChannelInitializer<NetconfClie
                 connectPromise = channelPromise;
                 ChannelPromise tcpConnectFuture = new DefaultChannelPromise(ch);
 
-                negotiationFutureListener = new GenericFutureListener<Future<NetconfClientSession>>() {
-                    @Override
-                    public void operationComplete(final Future<NetconfClientSession> future) throws Exception {
-                        if (future.isSuccess()) {
-                            connectPromise.setSuccess();
-                        }
+                negotiationFutureListener = future -> {
+                    if (future.isSuccess()) {
+                        connectPromise.setSuccess();
                     }
                 };
 
-                tcpConnectFuture.addListener(new GenericFutureListener<Future<? super Void>>() {
-                    @Override
-                    public void operationComplete(final Future<? super Void> future) throws Exception {
-                        if(future.isSuccess()) {
-                            //complete connection promise with netconf negotiation future
-                            negotiationFuture.addListener(negotiationFutureListener);
-                        } else {
-                            connectPromise.setFailure(future.cause());
-                        }
+                tcpConnectFuture.addListener(future -> {
+                    if(future.isSuccess()) {
+                        //complete connection promise with netconf negotiation future
+                        negotiationFuture.addListener(negotiationFutureListener);
+                    } else {
+                        connectPromise.setFailure(future.cause());
                     }
                 });
                 ctx.connect(remoteAddress, localAddress, tcpConnectFuture);
@@ -98,11 +91,6 @@ class TcpClientChannelInitializer extends AbstractChannelInitializer<NetconfClie
     @Override
     protected void initializeSessionNegotiator(final Channel ch, final Promise<NetconfClientSession> promise) {
         ch.pipeline().addAfter(NETCONF_MESSAGE_DECODER, AbstractChannelInitializer.NETCONF_SESSION_NEGOTIATOR,
-                negotiatorFactory.getSessionNegotiator(new SessionListenerFactory<NetconfClientSessionListener>() {
-                    @Override
-                    public NetconfClientSessionListener getSessionListener() {
-                        return sessionListener;
-                    }
-                }, ch, promise));
+                negotiatorFactory.getSessionNegotiator(() -> sessionListener, ch, promise));
     }
 }
