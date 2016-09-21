@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_8d4ddcc6",
+        "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibServiceImplTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T14:41:52Z",
+      "side": 1,
+      "message": "I don\u0027t think you need to use power mockito here. Creating SharedSchemaRepository object requires just one string with name of the new repository. \n\nOr you can also try to refactor YangLibService implementation to use interface SchemaRepository rather then implementation SharedSchemaRepository, which you can easily mock with mockito.",
+      "revId": "6040892cebe0bd518c86faab53d080239694471d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_cd4d149c",
+        "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibServiceImplTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T14:41:52Z",
+      "side": 1,
+      "message": "I think it is really unclear to use asci code to encode some string. At least some comment clarifying this would be helpful",
+      "revId": "6040892cebe0bd518c86faab53d080239694471d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_4d7aa4bd",
+        "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibServiceImplTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T14:41:52Z",
+      "side": 1,
+      "message": "Please wrap this line",
+      "revId": "6040892cebe0bd518c86faab53d080239694471d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
