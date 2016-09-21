@@ -13,15 +13,19 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.Preconditions;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.annotation.Arg;
@@ -35,6 +39,8 @@ public class TesttoolParameters {
     private static final String TCP_ONLY = "{TCP_ONLY}";
     private static final String ADDRESS_PORT = "{ADDRESS:PORT}";
     private static final String dest = "http://{ADDRESS:PORT}/restconf/config/network-topology:network-topology/topology/topology-netconf/";
+    private static final Pattern YANG_FILENAME_PATTERN = Pattern.compile("(?<name>.*)@(?<revision>\\d{4}-\\d{2}-\\d{2})\\.yang");
+    private static final Pattern DATE_PATTERN = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})");
 
     private static final String RESOURCE = "/config-template.json";
     @Arg(dest = "edit-content")
@@ -284,6 +290,36 @@ public class TesttoolParameters {
             checkArgument(schemasDir.exists(), "Schemas dir has to exist");
             checkArgument(schemasDir.isDirectory(), "Schemas dir has to be a directory");
             checkArgument(schemasDir.canRead(), "Schemas dir has to be readable");
+
+            final List<File> files = Arrays.asList(schemasDir.listFiles());
+            for (final File file : files) {
+                final Matcher matcher = YANG_FILENAME_PATTERN.matcher(file.getName());
+                if (!matcher.matches()) {
+                    BufferedReader reader;
+                    try {
+                        reader = new BufferedReader(new FileReader(file));
+                        String line = reader.readLine();
+                        while (!DATE_PATTERN.matcher(line).find()) {
+                            line = reader.readLine();
+                        }
+                        Matcher m = DATE_PATTERN.matcher(line);
+
+                        if (m.find()) {
+                            String moduleName = file.getAbsolutePath();
+                            if (file.getName().endsWith(".yang")) {
+                                moduleName = moduleName.substring(0, moduleName.length() - 5);
+                            }
+                            final String revision = m.group(1);
+                            String correctName = moduleName + "@" + revision + ".yang";
+                            File correctNameFile = new File(correctName);
+                            file.renameTo(correctNameFile);
+                        }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
     }
 
