@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2016 Inocybe Technologies Inc. and others.  All rights reserved.
+
+ This program and the accompanying materials are made available under the
+ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ and is available at http://www.eclipse.org/legal/epl-v10.html
+-->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           odl:restart-dependents-on-updates="true">
+
+    <reference id="dataBroker"
+               interface="org.opendaylight.controller.md.sal.binding.api.DataBroker"
+               odl:type="default"/>
+    <reference id="netconfOperationServiceFactoryListener"
+               interface="org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener"
+               odl:type="mapper-aggregator-registry"/>
+
+    <!--This is the MD-SAL netconf server notification blueprint xml file-->
+
+    <bean id="netconfNotificationManager"
+          class="org.opendaylight.netconf.notifications.impl.NetconfNotificationManager"
+          destroy-method="close">
+    </bean>
+    <service ref="netconfNotificationManager"
+             interface="org.opendaylight.netconf.notifications.NetconfNotificationRegistry"
+             odl:type="netconf-notification-manager">
+    </service>
+    <service ref="netconfNotificationManager"
+             interface="org.opendaylight.netconf.notifications.NetconfNotificationCollector"
+             odl:type="netconf-notification-manager">
+    </service>
+
+    <bean id="notificationToMdsalWriter"
+          class="org.opendaylight.controller.config.yang.netconf.mdsal.notification.NotificationToMdsalWriter"
+          init-method="start"
+          destroy-method="close">
+        <argument ref="netconfNotificationManager"/>
+        <argument ref="dataBroker"/>
+    </bean>
+
+    <bean id="capabilityChangeNotificationProducer"
+          class="org.opendaylight.controller.config.yang.netconf.mdsal.notification.CapabilityChangeNotificationProducer"
+          destroy-method="close">
+        <argument ref="netconfNotificationManager"/>
+        <argument ref="dataBroker"/>
+    </bean>
+
+    <bean id="sessionNotificationProducer"
+          class="org.opendaylight.controller.config.yang.netconf.mdsal.notification.SessionNotificationProducer"
+          destroy-method="close">
+        <argument ref="netconfNotificationManager"/>
+        <argument ref="dataBroker"/>
+    </bean>
+
+    <bean id="netconfNotificationOperationServiceFactory"
+          class="org.opendaylight.netconf.mdsal.notification.NetconfNotificationOperationServiceFactory"
+          destroy-method="close">
+        <argument ref="netconfNotificationManager"/>
+        <argument ref="netconfOperationServiceFactoryListener"/>
+    </bean>
+    <service ref="netconfNotificationOperationServiceFactory"
+             interface="org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory"
+             odl:type="mdsal-netconf-notification"/>
+</blueprint>
