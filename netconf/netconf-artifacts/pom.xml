@@ -233,6 +233,11 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>mdsal-notification-mapper</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-topology</artifactId>
                 <version>${project.version}</version>
             </dependency>

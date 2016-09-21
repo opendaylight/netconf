@@ -42,8 +42,9 @@ public class ActivatorTest {
 
     @Test
     public void testActivator() throws Exception {
-        final Activator activator = new Activator();
         final BundleContext context = mock(BundleContext.class);
+
+        final Activator activator = new Activator(context, mock(NetconfNotificationManager.class));
 
 
         final ServiceRegistration netconfNotificationCollectorServiceRegistration  = mock(ServiceRegistration.class);
@@ -55,7 +56,7 @@ public class ActivatorTest {
         doReturn(operationaServiceRegistration).when(context).
                 registerService(eq(NetconfOperationServiceFactory.class), any(NetconfOperationServiceFactory.class), any());
 
-        activator.start(context);
+        activator.start();
 
         verify(context, times(1)).registerService(eq(NetconfNotificationCollector.class),
                 any(NetconfNotificationManager.class), eq(new Hashtable<>()));
@@ -107,12 +108,10 @@ public class ActivatorTest {
         doNothing().when(netconfNotificationCollectorServiceRegistration).unregister();
         doNothing().when(operationaServiceRegistration).unregister();
 
-        activator.stop(context);
+        activator.stop();
 
         verify(netconfNotificationCollectorServiceRegistration, times(1)).unregister();
         verify(operationaServiceRegistration, times(1)).unregister();
 
     }
-
-
 }
