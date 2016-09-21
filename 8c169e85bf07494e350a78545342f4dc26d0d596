@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_b76469b9",
+        "filename": "netconf/netconf-topology/src/test/java/org/opendaylight/netconf/topology/impl/NetconfNodeManagerCallbackTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T10:09:47Z",
+      "side": 1,
+      "message": "For the future please try to annotate just specific declarations. You don\u0027t have to change this now.\n\nMoreover, here it\u0027s not really unavoidable. You don\u0027t have to mock Future object and you can use just any() instead of any(OnComplete.class)",
+      "revId": "8c169e85bf07494e350a78545342f4dc26d0d596",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_574eb53b",
+        "filename": "netconf/netconf-topology/src/test/java/org/opendaylight/netconf/topology/impl/NetconfNodeManagerCallbackTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T10:09:47Z",
+      "side": 1,
+      "message": "For now it is OK but you do not have to mock futures. You have convenient utility classes for creating new futures.",
+      "revId": "8c169e85bf07494e350a78545342f4dc26d0d596",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_37497931",
+        "filename": "netconf/netconf-topology/src/test/java/org/opendaylight/netconf/topology/impl/NetconfNodeManagerCallbackTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T10:09:47Z",
+      "side": 1,
+      "message": "any() is just enough",
+      "revId": "8c169e85bf07494e350a78545342f4dc26d0d596",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_1741dd0a",
+        "filename": "netconf/netconf-topology/src/test/java/org/opendaylight/netconf/topology/impl/NetconfNodeManagerCallbackTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T10:09:47Z",
+      "side": 1,
+      "message": "space",
+      "revId": "8c169e85bf07494e350a78545342f4dc26d0d596",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
