@@ -469,6 +469,20 @@ public class NetconfMDSalMappingTest {
     }
 
     @Test
+    public void testReplaceMapEntry() throws Exception {
+        verifyResponse(edit("messages/mapping/editConfigs/edit-config-replace-map-entry.xml"), RPC_REPLY_OK);
+        verifyResponse(commit(), RPC_REPLY_OK);
+        verifyResponse(getConfigRunning(), XmlFileLoader.xmlFileToDocument("messages/mapping/get-config-map-entry.xml"));
+    }
+
+    @Test
+    public void testMergeMapEntry() throws Exception {
+        verifyResponse(edit("messages/mapping/editConfigs/edit-config-merge-map-entry.xml"), RPC_REPLY_OK);
+        verifyResponse(commit(), RPC_REPLY_OK);
+        verifyResponse(getConfigRunning(), XmlFileLoader.xmlFileToDocument("messages/mapping/get-config-map-entry.xml"));
+    }
+
+    @Test
     public void testFiltering() throws Exception {
 
         assertEmptyDatastore(getConfigCandidate());
