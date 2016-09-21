@@ -21,28 +21,49 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
+import org.opendaylight.controller.md.sal.binding.api.DataTreeChangeListener;
+import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
+import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionEnd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionStart;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.ZeroBasedCounter32;
+import org.opendaylight.yangtools.concepts.ListenerRegistration;
 
 public class SessionNotificationProducerTest {
 
     private SessionNotificationProducer publisher;
+
     @Mock
     private BaseNotificationPublisherRegistration registration;
+    @Mock
+    private ListenerRegistration listenerRegistration;
+
+    @Mock
+    private NetconfNotificationCollector netconfNotificationCollector;
+    @Mock
+    private DataBroker dataBroker;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        publisher = new SessionNotificationProducer(registration);
+
+        doReturn(listenerRegistration).when(dataBroker).registerDataTreeChangeListener(any(DataTreeIdentifier.class), any(DataTreeChangeListener.class));
+
+        doNothing().when(registration).onCapabilityChanged(any(NetconfCapabilityChange.class));
         doNothing().when(registration).onSessionStarted(any());
         doNothing().when(registration).onSessionEnded(any());
+
+        doReturn(registration).when(netconfNotificationCollector).registerBaseNotificationPublisher();
+
+        publisher = new SessionNotificationProducer(netconfNotificationCollector, dataBroker);
     }
 
     @Test
