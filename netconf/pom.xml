@@ -31,6 +31,7 @@
     <module>mdsal-netconf-ssh</module>
     <module>mdsal-netconf-connector</module>
     <module>mdsal-netconf-monitoring</module>
+    <module>mdsal-notification-mapper</module>
     <module>mdsal-netconf-notification</module>
     <module>mdsal-netconf-yang-library</module>
     <module>mdsal-netconf-impl</module>
