@@ -2,6 +2,74 @@
   "comments": [
     {
       "key": {
+        "uuid": "7a6b29fe_6d4320af",
+        "filename": "netconf/netconf-notifications-api/src/test/java/org/opendaylight/netconf/notifications/NetconfNotificationTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T14:31:33Z",
+      "side": 1,
+      "message": "just Exception is enough here",
+      "revId": "c6f86c05fa9bb48c6f995daea6e07b577bebdd1e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_0d354c45",
+        "filename": "netconf/netconf-notifications-api/src/test/java/org/opendaylight/netconf/notifications/NetconfNotificationTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T14:31:33Z",
+      "side": 1,
+      "message": "Can you please wrap this line",
+      "revId": "c6f86c05fa9bb48c6f995daea6e07b577bebdd1e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_cd7cf4ee",
+        "filename": "netconf/netconf-notifications-api/src/test/java/org/opendaylight/netconf/notifications/NetconfNotificationTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T14:31:33Z",
+      "side": 1,
+      "message": "Can you please clarify this constatnts you use like 0, 1. What do you expect there and why the length should be 1.",
+      "revId": "c6f86c05fa9bb48c6f995daea6e07b577bebdd1e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ed37304b",
+        "filename": "netconf/netconf-notifications-api/src/test/java/org/opendaylight/netconf/notifications/NetconfNotificationTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T14:31:33Z",
+      "side": 1,
+      "message": "Also this line",
+      "revId": "c6f86c05fa9bb48c6f995daea6e07b577bebdd1e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_4bdf37d6",
         "filename": "netconf/netconf-notifications-api/src/test/java/org/opendaylight/netconf/notifications/NetconfNotificationTest.java",
         "patchSetId": 2
@@ -13,6 +81,23 @@
       "writtenOn": "2016-09-20T10:59:57Z",
       "side": 1,
       "message": "space",
+      "revId": "c6f86c05fa9bb48c6f995daea6e07b577bebdd1e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ed8570cf",
+        "filename": "netconf/netconf-notifications-api/src/test/java/org/opendaylight/netconf/notifications/NetconfNotificationTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T14:31:33Z",
+      "side": 1,
+      "message": "This whole gregorian calendar thing seems to me like an overkill. Isn\u0027t there something simpler?",
       "revId": "c6f86c05fa9bb48c6f995daea6e07b577bebdd1e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
