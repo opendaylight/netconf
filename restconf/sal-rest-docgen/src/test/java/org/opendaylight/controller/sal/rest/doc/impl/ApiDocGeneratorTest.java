@@ -224,7 +224,7 @@ public class ApiDocGeneratorTest {
                 // testing bugs.opendaylight.org bug 1290. UnionType model type.
                 final String jsonString = doc.getModels().toString();
                 assertTrue(jsonString.contains(
-                        "testUnion\":{\"minItems\":0,\"maxItems\":2147483647,\"type\":\"integer or string\",\"required\":false}"));
+                        "testUnion\":{\"type\":\"integer or string\",\"required\":false}"));
             }
         }
     }
