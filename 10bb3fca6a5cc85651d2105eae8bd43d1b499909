@@ -22,6 +22,30 @@
       "revId": "10bb3fca6a5cc85651d2105eae8bd43d1b499909",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_d2cad319",
+        "filename": "netconf/config-netconf-connector/src/main/java/org/opendaylight/netconf/confignetconfconnector/operations/get/Get.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-21T12:56:10Z",
+      "side": 1,
+      "message": "Done, good catch though. I haven\u0027t seen get(document) was throwing exception, hence this method throwing exception.",
+      "parentUuid": "7a6b29fe_37cfb957",
+      "range": {
+        "startLine": 45,
+        "startChar": 15,
+        "endLine": 45,
+        "endChar": 56
+      },
+      "revId": "10bb3fca6a5cc85651d2105eae8bd43d1b499909",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
