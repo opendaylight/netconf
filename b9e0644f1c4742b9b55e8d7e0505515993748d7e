@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_358a0e64",
+        "filename": "netconf/mdsal-netconf-connector/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-connector.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-21T22:55:46Z",
+      "side": 1,
+      "message": "add a type as used elsewhere",
+      "range": {
+        "startLine": 26,
+        "startChar": 8,
+        "endLine": 26,
+        "endChar": 133
+      },
+      "revId": "b9e0644f1c4742b9b55e8d7e0505515993748d7e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
