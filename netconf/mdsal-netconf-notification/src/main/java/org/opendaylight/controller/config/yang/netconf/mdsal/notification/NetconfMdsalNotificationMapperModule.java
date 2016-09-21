@@ -8,12 +8,21 @@
 
 package org.opendaylight.controller.config.yang.netconf.mdsal.notification;
 
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.netconf.mdsal.notification.NetconfNotificationOperationServiceFactory;
-import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import com.google.common.reflect.AbstractInvocationHandler;
+import com.google.common.reflect.Reflection;
+import java.lang.reflect.Method;
+import org.opendaylight.controller.config.api.osgi.WaitingServiceTracker;
+import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.osgi.framework.BundleContext;
 
-public class NetconfMdsalNotificationMapperModule extends org.opendaylight.controller.config.yang.netconf.mdsal.notification.AbstractNetconfMdsalNotificationMapperModule {
+/**
+ * @deprecated Replaced by blueprint wiring
+ */
+@Deprecated
+public class NetconfMdsalNotificationMapperModule extends AbstractNetconfMdsalNotificationMapperModule {
+
+    private BundleContext bundleContext;
+
     public NetconfMdsalNotificationMapperModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier, org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
         super(identifier, dependencyResolver);
     }
@@ -29,34 +38,27 @@ public class NetconfMdsalNotificationMapperModule extends org.opendaylight.contr
 
     @Override
     public java.lang.AutoCloseable createInstance() {
-        final NetconfNotificationCollector notificationCollector = getNotificationCollectorDependency();
+        final WaitingServiceTracker<NetconfOperationServiceFactory> tracker =
+                WaitingServiceTracker.create(NetconfOperationServiceFactory.class, bundleContext, "(type=mdsal-netconf-notification)");
+        final NetconfOperationServiceFactory service = tracker.waitForService(WaitingServiceTracker.FIVE_MINUTES);
 
-        final NotificationToMdsalWriter notificationToMdsalWriter = new NotificationToMdsalWriter(notificationCollector);
-        getBindingAwareBrokerDependency().registerProvider(notificationToMdsalWriter);
-        final DataBroker dataBroker = getDataBrokerDependency();
-
-        final OperationalDatastoreListener capabilityNotificationProducer =
-                new CapabilityChangeNotificationProducer(notificationCollector.registerBaseNotificationPublisher());
-        final ListenerRegistration capabilityChangeListenerRegistration = capabilityNotificationProducer.registerOnChanges(dataBroker);
-
-        final OperationalDatastoreListener sessionNotificationProducer =
-                new SessionNotificationProducer(notificationCollector.registerBaseNotificationPublisher());
-        final ListenerRegistration sessionListenerRegistration = sessionNotificationProducer.registerOnChanges(dataBroker);
-
-        final NetconfNotificationOperationServiceFactory netconfNotificationOperationServiceFactory =
-            new NetconfNotificationOperationServiceFactory(getNotificationRegistryDependency()) {
-                @Override
-                public void close() {
-                    super.close();
-                    notificationToMdsalWriter.close();
-                    capabilityChangeListenerRegistration.close();
-                    sessionListenerRegistration.close();
-                    getAggregatorDependency().onRemoveNetconfOperationServiceFactory(this);
+        return Reflection.newProxy(AutoCloseableNetconfOperationServiceFactory.class, new AbstractInvocationHandler() {
+            @Override
+            protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable {
+                if (method.getName().equals("close")) {
+                    tracker.close();
+                    return null;
+                } else {
+                    return method.invoke(service, args);
                 }
-            };
+            }
+        });
+    }
 
-        getAggregatorDependency().onAddNetconfOperationServiceFactory(netconfNotificationOperationServiceFactory);
+    void setBundleContext(BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
+    }
 
-        return netconfNotificationOperationServiceFactory;
+    private static interface AutoCloseableNetconfOperationServiceFactory extends NetconfOperationServiceFactory, AutoCloseable {
     }
 }
