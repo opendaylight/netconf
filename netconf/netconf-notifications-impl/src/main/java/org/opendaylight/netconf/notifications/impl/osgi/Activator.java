@@ -22,31 +22,31 @@ import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.notifications.NetconfNotification;
-import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.notifications.impl.NetconfNotificationManager;
 import org.opendaylight.netconf.notifications.impl.ops.CreateSubscription;
 import org.opendaylight.netconf.notifications.impl.ops.Get;
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class Activator implements BundleActivator {
+public class Activator {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
-
-    private ServiceRegistration<NetconfNotificationCollector> netconfNotificationCollectorServiceRegistration;
     private ServiceRegistration<NetconfOperationServiceFactory> operationaServiceRegistration;
-    private NetconfNotificationManager netconfNotificationManager;
 
-    @Override
-    public void start(final BundleContext context) throws Exception {
-        netconfNotificationManager = new NetconfNotificationManager();
+    private final BundleContext context;
+    private final NetconfNotificationManager netconfNotificationManager;
+
+    public Activator(final BundleContext context, final NetconfNotificationManager netconfNotificationManager) {
+        this.context = context;
+        this.netconfNotificationManager = netconfNotificationManager;
+    }
+
+    /**
+     * Invoke by blueprint
+     */
+    public void start() {
         // Add properties to autowire with netconf-impl instance for cfg subsystem
         final Dictionary<String, String> props = new Hashtable<>();
         props.put(NetconfConstants.SERVICE_NAME, NetconfConstants.NETCONF_NOTIFICATION);
-        netconfNotificationCollectorServiceRegistration = context.registerService(NetconfNotificationCollector.class, netconfNotificationManager, new Hashtable<String, Object>());
 
         final NetconfOperationServiceFactory netconfOperationServiceFactory = new NetconfOperationServiceFactory() {
 
@@ -60,12 +60,7 @@ public class Activator implements BundleActivator {
             @Override
             public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
                 listener.onCapabilitiesChanged(capabilities, Collections.<Capability>emptySet());
-                return new AutoCloseable() {
-                    @Override
-                    public void close() {
-                        listener.onCapabilitiesChanged(Collections.<Capability>emptySet(), capabilities);
-                    }
-                };
+                return () -> listener.onCapabilitiesChanged(Collections.<Capability>emptySet(), capabilities);
             }
 
             @Override
@@ -94,15 +89,10 @@ public class Activator implements BundleActivator {
         operationaServiceRegistration = context.registerService(NetconfOperationServiceFactory.class, netconfOperationServiceFactory, properties);
     }
 
-    @Override
-    public void stop(final BundleContext context) throws Exception {
-        if(netconfNotificationCollectorServiceRegistration != null) {
-            netconfNotificationCollectorServiceRegistration.unregister();
-            netconfNotificationCollectorServiceRegistration = null;
-        }
-        if (netconfNotificationManager != null) {
-            netconfNotificationManager.close();
-        }
+    /**
+     * Invoke by blueprint
+     */
+    public void stop() {
         if (operationaServiceRegistration != null) {
             operationaServiceRegistration.unregister();
             operationaServiceRegistration = null;
