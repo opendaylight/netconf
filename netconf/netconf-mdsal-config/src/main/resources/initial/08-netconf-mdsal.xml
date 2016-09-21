@@ -130,26 +130,6 @@
           <module>
               <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:notification">prefix:netconf-mdsal-notification-mapper</type>
               <name>netconf-mdsal-notification-mapper</name>
-              <data-broker xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:notification">
-                  <type xmlns:binding="urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding">binding:binding-async-data-broker</type>
-                  <name>binding-data-broker</name>
-              </data-broker>
-              <binding-aware-broker xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:notification">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding">prefix:binding-broker-osgi-registry</type>
-                  <name>binding-osgi-broker</name>
-              </binding-aware-broker>
-              <aggregator xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:notification">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:north:mapper">prefix:netconf-mapper-registry</type>
-                  <name>mapper-aggregator-registry</name>
-              </aggregator>
-              <notification-registry xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:notification">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:notification">prefix:netconf-notification-registry</type>
-                  <name>netconf-notification-manager</name>
-              </notification-registry>
-              <notification-collector>
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:notification">prefix:netconf-notification-collector</type>
-                  <name>netconf-notification-manager</name>
-              </notification-collector>
           </module>
 
           <module>
@@ -213,13 +193,6 @@
                 <instance>
                     <name>netconf-mdsal-server-dispatcher</name>
                     <provider>/modules/module[type='netconf-server-dispatcher-impl'][name='netconf-mdsal-server-dispatcher']</provider>
-                </instance>
-            </service>
-            <service>
-                <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:north:mapper">prefix:netconf-northbound-mapper</type>
-                <instance>
-                    <name>netconf-mdsal-notification-mapper</name>
-                    <provider>/modules/module[type='netconf-mdsal-notification-mapper'][name='netconf-mdsal-notification-mapper']</provider>
                 </instance>
             </service>
             <service>
