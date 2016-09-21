@@ -30,50 +30,6 @@ module netconf-mdsal-notification {
          case netconf-mdsal-notification-mapper {
              when "/config:modules/config:module/config:type = 'netconf-mdsal-notification-mapper'";
 
-             container aggregator {
-                 uses config:service-ref {
-                     refine type {
-                         mandatory true;
-                         config:required-identity nnm:netconf-mapper-registry;
-                         }
-                 }
-             }
-
-             container binding-aware-broker {
-                 uses config:service-ref {
-                     refine type {
-                         mandatory true;
-                         config:required-identity md-sal-binding:binding-broker-osgi-registry;
-                     }
-                 }
-             }
-
-             container data-broker {
-                uses config:service-ref {
-                    refine type {
-                        mandatory true;
-                        config:required-identity md-sal-binding:binding-async-data-broker;
-                    }
-                }
-             }
-
-             container notification-collector {
-                uses config:service-ref {
-                    refine type {
-                        mandatory true;
-                        config:required-identity nnn:netconf-notification-collector;
-                    }
-                }
-             }
-
-            container notification-registry {
-                uses config:service-ref {
-                    refine type {
-                        mandatory true;
-                        config:required-identity nnn:netconf-notification-registry;
-                    }
-                }
-            }
         }
     }
 }
