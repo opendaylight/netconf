@@ -10,7 +10,13 @@ package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
+import java.util.List;
+import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
@@ -19,6 +25,7 @@ import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.common.RpcResult;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -34,6 +41,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
     protected final RemoteDeviceId id;
     protected final NetconfBaseOps netOps;
     protected final boolean rollbackSupport;
+    protected final List<ListenableFuture<DOMRpcResult>> resultsFutures;
     // Allow commit to be called only once
     protected boolean finished = false;
 
@@ -41,6 +49,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
         this.netOps = netOps;
         this.id = id;
         this.rollbackSupport = rollbackSupport;
+        this.resultsFutures = Lists.newArrayList();
         init();
     }
 
@@ -90,8 +99,6 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
         editConfig(path, Optional.fromNullable(data), editStructure, Optional.of(ModifyAction.NONE), "put");
     }
 
-    protected abstract void handleEditException(YangInstanceIdentifier path, NormalizedNode<?, ?> data, NetconfDocumentedException e, String editType);
-
     @Override
     public synchronized void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode<?, ?> data) {
         checkEditable(store);
@@ -138,4 +145,36 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
     }
 
     protected abstract void editConfig(final YangInstanceIdentifier path, final Optional<NormalizedNode<?, ?>> data, final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> defaultOperation, final String operation);
+
+    protected ListenableFuture<RpcResult<TransactionStatus>> resultsToTxStatus() {
+        final SettableFuture<RpcResult<TransactionStatus>> transformed = SettableFuture.create();
+
+        Futures.addCallback(Futures.allAsList(resultsFutures), new FutureCallback<List<DOMRpcResult>>() {
+            @Override
+            public void onSuccess(final List<DOMRpcResult> domRpcResults) {
+                domRpcResults.forEach(domRpcResult -> {
+                    if(!domRpcResult.getErrors().isEmpty() && !transformed.isDone()) {
+                        NetconfDocumentedException exception =
+                                new NetconfDocumentedException(id + ":RPC during tx failed",
+                                        DocumentedException.ErrorType.application,
+                                        DocumentedException.ErrorTag.operation_failed,
+                                        DocumentedException.ErrorSeverity.error);
+                        transformed.setException(exception);
+                    }
+                });
+
+                if(!transformed.isDone()) {
+                    transformed.set(RpcResultBuilder.success(TransactionStatus.COMMITED).build());
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                // TODO should we wrap throwable in NetconfDocumentedException
+                transformed.setException(throwable);
+            }
+        });
+
+        return transformed;
+    }
 }

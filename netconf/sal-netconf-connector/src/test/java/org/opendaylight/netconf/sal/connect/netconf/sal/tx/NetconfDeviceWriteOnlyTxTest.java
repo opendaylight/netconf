@@ -132,6 +132,7 @@ public class NetconfDeviceWriteOnlyTxTest {
                 false);
 
         tx.delete(LogicalDatastoreType.CONFIGURATION, yangIId);
+        tx.submit();
         // verify discard changes was sent
         final InOrder inOrder = inOrder(rpc);
         inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME), NetconfBaseOps.getLockContent(NETCONF_RUNNING_QNAME));
