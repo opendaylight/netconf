@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_7771310b",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/impl/ClusteredNetconfTopology.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T10:56:18Z",
+      "side": 1,
+      "message": "Why is it just warning now?",
+      "revId": "c308726787c4827854cb42cf804bef346b0371d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
