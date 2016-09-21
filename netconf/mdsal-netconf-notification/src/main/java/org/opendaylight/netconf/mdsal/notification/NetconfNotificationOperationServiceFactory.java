@@ -11,24 +11,24 @@ package org.opendaylight.netconf.mdsal.notification;
 import java.util.Collections;
 import java.util.Set;
 import org.opendaylight.controller.config.util.capability.Capability;
+import org.opendaylight.controller.sal.common.util.NoopAutoCloseable;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
 import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
 
 public class NetconfNotificationOperationServiceFactory implements NetconfOperationServiceFactory, AutoCloseable {
 
     private final NetconfNotificationRegistry netconfNotificationRegistry;
+    private final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener;
 
-    private static final AutoCloseable AUTO_CLOSEABLE = new AutoCloseable() {
-        @Override
-        public void close() throws Exception {
-            // NOOP
-        }
-    };
-
-    public NetconfNotificationOperationServiceFactory(NetconfNotificationRegistry netconfNotificationRegistry) {
+    public NetconfNotificationOperationServiceFactory(final NetconfNotificationRegistry netconfNotificationRegistry,
+                                                      final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener) {
         this.netconfNotificationRegistry = netconfNotificationRegistry;
+        this.netconfOperationServiceFactoryListener = netconfOperationServiceFactoryListener;
+
+        this.netconfOperationServiceFactoryListener.onAddNetconfOperationServiceFactory(this);
     }
 
     @Override
@@ -46,10 +46,11 @@ public class NetconfNotificationOperationServiceFactory implements NetconfOperat
 
     @Override
     public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
-        return AUTO_CLOSEABLE;
+        return NoopAutoCloseable.INSTANCE;
     }
 
     @Override
     public void close() {
+        this.netconfOperationServiceFactoryListener.onRemoveNetconfOperationServiceFactory(this);
     }
 }
