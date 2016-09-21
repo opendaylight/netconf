@@ -460,6 +460,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_17fefd6a",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationActivator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T10:44:57Z",
+      "side": 1,
+      "message": "So how it can become null then?",
+      "parentUuid": "7a6b29fe_6da8678d",
+      "revId": "e4b6096dfb466e9d106f59ba21267f20093ea2b4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_9eb42183",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationActivator.java",
         "patchSetId": 3
