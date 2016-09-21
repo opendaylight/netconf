@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_52988377",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/ReadOnlyTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:35:47Z",
+      "side": 1,
+      "message": "I think this import is unused now",
+      "revId": "24a7f6fee21ef16f6b15c086a6854b6bb1f6142c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_3293475c",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/ReadOnlyTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:35:47Z",
+      "side": 1,
+      "message": "This is also unused",
+      "revId": "24a7f6fee21ef16f6b15c086a6854b6bb1f6142c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_f2842f0c",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/ReadOnlyTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:35:47Z",
+      "side": 1,
+      "message": "Can you also wrap these lines? Also wouldn\u0027t be \"Data read\" as prefix for NetconfRpcFutureCallback better?",
+      "revId": "24a7f6fee21ef16f6b15c086a6854b6bb1f6142c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_1299eb6d",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteCandidateRunningTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:35:47Z",
+      "side": 1,
+      "message": "You have unused imports here now",
+      "revId": "24a7f6fee21ef16f6b15c086a6854b6bb1f6142c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_52cd2365",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteRunningTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:35:47Z",
+      "side": 1,
+      "message": "Unused import",
+      "revId": "24a7f6fee21ef16f6b15c086a6854b6bb1f6142c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_32c86754",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteRunningTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:35:47Z",
+      "side": 1,
+      "message": "Unused import",
+      "revId": "24a7f6fee21ef16f6b15c086a6854b6bb1f6142c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
