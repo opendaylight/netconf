@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_37cfb957",
+        "filename": "netconf/config-netconf-connector/src/main/java/org/opendaylight/netconf/confignetconfconnector/operations/get/Get.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-09-21T10:43:47Z",
+      "side": 1,
+      "message": "I think the order in which the getConfigSubsystemFacade().get(document) were executed matters here since it can fail. With this change you log success and then the get could fail which just seems wrong and will be confusing in logs.",
+      "range": {
+        "startLine": 45,
+        "startChar": 15,
+        "endLine": 45,
+        "endChar": 56
+      },
+      "revId": "10bb3fca6a5cc85651d2105eae8bd43d1b499909",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
