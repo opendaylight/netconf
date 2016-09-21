@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_7cf6385e",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/SchemalessNetconfDeviceTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-09-21T09:01:53Z",
+      "side": 1,
+      "message": "I\u0027m not really a fan of using reflection in unit testing, it\u0027s better to modify the class you are testing and add a package private methods annotated with @VisibleForTesting and use those. In this case you could add a package private constructor that has the messageTransformer as an additional parameter.",
+      "range": {
+        "startLine": 57,
+        "startChar": 8,
+        "endLine": 59,
+        "endChar": 42
+      },
+      "revId": "b52a8d9f282302d74d57e227f98e9b98df978b75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
