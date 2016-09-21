@@ -222,20 +222,6 @@
                     <provider>/modules/module[type='netconf-mdsal-notification-mapper'][name='netconf-mdsal-notification-mapper']</provider>
                 </instance>
             </service>
-            <service>
-                <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:notification">prefix:netconf-notification-collector</type>
-                <instance>
-                    <name>netconf-notification-manager</name>
-                    <provider>/modules/module[type='netconf-notification-manager'][name='netconf-notification-manager']</provider>
-                </instance>
-            </service>
-            <service>
-                <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:notification">prefix:netconf-notification-registry</type>
-                <instance>
-                    <name>netconf-notification-manager</name>
-                    <provider>/modules/module[type='netconf-notification-manager'][name='netconf-notification-manager']</provider>
-                </instance>
-            </service>
         </services>
 
     </data>
