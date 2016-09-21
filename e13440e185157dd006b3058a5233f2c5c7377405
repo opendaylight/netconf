@@ -1,0 +1,242 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_120f2be2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:03:51Z",
+      "side": 1,
+      "message": "non-module",
+      "revId": "e13440e185157dd006b3058a5233f2c5c7377405",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_f211cf04",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:03:51Z",
+      "side": 1,
+      "message": "can",
+      "revId": "e13440e185157dd006b3058a5233f2c5c7377405",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_52fc03b8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:03:51Z",
+      "side": 1,
+      "message": "do not report",
+      "revId": "e13440e185157dd006b3058a5233f2c5c7377405",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_9757ad25",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:03:51Z",
+      "side": 1,
+      "message": "Can you please align this to previous line?",
+      "revId": "e13440e185157dd006b3058a5233f2c5c7377405",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_7752d135",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:03:51Z",
+      "side": 1,
+      "message": "This also",
+      "revId": "e13440e185157dd006b3058a5233f2c5c7377405",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_972e8da3",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 485,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:03:51Z",
+      "side": 1,
+      "message": "Can you please align this to previous line?",
+      "revId": "e13440e185157dd006b3058a5233f2c5c7377405",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_72177f45",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/controller/config/yang/md/sal/connector/netconf/NetconfConnectorModule.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:03:51Z",
+      "side": 1,
+      "message": "can you please align this to previous line?",
+      "revId": "e13440e185157dd006b3058a5233f2c5c7377405",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_d285b35a",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/UserPreferences.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:03:51Z",
+      "side": 1,
+      "message": "Override module based capabilities flag set true but module based capabilities list is empty.",
+      "revId": "e13440e185157dd006b3058a5233f2c5c7377405",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_f2f54fed",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/UserPreferences.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:03:51Z",
+      "side": 1,
+      "message": "Override non-module based capabilities set true but non-module based capabilities list is empty.",
+      "revId": "e13440e185157dd006b3058a5233f2c5c7377405",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_b2d6374d",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/UserPreferences.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:03:51Z",
+      "side": 1,
+      "message": "I think moduleBasedCapsOverrided name is more suitable here.",
+      "revId": "e13440e185157dd006b3058a5233f2c5c7377405",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_52c7e395",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/UserPreferences.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:03:51Z",
+      "side": 1,
+      "message": "nonModuleBasedCapsOverrided()",
+      "revId": "e13440e185157dd006b3058a5233f2c5c7377405",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_92bdfb04",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 10
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:03:51Z",
+      "side": 1,
+      "message": "space\n\nthat do not report\n\nplease remove space at the end of the line",
+      "revId": "e13440e185157dd006b3058a5233f2c5c7377405",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_f25a6ff0",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/odl-sal-netconf-connector-cfg.yang",
+        "patchSetId": 10
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:03:51Z",
+      "side": 1,
+      "message": "do not\n\nPlease remove space at the end of the line",
+      "revId": "e13440e185157dd006b3058a5233f2c5c7377405",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_d26133aa",
+        "filename": "netconf/sal-netconf-connector/src/test/resources/schemas/netconf-node-topology.yang",
+        "patchSetId": 10
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-21T12:03:51Z",
+      "side": 1,
+      "message": "space\n\nSorry my bad, this should be \"that do not report\"\n\nPlease remove the space at the end of the line",
+      "revId": "e13440e185157dd006b3058a5233f2c5c7377405",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
