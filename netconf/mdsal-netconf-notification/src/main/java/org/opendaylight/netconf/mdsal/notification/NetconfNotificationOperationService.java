@@ -19,7 +19,7 @@ public class NetconfNotificationOperationService implements NetconfOperationServ
     private final Set<NetconfOperation> netconfOperations;
 
     public NetconfNotificationOperationService(String netconfSessionIdForReporting, NetconfNotificationRegistry netconfNotificationRegistry) {
-        this.netconfOperations = Collections.<NetconfOperation>singleton(new CreateSubscription(netconfSessionIdForReporting, netconfNotificationRegistry));
+        this.netconfOperations = Collections.singleton(new CreateSubscription(netconfSessionIdForReporting, netconfNotificationRegistry));
     }
 
 
