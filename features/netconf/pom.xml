@@ -246,6 +246,10 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>mdsal-notification-mapper</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>mdsal-netconf-monitoring</artifactId>
     </dependency>
     <dependency>
