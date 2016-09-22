@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_46df1ed6",
+        "filename": "netconf/netconf-notifications-api/src/test/java/org/opendaylight/netconf/notifications/NetconfNotificationTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-22T13:50:08Z",
+      "side": 1,
+      "message": "Because, there should be only one element with tag notification namespace (also with Event time). I check it before I take first item.",
+      "parentUuid": "7a6b29fe_cd7cf4ee",
+      "revId": "c6f86c05fa9bb48c6f995daea6e07b577bebdd1e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_ed37304b",
         "filename": "netconf/netconf-notifications-api/src/test/java/org/opendaylight/netconf/notifications/NetconfNotificationTest.java",
         "patchSetId": 2
@@ -98,6 +116,24 @@
       "writtenOn": "2016-09-21T14:31:33Z",
       "side": 1,
       "message": "This whole gregorian calendar thing seems to me like an overkill. Isn\u0027t there something simpler?",
+      "revId": "c6f86c05fa9bb48c6f995daea6e07b577bebdd1e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_06524666",
+        "filename": "netconf/netconf-notifications-api/src/test/java/org/opendaylight/netconf/notifications/NetconfNotificationTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-22T13:50:08Z",
+      "side": 1,
+      "message": "I just wanted avoid of defining date format.",
+      "parentUuid": "7a6b29fe_ed8570cf",
       "revId": "c6f86c05fa9bb48c6f995daea6e07b577bebdd1e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
