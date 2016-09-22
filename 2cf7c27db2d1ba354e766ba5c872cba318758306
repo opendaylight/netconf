@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_fb3c0731",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-22T11:29:23Z",
+      "side": 1,
+      "message": "\u003e Anyway, I think the stackoverflow question you have posted is more concerned about order of modifier of one specific member, not about order of members in class according to their modifiers. I guess it says that you should write public static final boolean CONST not final public static boolean CONSt\n\nAre you saying we should use a different order than the one I\u0027ve proposed here? \nAs I said, I don\u0027t have strong opinion on this, purpose is really to refactor the class\u0027s methods so it\u0027s more tidy.",
+      "parentUuid": "7a6b29fe_58b8a129",
+      "revId": "2cf7c27db2d1ba354e766ba5c872cba318758306",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_38b3254e",
         "filename": "/COMMIT_MSG",
         "patchSetId": 5
@@ -87,6 +105,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_5bc37b37",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-22T11:29:23Z",
+      "side": 1,
+      "message": "I agree.",
+      "parentUuid": "7a6b29fe_38e1652a",
+      "revId": "2cf7c27db2d1ba354e766ba5c872cba318758306",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_18e0e927",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
         "patchSetId": 5
@@ -98,6 +134,24 @@
       "writtenOn": "2016-09-22T07:59:00Z",
       "side": 1,
       "message": "Is there any point in having package private constructor but also protected abstract methods? I mean you cannot extend the class in another package because of constructor.",
+      "revId": "2cf7c27db2d1ba354e766ba5c872cba318758306",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_1bd463ea",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-22T11:29:23Z",
+      "side": 1,
+      "message": "I assume what you meant is the protected abstract methods should just be abstract, no need for them to be protected, as anyway they can\u0027t be more than package private because of the constructor.\n\nIf my understanding is correct, I can submit a new patch set with those changes.",
+      "parentUuid": "7a6b29fe_18e0e927",
       "revId": "2cf7c27db2d1ba354e766ba5c872cba318758306",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
