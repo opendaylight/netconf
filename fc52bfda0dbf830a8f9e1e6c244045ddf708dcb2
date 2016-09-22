@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_780abd8a",
+        "filename": "netconf/netconf-notifications-impl/src/test/java/org/opendaylight/netconf/notifications/impl/osgi/ActivatorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-09-22T08:48:47Z",
+      "side": 1,
+      "message": "Do not use reflection in unit testing, preferably create a package private constructor annotated with @VisibleForTesting that would allow you to set the required fields.",
+      "range": {
+        "startLine": 94,
+        "startChar": 8,
+        "endLine": 96,
+        "endChar": 120
+      },
+      "revId": "fc52bfda0dbf830a8f9e1e6c244045ddf708dcb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
