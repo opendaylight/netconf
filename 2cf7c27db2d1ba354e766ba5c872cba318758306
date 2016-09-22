@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_9bf1936d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-22T11:46:23Z",
+      "side": 1,
+      "message": "No I am not saying nothing about ordering. I just think that SO question you have posted here is about something else than ordering of the members in class. (I think it is about ordering of modifiers of one specific member)",
+      "parentUuid": "7a6b29fe_fb3c0731",
+      "revId": "2cf7c27db2d1ba354e766ba5c872cba318758306",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_38b3254e",
         "filename": "/COMMIT_MSG",
         "patchSetId": 5
@@ -152,6 +170,24 @@
       "side": 1,
       "message": "I assume what you meant is the protected abstract methods should just be abstract, no need for them to be protected, as anyway they can\u0027t be more than package private because of the constructor.\n\nIf my understanding is correct, I can submit a new patch set with those changes.",
       "parentUuid": "7a6b29fe_18e0e927",
+      "revId": "2cf7c27db2d1ba354e766ba5c872cba318758306",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_7bf4775a",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-22T11:46:23Z",
+      "side": 1,
+      "message": "Yes that\u0027s what I\u0027ve meant.",
+      "parentUuid": "7a6b29fe_1bd463ea",
       "revId": "2cf7c27db2d1ba354e766ba5c872cba318758306",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
