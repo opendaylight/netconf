@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_26e02228",
+        "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibServiceImplTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-22T12:43:50Z",
+      "side": 1,
+      "message": "Ok, I refactored it.",
+      "parentUuid": "7a6b29fe_8d4ddcc6",
+      "revId": "6040892cebe0bd518c86faab53d080239694471d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_cd4d149c",
         "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibServiceImplTest.java",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_c6cccebd",
+        "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibServiceImplTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-22T12:43:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_cd4d149c",
+      "revId": "6040892cebe0bd518c86faab53d080239694471d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_4d7aa4bd",
         "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibServiceImplTest.java",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-09-21T14:41:52Z",
       "side": 1,
       "message": "Please wrap this line",
+      "revId": "6040892cebe0bd518c86faab53d080239694471d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_26c78297",
+        "filename": "netconf/yanglib/src/test/java/org/opendaylight/yanglib/impl/YangLibServiceImplTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-09-22T12:43:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_4d7aa4bd",
       "revId": "6040892cebe0bd518c86faab53d080239694471d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
