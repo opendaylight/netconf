@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_5f837ccb",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/restful/utils/PatchDataTransactionUtilTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5761
+      },
+      "writtenOn": "2016-09-22T14:56:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_3f01606a",
+      "revId": "5197009f32f6b23f844af63ecceae49c1cf9a378",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_9250580c",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/restful/utils/PatchDataTransactionUtilTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5761
+      },
+      "writtenOn": "2016-09-22T14:56:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_ff1888d4",
+      "revId": "5197009f32f6b23f844af63ecceae49c1cf9a378",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
