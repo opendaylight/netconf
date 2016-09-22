@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_fb86c7b7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-22T11:51:02Z",
+      "side": 1,
+      "message": "I understand now. Sorry, I\u0027m slow this am. I\u0027m really not a Java expert so I couldn\u0027t tell what\u0027s the best order for methods, based on their modifiers. I was actually hoping for a Java expert\u0027s review :) From what I\u0027ve seen here and there, I think the abstracts method should be listed first. But I really don\u0027t know.",
+      "parentUuid": "7a6b29fe_9bf1936d",
+      "revId": "2cf7c27db2d1ba354e766ba5c872cba318758306",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_38b3254e",
         "filename": "/COMMIT_MSG",
         "patchSetId": 5
@@ -188,6 +206,24 @@
       "side": 1,
       "message": "Yes that\u0027s what I\u0027ve meant.",
       "parentUuid": "7a6b29fe_1bd463ea",
+      "revId": "2cf7c27db2d1ba354e766ba5c872cba318758306",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_3b8ddfd3",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-09-22T11:51:02Z",
+      "side": 1,
+      "message": "Ack, will do that.",
+      "parentUuid": "7a6b29fe_7bf4775a",
       "revId": "2cf7c27db2d1ba354e766ba5c872cba318758306",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
