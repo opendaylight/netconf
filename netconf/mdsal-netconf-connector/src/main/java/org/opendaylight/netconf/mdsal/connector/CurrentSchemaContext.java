@@ -23,10 +23,10 @@ import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 
 public class CurrentSchemaContext implements SchemaContextListener, AutoCloseable {
-    final AtomicReference<SchemaContext> currentContext = new AtomicReference<SchemaContext>();
+    private final AtomicReference<SchemaContext> currentContext = new AtomicReference();
     private final ListenerRegistration<SchemaContextListener> schemaContextListenerListenerRegistration;
-    private final Set<CapabilityListener> listeners1 = Collections.synchronizedSet(Sets.<CapabilityListener>newHashSet());
-    private SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider;
+    private final Set<CapabilityListener> listeners1 = Collections.synchronizedSet(Sets.newHashSet());
+    private final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider;
 
     public SchemaContext getCurrentContext() {
         Preconditions.checkState(currentContext.get() != null, "Current context not received");
@@ -44,7 +44,7 @@ public class CurrentSchemaContext implements SchemaContextListener, AutoCloseabl
         // FIXME is notifying all the listeners from this callback wise ?
         final Set<Capability> addedCaps = MdsalNetconfOperationServiceFactory.transformCapabilities(currentContext.get(), rootSchemaSourceProvider);
         for (final CapabilityListener listener : listeners1) {
-            listener.onCapabilitiesChanged(addedCaps, Collections.<Capability>emptySet());
+            listener.onCapabilitiesChanged(addedCaps, Collections.emptySet());
         }
     }
 
@@ -58,11 +58,6 @@ public class CurrentSchemaContext implements SchemaContextListener, AutoCloseabl
     public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
         listener.onCapabilitiesChanged(MdsalNetconfOperationServiceFactory.transformCapabilities(currentContext.get(), rootSchemaSourceProvider), Collections.<Capability>emptySet());
         listeners1.add(listener);
-        return new AutoCloseable() {
-            @Override
-            public void close() throws Exception {
-                listeners1.remove(listener);
-            }
-        };
+        return () -> listeners1.remove(listener);
     }
 }
