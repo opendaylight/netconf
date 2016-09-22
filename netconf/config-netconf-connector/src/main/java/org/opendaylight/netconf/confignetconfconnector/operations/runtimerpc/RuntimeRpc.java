@@ -38,8 +38,7 @@ public class RuntimeRpc extends AbstractConfigNetconfOperation {
 
     @Override
     public HandlingPriority canHandle(Document message) throws DocumentedException {
-        XmlElement requestElement = null;
-        requestElement = getRequestElementWithCheck(message);
+        XmlElement requestElement = getRequestElementWithCheck(message);
 
         XmlElement operationElement = requestElement.getOnlyChildElement();
         final String netconfOperationName = operationElement.getName();
@@ -102,7 +101,7 @@ public class RuntimeRpc extends AbstractConfigNetconfOperation {
                 execution.getOn(), execution.getAttributes(), result);
 
         if (execution.isVoid()) {
-            return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
+            return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
         } else {
             return getConfigSubsystemFacade().getRpcFacade().toXml(document, result, execution);
         }

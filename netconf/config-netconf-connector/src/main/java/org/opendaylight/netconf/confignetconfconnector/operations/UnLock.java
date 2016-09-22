@@ -41,7 +41,7 @@ public class UnLock extends AbstractLastNetconfOperation {
             // Since candidate datastore instances are allocated per session and not accessible anywhere else, no need to lock
             LOG.debug("Unlocking {} datastore on session: {}", targetDatastore, getNetconfSessionIdForReporting());
             // TODO this should fail if we are not locked
-            return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
+            return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
         }
 
         // Not supported running lock
