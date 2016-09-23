@@ -21,12 +21,12 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.restconf.utils.patch.Draft16JsonToPATCHBodyReader;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
-public class TestDraft11JsonPATCHBodyReader extends Draft11AbstractBodyReaderTest {
+public class TestDraft16JsonPATCHBodyReader extends Draft16AbstractBodyReaderTest {
 
     private final Draft16JsonToPATCHBodyReader jsonPATCHBodyReader;
     private static SchemaContext schemaContext;
 
-    public TestDraft11JsonPATCHBodyReader() throws NoSuchFieldException, SecurityException {
+    public TestDraft16JsonPATCHBodyReader() throws Exception {
         super();
         jsonPATCHBodyReader = new Draft16JsonToPATCHBodyReader();
     }

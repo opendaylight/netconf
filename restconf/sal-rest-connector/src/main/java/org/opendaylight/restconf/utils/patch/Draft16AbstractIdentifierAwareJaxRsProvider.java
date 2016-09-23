@@ -15,6 +15,7 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
+import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 
 public class Draft16AbstractIdentifierAwareJaxRsProvider {
@@ -32,8 +33,10 @@ public class Draft16AbstractIdentifierAwareJaxRsProvider {
     }
 
     protected InstanceIdentifierContext<?> getInstanceIdentifierContext() {
-        return ParserIdentifier.toInstanceIdentifier(getIdentifier(),
-                ControllerContext.getInstance().getGlobalSchema(), Optional.absent());
+        return ParserIdentifier.toInstanceIdentifier(
+                getIdentifier(),
+                ControllerContext.getInstance().getGlobalSchema(),
+                Optional.fromNullable(RestConnectorProvider.getMountPointService()));
     }
 
     protected UriInfo getUriInfo() {
