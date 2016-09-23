@@ -26,7 +26,7 @@ public class TestDraft11JsonPATCHBodyReader extends Draft11AbstractBodyReaderTes
     private final Draft16JsonToPATCHBodyReader jsonPATCHBodyReader;
     private static SchemaContext schemaContext;
 
-    public TestDraft11JsonPATCHBodyReader() throws NoSuchFieldException, SecurityException {
+    public TestDraft11JsonPATCHBodyReader() throws Exception {
         super();
         jsonPATCHBodyReader = new Draft16JsonToPATCHBodyReader();
     }
