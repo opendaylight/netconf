@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_6f3aea99",
+        "filename": "opendaylight/netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-23T16:07:37Z",
+      "side": 1,
+      "message": "Please do not add blank line here. See https://google.github.io/styleguide/javaguide.html#s3.3.3-import-ordering-and-spacing for more details.",
+      "revId": "886fa28ab1259294d31ec4a0324ca365dc5f062a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_0fb8960f",
+        "filename": "opendaylight/netconf/netconf-notifications-impl/src/test/java/org/opendaylight/netconf/notifications/impl/NetconfNotificationManagerTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-23T16:07:37Z",
+      "side": 1,
+      "message": "Please remove this blank line. See https://google.github.io/styleguide/javaguide.html#s3.3.3-import-ordering-and-spacing",
+      "revId": "886fa28ab1259294d31ec4a0324ca365dc5f062a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_6fe02acd",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/schema/mapping/NetconfMessageTransformer.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-23T16:07:37Z",
+      "side": 1,
+      "message": "Can you please add some comments here what is going on? That you are trying to find out if event time contains milliseconds etc.",
+      "revId": "886fa28ab1259294d31ec4a0324ca365dc5f062a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_0fbed6ad",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/schema/mapping/NetconfMessageTransformer.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-23T16:07:37Z",
+      "side": 1,
+      "message": "Can you please wrap this line? Lines should be at most 120 characters long.",
+      "revId": "886fa28ab1259294d31ec4a0324ca365dc5f062a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
