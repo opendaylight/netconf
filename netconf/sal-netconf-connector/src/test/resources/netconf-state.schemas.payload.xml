@@ -112,13 +112,6 @@
         <ncm:version>2013-07-12</ncm:version>
     </ncm:schema>
     <ncm:schema>
-        <ncm:namespace>urn:opendaylight:params:xml:ns:yang:controller:threadpool:impl:fixed</ncm:namespace>
-        <ncm:location>NETCONF</ncm:location>
-        <ncm:identifier>threadpool-impl-fixed</ncm:identifier>
-                <ncm:format xmlns:prefix="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">prefix:yang</ncm:format>
-        <ncm:version>2013-12-01</ncm:version>
-    </ncm:schema>
-    <ncm:schema>
         <ncm:namespace>urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding:impl</ncm:namespace>
         <ncm:location>NETCONF</ncm:location>
         <ncm:identifier>opendaylight-sal-binding-broker-impl</ncm:identifier>
