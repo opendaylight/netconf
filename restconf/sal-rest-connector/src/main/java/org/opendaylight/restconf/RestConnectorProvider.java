@@ -59,6 +59,7 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
     private ListenerRegistration<SchemaContextListener> listenerRegistration;
     private static TransactionChainHandler transactionChainHandler;
     private static DOMDataBroker dataBroker;
+    private static DOMMountPointServiceHandler mountPointServiceHandler;
 
     @Override
     public void onSessionInitiated(final ProviderSession session) {
@@ -69,7 +70,7 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         final SchemaContextHandler schemaCtxHandler = new SchemaContextHandler();
         this.listenerRegistration = schemaService.registerSchemaContextListener(schemaCtxHandler);
 
-        final DOMMountPointServiceHandler domMountPointServiceHandler = new DOMMountPointServiceHandler(
+        RestConnectorProvider.mountPointServiceHandler = new DOMMountPointServiceHandler(
                 session.getService(DOMMountPointService.class));
 
         RestConnectorProvider.dataBroker = session.getService(DOMDataBroker.class);
@@ -81,7 +82,7 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         final DOMRpcService rpcService = session.getService(DOMRpcService.class);
         final RpcServiceHandler rpcServiceHandler = new RpcServiceHandler(rpcService);
 
-        wrapperServices.setHandlers(schemaCtxHandler, domMountPointServiceHandler,
+        wrapperServices.setHandlers(schemaCtxHandler, RestConnectorProvider.mountPointServiceHandler,
                 RestConnectorProvider.transactionChainHandler, brokerHandler, rpcServiceHandler);
     }
 
@@ -98,6 +99,14 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
                 Preconditions.checkNotNull(RestConnectorProvider.dataBroker).createTransactionChain(
                         RestConnectorProvider.transactionListener)
         );
+    }
+
+    /**
+     * Get current {@link DOMMountPointService} from {@link DOMMountPointServiceHandler}.
+     * @return {@link DOMMountPointService}
+     */
+    public static DOMMountPointService getMountPointService() {
+        return RestConnectorProvider.mountPointServiceHandler.get();
     }
 
     @Override
