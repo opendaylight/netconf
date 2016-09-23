@@ -58,7 +58,6 @@
         <capability>urn:opendaylight:params:xml:ns:yang:controller:clustered:netconf:topology?module=clustered-netconf-topology&amp;revision=2015-11-04</capability>
         <capability>urn:opendaylight:params:xml:ns:yang:controller:md:sal:clustering:entity-owners?module=entity-owners&amp;revision=2015-08-04</capability>
         <capability>urn:opendaylight:params:xml:ns:yang:controller:md:sal:common?module=opendaylight-md-sal-common&amp;revision=2013-10-28</capability>
-        <capability>urn:opendaylight:params:xml:ns:yang:controller:threadpool:impl:fixed?module=threadpool-impl-fixed&amp;revision=2013-12-01</capability>
         <capability>urn:opendaylight:params:xml:ns:yang:controller:config:actor-system-provider:service?module=actor-system-provider-service&amp;revision=2015-10-05</capability>
         <capability>urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf?module=odl-sal-netconf-connector-cfg&amp;revision=2015-08-03</capability>
         <capability>urn:opendaylight:netconf-node-topology?module=netconf-node-topology&amp;revision=2015-01-14</capability>
