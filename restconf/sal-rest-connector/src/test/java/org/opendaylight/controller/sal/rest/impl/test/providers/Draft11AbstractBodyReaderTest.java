@@ -19,11 +19,16 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
+import org.opendaylight.restconf.RestConnectorProvider;
+import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.utils.patch.Draft16AbstractIdentifierAwareJaxRsProvider;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
@@ -33,9 +38,14 @@ public abstract class Draft11AbstractBodyReaderTest {
     protected final MediaType mediaType;
     private static Field uriField;
     private static Field requestField;
+    private static Field mountPointServiceHandlerField;
 
-    public Draft11AbstractBodyReaderTest() throws NoSuchFieldException,
-            SecurityException {
+    @Mock
+    private  DOMMountPointServiceHandler mountPointServiceHandler;
+
+    Draft11AbstractBodyReaderTest() throws Exception {
+        MockitoAnnotations.initMocks(this);
+
         uriField = Draft16AbstractIdentifierAwareJaxRsProvider.class
                 .getDeclaredField("uriInfo");
         uriField.setAccessible(true);
@@ -43,6 +53,10 @@ public abstract class Draft11AbstractBodyReaderTest {
                 .getDeclaredField("request");
         requestField.setAccessible(true);
         mediaType = getMediaType();
+        mountPointServiceHandlerField = RestConnectorProvider.class.getDeclaredField("mountPointServiceHandler");
+        mountPointServiceHandlerField.setAccessible(true);
+        mountPointServiceHandlerField.set(RestConnectorProvider.class, mountPointServiceHandler);
+        when(mountPointServiceHandler.get()).thenReturn(mock(DOMMountPointService.class));
     }
 
     protected abstract MediaType getMediaType();

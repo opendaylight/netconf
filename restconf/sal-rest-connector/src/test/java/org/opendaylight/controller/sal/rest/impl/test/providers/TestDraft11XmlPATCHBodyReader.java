@@ -25,7 +25,7 @@ public class TestDraft11XmlPATCHBodyReader extends Draft11AbstractBodyReaderTest
     private final Draft16XmlToPATCHBodyReader xmlPATCHBodyReader;
     private static SchemaContext schemaContext;
 
-    public TestDraft11XmlPATCHBodyReader() throws NoSuchFieldException, SecurityException {
+    public TestDraft11XmlPATCHBodyReader() throws Exception {
         super();
         xmlPATCHBodyReader = new Draft16XmlToPATCHBodyReader();
     }
