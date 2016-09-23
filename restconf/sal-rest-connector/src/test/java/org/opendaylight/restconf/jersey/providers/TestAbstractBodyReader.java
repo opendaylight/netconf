@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.sal.rest.impl.test.providers;
+package org.opendaylight.restconf.jersey.providers;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -24,25 +24,34 @@ import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
-import org.opendaylight.restconf.jersey.providers.AbstractIdentifierAwareJaxRsProvider;
+import org.opendaylight.restconf.RestConnectorProvider;
+import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
-public abstract class Draft17AbstractBodyReaderTest {
+abstract class TestAbstractBodyReader {
 
     protected final static ControllerContext controllerContext = ControllerContext.getInstance();
     protected final MediaType mediaType;
     private static Field uriField;
     private static Field requestField;
+    protected final static DOMMountPointServiceHandler mountPointServiceHandler = mock(
+            DOMMountPointServiceHandler.class);
 
-    public Draft17AbstractBodyReaderTest() throws NoSuchFieldException,
-            SecurityException {
+    TestAbstractBodyReader() throws NoSuchFieldException, IllegalAccessException {
         uriField = AbstractIdentifierAwareJaxRsProvider.class
                 .getDeclaredField("uriInfo");
         uriField.setAccessible(true);
+
         requestField = AbstractIdentifierAwareJaxRsProvider.class
                 .getDeclaredField("request");
         requestField.setAccessible(true);
+
         mediaType = getMediaType();
+
+        final Field mountPointServiceHandlerField = RestConnectorProvider.class.
+                getDeclaredField("mountPointServiceHandler");
+        mountPointServiceHandlerField.setAccessible(true);
+        mountPointServiceHandlerField.set(RestConnectorProvider.class, mountPointServiceHandler);
     }
 
     protected abstract MediaType getMediaType();
@@ -78,12 +87,6 @@ public abstract class Draft17AbstractBodyReaderTest {
         requestField.set(normalizedNodeProvider, request);
     }
 
-    protected static void checkMountPointNormalizedNodeContext(
-            final NormalizedNodeContext nnContext) {
-        checkNormalizedNodeContext(nnContext);
-        assertNotNull(nnContext.getInstanceIdentifierContext().getMountPoint());
-    }
-
     protected static void checkNormalizedNodeContext(
             final NormalizedNodeContext nnContext) {
         assertNotNull(nnContext.getData());
@@ -99,5 +102,11 @@ public abstract class Draft17AbstractBodyReaderTest {
         assertNotNull(patchContext.getInstanceIdentifierContext().getInstanceIdentifier());
         assertNotNull(patchContext.getInstanceIdentifierContext().getSchemaContext());
         assertNotNull(patchContext.getInstanceIdentifierContext().getSchemaNode());
+    }
+
+    protected static void checkPATCHContextMountPoint(final PATCHContext patchContext) {
+        checkPATCHContext(patchContext);
+        assertNotNull(patchContext.getInstanceIdentifierContext().getMountPoint());
+        assertNotNull(patchContext.getInstanceIdentifierContext().getMountPoint().getSchemaContext());
     }
 }
