@@ -11,7 +11,9 @@ package org.opendaylight.restconf.restful.services.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -31,6 +33,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
@@ -91,6 +94,10 @@ public class RestconfDataServiceImplTest {
     private DOMMountPointServiceHandler mountPointServiceHandler;
     @Mock
     private DOMMountPointService mountPointService;
+    @Mock
+    private DOMMountPoint mountPoint;
+    @Mock
+    private DOMDataBroker domDataBroker;
 
     @Before
     public void setUp() throws Exception {
@@ -138,6 +145,8 @@ public class RestconfDataServiceImplTest {
         doReturn(readWrite).when(domTransactionChain).newReadWriteTransaction();
         doReturn(write).when(domTransactionChain).newWriteOnlyTransaction();
         doReturn(mountPointService).when(mountPointServiceHandler).get();
+        doReturn(Optional.of(domDataBroker)).when(mountPoint).getService(DOMDataBroker.class);
+        doReturn(domTransactionChain).when(domDataBroker).createTransactionChain(any(TransactionChainListener.class));
     }
 
     @Test
@@ -269,6 +278,35 @@ public class RestconfDataServiceImplTest {
         assertTrue(status.isOk());
         assertEquals(3, status.getEditCollection().size());
         assertEquals("replace data", status.getEditCollection().get(1).getEditId());
+    }
+
+    @Test
+    public void testPatchDataMountPoint() throws Exception {
+        final InstanceIdentifierContext<? extends SchemaNode> iidContext = new InstanceIdentifierContext<>(
+                iidBase, schemaNode, mountPoint, contextRef.get());
+        final List<PATCHEntity> entity = new ArrayList<>();
+        final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
+                .node(containerQname)
+                .node(leafQname)
+                .build();
+        entity.add(new PATCHEntity("create data", "CREATE", iidBase, buildBaseCont));
+        entity.add(new PATCHEntity("replace data", "REPLACE", iidBase, buildBaseContToReplace));
+        entity.add(new PATCHEntity("delete data", "DELETE", iidleaf));
+        final PATCHContext patch = new PATCHContext(iidContext, entity, "test patch id");
+
+        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseCont))).when(read)
+                .read(LogicalDatastoreType.CONFIGURATION, iidBase);
+        doNothing().when(write).put(LogicalDatastoreType.CONFIGURATION, iidBase, buildBaseCont);
+        doReturn(Futures.immediateCheckedFuture(null)).when(write).submit();
+        doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidleaf);
+        doReturn(Futures.immediateCheckedFuture(null)).when(readWrite).submit();
+        doReturn(Futures.immediateCheckedFuture(false)).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidBase);
+        doReturn(Futures.immediateCheckedFuture(true)).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
+
+        final PATCHStatusContext status = dataService.patchData(patch, uriInfo);
+        assertTrue(status.isOk());
+        assertEquals(3, status.getEditCollection().size());
+        assertNull(status.getGlobalErrors());
     }
 
     @Test
