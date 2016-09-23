@@ -11,6 +11,7 @@ package org.opendaylight.restconf.restful.services.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -346,6 +347,35 @@ public class RestconfDataServiceImplTest {
         assertTrue(status.isOk());
         assertEquals(3, status.getEditCollection().size());
         assertEquals("replace data", status.getEditCollection().get(1).getEditId());
+    }
+
+    @Test
+    public void testPatchDataMountPoint() throws Exception {
+        final InstanceIdentifierContext<? extends SchemaNode> iidContext = new InstanceIdentifierContext<>(
+                iidBase, schemaNode, mountPoint, contextRef.get());
+        final List<PATCHEntity> entity = new ArrayList<>();
+        final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
+                .node(containerPlayerQname)
+                .node(leafQname)
+                .build();
+        entity.add(new PATCHEntity("create data", "CREATE", iidBase, buildBaseCont));
+        entity.add(new PATCHEntity("replace data", "REPLACE", iidBase, buildBaseCont));
+        entity.add(new PATCHEntity("delete data", "DELETE", iidleaf));
+        final PATCHContext patch = new PATCHContext(iidContext, entity, "test patch id");
+
+        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseCont))).when(read)
+                .read(LogicalDatastoreType.CONFIGURATION, iidBase);
+        doNothing().when(write).put(LogicalDatastoreType.CONFIGURATION, iidBase, buildBaseCont);
+        doReturn(Futures.immediateCheckedFuture(null)).when(write).submit();
+        doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidleaf);
+        doReturn(Futures.immediateCheckedFuture(null)).when(readWrite).submit();
+        doReturn(Futures.immediateCheckedFuture(false)).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidBase);
+        doReturn(Futures.immediateCheckedFuture(true)).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
+
+        final PATCHStatusContext status = dataService.patchData(patch, uriInfo);
+        assertTrue(status.isOk());
+        assertEquals(3, status.getEditCollection().size());
+        assertNull(status.getGlobalErrors());
     }
 
     @Test
