@@ -194,4 +194,48 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
         assertEquals(dataNodeIdent, nnContext.getInstanceIdentifierContext().getInstanceIdentifier());
         assertNotNull(NormalizedNodes.findNode(nnContext.getData(), dataNodeIdent));
     }
+
+    /**
+     * Test when container with the same name is placed in two modules (foo-module and bar-module). Namespace must be
+     * used to distinguish between them to find correct one. Check if container was found not only according to its name
+     * but also by correct namespace used in payload.
+     */
+    @Test
+    public void findFooContainerUsingNamespaceTest() throws Exception {
+        mockBodyReader("", xmlBodyReader, true);
+        final InputStream inputStream = TestXmlBodyReader.class
+                .getResourceAsStream("/instanceidentifier/xml/xmlDataFindFooContainer.xml");
+        final NormalizedNodeContext returnValue = xmlBodyReader
+                .readFrom(null, null, null, mediaType, null, inputStream);
+
+        // check return value
+        checkNormalizedNodeContext(returnValue);
+        // check if container was found both according to its name and namespace
+        assertEquals("Not correct container found, name was ignored",
+                "foo-bar-container", returnValue.getData().getNodeType().getLocalName());
+        assertEquals("Not correct container found, namespace was ignored",
+                "foo:module", returnValue.getData().getNodeType().getNamespace().toString());
+    }
+
+    /**
+     * Test when container with the same name is placed in two modules (foo-module and bar-module). Namespace must be
+     * used to distinguish between them to find correct one. Check if container was found not only according to its name
+     * but also by correct namespace used in payload.
+     */
+    @Test
+    public void findBarContainerUsingNamespaceTest() throws Exception {
+        mockBodyReader("", xmlBodyReader, true);
+        final InputStream inputStream = TestXmlBodyReader.class
+                .getResourceAsStream("/instanceidentifier/xml/xmlDataFindBarContainer.xml");
+        final NormalizedNodeContext returnValue = xmlBodyReader
+                .readFrom(null, null, null, mediaType, null, inputStream);
+
+        // check return value
+        checkNormalizedNodeContext(returnValue);
+        // check if container was found both according to its name and namespace
+        assertEquals("Not correct container found, name was ignored",
+                "foo-bar-container", returnValue.getData().getNodeType().getLocalName());
+        assertEquals("Not correct container found, namespace was ignored",
+                "bar:module", returnValue.getData().getNodeType().getNamespace().toString());
+    }
 }
