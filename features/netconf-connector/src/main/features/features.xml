@@ -41,12 +41,14 @@
         <bundle>mvn:org.opendaylight.netconf/abstract-topology/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.netconf/sal-netconf-connector/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.netconf/netconf-config-dispatcher/{{VERSION}}</bundle>
+        <configfile finalname='${config.configfile.directory}/${config.netconf.topology.configfile}'>
+            mvn:org.opendaylight.netconf/netconf-topology-config/{{VERSION}}/xml/config
+        </configfile>
         <configfile finalname='${config.configfile.directory}/${config.netconf.client.configfile}'>mvn:org.opendaylight.netconf/netconf-config/{{VERSION}}/xml/config</configfile>
     </feature>
 
     <feature name='odl-netconf-connector-ssh' version='${project.version}' description="OpenDaylight :: Netconf Connector :: Netconf Connector + Netconf SSH Server + loopback connection configuration">
-        <feature version='${project.version}'>odl-netconf-ssh</feature>
-        <feature version='${project.version}'>odl-netconf-connector</feature>
+        <feature version='${project.version}'>odl-netconf-topology</feature>
         <configfile finalname="${config.configfile.directory}/${config.netconf.connector.configfile}">mvn:org.opendaylight.netconf/netconf-connector-config/{{VERSION}}/xml/config</configfile>
     </feature>
 
