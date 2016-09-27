@@ -132,10 +132,11 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
         } else if (schemaNodeContext instanceof DataSchemaNode) {
             schemaNode = (DataSchemaNode) schemaNodeContext;
         } else {
-            throw new IllegalStateException("Unknow SchemaNode");
+            throw new IllegalStateException("Unknown SchemaNode");
         }
 
         final String docRootElm = doc.getDocumentElement().getLocalName();
+        final String docRootNamespace = doc.getDocumentElement().getNamespaceURI();
         final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
         InstanceIdentifierContext<? extends SchemaNode> outIIContext;
 
@@ -145,7 +146,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
                 DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, pathContext.getSchemaContext());
 
         if (isPost() && !isRpc) {
-            final Deque<Object> foundSchemaNodes = findPathToSchemaNodeByName(schemaNode, docRootElm);
+            final Deque<Object> foundSchemaNodes = findPathToSchemaNodeByName(schemaNode, docRootElm, docRootNamespace);
             if (foundSchemaNodes.isEmpty()) {
                 throw new IllegalStateException(String.format("Child \"%s\" was not found in parent schema node \"%s\"",
                         docRootElm, schemaNode.getQName()));
@@ -164,7 +165,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
 
         NormalizedNode<?, ?> parsed = null;
 
-        if(schemaNode instanceof ContainerSchemaNode) {
+        if (schemaNode instanceof ContainerSchemaNode) {
             parsed = parserFactory.getContainerNodeParser().parse(Collections.singletonList(doc.getDocumentElement()), (ContainerSchemaNode) schemaNode);
         } else if(schemaNode instanceof ListSchemaNode) {
             final ListSchemaNode casted = (ListSchemaNode) schemaNode;
@@ -184,28 +185,35 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
         return new NormalizedNodeContext(outIIContext, parsed);
     }
 
-    private static Deque<Object> findPathToSchemaNodeByName(final DataSchemaNode schemaNode, final String elementName) {
+    private static Deque<Object> findPathToSchemaNodeByName(final DataSchemaNode schemaNode, final String elementName,
+                                                            final String namespace) {
         final Deque<Object> result = new ArrayDeque<>();
         final ArrayList<ChoiceSchemaNode> choiceSchemaNodes = new ArrayList<>();
         final Collection<DataSchemaNode> children = ((DataNodeContainer) schemaNode).getChildNodes();
         for (final DataSchemaNode child : children) {
             if (child instanceof ChoiceSchemaNode) {
                 choiceSchemaNodes.add((ChoiceSchemaNode) child);
-            } else if (child.getQName().getLocalName().equalsIgnoreCase(elementName)) {
+            } else if (child.getQName().getLocalName().equalsIgnoreCase(elementName)
+                    && child.getQName().getNamespace().toString().equalsIgnoreCase(namespace)) {
+                // add child to result
                 result.push(child);
+
+                // find augmentation
                 if (child.isAugmenting()) {
                     final AugmentationSchema augment = findCorrespondingAugment(schemaNode, child);
                     if (augment != null) {
                         result.push(augment);
                     }
                 }
+
+                // return result
                 return result;
             }
         }
 
         for (final ChoiceSchemaNode choiceNode : choiceSchemaNodes) {
             for (final ChoiceCaseNode caseNode : choiceNode.getCases()) {
-                final Deque<Object> resultFromRecursion = findPathToSchemaNodeByName(caseNode, elementName);
+                final Deque<Object> resultFromRecursion = findPathToSchemaNodeByName(caseNode, elementName, namespace);
                 if (!resultFromRecursion.isEmpty()) {
                     resultFromRecursion.push(choiceNode);
                     if (choiceNode.isAugmenting()) {
