@@ -41,6 +41,9 @@
         <bundle>mvn:org.opendaylight.netconf/abstract-topology/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.netconf/sal-netconf-connector/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.netconf/netconf-config-dispatcher/{{VERSION}}</bundle>
+        <configfile finalname='${config.configfile.directory}/${config.netconf.topology.configfile}'>
+            mvn:org.opendaylight.netconf/netconf-topology-config/{{VERSION}}/xml/config
+        </configfile>
         <configfile finalname='${config.configfile.directory}/${config.netconf.client.configfile}'>mvn:org.opendaylight.netconf/netconf-config/{{VERSION}}/xml/config</configfile>
     </feature>
 
