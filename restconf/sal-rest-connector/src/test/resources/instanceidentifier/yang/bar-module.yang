@@ -1,0 +1,11 @@
+module bar-module {
+  namespace "bar:module";
+
+  prefix "bar-module";
+    revision 2016-09-29 {
+  }
+
+  /* This container has the same name as container in foo-module */
+  container foo-bar-container {
+  }
+}
