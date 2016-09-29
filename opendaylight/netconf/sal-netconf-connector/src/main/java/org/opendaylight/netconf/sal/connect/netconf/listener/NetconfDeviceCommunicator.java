@@ -20,6 +20,7 @@ import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.opendaylight.controller.config.util.xml.XmlElement;
@@ -59,6 +60,15 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
     private Future<?> initFuture;
     private SettableFuture<NetconfDeviceCapabilities> firstConnectionFuture;
+
+    // isSessionClosing indicates a close operation on the session is issued and
+    // tearDown will surely be called later to finish the close.
+    // Used to allow only one thread to enter tearDown and other threads should
+    // NOT enter it simultaneously and should end its close operation without
+    // calling tearDown to release the locks they hold to avoid deadlock.
+    private volatile AtomicBoolean isSessionClosing = new AtomicBoolean(false);
+
+    public Boolean isSessionClosing() { return isSessionClosing.get(); }
 
     public NetconfDeviceCommunicator(final RemoteDeviceId id, final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice,
             final UserPreferences NetconfSessionPreferences) {
@@ -143,12 +153,15 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     }
 
     public void disconnect() {
-        if(session != null) {
+        // If session is already in closing, no need to close it again
+        if(session != null && isSessionClosing.compareAndSet(false, true)) {
             session.close();
         }
     }
 
     private void tearDown( String reason ) {
+        if (!isSessionClosing())
+            LOG.warn("It's curious that no one to close the session but tearDown is called!");
         LOG.debug("Tearing down {}", reason);
         List<UncancellableFuture<RpcResult<NetconfMessage>>> futuresToCancel = Lists.newArrayList();
         sessionLock.lock();
@@ -188,6 +201,8 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                 future.set( createErrorRpcResult( RpcError.ErrorType.TRANSPORT, reason ) );
             }
         }
+
+        isSessionClosing.set(false);
     }
 
     private RpcResult<NetconfMessage> createSessionDownRpcResult() {
@@ -202,12 +217,16 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
     @Override
     public void onSessionDown(final NetconfClientSession session, final Exception e) {
-        LOG.warn("{}: Session went down", id, e);
-        tearDown( null );
+        // If session is already in closing, no need to call tearDown again.
+        if (isSessionClosing.compareAndSet(false, true)) {
+            LOG.warn("{}: Session went down", id, e);
+            tearDown( null );
+        }
     }
 
     @Override
     public void onSessionTerminated(final NetconfClientSession session, final NetconfTerminationReason reason) {
+        // onSessionTerminated is called directly by disconnect, no need to compare and set isSessionClosing.
         LOG.warn("{}: Session terminated {}", id, reason);
         tearDown( reason.getErrorMessage() );
     }
