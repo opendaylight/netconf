@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_149262f5",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-29T08:42:51Z",
+      "side": 1,
+      "message": "If it is possible, I think you should use enhanced for statement.",
+      "revId": "5e8f967fa44a46e330df2b1912cb1458650a7f18",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_7443d612",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-29T08:42:51Z",
+      "side": 1,
+      "message": "I don\u0027t see the point in doing this transformation twice. If there is a reason, comment here would be really useful.",
+      "revId": "5e8f967fa44a46e330df2b1912cb1458650a7f18",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_148f0276",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-29T08:42:51Z",
+      "side": 1,
+      "message": "Documentation for this method is now outdated.",
+      "revId": "5e8f967fa44a46e330df2b1912cb1458650a7f18",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_d4c62a99",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/Get.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-29T08:42:51Z",
+      "side": 1,
+      "message": "It\u0027s not Optional anymore so maybe you should also change variable name",
+      "revId": "5e8f967fa44a46e330df2b1912cb1458650a7f18",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_14bd4202",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/Get.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-29T08:42:51Z",
+      "side": 1,
+      "message": "Name element can be confusing here",
+      "revId": "5e8f967fa44a46e330df2b1912cb1458650a7f18",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_1a61ebd2",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/GetConfig.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-29T08:42:51Z",
+      "side": 1,
+      "message": "Please, indent this comment properly. Review comments from Get apply also to this class.",
+      "revId": "5e8f967fa44a46e330df2b1912cb1458650a7f18",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
