@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_b510c84e",
+        "filename": "netconf/netconf-notifications-api/src/test/java/org/opendaylight/netconf/notifications/NetconfNotificationTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-09-29T12:26:36Z",
+      "side": 1,
+      "message": "just Exception",
+      "revId": "80ad335b006e6ad24a01b6668997622e4e85223f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
