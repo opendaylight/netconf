@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_5aa403b9",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-09-29T09:38:46Z",
+      "side": 1,
+      "message": "Do not keep the method body inline with the declaration, please split this up this violates our style guidelines.",
+      "range": {
+        "startLine": 71,
+        "startChar": 4,
+        "endLine": 71,
+        "endChar": 72
+      },
+      "revId": "46aadefe457fc4c575e581616cfd1c9207811d02",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_da749369",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-09-29T09:38:46Z",
+      "side": 1,
+      "message": "Do not use the shorthand if type, our coding guidelines state that you should use brackets even when there\u0027s one line inside the condition.",
+      "range": {
+        "startLine": 163,
+        "startChar": 8,
+        "endLine": 164,
+        "endChar": 94
+      },
+      "revId": "46aadefe457fc4c575e581616cfd1c9207811d02",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
