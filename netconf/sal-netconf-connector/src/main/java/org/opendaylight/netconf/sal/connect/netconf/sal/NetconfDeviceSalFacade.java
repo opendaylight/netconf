@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import java.util.List;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
@@ -34,6 +35,14 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
     public NetconfDeviceSalFacade(final RemoteDeviceId id, final Broker domBroker, final BindingAwareBroker bindingBroker) {
         this.id = id;
         this.salProvider = new NetconfDeviceSalProvider(id);
+        registerToSal(domBroker, bindingBroker);
+    }
+
+    @VisibleForTesting
+    NetconfDeviceSalFacade(final RemoteDeviceId id, NetconfDeviceSalProvider salProvider,
+                           final Broker domBroker, final BindingAwareBroker bindingBroker) {
+        this.id = id;
+        this.salProvider = salProvider;
         registerToSal(domBroker, bindingBroker);
     }
 

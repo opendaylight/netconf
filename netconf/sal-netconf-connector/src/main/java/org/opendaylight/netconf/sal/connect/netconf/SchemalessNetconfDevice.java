@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
@@ -34,6 +35,16 @@ public class SchemalessNetconfDevice implements
         final MessageCounter counter = new MessageCounter();
         rpcTransformer = new BaseRpcSchemalessTransformer(counter);
         messageTransformer = new SchemalessMessageTransformer(counter);
+    }
+
+    @VisibleForTesting
+    SchemalessNetconfDevice(final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
+                            final SchemalessMessageTransformer messageTransformer) {
+        this.id = id;
+        this.salFacade = salFacade;
+        final MessageCounter counter = new MessageCounter();
+        rpcTransformer = new BaseRpcSchemalessTransformer(counter);
+        this.messageTransformer = messageTransformer;
     }
 
     @Override public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
