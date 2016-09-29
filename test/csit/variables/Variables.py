@@ -174,7 +174,6 @@ NEUTRON_NETWORKS_API = NEUTRON_NB_API + '/' + 'networks'
 NEUTRON_PORTS_API = NEUTRON_NB_API + '/' + 'ports'
 NEUTRON_ROUTERS_API = NEUTRON_NB_API + '/' + 'routers'
 OSREST = '/v2.0/networks'
-KARAF_HOME = '${WORKSPACE}${/}${BUNDLEFOLDER}'
 
 # Openstack System Prompt
 OS_SYSTEM_PROMPT = '$'
