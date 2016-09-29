@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_1a572b27",
+        "filename": "netconf/netconf-console/src/test/java/org/opendaylight/netconf/console/commands/NetconfCommandsImplCallsTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-09-29T12:00:09Z",
+      "side": 1,
+      "message": "I would create a package private constructor annotated with @VisibleForTesting for all these reflection usages.",
+      "range": {
+        "startLine": 70,
+        "startChar": 7,
+        "endLine": 72,
+        "endChar": 59
+      },
+      "revId": "970c0d412ccbecd02dc4aeec48af184abf883f6f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
