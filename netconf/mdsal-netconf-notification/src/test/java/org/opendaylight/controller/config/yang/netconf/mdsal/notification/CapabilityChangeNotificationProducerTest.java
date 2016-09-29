@@ -57,7 +57,8 @@ public class CapabilityChangeNotificationProducerTest {
         Capabilities newCapabilities = new CapabilitiesBuilder().setCapability(newCapabilitiesList).build();
         Map<InstanceIdentifier<?>, DataObject> createdData = Maps.newHashMap();
         createdData.put(capabilitiesIdentifier, newCapabilities);
-        verifyDataTreeChange(null, newCapabilities, changedCapabilitesFrom(newCapabilitiesList, Collections.<Uri>emptyList()));
+        verifyDataTreeChange(DataObjectModification.ModificationType.WRITE, null, newCapabilities,
+                changedCapabilitesFrom(newCapabilitiesList, Collections.<Uri>emptyList()));
     }
 
     @Test
@@ -66,16 +67,27 @@ public class CapabilityChangeNotificationProducerTest {
         final List<Uri> updatedCapabilitiesList = Lists.newArrayList(new Uri("originalCapability"), new Uri("newCapability"));
         Capabilities originalCapabilities = new CapabilitiesBuilder().setCapability(originalCapabilitiesList).build();
         Capabilities updatedCapabilities = new CapabilitiesBuilder().setCapability(updatedCapabilitiesList).build();
-        verifyDataTreeChange(originalCapabilities, updatedCapabilities, changedCapabilitesFrom(
+        verifyDataTreeChange(DataObjectModification.ModificationType.WRITE, originalCapabilities, updatedCapabilities, changedCapabilitesFrom(
                 Lists.newArrayList(new Uri("newCapability")), Lists.newArrayList(new Uri("anotherOriginalCapability"))));
     }
 
+    @Test
+    public void testOnDataChangedDelete() {
+        final List<Uri> originalCapabilitiesList = Lists.newArrayList(new Uri("originalCapability"),
+                new Uri("anotherOriginalCapability"));
+        final Capabilities originalCapabilities =
+                new CapabilitiesBuilder().setCapability(originalCapabilitiesList).build();
+        verifyDataTreeChange(DataObjectModification.ModificationType.DELETE, originalCapabilities, null,
+                changedCapabilitesFrom(Collections.emptyList(), originalCapabilitiesList));
+    }
+
     @SuppressWarnings("unchecked")
-    private void verifyDataTreeChange(Capabilities originalCapabilities, Capabilities updatedCapabilities,
+    private void verifyDataTreeChange(final DataObjectModification.ModificationType modificationType,
+                                      Capabilities originalCapabilities, Capabilities updatedCapabilities,
                                       NetconfCapabilityChange expectedChange) {
         final DataTreeModification<Capabilities> treeChange2 = mock(DataTreeModification.class);
         final DataObjectModification<Capabilities> objectChange2 = mock(DataObjectModification.class);
-        doReturn(DataObjectModification.ModificationType.WRITE).when(objectChange2).getModificationType();
+        doReturn(modificationType).when(objectChange2).getModificationType();
         doReturn(objectChange2).when(treeChange2).getRootNode();
         doReturn(originalCapabilities).when(objectChange2).getDataBefore();
         doReturn(updatedCapabilities).when(objectChange2).getDataAfter();
