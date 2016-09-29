@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_da6f7329",
+        "filename": "features/netconf-connector/src/main/features/features.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-09-29T11:28:25Z",
+      "side": 1,
+      "message": "I think that all the netconf-connector dependencies used by odl-netconf-topology and odl-netconf-clustered-topology should be split out, since both of them use this feature. If you just put the config file here, both would try to start netconf-topology, even the clustered topology would start the regular nonclustered one and that would have broken behaviour, since both of them operate on the same list.",
+      "range": {
+        "startLine": 44,
+        "startChar": 8,
+        "endLine": 46,
+        "endChar": 21
+      },
+      "revId": "b171d9ddadc3459860eb015067df625fd0b7d90a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_fa706f09",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/controller/config/yang/md/sal/connector/netconf/NetconfConnectorModule.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-09-29T11:28:25Z",
+      "side": 1,
+      "message": "debug should be fine here.",
+      "range": {
+        "startLine": 108,
+        "startChar": 20,
+        "endLine": 108,
+        "endChar": 24
+      },
+      "revId": "b171d9ddadc3459860eb015067df625fd0b7d90a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_3a666751",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/controller/config/yang/md/sal/connector/netconf/NetconfConnectorModule.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-09-29T11:28:25Z",
+      "side": 1,
+      "message": "same here",
+      "range": {
+        "startLine": 126,
+        "startChar": 24,
+        "endLine": 126,
+        "endChar": 28
+      },
+      "revId": "b171d9ddadc3459860eb015067df625fd0b7d90a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
