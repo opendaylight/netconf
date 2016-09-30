@@ -23,7 +23,6 @@ import io.netty.channel.local.LocalAddress;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.HashedWheelTimer;
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.BindException;
@@ -56,6 +55,7 @@ import org.opendaylight.netconf.monitoring.osgi.NetconfMonitoringOperationServic
 import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfiguration;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
+import org.opendaylight.netconf.test.tool.customrpc.SettableOperationProvider;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -102,9 +102,9 @@ public class NetconfDeviceSimulator implements Closeable {
         this.nioExecutor = nioExecutor;
     }
 
-    private NetconfServerDispatcherImpl createDispatcher(final Set<Capability> capabilities, final boolean exi, final int generateConfigsTimeout,
-                                                         final Optional<File> notificationsFile, final boolean mdSal, final Optional<File> initialConfigXMLFile,
-                                                         final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
+    private NetconfServerDispatcherImpl createDispatcher(final Set<Capability> capabilities,
+                                                         final SchemaSourceProvider<YangTextSchemaSource> sourceProvider,
+                                                         final TesttoolParameters params) {
 
         final Set<Capability> transformedCapabilities = Sets.newHashSet(Collections2.transform(capabilities, new Function<Capability, Capability>() {
             @Override
@@ -117,33 +117,51 @@ public class NetconfDeviceSimulator implements Closeable {
                 }
             }
         }));
-
+        transformedCapabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0"));
+        final NetconfMonitoringService monitoringService1 = new DummyMonitoringService(transformedCapabilities);
         final SessionIdProvider idProvider = new SessionIdProvider();
 
+        final NetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory = createOperationServiceFactory(sourceProvider, params, transformedCapabilities, monitoringService1, idProvider);
+
+        final Set<String> serverCapabilities = params.exi
+                ? NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES
+                : Sets.newHashSet(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0, XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1);
+
+        final NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new TesttoolNegotiationFactory(
+                hashedWheelTimer, aggregatedNetconfOperationServiceFactory, idProvider, params.generateConfigsTimeout, monitoringService1, serverCapabilities);
+
+        final NetconfServerDispatcherImpl.ServerChannelInitializer serverChannelInitializer = new NetconfServerDispatcherImpl.ServerChannelInitializer(
+                serverNegotiatorFactory);
+        return new NetconfServerDispatcherImpl(serverChannelInitializer, nettyThreadgroup, nettyThreadgroup);
+    }
+
+    private NetconfOperationServiceFactory createOperationServiceFactory(final SchemaSourceProvider<YangTextSchemaSource> sourceProvider,
+                                                                         final TesttoolParameters params,
+                                                                         final Set<Capability> transformedCapabilities,
+                                                                         final NetconfMonitoringService monitoringService1,
+                                                                         final SessionIdProvider idProvider) {
         final AggregatedNetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory = new AggregatedNetconfOperationServiceFactory();
-        final NetconfOperationServiceFactory operationProvider = mdSal ? new MdsalOperationProvider(idProvider, transformedCapabilities, schemaContext, sourceProvider) :
-                new SimulatedOperationProvider(idProvider, transformedCapabilities, notificationsFile, initialConfigXMLFile);
 
-        transformedCapabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0"));
+        final NetconfOperationServiceFactory operationProvider;
+        if (params.mdSal) {
+            operationProvider = new MdsalOperationProvider(idProvider, transformedCapabilities, schemaContext, sourceProvider);
+        } else {
+            operationProvider = new SimulatedOperationProvider(idProvider, transformedCapabilities,
+                    Optional.fromNullable(params.notificationFile),
+                    Optional.fromNullable(params.initialConfigXMLFile));
+        }
 
-        final NetconfMonitoringService monitoringService1 = new DummyMonitoringService(transformedCapabilities);
 
         final NetconfMonitoringActivator.NetconfMonitoringOperationServiceFactory monitoringService =
                 new NetconfMonitoringActivator.NetconfMonitoringOperationServiceFactory(
                         new NetconfMonitoringOperationService(monitoringService1));
         aggregatedNetconfOperationServiceFactory.onAddNetconfOperationServiceFactory(operationProvider);
         aggregatedNetconfOperationServiceFactory.onAddNetconfOperationServiceFactory(monitoringService);
-
-        final Set<String> serverCapabilities = exi
-                ? NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES
-                : Sets.newHashSet(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0, XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1);
-
-        final NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new TesttoolNegotiationFactory(
-                hashedWheelTimer, aggregatedNetconfOperationServiceFactory, idProvider, generateConfigsTimeout, monitoringService1, serverCapabilities);
-
-        final NetconfServerDispatcherImpl.ServerChannelInitializer serverChannelInitializer = new NetconfServerDispatcherImpl.ServerChannelInitializer(
-                serverNegotiatorFactory);
-        return new NetconfServerDispatcherImpl(serverChannelInitializer, nettyThreadgroup, nettyThreadgroup);
+        if (params.rpcConfig != null) {
+            final SettableOperationProvider settableService = new SettableOperationProvider(params.rpcConfig);
+            aggregatedNetconfOperationServiceFactory.onAddNetconfOperationServiceFactory(settableService);
+        }
+        return aggregatedNetconfOperationServiceFactory;
     }
 
     public List<Integer> start(final TesttoolParameters params) {
@@ -152,14 +170,13 @@ public class NetconfDeviceSimulator implements Closeable {
         final SharedSchemaRepository schemaRepo = new SharedSchemaRepository("netconf-simulator");
         final Set<Capability> capabilities = parseSchemasToModuleCapabilities(params, schemaRepo);
 
-        final NetconfServerDispatcherImpl dispatcher = createDispatcher(capabilities, params.exi, params.generateConfigsTimeout,
-                Optional.fromNullable(params.notificationFile), params.mdSal, Optional.fromNullable(params.initialConfigXMLFile),
+        final NetconfServerDispatcherImpl dispatcher = createDispatcher(capabilities,
                 new SchemaSourceProvider<YangTextSchemaSource>() {
                     @Override
                     public CheckedFuture<? extends YangTextSchemaSource, SchemaSourceException> getSource(final SourceIdentifier sourceIdentifier) {
                         return schemaRepo.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class);
                     }
-                });
+                }, params);
 
         int currentPort = params.startingPort;
 
