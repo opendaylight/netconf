@@ -94,6 +94,8 @@ public class TesttoolParameters {
 
     @Arg(dest = "thread-pool-size")
     public int threadPoolSize;
+    @Arg(dest = "rpc-config")
+    public File rpcConfig;
 
     static ArgumentParser getParser() {
         final ArgumentParser parser = ArgumentParsers.newArgumentParser("netconf testtool");
@@ -234,6 +236,11 @@ public class TesttoolParameters {
                 .setDefault(8)
                 .help("The number of threads to keep in the pool, when creating a device simulator. Even if they are idle.")
                 .dest("thread-pool-size");
+        parser.addArgument("--rpc-config")
+                .type(File.class)
+                .help("Rpc config file. It can be used to define custom rpc behavior, or override the default one." +
+                        "Usable for testing buggy device behavior.")
+                .dest("rpc-config");
 
         return parser;
     }
@@ -322,6 +329,11 @@ public class TesttoolParameters {
                     }
                 }
             }
+        }
+        if (rpcConfig != null) {
+            checkArgument(rpcConfig.exists(), "Rpc config file has to exist");
+            checkArgument(!rpcConfig.isDirectory(), "Rpc config file can't be a directory");
+            checkArgument(rpcConfig.canRead(), "Rpc config file to be readable");
         }
     }
 
