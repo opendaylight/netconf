@@ -1,0 +1,8 @@
+Code-Review+1: Ivan Hrasko <ivan.hrasko@pantheon.tech>
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: Tomas Cere <tcere@cisco.com>
+Submitted-by: Tomas Cere <tcere@cisco.com>
+Submitted-at: Fri, 30 Sep 2016 14:47:35 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/45073
+Project: netconf
+Branch: refs/heads/master
