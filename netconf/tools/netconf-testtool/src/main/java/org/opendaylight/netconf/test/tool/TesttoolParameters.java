@@ -92,6 +92,8 @@ public class TesttoolParameters {
 
     @Arg(dest = "thread-pool-size")
     public int threadPoolSize;
+    @Arg(dest = "rpc-config")
+    public File rpcConfig;
 
     static ArgumentParser getParser() {
         final ArgumentParser parser = ArgumentParsers.newArgumentParser("netconf testtool");
@@ -232,6 +234,11 @@ public class TesttoolParameters {
                 .setDefault(8)
                 .help("The number of threads to keep in the pool, when creating a device simulator. Even if they are idle.")
                 .dest("thread-pool-size");
+        parser.addArgument("--rpc-config")
+                .type(File.class)
+                .help("Rpc config file. It can be used to define custom rpc behavior, or override the default one." +
+                        "Usable for testing buggy device behavior.")
+                .dest("rpc-config");
 
         return parser;
     }
@@ -278,7 +285,7 @@ public class TesttoolParameters {
 
         if (controllerDestination != null) {
             Preconditions.checkArgument(controllerDestination.contains(":"), "Controller Destination needs to be in a following format <ip>:<port>");
-            String[] parts = controllerDestination.split(Pattern.quote(":"));
+            final String[] parts = controllerDestination.split(Pattern.quote(":"));
             Preconditions.checkArgument(Integer.parseInt(parts[1]) > 0, "Port =< 0");
         }
 
@@ -320,6 +327,11 @@ public class TesttoolParameters {
                     }
                 }
             }
+        }
+        if (rpcConfig != null) {
+            checkArgument(rpcConfig.exists(), "Rpc config file has to exist");
+            checkArgument(!rpcConfig.isDirectory(), "Rpc config file can't be a directory");
+            checkArgument(rpcConfig.canRead(), "Rpc config file to be readable");
         }
     }
 
@@ -400,7 +412,7 @@ public class TesttoolParameters {
     }
 
     private String prepareMessage(final int openDevice, final String editContentString) {
-        StringBuilder messageBuilder = new StringBuilder(editContentString);
+        final StringBuilder messageBuilder = new StringBuilder(editContentString);
 
         if (editContentString.contains(HOST_KEY)) {
             messageBuilder.replace(messageBuilder.indexOf(HOST_KEY), messageBuilder.indexOf(HOST_KEY) + HOST_KEY.length(), generateConfigsAddress);
@@ -444,7 +456,7 @@ public class TesttoolParameters {
     //TODO This may be more scalable enumerating parameters via reflection
     @Override
     public String toString() {
-        StringBuffer params = new StringBuffer("TesttoolParameters{");
+        final StringBuffer params = new StringBuffer("TesttoolParameters{");
         params.append("edit-content='").append(editContent).append('\'');
         params.append(", async='").append(async).append('\'');
         params.append(", thread-amount='").append(threadAmount).append('\'');
