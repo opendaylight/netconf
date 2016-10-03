@@ -27,14 +27,14 @@ import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
-import org.opendaylight.restconf.Draft16;
+import org.opendaylight.restconf.Draft17;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 
 
 @Provider
 @Produces({Draft02.MediaTypes.PATCH_STATUS + RestconfService.JSON,
-        Draft16.MediaTypes.PATCH_STATUS + RestconfConstants.JSON})
+        Draft17.MediaTypes.PATCH_STATUS + RestconfConstants.JSON})
 public class PATCHJsonBodyWriter implements MessageBodyWriter<PATCHStatusContext> {
 
     @Override
