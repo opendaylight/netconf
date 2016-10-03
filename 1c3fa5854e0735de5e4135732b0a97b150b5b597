@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_20d6314f",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteRunningTx.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-10-03T07:52:38Z",
+      "side": 1,
+      "message": "changes.stream()\n                .map(change -\u003e change.execute(id, netOps, rollbackSupport))\n                .collect(Collectors.toCollection(() -\u003e resultsFutures)); \nseems less readable to me too.",
+      "parentUuid": "7a6b29fe_cad31e02",
+      "revId": "1c3fa5854e0735de5e4135732b0a97b150b5b597",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_0ac35638",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteRunningTx.java",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2016-09-30T10:40:01Z",
       "side": 1,
       "message": "Fields path, data and operation are redundant and not used.",
+      "revId": "1c3fa5854e0735de5e4135732b0a97b150b5b597",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_00e69543",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/WriteRunningTx.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-10-03T07:52:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_0ac35638",
       "revId": "1c3fa5854e0735de5e4135732b0a97b150b5b597",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
