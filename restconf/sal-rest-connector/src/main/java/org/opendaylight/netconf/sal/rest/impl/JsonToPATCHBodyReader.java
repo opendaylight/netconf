@@ -9,7 +9,6 @@
 package org.opendaylight.netconf.sal.rest.impl;
 
 import static org.opendaylight.netconf.sal.restconf.impl.PATCHEditOperation.isPatchOperationWithValue;
-
 import com.google.common.collect.ImmutableList;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
@@ -37,7 +36,6 @@ import org.opendaylight.netconf.sal.restconf.impl.PATCHEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
-import org.opendaylight.restconf.utils.patch.Draft16JsonToPATCHBodyReader;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -52,7 +50,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @deprecated This class will be replaced by {@link Draft16JsonToPATCHBodyReader}
+ * @deprecated This class will be replaced by
+ *             {@link org.opendaylight.restconf.utils.patch.JsonToPATCHBodyReader}
  */
 @Deprecated
 @Provider
@@ -115,7 +114,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
         final List<PATCHEntity> resultList = read(jsonReader, path);
         jsonReader.close();
 
-        return new PATCHContext(path, resultList, patchId);
+        return new PATCHContext(path, resultList, this.patchId);
     }
 
     private List<PATCHEntity> read(final JsonReader in, final InstanceIdentifierContext path) throws IOException {
@@ -338,8 +337,8 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @param in reader JsonReader reader
      * @return NormalizedNode representing data
      */
-    private NormalizedNode readEditData(@Nonnull final JsonReader in, @Nonnull SchemaNode targetSchemaNode,
-                                        @Nonnull InstanceIdentifierContext path) {
+    private NormalizedNode readEditData(@Nonnull final JsonReader in, @Nonnull final SchemaNode targetSchemaNode,
+                                        @Nonnull final InstanceIdentifierContext path) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         JsonParserStream.create(writer, path.getSchemaContext(), targetSchemaNode).parse(in);
@@ -353,7 +352,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @return PATCHEntity
      */
     private PATCHEntity prepareEditOperation(@Nonnull final PatchEdit edit) {
-        if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
+        if ((edit.getOperation() != null) && (edit.getTargetSchemaNode() != null)
                 && checkDataPresence(edit.getOperation(), (edit.getData() != null))) {
             if (isPatchOperationWithValue(edit.getOperation())) {
                 // for lists allow to manipulate with list items through their parent
@@ -407,51 +406,51 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
         private NormalizedNode data;
 
         public String getId() {
-            return id;
+            return this.id;
         }
 
-        public void setId(String id) {
+        public void setId(final String id) {
             this.id = id;
         }
 
         public String getOperation() {
-            return operation;
+            return this.operation;
         }
 
-        public void setOperation(String operation) {
+        public void setOperation(final String operation) {
             this.operation = operation;
         }
 
         public YangInstanceIdentifier getTarget() {
-            return target;
+            return this.target;
         }
 
-        public void setTarget(YangInstanceIdentifier target) {
+        public void setTarget(final YangInstanceIdentifier target) {
             this.target = target;
         }
 
         public SchemaNode getTargetSchemaNode() {
-            return targetSchemaNode;
+            return this.targetSchemaNode;
         }
 
-        public void setTargetSchemaNode(SchemaNode targetSchemaNode) {
+        public void setTargetSchemaNode(final SchemaNode targetSchemaNode) {
             this.targetSchemaNode = targetSchemaNode;
         }
 
         public NormalizedNode getData() {
-            return data;
+            return this.data;
         }
 
-        public void setData(NormalizedNode data) {
+        public void setData(final NormalizedNode data) {
             this.data = data;
         }
 
         public void clear() {
-            id = null;
-            operation = null;
-            target = null;
-            targetSchemaNode = null;
-            data = null;
+            this.id = null;
+            this.operation = null;
+            this.target = null;
+            this.targetSchemaNode = null;
+            this.data = null;
         }
     }
 }
