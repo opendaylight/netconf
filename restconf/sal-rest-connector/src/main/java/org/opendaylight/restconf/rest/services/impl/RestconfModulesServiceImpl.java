@@ -18,7 +18,7 @@ import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
-import org.opendaylight.restconf.Draft16;
+import org.opendaylight.restconf.Draft17;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
@@ -117,7 +117,7 @@ public class RestconfModulesServiceImpl implements RestconfModulesService {
         final MapNode moduleMap = RestconfMappingNodeUtil
                 .restconfMappingNode(schemaContextRef.getRestconfModule(), modules);
         final DataSchemaNode moduleSchemaNode = RestconfSchemaUtil.getRestconfSchemaNode(
-                schemaContextRef.getRestconfModule(), Draft16.RestconfModule.MODULE_LIST_SCHEMA_NODE);
+                schemaContextRef.getRestconfModule(), Draft17.RestconfModule.MODULE_LIST_SCHEMA_NODE);
         Preconditions.checkState(moduleSchemaNode instanceof ListSchemaNode);
         if (mountPoint == null) {
             return new NormalizedNodeContext(
@@ -148,7 +148,7 @@ public class RestconfModulesServiceImpl implements RestconfModulesService {
 
         final MapNode mapNodes = RestconfMappingNodeUtil.restconfMappingNode(restconfModule, modules);
         final DataSchemaNode schemaNode = RestconfSchemaUtil.getRestconfSchemaNode(restconfModule,
-                Draft16.RestconfModule.MODULES_CONTAINER_SCHEMA_NODE);
+                Draft17.RestconfModule.MODULES_CONTAINER_SCHEMA_NODE);
         Preconditions.checkState(schemaNode instanceof ContainerSchemaNode);
         final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> modulContainerSchemaNodeBuilder = Builders
                 .containerBuilder((ContainerSchemaNode) schemaNode);
