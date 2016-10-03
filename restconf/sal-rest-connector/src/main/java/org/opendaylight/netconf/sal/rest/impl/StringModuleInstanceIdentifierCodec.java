@@ -12,7 +12,6 @@ import com.google.common.base.Preconditions;
 import java.net.URI;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opendaylight.restconf.utils.patch.Draft16StringModuleInstanceIdentifierCodec;
 import org.opendaylight.yangtools.yang.data.util.AbstractModuleStringInstanceIdentifierCodec;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -20,7 +19,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * @deprecated This class will be replaced by
- *             {@link Draft16StringModuleInstanceIdentifierCodec}
+ *             {@link org.opendaylight.restconf.utils.patch.StringModuleInstanceIdentifierCodec}
  */
 @Deprecated
 public final class StringModuleInstanceIdentifierCodec extends AbstractModuleStringInstanceIdentifierCodec {
