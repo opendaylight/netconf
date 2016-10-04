@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.opendaylight.odlparent</groupId>
-    <artifactId>odlparent</artifactId>
+    <artifactId>bundle-parent</artifactId>
     <version>1.8.0-SNAPSHOT</version>
     <relativePath/>
   </parent>
@@ -20,31 +20,39 @@
   <artifactId>netconf-config</artifactId>
   <version>1.2.0-SNAPSHOT</version>
   <description>Configuration files for netconf</description>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.opendaylight.controller</groupId>
+        <artifactId>config-artifacts</artifactId>
+        <version>0.6.0-SNAPSHOT</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.opendaylight.controller</groupId>
+      <artifactId>threadpool-config-impl</artifactId>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
-        <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-artifacts</id>
-            <goals>
-              <goal>attach-artifact</goal>
-            </goals>
-            <phase>package</phase>
-            <configuration>
-              <artifacts>
-                <artifact>
-                  <file>${project.build.directory}/classes/initial/01-netconf.xml</file>
-                  <type>xml</type>
-                  <classifier>config</classifier>
-                </artifact>
-              </artifacts>
-            </configuration>
-          </execution>
-        </executions>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Embed-Dependency>threadpool-config-impl</Embed-Dependency>
+          </instructions>
+        </configuration>
       </plugin>
     </plugins>
   </build>
