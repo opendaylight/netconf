@@ -200,7 +200,8 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
     private String prepareXmlFrom(final DOMNotification notification) {
         final SchemaContext schemaContext = ControllerContext.getInstance().getGlobalSchema();
         final Document doc = ListenerAdapter.createDocument();
-        final Element notificationElement = doc.createElementNS("urn:ietf:params:xml:ns:netconf:notification:1.0",
+        final Element notificationElement =
+                doc.createElementNS("urn:ietf:params:xml:ns:netconf:notification:1.0",
                 "notification");
         doc.appendChild(notificationElement);
 
