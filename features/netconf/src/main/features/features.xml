@@ -92,7 +92,7 @@
     <feature version='${config.version}'>odl-config-netty</feature>
     <feature version='${project.version}'>odl-netconf-netty-util</feature>
     <bundle>mvn:org.opendaylight.netconf/netconf-client/{{VERSION}}</bundle>
-    <configfile finalname='${config.configfile.directory}/${config.netconf.client.configfile}'>mvn:org.opendaylight.netconf/netconf-config/{{VERSION}}/xml/config</configfile>
+    <bundle>mvn:org.opendaylight.netconf/netconf-config/{{VERSION}}</bundle>
   </feature>
 
   <feature name='odl-netconf-monitoring' version='${project.version}' description="OpenDaylight :: Netconf :: Monitoring">
