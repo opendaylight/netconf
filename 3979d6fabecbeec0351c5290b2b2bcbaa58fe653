@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_4a4c2377",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/TxChain.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-04T11:51:14Z",
+      "side": 1,
+      "message": "I do not think this flag will always reflect success status of last write transaction. For example, when you create new write tx and submit it you will be in state lastTxSuccessful \u003d true and also lastTxFinished \u003d true, but tx don\u0027t have to be completed.",
+      "revId": "3979d6fabecbeec0351c5290b2b2bcbaa58fe653",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_8aa47b09",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/TxChain.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-04T11:51:14Z",
+      "side": 1,
+      "message": "You are rewriting txListenerRegistration here, but the previous writeTx doesn\u0027t have to be completed yet.",
+      "revId": "3979d6fabecbeec0351c5290b2b2bcbaa58fe653",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ea508fd6",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/TxChain.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-04T11:51:14Z",
+      "side": 1,
+      "message": "If txChain was closed but transactions will complete after that, you will call onTransactionChainSuccess on txChainListener for each successful tx?",
+      "revId": "3979d6fabecbeec0351c5290b2b2bcbaa58fe653",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_cac2f385",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/TxChain.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-04T11:51:14Z",
+      "side": 1,
+      "message": "So you just notify listener that one tx failed? I think you shouldn\u0027t continue..",
+      "revId": "3979d6fabecbeec0351c5290b2b2bcbaa58fe653",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_eab40f37",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/TxChain.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-04T11:51:14Z",
+      "side": 1,
+      "message": "Ok, this is bit confusing. Method is called setLastFinishedTxStatus but actually is setting lastTxSuccessful status and does nothing to lastFinishedTx status.",
+      "revId": "3979d6fabecbeec0351c5290b2b2bcbaa58fe653",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_caadd3ec",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/TxChain.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-04T11:51:14Z",
+      "side": 1,
+      "message": "This does not have to be listenerRegistration you want to close. This callback does not have to be invoked by last write transaction",
+      "revId": "3979d6fabecbeec0351c5290b2b2bcbaa58fe653",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
