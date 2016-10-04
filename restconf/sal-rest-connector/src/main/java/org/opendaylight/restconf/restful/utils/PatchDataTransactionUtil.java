@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 public final class PatchDataTransactionUtil {
     private static final Logger LOG = LoggerFactory.getLogger(PatchDataTransactionUtil.class);
 
-    public PatchDataTransactionUtil() {
+    private PatchDataTransactionUtil() {
         throw new UnsupportedOperationException("Util class.");
     }
 
