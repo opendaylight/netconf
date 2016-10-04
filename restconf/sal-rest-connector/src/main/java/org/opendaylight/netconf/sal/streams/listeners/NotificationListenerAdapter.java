@@ -12,9 +12,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.util.internal.ConcurrentSet;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -55,6 +52,9 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.util.internal.ConcurrentSet;
 
 /**
  * {@link NotificationListenerAdapter} is responsible to track events on
@@ -200,7 +200,8 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
     private String prepareXmlFrom(final DOMNotification notification) {
         final SchemaContext schemaContext = ControllerContext.getInstance().getGlobalSchema();
         final Document doc = ListenerAdapter.createDocument();
-        final Element notificationElement = doc.createElementNS("urn:ietf:params:xml:ns:yang:ietf-restconf",
+        final Element notificationElement =
+                doc.createElementNS("urn:ietf:params:xml:ns:netconf:notification:1.0",
                 "notification");
         doc.appendChild(notificationElement);
 
