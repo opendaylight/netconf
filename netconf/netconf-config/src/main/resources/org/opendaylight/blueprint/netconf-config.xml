@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2016 Inocybe Technologies Inc. and others.  All rights reserved.
+
+ This program and the accompanying materials are made available under the
+ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ and is available at http://www.eclipse.org/legal/epl-v10.html
+-->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.3.0"
+           odl:restart-dependents-on-updates="true">
+
+    <!--Thread Factory -->
+
+    <cm:property-placeholder persistent-id="org.opendaylight.controller.config.threadpool.util.NamingThreadPoolFactory"
+                             update-strategy="none">
+        <cm:default-properties>
+            <cm:property name="name-prefix" value="remote-connector-processing-executor"/>
+        </cm:default-properties>
+    </cm:property-placeholder>
+
+    <bean id="namingThreadPoolFactory"
+          class="org.opendaylight.controller.config.threadpool.util.NamingThreadPoolFactory">
+        <argument value="${name-prefix}"/>
+    </bean>
+    <service ref="namingThreadPoolFactory" interface="java.util.concurrent.ThreadFactory"
+             odl:type="naming-thread-factory"/>
+
+    <!--Flexible Thread Pool -->
+
+    <cm:property-placeholder
+            persistent-id="org.opendaylight.controller.config.threadpool.util.FlexibleThreadPoolWrapper"
+            update-strategy="none">
+        <cm:default-properties>
+            <cm:property name="min-thread-count" value="1"/>
+            <cm:property name="max-thread-count" value="4"/>
+            <cm:property name="keep-alive-millis" value="600000"/>
+        </cm:default-properties>
+    </cm:property-placeholder>
+
+    <bean id="timeUnitMilli" class="java.util.concurrent.TimeUnit"
+          factory-method="valueOf">
+        <argument value="MILLISECONDS"/>
+    </bean>
+
+    <bean id="flexibleThreadPool"
+          class="org.opendaylight.controller.config.threadpool.util.FlexibleThreadPoolWrapper">
+        <argument value="${min-thread-count}"/>
+        <argument value="${max-thread-count}"/>
+        <argument value="${keep-alive-millis}"/>
+        <argument ref="timeUnitMilli"/>
+        <argument ref="mamingThreadPoolFactory"/>
+    </bean>
+    <service ref="flexibleThreadPool"
+             interface="org.opendaylight.controller.config.threadpool.ThreadPool"
+             odl:type="global-netconf-processing-executor"/>
+
+    <!-- Scheduled Thread Pool -->
+
+    <cm:property-placeholder
+            persistent-id="org.opendaylight.controller.config.threadpool.util.ScheduledThreadPoolWrapper"
+            update-strategy="none">
+        <cm:default-properties>
+            <cm:property name="max-thread-count" value="8"/>
+        </cm:default-properties>
+    </cm:property-placeholder>
+
+    <bean id="scheduleThreadPool"
+          class="org.opendaylight.controller.config.threadpool.util.ScheduledThreadPoolWrapper">
+        <argument value="${max-thread-count}"/>
+        <argument ref="mamingThreadPoolFactory"/>
+    </bean>
+    <service ref="mamingThreadPoolFactory"
+             interface="org.opendaylight.controller.config.threadpool.ScheduledThreadPool"
+             odl:type="global-netconf-ssh-scheduled-executor"/>
+
+
+</blueprint>
