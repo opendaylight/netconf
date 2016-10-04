@@ -31,9 +31,6 @@
     <protocol-framework.version>0.9.0-SNAPSHOT</protocol-framework.version>
     <yangtools.version>1.1.0-SNAPSHOT</yangtools.version>
     <sshd-core.version>0.14.0</sshd-core.version>
-
-    <config.configfile.directory>etc/opendaylight/karaf</config.configfile.directory>
-    <config.netconf.client.configfile>01-netconf.xml</config.netconf.client.configfile>
   </properties>
 
   <dependencyManagement>
@@ -222,8 +219,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-config</artifactId>
-      <type>xml</type>
-      <classifier>config</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

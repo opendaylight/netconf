@@ -20,9 +20,11 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
     <reference id="bindingAwareBroker"
                interface="org.opendaylight.controller.sal.binding.api.BindingAwareBroker"/>
     <reference id="keepAliveExecutor"
-               interface="org.opendaylight.controller.config.threadpool.ScheduledThreadPool"/>
+               interface="org.opendaylight.controller.config.threadpool.ScheduledThreadPool"
+               odl:type="global-netconf-ssh-scheduled-executor"/>
     <reference id="processingExecutor"
-               interface="org.opendaylight.controller.config.threadpool.ThreadPool"/>
+               interface="org.opendaylight.controller.config.threadpool.ThreadPool"
+               odl:type="global-netconf-processing-executor"/>
     <reference id="domBroker"
                interface="org.opendaylight.controller.sal.core.api.Broker"/>
     <reference id="actorSystemProvider"
