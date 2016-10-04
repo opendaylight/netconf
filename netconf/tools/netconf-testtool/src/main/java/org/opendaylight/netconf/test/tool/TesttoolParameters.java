@@ -17,10 +17,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import net.sourceforge.argparse4j.ArgumentParsers;
@@ -272,7 +275,7 @@ public class TesttoolParameters {
 
         if (controllerDestination != null) {
             Preconditions.checkArgument(controllerDestination.contains(":"), "Controller Destination needs to be in a following format <ip>:<port>");
-            String[] parts = controllerDestination.split(Pattern.quote(":"));
+            final String[] parts = controllerDestination.split(Pattern.quote(":"));
             Preconditions.checkArgument(Integer.parseInt(parts[1]) > 0, "Port =< 0");
         }
 
@@ -364,7 +367,7 @@ public class TesttoolParameters {
     }
 
     private String prepareMessage(final int openDevice, final String editContentString) {
-        StringBuilder messageBuilder = new StringBuilder(editContentString);
+        final StringBuilder messageBuilder = new StringBuilder(editContentString);
 
         if (editContentString.contains(HOST_KEY)) {
             messageBuilder.replace(messageBuilder.indexOf(HOST_KEY), messageBuilder.indexOf(HOST_KEY) + HOST_KEY.length(), generateConfigsAddress);
@@ -405,33 +408,19 @@ public class TesttoolParameters {
         return payloads;
     }
 
-    //TODO This may be more scalable enumerating parameters via reflection
     @Override
     public String toString() {
-        StringBuffer params = new StringBuffer("TesttoolParameters{");
-        params.append("edit-content='").append(editContent).append('\'');
-        params.append(", async='").append(async).append('\'');
-        params.append(", thread-amount='").append(threadAmount).append('\'');
-        params.append(", throttle='").append(throttle).append('\'');
-        params.append(", auth='").append(auth).append('\'');
-        params.append(", controller-destination='").append(controllerDestination).append('\'');
-        params.append(", schemas-dir='").append(schemasDir).append('\'');
-        params.append(", devices-count='").append(deviceCount).append('\'');
-        params.append(", devices-per-port='").append(devicesPerPort).append('\'');
-        params.append(", starting-port='").append(startingPort).append('\'');
-        params.append(", generate-config-connection-timeout='").append(generateConfigsTimeout).append('\'');
-        params.append(", generate-config-address='").append(generateConfigsAddress).append('\'');
-        params.append(", distro-folder='").append(distroFolder).append('\'');
-        params.append(", generate-configs-batch-size='").append(generateConfigBatchSize).append('\'');
-        params.append(", ssh='").append(ssh).append('\'');
-        params.append(", exi='").append(exi).append('\'');
-        params.append(", debug='").append(debug).append('\'');
-        params.append(", notification-file='").append(notificationFile).append('\'');
-        params.append(", md-sal='").append(mdSal).append('\'');
-        params.append(", initial-config-xml-file='").append(initialConfigXMLFile).append('\'');
-        params.append(", time-out='").append(timeOut).append('\'');
-        params.append('}');
+        final List<Field> fields = Arrays.asList(this.getClass().getDeclaredFields());
+        final StringJoiner joiner = new StringJoiner(", \n", "TesttoolParameters{", "}\n");
+        fields.stream().map(this::getFieldString).forEach(joiner::add);
+        return joiner.toString();
+    }
 
-        return params.toString();
+    private String getFieldString(final Field field) {
+        try {
+            return field.getName() + "='" + field.get(this) + "'";
+        } catch (final IllegalAccessException e) {
+            return field.getName() + "= UNKNOWN";
+        }
     }
 }
