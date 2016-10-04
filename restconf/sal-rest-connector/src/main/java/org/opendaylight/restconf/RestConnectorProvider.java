@@ -113,8 +113,8 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         }
 
         // close transaction chain
-        if (RestConnectorProvider.transactionChainHandler != null) {
-            RestConnectorProvider.transactionChainHandler.get().close();
+        if ((transactionChainHandler != null) && (transactionChainHandler.get() != null)) {
+            transactionChainHandler.get().close();
         }
     }
 }
