@@ -45,7 +45,7 @@ import javanet.staxutils.IndentingXMLStreamWriter;
 
 @Provider
 @Produces({ Draft02.MediaTypes.API + RestconfService.XML, Draft02.MediaTypes.DATA + RestconfService.XML,
-        Draft02.MediaTypes.OPERATION + RestconfService.XML, Draft17.MediaTypes.DATA + RestconfConstants.XML_ORIG,
+        Draft02.MediaTypes.OPERATION + RestconfService.XML, Draft17.MediaTypes.DATA + RestconfConstants.XML,
         MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<NormalizedNodeContext> {
 
