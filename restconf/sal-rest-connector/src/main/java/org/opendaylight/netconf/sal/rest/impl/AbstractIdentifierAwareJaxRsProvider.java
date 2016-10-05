@@ -17,7 +17,7 @@ import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 
 /**
  * @deprecated This class will be replaced by
- *             {@link org.opendaylight.restconf.utils.patch.AbstractIdentifierAwareJaxRsProvider}
+ *             {@link org.opendaylight.restconf.jersey.providers.AbstractIdentifierAwareJaxRsProvider}
  */
 @Deprecated
 public class AbstractIdentifierAwareJaxRsProvider {
@@ -44,5 +44,9 @@ public class AbstractIdentifierAwareJaxRsProvider {
 
     protected boolean isPost() {
         return POST.equals(this.request.getMethod());
+    }
+
+    Request getRequest() {
+        return this.request;
     }
 }

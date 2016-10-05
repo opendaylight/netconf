@@ -11,8 +11,8 @@ package org.opendaylight.controller.sal.rest.impl.test.providers;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import java.lang.reflect.Field;
+import java.net.URI;
 import java.util.Collections;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -42,7 +42,7 @@ public abstract class AbstractBodyReaderTest {
         requestField = AbstractIdentifierAwareJaxRsProvider.class
                 .getDeclaredField("request");
         requestField.setAccessible(true);
-        mediaType = getMediaType();
+        this.mediaType = getMediaType();
     }
 
     protected abstract MediaType getMediaType();
@@ -52,10 +52,8 @@ public abstract class AbstractBodyReaderTest {
         return TestRestconfUtils.loadSchemaContext(yangPath, schemaContext);
     }
 
-    protected static <T extends AbstractIdentifierAwareJaxRsProvider> void mockBodyReader(
-            final String identifier, final T normalizedNodeProvider,
-            final boolean isPost) throws NoSuchFieldException,
-            SecurityException, IllegalArgumentException, IllegalAccessException {
+    protected static <T extends AbstractIdentifierAwareJaxRsProvider> void mockBodyReader(final String identifier,
+            final T normalizedNodeProvider, final boolean isPost) throws Exception {
         final UriInfo uriInfoMock = mock(UriInfo.class);
         final MultivaluedMap<String, String> pathParm = new MultivaluedHashMap<>(1);
 
@@ -66,6 +64,7 @@ public abstract class AbstractBodyReaderTest {
         when(uriInfoMock.getPathParameters()).thenReturn(pathParm);
         when(uriInfoMock.getPathParameters(false)).thenReturn(pathParm);
         when(uriInfoMock.getPathParameters(true)).thenReturn(pathParm);
+        when(uriInfoMock.getAbsolutePath()).thenReturn(new URI("restconf"));
         uriField.set(normalizedNodeProvider, uriInfoMock);
 
         final Request request = mock(Request.class);
