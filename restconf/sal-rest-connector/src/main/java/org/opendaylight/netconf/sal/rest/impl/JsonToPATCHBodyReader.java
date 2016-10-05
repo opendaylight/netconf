@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @deprecated This class will be replaced by
- *             {@link org.opendaylight.restconf.utils.patch.JsonToPATCHBodyReader}
+ *             {@link org.opendaylight.restconf.jersey.providers.JsonToPATCHBodyReader}
  */
 @Deprecated
 @Provider

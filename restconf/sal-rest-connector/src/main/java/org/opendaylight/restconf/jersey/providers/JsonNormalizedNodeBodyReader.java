@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2014 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.rest.impl;
+package org.opendaylight.restconf.jersey.providers;
 
 import com.google.common.collect.Iterables;
 import com.google.gson.stream.JsonReader;
@@ -20,11 +20,10 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
-import org.opendaylight.netconf.sal.rest.api.Draft02;
-import org.opendaylight.netconf.sal.rest.api.RestconfService;
-import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
@@ -52,8 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Provider
-@Consumes({ Draft02.MediaTypes.DATA + RestconfService.JSON, Draft02.MediaTypes.OPERATION + RestconfService.JSON,
-        Draft17.MediaTypes.DATA + RestconfConstants.JSON, MediaType.APPLICATION_JSON })
+@Consumes({ Draft17.MediaTypes.DATA + RestconfConstants.JSON, MediaType.APPLICATION_JSON })
 public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsProvider implements MessageBodyReader<NormalizedNodeContext> {
 
     private final static Logger LOG = LoggerFactory.getLogger(JsonNormalizedNodeBodyReader.class);
@@ -70,17 +68,10 @@ public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPr
             final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream) throws IOException,
             WebApplicationException {
         try {
-            if(getUriInfo().getAbsolutePath().getPath().contains("restconf/16")){
-                final org.opendaylight.restconf.jersey.providers.JsonNormalizedNodeBodyReader jsonReaderNewRest =
-                        new org.opendaylight.restconf.jersey.providers.JsonNormalizedNodeBodyReader();
-                jsonReaderNewRest.injectParams(getUriInfo(), getRequest());
-                return jsonReaderNewRest.readFrom(type, genericType, annotations, mediaType, httpHeaders, entityStream);
-            } else {
-                return readFrom(getInstanceIdentifierContext(), entityStream, isPost());
-            }
+            return readFrom(getInstanceIdentifierContext(), entityStream, isPost());
         } catch (final Exception e) {
             propagateExceptionAs(e);
-            return null; // no-op
+            return null;
         }
     }
 
@@ -102,17 +93,6 @@ public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPr
                 ErrorTag.MALFORMED_MESSAGE, e);
     }
 
-    public static NormalizedNodeContext readFrom(final String uriPath, final InputStream entityStream,
-            final boolean isPost) throws RestconfDocumentedException {
-
-        try {
-            return readFrom(ControllerContext.getInstance().toInstanceIdentifier(uriPath), entityStream, isPost);
-        } catch (final Exception e) {
-            propagateExceptionAs(e);
-            return null; // no-op
-        }
-    }
-
     private static NormalizedNodeContext readFrom(final InstanceIdentifierContext<?> path, final InputStream entityStream,
             final boolean isPost) throws IOException {
         if (entityStream.available() < 1) {
@@ -123,7 +103,6 @@ public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPr
 
         final SchemaNode parentSchema;
         if(isPost) {
-            // FIXME: We need dispatch for RPC.
             parentSchema = path.getSchemaNode();
         } else if(path.getSchemaNode() instanceof SchemaContext) {
             parentSchema = path.getSchemaContext();
@@ -171,6 +150,11 @@ public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPr
                 path.getSchemaContext());
 
         return new NormalizedNodeContext(newIIContext, result);
+    }
+
+    public void injectParams(final UriInfo uriInfo, final Request request) {
+        setUriInfo(uriInfo);
+        setRequest(request);
     }
 }
 

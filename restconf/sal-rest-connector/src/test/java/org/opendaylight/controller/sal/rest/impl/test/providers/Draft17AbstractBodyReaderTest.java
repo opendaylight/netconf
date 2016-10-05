@@ -24,17 +24,17 @@ import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
-import org.opendaylight.restconf.utils.patch.AbstractIdentifierAwareJaxRsProvider;
+import org.opendaylight.restconf.jersey.providers.AbstractIdentifierAwareJaxRsProvider;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
-public abstract class Draft11AbstractBodyReaderTest {
+public abstract class Draft17AbstractBodyReaderTest {
 
     protected final static ControllerContext controllerContext = ControllerContext.getInstance();
     protected final MediaType mediaType;
     private static Field uriField;
     private static Field requestField;
 
-    public Draft11AbstractBodyReaderTest() throws NoSuchFieldException,
+    public Draft17AbstractBodyReaderTest() throws NoSuchFieldException,
             SecurityException {
         uriField = AbstractIdentifierAwareJaxRsProvider.class
                 .getDeclaredField("uriInfo");
