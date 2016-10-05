@@ -23,8 +23,12 @@ import org.opendaylight.controller.sal.binding.api.BindingAwareConsumer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.YangModuleCapabilities;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.YangModuleCapabilitiesBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.schema.storage.YangLibrary;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.schema.storage.YangLibraryBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -98,7 +102,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         final WriteTransaction transaction = dataBroker.newWriteOnlyTransaction();
         final NodeId nodeId = new NodeId(instanceName);
         final NodeKey nodeKey = new NodeKey(nodeId);
-        final Node node = createrNetconfNode(nodeId, nodeKey);
+        final Node node = createNetconfNode(nodeId, nodeKey);
         nodePath = TOPOLOGY_PATH.child(Node.class, nodeKey);
         transaction.put(LogicalDatastoreType.CONFIGURATION, nodePath, node);
         final CheckedFuture<Void, TransactionCommitFailedException> submitFuture = transaction.submit();
@@ -135,11 +139,30 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         }
     }
 
-    private Node createrNetconfNode(final NodeId nodeId, final NodeKey nodeKey) {
+    private Node createNetconfNode(final NodeId nodeId, final NodeKey nodeKey) {
         final Credentials credentials = new LoginPasswordBuilder()
                 .setUsername(getUsername())
                 .setPassword(getPassword())
                 .build();
+        final YangModuleCapabilities capabilities;
+        if (getYangModuleCapabilities() != null) {
+            capabilities = new YangModuleCapabilitiesBuilder()
+                    .setOverride(getYangModuleCapabilities().getOverride())
+                    .setCapability(getYangModuleCapabilities().getCapability())
+                    .build();
+        } else {
+            capabilities = null;
+        }
+        final YangLibrary yangLibrary;
+        if (getYangLibrary() != null) {
+            yangLibrary = new YangLibraryBuilder()
+                    .setYangLibraryUrl(getYangLibrary().getYangLibraryUrl())
+                    .setUsername(getYangLibrary().getUsername())
+                    .setPassword(getYangLibrary().getPassword())
+                    .build();
+        } else {
+            yangLibrary = null;
+        }
         final NetconfNode netconfNode = new NetconfNodeBuilder()
                 .setHost(getAddress())
                 .setPort(getPort())
@@ -154,6 +177,8 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
                 .setSchemaCacheDirectory(getSchemaCacheDirectory())
                 .setSleepFactor(getSleepFactor())
                 .setTcpOnly(getTcpOnly())
+                .setYangModuleCapabilities(capabilities)
+                .setYangLibrary(yangLibrary)
                 .build();
         return new NodeBuilder()
                 .setNodeId(nodeId)
