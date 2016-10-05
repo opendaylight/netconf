@@ -19,7 +19,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * @deprecated This class will be replaced by
- *             {@link org.opendaylight.restconf.utils.patch.StringModuleInstanceIdentifierCodec}
+ *             {@link org.opendaylight.restconf.jersey.providers.StringModuleInstanceIdentifierCodec}
  */
 @Deprecated
 public final class StringModuleInstanceIdentifierCodec extends AbstractModuleStringInstanceIdentifierCodec {
