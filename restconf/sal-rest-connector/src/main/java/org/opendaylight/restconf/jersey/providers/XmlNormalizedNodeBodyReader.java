@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.rest.impl;
+package org.opendaylight.restconf.jersey.providers;
 
 import com.google.common.collect.Iterables;
 import java.io.IOException;
@@ -22,18 +22,20 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.opendaylight.netconf.sal.rest.api.Draft02;
-import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.restconf.Draft17;
+import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlUtils;
@@ -53,11 +55,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 @Provider
-@Consumes({ Draft02.MediaTypes.DATA + RestconfService.XML, Draft02.MediaTypes.OPERATION + RestconfService.XML,
-        MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+@Consumes({ Draft17.MediaTypes.DATA + RestconfConstants.XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsProvider implements MessageBodyReader<NormalizedNodeContext> {
 
     private final static Logger LOG = LoggerFactory.getLogger(XmlNormalizedNodeBodyReader.class);
@@ -93,13 +93,22 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
             final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream) throws IOException,
             WebApplicationException {
         try {
-            if (getUriInfo().getAbsolutePath().getPath().contains("restconf/16")) {
-                final org.opendaylight.restconf.jersey.providers.XmlNormalizedNodeBodyReader xmlReaderNewRest = new org.opendaylight.restconf.jersey.providers.XmlNormalizedNodeBodyReader();
-                xmlReaderNewRest.injectParams(getUriInfo(), getRequest());
-                return xmlReaderNewRest.readFrom(type, genericType, annotations, mediaType, httpHeaders, entityStream);
-            } else {
-                return readFrom(entityStream);
+            final InstanceIdentifierContext<?> path = getInstanceIdentifierContext();
+
+            if (entityStream.available() < 1) {
+                // represent empty nopayload input
+                return new NormalizedNodeContext(path, null);
             }
+
+            final DocumentBuilder dBuilder;
+            try {
+                dBuilder = BUILDERFACTORY.newDocumentBuilder();
+            } catch (final ParserConfigurationException e) {
+                throw new RuntimeException("Failed to parse XML document", e);
+            }
+            final Document doc = dBuilder.parse(entityStream);
+
+            return parse(path,doc);
         } catch (final RestconfDocumentedException e){
             throw e;
         } catch (final Exception e) {
@@ -108,25 +117,6 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
                     ErrorTag.MALFORMED_MESSAGE);
         }
-    }
-
-    private NormalizedNodeContext readFrom(final InputStream entityStream) throws IOException, SAXException {
-        final InstanceIdentifierContext<?> path = getInstanceIdentifierContext();
-
-        if (entityStream.available() < 1) {
-            // represent empty nopayload input
-            return new NormalizedNodeContext(path, null);
-        }
-
-        final DocumentBuilder dBuilder;
-        try {
-            dBuilder = BUILDERFACTORY.newDocumentBuilder();
-        } catch (final ParserConfigurationException e) {
-            throw new RuntimeException("Failed to parse XML document", e);
-        }
-        final Document doc = dBuilder.parse(entityStream);
-
-        return parse(path,doc);
     }
 
     private NormalizedNodeContext parse(final InstanceIdentifierContext<?> pathContext,final Document doc) {
@@ -248,6 +238,11 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
             }
         }
         return null;
+    }
+
+    public void injectParams(final UriInfo uriInfo, final Request request) {
+        setRequest(request);
+        setUriInfo(uriInfo);
     }
 }
 

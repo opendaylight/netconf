@@ -21,8 +21,8 @@ import org.opendaylight.netconf.sal.rest.impl.PATCHXmlBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.RestconfDocumentedExceptionMapper;
 import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.restconf.common.wrapper.services.ServicesWrapperImpl;
-import org.opendaylight.restconf.utils.patch.JsonToPATCHBodyReader;
-import org.opendaylight.restconf.utils.patch.XmlToPATCHBodyReader;
+import org.opendaylight.restconf.jersey.providers.JsonToPATCHBodyReader;
+import org.opendaylight.restconf.jersey.providers.XmlToPATCHBodyReader;
 
 public class RestconfApplication extends Application {
 
