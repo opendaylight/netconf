@@ -59,7 +59,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * @deprecated This class will be replaced by
- *             {@link org.opendaylight.restconf.utils.patch.XmlToPATCHBodyReader}
+ *             {@link org.opendaylight.restconf.jersey.providers.XmlToPATCHBodyReader}
  */
 @Deprecated
 @Provider

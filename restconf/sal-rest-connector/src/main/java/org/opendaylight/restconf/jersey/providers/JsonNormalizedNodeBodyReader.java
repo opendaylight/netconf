@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.rest.impl;
+package org.opendaylight.restconf.jersey.providers;
 
 import com.google.common.collect.Iterables;
 import com.google.gson.stream.JsonReader;
@@ -20,6 +20,8 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
@@ -70,16 +72,10 @@ public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPr
             final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream) throws IOException,
             WebApplicationException {
         try {
-            if(getUriInfo().getAbsolutePath().getPath().contains("restconf/16")){
-                final org.opendaylight.restconf.jersey.providers.JsonNormalizedNodeBodyReader jsonReaderNewRest = new org.opendaylight.restconf.jersey.providers.JsonNormalizedNodeBodyReader();
-                jsonReaderNewRest.injectParams(getUriInfo(), getRequest());
-                return jsonReaderNewRest.readFrom(type, genericType, annotations, mediaType, httpHeaders, entityStream);
-            } else {
-                return readFrom(getInstanceIdentifierContext(), entityStream, isPost());
-            }
+            return readFrom(getInstanceIdentifierContext(), entityStream, isPost());
         } catch (final Exception e) {
             propagateExceptionAs(e);
-            return null; // no-op
+            return null;
         }
     }
 
@@ -170,6 +166,11 @@ public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPr
                 path.getSchemaContext());
 
         return new NormalizedNodeContext(newIIContext, result);
+    }
+
+    public void injectParams(final UriInfo uriInfo, final Request request) {
+        setUriInfo(uriInfo);
+        setRequest(request);
     }
 }
 
