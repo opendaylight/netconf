@@ -8,6 +8,7 @@
 
 package org.opendaylight.controller.sal.rest.impl.test.providers;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -176,5 +177,49 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
         }
         assertNotNull(NormalizedNodes.findNode(nnContext.getData(),
                 dataNodeIdent));
+    }
+
+    /**
+     * Test when container with the same name is placed in two modules (foo-module and bar-module). Namespace must be
+     * used to distinguish between them to find correct one. Check if container was found not only according to its name
+     * but also by correct namespace used in payload.
+     */
+    @Test
+    public void findFooContainerUsingNamespaceTest() throws Exception {
+        mockBodyReader("instance-identifier-module:cont/yang-ext:mount", xmlBodyReader, true);
+        final InputStream inputStream = TestXmlBodyReader.class
+                .getResourceAsStream("/instanceidentifier/xml/xmlDataFindFooContainer.xml");
+        final NormalizedNodeContext returnValue = xmlBodyReader
+                .readFrom(null, null, null, mediaType, null, inputStream);
+
+        // check return value
+        checkMountPointNormalizedNodeContext(returnValue);
+        // check if container was found both according to its name and namespace
+        assertEquals("Not correct container found, name was ignored",
+                "foo-bar-container", returnValue.getData().getNodeType().getLocalName());
+        assertEquals("Not correct container found, namespace was ignored",
+                "foo:module", returnValue.getData().getNodeType().getNamespace().toString());
+    }
+
+    /**
+     * Test when container with the same name is placed in two modules (foo-module and bar-module). Namespace must be
+     * used to distinguish between them to find correct one. Check if container was found not only according to its name
+     * but also by correct namespace used in payload.
+     */
+    @Test
+    public void findBarContainerUsingNamespaceTest() throws Exception {
+        mockBodyReader("instance-identifier-module:cont/yang-ext:mount", xmlBodyReader, true);
+        final InputStream inputStream = TestXmlBodyReader.class
+                .getResourceAsStream("/instanceidentifier/xml/xmlDataFindBarContainer.xml");
+        final NormalizedNodeContext returnValue = xmlBodyReader
+                .readFrom(null, null, null, mediaType, null, inputStream);
+
+        // check return value
+        checkMountPointNormalizedNodeContext(returnValue);
+        // check if container was found both according to its name and namespace
+        assertEquals("Not correct container found, name was ignored",
+                "foo-bar-container", returnValue.getData().getNodeType().getLocalName());
+        assertEquals("Not correct container found, namespace was ignored",
+                "bar:module", returnValue.getData().getNodeType().getNamespace().toString());
     }
 }
