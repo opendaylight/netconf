@@ -9,11 +9,19 @@
 package org.opendaylight.yang.gen.v1.config.aaa.authn.netconf.plugin.rev150715;
 
 import com.google.common.base.Preconditions;
-import org.opendaylight.aaa.odl.CredentialServiceAuthProvider;
+import com.google.common.reflect.AbstractInvocationHandler;
+import com.google.common.reflect.Reflection;
+import java.lang.reflect.Method;
 import org.opendaylight.controller.config.api.DependencyResolver;
 import org.opendaylight.controller.config.api.ModuleIdentifier;
+import org.opendaylight.controller.config.api.osgi.WaitingServiceTracker;
+import org.opendaylight.netconf.auth.AuthProvider;
 import org.osgi.framework.BundleContext;
 
+/**
+ * @deprecated Replaced by blueprint wiring
+ */
+@Deprecated
 public class AuthProviderModule extends org.opendaylight.yang.gen.v1.config.aaa.authn.netconf.plugin.rev150715.AbstractAuthProviderModule {
 
     private BundleContext bundleContext;
@@ -42,8 +50,24 @@ public class AuthProviderModule extends org.opendaylight.yang.gen.v1.config.aaa.
     }
 
     @Override
-    public AutoCloseable createInstance() {
-       return new CredentialServiceAuthProvider(bundleContext);
+    public java.lang.AutoCloseable createInstance() {
+        final WaitingServiceTracker<AuthProvider> tracker =
+                WaitingServiceTracker.create(AuthProvider.class, bundleContext, "(type=netconf-auth-provider)");
+        final AuthProvider service = tracker.waitForService(WaitingServiceTracker.FIVE_MINUTES);
+
+        return Reflection.newProxy(AutoCloseableAuthProvider.class, new AbstractInvocationHandler() {
+            @Override
+            protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable {
+                if (method.getName().equals("close")) {
+                    tracker.close();
+                    return null;
+                } else {
+                    return method.invoke(service, args);
+                }
+            }
+        });
     }
 
+    private static interface AutoCloseableAuthProvider extends AuthProvider, AutoCloseable {
+    }
 }
