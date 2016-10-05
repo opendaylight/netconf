@@ -60,7 +60,7 @@
 
     <servlet-mapping>
         <servlet-name>Restconf</servlet-name>
-        <url-pattern>/16/*</url-pattern>
+        <url-pattern>/17/*</url-pattern>
     </servlet-mapping>
 
     <filter>
