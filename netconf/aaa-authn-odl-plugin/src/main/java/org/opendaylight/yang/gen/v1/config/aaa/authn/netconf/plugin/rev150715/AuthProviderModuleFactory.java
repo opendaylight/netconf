@@ -24,6 +24,10 @@ import org.opendaylight.controller.config.api.DependencyResolverFactory;
 import org.opendaylight.controller.config.api.ModuleIdentifier;
 import org.osgi.framework.BundleContext;
 
+/**
+ * @deprecated Replaced by blueprint wiring
+ */
+@Deprecated
 public class AuthProviderModuleFactory extends org.opendaylight.yang.gen.v1.config.aaa.authn.netconf.plugin.rev150715.AbstractAuthProviderModuleFactory {
 
     private static final ModuleIdentifier DEFAULT_INSTANCE_ID = new ModuleIdentifier(NAME, "default-auth-provider");
