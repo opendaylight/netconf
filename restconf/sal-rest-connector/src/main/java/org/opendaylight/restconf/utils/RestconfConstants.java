@@ -23,6 +23,7 @@ public final class RestconfConstants {
     public static final SimpleDateFormat REVISION_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     public static final char SLASH = '/';
     public static final Splitter SLASH_SPLITTER = Splitter.on(SLASH);
+    public static final String DRAFT_PATTERN = "restconf/17";
 
     private RestconfConstants() {
         throw new UnsupportedOperationException("Util class");
