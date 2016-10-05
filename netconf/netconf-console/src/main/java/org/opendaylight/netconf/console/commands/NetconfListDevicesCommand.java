@@ -9,9 +9,7 @@
 package org.opendaylight.netconf.console.commands;
 
 import java.util.Map;
-
 import javax.annotation.Nonnull;
-
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.console.AbstractAction;
 import org.apache.karaf.shell.table.ShellTable;

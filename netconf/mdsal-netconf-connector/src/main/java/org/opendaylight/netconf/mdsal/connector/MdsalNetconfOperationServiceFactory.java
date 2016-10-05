@@ -28,6 +28,7 @@ import org.opendaylight.controller.sal.core.api.Consumer;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -45,12 +46,18 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
     private ConsumerSession session = null;
     private DOMDataBroker dataBroker = null;
     private DOMRpcService rpcService = null;
+
     private final CurrentSchemaContext currentSchemaContext;
     private final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency;
+    private final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener;
 
-    public MdsalNetconfOperationServiceFactory(final SchemaService schemaService, final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency) {
+    public MdsalNetconfOperationServiceFactory(final SchemaService schemaService,
+                                               final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency,
+                                               final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener) {
         this.rootSchemaSourceProviderDependency = rootSchemaSourceProviderDependency;
         this.currentSchemaContext = new CurrentSchemaContext(Preconditions.checkNotNull(schemaService), rootSchemaSourceProviderDependency);
+        this.netconfOperationServiceFactoryListener = netconfOperationServiceFactoryListener;
+        this.netconfOperationServiceFactoryListener.onAddNetconfOperationServiceFactory(this);
     }
 
     @Override
@@ -62,6 +69,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
     @Override
     public void close() throws Exception {
         currentSchemaContext.close();
+        netconfOperationServiceFactoryListener.onRemoveNetconfOperationServiceFactory(this);
     }
 
     @Override
