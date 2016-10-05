@@ -9,17 +9,12 @@ package org.opendaylight.controller.sal.restconf.impl.json.to.nn.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
 import java.io.InputStream;
-
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.controller.sal.rest.impl.test.providers.AbstractBodyReaderTest;
+import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -31,7 +26,7 @@ public class JsonLeafrefToNnTest extends AbstractBodyReaderTest {
 
     public JsonLeafrefToNnTest() throws NoSuchFieldException, SecurityException {
         super();
-        jsonBodyReader = new JsonNormalizedNodeBodyReader();
+        this.jsonBodyReader = new JsonNormalizedNodeBodyReader();
     }
 
     @BeforeClass
@@ -42,28 +37,25 @@ public class JsonLeafrefToNnTest extends AbstractBodyReaderTest {
     }
 
     @Test
-    public void jsonIdentityrefToNormalizeNode() throws NoSuchFieldException,
-            SecurityException, IllegalArgumentException,
-            IllegalAccessException, WebApplicationException, IOException {
+    public void jsonIdentityrefToNormalizeNode() throws Exception {
 
-        String uri = "leafref-module:cont";
-        mockBodyReader(uri, jsonBodyReader, false);
-        InputStream inputStream = this.getClass().getResourceAsStream(
+        final String uri = "leafref-module:cont";
+        mockBodyReader(uri, this.jsonBodyReader, false);
+        final InputStream inputStream = this.getClass().getResourceAsStream(
                 "/json-to-nn/leafref/json/data.json");
 
-        NormalizedNodeContext normalizedNodeContext = jsonBodyReader.readFrom(
-                null, null, null, mediaType, null, inputStream);
+        final NormalizedNodeContext normalizedNodeContext = this.jsonBodyReader.readFrom(
+                null, null, null, this.mediaType, null, inputStream);
 
         assertEquals("cont", normalizedNodeContext.getData().getNodeType()
                 .getLocalName());
-        String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext
+        final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext
                 .getData());
         assertTrue(dataTree.contains("lf2 121"));
     }
 
     @Override
     protected MediaType getMediaType() {
-        // TODO Auto-generated method stub
         return null;
     }
 
