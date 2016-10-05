@@ -24,7 +24,6 @@
         <capability>urn:ietf:params:xml:ns:yang:ietf-network-topology?module=ietf-network-topology&amp;revision=2015-06-08</capability>
         <capability>urn:ietf:params:xml:ns:yang:ietf-netconf-notifications?module=ietf-netconf-notifications&amp;revision=2012-02-06</capability>
         <capability>urn:TBD:params:xml:ns:yang:ospf-topology?module=ospf-topology&amp;revision=2013-10-21</capability>
-        <capability>config:aaa:authn:netconf:plugin?module=aaa-authn-netconf-plugin&amp;revision=2015-07-15</capability>
         <capability>urn:opendaylight:params:xml:ns:yang:controller:config:netconf:auth?module=netconf-auth&amp;revision=2015-07-15</capability>
         <capability>urn:opendaylight:params:xml:ns:yang:controller:md:sal:core:spi:operational-dom-store?module=opendaylight-operational-dom-datastore&amp;revision=2014-06-17</capability>
         <capability>urn:ietf:params:xml:ns:yang:ospf-topology?module=ospf-topology&amp;revision=2013-07-12</capability>
