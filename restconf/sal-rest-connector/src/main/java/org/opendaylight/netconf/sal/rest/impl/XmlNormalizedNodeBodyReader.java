@@ -34,6 +34,7 @@ import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlUtils;
@@ -93,7 +94,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
             final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream) throws IOException,
             WebApplicationException {
         try {
-            if (getUriInfo().getAbsolutePath().getPath().contains("restconf/16")) {
+            if (getUriInfo().getAbsolutePath().getPath().contains(RestconfConstants.DRAFT_PATTERN)) {
                 final org.opendaylight.restconf.jersey.providers.XmlNormalizedNodeBodyReader xmlReaderNewRest = new org.opendaylight.restconf.jersey.providers.XmlNormalizedNodeBodyReader();
                 xmlReaderNewRest.injectParams(getUriInfo(), getRequest());
                 return xmlReaderNewRest.readFrom(type, genericType, annotations, mediaType, httpHeaders, entityStream);

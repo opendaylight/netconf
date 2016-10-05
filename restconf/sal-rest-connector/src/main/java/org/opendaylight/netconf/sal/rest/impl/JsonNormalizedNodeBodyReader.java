@@ -70,7 +70,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPr
             final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream) throws IOException,
             WebApplicationException {
         try {
-            if(getUriInfo().getAbsolutePath().getPath().contains("restconf/16")){
+            if (getUriInfo().getAbsolutePath().getPath().contains(RestconfConstants.DRAFT_PATTERN)) {
                 final org.opendaylight.restconf.jersey.providers.JsonNormalizedNodeBodyReader jsonReaderNewRest = new org.opendaylight.restconf.jersey.providers.JsonNormalizedNodeBodyReader();
                 jsonReaderNewRest.injectParams(getUriInfo(), getRequest());
                 return jsonReaderNewRest.readFrom(type, genericType, annotations, mediaType, httpHeaders, entityStream);
