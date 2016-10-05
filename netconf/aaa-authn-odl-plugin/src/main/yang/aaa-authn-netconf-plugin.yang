@@ -16,9 +16,11 @@ module aaa-authn-netconf-plugin {
             base config:module-type;
             config:java-name-prefix AuthProvider;
             config:provided-service na:netconf-auth-provider;
+            status deprecated;
     }
 
     augment "/config:modules/config:module/config:configuration" {
+        status deprecated;
         case aaa-authn-netconf-plugin {
             when "/config:modules/config:module/config:type = 'aaa-authn-netconf-plugin'";
             // no config yet
