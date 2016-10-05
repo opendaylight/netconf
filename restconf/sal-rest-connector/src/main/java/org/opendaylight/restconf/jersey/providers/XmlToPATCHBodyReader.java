@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.restconf.utils.patch;
+package org.opendaylight.restconf.jersey.providers;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
