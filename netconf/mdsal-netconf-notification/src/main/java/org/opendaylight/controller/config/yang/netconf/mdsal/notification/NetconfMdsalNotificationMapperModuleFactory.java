@@ -17,6 +17,29 @@
 */
 package org.opendaylight.controller.config.yang.netconf.mdsal.notification;
 
-public class NetconfMdsalNotificationMapperModuleFactory extends org.opendaylight.controller.config.yang.netconf.mdsal.notification.AbstractNetconfMdsalNotificationMapperModuleFactory {
+import org.opendaylight.controller.config.api.DependencyResolver;
+import org.osgi.framework.BundleContext;
 
+/**
+ * @deprecated Replaced by blueprint wiring
+ */
+@Deprecated
+public class NetconfMdsalNotificationMapperModuleFactory extends AbstractNetconfMdsalNotificationMapperModuleFactory {
+
+    @Override
+    public NetconfMdsalNotificationMapperModule instantiateModule(String instanceName, DependencyResolver dependencyResolver,
+                                                                  NetconfMdsalNotificationMapperModule oldModule, AutoCloseable oldInstance, BundleContext bundleContext) {
+        NetconfMdsalNotificationMapperModule module = super.instantiateModule(instanceName, dependencyResolver, oldModule,
+                oldInstance, bundleContext);
+        module.setBundleContext(bundleContext);
+        return module;
+    }
+
+    @Override
+    public NetconfMdsalNotificationMapperModule instantiateModule(String instanceName, DependencyResolver dependencyResolver,
+                                                      BundleContext bundleContext) {
+        NetconfMdsalNotificationMapperModule module = super.instantiateModule(instanceName, dependencyResolver, bundleContext);
+        module.setBundleContext(bundleContext);
+        return module;
+    }
 }

@@ -17,64 +17,11 @@
           <module>
               <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:mapper">prefix:netconf-mdsal-mapper</type>
               <name>netconf-mdsal-mapper</name>
-              <root-schema-service>
-                  <type xmlns:dom="urn:opendaylight:params:xml:ns:yang:controller:md:sal:dom">dom:schema-service</type>
-                  <name>yang-schema-service</name>
-              </root-schema-service>
-              <root-schema-source-provider>
-                  <type xmlns:dom="urn:opendaylight:params:xml:ns:yang:controller:md:sal:dom">dom:yang-text-source-provider</type>
-                  <name>yang-text-source-provider</name>
-              </root-schema-source-provider>
-              <dom-broker xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:mapper">
-                  <type xmlns:dom="urn:opendaylight:params:xml:ns:yang:controller:md:sal:dom">dom:dom-broker-osgi-registry</type>
-                  <name>dom-broker</name>
-              </dom-broker>
-              <mapper-aggregator xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:mapper">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:north:mapper">prefix:netconf-mapper-registry</type>
-                  <name>mapper-aggregator-registry</name>
-              </mapper-aggregator>
           </module>
 
           <module>
               <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound:impl">prefix:netconf-server-dispatcher-impl</type>
               <name>netconf-mdsal-server-dispatcher</name>
-              <mappers xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound:impl">
-                  <type xmlns:dom="urn:opendaylight:params:xml:ns:yang:controller:netconf:north:mapper">dom:netconf-northbound-mapper</type>
-                  <name>mapper-aggregator</name>
-              </mappers>
-              <server-monitor xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound:impl">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound">prefix:netconf-server-monitoring</type>
-                  <name>server-monitor</name>
-              </server-monitor>
-              <boss-thread-group xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound:impl">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netty">prefix:netty-threadgroup</type>
-                  <name>global-boss-group</name>
-              </boss-thread-group>
-              <worker-thread-group xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound:impl">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netty">prefix:netty-threadgroup</type>
-                  <name>global-worker-group</name>
-              </worker-thread-group>
-              <timer xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound:impl">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netty">prefix:netty-timer</type>
-                  <name>global-timer</name>
-              </timer>
-          </module>
-
-          <module>
-              <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:monitoring">prefix:netconf-mdsal-monitoring-mapper</type>
-              <name>netconf-mdsal-monitoring-mapper</name>
-              <server-monitoring xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:monitoring">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound">prefix:netconf-server-monitoring</type>
-                  <name>server-monitor</name>
-              </server-monitoring>
-              <binding-aware-broker xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:monitoring">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding">prefix:binding-broker-osgi-registry</type>
-                  <name>binding-osgi-broker</name>
-              </binding-aware-broker>
-              <aggregator xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:monitoring">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:north:mapper">prefix:netconf-mapper-registry</type>
-                  <name>mapper-aggregator-registry</name>
-              </aggregator>
           </module>
 
           <module>
@@ -85,41 +32,6 @@
           <module>
               <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound:impl">prefix:netconf-server-monitoring-impl</type>
               <name>server-monitor</name>
-              <aggregator xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound:impl">
-                  <type xmlns:dom="urn:opendaylight:params:xml:ns:yang:controller:netconf:north:mapper">dom:netconf-northbound-mapper</type>
-                  <name>mapper-aggregator</name>
-              </aggregator>
-              <scheduled-threadpool xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound:impl">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:threadpool">prefix:threadpool</type>
-                  <name>global-netconf-ssh-scheduled-executor</name>
-              </scheduled-threadpool>
-              <monitoring-update-interval xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound:impl">6</monitoring-update-interval>
-          </module>
-
-          <module>
-              <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:ssh">prefix:netconf-northbound-ssh</type>
-              <name>netconf-mdsal-ssh-server</name>
-
-              <event-executor xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:ssh">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netty">prefix:netty-event-executor</type>
-                  <name>global-event-executor</name>
-              </event-executor>
-              <worker-thread-group xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:ssh">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netty">prefix:netty-threadgroup</type>
-                  <name>global-worker-group</name>
-              </worker-thread-group>
-              <processing-executor xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:ssh">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:threadpool">prefix:threadpool</type>
-                  <name>global-netconf-ssh-scheduled-executor</name>
-              </processing-executor>
-              <dispatcher xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:ssh">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound">prefix:netconf-server-dispatcher</type>
-                  <name>netconf-mdsal-server-dispatcher</name>
-              </dispatcher>
-              <auth-provider xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:ssh">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:auth">prefix:netconf-auth-provider</type>
-                  <name>default-auth-provider</name>
-              </auth-provider>
           </module>
 
           <module>
@@ -130,42 +42,7 @@
           <module>
               <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:notification">prefix:netconf-mdsal-notification-mapper</type>
               <name>netconf-mdsal-notification-mapper</name>
-              <data-broker xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:notification">
-                  <type xmlns:binding="urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding">binding:binding-async-data-broker</type>
-                  <name>binding-data-broker</name>
-              </data-broker>
-              <binding-aware-broker xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:notification">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding">prefix:binding-broker-osgi-registry</type>
-                  <name>binding-osgi-broker</name>
-              </binding-aware-broker>
-              <aggregator xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:notification">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:north:mapper">prefix:netconf-mapper-registry</type>
-                  <name>mapper-aggregator-registry</name>
-              </aggregator>
-              <notification-registry xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:notification">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:notification">prefix:netconf-notification-registry</type>
-                  <name>netconf-notification-manager</name>
-              </notification-registry>
-              <notification-collector>
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:notification">prefix:netconf-notification-collector</type>
-                  <name>netconf-notification-manager</name>
-              </notification-collector>
           </module>
-
-          <module>
-              <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:yang:library">prefix:netconf-mdsal-yanglib</type>
-              <name>netconf-mdsal-yanglib</name>
-              <binding-aware-broker xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:yang:library">
-                  <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding">prefix:binding-broker-osgi-registry</type>
-                  <name>binding-osgi-broker</name>
-              </binding-aware-broker>
-              <root-schema-service xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:yang:library">
-              <type xmlns:dom="urn:opendaylight:params:xml:ns:yang:controller:md:sal:dom">dom:schema-service</type>
-              <name>yang-schema-service</name>
-          </root-schema-service>
-          </module>
-
-
 
           <!--TCP endpoint for MD-SAL netconf server -->
           <!--<module>-->
@@ -181,38 +58,10 @@
 
         <services xmlns="urn:opendaylight:params:xml:ns:yang:controller:config">
             <service>
-                <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound">prefix:netconf-server-monitoring</type>
-                <instance>
-                    <name>server-monitor</name>
-                    <provider>/modules/module[type='netconf-server-monitoring-impl'][name='server-monitor']</provider>
-                </instance>
-            </service>
-            <service>
-                <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:north:mapper">prefix:netconf-northbound-mapper</type>
-                <instance>
-                    <name>netconf-mdsal-mapper</name>
-                    <provider>/modules/module[type='netconf-mdsal-mapper'][name='netconf-mdsal-mapper']</provider>
-                </instance>
-            </service>
-            <service>
                 <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:north:mapper">prefix:netconf-northbound-mapper</type>
                 <instance>
                     <name>mapper-aggregator</name>
                     <provider>/modules/module[type='netconf-mapper-aggregator'][name='mapper-aggregator']</provider>
-                </instance>
-            </service>
-            <service>
-                <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:north:mapper">prefix:netconf-mapper-registry</type>
-                <instance>
-                    <name>mapper-aggregator-registry</name>
-                    <provider>/modules/module[type='netconf-mapper-aggregator'][name='mapper-aggregator']</provider>
-                </instance>
-            </service>
-            <service>
-                <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound">prefix:netconf-server-dispatcher</type>
-                <instance>
-                    <name>netconf-mdsal-server-dispatcher</name>
-                    <provider>/modules/module[type='netconf-server-dispatcher-impl'][name='netconf-mdsal-server-dispatcher']</provider>
                 </instance>
             </service>
             <service>
@@ -242,12 +91,9 @@
   </configuration>
   <required-capabilities>
       <capability>urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:mapper?module=netconf-mdsal-mapper&amp;revision=2015-01-14</capability>
-      <capability>urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:monitoring?module=netconf-mdsal-monitoring&amp;revision=2015-02-18</capability>
-      <capability>urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:ssh?module=netconf-northbound-ssh&amp;revision=2015-01-14</capability>
       <capability>urn:opendaylight:params:xml:ns:yang:controller:netconf:northbound:tcp?module=netconf-northbound-tcp&amp;revision=2015-04-23</capability>
       <capability>urn:opendaylight:params:xml:ns:yang:controller:config:netconf:northbound:impl?module=netconf-northbound-impl&amp;revision=2015-01-12</capability>
       <capability>urn:opendaylight:params:xml:ns:yang:controller:threadpool:impl:scheduled?module=threadpool-impl-scheduled&amp;revision=2013-12-01</capability>
       <capability>urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:notification?module=netconf-mdsal-notification&amp;revision=2015-08-03</capability>
-      <capability>urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:yang:library?module=netconf-mdsal-yang-library&amp;revision=2016-06-17</capability>
   </required-capabilities>
 </snapshot>

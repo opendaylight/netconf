@@ -85,7 +85,6 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-Activator>org.opendaylight.netconf.notifications.impl.osgi.Activator</Bundle-Activator>
                         <Export-Package>org.opendaylight.netconf.notifications.impl.*</Export-Package>
                     </instructions>
                 </configuration>
