@@ -36,7 +36,6 @@
     <module>netconf-netty-util</module>
     <module>netconf-mapping-api</module>
     <module>netconf-client</module>
-    <module>netconf-config-dispatcher</module>
     <module>netconf-ssh</module>
     <module>netconf-tcp</module>
     <module>netconf-monitoring</module>

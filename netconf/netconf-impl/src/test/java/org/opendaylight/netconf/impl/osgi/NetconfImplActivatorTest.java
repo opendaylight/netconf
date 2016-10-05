@@ -54,9 +54,9 @@ public class NetconfImplActivatorTest {
 
     @Test
     public void testStart() throws Exception {
-        NetconfImplActivator activator = new NetconfImplActivator();
-        activator.start(bundle);
+        NetconfImplActivator activator = new NetconfImplActivator(bundle);
+        activator.start();
         verify(bundle).registerService(any(Class.class), any(AggregatedNetconfOperationServiceFactory.class), any(Dictionary.class));
-        activator.stop(bundle);
+        activator.stop();
     }
 }
