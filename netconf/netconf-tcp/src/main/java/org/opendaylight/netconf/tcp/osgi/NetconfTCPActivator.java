@@ -13,7 +13,6 @@ import org.opendaylight.netconf.tcp.netty.ProxyServer;
 import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
 import org.opendaylight.netconf.util.osgi.NetconfConfigUtil.InfixProp;
 import org.opendaylight.netconf.util.osgi.NetconfConfiguration;
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,14 +20,21 @@ import org.slf4j.LoggerFactory;
 /**
  * Opens TCP port specified in config.ini, creates bridge between this port and local netconf server.
  */
-public class NetconfTCPActivator implements BundleActivator {
+public class NetconfTCPActivator {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTCPActivator.class);
     private ProxyServer proxyServer;
 
-    @Override
-    public void start(BundleContext context) {
+    private final BundleContext context;
+
+    public NetconfTCPActivator(final BundleContext context) {
+        this.context = context;
+    }
+    /**
+     * Invoke by blueprint
+     */
+    public void start() {
         final NetconfConfiguration netconfConfiguration = NetconfConfigUtil.getNetconfConfigurationService(context).
-                        orElseThrow(() -> new IllegalStateException("Configuration for TCP not found."));
+                orElseThrow(() -> new IllegalStateException("Configuration for TCP not found."));
 
         final InetSocketAddress address = netconfConfiguration.getTcpServerAddress();
 
@@ -40,8 +46,10 @@ public class NetconfTCPActivator implements BundleActivator {
         proxyServer = new ProxyServer(address, NetconfConfigUtil.getNetconfLocalAddress());
     }
 
-    @Override
-    public void stop(BundleContext context) {
+    /**
+     * Invoke by blueprint
+     */
+    public void stop() {
         if (proxyServer != null) {
             proxyServer.close();
         }
