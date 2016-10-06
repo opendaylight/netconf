@@ -28,7 +28,7 @@ public class NetconfTCPActivator implements BundleActivator {
     @Override
     public void start(BundleContext context) {
         final NetconfConfiguration netconfConfiguration = NetconfConfigUtil.getNetconfConfigurationService(context).
-                        orElseThrow(() -> new IllegalStateException("Configuration for TCP not found."));
+                orElseThrow(() -> new IllegalStateException("Configuration for TCP not found."));
 
         final InetSocketAddress address = netconfConfiguration.getTcpServerAddress();
 
