@@ -17,6 +17,10 @@ import org.opendaylight.netconf.api.NetconfServerDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @deprecated Replaced by blueprint wiring
+ */
+@Deprecated
 public class NetconfNorthboundTcpModule extends org.opendaylight.controller.config.yang.netconf.northbound.tcp.AbstractNetconfNorthboundTcpModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNorthboundTcpModule.class);
