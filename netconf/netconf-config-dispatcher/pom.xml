@@ -15,6 +15,8 @@
     <relativePath/>
   </parent>
 
+  <!--TODO Delete this bundle as soon as https://git.opendaylight.org/gerrit/#/c/46621/ is merged.-->
+
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>netconf-config-dispatcher</artifactId>
   <version>1.2.0-SNAPSHOT</version>
