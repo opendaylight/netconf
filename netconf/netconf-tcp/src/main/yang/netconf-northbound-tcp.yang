@@ -24,11 +24,14 @@ module netconf-northbound-tcp {
     identity netconf-northbound-tcp {
         base config:module-type;
         config:java-name-prefix NetconfNorthboundTcp;
+        status deprecated;
     }
 
     augment "/config:modules/config:module/config:configuration" {
         case netconf-northbound-tcp {
             when "/config:modules/config:module/config:type = 'netconf-northbound-tcp'";
+
+            status deprecated;
 
             leaf port {
                 type inet:port-number;
