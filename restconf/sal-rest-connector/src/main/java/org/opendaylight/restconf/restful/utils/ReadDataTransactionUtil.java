@@ -10,13 +10,19 @@ package org.opendaylight.restconf.restful.utils;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import javax.annotation.Nonnull;
+import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.netconf.sal.restconf.impl.WriterParameters;
+import org.opendaylight.netconf.sal.restconf.impl.WriterParameters.WriterParametersBuilder;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -51,6 +57,11 @@ public final class ReadDataTransactionUtil {
 
     private ReadDataTransactionUtil() {
         throw new UnsupportedOperationException("Util class.");
+    }
+
+    private enum UriParameters {
+        CONTENT,
+        DEPTH
     }
 
     /**
@@ -319,5 +330,23 @@ public final class ReadDataTransactionUtil {
         if (moduleOfStateData != moduleOfConfigData) {
             throw new RestconfDocumentedException("It is not possible to merge ");
         }
+    }
+
+    public static WriterParameters parseUriParameters(final UriInfo uriInfo) {
+        final WriterParametersBuilder builder = new WriterParametersBuilder();
+
+        if (uriInfo == null) {
+            return builder.build();
+        }
+
+        final List<String> content = uriInfo.getQueryParameters(false)
+                .getOrDefault(UriParameters.CONTENT.name(), Collections.singletonList("all"));
+        final List<String> depth = uriInfo.getQueryParameters(false)
+                .getOrDefault(UriParameters.DEPTH.name(), Collections.singletonList("unbounded"));
+
+        builder.setContent(content.get(0));
+        builder.setDepth(Integer.parseInt(depth.get(0)));
+
+        return builder.build();
     }
 }
