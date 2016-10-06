@@ -16,18 +16,6 @@
         <module>
           <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:client:dispatcher">prefix:netconf-client-dispatcher</type>
           <name>global-netconf-dispatcher</name>
-          <boss-thread-group xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:client:dispatcher">
-            <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netty">prefix:netty-threadgroup</type>
-            <name>global-boss-group</name>
-          </boss-thread-group>
-          <worker-thread-group xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:client:dispatcher">
-            <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netty">prefix:netty-threadgroup</type>
-            <name>global-worker-group</name>
-          </worker-thread-group>
-          <timer xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:client:dispatcher">
-            <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netty">prefix:netty-timer</type>
-            <name>global-timer</name>
-          </timer>
         </module>
 
         <!-- Thread factory to be used by all threadpools in netconf-connectors -->
@@ -64,17 +52,17 @@
 
       <services xmlns="urn:opendaylight:params:xml:ns:yang:controller:config">
         <service>
-          <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:config:netconf">prefix:netconf-client-dispatcher</type>
-          <instance>
-            <name>global-netconf-dispatcher</name>
-            <provider>/modules/module[type='netconf-client-dispatcher'][name='global-netconf-dispatcher']</provider>
-          </instance>
-        </service>
-        <service>
           <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:threadpool">prefix:threadfactory</type>
           <instance>
             <name>global-netconf-processing-executor-threadfactory</name>
             <provider>/modules/module[type='threadfactory-naming'][name='global-netconf-processing-executor-threadfactory']</provider>
+          </instance>
+        </service>
+        <service>
+          <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:config:netconf">prefix:netconf-client-dispatcher</type>
+          <instance>
+            <name>global-netconf-dispatcher</name>
+            <provider>/modules/module[type='netconf-client-dispatcher'][name='global-netconf-dispatcher']</provider>
           </instance>
         </service>
         <service>
