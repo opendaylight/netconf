@@ -22,6 +22,7 @@ import com.google.common.base.Optional;
 import com.google.common.util.concurrent.Futures;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.Response;
@@ -225,6 +226,66 @@ public class RestconfDataServiceImplTest {
         doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(read).read(LogicalDatastoreType.OPERATIONAL,
                 iidBase);
         dataService.readData("example-jukebox:jukebox", uriInfo);
+    }
+
+    /**
+     * Read data from config datastore according to content parameter
+     */
+    @Test
+    public void testReadDataConfigTest() {
+        final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
+        parameters.put("content", Collections.singletonList("config"));
+
+        doReturn(parameters).when(uriInfo).getQueryParameters();
+        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseContConfig))).when(read)
+                .read(LogicalDatastoreType.CONFIGURATION, iidBase);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseContOperational))).when(read)
+                .read(LogicalDatastoreType.OPERATIONAL, iidBase);
+
+        final Response response = dataService.readData("example-jukebox:jukebox", uriInfo);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatus());
+
+        // response must contain only config data
+        final NormalizedNode<?, ?> data = ((NormalizedNodeContext) response.getEntity()).getData();
+
+        // config data present
+        assertTrue(((ContainerNode) data).getChild(buildPlayerCont.getIdentifier()).isPresent());
+        assertTrue(((ContainerNode) data).getChild(buildLibraryCont.getIdentifier()).isPresent());
+
+        // state data absent
+        assertFalse(((ContainerNode) data).getChild(buildPlaylistList.getIdentifier()).isPresent());
+    }
+
+    /**
+     * Read data from operational datastore according to content parameter
+     */
+    @Test
+    public void testReadDataOperationalTest() {
+        final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
+        parameters.put("content", Collections.singletonList("nonconfig"));
+
+        doReturn(parameters).when(uriInfo).getQueryParameters();
+        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseContConfig))).when(read)
+                .read(LogicalDatastoreType.CONFIGURATION, iidBase);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseContOperational))).when(read)
+                .read(LogicalDatastoreType.OPERATIONAL, iidBase);
+
+        final Response response = dataService.readData("example-jukebox:jukebox", uriInfo);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatus());
+
+        // response must contain only operational data
+        final NormalizedNode<?, ?> data = ((NormalizedNodeContext) response.getEntity()).getData();
+
+        // state data present
+        assertTrue(((ContainerNode) data).getChild(buildPlayerCont.getIdentifier()).isPresent());
+        assertTrue(((ContainerNode) data).getChild(buildPlaylistList.getIdentifier()).isPresent());
+
+        // config data absent
+        assertFalse(((ContainerNode) data).getChild(buildLibraryCont.getIdentifier()).isPresent());
     }
 
     @Test

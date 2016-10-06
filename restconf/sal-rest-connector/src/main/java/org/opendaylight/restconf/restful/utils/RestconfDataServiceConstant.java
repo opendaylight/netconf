@@ -21,7 +21,6 @@ import org.opendaylight.yangtools.yang.common.QNameModule;
  */
 public final class RestconfDataServiceConstant {
 
-    public static final String CONTENT = "content";
     public static final QName NETCONF_BASE_QNAME;
     static {
         try {
@@ -43,10 +42,20 @@ public final class RestconfDataServiceConstant {
      *
      */
     public final class ReadData {
+        // URI parameters
+        public static final String CONTENT = "content";
+        public static final String DEPTH = "depth";
 
+        // content values
         public static final String CONFIG = "config";
-        public static final String NONCONFIG = "nonconfig";
         public static final String ALL = "all";
+        public static final String NONCONFIG = "nonconfig";
+
+        // depth values
+        public static final String UNBOUNDED = "unbounded";
+        public static final int MIN_DEPTH = 1;
+        public static final int MAX_DEPTH = 65535;
+
         public static final String READ_TYPE_TX = "READ";
 
         private ReadData() {
