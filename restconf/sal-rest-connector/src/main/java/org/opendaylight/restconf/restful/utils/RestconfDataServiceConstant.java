@@ -21,8 +21,7 @@ import org.opendaylight.yangtools.yang.common.QNameModule;
  */
 public final class RestconfDataServiceConstant {
 
-    public static final String CONTENT = "content";
-    public static final QName NETCONF_BASE_QNAME;
+    static final QName NETCONF_BASE_QNAME;
     static {
         try {
             NETCONF_BASE_QNAME = QName.create(
@@ -43,10 +42,31 @@ public final class RestconfDataServiceConstant {
      *
      */
     public final class ReadData {
+        // URI parameters
+        public static final String CONTENT = "content";
+        public static final String DEPTH = "depth";
+        public static final String FIELDS = "fields";
+        public static final String FILTER = "filter";
+        public static final String START_TIME = "start-time";
+        public static final String STOP_TIME = "stop-time";
+        public static final String WITH_DEFAULTS = "with-defaults";
 
+        // content
         public static final String CONFIG = "config";
-        public static final String NONCONFIG = "nonconfig";
         public static final String ALL = "all";
+        public static final String NONCONFIG = "nonconfig";
+
+        // depth
+        public static final String UNBOUNDED = "unbounded";
+        public static final int MIN_DEPTH = 1;
+        public static final int MAX_DEPTH = 65535;
+
+        // with-defaults
+        public static final String REPORT_ALL = "report-all";
+        public static final String TRIM = "trim";
+        public static final String EXPLICIT = "explicit";
+        public static final String REPORT_ALL_TAGGED = "report-all-tagged";
+
         public static final String READ_TYPE_TX = "READ";
 
         private ReadData() {
@@ -59,6 +79,16 @@ public final class RestconfDataServiceConstant {
      *
      */
     public final class PutData {
+        // URI parameters
+        public static final String INSERT = "insert";
+        public static final String POINT = "point";
+
+        // insert
+        public static final String FIRST = "first";
+        public static final String LAST = "last";
+        public static final String BEFORE = "before";
+        public static final String AFTER = "after";
+
         public static final String NETCONF_BASE = "urn:ietf:params:xml:ns:netconf:base:1.0";
         public static final String NETCONF_BASE_PAYLOAD_NAME = "data";
         public static final String PUT_TX_TYPE = "PUT";
@@ -73,6 +103,16 @@ public final class RestconfDataServiceConstant {
      *
      */
     public final class PostData {
+        // URI parameters
+        public static final String INSERT = "insert";
+        public static final String POINT = "point";
+
+        // insert
+        public static final String FIRST = "first";
+        public static final String LAST = "last";
+        public static final String BEFORE = "before";
+        public static final String AFTER = "after";
+
         public static final String POST_TX_TYPE = "POST";
 
         private PostData() {
