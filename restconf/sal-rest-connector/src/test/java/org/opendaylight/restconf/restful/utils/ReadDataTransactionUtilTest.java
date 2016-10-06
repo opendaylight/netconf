@@ -9,20 +9,31 @@
 package org.opendaylight.restconf.restful.utils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Futures;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.netconf.sal.restconf.impl.WriterParameters;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -122,7 +133,8 @@ public class ReadDataTransactionUtilTest {
         doReturn(Futures.immediateCheckedFuture(Optional.of(data.data4))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, data.path);
         doReturn(data.path).when(context).getInstanceIdentifier();
-        final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(null, wrapper);
+        final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(
+                RestconfDataServiceConstant.ReadData.ALL, wrapper);
         final ContainerNode checkingData = Builders
                 .containerBuilder()
                 .withNodeIdentifier(nodeIdentifier)
@@ -164,5 +176,118 @@ public class ReadDataTransactionUtilTest {
         final String valueOfContent = RestconfDataServiceConstant.ReadData.READ_TYPE_TX;
         final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(valueOfContent, null);
         assertNull(normalizedNode);
+    }
+
+    /**
+     * Test of parsing default parameters from Uri request
+     */
+    @Test
+    public void parseUriParametersDefaultTest() {
+        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
+
+        // no parameters, default values should be used
+        when(uriInfo.getQueryParameters()).thenReturn(parameters);
+
+        final WriterParameters parsedParameters = ReadDataTransactionUtil.parseUriParameters(uriInfo);
+
+        assertEquals("Not correctly parsed Uri parameter",
+                RestconfDataServiceConstant.ReadData.ALL, parsedParameters.getContent());
+        assertFalse("Not correctly parsed Uri parameter",
+                parsedParameters.getDepth().isPresent());
+    }
+
+    /**
+     * Test of parsing user defined parameters from Uri request
+     */
+    @Test
+    public void parseUriParametersUserDefinedTest() {
+        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
+
+        final String content = "config";
+        final String depth = "10";
+
+        parameters.put("content", Lists.newArrayList(content));
+        parameters.put("depth", Lists.newArrayList(depth));
+
+        when(uriInfo.getQueryParameters()).thenReturn(parameters);
+
+        final WriterParameters parsedParameters = ReadDataTransactionUtil.parseUriParameters(uriInfo);
+
+        assertEquals("Not correctly parsed Uri parameter",
+                content, parsedParameters.getContent());
+        assertTrue("Not correctly parsed Uri parameter",
+                parsedParameters.getDepth().isPresent());
+        assertEquals("Not correctly parsed Uri parameter",
+                depth, parsedParameters.getDepth().get().toString());
+    }
+
+    /**
+     * Negative test of parsing request URI parameters when content parameter has not allowed value.
+     */
+    @Test
+    public void parseUriParametersContentParameterNegativeTest() {
+        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
+
+        parameters.put("content", Lists.newArrayList("not-allowed-parameter-value"));
+        when(uriInfo.getQueryParameters()).thenReturn(parameters);
+
+        try {
+            ReadDataTransactionUtil.parseUriParameters(uriInfo);
+            fail("Test expected to fail due to not allowed parameter value");
+        } catch (final RestconfDocumentedException e) {
+            // Bad request
+            assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
+            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
+        }
+    }
+
+    /**
+     * Negative test of parsing request URI parameters when depth parameter has not allowed value.
+     */
+    @Test
+    public void parseUriParametersDepthMinimalParameterNegativeTest() {
+        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
+
+        // inserted value is too low
+        parameters.put("depth", Lists.newArrayList(String.valueOf(RestconfDataServiceConstant.ReadData.MIN_DEPTH - 1)));
+        when(uriInfo.getQueryParameters()).thenReturn(parameters);
+
+        try {
+            ReadDataTransactionUtil.parseUriParameters(uriInfo);
+            fail("Test expected to fail due to not allowed parameter value");
+        } catch (final RestconfDocumentedException e) {
+            // Bad request
+            assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
+            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
+        }
+    }
+
+    /**
+     * Negative test of parsing request URI parameters when depth parameter has not allowed value.
+     */
+    @Test
+    public void parseUriParametersDepthMaximalParameterNegativeTest() {
+        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
+
+        // inserted value is too high
+        parameters.put("depth", Lists.newArrayList(String.valueOf(RestconfDataServiceConstant.ReadData.MAX_DEPTH + 1)));
+        when(uriInfo.getQueryParameters()).thenReturn(parameters);
+
+        try {
+            ReadDataTransactionUtil.parseUriParameters(uriInfo);
+            fail("Test expected to fail due to not allowed parameter value");
+        } catch (final RestconfDocumentedException e) {
+            // Bad request
+            assertEquals("Error type is not correct", ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
+            assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
+        }
     }
 }
