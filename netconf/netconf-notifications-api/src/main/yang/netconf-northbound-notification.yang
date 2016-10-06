@@ -13,13 +13,22 @@ module netconf-northbound-notification {
             description "Initial revision.";
     }
 
+        // We keep those as mdsal-netconf-notification needs them.
+        // Once it will be moved to blueprint, it will be safe to delete
+        // this yang files.
+        // Those APIs are now registered by blueprint in netconf-notification
+
     identity netconf-notification-collector {
             base "config:service-type";
             config:java-class "org.opendaylight.netconf.notifications.NetconfNotificationCollector";
+            config:disable-osgi-service-registration;
+            status deprecated;
         }
 
     identity netconf-notification-registry {
            base "config:service-type";
            config:java-class "org.opendaylight.netconf.notifications.NetconfNotificationRegistry";
+           config:disable-osgi-service-registration;
+           status deprecated;
     }
 }

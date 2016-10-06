@@ -13,23 +13,28 @@ import java.util.Hashtable;
 import org.opendaylight.controller.config.facade.xml.ConfigSubsystemFacadeFactory;
 import org.opendaylight.netconf.api.util.NetconfConstants;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.*;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Activator implements BundleActivator {
+public class Activator {
 
     private static final Logger LOG = LoggerFactory.getLogger(Activator.class);
 
+    private final BundleContext context;
+
     private ServiceRegistration<?> osgiRegistration;
 
-    @Override
-    public void start(final BundleContext context) throws Exception {
+    public Activator(final BundleContext context) {
+        this.context = context;
+    }
+
+    /**
+     * Invoke by blueprint
+     */
+    public void start() {
         ServiceTrackerCustomizer<ConfigSubsystemFacadeFactory, ConfigSubsystemFacadeFactory> schemaServiceTrackerCustomizer = new ServiceTrackerCustomizer<ConfigSubsystemFacadeFactory, ConfigSubsystemFacadeFactory>() {
 
             @Override
@@ -57,8 +62,10 @@ public class Activator implements BundleActivator {
         schemaContextProviderServiceTracker.open();
     }
 
-    @Override
-    public void stop(final BundleContext bundleContext) throws Exception {
+    /**
+     * Invoke by blueprint
+     */
+    public void stop() {
         if (osgiRegistration != null) {
             osgiRegistration.unregister();
         }

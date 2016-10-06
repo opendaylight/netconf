@@ -45,11 +45,11 @@ public class NetconfMonitoringActivatorTest {
 
     @Test
     public void testNetconfMonitoringActivator() throws Exception {
-        NetconfMonitoringActivator activator = new NetconfMonitoringActivator();
-        activator.start(context);
+        NetconfMonitoringActivator activator = new NetconfMonitoringActivator(context);
+        activator.start();
         verify(context, times(1)).addServiceListener(any(ServiceListener.class), anyString());
 
-        activator.stop(context);
+        activator.stop();
         verify(context, times(1)).removeServiceListener(any(ServiceListener.class));
     }
 }

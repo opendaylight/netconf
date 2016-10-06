@@ -31,7 +31,6 @@ import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.notifications.NetconfNotification;
-import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.notifications.impl.NetconfNotificationManager;
 import org.opendaylight.netconf.notifications.impl.ops.CreateSubscription;
 import org.opendaylight.netconf.notifications.impl.ops.Get;
@@ -42,23 +41,18 @@ public class ActivatorTest {
 
     @Test
     public void testActivator() throws Exception {
-        final Activator activator = new Activator();
         final BundleContext context = mock(BundleContext.class);
 
+        final Activator activator = new Activator(context, mock(NetconfNotificationManager.class));
 
-        final ServiceRegistration netconfNotificationCollectorServiceRegistration  = mock(ServiceRegistration.class);
+
         final ServiceRegistration operationaServiceRegistration = mock(ServiceRegistration.class);
 
         // test registering services
-        doReturn(netconfNotificationCollectorServiceRegistration).when(context).
-                registerService(eq(NetconfNotificationCollector.class), any(NetconfNotificationManager.class), any());
         doReturn(operationaServiceRegistration).when(context).
                 registerService(eq(NetconfOperationServiceFactory.class), any(NetconfOperationServiceFactory.class), any());
 
-        activator.start(context);
-
-        verify(context, times(1)).registerService(eq(NetconfNotificationCollector.class),
-                any(NetconfNotificationManager.class), eq(new Hashtable<>()));
+        activator.start();
 
         final ArgumentCaptor<NetconfOperationServiceFactory> serviceFactoryArgumentCaptor =
                 ArgumentCaptor.forClass(NetconfOperationServiceFactory.class);
@@ -104,12 +98,10 @@ public class ActivatorTest {
         );
 
         // test unregister after stop
-        doNothing().when(netconfNotificationCollectorServiceRegistration).unregister();
         doNothing().when(operationaServiceRegistration).unregister();
 
-        activator.stop(context);
+        activator.stop();
 
-        verify(netconfNotificationCollectorServiceRegistration, times(1)).unregister();
         verify(operationaServiceRegistration, times(1)).unregister();
 
     }

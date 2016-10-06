@@ -8,10 +8,9 @@
 
 package org.opendaylight.netconf.console.commands;
 
+import com.google.common.base.Strings;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.google.common.base.Strings;
 
 public class NetconfCommandUtils {
 
