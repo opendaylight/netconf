@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_829d775c",
+        "filename": "netconf/netconf-tcp/src/main/java/org/opendaylight/netconf/tcp/osgi/NetconfTCPActivator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-06T10:59:34Z",
+      "side": 1,
+      "message": "Shouldn\u0027t there be a blank line here? According to https://google.github.io/styleguide/javaguide.html#s4.6.1-vertical-whitespace, I think there should be",
+      "revId": "19e5ab0183fc7e3905e14093d2d3194e2faec9b8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_e2a1cb96",
+        "filename": "netconf/netconf-tcp/src/main/java/org/opendaylight/netconf/tcp/osgi/NetconfTCPActivator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-06T10:59:34Z",
+      "side": 1,
+      "message": "Invoke",
+      "revId": "19e5ab0183fc7e3905e14093d2d3194e2faec9b8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_c29e4f54",
+        "filename": "netconf/netconf-tcp/src/main/java/org/opendaylight/netconf/tcp/osgi/NetconfTCPActivator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-06T10:59:34Z",
+      "side": 1,
+      "message": "Invoke",
+      "revId": "19e5ab0183fc7e3905e14093d2d3194e2faec9b8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
