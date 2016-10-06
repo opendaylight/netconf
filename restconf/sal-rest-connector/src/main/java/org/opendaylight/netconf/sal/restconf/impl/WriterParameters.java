@@ -11,12 +11,18 @@ package org.opendaylight.netconf.sal.restconf.impl;
 import com.google.common.base.Optional;
 
 public class WriterParameters {
+    private final String content;
     private final Optional<Integer> depth;
     private final boolean prettyPrint;
 
     private WriterParameters(final WriterParametersBuilder builder) {
+        this.content = builder.content;
         this.prettyPrint = builder.prettyPrint;
         this.depth = builder.depth;
+    }
+
+    public String getContent() {
+        return content;
     }
 
     public Optional<Integer> getDepth() {
@@ -28,23 +34,20 @@ public class WriterParameters {
     }
 
     public static class WriterParametersBuilder {
+        private String content;
         private Optional<Integer> depth = Optional.absent();
         private boolean prettyPrint;
 
-        public WriterParametersBuilder() {
-        }
+        public WriterParametersBuilder() {}
 
-        public Optional<Integer> getDepth() {
-            return depth;
+        public WriterParametersBuilder setContent(final String content) {
+            this.content = content;
+            return this;
         }
 
         public WriterParametersBuilder setDepth(final int depth) {
             this.depth = Optional.of(depth);
             return this;
-        }
-
-        public boolean isPrettyPrint() {
-            return prettyPrint;
         }
 
         public WriterParametersBuilder setPrettyPrint(final boolean prettyPrint) {

@@ -9,14 +9,23 @@ package org.opendaylight.restconf.restful.utils;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import javax.annotation.Nonnull;
+import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.netconf.sal.restconf.impl.WriterParameters;
+import org.opendaylight.netconf.sal.restconf.impl.WriterParameters.WriterParametersBuilder;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -62,27 +71,24 @@ public final class ReadDataTransactionUtil {
      *            - {@link TransactionVarsWrapper} - wrapper for variables
      * @return {@link NormalizedNode}
      */
-    public static NormalizedNode<?, ?> readData(final String valueOfContent, final TransactionVarsWrapper transactionNode) {
+    public static NormalizedNode<?, ?> readData(@Nonnull final String valueOfContent,
+                                                final TransactionVarsWrapper transactionNode) {
         final NormalizedNode<?, ?> data;
-        if (valueOfContent != null) {
-            switch (valueOfContent) {
-                case RestconfDataServiceConstant.ReadData.CONFIG:
-                    transactionNode.setLogicalDatastoreType(LogicalDatastoreType.CONFIGURATION);
-                    data = readDataViaTransaction(transactionNode);
-                    break;
-                case RestconfDataServiceConstant.ReadData.NONCONFIG:
-                    transactionNode.setLogicalDatastoreType(LogicalDatastoreType.OPERATIONAL);
-                    data = readDataViaTransaction(transactionNode);
-                    break;
-                case RestconfDataServiceConstant.ReadData.ALL:
-                    data = readAllData(transactionNode);
-                    break;
-                default:
-                    throw new RestconfDocumentedException("Bad querry parameter for content.", ErrorType.APPLICATION,
-                            ErrorTag.INVALID_VALUE);
-            }
-        } else {
-            data = readAllData(transactionNode);
+        switch (valueOfContent) {
+            case RestconfDataServiceConstant.ReadData.CONFIG:
+                transactionNode.setLogicalDatastoreType(LogicalDatastoreType.CONFIGURATION);
+                data = readDataViaTransaction(transactionNode);
+                break;
+            case RestconfDataServiceConstant.ReadData.NONCONFIG:
+                transactionNode.setLogicalDatastoreType(LogicalDatastoreType.OPERATIONAL);
+                data = readDataViaTransaction(transactionNode);
+                break;
+            case RestconfDataServiceConstant.ReadData.ALL:
+                data = readAllData(transactionNode);
+                break;
+            default:
+                throw new RestconfDocumentedException("Bad querry parameter for content.", ErrorType.APPLICATION,
+                        ErrorTag.INVALID_VALUE);
         }
 
         return data;
@@ -318,6 +324,85 @@ public final class ReadDataTransactionUtil {
         final QNameModule moduleOfConfigData = configDataNode.getIdentifier().getNodeType().getModule();
         if (moduleOfStateData != moduleOfConfigData) {
             throw new RestconfDocumentedException("It is not possible to merge ");
+        }
+    }
+
+    public static WriterParameters parseUriParameters(final UriInfo uriInfo) {
+        final WriterParametersBuilder builder = new WriterParametersBuilder();
+
+        if (uriInfo == null) {
+            return builder.build();
+        }
+
+        // read parameters from URI or set default values
+        final List<String> content = uriInfo.getQueryParameters(false).getOrDefault(
+                RestconfDataServiceConstant.ReadData.CONTENT,
+                Collections.singletonList(RestconfDataServiceConstant.ReadData.ALL));
+        final List<String> depth = uriInfo.getQueryParameters(false).getOrDefault(
+                RestconfDataServiceConstant.ReadData.DEPTH,
+                Collections.singletonList(RestconfDataServiceConstant.ReadData.UNBOUNDED));
+
+        // check only allowed parameters
+        checkParametersTypes(uriInfo.getQueryParameters().keySet());
+
+        // parameter can be in URI at most once
+        checkParameterCount(content, RestconfDataServiceConstant.ReadData.CONTENT);
+        checkParameterCount(depth, RestconfDataServiceConstant.ReadData.DEPTH);
+
+        // set content
+        builder.setContent(content.get(0));
+
+        // set depth
+        if (!depth.get(0).equals(RestconfDataServiceConstant.ReadData.UNBOUNDED)) {
+            final Integer value = Ints.tryParse(depth.get(0));
+
+            if (value == null
+                    || (!(value >= RestconfDataServiceConstant.ReadData.MIN_DEPTH
+                            && value <= RestconfDataServiceConstant.ReadData.MAX_DEPTH))) {
+                throw new RestconfDocumentedException(
+                        new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
+                            "Invalid depth parameter: " + depth, null,
+                            "The depth parameter must be an integer between 1 and 65535 or \"unbounded\""));
+            } else {
+                builder.setDepth(value);
+            }
+        }
+
+        return builder.build();
+    }
+
+    /**
+     * Check if URI contains only parameters allowed for GET operation
+     *
+     * @param parameters
+     *            - set of parameters used in URI
+     */
+    private static void checkParametersTypes(final Set<String> parameters) {
+        final Set<String> notAllowedParameters = new HashSet<>(parameters);
+        notAllowedParameters.remove(RestconfDataServiceConstant.ReadData.CONTENT);
+        notAllowedParameters.remove(RestconfDataServiceConstant.ReadData.DEPTH);
+
+        if (!notAllowedParameters.isEmpty()) {
+            throw new RestconfDocumentedException("Not allowed parameters for GET operation: " + notAllowedParameters,
+                    RestconfError.ErrorType.PROTOCOL,
+                    RestconfError.ErrorTag.INVALID_VALUE);
+        }
+    }
+
+    /**
+     * Check if URI does not contain value for the same parameter more than once
+     *
+     * @param parameterValues
+     *            - data node of state data
+     * @param parameterName
+     *            - data node of config data
+     */
+    private static void checkParameterCount(final List<String> parameterValues, final String parameterName) {
+        if (parameterValues.size() > 1) {
+            throw new RestconfDocumentedException(
+                    "Parameter " + parameterName + " can appear at most once in a request URI",
+                    ErrorType.PROTOCOL,
+                    ErrorTag.INVALID_VALUE);
         }
     }
 }
