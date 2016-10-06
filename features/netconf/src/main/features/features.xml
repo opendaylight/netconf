@@ -135,6 +135,9 @@
     <feature version='${project.version}'>odl-netconf-client</feature>
     <feature version='${controller.mdsal.version}'>odl-mdsal-broker</feature>
     <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-ssh/{{VERSION}}</bundle>
+    <!-- If you want to use a TCP session for the MD-SAL NETCONF server,
+    uncomment the bellow bundle and comment the one above (mdsal-netconf-ssh) -->
+    <!-- <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-tcp/{{VERSION}}</bundle> -->
     <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-notification/{{VERSION}}</bundle>
     <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-connector/{{VERSION}}</bundle>
     <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-monitoring/{{VERSION}}</bundle>
