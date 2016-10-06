@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2016 Inocybe Technologies Inc. and others.  All rights reserved.
+
+ This program and the accompanying materials are made available under the
+ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ and is available at http://www.eclipse.org/legal/epl-v10.html
+-->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           odl:use-default-for-reference-types="true">
+
+    <reference id="globalBossGroup" interface="io.netty.channel.EventLoopGroup" odl:type="global-boss-group"/>
+    <reference id="globalWorkerGroup" interface="io.netty.channel.EventLoopGroup" odl:type="global-worker-group"/>
+    <reference id="timer" interface="io.netty.util.Timer" odl:type="global-timer"/>
+
+    <bean id="netconfClientDispatcherImpl"
+          class="org.opendaylight.netconf.client.NetconfClientDispatcherImpl">
+        <argument ref="globalBossGroup"/>
+        <argument ref="globalWorkerGroup"/>
+        <argument ref="timer"/>
+    </bean>
+    <service ref="netconfClientDispatcherImpl"
+             interface="org.opendaylight.netconf.client.NetconfClientDispatcher"
+             odl:type="netconf-client-dispatcher">
+        <service-properties>
+        <entry key="config-module-namespace" value="urn:opendaylight:params:xml:ns:yang:controller:config:netconf"/>
+        <entry key="config-module-name" value="netconf-client-dispatcher"/>
+        <entry key="config-instance-name" value="global-netconf-dispatcher"/>
+        </service-properties>
+    </service>
+
+</blueprint>
