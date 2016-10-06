@@ -24,6 +24,7 @@ import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
+import org.opendaylight.netconf.sal.restconf.impl.WriterParameters;
 import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
@@ -31,6 +32,7 @@ import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.restconf.restful.utils.DeleteDataTransactionUtil;
+import org.opendaylight.restconf.restful.utils.ParametersUtil;
 import org.opendaylight.restconf.restful.utils.PatchDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.PutDataTransactionUtil;
@@ -61,12 +63,13 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     @Override
     public Response readData(final String identifier, final UriInfo uriInfo) {
         Preconditions.checkNotNull(identifier);
+
+        final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(uriInfo);
         final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
 
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
                 schemaContextRef.get());
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
-        final String value = uriInfo.getQueryParameters().getFirst(RestconfDataServiceConstant.CONTENT);
 
         final DOMTransactionChain transaction;
         if (mountPoint == null) {
@@ -75,9 +78,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             transaction = transactionOfMountPoint(mountPoint);
         }
 
-        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(instanceIdentifier, mountPoint,
-                transaction);
-        final NormalizedNode<?, ?> node = ReadDataTransactionUtil.readData(value, transactionNode);
+        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
+                instanceIdentifier, mountPoint, transaction);
+        final NormalizedNode<?, ?> node = ReadDataTransactionUtil.readData(parameters.getContent(), transactionNode);
         if (node == null) {
             throw new RestconfDocumentedException(
                     "Request could not be completed because the relevant data model content does not exist",
@@ -90,12 +93,19 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 + node.getNodeType().getLocalName() + '"';
         final Response resp;
 
-        if ((value == null) || value.contains(RestconfDataServiceConstant.ReadData.CONFIG)) {
-            resp = Response.status(200).entity(new NormalizedNodeContext(instanceIdentifier, node)).header("ETag", etag)
-                    .header("Last-Modified", dateFormatGmt.format(new Date())).build();
+        if ((parameters.getContent().equals(RestconfDataServiceConstant.ReadData.ALL))
+                    || parameters.getContent().equals(RestconfDataServiceConstant.ReadData.CONFIG)) {
+            resp = Response.status(200)
+                    .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
+                    .header("ETag", etag)
+                    .header("Last-Modified", dateFormatGmt.format(new Date()))
+                    .build();
         } else {
-            resp = Response.status(200).entity(new NormalizedNodeContext(instanceIdentifier, node)).build();
+            resp = Response.status(200)
+                    .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
+                    .build();
         }
+
         return resp;
     }
 
