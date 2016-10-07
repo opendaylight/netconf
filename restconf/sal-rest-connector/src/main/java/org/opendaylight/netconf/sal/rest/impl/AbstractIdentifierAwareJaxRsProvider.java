@@ -14,11 +14,10 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
-import org.opendaylight.restconf.utils.patch.Draft16AbstractIdentifierAwareJaxRsProvider;
 
 /**
  * @deprecated This class will be replaced by
- * {@link Draft16AbstractIdentifierAwareJaxRsProvider}
+ *             {@link org.opendaylight.restconf.utils.patch.AbstractIdentifierAwareJaxRsProvider}
  */
 @Deprecated
 public class AbstractIdentifierAwareJaxRsProvider {

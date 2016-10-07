@@ -37,7 +37,6 @@ import org.opendaylight.netconf.sal.restconf.impl.PATCHEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
-import org.opendaylight.restconf.utils.patch.Draft16XmlToPATCHBodyReader;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -59,7 +58,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * @deprecated This class will be replaced by {@link Draft16XmlToPATCHBodyReader}
+ * @deprecated This class will be replaced by
+ *             {@link org.opendaylight.restconf.utils.patch.XmlToPATCHBodyReader}
  */
 @Deprecated
 @Provider
@@ -213,12 +213,12 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
     private List<Element> readValueNodes(@Nonnull final Element element, @Nonnull final String operation) {
         final Node valueNode = element.getElementsByTagName("value").item(0);
 
-        if (PATCHEditOperation.isPatchOperationWithValue(operation) && valueNode == null) {
+        if (PATCHEditOperation.isPatchOperationWithValue(operation) && (valueNode == null)) {
             throw new RestconfDocumentedException("Error parsing input",
                     ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
 
-        if (!PATCHEditOperation.isPatchOperationWithValue(operation) && valueNode != null) {
+        if (!PATCHEditOperation.isPatchOperationWithValue(operation) && (valueNode != null)) {
             throw new RestconfDocumentedException("Error parsing input",
                     ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
@@ -250,7 +250,7 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
      */
     private String prepareNonCondXpath(@Nonnull final DataSchemaNode schemaNode, @Nonnull final String target,
                                        @Nonnull final Element value, @Nonnull final String namespace,
-                                       @Nonnull String revision) {
+                                       @Nonnull final String revision) {
         final Iterator<String> args = Splitter.on("/").split(target.substring(target.indexOf(':') + 1)).iterator();
 
         final StringBuilder nonCondXpath = new StringBuilder();
@@ -262,12 +262,12 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
             nonCondXpath.append(s);
             childNode = ((DataNodeContainer) childNode).getDataChildByName(QName.create(namespace, revision, s));
 
-            if (childNode instanceof ListSchemaNode && args.hasNext()) {
+            if ((childNode instanceof ListSchemaNode) && args.hasNext()) {
                 appendKeys(nonCondXpath, ((ListSchemaNode) childNode).getKeyDefinition().iterator(), args);
             }
         }
 
-        if (childNode instanceof ListSchemaNode && value != null) {
+        if ((childNode instanceof ListSchemaNode) && (value != null)) {
             final Iterator<String> keyValues = readKeyValues(value,
                     ((ListSchemaNode) childNode).getKeyDefinition().iterator());
             appendKeys(nonCondXpath, ((ListSchemaNode) childNode).getKeyDefinition().iterator(), keyValues);

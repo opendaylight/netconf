@@ -29,7 +29,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.broker.impl.mount.DOMMountPointServiceImpl;
 import org.opendaylight.controller.md.sal.dom.broker.spi.mount.SimpleDOMMountPoint;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
-import org.opendaylight.restconf.Draft16;
+import org.opendaylight.restconf.Draft17;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.utils.RestconfConstants;
@@ -193,8 +193,8 @@ class RestconfModulesServiceTestUtils {
 
         when(schemaContext.findModuleByNamespaceAndRevision(any(URI.class), any(Date.class))).thenAnswer(invocation -> {
             final Object[] args = invocation.getArguments();
-            if ((args[0] == Draft16.RestconfModule.IETF_RESTCONF_QNAME.getNamespace())
-                    && (args[1] == Draft16.RestconfModule.IETF_RESTCONF_QNAME.getRevision())) {
+            if ((args[0] == Draft17.RestconfModule.IETF_RESTCONF_QNAME.getNamespace())
+                    && (args[1] == Draft17.RestconfModule.IETF_RESTCONF_QNAME.getRevision())) {
                 return parseCustomRestconfSource(restconfModuleName).findModuleByName(
                         restconfModuleName, (Date) args[1]);
             } else {
