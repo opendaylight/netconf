@@ -1,0 +1,354 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_735d8cec",
+        "filename": "netconf/netconf-topology-singleton/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T13:30:09Z",
+      "side": 1,
+      "message": "missing copyright",
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_1351b8d8",
+        "filename": "netconf/netconf-topology-singleton/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T13:30:09Z",
+      "side": 1,
+      "message": "trailing space",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 63,
+        "endChar": 4
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_536210ae",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/api/NetconfDOMTransactions.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T13:30:09Z",
+      "side": 1,
+      "message": "please provide javadoc and I would have the class singular not plural, e.g. NetconfDOMTransaction (but that might be a personal taste)",
+      "range": {
+        "startLine": 17,
+        "startChar": 17,
+        "endLine": 17,
+        "endChar": 39
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_f3707c75",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/api/NetconfTopologyServicesProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T13:30:09Z",
+      "side": 1,
+      "message": "javadoc please",
+      "range": {
+        "startLine": 11,
+        "startChar": 17,
+        "endLine": 11,
+        "endChar": 48
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_d36d809b",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/api/RemoteDeviceConnector.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T13:30:09Z",
+      "side": 1,
+      "message": "javadoc please",
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_336b1487",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/api/RemoteOperationTxProcessor.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T13:30:09Z",
+      "side": 1,
+      "message": "javadoc please",
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_538cd035",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T13:30:09Z",
+      "side": 1,
+      "message": "This shouldn\u0027t be needed, as using blueprint",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 5
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_93b4a8d2",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyContext.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T13:30:09Z",
+      "side": 1,
+      "message": "inconsistent use of this in the constructor. Either use it everywhere, either don\u0027t use it. But I think it\u0027s inconsistent having it here and there..",
+      "range": {
+        "startLine": 43,
+        "startChar": 8,
+        "endLine": 43,
+        "endChar": 13
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_339e7464",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T13:30:09Z",
+      "side": 1,
+      "message": "not necessary",
+      "range": {
+        "startLine": 144,
+        "startChar": 24,
+        "endLine": 144,
+        "endChar": 40
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_f3935c5a",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T13:30:09Z",
+      "side": 1,
+      "message": "that class could go away, you could directly instantiate NetconfTopologyManager in the blueprint xml file",
+      "range": {
+        "startLine": 28,
+        "startChar": 13,
+        "endLine": 28,
+        "endChar": 36
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_53e170cf",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T13:30:09Z",
+      "side": 1,
+      "message": "what about the extra config, like concurrentRpc, schemaCacheDirectory, yangLib and so on... I\u0027m under the impression we are loosing some configuration knobs here.",
+      "range": {
+        "startLine": 46,
+        "startChar": 35,
+        "endLine": 52,
+        "endChar": 58
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_139b7873",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/SlaveSalFacade.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T13:30:09Z",
+      "side": 1,
+      "message": "that shouldn\u0027t happen if using blueprint",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 5
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_33195423",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/NetconfMasterDOMTransactions.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T13:30:09Z",
+      "side": 1,
+      "message": "could be singular as well. Not sure it\u0027s adding real value to have Netconf prefix in the class name. Same goes with all other tx classes.",
+      "range": {
+        "startLine": 33,
+        "startChar": 13,
+        "endLine": 33,
+        "endChar": 41
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_d3c5803e",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/utils/NetconfTopologySetupBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T13:30:09Z",
+      "side": 1,
+      "message": "instanceIdentifier or identifier or id. But I feel like ident is confusing.",
+      "range": {
+        "startLine": 29,
+        "startChar": 37,
+        "endLine": 29,
+        "endChar": 42
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_b3af247d",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/utils/NetconfTopologySetupBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T13:30:09Z",
+      "side": 1,
+      "message": "Why is the object nested in its builder class. Should be moved to its own class",
+      "range": {
+        "startLine": 149,
+        "startChar": 17,
+        "endLine": 149,
+        "endChar": 37
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_33f034c9",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/NormalizedNodeMessage.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T13:30:09Z",
+      "side": 1,
+      "message": "could have a comment saying it\u0027s needed for Externalizable.",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 5
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
