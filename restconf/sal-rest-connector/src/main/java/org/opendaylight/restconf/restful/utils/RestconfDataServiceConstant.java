@@ -45,6 +45,7 @@ public final class RestconfDataServiceConstant {
         // URI parameters
         public static final String CONTENT = "content";
         public static final String DEPTH = "depth";
+        public static final String FIELDS = "fields";
 
         // content values
         public static final String CONFIG = "config";

@@ -28,10 +28,10 @@ import org.opendaylight.restconf.rest.services.impl.RestconfModulesServiceImpl;
 import org.opendaylight.restconf.rest.services.impl.RestconfOperationsServiceImpl;
 import org.opendaylight.restconf.rest.services.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.restconf.rest.services.impl.RestconfStreamsServiceImpl;
-import org.opendaylight.restconf.restful.services.api.TransactionServicesWrapper;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
 import org.opendaylight.restconf.restful.services.api.RestconfInvokeOperationsService;
 import org.opendaylight.restconf.restful.services.api.RestconfStreamsSubscriptionService;
+import org.opendaylight.restconf.restful.services.api.TransactionServicesWrapper;
 import org.opendaylight.restconf.restful.services.impl.RestconfDataServiceImpl;
 import org.opendaylight.restconf.restful.services.impl.RestconfInvokeOperationsServiceImpl;
 import org.opendaylight.restconf.restful.services.impl.RestconfStreamsSubscriptionServiceImpl;
@@ -99,6 +99,11 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
     @Override
     public SchemaExportContext getSchema(final String mountAndModuleId) {
         return this.delegRestSchService.getSchema(mountAndModuleId);
+    }
+
+    @Override
+    public Response readData(final UriInfo uriInfo) {
+        return this.delegRestconfDataService.readData(uriInfo);
     }
 
     @Override
