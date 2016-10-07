@@ -153,6 +153,10 @@ module netconf-node-topology {
                     }
                 }
             }
+            leaf netconf-master-node {
+                config false;
+                type string;
+            }
         }
 
         leaf connected-message {
