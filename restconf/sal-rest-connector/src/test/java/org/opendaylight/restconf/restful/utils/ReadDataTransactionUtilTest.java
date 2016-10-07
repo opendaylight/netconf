@@ -41,6 +41,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class ReadDataTransactionUtilTest {
 
@@ -55,6 +56,8 @@ public class ReadDataTransactionUtilTest {
     private InstanceIdentifierContext<?> context;
     @Mock
     private DOMDataReadOnlyTransaction read;
+    @Mock
+    private SchemaContext schemaContext;
 
     @Before
     public void setUp() {
@@ -174,7 +177,8 @@ public class ReadDataTransactionUtilTest {
     @Test(expected = RestconfDocumentedException.class)
     public void readDataFailTest() {
         final String valueOfContent = RestconfDataServiceConstant.ReadData.READ_TYPE_TX;
-        final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(valueOfContent, null);
+        final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(
+                valueOfContent, wrapper);
         assertNull(normalizedNode);
     }
 
@@ -189,7 +193,7 @@ public class ReadDataTransactionUtilTest {
         // no parameters, default values should be used
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
-        final WriterParameters parsedParameters = ReadDataTransactionUtil.parseUriParameters(uriInfo);
+        final WriterParameters parsedParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
 
         assertEquals("Not correctly parsed URI parameter",
                 RestconfDataServiceConstant.ReadData.ALL, parsedParameters.getContent());
@@ -213,7 +217,7 @@ public class ReadDataTransactionUtilTest {
 
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
-        final WriterParameters parsedParameters = ReadDataTransactionUtil.parseUriParameters(uriInfo);
+        final WriterParameters parsedParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
 
         assertEquals("Not correctly parsed URI parameter",
                 content, parsedParameters.getContent());
@@ -235,7 +239,7 @@ public class ReadDataTransactionUtilTest {
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         try {
-            ReadDataTransactionUtil.parseUriParameters(uriInfo);
+            ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
             fail("Test expected to fail due to not allowed parameter value");
         } catch (final RestconfDocumentedException e) {
             // Bad request
@@ -258,7 +262,7 @@ public class ReadDataTransactionUtilTest {
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         try {
-            ReadDataTransactionUtil.parseUriParameters(uriInfo);
+            ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
             fail("Test expected to fail due to not allowed parameter value");
         } catch (final RestconfDocumentedException e) {
             // Bad request
@@ -282,7 +286,7 @@ public class ReadDataTransactionUtilTest {
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         try {
-            ReadDataTransactionUtil.parseUriParameters(uriInfo);
+            ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
             fail("Test expected to fail due to not allowed parameter value");
         } catch (final RestconfDocumentedException e) {
             // Bad request
@@ -306,7 +310,7 @@ public class ReadDataTransactionUtilTest {
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         try {
-            ReadDataTransactionUtil.parseUriParameters(uriInfo);
+            ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
             fail("Test expected to fail due to not allowed parameter value");
         } catch (final RestconfDocumentedException e) {
             // Bad request
