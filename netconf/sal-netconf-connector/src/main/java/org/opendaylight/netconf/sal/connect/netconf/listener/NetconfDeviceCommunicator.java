@@ -246,10 +246,8 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
             initFuture.cancel(false);
         }
         // Disconnect from device
-        if(session != null) {
-            session.close();
-            // tear down not necessary, called indirectly by above close
-        }
+        // tear down not necessary, called indirectly by the close in disconnect()
+        disconnect();
     }
 
     @Override
