@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_7303cc76",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T13:34:05Z",
+      "side": 1,
+      "message": "the commit message is quite not accurate. But overall this is a good thing what that patch is doing",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 22
+      },
+      "revId": "4ae56d9dc7800f42f6f6ff1856e7f66a26b7118e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_53085091",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T13:34:05Z",
+      "side": 1,
+      "message": "netconf",
+      "range": {
+        "startLine": 9,
+        "startChar": 9,
+        "endLine": 9,
+        "endChar": 16
+      },
+      "revId": "4ae56d9dc7800f42f6f6ff1856e7f66a26b7118e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
