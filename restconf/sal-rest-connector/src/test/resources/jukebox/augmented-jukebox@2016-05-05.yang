@@ -1,0 +1,16 @@
+module augmented-jukebox {
+
+      namespace "http://example.com/ns/augmented-jukebox";
+      prefix "augmented-jbox";
+
+      revision "2016-05-05" {
+        description "Initial version.";
+      }
+
+      import example-jukebox {prefix jbox; revision-date "2015-04-04";}
+
+      augment "/jbox:jukebox" {
+        container augmented-library {
+        }
+     }
+   }
