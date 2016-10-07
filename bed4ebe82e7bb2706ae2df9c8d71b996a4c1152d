@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_fe7a0324",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-07T16:40:49Z",
+      "side": 1,
+      "message": "mdsal",
+      "revId": "bed4ebe82e7bb2706ae2df9c8d71b996a4c1152d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_3e759b32",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-07T16:40:49Z",
+      "side": 1,
+      "message": "classes\u0027 modifiers",
+      "revId": "bed4ebe82e7bb2706ae2df9c8d71b996a4c1152d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_decc6764",
+        "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/NetconfMdsalNotificationMapperModule.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-07T16:40:49Z",
+      "side": 1,
+      "message": "Can we be sure that we will have here the right one NetconfOperationServiceFactory?\n\nI mean, cannot be there more NetconfOperationServiceFactory services registered with OSGi?",
+      "revId": "bed4ebe82e7bb2706ae2df9c8d71b996a4c1152d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_7e039376",
+        "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/NetconfMdsalNotificationMapperModule.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-07T16:40:49Z",
+      "side": 1,
+      "message": "static is redundant",
+      "revId": "bed4ebe82e7bb2706ae2df9c8d71b996a4c1152d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
