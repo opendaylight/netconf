@@ -40,6 +40,7 @@ import org.opendaylight.restconf.restful.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.RestconfDataServiceConstant;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,15 +66,14 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response readData(final String identifier, final UriInfo uriInfo) {
-        Preconditions.checkNotNull(identifier);
-
-        final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(uriInfo);
         final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
-
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
                 identifier, schemaContextRef.get(), Optional.of(this.mountPointServiceHandler.get()));
-        final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
 
+        final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(
+                instanceIdentifier, uriInfo);
+
+        final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final DOMTransactionChain transactionChain;
         if (mountPoint == null) {
             transactionChain = this.transactionChainHandler.get();
