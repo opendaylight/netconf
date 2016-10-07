@@ -9,15 +9,19 @@
 package org.opendaylight.netconf.sal.restconf.impl;
 
 import com.google.common.base.Optional;
+import java.util.List;
+import org.opendaylight.yangtools.yang.common.QName;
 
 public class WriterParameters {
     private final String content;
     private final Optional<Integer> depth;
+    private final Optional<List<QName>> fields;
     private final boolean prettyPrint;
 
     private WriterParameters(final WriterParametersBuilder builder) {
         this.content = builder.content;
         this.depth = builder.depth;
+        this.fields = builder.fields;
         this.prettyPrint = builder.prettyPrint;
     }
 
@@ -29,6 +33,10 @@ public class WriterParameters {
         return depth;
     }
 
+    public Optional<List<QName>> getFields() {
+        return fields;
+    }
+
     public boolean isPrettyPrint() {
         return prettyPrint;
     }
@@ -36,6 +44,7 @@ public class WriterParameters {
     public static class WriterParametersBuilder {
         private String content;
         private Optional<Integer> depth = Optional.absent();
+        private Optional<List<QName>> fields = Optional.absent();
         private boolean prettyPrint;
 
         public WriterParametersBuilder() {}
@@ -47,6 +56,11 @@ public class WriterParameters {
 
         public WriterParametersBuilder setDepth(final int depth) {
             this.depth = Optional.of(depth);
+            return this;
+        }
+
+        public WriterParametersBuilder setFields(final List<QName> fields) {
+            this.fields = Optional.of(fields);
             return this;
         }
 
