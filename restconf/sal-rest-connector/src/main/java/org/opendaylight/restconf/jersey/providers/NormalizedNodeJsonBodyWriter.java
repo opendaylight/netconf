@@ -1,13 +1,13 @@
 /*
- * Copyright (c) 2014 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.rest.impl;
 
-import com.google.common.base.Optional;
+package org.opendaylight.restconf.jersey.providers;
+
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -16,17 +16,20 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Set;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfNormalizedNodeWriter;
-import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.restconf.Draft17;
+import org.opendaylight.restconf.utils.RestconfConstants;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -44,8 +47,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 @Provider
-@Produces({ Draft02.MediaTypes.API + RestconfService.JSON, Draft02.MediaTypes.DATA + RestconfService.JSON,
-        Draft02.MediaTypes.OPERATION + RestconfService.JSON, MediaType.APPLICATION_JSON })
+@Produces({ Draft17.MediaTypes.DATA + RestconfConstants.JSON, MediaType.APPLICATION_JSON })
 public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<NormalizedNodeContext> {
 
     private static final int DEFAULT_INDENT_SPACES_NUM = 2;
@@ -75,53 +77,62 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         final SchemaPath path = context.getSchemaNode().getPath();
         final JsonWriter jsonWriter = createJsonWriter(entityStream, t.getWriterParameters().isPrettyPrint());
         jsonWriter.beginObject();
-        writeNormalizedNode(jsonWriter,path,context,data, Optional.fromNullable(t.getWriterParameters().getDepth()));
+        writeNormalizedNode(jsonWriter, path, context, data, t.getWriterParameters().getDepth(), t.getWriterParameters().getFields());
         jsonWriter.endObject();
         jsonWriter.flush();
     }
 
-    private void writeNormalizedNode(final JsonWriter jsonWriter, SchemaPath path,
-            final InstanceIdentifierContext<SchemaNode> context, NormalizedNode<?, ?> data, final Optional<Integer> depth) throws
-            IOException {
+    private void writeNormalizedNode(final JsonWriter jsonWriter,
+                                     final SchemaPath path,
+                                     final InstanceIdentifierContext<SchemaNode> context,
+                                     final NormalizedNode<?, ?> data,
+                                     final Integer depth,
+                                     final List<Set<QName>> fields) throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
-        if (SchemaPath.ROOT.equals(path)) {
-            /*
-             *  Creates writer without initialNs and we write children of root data container
-             *  which is not visible in restconf
-             */
-            nnWriter = createNormalizedNodeWriter(context,path,jsonWriter, depth);
-            writeChildren(nnWriter,(ContainerNode) data);
-        } else if (context.getSchemaNode() instanceof RpcDefinition) {
+
+        if (context.getSchemaNode() instanceof RpcDefinition) {
             /*
              *  RpcDefinition is not supported as initial codec in JSONStreamWriter,
              *  so we need to emit initial output declaratation..
              */
-            path = ((RpcDefinition) context.getSchemaNode()).getOutput().getPath();
-            nnWriter = createNormalizedNodeWriter(context,path,jsonWriter, depth);
+            nnWriter = createNormalizedNodeWriter(
+                    context,
+                    ((RpcDefinition) context.getSchemaNode()).getOutput().getPath(),
+                    jsonWriter,
+                    depth,
+                    fields);
             jsonWriter.name("output");
             jsonWriter.beginObject();
             writeChildren(nnWriter, (ContainerNode) data);
             jsonWriter.endObject();
         } else {
-            path = path.getParent();
-
-            if(data instanceof MapEntryNode) {
-                data = ImmutableNodes.mapNodeBuilder(data.getNodeType()).withChild(((MapEntryNode) data)).build();
+            if (SchemaPath.ROOT.equals(path)) {
+                nnWriter = createNormalizedNodeWriter(context, path, jsonWriter, depth, fields);
+            } else {
+                nnWriter = createNormalizedNodeWriter(context, path.getParent(), jsonWriter, depth, fields);
             }
-            nnWriter = createNormalizedNodeWriter(context,path,jsonWriter, depth);
-            nnWriter.write(data);
+
+            if (data instanceof MapEntryNode) {
+                // Restconf allows returning one list item. We need to wrap it
+                // in map node in order to serialize it properly
+                nnWriter.write(
+                        ImmutableNodes.mapNodeBuilder(data.getNodeType()).withChild(((MapEntryNode) data)).build());
+            } else {
+                nnWriter.write(data);
+            }
         }
+
         nnWriter.flush();
     }
 
     private void writeChildren(final RestconfNormalizedNodeWriter nnWriter, final ContainerNode data) throws IOException {
-        for(final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
+        for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
             nnWriter.write(child);
         }
     }
 
     private RestconfNormalizedNodeWriter createNormalizedNodeWriter(final InstanceIdentifierContext<SchemaNode> context,
-            final SchemaPath path, final JsonWriter jsonWriter, final Optional<Integer> depth) {
+            final SchemaPath path, final JsonWriter jsonWriter, final Integer depth, final List<Set<QName>> fields) {
 
         final SchemaNode schema = context.getSchemaNode();
         final JSONCodecFactory codecs = getCodecFactory(context);
@@ -136,18 +147,15 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         } else {
             initialNs = null;
         }
-        final NormalizedNodeStreamWriter streamWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(codecs,path,initialNs,jsonWriter);
-        if (depth.isPresent()) {
-            return DepthAwareNormalizedNodeWriter.forStreamWriter(streamWriter, depth.get());
-        } else {
-            return RestconfDelegatingNormalizedNodeWriter.forStreamWriter(streamWriter);
-        }
+        final NormalizedNodeStreamWriter streamWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(
+                codecs, path, initialNs, jsonWriter);
+        return ParameterAwareNormalizedNodeWriter.forStreamWriter(streamWriter, depth, fields);
     }
 
     private JsonWriter createJsonWriter(final OutputStream entityStream, final boolean prettyPrint) {
         if (prettyPrint) {
-            return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8),
-                    DEFAULT_INDENT_SPACES_NUM);
+            return JsonWriterFactory.createJsonWriter(
+                    new OutputStreamWriter(entityStream, StandardCharsets.UTF_8), DEFAULT_INDENT_SPACES_NUM);
         } else {
             return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8));
         }
@@ -157,5 +165,4 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         // TODO: Performance: Cache JSON Codec factory and schema context
         return JSONCodecFactory.create(context.getSchemaContext());
     }
-
 }
