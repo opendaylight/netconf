@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -29,6 +30,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.AvailableCapabilitiesBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.ClusteredConnectionStatusBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.UnavailableCapabilities;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.UnavailableCapabilitiesBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability;
@@ -51,7 +53,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class NetconfDeviceTopologyAdapter implements AutoCloseable {
+public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceTopologyAdapter.class);
     public static final Function<Entry<QName, FailureReason>, UnavailableCapability> UNAVAILABLE_CAPABILITY_TRANSFORMER = new Function<Entry<QName, FailureReason>, UnavailableCapability>() {
@@ -134,6 +136,21 @@ final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         commitTransaction(writeTx, "update");
     }
 
+    public void updateClusteredDeviceData(boolean up, String masterAddress, NetconfDeviceCapabilities capabilities) {
+        final NetconfNode data = buildDataForNetconfClusteredNode(up, masterAddress, capabilities);
+
+        final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
+        LOG.trace(
+                "{}: Update device state transaction {} merging operational data started.",
+                id, writeTx.getIdentifier());
+        writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath().augmentation(NetconfNode.class), data, true);
+        LOG.trace(
+                "{}: Update device state transaction {} merging operational data ended.",
+                id, writeTx.getIdentifier());
+
+        commitTransaction(writeTx, "update");
+    }
+
     public void setDeviceAsFailed(Throwable throwable) {
         String reason = (throwable != null && throwable.getMessage() != null) ? throwable.getMessage() : UNKNOWN_REASON;
 
@@ -168,6 +185,31 @@ final class NetconfDeviceTopologyAdapter implements AutoCloseable {
                 .setConnectionStatus(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting)
                 .setAvailableCapabilities(avCapabalitiesBuilder.build())
                 .setUnavailableCapabilities(unavailableCapabilities);
+
+        return netconfNodeBuilder.build();
+    }
+
+    private NetconfNode buildDataForNetconfClusteredNode(boolean up, String masterNodeAddress, NetconfDeviceCapabilities capabilities) {
+        List<String> capabilityList = new ArrayList<>();
+        capabilityList.addAll(capabilities.getNonModuleBasedCapabilities());
+        capabilityList.addAll(capabilities.getResolvedCapabilities().stream()
+                .map(AVAILABLE_CAPABILITY_TRANSFORMER::apply).collect(Collectors.toList()));
+        final AvailableCapabilitiesBuilder avCapabalitiesBuilder = new AvailableCapabilitiesBuilder();
+        avCapabalitiesBuilder.setAvailableCapability(capabilityList);
+
+        final UnavailableCapabilities unavailableCapabilities =
+                new UnavailableCapabilitiesBuilder().setUnavailableCapability(capabilities.getUnresolvedCapabilites()
+                        .entrySet().stream().map(UNAVAILABLE_CAPABILITY_TRANSFORMER::apply)
+                        .collect(Collectors.toList())).build();
+
+        final NetconfNodeBuilder netconfNodeBuilder = new NetconfNodeBuilder()
+                .setHost(id.getHost())
+                .setPort(new PortNumber(id.getAddress().getPort()))
+                .setConnectionStatus(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting)
+                .setAvailableCapabilities(avCapabalitiesBuilder.build())
+                .setUnavailableCapabilities(unavailableCapabilities)
+                .setClusteredConnectionStatus(
+                        new ClusteredConnectionStatusBuilder().setNetconfMasterNode(masterNodeAddress).build());
 
         return netconfNodeBuilder.build();
     }
