@@ -65,15 +65,16 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response readData(final String identifier, final UriInfo uriInfo) {
-        Preconditions.checkNotNull(identifier);
-
-        final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(uriInfo);
         final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
-
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
                 identifier, schemaContextRef.get(), Optional.of(this.mountPointServiceHandler.get()));
-        final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
 
+        final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(
+                instanceIdentifier.getInstanceIdentifier().getLastPathArgument().getNodeType().getNamespace().toString(),
+                uriInfo,
+                schemaContextRef.get());
+
+        final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final DOMTransactionChain transactionChain;
         if (mountPoint == null) {
             transactionChain = this.transactionChainHandler.get();
