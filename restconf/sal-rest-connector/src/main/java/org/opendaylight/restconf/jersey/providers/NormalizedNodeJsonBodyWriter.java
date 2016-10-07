@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 2014 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.rest.impl;
+
+package org.opendaylight.restconf.jersey.providers;
 
 import com.google.common.base.Optional;
 import com.google.gson.stream.JsonWriter;
@@ -22,11 +23,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfNormalizedNodeWriter;
-import org.opendaylight.netconf.sal.rest.api.RestconfService;
+import org.opendaylight.netconf.sal.rest.impl.RestconfDelegatingNormalizedNodeWriter;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.restconf.Draft17;
+import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -44,8 +46,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 @Provider
-@Produces({ Draft02.MediaTypes.API + RestconfService.JSON, Draft02.MediaTypes.DATA + RestconfService.JSON,
-        Draft02.MediaTypes.OPERATION + RestconfService.JSON })
+@Produces({ Draft17.MediaTypes.DATA + RestconfConstants.JSON, MediaType.APPLICATION_JSON })
 public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<NormalizedNodeContext> {
 
     private static final int DEFAULT_INDENT_SPACES_NUM = 2;
@@ -75,13 +76,14 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         final SchemaPath path = context.getSchemaNode().getPath();
         final JsonWriter jsonWriter = createJsonWriter(entityStream, t.getWriterParameters().isPrettyPrint());
         jsonWriter.beginObject();
-        writeNormalizedNode(jsonWriter,path,context,data, t.getWriterParameters().getDepth());
+        writeNormalizedNode(jsonWriter,path,context,data, t.getWriterParameters().getDepth(), t.getWriterParameters().getFields());
         jsonWriter.endObject();
         jsonWriter.flush();
     }
 
     private void writeNormalizedNode(final JsonWriter jsonWriter, SchemaPath path,
-            final InstanceIdentifierContext<SchemaNode> context, NormalizedNode<?, ?> data, final Optional<Integer> depth) throws
+            final InstanceIdentifierContext<SchemaNode> context, NormalizedNode<?, ?> data,
+                                     final Optional<Integer> depth, final Optional<String> fields) throws
             IOException {
         final RestconfNormalizedNodeWriter nnWriter;
         if (SchemaPath.ROOT.equals(path)) {
@@ -89,7 +91,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
              *  Creates writer without initialNs and we write children of root data container
              *  which is not visible in restconf
              */
-            nnWriter = createNormalizedNodeWriter(context,path,jsonWriter, depth);
+            nnWriter = createNormalizedNodeWriter(context,path,jsonWriter, depth, fields);
             writeChildren(nnWriter,(ContainerNode) data);
         } else if (context.getSchemaNode() instanceof RpcDefinition) {
             /*
@@ -97,7 +99,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
              *  so we need to emit initial output declaratation..
              */
             path = ((RpcDefinition) context.getSchemaNode()).getOutput().getPath();
-            nnWriter = createNormalizedNodeWriter(context,path,jsonWriter, depth);
+            nnWriter = createNormalizedNodeWriter(context,path,jsonWriter, depth, fields);
             jsonWriter.name("output");
             jsonWriter.beginObject();
             writeChildren(nnWriter, (ContainerNode) data);
@@ -108,7 +110,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
             if(data instanceof MapEntryNode) {
                 data = ImmutableNodes.mapNodeBuilder(data.getNodeType()).withChild(((MapEntryNode) data)).build();
             }
-            nnWriter = createNormalizedNodeWriter(context,path,jsonWriter, depth);
+            nnWriter = createNormalizedNodeWriter(context,path,jsonWriter, depth, fields);
             nnWriter.write(data);
         }
         nnWriter.flush();
@@ -121,7 +123,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
     }
 
     private RestconfNormalizedNodeWriter createNormalizedNodeWriter(final InstanceIdentifierContext<SchemaNode> context,
-            final SchemaPath path, final JsonWriter jsonWriter, final Optional<Integer> depth) {
+            final SchemaPath path, final JsonWriter jsonWriter, final Optional<Integer> depth, final Optional<String> fields) {
 
         final SchemaNode schema = context.getSchemaNode();
         final JSONCodecFactory codecs = getCodecFactory(context);
@@ -137,8 +139,8 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
             initialNs = null;
         }
         final NormalizedNodeStreamWriter streamWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(codecs,path,initialNs,jsonWriter);
-        if (depth.isPresent()) {
-            return DepthAwareNormalizedNodeWriter.forStreamWriter(streamWriter, depth.get());
+        if (depth.isPresent() || fields.isPresent()) {
+            return ParameterAwareNormalizedNodeWriter.forStreamWriter(streamWriter, depth, fields);
         } else {
             return RestconfDelegatingNormalizedNodeWriter.forStreamWriter(streamWriter);
         }
