@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.common.wrapper.services;
 
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
@@ -99,6 +100,11 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
     @Override
     public SchemaExportContext getSchema(final String mountAndModuleId) {
         return this.delegRestSchService.getSchema(mountAndModuleId);
+    }
+
+    @Override
+    public Response readData(@Context UriInfo uriInfo) {
+        return this.delegRestconfDataService.readData(uriInfo);
     }
 
     @Override
