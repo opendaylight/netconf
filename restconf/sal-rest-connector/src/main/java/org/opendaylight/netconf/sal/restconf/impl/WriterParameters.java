@@ -13,12 +13,14 @@ import com.google.common.base.Optional;
 public class WriterParameters {
     private final String content;
     private final Optional<Integer> depth;
+    private final Optional<String> fields;
     private final boolean prettyPrint;
 
     private WriterParameters(final WriterParametersBuilder builder) {
         this.content = builder.content;
-        this.prettyPrint = builder.prettyPrint;
         this.depth = builder.depth;
+        this.fields = builder.fields;
+        this.prettyPrint = builder.prettyPrint;
     }
 
     public String getContent() {
@@ -29,6 +31,10 @@ public class WriterParameters {
         return depth;
     }
 
+    public Optional<String> getFields() {
+        return fields;
+    }
+
     public boolean isPrettyPrint() {
         return prettyPrint;
     }
@@ -36,6 +42,7 @@ public class WriterParameters {
     public static class WriterParametersBuilder {
         private String content;
         private Optional<Integer> depth = Optional.absent();
+        private Optional<String> fields = Optional.absent();
         private boolean prettyPrint;
 
         public WriterParametersBuilder() {}
@@ -47,6 +54,11 @@ public class WriterParameters {
 
         public WriterParametersBuilder setDepth(final int depth) {
             this.depth = Optional.of(depth);
+            return this;
+        }
+
+        public WriterParametersBuilder setFields(final String fields) {
+            this.fields = Optional.of(fields);
             return this;
         }
 
