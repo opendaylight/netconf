@@ -69,4 +69,12 @@
        <configfile finalname='${config.configfile.directory}/${config.netconf.console.configfile}'>mvn:org.opendaylight.netconf/netconf-console/{{VERSION}}/xml/config</configfile>
     </feature>
 
+    <feature name='odl-netconf-topology-singleton' version='${project.version}' description="OpenDaylight :: Netconf :: Singleton">
+        <feature version='${project.version}'>odl-netconf-ssh</feature>
+        <feature version='${project.version}'>odl-netconf-connector</feature>
+        <bundle>mvn:javax.annotation/javax.annotation-api/1.2</bundle>
+        <bundle>mvn:commons-lang/commons-lang/2.6</bundle>
+        <bundle>mvn:org.opendaylight.netconf/netconf-topology-singleton/{{VERSION}}</bundle>
+    </feature>
+
 </features>
