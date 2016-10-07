@@ -9,6 +9,7 @@ package org.opendaylight.restconf.restful.utils;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.util.Collection;
@@ -343,19 +344,29 @@ public final class ReadDataTransactionUtil {
                 RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
                 uriInfo.getQueryParameters().keySet(),
                 RestconfDataServiceConstant.ReadData.CONTENT,
-                RestconfDataServiceConstant.ReadData.DEPTH);
+                RestconfDataServiceConstant.ReadData.DEPTH,
+                RestconfDataServiceConstant.ReadData.FIELDS);
 
         // read parameters from URI or set default values
+        // content
         final List<String> content = uriInfo.getQueryParameters().getOrDefault(
                 RestconfDataServiceConstant.ReadData.CONTENT,
                 Collections.singletonList(RestconfDataServiceConstant.ReadData.ALL));
+
+        // depth
         final List<String> depth = uriInfo.getQueryParameters().getOrDefault(
                 RestconfDataServiceConstant.ReadData.DEPTH,
                 Collections.singletonList(RestconfDataServiceConstant.ReadData.UNBOUNDED));
 
+        // fields
+        final List<String> fields = uriInfo.getQueryParameters().getOrDefault(
+                RestconfDataServiceConstant.ReadData.FIELDS,
+                Collections.emptyList());
+
         // parameter can be in URI at most once
         ParametersUtil.checkParameterCount(content, RestconfDataServiceConstant.ReadData.CONTENT);
         ParametersUtil.checkParameterCount(depth, RestconfDataServiceConstant.ReadData.DEPTH);
+        ParametersUtil.checkParameterCount(fields, RestconfDataServiceConstant.ReadData.FIELDS);
 
         // set content
         builder.setContent(content.get(0));
@@ -374,6 +385,11 @@ public final class ReadDataTransactionUtil {
             } else {
                 builder.setDepth(value);
             }
+        }
+
+        // set fields
+        if (!fields.isEmpty()) {
+            builder.setFields(Splitter.on(";").splitToList(fields.get(0)));
         }
 
         return builder.build();
