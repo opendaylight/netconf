@@ -55,10 +55,12 @@
         <configfile finalname='${config.configfile.directory}/${config.netconf.topology.configfile}'>mvn:org.opendaylight.netconf/netconf-topology-config/{{VERSION}}/xml/config</configfile>
     </feature>
 
-    <feature name='odl-netconf-clustered-topology' version='${project.version}' description="OpenDaylight :: Clustered Netconf Topology :: Netconf Connector + Netconf SSH Server + Clustered Netconf configuration via config topology datastore">
-        <feature version='${netconf.version}'>odl-netconf-ssh</feature>
+    <feature name='odl-netconf-clustered-topology' version='${project.version}' description="OpenDaylight :: Clustered Netconf Topology :: Netconf Connector + Netconf SSH Server">
+        <feature version='${project.version}'>odl-netconf-ssh</feature>
         <feature version='${project.version}'>odl-netconf-connector</feature>
-        <configfile finalname='${config.configfile.directory}/${config.netconf.topology.configfile}'>mvn:org.opendaylight.netconf/netconf-topology-config/{{VERSION}}/xml/clustered-config</configfile>
+        <bundle>mvn:javax.annotation/javax.annotation-api/1.2</bundle>
+        <bundle>mvn:commons-lang/commons-lang/2.6</bundle>
+        <bundle>mvn:org.opendaylight.netconf/netconf-topology-singleton/{{VERSION}}</bundle>
     </feature>
 
     <feature name='odl-netconf-console' version='${project.version}' description="OpenDaylight :: Netconf Console + Karaf CLI for netconf CRUD operations">
