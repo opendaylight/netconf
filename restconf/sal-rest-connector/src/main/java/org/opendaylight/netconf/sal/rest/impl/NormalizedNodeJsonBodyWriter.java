@@ -27,8 +27,6 @@ import org.opendaylight.netconf.sal.rest.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
-import org.opendaylight.restconf.Draft17;
-import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -45,10 +43,14 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
+/**
+ * @deprecated This class will be replaced by
+ * {@link org.opendaylight.restconf.jersey.providers.NormalizedNodeJsonBodyWriter}
+ */
+@Deprecated
 @Provider
 @Produces({ Draft02.MediaTypes.API + RestconfService.JSON, Draft02.MediaTypes.DATA + RestconfService.JSON,
-        Draft02.MediaTypes.OPERATION + RestconfService.JSON, Draft17.MediaTypes.DATA + RestconfConstants.JSON,
-        MediaType.APPLICATION_JSON })
+        Draft02.MediaTypes.OPERATION + RestconfService.JSON, MediaType.APPLICATION_JSON })
 public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<NormalizedNodeContext> {
 
     private static final int DEFAULT_INDENT_SPACES_NUM = 2;
@@ -78,7 +80,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         final SchemaPath path = context.getSchemaNode().getPath();
         final JsonWriter jsonWriter = createJsonWriter(entityStream, t.getWriterParameters().isPrettyPrint());
         jsonWriter.beginObject();
-        writeNormalizedNode(jsonWriter,path,context,data, t.getWriterParameters().getDepth());
+        writeNormalizedNode(jsonWriter,path,context,data, Optional.fromNullable(t.getWriterParameters().getDepth()));
         jsonWriter.endObject();
         jsonWriter.flush();
     }
