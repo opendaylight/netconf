@@ -16,6 +16,29 @@
 * Do not modify this file unless it is present under src/main directory
 */
 package org.opendaylight.controller.config.yang.netconf.mdsal.mapper;
-public class NetconfMdsalMapperModuleFactory extends org.opendaylight.controller.config.yang.netconf.mdsal.mapper.AbstractNetconfMdsalMapperModuleFactory {
 
+import org.opendaylight.controller.config.api.DependencyResolver;
+import org.osgi.framework.BundleContext;
+
+/**
+ * @deprecated Replaced by blueprint wiring
+ */
+@Deprecated
+public class NetconfMdsalMapperModuleFactory extends AbstractNetconfMdsalMapperModuleFactory {
+    @Override
+    public NetconfMdsalMapperModule instantiateModule(String instanceName, DependencyResolver dependencyResolver,
+                                                      NetconfMdsalMapperModule oldModule, AutoCloseable oldInstance, BundleContext bundleContext) {
+        NetconfMdsalMapperModule module = super.instantiateModule(instanceName, dependencyResolver, oldModule,
+                oldInstance, bundleContext);
+        module.setBundleContext(bundleContext);
+        return module;
+    }
+
+    @Override
+    public NetconfMdsalMapperModule instantiateModule(String instanceName, DependencyResolver dependencyResolver,
+                                                           BundleContext bundleContext) {
+        NetconfMdsalMapperModule module = super.instantiateModule(instanceName, dependencyResolver, bundleContext);
+        module.setBundleContext(bundleContext);
+        return module;
+    }
 }

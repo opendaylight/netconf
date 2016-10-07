@@ -16,6 +16,10 @@
 * Do not modify this file unless it is present under src/main directory
 */
 package org.opendaylight.controller.config.yang.netconf.northbound.tcp;
+/**
+ * @deprecated Replaced by blueprint wiring
+ */
+@Deprecated
 public class NetconfNorthboundTcpModuleFactory extends org.opendaylight.controller.config.yang.netconf.northbound.tcp.AbstractNetconfNorthboundTcpModuleFactory {
 
 }
