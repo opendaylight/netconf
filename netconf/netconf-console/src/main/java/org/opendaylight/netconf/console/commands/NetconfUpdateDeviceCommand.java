@@ -10,7 +10,6 @@ package org.opendaylight.netconf.console.commands;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.apache.karaf.shell.console.AbstractAction;

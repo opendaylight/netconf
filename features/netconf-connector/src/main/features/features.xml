@@ -26,7 +26,6 @@
         <feature version='${project.version}'>odl-netconf-connector-all</feature>
         <feature version='${controller.mdsal.version}'>odl-message-bus-collector</feature>
         <bundle>mvn:org.opendaylight.netconf/messagebus-netconf/{{VERSION}}</bundle>
-        <configfile finalname="${config.configfile.directory}/06-message-netconf.xml">mvn:org.opendaylight.netconf/messagebus-netconf/{{VERSION}}/xml/config</configfile>
     </feature>
 
     <feature name='odl-netconf-connector' version='${project.version}' description="OpenDaylight :: Netconf Connector :: Netconf Connector">
@@ -40,7 +39,6 @@
         <bundle>mvn:org.opendaylight.netconf/netconf-topology/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.netconf/abstract-topology/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.netconf/sal-netconf-connector/{{VERSION}}</bundle>
-        <bundle>mvn:org.opendaylight.netconf/netconf-config-dispatcher/{{VERSION}}</bundle>
         <configfile finalname='${config.configfile.directory}/${config.netconf.client.configfile}'>mvn:org.opendaylight.netconf/netconf-config/{{VERSION}}/xml/config</configfile>
     </feature>
 
@@ -66,7 +64,6 @@
        <feature version='${project.version}'>odl-netconf-connector-all</feature>
        <feature version='${project.version}'>odl-netconf-topology</feature>
        <bundle>mvn:org.opendaylight.netconf/netconf-console/{{VERSION}}</bundle>
-       <configfile finalname='${config.configfile.directory}/${config.netconf.console.configfile}'>mvn:org.opendaylight.netconf/netconf-console/{{VERSION}}/xml/config</configfile>
     </feature>
 
 </features>
