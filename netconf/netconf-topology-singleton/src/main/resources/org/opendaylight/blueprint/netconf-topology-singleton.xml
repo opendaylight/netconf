@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- vi: set et smarttab sw=4 tabstop=4: -->
+<!--
+Copyright © 2016 Cisco Systems, Inc. and others. All rights reserved.
+
+This program and the accompanying materials are made available under the
+terms of the Eclipse Public License v1.0 which accompanies this distribution,
+and is available at http://www.eclipse.org/legal/epl-v10.html
+-->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+           odl:use-default-for-reference-types="true">
+
+    <reference id="dataBroker"
+               interface="org.opendaylight.controller.md.sal.binding.api.DataBroker"/>
+
+    <reference id="rpcRegistry"
+               interface="org.opendaylight.controller.sal.binding.api.RpcProviderRegistry"/>
+
+    <reference id="clusterSingletonService"
+               interface="org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider"/>
+
+    <reference id="bindingAwareBroker"
+               interface="org.opendaylight.controller.sal.binding.api.BindingAwareBroker"
+                />
+
+    <reference id="keepAliveExecutor"
+               interface="org.opendaylight.controller.config.threadpool.ScheduledThreadPool"
+                />
+
+    <reference id="processingExecutor"
+               interface="org.opendaylight.controller.config.threadpool.ThreadPool"
+                />
+
+    <reference id="domBroker"
+               interface="org.opendaylight.controller.sal.core.api.Broker"
+                />
+
+    <reference id="actorSystemProvider"
+               interface="org.opendaylight.controller.cluster.ActorSystemProvider"
+                />
+
+    <reference id="eventExecutor"
+               interface="io.netty.util.concurrent.EventExecutor"
+               odl:type="global-event-executor"/>
+
+    <reference id="clientDispatcherDependency"
+               interface="org.opendaylight.netconf.client.NetconfClientDispatcher"
+               />
+
+    <bean id="netconfTopologyServiceProvider"
+          class="org.opendaylight.netconf.topology.singleton.impl.NetconfTopologyManager"
+          init-method="init" destroy-method="close">
+        <argument ref="dataBroker" />
+        <argument ref="rpcRegistry" />
+        <argument ref="clusterSingletonService" />
+        <argument ref="bindingAwareBroker" />
+        <argument ref="keepAliveExecutor" />
+        <argument ref="processingExecutor" />
+        <argument ref="domBroker" />
+        <argument ref="actorSystemProvider" />
+        <argument ref="eventExecutor" />
+        <argument ref="clientDispatcherDependency" />
+        <argument value="topology-netconf" />
+    </bean>
+
+    <service ref="netconfTopologyServiceProvider" interface="org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService"
+            />
+
+</blueprint>
