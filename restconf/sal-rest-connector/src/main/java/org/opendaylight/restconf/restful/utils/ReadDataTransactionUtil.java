@@ -25,6 +25,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.netconf.sal.restconf.impl.WriterParameters;
 import org.opendaylight.netconf.sal.restconf.impl.WriterParameters.WriterParametersBuilder;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
+import org.opendaylight.restconf.utils.parser.ParserFieldsParameter;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -41,9 +42,11 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.impl.schema.SchemaUtils;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * Util class for read data from data store via transaction.
@@ -331,7 +334,7 @@ public final class ReadDataTransactionUtil {
      * @param uriInfo
      *            - URI info
      */
-    public static WriterParameters parseUriParameters(final UriInfo uriInfo) {
+    public static WriterParameters parseUriParameters(final UriInfo uriInfo, final SchemaContext context) {
         final WriterParametersBuilder builder = new WriterParametersBuilder();
 
         if (uriInfo == null) {
@@ -343,19 +346,29 @@ public final class ReadDataTransactionUtil {
                 RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
                 uriInfo.getQueryParameters().keySet(),
                 RestconfDataServiceConstant.ReadData.CONTENT,
-                RestconfDataServiceConstant.ReadData.DEPTH);
+                RestconfDataServiceConstant.ReadData.DEPTH,
+                RestconfDataServiceConstant.ReadData.FIELDS);
 
         // read parameters from URI or set default values
+        // content
         final List<String> content = uriInfo.getQueryParameters().getOrDefault(
                 RestconfDataServiceConstant.ReadData.CONTENT,
                 Collections.singletonList(RestconfDataServiceConstant.ReadData.ALL));
+
+        // depth
         final List<String> depth = uriInfo.getQueryParameters().getOrDefault(
                 RestconfDataServiceConstant.ReadData.DEPTH,
                 Collections.singletonList(RestconfDataServiceConstant.ReadData.UNBOUNDED));
 
+        // fields
+        final List<String> fields = uriInfo.getQueryParameters().getOrDefault(
+                RestconfDataServiceConstant.ReadData.FIELDS,
+                Collections.emptyList());
+
         // parameter can be in URI at most once
         ParametersUtil.checkParameterCount(content, RestconfDataServiceConstant.ReadData.CONTENT);
         ParametersUtil.checkParameterCount(depth, RestconfDataServiceConstant.ReadData.DEPTH);
+        ParametersUtil.checkParameterCount(fields, RestconfDataServiceConstant.ReadData.FIELDS);
 
         // set content
         builder.setContent(content.get(0));
@@ -374,6 +387,11 @@ public final class ReadDataTransactionUtil {
             } else {
                 builder.setDepth(value);
             }
+        }
+
+        // set fields
+        if (!fields.isEmpty()) {
+            builder.setFields(ParserFieldsParameter.parseFieldsParameter(fields.get(0), "toaster", context));
         }
 
         return builder.build();

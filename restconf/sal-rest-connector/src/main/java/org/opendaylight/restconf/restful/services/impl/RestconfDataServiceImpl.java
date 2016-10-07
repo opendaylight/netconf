@@ -39,8 +39,11 @@ import org.opendaylight.restconf.restful.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.RestconfDataServiceConstant;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +67,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     public Response readData(final String identifier, final UriInfo uriInfo) {
         Preconditions.checkNotNull(identifier);
 
-        final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(uriInfo);
+        final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(uriInfo, null);
         final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
 
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
@@ -80,6 +83,43 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
                 instanceIdentifier, mountPoint, transaction);
+        final NormalizedNode<?, ?> node = ReadDataTransactionUtil.readData(parameters.getContent(), transactionNode);
+        if (node == null) {
+            throw new RestconfDocumentedException(
+                    "Request could not be completed because the relevant data model content does not exist",
+                    RestconfError.ErrorType.PROTOCOL,
+                    RestconfError.ErrorTag.DATA_MISSING);
+        }
+        final SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
+        dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
+        final String etag = '"' + node.getNodeType().getModule().getFormattedRevision()
+                + node.getNodeType().getLocalName() + '"';
+        final Response resp;
+
+        if ((parameters.getContent().equals(RestconfDataServiceConstant.ReadData.ALL))
+                    || parameters.getContent().equals(RestconfDataServiceConstant.ReadData.CONFIG)) {
+            resp = Response.status(200)
+                    .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
+                    .header("ETag", etag)
+                    .header("Last-Modified", dateFormatGmt.format(new Date()))
+                    .build();
+        } else {
+            resp = Response.status(200)
+                    .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
+                    .build();
+        }
+
+        return resp;
+    }
+
+    public Response readDataWithParameters(final String identifier, final UriInfo uriInfo) {
+        final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(uriInfo, schemaContextHandler.get());
+        final DOMTransactionChain transaction = this.transactionChainHandler.get();
+        final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
+                null, schemaContextHandler.get());
+
+        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
+                instanceIdentifier, null, transaction);
         final NormalizedNode<?, ?> node = ReadDataTransactionUtil.readData(parameters.getContent(), transactionNode);
         if (node == null) {
             throw new RestconfDocumentedException(
