@@ -31,6 +31,7 @@
     <protocol-framework.version>0.9.0-SNAPSHOT</protocol-framework.version>
     <yangtools.version>1.1.0-SNAPSHOT</yangtools.version>
     <sshd-core.version>0.14.0</sshd-core.version>
+    <netconf-topology-singleton.version>1.2.0-SNAPSHOT</netconf-topology-singleton.version>
 
     <config.configfile.directory>etc/opendaylight/karaf</config.configfile.directory>
     <config.netconf.client.configfile>01-netconf.xml</config.netconf.client.configfile>
@@ -85,6 +86,13 @@
         <groupId>org.opendaylight.yangtools</groupId>
         <artifactId>yangtools-artifacts</artifactId>
         <version>${yangtools.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.opendaylight.netconf</groupId>
+        <artifactId>netconf-topology-singleton</artifactId>
+        <version>${netconf-topology-singleton.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -245,6 +253,11 @@
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>mdsal-netconf-yang-library</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>netconf-topology-singleton</artifactId>
+      <version>${netconf-topology-singleton.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
