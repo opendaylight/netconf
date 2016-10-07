@@ -1,18 +1,20 @@
 /*
- * Copyright (c) 2014 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.rest.impl;
 
-import com.google.common.base.Optional;
+package org.opendaylight.restconf.jersey.providers;
+
 import com.google.common.base.Throwables;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Set;
 import javanet.staxutils.IndentingXMLStreamWriter;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -25,11 +27,12 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfNormalizedNodeWriter;
-import org.opendaylight.netconf.sal.rest.api.RestconfService;
+import org.opendaylight.netconf.sal.rest.impl.RestconfDelegatingNormalizedNodeWriter;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.restconf.Draft17;
+import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -42,8 +45,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 @Provider
-@Produces({ Draft02.MediaTypes.API + RestconfService.XML, Draft02.MediaTypes.DATA + RestconfService.XML,
-        Draft02.MediaTypes.OPERATION + RestconfService.XML })
+@Produces({ Draft17.MediaTypes.DATA + RestconfConstants.XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<NormalizedNodeContext> {
 
     private static final XMLOutputFactory XML_FACTORY;
@@ -89,22 +91,23 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
         final NormalizedNode<?, ?> data = t.getData();
         final SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
 
-        writeNormalizedNode(xmlWriter, schemaPath, pathContext, data, Optional.fromNullable(t.getWriterParameters().getDepth()));
+        writeNormalizedNode(xmlWriter, schemaPath, pathContext, data, t.getWriterParameters().getDepth(),
+                t.getWriterParameters().getFields());
     }
 
     private void writeNormalizedNode(final XMLStreamWriter xmlWriter, final SchemaPath schemaPath, final InstanceIdentifierContext<?>
-            pathContext, NormalizedNode<?, ?> data, final Optional<Integer> depth) throws IOException {
+            pathContext, NormalizedNode<?, ?> data, final Integer depth, final List<Set<QName>> fields) throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
         final SchemaContext schemaCtx = pathContext.getSchemaContext();
         if (SchemaPath.ROOT.equals(schemaPath)) {
-            nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, schemaPath, depth);
+            nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, schemaPath, depth, fields);
             writeElements(xmlWriter, nnWriter, (ContainerNode) data);
         }  else if (pathContext.getSchemaNode() instanceof RpcDefinition) {
             nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx,
-                    ((RpcDefinition) pathContext.getSchemaNode()).getOutput().getPath(), depth);
+                    ((RpcDefinition) pathContext.getSchemaNode()).getOutput().getPath(), depth, fields);
             writeElements(xmlWriter, nnWriter, (ContainerNode) data);
         } else {
-            nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, schemaPath.getParent(), depth);
+            nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, schemaPath.getParent(), depth, fields);
             if (data instanceof MapEntryNode) {
                 // Restconf allows returning one list item. We need to wrap it
                 // in map node in order to serialize it properly
@@ -116,10 +119,12 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
     }
 
     private RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
-                                                                        final SchemaContext schemaContext, final SchemaPath schemaPath, final Optional<Integer> depth) {
+                                                                    final SchemaContext schemaContext, final SchemaPath schemaPath,
+                                                                    final Integer depth,
+                                                                    final List<Set<QName>> fields) {
         final NormalizedNodeStreamWriter xmlStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, schemaContext, schemaPath);
-        if (depth.isPresent()) {
-            return DepthAwareNormalizedNodeWriter.forStreamWriter(xmlStreamWriter, depth.get());
+        if (depth != null || fields != null) {
+            return ParameterAwareNormalizedNodeWriter.forStreamWriter(xmlStreamWriter, depth, fields);
         } else {
             return RestconfDelegatingNormalizedNodeWriter.forStreamWriter(xmlStreamWriter);
         }
