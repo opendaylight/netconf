@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_5986b166",
+        "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/NetconfMdsalNotificationMapperModule.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T21:21:54Z",
+      "side": 1,
+      "message": "\u003e Can we be sure that we will have here the right one NetconfOperationServiceFactory?\n\u003e I mean, cannot be there more NetconfOperationServiceFactory services registered with OSGi?\n\nYes, either there is only one registered in the OSGi registry and it is the one we get, either they are multiple instances of it, thus we will have to use the following method to pass the service type:\nhttps://github.com/opendaylight/controller/blob/07c96b0fa318b7bf559df4954f705d06a44f1354/opendaylight/config/config-api/src/main/java/org/opendaylight/controller/config/api/osgi/WaitingServiceTracker.java#L80-L81\n\nWhen exposing the service through blueprint, we use \n\n    \u003cservice ref\u003d\"netconfNotificationOperationServiceFactory\"\n             interface\u003d\"org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory\"\n             odl:type\u003d\"mdsal-netconf-notification\"/\u003e\n\nso the service is exposed with the type \"mdsal-netconf-notification\"\n\nIf no odl:type is specified, it will be set to \"default\".\n\nSo actually, here, I should request the one for the type \"mdsal-netconf-notification\", as exposed in the blueprint xml file",
+      "parentUuid": "7a6b29fe_decc6764",
+      "revId": "bed4ebe82e7bb2706ae2df9c8d71b996a4c1152d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_7e039376",
         "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/NetconfMdsalNotificationMapperModule.java",
         "patchSetId": 6
@@ -64,6 +82,24 @@
       "writtenOn": "2016-10-07T16:40:49Z",
       "side": 1,
       "message": "static is redundant",
+      "revId": "bed4ebe82e7bb2706ae2df9c8d71b996a4c1152d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_b97b857a",
+        "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/NetconfMdsalNotificationMapperModule.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-07T21:21:54Z",
+      "side": 1,
+      "message": "I know but it is the pattern we have used everywhere (other projects), so I\u0027d rather like keeping it consistent if possible.",
+      "parentUuid": "7a6b29fe_7e039376",
       "revId": "bed4ebe82e7bb2706ae2df9c8d71b996a4c1152d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
