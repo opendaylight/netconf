@@ -20,6 +20,7 @@ public final class OperationBuilder {
 
     public static final String OPERATIONAL = "(operational)";
     public static final String CONFIG = "(config)";
+    public static final String TOP = "-TOP";
 
     public static final List<String> CONSUMES_PUT_POST = new ArrayList<>();
 
@@ -34,7 +35,7 @@ public final class OperationBuilder {
         protected DataSchemaNode schemaNode;
         private static final String METHOD_NAME = "GET";
 
-        public Get(DataSchemaNode node, boolean isConfig) {
+        public Get(final DataSchemaNode node, final boolean isConfig) {
             this.schemaNode = node;
             spec = new Operation();
             spec.setMethod(METHOD_NAME);
@@ -43,8 +44,8 @@ public final class OperationBuilder {
             spec.setNotes(node.getDescription());
         }
 
-        public Get pathParams(List<Parameter> params) {
-            List<Parameter> pathParameters = new ArrayList<>(params);
+        public Get pathParams(final List<Parameter> params) {
+            final List<Parameter> pathParameters = new ArrayList<>(params);
             spec.setParameters(pathParameters);
             return this;
         }
@@ -57,21 +58,24 @@ public final class OperationBuilder {
     public static class Put {
         protected Operation spec;
         protected String nodeName;
+        protected String parentName;
         private static final String METHOD_NAME = "PUT";
 
-        public Put(String nodeName, final String description) {
+        public Put(final String nodeName, final String description, final String parentName) {
             this.nodeName = nodeName;
+            this.parentName = parentName;
             spec = new Operation();
-            spec.setType(CONFIG + nodeName);
+            spec.setType(parentName + CONFIG + nodeName + TOP);
             spec.setNotes(description);
             spec.setConsumes(CONSUMES_PUT_POST);
         }
 
-        public Put pathParams(List<Parameter> params) {
-            List<Parameter> parameters = new ArrayList<>(params);
-            Parameter payload = new Parameter();
+        public Put pathParams(final List<Parameter> params) {
+            final List<Parameter> parameters = new ArrayList<>(params);
+            final Parameter payload = new Parameter();
             payload.setParamType("body");
-            payload.setType(CONFIG + nodeName);
+            payload.setType(parentName + CONFIG + nodeName + TOP);
+            payload.setName(CONFIG + nodeName);
             parameters.add(payload);
             spec.setParameters(parameters);
             return this;
@@ -89,8 +93,8 @@ public final class OperationBuilder {
         public static final String METHOD_NAME = "POST";
         private final DataNodeContainer dataNodeContainer;
 
-        public Post(final String nodeName, final String description, final DataNodeContainer dataNodeContainer) {
-            super(nodeName, description);
+        public Post(final String nodeName, final String parentName, final String description, final DataNodeContainer dataNodeContainer) {
+            super(nodeName, description, parentName.replace("_module", ""));
             this.dataNodeContainer = dataNodeContainer;
             spec.setType(CONFIG + nodeName + METHOD_NAME);
             spec.setConsumes(CONSUMES_PUT_POST);
@@ -104,20 +108,19 @@ public final class OperationBuilder {
         }
 
         @Override
-        public Put pathParams(List<Parameter> params) {
-            List<Parameter> parameters = new ArrayList<>(params);
-            for (DataSchemaNode node : dataNodeContainer.getChildNodes()) {
+        public Put pathParams(final List<Parameter> params) {
+            final List<Parameter> parameters = new ArrayList<>(params);
+            for (final DataSchemaNode node : dataNodeContainer.getChildNodes()) {
                 if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
-                    Parameter payload = new Parameter();
+                    final Parameter payload = new Parameter();
                     payload.setParamType("body");
-                    payload.setType(CONFIG + node.getQName().getLocalName());
+                    payload.setType(parentName + CONFIG + node.getQName().getLocalName() + TOP);
                     payload.setName("**" + CONFIG + node.getQName().getLocalName());
                     parameters.add(payload);
                 }
             }
             spec.setParameters(parameters);
             return this;
-
         }
 
         public Post summary(final String summary) {
@@ -129,7 +132,7 @@ public final class OperationBuilder {
     public static final class Delete extends Get {
         private static final String METHOD_NAME = "DELETE";
 
-        public Delete(DataSchemaNode node) {
+        public Delete(final DataSchemaNode node) {
             super(node, false);
         }
 
