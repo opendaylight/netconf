@@ -145,8 +145,8 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
                         .collect(Collectors.toList());
 
         // send initial data to master actor and create actor for providing it
-        return Patterns.ask(masterActorRef, new CreateInitialMasterActorData(deviceDataBroker, sourceIdentifiers),
-                NetconfTopologyUtils.TIMEOUT);
+        return Patterns.ask(masterActorRef, new CreateInitialMasterActorData(deviceDataBroker, sourceIdentifiers,
+                        deviceRpc), NetconfTopologyUtils.TIMEOUT);
     }
 
     private void updateDeviceData() {

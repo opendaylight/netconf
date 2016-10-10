@@ -22,7 +22,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.api.RemoteOperationTxProcessor;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
-import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyResultResponse;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitReply;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -100,7 +100,7 @@ public class RemoteOperationTxProcessorImpl implements RemoteOperationTxProcesso
             @Override
             public void onSuccess(final Optional<NormalizedNode<?, ?>> result) {
                 if (!result.isPresent()) {
-                    recipient.tell(new EmptyReadResponse(), sender);
+                    recipient.tell(new EmptyResultResponse(), sender);
                     return;
                 }
                 recipient.tell(new NormalizedNodeMessage(path, result.get()), sender);

@@ -10,5 +10,5 @@ package org.opendaylight.netconf.topology.singleton.messages.transactions;
 
 import java.io.Serializable;
 
-public class EmptyReadResponse implements Serializable {
+public class EmptyResultResponse implements Serializable {
 }
