@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_6e759e31",
+        "filename": "netconf/netconf-notifications-api/src/main/yang/netconf-northbound-notification.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-10T13:55:40Z",
+      "side": 1,
+      "message": "no need for blank line",
+      "revId": "945d40c86781f15ac86365348227c1b23b812f32",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_4e4a62ad",
+        "filename": "netconf/netconf-notifications-impl/src/main/resources/org/opendaylight/blueprint/netconf-notification.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-10T13:55:40Z",
+      "side": 1,
+      "message": "Don\u0027t we need this services twice? One group for CSS and one group for md-sal northbound?",
+      "revId": "945d40c86781f15ac86365348227c1b23b812f32",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_6e4d9ec4",
+        "filename": "netconf/netconf-notifications-impl/src/main/resources/org/opendaylight/blueprint/netconf-notification.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-10T13:55:40Z",
+      "side": 1,
+      "message": "Why netconfMonitoringActivator? Shouldn\u0027t be this NetconfNotificationActivator or something similiar?",
+      "revId": "945d40c86781f15ac86365348227c1b23b812f32",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
