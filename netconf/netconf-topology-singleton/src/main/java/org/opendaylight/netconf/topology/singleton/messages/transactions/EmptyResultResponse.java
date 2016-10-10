@@ -13,5 +13,5 @@ import java.io.Serializable;
 /**
  * Message is sended when read result do not present any value.
  */
-public class EmptyReadResponse implements Serializable {
+public class EmptyResultResponse implements Serializable {
 }
