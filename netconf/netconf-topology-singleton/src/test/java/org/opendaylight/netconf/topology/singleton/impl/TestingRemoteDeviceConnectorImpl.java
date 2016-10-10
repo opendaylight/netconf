@@ -38,9 +38,9 @@ class TestingRemoteDeviceConnectorImpl extends RemoteDeviceConnectorImpl {
     @Override
     public NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
                                                         final ActorRef deviceContextActorRef) {
+
         final NetconfConnectorDTO connectorDTO = new NetconfConnectorDTO(communicator, salFacade);
         doReturn(Futures.immediateCheckedFuture(null)).when(communicator).initializeRemoteConnection(any(), any());
-
         return connectorDTO;
     }
 

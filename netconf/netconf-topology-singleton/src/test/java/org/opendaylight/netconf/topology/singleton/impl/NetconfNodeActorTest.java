@@ -9,9 +9,12 @@
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.MockitoAnnotations.initMocks;
 import static org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
 
 import akka.actor.ActorContext;
@@ -34,22 +37,38 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mock;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
+import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.messages.AskForMasterMountPoint;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.MasterActorDataInitialized;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.RegisterMountPoint;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.RpcError;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
+import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -69,12 +88,15 @@ public class NetconfNodeActorTest {
     private ActorRef masterRef;
     private RemoteDeviceId remoteDeviceId;
 
+    @Mock
+    private DOMRpcService domRpcService;
+
     @Before
     public void setup() throws UnknownHostException {
-
+        initMocks
+                (this);
         remoteDeviceId = new RemoteDeviceId("netconf-topology",
                 new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 9999));
-
         final NetconfTopologySetup setup = mock(NetconfTopologySetup.class);
 
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY,
@@ -100,8 +122,8 @@ public class NetconfNodeActorTest {
         /* Test init master data */
 
         final Future<Object> initialDataToActor =
-                Patterns.ask(masterRef, new CreateInitialMasterActorData(domDataBroker, sourceIdentifiers),
-                        TIMEOUT);
+                Patterns.ask(masterRef, new CreateInitialMasterActorData(domDataBroker, sourceIdentifiers,
+                                domRpcService), TIMEOUT);
 
         final Object success = Await.result(initialDataToActor, TIMEOUT.duration());
         assertTrue(success instanceof MasterActorDataInitialized);
@@ -128,13 +150,13 @@ public class NetconfNodeActorTest {
 
         final DOMDataBroker domDataBroker = mock(DOMDataBroker.class);
         final List<SourceIdentifier> sourceIdentifiers =
-                Lists.newArrayList(SourceIdentifier.create("testID", Optional.absent()));
+                Lists.newArrayList(RevisionSourceIdentifier.create("testID", Optional.absent()));
 
         // init master data
 
         final Future<Object> initialDataToActor =
-                Patterns.ask(masterRef, new CreateInitialMasterActorData(domDataBroker, sourceIdentifiers),
-                        TIMEOUT);
+                Patterns.ask(masterRef, new CreateInitialMasterActorData(domDataBroker, sourceIdentifiers,
+                                domRpcService), TIMEOUT);
 
         final Object successInit = Await.result(initialDataToActor, TIMEOUT.duration());
 
@@ -156,7 +178,7 @@ public class NetconfNodeActorTest {
     @Test
     public void testYangTextSchemaSourceRequestMessage() throws Exception {
         final SchemaRepository schemaRepository = mock(SchemaRepository.class);
-        final SourceIdentifier sourceIdentifier = SourceIdentifier.create("testID", Optional.absent());
+        final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create("testID", Optional.absent());
         final Props props = NetconfNodeActor.props(mock(NetconfTopologySetup.class), remoteDeviceId,
                 DEFAULT_SCHEMA_REPOSITORY, schemaRepository);
 
@@ -210,6 +232,96 @@ public class NetconfNodeActorTest {
                 proxyYang.getYangTextSchemaSource(sourceIdentifier);
 
         Await.result(failedSchema, TIMEOUT.duration());
+
+    }
+
+    @Test
+    public void testProxyDOMRpcService() throws Exception {
+
+        final DOMDataBroker domDataBroker = mock(DOMDataBroker.class);
+        final List<SourceIdentifier> sourceIdentifiers =
+                Lists.newArrayList(RevisionSourceIdentifier.create("testID", Optional.absent()));
+
+        // init master data
+
+        final Future<Object> initialDataToActor =
+                Patterns.ask(masterRef, new CreateInitialMasterActorData(domDataBroker, sourceIdentifiers,
+                        domRpcService), TIMEOUT);
+
+        final Object successInit = Await.result(initialDataToActor, TIMEOUT.duration());
+
+        assertTrue(successInit instanceof MasterActorDataInitialized);
+
+        // test if slave get right identifiers from master
+
+        final ProxyDOMRpcService slaveDomRPCService = new ProxyDOMRpcService(system, masterRef, remoteDeviceId);
+
+        final SchemaPath schemaPath = SchemaPath.create(true, QName.create("TestQname"));
+        final NormalizedNode<?, ?> outputNode = ImmutableContainerNodeBuilder.create()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("TestQname")))
+                .withChild(ImmutableNodes.leafNode(QName.create("NodeQname"), "foo")).build();
+        final RpcError rpcError = RpcResultBuilder.newError(RpcError.ErrorType.RPC, null, "Rpc invocation failed.");
+        // EmptyResultResponse message
+
+        doReturn(Futures.immediateCheckedFuture(null)).when(domRpcService).invokeRpc(any(), any());
+
+        final CheckedFuture<DOMRpcResult, DOMRpcException> resultFutureEmpty =
+                slaveDomRPCService.invokeRpc(schemaPath, outputNode);
+
+        final Object resultNull = resultFutureEmpty.checkedGet(2, TimeUnit.SECONDS);
+
+        assertEquals(null, resultNull);
+
+        // InvokeRpcMessageReply message
+
+        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(outputNode))).
+                when(domRpcService).invokeRpc(any(), any());
+
+        final CheckedFuture<DOMRpcResult, DOMRpcException> resultFutureNn =
+                slaveDomRPCService.invokeRpc(schemaPath, outputNode);
+
+        final DOMRpcResult resultNn = resultFutureNn.checkedGet(2, TimeUnit.SECONDS);
+
+        assertEquals(outputNode, resultNn.getResult());
+        assertTrue(resultNn.getErrors().isEmpty());
+
+        // InvokeRpcMessageReply message only error
+
+        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(rpcError)))
+                .when(domRpcService).invokeRpc(any(), any());
+
+        final CheckedFuture<DOMRpcResult, DOMRpcException> resultFutureError =
+                slaveDomRPCService.invokeRpc(schemaPath, outputNode);
+
+        final DOMRpcResult resultError = resultFutureError.checkedGet(2, TimeUnit.SECONDS);
+
+        assertNull(resultError.getResult());
+        assertEquals(rpcError, resultError.getErrors().iterator().next());
+
+        // InvokeRpcMessageReply message error + result
+
+        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(outputNode, rpcError)))
+                .when(domRpcService).invokeRpc(any(), any());
+
+        final CheckedFuture<DOMRpcResult, DOMRpcException> resultFutureOutputError =
+                slaveDomRPCService.invokeRpc(schemaPath, outputNode);
+
+        final DOMRpcResult resultOutputError = resultFutureOutputError.checkedGet(2, TimeUnit.SECONDS);
+
+        assertEquals(outputNode, resultOutputError.getResult());
+        assertEquals(rpcError, resultOutputError.getErrors().iterator().next());
+
+        // Throwable message
+
+        exception.expect(DOMRpcException.class);
+
+        doReturn(Futures.immediateFailedCheckedFuture(new ClusteringRpcException("")))
+                .when(domRpcService).invokeRpc(any(), any());
+
+        final CheckedFuture<DOMRpcResult, DOMRpcException> resultFutureThrowable =
+                slaveDomRPCService.invokeRpc(schemaPath, outputNode);
+
+        resultFutureThrowable.checkedGet(2, TimeUnit.SECONDS);
 
     }
 
