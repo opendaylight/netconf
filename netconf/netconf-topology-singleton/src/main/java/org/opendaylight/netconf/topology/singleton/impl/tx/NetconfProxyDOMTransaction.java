@@ -19,7 +19,6 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
-import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitFailedReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.CancelRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.DeleteRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
@@ -27,6 +26,7 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.ExistsR
 import org.opendaylight.netconf.topology.singleton.messages.transactions.MergeRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.PutRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ReadRequest;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitFailedReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitRequest;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.slf4j.Logger;
@@ -81,7 +81,6 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
                     promise.success(Optional.absent());
                     return;
                 }
-
                 promise.success(Optional.of((NormalizedNodeMessage) success));
             }
         }, actorSystem.dispatcher());
