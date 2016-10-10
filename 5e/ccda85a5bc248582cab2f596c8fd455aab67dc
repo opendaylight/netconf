@@ -1,0 +1,9 @@
+Code-Review+1: Ivan Hrasko <ivan.hrasko@pantheon.tech>
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+1: Jakub Toth <jatoth@cisco.com>
+Code-Review+2: Tomas Cere <tcere@cisco.com>
+Submitted-by: Tomas Cere <tcere@cisco.com>
+Submitted-at: Mon, 10 Oct 2016 15:39:48 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/46530
+Project: netconf
+Branch: refs/heads/stable/beryllium
