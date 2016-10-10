@@ -19,7 +19,7 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUti
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.CancelRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.DeleteRequest;
-import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyResultResponse;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ExistsRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.MergeRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.PutRequest;
@@ -57,7 +57,7 @@ public class NetconfProxyDOMTransactions implements NetconfDOMTransactions {
                     promise.failure(failure);
                     return;
                 }
-                if (success instanceof EmptyReadResponse) {
+                if (success instanceof EmptyResultResponse) {
                     promise.success(Optional.absent());
                     return;
                 }
