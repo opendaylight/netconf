@@ -201,12 +201,12 @@ public class BaseYangSwaggerGenerator {
                         hasAddRootPostLink = true;
                     }
 
-                    addApis(node, apis, resourcePath, pathParams, schemaContext, true);
+                    addApis(node, apis, resourcePath, pathParams, schemaContext, true, m.getName());
                 }
 
                 pathParams = new ArrayList<>();
                 resourcePath = getDataStorePath("/operational/", context);
-                addApis(node, apis, resourcePath, pathParams, schemaContext, false);
+                addApis(node, apis, resourcePath, pathParams, schemaContext, false, m.getName());
             }
         }
 
@@ -243,7 +243,7 @@ public class BaseYangSwaggerGenerator {
             final Api apiForRootPostUri = new Api();
             apiForRootPostUri.setPath(resourcePath);
             apiForRootPostUri.setOperations(operationPost(module.getName() + MODULE_NAME_SUFFIX,
-                    module.getDescription(), module, pathParams, true));
+                    module.getDescription(), module, pathParams, true, ""));
             apis.add(apiForRootPostUri);
         }
     }
@@ -266,7 +266,7 @@ public class BaseYangSwaggerGenerator {
     }
 
     private void addApis(final DataSchemaNode node, final List<Api> apis, final String parentPath, final List<Parameter> parentPathParams, final SchemaContext schemaContext,
-                         final boolean addConfigApi) {
+                         final boolean addConfigApi, final String parentName) {
 
         final Api api = new Api();
         final List<Parameter> pathParams = new ArrayList<>(parentPathParams);
@@ -280,18 +280,18 @@ public class BaseYangSwaggerGenerator {
             final DataNodeContainer dataNodeContainer = (DataNodeContainer) node;
             childSchemaNodes = dataNodeContainer.getChildNodes();
         }
-        api.setOperations(operation(node, pathParams, addConfigApi, childSchemaNodes));
+        api.setOperations(operation(node, pathParams, addConfigApi, childSchemaNodes, parentName));
         apis.add(api);
 
         for (final DataSchemaNode childNode : childSchemaNodes) {
             if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
                 // keep config and operation attributes separate.
                 if (childNode.isConfiguration() == addConfigApi) {
-                    addApis(childNode, apis, resourcePath, pathParams, schemaContext, addConfigApi);
+                    final String newParent = parentName + "/" + node.getQName().getLocalName();
+                    addApis(childNode, apis, resourcePath, pathParams, schemaContext, addConfigApi, newParent);
                 }
             }
         }
-
     }
 
     private boolean containsListOrContainer(final Iterable<DataSchemaNode> nodes) {
@@ -303,15 +303,15 @@ public class BaseYangSwaggerGenerator {
         return false;
     }
 
-    private List<Operation> operation(final DataSchemaNode node, final List<Parameter> pathParams, final boolean isConfig, final Iterable<DataSchemaNode> childSchemaNodes) {
+    private List<Operation> operation(final DataSchemaNode node, final List<Parameter> pathParams, final boolean isConfig,
+                                      final Iterable<DataSchemaNode> childSchemaNodes, final String parentName) {
         final List<Operation> operations = new ArrayList<>();
 
         final Get getBuilder = new Get(node, isConfig);
         operations.add(getBuilder.pathParams(pathParams).build());
 
         if (isConfig) {
-            final Put putBuilder = new Put(node.getQName().getLocalName(),
-                    node.getDescription());
+            final Put putBuilder = new Put(node.getQName().getLocalName(), node.getDescription(), parentName);
             operations.add(putBuilder.pathParams(pathParams).build());
 
             final Delete deleteBuilder = new Delete(node);
@@ -319,16 +319,17 @@ public class BaseYangSwaggerGenerator {
 
             if (containsListOrContainer(childSchemaNodes)) {
                 operations.addAll(operationPost(node.getQName().getLocalName(), node.getDescription(),
-                        (DataNodeContainer) node, pathParams, isConfig));
+                        (DataNodeContainer) node, pathParams, isConfig, parentName + "/"));
             }
         }
         return operations;
     }
 
-    private List<Operation> operationPost(final String name, final String description, final DataNodeContainer dataNodeContainer, final List<Parameter> pathParams, final boolean isConfig) {
+    private List<Operation> operationPost(final String name, final String description, final DataNodeContainer dataNodeContainer,
+                                          final List<Parameter> pathParams, final boolean isConfig, final String parentName) {
         final List<Operation> operations = new ArrayList<>();
         if (isConfig) {
-            final Post postBuilder = new Post(name, description, dataNodeContainer);
+            final Post postBuilder = new Post(name, parentName + name, description, dataNodeContainer);
             operations.add(postBuilder.pathParams(pathParams).build());
         }
         return operations;

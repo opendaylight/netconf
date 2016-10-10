@@ -58,12 +58,14 @@ public final class OperationBuilder {
     public static class Put {
         protected Operation spec;
         protected String nodeName;
+        protected String parentName;
         private static final String METHOD_NAME = "PUT";
 
-        public Put(final String nodeName, final String description) {
+        public Put(final String nodeName, final String description, final String parentName) {
             this.nodeName = nodeName;
+            this.parentName = parentName;
             spec = new Operation();
-            spec.setType(CONFIG + nodeName);
+            spec.setType(parentName + CONFIG + nodeName + TOP);
             spec.setNotes(description);
             spec.setConsumes(CONSUMES_PUT_POST);
         }
@@ -72,7 +74,7 @@ public final class OperationBuilder {
             final List<Parameter> parameters = new ArrayList<>(params);
             final Parameter payload = new Parameter();
             payload.setParamType("body");
-            payload.setType(CONFIG + nodeName + TOP);
+            payload.setType(parentName + CONFIG + nodeName + TOP);
             payload.setName(CONFIG + nodeName);
             parameters.add(payload);
             spec.setParameters(parameters);
@@ -91,8 +93,8 @@ public final class OperationBuilder {
         public static final String METHOD_NAME = "POST";
         private final DataNodeContainer dataNodeContainer;
 
-        public Post(final String nodeName, final String description, final DataNodeContainer dataNodeContainer) {
-            super(nodeName, description);
+        public Post(final String nodeName, final String parentName, final String description, final DataNodeContainer dataNodeContainer) {
+            super(nodeName, description, parentName.replace("_module", ""));
             this.dataNodeContainer = dataNodeContainer;
             spec.setType(CONFIG + nodeName + METHOD_NAME);
             spec.setConsumes(CONSUMES_PUT_POST);
@@ -112,14 +114,13 @@ public final class OperationBuilder {
                 if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
                     final Parameter payload = new Parameter();
                     payload.setParamType("body");
-                    payload.setType(CONFIG + node.getQName().getLocalName() + TOP);
+                    payload.setType(parentName + CONFIG + node.getQName().getLocalName() + TOP);
                     payload.setName("**" + CONFIG + node.getQName().getLocalName());
                     parameters.add(payload);
                 }
             }
             spec.setParameters(parameters);
             return this;
-
         }
 
         public Post summary(final String summary) {
