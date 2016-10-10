@@ -10,7 +10,6 @@ package org.opendaylight.netconf.topology.singleton.impl;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 import akka.actor.ActorRef;
 import com.google.common.util.concurrent.Futures;
@@ -39,13 +38,9 @@ class TestingRemoteDeviceConnectorImpl extends RemoteDeviceConnectorImpl {
     @Override
     public NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
                                                  final ActorRef deviceContextActorRef) {
-
-        final NetconfConnectorDTO connectorDTO = mock(NetconfConnectorDTO.class);
-        doReturn(communicator).when(connectorDTO).getCommunicator();
-        doReturn(communicator).when(connectorDTO).getSessionListener();
-        doReturn(salFacade).when(connectorDTO).getFacade();
+        final NetconfConnectorDTO connectorDTO = new NetconfConnectorDTO(communicator, salFacade);
         doReturn(Futures.immediateCheckedFuture(null)).when(communicator).initializeRemoteConnection(any(), any());
-
+        
         return connectorDTO;
     }
 

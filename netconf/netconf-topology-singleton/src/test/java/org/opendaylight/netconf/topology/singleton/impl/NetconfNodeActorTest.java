@@ -41,6 +41,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
@@ -68,13 +69,14 @@ public class NetconfNodeActorTest {
 
     private ActorRef masterRef;
     private RemoteDeviceId remoteDeviceId;
+    private DOMRpcService domRpcService;
 
     @Before
     public void setup() throws UnknownHostException {
 
         remoteDeviceId = new RemoteDeviceId("netconf-topology",
                 new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 9999));
-
+        domRpcService = mock(DOMRpcService.class);
         final NetconfTopologySetup setup = mock(NetconfTopologySetup.class);
 
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY,
@@ -100,8 +102,8 @@ public class NetconfNodeActorTest {
         /* Test init master data */
 
         final Future<Object> initialDataToActor =
-                Patterns.ask(masterRef, new CreateInitialMasterActorData(domDataBroker, sourceIdentifiers),
-                        TIMEOUT);
+                Patterns.ask(masterRef, new CreateInitialMasterActorData(domDataBroker, sourceIdentifiers,
+                                domRpcService), TIMEOUT);
 
         final Object success = Await.result(initialDataToActor, TIMEOUT.duration());
         assertTrue(success instanceof MasterActorDataInitialized);
@@ -133,8 +135,8 @@ public class NetconfNodeActorTest {
         // init master data
 
         final Future<Object> initialDataToActor =
-                Patterns.ask(masterRef, new CreateInitialMasterActorData(domDataBroker, sourceIdentifiers),
-                        TIMEOUT);
+                Patterns.ask(masterRef, new CreateInitialMasterActorData(domDataBroker, sourceIdentifiers,
+                                domRpcService), TIMEOUT);
 
         final Object successInit = Await.result(initialDataToActor, TIMEOUT.duration());
 
