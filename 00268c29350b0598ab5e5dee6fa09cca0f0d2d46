@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_8e863a64",
+        "filename": "netconf/mdsal-netconf-monitoring/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-monitoring.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-10T10:41:18Z",
+      "side": 1,
+      "message": "Are we sure this is right monitoring service instance?",
+      "revId": "00268c29350b0598ab5e5dee6fa09cca0f0d2d46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
