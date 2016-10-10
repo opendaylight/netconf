@@ -145,6 +145,168 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_21129758",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-10-10T15:15:51Z",
+      "side": 1,
+      "message": "You seem to be missing the rest of the sentence",
+      "parentUuid": "7a6b29fe_538cd035",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 5
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_611c8f6b",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-10-10T15:15:51Z",
+      "side": 1,
+      "message": "This should either have javadoc that says this class handles the lifecycle of the slave mountpoint or a name that reflects that.",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 24
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ee0ecee4",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-10-10T15:15:51Z",
+      "side": 1,
+      "message": "What about DELETE? is it handled somewhere else? How would the slave mountpoint be unregistered from the MountService?",
+      "range": {
+        "startLine": 65,
+        "startChar": 12,
+        "endLine": 65,
+        "endChar": 53
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_0e6eaa96",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-10-10T15:15:51Z",
+      "side": 1,
+      "message": "Trying to register",
+      "range": {
+        "startLine": 67,
+        "startChar": 64,
+        "endLine": 67,
+        "endChar": 81
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_6e6bde85",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-10-10T15:15:51Z",
+      "side": 1,
+      "message": "same as above",
+      "range": {
+        "startLine": 72,
+        "startChar": 64,
+        "endLine": 72,
+        "endChar": 82
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ce45d218",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-10-10T15:15:51Z",
+      "side": 1,
+      "message": "Unknown",
+      "range": {
+        "startLine": 77,
+        "startChar": 31,
+        "endLine": 77,
+        "endChar": 36
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ee57eec8",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-10-10T15:15:51Z",
+      "side": 1,
+      "message": "This is by itself is fine, but maybe a better solution would be to augment the NetconfNode with master-address element which we could then use to send the message directly to master instead of doing this lookup through all members. This would also be handy for people the check which member is actually doing the connection.",
+      "range": {
+        "startLine": 110,
+        "startChar": 11,
+        "endLine": 116,
+        "endChar": 13
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_93b4a8d2",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyContext.java",
         "patchSetId": 1
@@ -161,6 +323,76 @@
         "startChar": 8,
         "endLine": 43,
         "endChar": 13
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ce13120c",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyContext.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-10-10T15:15:51Z",
+      "side": 1,
+      "message": "Huh, I don\u0027t really see a point in being so strict with this, the this is here purely because the field name matches the parameter name so it\u0027s needed here. It\u0027s not needed anywhere else.",
+      "parentUuid": "7a6b29fe_93b4a8d2",
+      "range": {
+        "startLine": 43,
+        "startChar": 8,
+        "endLine": 43,
+        "endChar": 13
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_4e47024c",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-10-10T15:15:51Z",
+      "side": 1,
+      "message": "debug should be enough here",
+      "range": {
+        "startLine": 103,
+        "startChar": 28,
+        "endLine": 103,
+        "endChar": 32
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ae7336b3",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-10-10T15:15:51Z",
+      "side": 1,
+      "message": "This would warrant a warn, since if the modification type changed there would be no signs unless you had debug logs on.",
+      "range": {
+        "startLine": 114,
+        "startChar": 24,
+        "endLine": 114,
+        "endChar": 29
       },
       "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
@@ -237,6 +469,29 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_0ed7cac0",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteOperationTxProcessorImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-10-10T15:15:51Z",
+      "side": 1,
+      "message": "I would log a warn atleast if we dont have a tx open and submit was called since it seems something went wrong somewhere.",
+      "range": {
+        "startLine": 51,
+        "startChar": 8,
+        "endLine": 64,
+        "endChar": 9
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_139b7873",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/SlaveSalFacade.java",
         "patchSetId": 1
@@ -260,6 +515,52 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_8ecbda1d",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfNodeActor.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-10-10T15:15:51Z",
+      "side": 1,
+      "message": "I don\u0027t think you need the UID here, you can replace the creator with lambda when you remove this.",
+      "range": {
+        "startLine": 76,
+        "startChar": 12,
+        "endLine": 76,
+        "endChar": 60
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ee59ae8f",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfNodeActor.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-10-10T15:15:51Z",
+      "side": 1,
+      "message": "debug",
+      "range": {
+        "startLine": 103,
+        "startChar": 16,
+        "endLine": 103,
+        "endChar": 20
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_33195423",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/NetconfMasterDOMTransactions.java",
         "patchSetId": 1
@@ -276,6 +577,29 @@
         "startChar": 13,
         "endLine": 33,
         "endChar": 41
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_6e80fe8b",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/NetconfProxyDOMTransactions.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-10-10T15:15:51Z",
+      "side": 1,
+      "message": "I don\u0027t think you need FQCN here since you already have it imported",
+      "range": {
+        "startLine": 48,
+        "startChar": 8,
+        "endLine": 48,
+        "endChar": 24
       },
       "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
@@ -317,6 +641,30 @@
       "writtenOn": "2016-10-07T13:30:09Z",
       "side": 1,
       "message": "Why is the object nested in its builder class. Should be moved to its own class",
+      "range": {
+        "startLine": 149,
+        "startChar": 17,
+        "endLine": 149,
+        "endChar": 37
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_c12483b1",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/utils/NetconfTopologySetupBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-10-10T15:15:51Z",
+      "side": 1,
+      "message": "This pattern is all over cds and I don\u0027t think it\u0027s that bad, but a reversed relation would look better in that the implementation should have the builder as an inner class. Either way the inner class should be static as it doesn\u0027t need a reference to the outer class.",
+      "parentUuid": "7a6b29fe_b3af247d",
       "range": {
         "startLine": 149,
         "startChar": 17,
