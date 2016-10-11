@@ -16,6 +16,24 @@
       "revId": "c8864cd72bf24f0c185a416c03c7bdcd552323d2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_9f9ae6c3",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/mapper/NetconfMdsalMapperModule.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-11T12:50:27Z",
+      "side": 1,
+      "message": "I assume you\u0027re referring to the NetconfOperationServiceFactory not the NetconfOperationService, is that right?\n\nTo make sure we\u0027re retrieving the right one, I could specify the type \"mdsal-netconf-connector\" as define in the blueprint xml file, where exposing the service.",
+      "parentUuid": "7a6b29fe_a4d23532",
+      "revId": "c8864cd72bf24f0c185a416c03c7bdcd552323d2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
