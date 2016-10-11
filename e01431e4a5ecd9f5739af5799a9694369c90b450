@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_84c0d9e1",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientDispatcherImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-11T11:48:57Z",
+      "side": 1,
+      "message": "You can also replace this anonymous class.",
+      "revId": "e01431e4a5ecd9f5739af5799a9694369c90b450",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
