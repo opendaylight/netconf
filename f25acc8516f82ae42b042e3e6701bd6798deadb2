@@ -169,6 +169,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_bff7e2f4",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-11T13:04:27Z",
+      "side": 1,
+      "message": "No, that was it :) As the wiring *should* be all done by blueprint, all required services should be exposed and registered using the blueprint xml file, hence, it is no longer required to register the provider here, as this is pretty much what blueprint does (making it available in the OSGi registry).",
+      "parentUuid": "7a6b29fe_21129758",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 5
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_611c8f6b",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
         "patchSetId": 1
@@ -665,6 +689,30 @@
       "side": 1,
       "message": "This pattern is all over cds and I don\u0027t think it\u0027s that bad, but a reversed relation would look better in that the implementation should have the builder as an inner class. Either way the inner class should be static as it doesn\u0027t need a reference to the outer class.",
       "parentUuid": "7a6b29fe_b3af247d",
+      "range": {
+        "startLine": 149,
+        "startChar": 17,
+        "endLine": 149,
+        "endChar": 37
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ff915a9b",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/utils/NetconfTopologySetupBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-11T13:04:27Z",
+      "side": 1,
+      "message": "Ok, TBH what I didn\u0027t like is the static import in some classes to get NetconfTopologySetup so having NetconfTopologySetupBuilder.NetconfTopologySetup doesn\u0027t look right to me. But I think you\u0027re answer is addressing that part, so all good with me. Thanks",
+      "parentUuid": "7a6b29fe_c12483b1",
       "range": {
         "startLine": 149,
         "startChar": 17,
