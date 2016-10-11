@@ -45,8 +45,8 @@ public class UnLock extends AbstractLastNetconfOperation {
         }
 
         // Not supported running lock
-        throw new DocumentedException("Unable to unlock " + Datastore.running + " datastore", DocumentedException.ErrorType.application,
-                DocumentedException.ErrorTag.operation_not_supported, DocumentedException.ErrorSeverity.error);
+        throw new DocumentedException("Unable to unlock " + Datastore.running + " datastore", DocumentedException.ErrorType.APPLICATION,
+                DocumentedException.ErrorTag.OPERATION_NOT_SUPPORTED, DocumentedException.ErrorSeverity.ERROR);
     }
 
     @Override

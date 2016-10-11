@@ -82,57 +82,57 @@ public class RuntimeRpcTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(RuntimeRpcTest.class);
 
-    private String sessionIdForReporting = "netconf-test-session1";
+    private final String sessionIdForReporting = "netconf-test-session1";
 
     private static Document RPC_REPLY_OK = null;
 
     static {
         try {
             RPC_REPLY_OK = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/runtimerpc-ok-reply.xml");
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOG.debug("unable to load rpc reply ok.", e);
             RPC_REPLY_OK = XmlUtil.newDocument();
         }
     }
 
-    private DOMRpcService rpcServiceVoidInvoke = new DOMRpcService() {
+    private final DOMRpcService rpcServiceVoidInvoke = new DOMRpcService() {
         @Nonnull
         @Override
-        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull SchemaPath type, @Nullable NormalizedNode<?, ?> input) {
+        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull final SchemaPath type, @Nullable final NormalizedNode<?, ?> input) {
             return Futures.immediateCheckedFuture((DOMRpcResult) new DefaultDOMRpcResult(null, Collections.<RpcError>emptyList()));
         }
 
         @Nonnull
         @Override
-        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(@Nonnull T listener) {
+        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(@Nonnull final T listener) {
             return null;
         }
     };
 
-    private DOMRpcService rpcServiceFailedInvocation = new DOMRpcService() {
+    private final DOMRpcService rpcServiceFailedInvocation = new DOMRpcService() {
         @Nonnull
         @Override
-        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull SchemaPath type, @Nullable NormalizedNode<?, ?> input) {
+        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull final SchemaPath type, @Nullable final NormalizedNode<?, ?> input) {
             return Futures.immediateFailedCheckedFuture((DOMRpcException) new DOMRpcException("rpc invocation not implemented yet") {
             });
         }
 
         @Nonnull
         @Override
-        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(@Nonnull T listener) {
+        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(@Nonnull final T listener) {
             return null;
         }
     };
 
-    private DOMRpcService rpcServiceSuccesfullInvocation = new DOMRpcService() {
+    private final DOMRpcService rpcServiceSuccesfullInvocation = new DOMRpcService() {
         @Nonnull
         @Override
-        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull SchemaPath type, @Nullable NormalizedNode<?, ?> input) {
-            Collection<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> children = (Collection) input.getValue();
-            Module module = schemaContext.findModuleByNamespaceAndRevision(type.getLastComponent().getNamespace(), null);
-            RpcDefinition rpcDefinition = getRpcDefinitionFromModule(module, module.getNamespace(), type.getLastComponent().getLocalName());
-            ContainerSchemaNode outputSchemaNode = rpcDefinition.getOutput();
-            ContainerNode node = ImmutableContainerNodeBuilder.create()
+        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull final SchemaPath type, @Nullable final NormalizedNode<?, ?> input) {
+            final Collection<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> children = (Collection) input.getValue();
+            final Module module = schemaContext.findModuleByNamespaceAndRevision(type.getLastComponent().getNamespace(), null);
+            final RpcDefinition rpcDefinition = getRpcDefinitionFromModule(module, module.getNamespace(), type.getLastComponent().getLocalName());
+            final ContainerSchemaNode outputSchemaNode = rpcDefinition.getOutput();
+            final ContainerNode node = ImmutableContainerNodeBuilder.create()
                     .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(outputSchemaNode.getQName()))
                     .withValue(children).build();
 
@@ -141,7 +141,7 @@ public class RuntimeRpcTest {
 
         @Nonnull
         @Override
-        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(@Nonnull T listener) {
+        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(@Nonnull final T listener) {
             return null;
         }
     };
@@ -169,7 +169,7 @@ public class RuntimeRpcTest {
         doReturn(schemaContext).when(schemaService).getSessionContext();
         doAnswer(new Answer() {
             @Override
-            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+            public Object answer(final InvocationOnMock invocationOnMock) throws Throwable {
                 ((SchemaContextListener) invocationOnMock.getArguments()[0]).onGlobalContextUpdated(schemaContext);
                 return registration;
             }
@@ -195,96 +195,96 @@ public class RuntimeRpcTest {
 
     @Test
     public void testVoidOutputRpc() throws Exception {
-        RuntimeRpc rpc = new RuntimeRpc(sessionIdForReporting, currentSchemaContext, rpcServiceVoidInvoke);
+        final RuntimeRpc rpc = new RuntimeRpc(sessionIdForReporting, currentSchemaContext, rpcServiceVoidInvoke);
 
-        Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-void-output.xml");
-        HandlingPriority priority = rpc.canHandle(rpcDocument);
+        final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-void-output.xml");
+        final HandlingPriority priority = rpc.canHandle(rpcDocument);
         Preconditions.checkState(priority != HandlingPriority.CANNOT_HANDLE);
 
-        Document response = rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
+        final Document response = rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
 
         verifyResponse(response, RPC_REPLY_OK);
     }
 
     @Test
     public void testSuccesfullNonVoidInvocation() throws Exception {
-        RuntimeRpc rpc = new RuntimeRpc(sessionIdForReporting, currentSchemaContext, rpcServiceSuccesfullInvocation);
+        final RuntimeRpc rpc = new RuntimeRpc(sessionIdForReporting, currentSchemaContext, rpcServiceSuccesfullInvocation);
 
-        Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-nonvoid.xml");
-        HandlingPriority priority = rpc.canHandle(rpcDocument);
+        final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-nonvoid.xml");
+        final HandlingPriority priority = rpc.canHandle(rpcDocument);
         Preconditions.checkState(priority != HandlingPriority.CANNOT_HANDLE);
 
-        Document response = rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
+        final Document response = rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
         verifyResponse(response, XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-nonvoid-control.xml"));
     }
 
     @Test
     public void testSuccesfullContainerInvocation() throws Exception {
-        RuntimeRpc rpc = new RuntimeRpc(sessionIdForReporting, currentSchemaContext, rpcServiceSuccesfullInvocation);
+        final RuntimeRpc rpc = new RuntimeRpc(sessionIdForReporting, currentSchemaContext, rpcServiceSuccesfullInvocation);
 
-        Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-container.xml");
-        HandlingPriority priority = rpc.canHandle(rpcDocument);
+        final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-container.xml");
+        final HandlingPriority priority = rpc.canHandle(rpcDocument);
         Preconditions.checkState(priority != HandlingPriority.CANNOT_HANDLE);
 
-        Document response = rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
+        final Document response = rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
         verifyResponse(response, XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-container-control.xml"));
     }
 
     @Test
     public void testFailedInvocation() throws Exception {
-        RuntimeRpc rpc = new RuntimeRpc(sessionIdForReporting, currentSchemaContext, rpcServiceFailedInvocation);
+        final RuntimeRpc rpc = new RuntimeRpc(sessionIdForReporting, currentSchemaContext, rpcServiceFailedInvocation);
 
-        Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-nonvoid.xml");
-        HandlingPriority priority = rpc.canHandle(rpcDocument);
+        final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-nonvoid.xml");
+        final HandlingPriority priority = rpc.canHandle(rpcDocument);
         Preconditions.checkState(priority != HandlingPriority.CANNOT_HANDLE);
 
         try {
             rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
             fail("should have failed with rpc invocation not implemented yet");
-        } catch (DocumentedException e) {
-            assertTrue(e.getErrorType() == ErrorType.application);
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.operation_failed);
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
+            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_FAILED);
         }
     }
 
     @Test
     public void testVoidInputOutputRpc() throws Exception {
-        RuntimeRpc rpc = new RuntimeRpc(sessionIdForReporting, currentSchemaContext, rpcServiceVoidInvoke);
+        final RuntimeRpc rpc = new RuntimeRpc(sessionIdForReporting, currentSchemaContext, rpcServiceVoidInvoke);
 
-        Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-void-input-output.xml");
-        HandlingPriority priority = rpc.canHandle(rpcDocument);
+        final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-void-input-output.xml");
+        final HandlingPriority priority = rpc.canHandle(rpcDocument);
         Preconditions.checkState(priority != HandlingPriority.CANNOT_HANDLE);
 
-        Document response = rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
+        final Document response = rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
 
         verifyResponse(response, RPC_REPLY_OK);
     }
 
     @Test
     public void testBadNamespaceInRpc() throws Exception {
-        RuntimeRpc rpc = new RuntimeRpc(sessionIdForReporting, currentSchemaContext, rpcServiceVoidInvoke);
-        Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-bad-namespace.xml");
+        final RuntimeRpc rpc = new RuntimeRpc(sessionIdForReporting, currentSchemaContext, rpcServiceVoidInvoke);
+        final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-bad-namespace.xml");
 
         try {
             rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
             fail("Should have failed, rpc has bad namespace");
-        } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.bad_element);
-            assertTrue(e.getErrorType() == ErrorType.application);
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
+            assertTrue(e.getErrorTag() == ErrorTag.BAD_ELEMENT);
+            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
         }
     }
 
-    private void verifyResponse(Document response, Document template) throws IOException, TransformerException {
-        DetailedDiff dd = new DetailedDiff(new Diff(response, template));
+    private void verifyResponse(final Document response, final Document template) throws IOException, TransformerException {
+        final DetailedDiff dd = new DetailedDiff(new Diff(response, template));
         dd.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
         //we care about order so response has to be identical
         assertTrue(dd.identical());
     }
 
-    private RpcDefinition getRpcDefinitionFromModule(Module module, URI namespaceURI, String name) {
-        for (RpcDefinition rpcDef : module.getRpcs()) {
+    private RpcDefinition getRpcDefinitionFromModule(final Module module, final URI namespaceURI, final String name) {
+        for (final RpcDefinition rpcDef : module.getRpcs()) {
             if (rpcDef.getQName().getNamespace().equals(namespaceURI)
                     && rpcDef.getQName().getLocalName().equals(name)) {
                 return rpcDef;
@@ -299,8 +299,8 @@ public class RuntimeRpcTest {
         final List<String> schemaPaths = Arrays.asList("/yang/mdsal-netconf-rpc-test.yang");
         final List<InputStream> schemas = new ArrayList<>();
 
-        for (String schemaPath : schemaPaths) {
-            InputStream resourceAsStream = getClass().getResourceAsStream(schemaPath);
+        for (final String schemaPath : schemaPaths) {
+            final InputStream resourceAsStream = getClass().getResourceAsStream(schemaPath);
             schemas.add(resourceAsStream);
         }
 
@@ -308,12 +308,12 @@ public class RuntimeRpcTest {
     }
 
     private static SchemaContext parseYangStreams(final List<InputStream> streams) {
-        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
+        final CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
                 .newBuild();
         final SchemaContext schemaContext;
         try {
             schemaContext = reactor.buildEffective(streams);
-        } catch (ReactorException e) {
+        } catch (final ReactorException e) {
             throw new RuntimeException("Unable to build schema context from " + streams, e);
         }
         return schemaContext;

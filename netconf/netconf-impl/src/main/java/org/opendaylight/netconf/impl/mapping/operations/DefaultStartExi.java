@@ -13,11 +13,11 @@ import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorType;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
-import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.impl.NetconfServerSession;
+import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
+import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -42,9 +42,9 @@ public class DefaultStartExi extends AbstractSingletonNetconfOperation implement
 
         try {
             netconfSession.startExiCommunication(new NetconfMessage(message));
-        } catch (IllegalArgumentException e) {
-            throw new DocumentedException("Failed to parse EXI parameters", e, ErrorType.protocol,
-                    ErrorTag.operation_failed, ErrorSeverity.error);
+        } catch (final IllegalArgumentException e) {
+            throw new DocumentedException("Failed to parse EXI parameters", e, ErrorType.PROTOCOL,
+                    ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
 
         return super.handle(message, subsequentOperation);
@@ -52,7 +52,7 @@ public class DefaultStartExi extends AbstractSingletonNetconfOperation implement
 
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
-        Element getSchemaResult = document.createElementNS( XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, XmlNetconfConstants.OK);
+        final Element getSchemaResult = document.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, XmlNetconfConstants.OK);
         LOG.trace("{} operation successful", START_EXI);
         return getSchemaResult;
     }

@@ -118,7 +118,7 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         }
     }
 
-    protected Element serializeNodeWithParentStructure(Document document, YangInstanceIdentifier dataRoot, NormalizedNode node) {
+    protected Element serializeNodeWithParentStructure(final Document document, final YangInstanceIdentifier dataRoot, final NormalizedNode node) {
         if (!dataRoot.equals(ROOT)) {
             return (Element) transformNormalizedNode(document,
                     ImmutableNodes.fromInstanceId(schemaContext.getCurrentContext(), dataRoot, node),
@@ -135,8 +135,8 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
      *         if filter is not present we want to read the entire datastore - return ROOT.
      * @throws DocumentedException
      */
-    protected Optional<YangInstanceIdentifier> getDataRootFromFilter(XmlElement operationElement) throws DocumentedException {
-        Optional<XmlElement> filterElement = operationElement.getOnlyChildElementOptionally(FILTER);
+    protected Optional<YangInstanceIdentifier> getDataRootFromFilter(final XmlElement operationElement) throws DocumentedException {
+        final Optional<XmlElement> filterElement = operationElement.getOnlyChildElementOptionally(FILTER);
         if (filterElement.isPresent()) {
             if (filterElement.get().getChildElements().size() == 0) {
                 return Optional.absent();
@@ -148,14 +148,14 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
     }
 
     @VisibleForTesting
-    protected YangInstanceIdentifier getInstanceIdentifierFromFilter(XmlElement filterElement) throws DocumentedException {
+    protected YangInstanceIdentifier getInstanceIdentifierFromFilter(final XmlElement filterElement) throws DocumentedException {
 
         if (filterElement.getChildElements().size() != 1) {
             throw new DocumentedException("Multiple filter roots not supported yet",
-                    ErrorType.application, ErrorTag.operation_not_supported, ErrorSeverity.error);
+                    ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED, ErrorSeverity.ERROR);
         }
 
-        XmlElement element = filterElement.getOnlyChildElement();
+        final XmlElement element = filterElement.getOnlyChildElement();
         return validator.validate(element);
     }
 
@@ -195,7 +195,7 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
                     Optional.of(Datastore.valueOf(sourceElement.get().getOnlyChildElement().getName())) : Optional.<Datastore>absent();
         }
 
-        private static void validateInputRpc(final XmlElement xml, String operationName) throws DocumentedException{
+        private static void validateInputRpc(final XmlElement xml, final String operationName) throws DocumentedException {
             xml.checkName(operationName);
             xml.checkNamespace(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
         }

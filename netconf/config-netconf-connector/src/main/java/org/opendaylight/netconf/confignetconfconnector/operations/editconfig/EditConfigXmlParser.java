@@ -50,8 +50,8 @@ public class EditConfigXmlParser {
         targetElement  = xml.getOnlyChildElementWithSameNamespace(EditConfigXmlParser.TARGET_KEY);
         targetChildNode = targetElement.getOnlyChildElementWithSameNamespace();
 
-        String datastoreValue = targetChildNode.getName();
-        Datastore targetDatastore = Datastore.valueOf(datastoreValue);
+        final String datastoreValue = targetChildNode.getName();
+        final Datastore targetDatastore = Datastore.valueOf(datastoreValue);
         LOG.debug("Setting {} to '{}'", EditConfigXmlParser.TARGET_KEY, targetDatastore);
 
         // check target
@@ -60,17 +60,17 @@ public class EditConfigXmlParser {
                     "Only %s datastore supported for edit config but was: %s",
                     Datastore.candidate,
                     targetDatastore),
-                    DocumentedException.ErrorType.application,
-                    DocumentedException.ErrorTag.invalid_value,
-                    DocumentedException.ErrorSeverity.error);
+                    DocumentedException.ErrorType.APPLICATION,
+                    DocumentedException.ErrorTag.INVALID_VALUE,
+                    DocumentedException.ErrorSeverity.ERROR);
         }
 
         // Test option
-        TestOption testOption;
-        Optional<XmlElement> testOptionElementOpt = xml
+        final TestOption testOption;
+        final Optional<XmlElement> testOptionElementOpt = xml
                 .getOnlyChildElementWithSameNamespaceOptionally(EditConfigXmlParser.TEST_OPTION_KEY);
         if (testOptionElementOpt.isPresent()) {
-            String testOptionValue = testOptionElementOpt.get().getTextContent();
+            final String testOptionValue = testOptionElementOpt.get().getTextContent();
             testOption = TestOption.getFromXmlName(testOptionValue);
         } else {
             testOption = TestOption.getDefault();
@@ -78,10 +78,10 @@ public class EditConfigXmlParser {
         LOG.debug("Setting {} to '{}'", EditConfigXmlParser.TEST_OPTION_KEY, testOption);
 
         // Error option
-        Optional<XmlElement> errorOptionElement = xml
+        final Optional<XmlElement> errorOptionElement = xml
                 .getOnlyChildElementWithSameNamespaceOptionally(EditConfigXmlParser.ERROR_OPTION_KEY);
         if (errorOptionElement.isPresent()) {
-            String errorOptionParsed = errorOptionElement.get().getTextContent();
+            final String errorOptionParsed = errorOptionElement.get().getTextContent();
             if (!errorOptionParsed.equals(EditConfigXmlParser.DEFAULT_ERROR_OPTION)){
                 throw new UnsupportedOperationException("Only " + EditConfigXmlParser.DEFAULT_ERROR_OPTION
                         + " supported for " + EditConfigXmlParser.ERROR_OPTION_KEY + ", was " + errorOptionParsed);
@@ -89,10 +89,10 @@ public class EditConfigXmlParser {
         }
 
         // Default op
-        Optional<XmlElement> defaultContent = xml
+        final Optional<XmlElement> defaultContent = xml
                 .getOnlyChildElementWithSameNamespaceOptionally(EditConfigXmlParser.DEFAULT_OPERATION_KEY);
         if (defaultContent.isPresent()) {
-            String mergeStrategyString = defaultContent.get().getTextContent();
+            final String mergeStrategyString = defaultContent.get().getTextContent();
             LOG.trace("Setting merge strategy to {}", mergeStrategyString);
             editStrategyType = EditStrategyType.valueOf(mergeStrategyString);
         }

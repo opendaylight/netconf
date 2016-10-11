@@ -195,9 +195,9 @@ public class NetconfMessageTransformUtil {
                     .build();
 
             throw new NetconfDocumentedException( "Response message contained unknown \"message-id\"",
-                    null, NetconfDocumentedException.ErrorType.protocol,
-                    NetconfDocumentedException.ErrorTag.bad_attribute,
-                    NetconfDocumentedException.ErrorSeverity.error, errorInfo );
+                    null, NetconfDocumentedException.ErrorType.PROTOCOL,
+                    NetconfDocumentedException.ErrorTag.BAD_ATTRIBUTE,
+                    NetconfDocumentedException.ErrorSeverity.ERROR, errorInfo);
         }
     }
 
@@ -230,20 +230,20 @@ public class NetconfMessageTransformUtil {
 
     private static ErrorSeverity toRpcErrorSeverity( final NetconfDocumentedException.ErrorSeverity severity ) {
         switch (severity) {
-        case warning:
-            return RpcError.ErrorSeverity.WARNING;
-        default:
-            return RpcError.ErrorSeverity.ERROR;
+            case WARNING:
+                return RpcError.ErrorSeverity.WARNING;
+            default:
+                return RpcError.ErrorSeverity.ERROR;
         }
     }
 
     private static RpcError.ErrorType toRpcErrorType(final NetconfDocumentedException.ErrorType type) {
         switch (type) {
-        case protocol:
+            case PROTOCOL:
             return RpcError.ErrorType.PROTOCOL;
-        case rpc:
+            case RPC:
             return RpcError.ErrorType.RPC;
-        case transport:
+            case TRANSPORT:
             return RpcError.ErrorType.TRANSPORT;
         default:
             return RpcError.ErrorType.APPLICATION;
@@ -329,7 +329,7 @@ public class NetconfMessageTransformUtil {
                 @Override public Date parse(final String source) throws ParseException {
                     try {
                         return super.parse(source);
-                    } catch (ParseException e) {
+                    } catch (final ParseException e) {
                         // In case of failure, try to parse with milliseconds
                         return withMillis.parse(source);
                     }
@@ -365,9 +365,9 @@ public class NetconfMessageTransformUtil {
 
         try {
             return new AbstractMap.SimpleEntry<>(EVENT_TIME_FORMAT.get().parse(eventTimeElement.getTextContent()), notificationElement);
-        } catch (DocumentedException e) {
+        } catch (final DocumentedException e) {
             throw new IllegalArgumentException("Notification payload does not contain " + EVENT_TIME + " " + message);
-        } catch (ParseException e) {
+        } catch (final ParseException e) {
             LOG.warn("Unable to parse event time from {}. Setting time to {}", eventTimeElement, NetconfNotification.UNKNOWN_EVENT_TIME, e);
             return new AbstractMap.SimpleEntry<>(NetconfNotification.UNKNOWN_EVENT_TIME, notificationElement);
         }
@@ -393,7 +393,7 @@ public class NetconfMessageTransformUtil {
                     XMLStreamNormalizedNodeStreamWriter.create(writer, baseNetconfCtx, schemaPath)) {
                 try (final SchemaOrderedNormalizedNodeWriter normalizedNodeWriter =
                         new SchemaOrderedNormalizedNodeWriter(normalizedNodeStreamWriter, baseNetconfCtx, schemaPath)) {
-                    Collection<DataContainerChild<?, ?>> value = normalized.getValue();
+                    final Collection<DataContainerChild<?, ?>> value = normalized.getValue();
                     normalizedNodeWriter.write(value);
                     normalizedNodeWriter.flush();
                 }

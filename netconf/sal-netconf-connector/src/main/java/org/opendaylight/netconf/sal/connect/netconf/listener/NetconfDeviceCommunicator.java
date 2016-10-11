@@ -62,14 +62,14 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     private NetconfClientSession session;
 
     private Future<?> initFuture;
-    private SettableFuture<NetconfDeviceCapabilities> firstConnectionFuture;
+    private final SettableFuture<NetconfDeviceCapabilities> firstConnectionFuture;
 
     // isSessionClosing indicates a close operation on the session is issued and
     // tearDown will surely be called later to finish the close.
     // Used to allow only one thread to enter tearDown and other threads should
     // NOT enter it simultaneously and should end its close operation without
     // calling tearDown to release the locks they hold to avoid deadlock.
-    private volatile AtomicBoolean isSessionClosing = new AtomicBoolean(false);
+    private final AtomicBoolean isSessionClosing = new AtomicBoolean(false);
 
     public Boolean isSessionClosing() {
         return isSessionClosing.get();
@@ -146,7 +146,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         initFuture.addListener(new GenericFutureListener<Future<Object>>(){
 
             @Override
-            public void operationComplete(Future<Object> future) throws Exception {
+            public void operationComplete(final Future<Object> future) throws Exception {
                 if (!future.isSuccess() && !future.isCancelled()) {
                     LOG.debug("{}: Connection failed", id, future.cause());
                     NetconfDeviceCommunicator.this.remoteDevice.onRemoteSessionFailed(future.cause());
@@ -166,12 +166,12 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         }
     }
 
-    private void tearDown( String reason ) {
+    private void tearDown(final String reason) {
         if (!isSessionClosing()) {
             LOG.warn("It's curious that no one to close the session but tearDown is called!");
         }
         LOG.debug("Tearing down {}", reason);
-        List<UncancellableFuture<RpcResult<NetconfMessage>>> futuresToCancel = Lists.newArrayList();
+        final List<UncancellableFuture<RpcResult<NetconfMessage>>> futuresToCancel = Lists.newArrayList();
         sessionLock.lock();
         try {
             if( session != null ) {
@@ -202,7 +202,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
         // Notify pending request futures outside of the sessionLock to avoid unnecessarily
         // blocking the caller.
-        for( UncancellableFuture<RpcResult<NetconfMessage>> future: futuresToCancel ) {
+        for (final UncancellableFuture<RpcResult<NetconfMessage>> future : futuresToCancel) {
             if( Strings.isNullOrEmpty( reason ) ) {
                 future.set( createSessionDownRpcResult() );
             } else {
@@ -218,9 +218,9 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                              String.format( "The netconf session to %1$s is disconnected", id.getName() ) );
     }
 
-    private RpcResult<NetconfMessage> createErrorRpcResult( RpcError.ErrorType errorType, String message ) {
+    private RpcResult<NetconfMessage> createErrorRpcResult(final RpcError.ErrorType errorType, final String message) {
         return RpcResultBuilder.<NetconfMessage>failed()
-                .withError(errorType, NetconfDocumentedException.ErrorTag.operation_failed.getTagValue(), message).build();
+                .withError(errorType, NetconfDocumentedException.ErrorTag.OPERATION_FAILED.getTagValue(), message).build();
     }
 
     @Override

@@ -108,7 +108,7 @@ public class NetconfMDSalMappingTest {
     static {
         try {
             RPC_REPLY_OK = XmlFileLoader.xmlFileToDocument("messages/mapping/rpc-reply_ok.xml");
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOG.debug("unable to load rpc reply ok.", e);
             RPC_REPLY_OK = XmlUtil.newDocument();
         }
@@ -116,7 +116,7 @@ public class NetconfMDSalMappingTest {
 
     private CurrentSchemaContext currentSchemaContext = null;
     private SchemaContext schemaContext = null;
-    private String sessionIdForReporting = "netconf-test-session1";
+    private final String sessionIdForReporting = "netconf-test-session1";
 
     private TransactionProvider transactionProvider = null;
 
@@ -141,7 +141,7 @@ public class NetconfMDSalMappingTest {
         datastores.put(LogicalDatastoreType.CONFIGURATION, configStore);
         datastores.put(LogicalDatastoreType.OPERATIONAL, operStore);
 
-        ExecutorService listenableFutureExecutor = SpecialExecutors.newBlockingBoundedCachedThreadPool(
+        final ExecutorService listenableFutureExecutor = SpecialExecutors.newBlockingBoundedCachedThreadPool(
                 16, 16, "CommitFutures");
 
         final ConcurrentDOMDataBroker cdb = new ConcurrentDOMDataBroker(datastores, listenableFutureExecutor);
@@ -175,19 +175,19 @@ public class NetconfMDSalMappingTest {
         try {
             executeOperation(new GetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider), "messages/mapping/bad_getConfig.xml");
             fail("Should have failed, this is an incorrect request");
-        } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.operation_failed);
-            assertTrue(e.getErrorType() == ErrorType.application);
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
+            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_FAILED);
+            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
         }
 
         try {
             executeOperation(new GetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider), "messages/mapping/bad_namespace_getConfig.xml");
             fail("Should have failed, this is an incorrect request");
-        } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.operation_failed);
-            assertTrue(e.getErrorType() == ErrorType.application);
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
+            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_FAILED);
+            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
         }
 
 
@@ -199,10 +199,10 @@ public class NetconfMDSalMappingTest {
         try {
             edit("messages/mapping/editConfigs/editConfig_running.xml");
             fail("Should have failed - edit config on running datastore is not supported");
-        } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.operation_not_supported);
-            assertTrue(e.getErrorType() == ErrorType.protocol);
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
+            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_NOT_SUPPORTED);
+            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
         }
 
     }
@@ -309,20 +309,20 @@ public class NetconfMDSalMappingTest {
         try {
             lock();
             fail("Should have failed - locking of running datastore is not supported");
-        } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.operation_not_supported);
-            assertTrue(e.getErrorType() == ErrorType.application);
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
+            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_NOT_SUPPORTED);
+            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
         }
 
 
         try {
             lockWithoutTarget();
             fail("Should have failed, target is missing");
-        } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.invalid_value);
-            assertTrue(e.getErrorType() == ErrorType.application);
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
+            assertTrue(e.getErrorTag() == ErrorTag.INVALID_VALUE);
+            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
         }
     }
 
@@ -334,19 +334,19 @@ public class NetconfMDSalMappingTest {
         try {
             unlock();
             fail("Should have failed - unlocking of running datastore is not supported");
-        } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.operation_not_supported);
-            assertTrue(e.getErrorType() == ErrorType.application);
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
+            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_NOT_SUPPORTED);
+            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
         }
 
         try {
             unlockWithoutTarget();
             fail("Should have failed, target is missing");
-        } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.invalid_value);
-            assertTrue(e.getErrorType() == ErrorType.application);
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
+            assertTrue(e.getErrorTag() == ErrorTag.INVALID_VALUE);
+            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
         }
     }
 
@@ -360,10 +360,10 @@ public class NetconfMDSalMappingTest {
         try {
             edit("messages/mapping/editConfigs/editConfig_create.xml");
             fail("Create should have failed - data already exists");
-        } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.data_exists);
-            assertTrue(e.getErrorType() == ErrorType.protocol);
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
+            assertTrue(e.getErrorTag() == ErrorTag.DATA_EXISTS);
+            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
         }
 
         verifyResponse(discardChanges(), RPC_REPLY_OK);
@@ -379,10 +379,10 @@ public class NetconfMDSalMappingTest {
         try {
             edit("messages/mapping/editConfigs/editConfig_delete-top.xml");
             fail("Delete should have failed - data is missing");
-        } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.data_missing);
-            assertTrue(e.getErrorType() == ErrorType.protocol);
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
+            assertTrue(e.getErrorTag() == ErrorTag.DATA_MISSING);
+            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
         }
 
     }
@@ -400,16 +400,16 @@ public class NetconfMDSalMappingTest {
         deleteDatastore();
     }
 
-    public static void printDocument(Document doc) throws IOException, TransformerException {
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer = tf.newTransformer();
+    public static void printDocument(final Document doc) throws IOException, TransformerException {
+        final TransformerFactory tf = TransformerFactory.newInstance();
+        final Transformer transformer = tf.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
-        StringWriter writer = new StringWriter();
+        final StringWriter writer = new StringWriter();
         transformer.transform(new DOMSource(doc),
                 new StreamResult(writer));
         LOG.warn(writer.getBuffer().toString());
@@ -436,10 +436,10 @@ public class NetconfMDSalMappingTest {
         try {
             edit("messages/mapping/editConfigs/editConfig_merge_multiple_operations_4_create_existing.xml");
             fail();
-        } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.data_exists);
-            assertTrue(e.getErrorType() == ErrorType.protocol);
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
+            assertTrue(e.getErrorTag() == ErrorTag.DATA_EXISTS);
+            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
         }
 
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_multiple_operations_4_delete_children_operations.xml"), RPC_REPLY_OK);
@@ -449,10 +449,10 @@ public class NetconfMDSalMappingTest {
         try {
             edit("messages/mapping/editConfigs/editConfig_merge_multiple_operations_4_delete-non-existing.xml");
             fail();
-        } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.data_missing);
-            assertTrue(e.getErrorType() == ErrorType.protocol);
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
+            assertTrue(e.getErrorTag() == ErrorTag.DATA_MISSING);
+            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
         }
 
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_multiple_operations_5_choice_setup.xml"), RPC_REPLY_OK);
@@ -516,7 +516,7 @@ public class NetconfMDSalMappingTest {
         verifyFilterIdentifier("messages/mapping/filters/get-filter-users.xml",
                 YangInstanceIdentifier.builder().node(TOP).node(USERS).build());
 
-        YangInstanceIdentifier ident = YangInstanceIdentifier.
+        final YangInstanceIdentifier ident = YangInstanceIdentifier.
                 builder(AUGMENTED_CONTAINER_IN_MODULES).
                 node(AUGMENTED_CONTAINER).
                 node(AUGMENTED_STRING_IN_CONT).build();
@@ -559,20 +559,20 @@ public class NetconfMDSalMappingTest {
 
     }
 
-    private void verifyFilterIdentifier(String resource, YangInstanceIdentifier identifier) throws Exception{
-        TestingGetConfig getConfig = new TestingGetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
-        Document request = XmlFileLoader.xmlFileToDocument(resource);
-        YangInstanceIdentifier iid = getConfig.getInstanceIdentifierFromDocument(request);
+    private void verifyFilterIdentifier(final String resource, final YangInstanceIdentifier identifier) throws Exception {
+        final TestingGetConfig getConfig = new TestingGetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
+        final Document request = XmlFileLoader.xmlFileToDocument(resource);
+        final YangInstanceIdentifier iid = getConfig.getInstanceIdentifierFromDocument(request);
         assertEquals(identifier, iid);
     }
 
     private class TestingGetConfig extends GetConfig{
-        public TestingGetConfig(String sessionId, CurrentSchemaContext schemaContext, TransactionProvider transactionProvider) {
+        public TestingGetConfig(final String sessionId, final CurrentSchemaContext schemaContext, final TransactionProvider transactionProvider) {
             super(sessionId, schemaContext, transactionProvider);
         }
 
-        public YangInstanceIdentifier getInstanceIdentifierFromDocument(Document request) throws DocumentedException {
-            XmlElement filterElement = XmlElement.fromDomDocument(request).getOnlyChildElement(GET_CONFIG).getOnlyChildElement(FILTER_NODE);
+        public YangInstanceIdentifier getInstanceIdentifierFromDocument(final Document request) throws DocumentedException {
+            final XmlElement filterElement = XmlElement.fromDomDocument(request).getOnlyChildElement(GET_CONFIG).getOnlyChildElement(FILTER_NODE);
             return getInstanceIdentifierFromFilter(filterElement);
         }
     }
@@ -585,8 +585,8 @@ public class NetconfMDSalMappingTest {
         assertEmptyDatastore(getConfigRunning());
     }
 
-    private void verifyResponse(Document response, Document template) throws IOException, TransformerException {
-        DetailedDiff dd = new DetailedDiff(new Diff(response, template));
+    private void verifyResponse(final Document response, final Document template) throws IOException, TransformerException {
+        final DetailedDiff dd = new DetailedDiff(new Diff(response, template));
         dd.overrideElementQualifier(new NetconfXmlUnitRecursiveQualifier());
 
         printDocument(response);
@@ -595,93 +595,93 @@ public class NetconfMDSalMappingTest {
         assertTrue(dd.toString(), dd.similar());
     }
 
-    private void assertEmptyDatastore(Document response) {
+    private void assertEmptyDatastore(final Document response) {
 
-        NodeList nodes = response.getChildNodes();
+        final NodeList nodes = response.getChildNodes();
         assertTrue(nodes.getLength() == 1);
 
         assertEquals(nodes.item(0).getLocalName(), RPC_REPLY_ELEMENT);
 
-        NodeList replyNodes = nodes.item(0).getChildNodes();
+        final NodeList replyNodes = nodes.item(0).getChildNodes();
         assertTrue(replyNodes.getLength() == 1);
 
-        Node dataNode = replyNodes.item(0);
+        final Node dataNode = replyNodes.item(0);
         assertEquals(dataNode.getLocalName(), DATA_ELEMENT);
         assertFalse(dataNode.hasChildNodes());
 
     }
 
     private Document commit() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
-        Commit commit = new Commit(sessionIdForReporting, transactionProvider);
+        final Commit commit = new Commit(sessionIdForReporting, transactionProvider);
         return executeOperation(commit, "messages/mapping/commit.xml");
     }
 
     private Document discardChanges() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
-        DiscardChanges discardOp = new DiscardChanges(sessionIdForReporting, transactionProvider);
+        final DiscardChanges discardOp = new DiscardChanges(sessionIdForReporting, transactionProvider);
         return executeOperation(discardOp, "messages/mapping/discardChanges.xml");
     }
 
-    private Document edit(String resource) throws DocumentedException, ParserConfigurationException, SAXException, IOException {
-        EditConfig editConfig = new EditConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
+    private Document edit(final String resource) throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+        final EditConfig editConfig = new EditConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
         return executeOperation(editConfig, resource);
     }
 
     private Document get() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
-        Get get = new Get(sessionIdForReporting, currentSchemaContext, transactionProvider);
+        final Get get = new Get(sessionIdForReporting, currentSchemaContext, transactionProvider);
         return executeOperation(get, "messages/mapping/get.xml");
     }
 
-    private Document getWithFilter(String resource) throws DocumentedException, ParserConfigurationException, SAXException, IOException {
-        Get get = new Get(sessionIdForReporting, currentSchemaContext, transactionProvider);
+    private Document getWithFilter(final String resource) throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+        final Get get = new Get(sessionIdForReporting, currentSchemaContext, transactionProvider);
         return executeOperation(get, resource);
     }
 
     private Document getConfigRunning() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
-        GetConfig getConfig = new GetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
+        final GetConfig getConfig = new GetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
         return executeOperation(getConfig, "messages/mapping/getConfig.xml");
     }
 
     private Document getConfigCandidate() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
-        GetConfig getConfig = new GetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
+        final GetConfig getConfig = new GetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
         return executeOperation(getConfig, "messages/mapping/getConfig_candidate.xml");
     }
 
-    private Document getConfigWithFilter(String resource) throws DocumentedException, ParserConfigurationException, SAXException, IOException {
-        GetConfig getConfig = new GetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
+    private Document getConfigWithFilter(final String resource) throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+        final GetConfig getConfig = new GetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
         return executeOperation(getConfig, resource);
     }
 
     private Document lock() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
-        Lock lock = new Lock(sessionIdForReporting);
+        final Lock lock = new Lock(sessionIdForReporting);
         return executeOperation(lock, "messages/mapping/lock.xml");
     }
 
     private Document unlock() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
-        Unlock unlock = new Unlock(sessionIdForReporting);
+        final Unlock unlock = new Unlock(sessionIdForReporting);
         return executeOperation(unlock, "messages/mapping/unlock.xml");
     }
 
     private Document lockWithoutTarget() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
-        Lock lock = new Lock(sessionIdForReporting);
+        final Lock lock = new Lock(sessionIdForReporting);
         return executeOperation(lock, "messages/mapping/lock_notarget.xml");
     }
 
     private Document unlockWithoutTarget() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
-        Unlock unlock = new Unlock(sessionIdForReporting);
+        final Unlock unlock = new Unlock(sessionIdForReporting);
         return executeOperation(unlock, "messages/mapping/unlock_notarget.xml");
     }
 
     private Document lockCandidate() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
-        Lock lock = new Lock(sessionIdForReporting);
+        final Lock lock = new Lock(sessionIdForReporting);
         return executeOperation(lock, "messages/mapping/lock_candidate.xml");
     }
 
     private Document unlockCandidate() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
-        Unlock unlock = new Unlock(sessionIdForReporting);
+        final Unlock unlock = new Unlock(sessionIdForReporting);
         return executeOperation(unlock, "messages/mapping/unlock_candidate.xml");
     }
 
-    private Document executeOperation(NetconfOperation op, String filename) throws ParserConfigurationException, SAXException, IOException, DocumentedException {
+    private Document executeOperation(final NetconfOperation op, final String filename) throws ParserConfigurationException, SAXException, IOException, DocumentedException {
         final Document request = XmlFileLoader.xmlFileToDocument(filename);
         final Document response = op.handle(request, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
 
@@ -693,8 +693,8 @@ public class NetconfMDSalMappingTest {
         final List<String> schemaPaths = Arrays.asList("/META-INF/yang/config.yang", "/yang/mdsal-netconf-mapping-test.yang");
         final List<InputStream> schemas = new ArrayList<>();
 
-        for (String schemaPath : schemaPaths) {
-            InputStream resourceAsStream = getClass().getResourceAsStream(schemaPath);
+        for (final String schemaPath : schemaPaths) {
+            final InputStream resourceAsStream = getClass().getResourceAsStream(schemaPath);
             schemas.add(resourceAsStream);
         }
 
@@ -702,12 +702,12 @@ public class NetconfMDSalMappingTest {
     }
 
     private static SchemaContext parseYangStreams(final List<InputStream> streams) {
-        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
+        final CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
                 .newBuild();
         final SchemaContext schemaContext;
         try {
             schemaContext = reactor.buildEffective(streams);
-        } catch (ReactorException e) {
+        } catch (final ReactorException e) {
             throw new RuntimeException("Unable to build schema context from " + streams, e);
         }
         return schemaContext;
@@ -717,11 +717,11 @@ public class NetconfMDSalMappingTest {
         return new SchemaService() {
 
             @Override
-            public void addModule(Module module) {
+            public void addModule(final Module module) {
             }
 
             @Override
-            public void removeModule(Module module) {
+            public void removeModule(final Module module) {
 
             }
 

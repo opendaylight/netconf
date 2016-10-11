@@ -209,8 +209,8 @@ public class NetconfMappingTest extends AbstractConfigTest {
         setModule(mxBean, transaction, instanceName + "_dep");
 
         int i = 1;
-        for (Class<? extends AbstractServiceInterface> sInterface : factory.getImplementedServiceIntefaces()) {
-            ServiceInterfaceAnnotation annotation = sInterface.getAnnotation(ServiceInterfaceAnnotation.class);
+        for (final Class<? extends AbstractServiceInterface> sInterface : factory.getImplementedServiceIntefaces()) {
+            final ServiceInterfaceAnnotation annotation = sInterface.getAnnotation(ServiceInterfaceAnnotation.class);
             transaction.saveServiceReference(
                     transaction.getServiceInterfaceName(annotation.namespace(), annotation.localName()), "ref_from_code_to_" + instanceName + "_" + i++,
                     on);
@@ -298,10 +298,10 @@ public class NetconfMappingTest extends AbstractConfigTest {
         try {
             edit("netconfMessages/editConfig_removeServiceNameOnTest.xml");
             fail("Should've failed, non-existing service instance");
-        } catch (DocumentedException e) {
-            assertEquals(e.getErrorSeverity(), DocumentedException.ErrorSeverity.error);
-            assertEquals(e.getErrorTag(), DocumentedException.ErrorTag.operation_failed);
-            assertEquals(e.getErrorType(), DocumentedException.ErrorType.application);
+        } catch (final DocumentedException e) {
+            assertEquals(e.getErrorSeverity(), DocumentedException.ErrorSeverity.ERROR);
+            assertEquals(e.getErrorTag(), DocumentedException.ErrorTag.OPERATION_FAILED);
+            assertEquals(e.getErrorType(), DocumentedException.ErrorType.APPLICATION);
         }
 
         edit("netconfMessages/editConfig_replace_default.xml");
@@ -325,11 +325,11 @@ public class NetconfMappingTest extends AbstractConfigTest {
     }
 
     private static void assertCorrectRefNamesForDependencies(final Document config) throws NodeTestException {
-        NodeList modulesList = config.getElementsByTagName("modules");
+        final NodeList modulesList = config.getElementsByTagName("modules");
         assertEquals(1, modulesList.getLength());
 
-        NodeTest nt = new NodeTest((DocumentTraversal) config, modulesList.item(0));
-        NodeTester tester = new AbstractNodeTester() {
+        final NodeTest nt = new NodeTest((DocumentTraversal) config, modulesList.item(0));
+        final NodeTester tester = new AbstractNodeTester() {
             private int defaultRefNameCount = 0;
             private int userRefNameCount = 0;
 
@@ -353,17 +353,17 @@ public class NetconfMappingTest extends AbstractConfigTest {
 
     private static void assertCorrectServiceNames(final Document configCandidate, final Set<String> refNames) throws NodeTestException {
         final Set<String> refNames2 = new HashSet<>(refNames);
-        NodeList servicesNodes = configCandidate.getElementsByTagName("services");
+        final NodeList servicesNodes = configCandidate.getElementsByTagName("services");
         assertEquals(1, servicesNodes.getLength());
 
-        NodeTest nt = new NodeTest((DocumentTraversal) configCandidate, servicesNodes.item(0));
-        NodeTester tester = new AbstractNodeTester() {
+        final NodeTest nt = new NodeTest((DocumentTraversal) configCandidate, servicesNodes.item(0));
+        final NodeTester tester = new AbstractNodeTester() {
 
             @Override
             public void testElement(final Element element) throws NodeTestException {
                 if(element.getNodeName() != null) {
                     if(element.getNodeName().equals("name")) {
-                        String elmText = element.getTextContent();
+                        final String elmText = element.getTextContent();
                         if(refNames2.contains(elmText)) {
                             refNames2.remove(elmText);
                         } else {
@@ -390,7 +390,7 @@ public class NetconfMappingTest extends AbstractConfigTest {
         edit("netconfMessages/editConfig.xml");
         commit();
         Document response = getConfigRunning();
-        Element ipElement = readXmlToElement("<ip xmlns=\"urn:opendaylight:params:xml:ns:yang:controller:test:impl\">0:0:0:0:0:0:0:1</ip>");
+        final Element ipElement = readXmlToElement("<ip xmlns=\"urn:opendaylight:params:xml:ns:yang:controller:test:impl\">0:0:0:0:0:0:0:1</ip>");
         assertContainsElement(response, readXmlToElement("<ip xmlns=\"urn:opendaylight:params:xml:ns:yang:controller:test:impl\">0:0:0:0:0:0:0:1</ip>"));
 
         assertContainsElement(response, readXmlToElement("<union-test-attr xmlns=\"urn:opendaylight:params:xml:ns:yang:controller:test:impl\">456</union-test-attr>"));
@@ -410,7 +410,7 @@ public class NetconfMappingTest extends AbstractConfigTest {
         createModule(INSTANCE_NAME);
 
         edit("netconfMessages/editConfig.xml");
-        Document configCandidate = getConfigCandidate();
+        final Document configCandidate = getConfigCandidate();
         checkBinaryLeafEdited(configCandidate);
 
 
@@ -420,7 +420,7 @@ public class NetconfMappingTest extends AbstractConfigTest {
 
         // check after edit
         commit();
-        Document response = getConfigRunning();
+        final Document response = getConfigRunning();
 
         checkBinaryLeafEdited(response);
         checkTypeConfigAttribute(response);
@@ -460,41 +460,41 @@ public class NetconfMappingTest extends AbstractConfigTest {
         final NetconfServerSession session =
                 new NetconfServerSession(listener, channel, 1L,
                         NetconfHelloMessageAdditionalHeader.fromString("[netconf;10.12.0.102:48528;ssh;;;;;;]"));
-        DefaultCloseSession closeOp = new DefaultCloseSession(NETCONF_SESSION_ID, sessionCloseable);
+        final DefaultCloseSession closeOp = new DefaultCloseSession(NETCONF_SESSION_ID, sessionCloseable);
         closeOp.setNetconfSession(session);
         executeOp(closeOp, "netconfMessages/closeSession.xml");
     }
 
     private void edit(final String resource) throws ParserConfigurationException, SAXException, IOException,
             DocumentedException {
-        EditConfig editOp = new EditConfig(configSubsystemFacade, NETCONF_SESSION_ID);
+        final EditConfig editOp = new EditConfig(configSubsystemFacade, NETCONF_SESSION_ID);
         executeOp(editOp, resource);
     }
 
     private void commit() throws ParserConfigurationException, SAXException, IOException, DocumentedException {
-        Commit commitOp = new Commit(configSubsystemFacade, NETCONF_SESSION_ID);
+        final Commit commitOp = new Commit(configSubsystemFacade, NETCONF_SESSION_ID);
         executeOp(commitOp, "netconfMessages/commit.xml");
     }
 
     private static Document lockCandidate() throws ParserConfigurationException, SAXException, IOException, DocumentedException {
-        Lock commitOp = new Lock(NETCONF_SESSION_ID);
+        final Lock commitOp = new Lock(NETCONF_SESSION_ID);
         return executeOp(commitOp, "netconfMessages/lock.xml");
     }
 
     private static Document unlockCandidate() throws ParserConfigurationException, SAXException, IOException, DocumentedException {
-        UnLock commitOp = new UnLock(NETCONF_SESSION_ID);
+        final UnLock commitOp = new UnLock(NETCONF_SESSION_ID);
         return executeOp(commitOp, "netconfMessages/unlock.xml");
     }
 
     private Document getConfigCandidate() throws ParserConfigurationException, SAXException, IOException,
             DocumentedException {
-        GetConfig getConfigOp = new GetConfig(configSubsystemFacade, Optional.<String> absent(), NETCONF_SESSION_ID);
+        final GetConfig getConfigOp = new GetConfig(configSubsystemFacade, Optional.<String>absent(), NETCONF_SESSION_ID);
         return executeOp(getConfigOp, "netconfMessages/getConfig_candidate.xml");
     }
 
     private Document getConfigRunning() throws ParserConfigurationException, SAXException, IOException,
             DocumentedException {
-        GetConfig getConfigOp = new GetConfig(configSubsystemFacade, Optional.<String> absent(), NETCONF_SESSION_ID);
+        final GetConfig getConfigOp = new GetConfig(configSubsystemFacade, Optional.<String>absent(), NETCONF_SESSION_ID);
         return executeOp(getConfigOp, "netconfMessages/getConfig.xml");
     }
 
@@ -533,8 +533,8 @@ public class NetconfMappingTest extends AbstractConfigTest {
         try {
             edit("netconfMessages/namespaces/editConfig_sameAttrDifferentNamespaces.xml");
             fail();
-        } catch (DocumentedException e) {
-            String message = e.getMessage();
+        } catch (final DocumentedException e) {
+            final String message = e.getMessage();
             assertContainsString(message, "Element simpleInt present multiple times with different namespaces");
             assertContainsString(message, TEST_NAMESPACE);
             assertContainsString(message, XmlMappingConstants.URN_OPENDAYLIGHT_PARAMS_XML_NS_YANG_CONTROLLER_CONFIG);
@@ -546,8 +546,8 @@ public class NetconfMappingTest extends AbstractConfigTest {
         try {
             edit("netconfMessages/namespaces/editConfig_differentNamespaceTO.xml");
             fail();
-        } catch (DocumentedException e) {
-            String message = e.getMessage();
+        } catch (final DocumentedException e) {
+            final String message = e.getMessage();
             assertContainsString(message, "Unrecognised elements");
             assertContainsString(message, "simple-int2");
             assertContainsString(message, "dto_d");
@@ -559,8 +559,8 @@ public class NetconfMappingTest extends AbstractConfigTest {
         try {
             edit("netconfMessages/namespaces/editConfig_sameAttrDifferentNamespacesList.xml");
             fail();
-        } catch (DocumentedException e) {
-            String message = e.getMessage();
+        } catch (final DocumentedException e) {
+            final String message = e.getMessage();
             assertContainsString(message, "Element allow-user present multiple times with different namespaces");
             assertContainsString(message, TEST_NAMESPACE);
             assertContainsString(message, XmlMappingConstants.URN_OPENDAYLIGHT_PARAMS_XML_NS_YANG_CONTROLLER_CONFIG);
@@ -574,7 +574,7 @@ public class NetconfMappingTest extends AbstractConfigTest {
         edit("netconfMessages/namespaces/editConfig_typeNameConfigAttributeMatching.xml");
         commit();
 
-        Document response = getConfigRunning();
+        final Document response = getConfigRunning();
         checkTypeConfigAttribute(response);
     }
 
@@ -591,15 +591,15 @@ public class NetconfMappingTest extends AbstractConfigTest {
     @Test
     public void testUnrecognisedConfigElements() throws Exception {
 
-        String format = "netconfMessages/unrecognised/editConfig_unrecognised%d.xml";
+        final String format = "netconfMessages/unrecognised/editConfig_unrecognised%d.xml";
         final int TESTS_COUNT = 8;
 
         for (int i = 0; i < TESTS_COUNT; i++) {
-            String file = String.format(format, i + 1);
+            final String file = String.format(format, i + 1);
             LOG.info("Reading {}", file);
             try {
                 edit(file);
-            } catch (DocumentedException e) {
+            } catch (final DocumentedException e) {
                 assertContainsString(e.getMessage(), "Unrecognised elements");
                 assertContainsString(e.getMessage(), "unknownAttribute");
                 continue;
@@ -645,20 +645,20 @@ public class NetconfMappingTest extends AbstractConfigTest {
         final ConfigSubsystemFacade facade = mock(ConfigSubsystemFacade.class);
         doThrow(new RuntimeException("Mocked runtime exception, Abort has to fail")).when(facade).abortConfiguration();
 
-        DiscardChanges discardOp = new DiscardChanges(facade, NETCONF_SESSION_ID);
+        final DiscardChanges discardOp = new DiscardChanges(facade, NETCONF_SESSION_ID);
 
         try {
             executeOp(discardOp, "netconfMessages/discardChanges.xml");
             fail("Should've failed, abort on mocked is supposed to throw RuntimeException");
-        } catch (DocumentedException e) {
-            assertTrue(e.getErrorTag() == DocumentedException.ErrorTag.operation_failed);
-            assertTrue(e.getErrorSeverity() == DocumentedException.ErrorSeverity.error);
-            assertTrue(e.getErrorType() == DocumentedException.ErrorType.application);
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorTag() == DocumentedException.ErrorTag.OPERATION_FAILED);
+            assertTrue(e.getErrorSeverity() == DocumentedException.ErrorSeverity.ERROR);
+            assertTrue(e.getErrorType() == DocumentedException.ErrorType.APPLICATION);
         }
     }
 
     private Document discard() throws ParserConfigurationException, SAXException, IOException, DocumentedException {
-        DiscardChanges discardOp = new DiscardChanges(configSubsystemFacade, NETCONF_SESSION_ID);
+        final DiscardChanges discardOp = new DiscardChanges(configSubsystemFacade, NETCONF_SESSION_ID);
         return executeOp(discardOp, "netconfMessages/discardChanges.xml");
     }
 
@@ -688,7 +688,7 @@ public class NetconfMappingTest extends AbstractConfigTest {
 
     private static void checkEnum(final Document response) throws Exception {
 
-        String expectedEnumContent = "two";
+        final String expectedEnumContent = "two";
 
         XMLAssert.assertXpathEvaluatesTo(expectedEnumContent,
                 getXpathForNetconfImplSubnode(INSTANCE_NAME, "extended-enum"),
@@ -696,7 +696,7 @@ public class NetconfMappingTest extends AbstractConfigTest {
     }
 
     private static void checkTestingDeps(final Document response) {
-        int testingDepsSize = response.getElementsByTagName("testing-deps").getLength();
+        final int testingDepsSize = response.getElementsByTagName("testing-deps").getLength();
         assertEquals(2, testingDepsSize);
     }
 
@@ -712,9 +712,9 @@ public class NetconfMappingTest extends AbstractConfigTest {
 
     private static void checkTypeConfigAttribute(final Document response) throws Exception {
 
-        Map<String,String> namesToTypeValues = ImmutableMap.of("instance-from-code", "configAttributeType",
+        final Map<String, String> namesToTypeValues = ImmutableMap.of("instance-from-code", "configAttributeType",
                 "test2", "default-string");
-        for (Entry<String, String> nameToExpectedValue : namesToTypeValues.entrySet()) {
+        for (final Entry<String, String> nameToExpectedValue : namesToTypeValues.entrySet()) {
             XMLAssert.assertXpathEvaluatesTo(nameToExpectedValue.getValue(),
                     getXpathForNetconfImplSubnode(nameToExpectedValue.getKey(),"type"),
                     response);
@@ -727,7 +727,7 @@ public class NetconfMappingTest extends AbstractConfigTest {
         final Map<String, Map<String, ModuleMXBeanEntry>> mBeanEntries = Maps.newHashMap();
 
         final SchemaContext schemaContext = parseYangStreams(yangDependencies);
-        YangStoreService yangStoreService = new YangStoreService(new SchemaContextProvider() {
+        final YangStoreService yangStoreService = new YangStoreService(new SchemaContextProvider() {
             @Override public SchemaContext getSchemaContext() {
                 return schemaContext;
             }
@@ -752,18 +752,18 @@ public class NetconfMappingTest extends AbstractConfigTest {
     }
 
     private Set<org.opendaylight.yangtools.yang.model.api.Module> getModules() throws Exception {
-        SchemaContext resolveSchemaContext = parseYangStreams(getYangs());
+        final SchemaContext resolveSchemaContext = parseYangStreams(getYangs());
         return resolveSchemaContext.getModules();
     }
 
     private static SchemaContext parseYangStreams(final List<InputStream> streams) {
 
-        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
+        final CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
                 .newBuild();
         final SchemaContext schemaContext;
         try {
             schemaContext = reactor.buildEffective(streams);
-        } catch (ReactorException e) {
+        } catch (final ReactorException e) {
             throw new RuntimeException("Unable to build schema context from " + streams, e);
         }
         return schemaContext;
@@ -796,13 +796,13 @@ public class NetconfMappingTest extends AbstractConfigTest {
         assertEquals(8, getElementsSize(response, "deep4"));
         // TODO assert keys
 
-        RuntimeRpc netconf = new RuntimeRpc(configSubsystemFacade, NETCONF_SESSION_ID);
+        final RuntimeRpc netconf = new RuntimeRpc(configSubsystemFacade, NETCONF_SESSION_ID);
 
         response = executeOp(netconf, "netconfMessages/rpc.xml");
         assertContainsElementWithText(response, "testarg1");
 
         response = executeOp(netconf, "netconfMessages/rpcInner.xml");
-        Document expectedReplyOk = XmlFileLoader.xmlFileToDocument("netconfMessages/rpc-reply_ok.xml");
+        final Document expectedReplyOk = XmlFileLoader.xmlFileToDocument("netconfMessages/rpc-reply_ok.xml");
         XMLUnit.setIgnoreWhitespace(true);
         XMLAssert.assertXMLEqual(expectedReplyOk, response);
 
@@ -815,7 +815,7 @@ public class NetconfMappingTest extends AbstractConfigTest {
     }
 
     private Document get() throws ParserConfigurationException, SAXException, IOException, DocumentedException {
-        Get getOp = new Get(configSubsystemFacade, NETCONF_SESSION_ID);
+        final Get getOp = new Get(configSubsystemFacade, NETCONF_SESSION_ID);
         return executeOp(getOp, "netconfMessages/get.xml");
     }
 
@@ -833,7 +833,7 @@ public class NetconfMappingTest extends AbstractConfigTest {
         final Document request = XmlFileLoader.xmlFileToDocument(filename);
 
         LOG.debug("Executing netconf operation\n{}", XmlUtil.toString(request));
-        HandlingPriority priority = op.canHandle(request);
+        final HandlingPriority priority = op.canHandle(request);
 
         Preconditions.checkState(priority != HandlingPriority.CANNOT_HANDLE);
 
@@ -843,11 +843,11 @@ public class NetconfMappingTest extends AbstractConfigTest {
     }
 
     private List<InputStream> getYangs() {
-        List<String> paths = Arrays.asList("/META-INF/yang/config.yang", "/META-INF/yang/rpc-context.yang",
+        final List<String> paths = Arrays.asList("/META-INF/yang/config.yang", "/META-INF/yang/rpc-context.yang",
                 "/META-INF/yang/config-test.yang", "/META-INF/yang/config-test-impl.yang", "/META-INF/yang/test-types.yang",
                 "/META-INF/yang/test-groups.yang", "/META-INF/yang/ietf-inet-types@2013-07-15.yang");
         final Collection<InputStream> yangDependencies = new ArrayList<>();
-        for (String path : paths) {
+        for (final String path : paths) {
             final InputStream is = Preconditions
                     .checkNotNull(getClass().getResourceAsStream(path), path + " not found");
             yangDependencies.add(is);
@@ -888,8 +888,8 @@ public class NetconfMappingTest extends AbstractConfigTest {
 
         final ObjectName testingDepOn = transaction.createModule(this.factory2.getImplementationName(), depName);
         int i = 1;
-        for (Class<? extends AbstractServiceInterface> sInterface : factory2.getImplementedServiceIntefaces()) {
-            ServiceInterfaceAnnotation annotation = sInterface.getAnnotation(ServiceInterfaceAnnotation.class);
+        for (final Class<? extends AbstractServiceInterface> sInterface : factory2.getImplementedServiceIntefaces()) {
+            final ServiceInterfaceAnnotation annotation = sInterface.getAnnotation(ServiceInterfaceAnnotation.class);
             transaction.saveServiceReference(
                     transaction.getServiceInterfaceName(annotation.namespace(), annotation.localName()), "ref_from_code_to_" + depName + "_" + i++,
                     testingDepOn);

@@ -21,9 +21,9 @@ import org.opendaylight.netconf.api.monitoring.SessionEvent;
 import org.opendaylight.netconf.api.monitoring.SessionListener;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.impl.osgi.NetconfOperationRouter;
-import org.opendaylight.netconf.util.messages.SubtreeFilter;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.util.messages.SendErrorExceptionUtil;
+import org.opendaylight.netconf.util.messages.SubtreeFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -60,12 +60,12 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
 
         try {
             operationRouter.close();
-        } catch (Exception closingEx) {
+        } catch (final Exception closingEx) {
             LOG.debug("Ignoring exception while closing operationRouter", closingEx);
         }
         try {
             onSessionDownCloseable.close();
-        } catch(Exception ex){
+        } catch (final Exception ex) {
             LOG.debug("Ignoring exception while closing onSessionDownCloseable", ex);
         }
     }
@@ -95,7 +95,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
             session.onIncommingRpcFail();
             monitoringSessionListener.onSessionEvent(SessionEvent.inRpcFail(session));
             throw new IllegalStateException("Unable to process incoming message " + netconfMessage, e);
-        } catch (DocumentedException e) {
+        } catch (final DocumentedException e) {
             LOG.trace("Error occurred while processing message",e);
             session.onOutgoingRpcError();
             session.onIncommingRpcFail();
@@ -135,15 +135,15 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
              * unexpected element Description: An unexpected element is present.
              */
             throw new DocumentedException("Unknown tag " + rootNode.getNodeName() + " in message:\n" + netconfMessage,
-                    DocumentedException.ErrorType.protocol, DocumentedException.ErrorTag.unknown_element,
-                    DocumentedException.ErrorSeverity.error, ImmutableMap.of("bad-element",
+                    DocumentedException.ErrorType.PROTOCOL, DocumentedException.ErrorTag.UNKNOWN_ELEMENT,
+                    DocumentedException.ErrorSeverity.ERROR, ImmutableMap.of("bad-element",
                             rootNode.getNodeName()));
         }
     }
 
     private static void checkMessageId(final Node rootNode) throws DocumentedException {
 
-        NamedNodeMap attributes = rootNode.getAttributes();
+        final NamedNodeMap attributes = rootNode.getAttributes();
 
         if(attributes.getNamedItemNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, XmlNetconfConstants.MESSAGE_ID)!=null) {
             return;
@@ -154,9 +154,9 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
         }
 
         throw new DocumentedException("Missing attribute" + rootNode.getNodeName(),
-                DocumentedException.ErrorType.protocol, DocumentedException.ErrorTag.missing_attribute,
-                DocumentedException.ErrorSeverity.error,
-                ImmutableMap.of(DocumentedException.ErrorTag.missing_attribute.toString(),
+                DocumentedException.ErrorType.PROTOCOL, DocumentedException.ErrorTag.MISSING_ATTRIBUTE,
+                DocumentedException.ErrorSeverity.ERROR,
+                ImmutableMap.of(DocumentedException.ErrorTag.MISSING_ATTRIBUTE.toString(),
                         XmlNetconfConstants.MESSAGE_ID));
     }
 }

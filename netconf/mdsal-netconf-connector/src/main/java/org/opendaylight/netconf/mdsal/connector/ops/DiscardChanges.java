@@ -43,14 +43,14 @@ public class DiscardChanges extends AbstractSingletonNetconfOperation {
 
         try {
             transactionProvider.abortTransaction();
-        } catch (IllegalStateException e) {
+        } catch (final IllegalStateException e) {
             LOG.warn("Abort failed ", e);
             final Map<String, String> errorInfo = new HashMap<>();
             errorInfo
-                    .put(ErrorTag.operation_failed.name(),
+                    .put(ErrorTag.OPERATION_FAILED.name(),
                             "Operation failed. Use 'get-config' or 'edit-config' before triggering 'discard-changes' operation");
-            throw new DocumentedException(e.getMessage(), e, ErrorType.application, ErrorTag.operation_failed,
-                    ErrorSeverity.error, errorInfo);
+            throw new DocumentedException(e.getMessage(), e, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
+                    ErrorSeverity.ERROR, errorInfo);
         }
         return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
     }

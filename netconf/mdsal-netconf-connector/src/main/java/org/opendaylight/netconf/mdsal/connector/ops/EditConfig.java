@@ -70,9 +70,9 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         final Datastore targetDatastore = extractTargetParameter(operationElement);
         if (targetDatastore == Datastore.running) {
             throw new DocumentedException("edit-config on running datastore is not supported",
-                    ErrorType.protocol,
-                    ErrorTag.operation_not_supported,
-                    ErrorSeverity.error);
+                    ErrorType.PROTOCOL,
+                    ErrorTag.OPERATION_NOT_SUPPORTED,
+                    ErrorSeverity.ERROR);
         }
 
         final ModifyAction defaultAction = getDefaultOperation(operationElement);
@@ -118,7 +118,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
             try {
                 final Optional<NormalizedNode<?, ?>> readResult = rwtx.read(LogicalDatastoreType.CONFIGURATION, path).checkedGet();
                 if (readResult.isPresent()) {
-                    throw new DocumentedException("Data already exists, cannot execute CREATE operation", ErrorType.protocol, ErrorTag.data_exists, ErrorSeverity.error);
+                    throw new DocumentedException("Data already exists, cannot execute CREATE operation", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, ErrorSeverity.ERROR);
                 }
                 createMapNodeIfNonExistent(rwtx, path, changeData);
                 rwtx.put(LogicalDatastoreType.CONFIGURATION, path, changeData);
@@ -134,7 +134,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
             try {
                 final Optional<NormalizedNode<?, ?>> readResult = rwtx.read(LogicalDatastoreType.CONFIGURATION, path).checkedGet();
                 if (!readResult.isPresent()) {
-                    throw new DocumentedException("Data is missing, cannot execute DELETE operation", ErrorType.protocol, ErrorTag.data_missing, ErrorSeverity.error);
+                    throw new DocumentedException("Data is missing, cannot execute DELETE operation", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
                 }
                 rwtx.delete(LogicalDatastoreType.CONFIGURATION, path);
             } catch (final ReadFailedException e) {
@@ -164,7 +164,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
                 rwtx.put(LogicalDatastoreType.CONFIGURATION, mapNodeYid, mixinNode);
             }
         } catch (final ReadFailedException e) {
-            throw new DocumentedException("List node existence check failed", e, ErrorType.protocol, ErrorTag.data_missing, ErrorSeverity.error);
+            throw new DocumentedException("List node existence check failed", e, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
 
         }
     }
@@ -198,7 +198,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
             if (module == null) {
                 // no module is present with this namespace
                 throw new NetconfDocumentedException("Unable to find module by namespace: " + namespace,
-                        ErrorType.application, ErrorTag.unknown_namespace, ErrorSeverity.error);
+                        ErrorType.APPLICATION, ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
             }
             final DataSchemaNode schemaNode =
                     module.getDataChildByName(QName.create(module.getQNameModule(), element.getName()));
@@ -206,9 +206,9 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
                 dataSchemaNode = Optional.of(schemaNode);
             } else {
                 throw new DocumentedException("Unable to find node with namespace: " + namespace + "in module: " + module.toString(),
-                        ErrorType.application,
-                        ErrorTag.unknown_namespace,
-                        ErrorSeverity.error);
+                        ErrorType.APPLICATION,
+                        ErrorTag.UNKNOWN_NAMESPACE,
+                        ErrorSeverity.ERROR);
             }
         } catch (final URISyntaxException e) {
             LOG.debug("Unable to create URI for namespace : {}", namespace);
@@ -221,9 +221,9 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         final NodeList elementsByTagName = operationElement.getDomElement().getElementsByTagName(TARGET_KEY);
         // Direct lookup instead of using XmlElement class due to performance
         if (elementsByTagName.getLength() == 0) {
-            throw new DocumentedException("Missing target element", ErrorType.rpc, ErrorTag.missing_attribute, ErrorSeverity.error);
+            throw new DocumentedException("Missing target element", ErrorType.RPC, ErrorTag.MISSING_ATTRIBUTE, ErrorSeverity.ERROR);
         } else if (elementsByTagName.getLength() > 1) {
-            throw new DocumentedException("Multiple target elements", ErrorType.rpc, ErrorTag.unknown_attribute, ErrorSeverity.error);
+            throw new DocumentedException("Multiple target elements", ErrorType.RPC, ErrorTag.UNKNOWN_ATTRIBUTE, ErrorSeverity.ERROR);
         } else {
             final XmlElement targetChildNode = XmlElement.fromDomElement((Element) elementsByTagName.item(0)).getOnlyChildElement();
             return Datastore.valueOf(targetChildNode.getName());
@@ -236,7 +236,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
             return ModifyAction.MERGE;
         } else if(elementsByTagName.getLength() > 1) {
             throw new DocumentedException("Multiple " + DEFAULT_OPERATION_KEY + " elements",
-                    ErrorType.rpc, ErrorTag.unknown_attribute, ErrorSeverity.error);
+                    ErrorType.RPC, ErrorTag.UNKNOWN_ATTRIBUTE, ErrorSeverity.ERROR);
         } else {
             return ModifyAction.fromXmlValue(elementsByTagName.item(0).getTextContent());
         }
@@ -247,9 +247,9 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         final Optional<XmlElement> childNode = operationElement.getOnlyChildElementOptionally(elementName);
         if (!childNode.isPresent()) {
             throw new DocumentedException(elementName + " element is missing",
-                    ErrorType.protocol,
-                    ErrorTag.missing_element,
-                    ErrorSeverity.error);
+                    ErrorType.PROTOCOL,
+                    ErrorTag.MISSING_ELEMENT,
+                    ErrorSeverity.ERROR);
         }
 
         return childNode.get();

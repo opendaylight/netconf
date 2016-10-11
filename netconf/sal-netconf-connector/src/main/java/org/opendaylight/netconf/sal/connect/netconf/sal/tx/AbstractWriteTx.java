@@ -154,11 +154,11 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
             public void onSuccess(final List<DOMRpcResult> domRpcResults) {
                 domRpcResults.forEach(domRpcResult -> {
                     if(!domRpcResult.getErrors().isEmpty() && !transformed.isDone()) {
-                        NetconfDocumentedException exception =
+                        final NetconfDocumentedException exception =
                                 new NetconfDocumentedException(id + ":RPC during tx failed",
-                                        DocumentedException.ErrorType.application,
-                                        DocumentedException.ErrorTag.operation_failed,
-                                        DocumentedException.ErrorSeverity.error);
+                                        DocumentedException.ErrorType.APPLICATION,
+                                        DocumentedException.ErrorTag.OPERATION_FAILED,
+                                        DocumentedException.ErrorSeverity.ERROR);
                         transformed.setException(exception);
                     }
                 });
@@ -169,14 +169,14 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
             }
 
             @Override
-            public void onFailure(Throwable throwable) {
-                NetconfDocumentedException exception =
+            public void onFailure(final Throwable throwable) {
+                final NetconfDocumentedException exception =
                         new NetconfDocumentedException(
                                 new DocumentedException(id + ":RPC during tx returned an exception",
                                         new Exception(throwable),
-                                        DocumentedException.ErrorType.application,
-                                        DocumentedException.ErrorTag.operation_failed,
-                                        DocumentedException.ErrorSeverity.error) );
+                                        DocumentedException.ErrorType.APPLICATION,
+                                        DocumentedException.ErrorTag.OPERATION_FAILED,
+                                        DocumentedException.ErrorSeverity.ERROR));
                 transformed.setException(exception);
             }
         });

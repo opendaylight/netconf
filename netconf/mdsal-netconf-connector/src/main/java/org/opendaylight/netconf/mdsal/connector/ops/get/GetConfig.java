@@ -43,7 +43,7 @@ public class GetConfig extends AbstractGet {
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(Document document, XmlElement operationElement) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
         GetConfigExecution getConfigExecution = null;
         try {
             getConfigExecution = GetConfigExecution.fromXml(operationElement, OPERATION_NAME);
@@ -63,7 +63,7 @@ public class GetConfig extends AbstractGet {
         // Proper exception should be thrown
         Preconditions.checkState(getConfigExecution.getDatastore().isPresent(), "Source element missing from request");
 
-        DOMDataReadWriteTransaction rwTx = getTransaction(getConfigExecution.getDatastore().get());
+        final DOMDataReadWriteTransaction rwTx = getTransaction(getConfigExecution.getDatastore().get());
         try {
             final Optional<NormalizedNode<?, ?>> normalizedNodeOptional = rwTx.read(LogicalDatastoreType.CONFIGURATION, dataRoot).checkedGet();
             if (getConfigExecution.getDatastore().get() == Datastore.running) {
@@ -75,19 +75,19 @@ public class GetConfig extends AbstractGet {
             }
 
             return serializeNodeWithParentStructure(document, dataRoot, normalizedNodeOptional.get());
-        } catch (ReadFailedException e) {
+        } catch (final ReadFailedException e) {
             LOG.warn("Unable to read data: {}", dataRoot, e);
             throw new IllegalStateException("Unable to read data " + dataRoot, e);
         }
     }
 
-    private DOMDataReadWriteTransaction getTransaction(Datastore datastore) throws DocumentedException{
+    private DOMDataReadWriteTransaction getTransaction(final Datastore datastore) throws DocumentedException {
         if (datastore == Datastore.candidate) {
             return transactionProvider.getOrCreateTransaction();
         } else if (datastore == Datastore.running) {
             return transactionProvider.createRunningTransaction();
         }
-        throw new DocumentedException("Incorrect Datastore: ", ErrorType.protocol, ErrorTag.bad_element, ErrorSeverity.error);
+        throw new DocumentedException("Incorrect Datastore: ", ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT, ErrorSeverity.ERROR);
     }
 
     @Override

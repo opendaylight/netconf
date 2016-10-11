@@ -67,7 +67,7 @@ public class NetconfOperationRouterImplTest {
         doReturn(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY).when(defaultPrioMock).canHandle(any(Document.class));
         doReturn(XmlUtil.readXmlToDocument(DEFAULT_PRIORITY_REPLY)).when(defaultPrioMock).handle(any(Document.class), any(NetconfOperationChainedExecution.class));
 
-        Set<NetconfOperation> operations = new HashSet<>();
+        final Set<NetconfOperation> operations = new HashSet<>();
         operations.add(maxPrioMock);
         operations.add(defaultPrioMock);
         doReturn(operations).when(operationService).getNetconfOperations();
@@ -80,8 +80,8 @@ public class NetconfOperationRouterImplTest {
 
     @Test
     public void testOnNetconfMessage() throws Exception {
-        ArgumentCaptor<NetconfOperationChainedExecution> highPriorityChainEx = ArgumentCaptor.forClass(NetconfOperationChainedExecution.class);
-        ArgumentCaptor<NetconfOperationChainedExecution> defaultPriorityChainEx = ArgumentCaptor.forClass(NetconfOperationChainedExecution.class);
+        final ArgumentCaptor<NetconfOperationChainedExecution> highPriorityChainEx = ArgumentCaptor.forClass(NetconfOperationChainedExecution.class);
+        final ArgumentCaptor<NetconfOperationChainedExecution> defaultPriorityChainEx = ArgumentCaptor.forClass(NetconfOperationChainedExecution.class);
 
         final Document document = operationRouter.onNetconfMessage(TEST_RPC_DOC, null);
 
@@ -106,8 +106,8 @@ public class NetconfOperationRouterImplTest {
         try{
             emptyOperationRouter.onNetconfMessage(TEST_RPC_DOC, null);
             Assert.fail("Exception expected");
-        } catch (DocumentedException e) {
-            Assert.assertEquals(e.getErrorTag(), DocumentedException.ErrorTag.operation_not_supported);
+        } catch (final DocumentedException e) {
+            Assert.assertEquals(e.getErrorTag(), DocumentedException.ErrorTag.OPERATION_NOT_SUPPORTED);
         }
     }
 

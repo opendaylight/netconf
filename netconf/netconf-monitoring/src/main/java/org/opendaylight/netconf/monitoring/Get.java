@@ -11,13 +11,13 @@ import java.util.Collections;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlMappingConstants;
-import org.opendaylight.netconf.util.mapping.AbstractNetconfOperation;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.monitoring.xml.JaxBSerializer;
 import org.opendaylight.netconf.monitoring.xml.model.NetconfState;
+import org.opendaylight.netconf.util.mapping.AbstractNetconfOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -55,9 +55,9 @@ public class Get extends AbstractNetconfOperation {
             throws DocumentedException {
         if (subsequentOperation.isExecutionTermination()){
             throw new DocumentedException(String.format("Subsequent netconf operation expected by %s", this),
-                    DocumentedException.ErrorType.application,
-                    DocumentedException.ErrorTag.operation_failed,
-                    DocumentedException.ErrorSeverity.error);
+                    DocumentedException.ErrorType.APPLICATION,
+                    DocumentedException.ErrorTag.OPERATION_FAILED,
+                    DocumentedException.ErrorSeverity.ERROR);
         }
 
         try {
@@ -75,10 +75,10 @@ public class Get extends AbstractNetconfOperation {
             final String errorMessage = "Get operation for netconf-state subtree failed";
             LOG.warn(errorMessage, e);
 
-            throw new DocumentedException(errorMessage, DocumentedException.ErrorType.application,
-                    DocumentedException.ErrorTag.operation_failed,
-                    DocumentedException.ErrorSeverity.error,
-                    Collections.singletonMap(DocumentedException.ErrorSeverity.error.toString(), e.getMessage()));
+            throw new DocumentedException(errorMessage, DocumentedException.ErrorType.APPLICATION,
+                    DocumentedException.ErrorTag.OPERATION_FAILED,
+                    DocumentedException.ErrorSeverity.ERROR,
+                    Collections.singletonMap(DocumentedException.ErrorSeverity.ERROR.toString(), e.getMessage()));
         }
     }
 

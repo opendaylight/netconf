@@ -42,7 +42,7 @@ public class Get extends AbstractGet {
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(Document document, XmlElement operationElement) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
 
         final Optional<YangInstanceIdentifier> dataRootOptional = getDataRootFromFilter(operationElement);
         if (!dataRootOptional.isPresent()) {
@@ -51,7 +51,7 @@ public class Get extends AbstractGet {
 
         final YangInstanceIdentifier dataRoot = dataRootOptional.get();
 
-        DOMDataReadWriteTransaction rwTx = getTransaction(Datastore.running);
+        final DOMDataReadWriteTransaction rwTx = getTransaction(Datastore.running);
         try {
             final Optional<NormalizedNode<?, ?>> normalizedNodeOptional = rwTx.read(LogicalDatastoreType.OPERATIONAL, dataRoot).checkedGet();
             transactionProvider.abortRunningTransaction(rwTx);
@@ -61,19 +61,19 @@ public class Get extends AbstractGet {
             }
 
             return serializeNodeWithParentStructure(document, dataRoot, normalizedNodeOptional.get());
-        } catch (ReadFailedException e) {
+        } catch (final ReadFailedException e) {
             LOG.warn("Unable to read data: {}", dataRoot, e);
             throw new IllegalStateException("Unable to read data " + dataRoot, e);
         }
     }
 
-    private DOMDataReadWriteTransaction getTransaction(Datastore datastore) throws DocumentedException{
+    private DOMDataReadWriteTransaction getTransaction(final Datastore datastore) throws DocumentedException {
         if (datastore == Datastore.candidate) {
             return transactionProvider.getOrCreateTransaction();
         } else if (datastore == Datastore.running) {
             return transactionProvider.createRunningTransaction();
         }
-        throw new DocumentedException("Incorrect Datastore: ", ErrorType.protocol, ErrorTag.bad_element, ErrorSeverity.error);
+        throw new DocumentedException("Incorrect Datastore: ", ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT, ErrorSeverity.ERROR);
     }
 
     @Override

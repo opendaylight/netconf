@@ -39,7 +39,7 @@ public class FilterContentValidator {
     /**
      * @param schemaContext current schema context
      */
-    public FilterContentValidator(CurrentSchemaContext schemaContext) {
+    public FilterContentValidator(final CurrentSchemaContext schemaContext) {
         this.schemaContext = schemaContext;
     }
 
@@ -50,20 +50,20 @@ public class FilterContentValidator {
      * @return YangInstanceIdentifier
      * @throws DocumentedException if filter content is not valid
      */
-    public YangInstanceIdentifier validate(XmlElement filterContent) throws DocumentedException {
+    public YangInstanceIdentifier validate(final XmlElement filterContent) throws DocumentedException {
         try {
             final URI namespace = new URI(filterContent.getNamespace());
             final Module module = schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(namespace, null);
             final DataSchemaNode schema = getRootDataSchemaNode(module, namespace, filterContent.getName());
             final FilterTree filterTree = validateNode(filterContent, schema, new FilterTree(schema.getQName(), Type.OTHER));
             return getFilterDataRoot(filterTree, YangInstanceIdentifier.builder());
-        } catch (DocumentedException e) {
+        } catch (final DocumentedException e) {
             throw e;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new DocumentedException("Validation failed. Cause: " + e.getMessage(),
-                    DocumentedException.ErrorType.application,
-                    DocumentedException.ErrorTag.unknown_namespace,
-                    DocumentedException.ErrorSeverity.error);
+                    DocumentedException.ErrorType.APPLICATION,
+                    DocumentedException.ErrorTag.UNKNOWN_NAMESPACE,
+                    DocumentedException.ErrorSeverity.ERROR);
         }
     }
 
@@ -75,18 +75,18 @@ public class FilterContentValidator {
      * @return child data node schema
      * @throws DocumentedException if child with given name is not present
      */
-    private DataSchemaNode getRootDataSchemaNode(Module module, URI nameSpace, String name) throws DocumentedException {
+    private DataSchemaNode getRootDataSchemaNode(final Module module, final URI nameSpace, final String name) throws DocumentedException {
         final Collection<DataSchemaNode> childNodes = module.getChildNodes();
-        for (DataSchemaNode childNode : childNodes) {
+        for (final DataSchemaNode childNode : childNodes) {
             final QName qName = childNode.getQName();
             if (qName.getNamespace().equals(nameSpace) && qName.getLocalName().equals(name)) {
                 return childNode;
             }
         }
         throw new DocumentedException("Unable to find node with namespace: " + nameSpace + "in schema context: " + schemaContext.getCurrentContext().toString(),
-                DocumentedException.ErrorType.application,
-                DocumentedException.ErrorTag.unknown_namespace,
-                DocumentedException.ErrorSeverity.error);
+                DocumentedException.ErrorType.APPLICATION,
+                DocumentedException.ErrorTag.UNKNOWN_NAMESPACE,
+                DocumentedException.ErrorSeverity.ERROR);
     }
 
     /**
@@ -97,16 +97,16 @@ public class FilterContentValidator {
      * @return tree
      * @throws ValidationException if filter content is not valid
      */
-    private FilterTree validateNode(XmlElement element, DataSchemaNode parentNodeSchema, FilterTree tree) throws ValidationException {
+    private FilterTree validateNode(final XmlElement element, final DataSchemaNode parentNodeSchema, final FilterTree tree) throws ValidationException {
         final List<XmlElement> childElements = element.getChildElements();
-        for (XmlElement childElement : childElements) {
+        for (final XmlElement childElement : childElements) {
             try {
                 final Deque<DataSchemaNode> path = findSchemaNodeByNameAndNamespace(parentNodeSchema, childElement.getName(), new URI(childElement.getNamespace()));
                 if (path.isEmpty()) {
                     throw new ValidationException(element, childElement);
                 }
                 FilterTree subtree = tree;
-                for (DataSchemaNode dataSchemaNode : path) {
+                for (final DataSchemaNode dataSchemaNode : path) {
                         subtree = subtree.addChild(dataSchemaNode);
                 }
                 final DataSchemaNode childSchema = path.getLast();
@@ -126,7 +126,7 @@ public class FilterContentValidator {
      * @param builder builder
      * @return YangInstanceIdentifier
      */
-    private YangInstanceIdentifier getFilterDataRoot(FilterTree tree, YangInstanceIdentifier.InstanceIdentifierBuilder builder) {
+    private YangInstanceIdentifier getFilterDataRoot(FilterTree tree, final YangInstanceIdentifier.InstanceIdentifierBuilder builder) {
         builder.node(tree.getName());
         while (tree.getChildren().size() == 1) {
             final FilterTree child = tree.getChildren().iterator().next();
@@ -205,14 +205,14 @@ public class FilterContentValidator {
         private final Type type;
         private final Map<QName, FilterTree> children;
 
-        FilterTree(QName name, Type type) {
+        FilterTree(final QName name, final Type type) {
             this.name = name;
             this.type = type;
             this.children = new HashMap<>();
         }
 
-        FilterTree addChild(DataSchemaNode data) {
-            Type type;
+        FilterTree addChild(final DataSchemaNode data) {
+            final Type type;
             if (data instanceof ChoiceCaseNode) {
                 type = Type.CHOICE_CASE;
             } else if (data instanceof ListSchemaNode) {
@@ -247,7 +247,7 @@ public class FilterContentValidator {
     }
 
     private static class ValidationException extends Exception {
-        public ValidationException(XmlElement parent, XmlElement child) {
+        public ValidationException(final XmlElement parent, final XmlElement child) {
             super("Element " + child + " can't be child of " + parent);
         }
     }

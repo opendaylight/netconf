@@ -36,7 +36,7 @@ public class DiscardChanges extends AbstractConfigNetconfOperation {
         super(configSubsystemFacade, netconfSessionIdForReporting);
     }
 
-    private static void fromXml(XmlElement xml) throws DocumentedException {
+    private static void fromXml(final XmlElement xml) throws DocumentedException {
         xml.checkName(DISCARD);
         xml.checkNamespace(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
     }
@@ -47,7 +47,7 @@ public class DiscardChanges extends AbstractConfigNetconfOperation {
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(Document document, XmlElement xml) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement xml) throws DocumentedException {
         fromXml(xml);
         try {
             getConfigSubsystemFacade().abortConfiguration();
@@ -55,10 +55,10 @@ public class DiscardChanges extends AbstractConfigNetconfOperation {
             LOG.warn("Abort failed: ", e);
             final Map<String, String> errorInfo = new HashMap<>();
             errorInfo
-                    .put(ErrorTag.operation_failed.name(),
+                    .put(ErrorTag.OPERATION_FAILED.name(),
                             "Abort failed.");
-            throw new DocumentedException(e.getMessage(), e, ErrorType.application, ErrorTag.operation_failed,
-                    ErrorSeverity.error, errorInfo);
+            throw new DocumentedException(e.getMessage(), e, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
+                    ErrorSeverity.ERROR, errorInfo);
         }
         LOG.trace("Changes discarded successfully from datastore {}", Datastore.candidate);
 

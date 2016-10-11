@@ -64,7 +64,7 @@ public class GetTest {
         try {
             get.handle(null, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
         } catch (final DocumentedException e) {
-            assertNetconfDocumentedEx(e, DocumentedException.ErrorSeverity.error, DocumentedException.ErrorTag.operation_failed, DocumentedException.ErrorType.application);
+            assertNetconfDocumentedEx(e, DocumentedException.ErrorSeverity.ERROR, DocumentedException.ErrorTag.OPERATION_FAILED, DocumentedException.ErrorType.APPLICATION);
             return;
         }
 
@@ -77,7 +77,7 @@ public class GetTest {
         try {
             get.handle(request, subsequentOperation);
         } catch (final DocumentedException e) {
-            assertNetconfDocumentedEx(e, DocumentedException.ErrorSeverity.error, DocumentedException.ErrorTag.invalid_value, DocumentedException.ErrorType.application);
+            assertNetconfDocumentedEx(e, DocumentedException.ErrorSeverity.ERROR, DocumentedException.ErrorTag.INVALID_VALUE, DocumentedException.ErrorType.APPLICATION);
             return;
         }
 
@@ -90,7 +90,7 @@ public class GetTest {
         try {
             get.handle(request, subsequentOperation);
         } catch (final DocumentedException e) {
-            assertNetconfDocumentedEx(e, DocumentedException.ErrorSeverity.error, DocumentedException.ErrorTag.operation_failed, DocumentedException.ErrorType.application);
+            assertNetconfDocumentedEx(e, DocumentedException.ErrorSeverity.ERROR, DocumentedException.ErrorTag.OPERATION_FAILED, DocumentedException.ErrorType.APPLICATION);
             assertEquals(1, e.getErrorInfo().size());
             return;
         }

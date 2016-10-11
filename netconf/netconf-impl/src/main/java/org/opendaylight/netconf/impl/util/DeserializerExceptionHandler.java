@@ -22,28 +22,28 @@ public final class DeserializerExceptionHandler implements ChannelHandler {
     private static final Logger LOG = LoggerFactory.getLogger(DeserializerExceptionHandler.class);
 
     @Override
-    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+    public void handlerAdded(final ChannelHandlerContext ctx) throws Exception {
         // NOOP
     }
 
     @Override
-    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+    public void handlerRemoved(final ChannelHandlerContext ctx) throws Exception {
         // NOOP
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
         LOG.warn("An exception occurred during message handling", cause);
         handleDeserializerException(ctx, cause);
     }
 
-    private void handleDeserializerException(ChannelHandlerContext ctx, Throwable cause) {
+    private void handleDeserializerException(final ChannelHandlerContext ctx, final Throwable cause) {
 
-        Map<String, String> info = Maps.newHashMap();
+        final Map<String, String> info = Maps.newHashMap();
         info.put("cause", cause.getMessage());
-        DocumentedException ex = new DocumentedException(cause.getMessage(),
-                DocumentedException.ErrorType.rpc, DocumentedException.ErrorTag.malformed_message,
-                DocumentedException.ErrorSeverity.error, info);
+        final DocumentedException ex = new DocumentedException(cause.getMessage(),
+                DocumentedException.ErrorType.RPC, DocumentedException.ErrorTag.MALFORMED_MESSAGE,
+                DocumentedException.ErrorSeverity.ERROR, info);
 
         SendErrorExceptionUtil.sendErrorMessage(ctx.channel(), ex);
     }

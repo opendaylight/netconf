@@ -14,9 +14,9 @@ import java.util.Map;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -57,10 +57,10 @@ public class GetSchema extends AbstractSingletonNetconfOperation {
         } catch (final IllegalStateException e) {
             final Map<String, String> errorInfo = Maps.newHashMap();
             errorInfo.put(entry.identifier, e.getMessage());
-            LOG.warn("Rpc error: {}", DocumentedException.ErrorTag.operation_failed, e);
-            throw new DocumentedException(e.getMessage(), DocumentedException.ErrorType.application,
-                    DocumentedException.ErrorTag.operation_failed,
-                    DocumentedException.ErrorSeverity.error, errorInfo);
+            LOG.warn("Rpc error: {}", DocumentedException.ErrorTag.OPERATION_FAILED, e);
+            throw new DocumentedException(e.getMessage(), DocumentedException.ErrorType.APPLICATION,
+                    DocumentedException.ErrorTag.OPERATION_FAILED,
+                    DocumentedException.ErrorSeverity.ERROR, errorInfo);
         }
 
         final Element getSchemaResult;

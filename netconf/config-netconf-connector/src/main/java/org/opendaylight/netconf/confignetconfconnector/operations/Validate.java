@@ -36,21 +36,21 @@ public class Validate extends AbstractConfigNetconfOperation {
         super(configSubsystemFacade, netconfSessionIdForReporting);
     }
 
-    private void checkXml(XmlElement xml) throws DocumentedException {
+    private void checkXml(final XmlElement xml) throws DocumentedException {
         xml.checkName(VALIDATE);
         xml.checkNamespace(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
 
-        XmlElement sourceElement = xml.getOnlyChildElement(XmlNetconfConstants.SOURCE_KEY,
+        final XmlElement sourceElement = xml.getOnlyChildElement(XmlNetconfConstants.SOURCE_KEY,
                 XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
-        XmlElement sourceChildNode = sourceElement.getOnlyChildElement();
+        final XmlElement sourceChildNode = sourceElement.getOnlyChildElement();
 
         sourceChildNode.checkNamespace(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
-        String datastoreValue = sourceChildNode.getName();
-        Datastore sourceDatastore = Datastore.valueOf(datastoreValue);
+        final String datastoreValue = sourceChildNode.getName();
+        final Datastore sourceDatastore = Datastore.valueOf(datastoreValue);
 
         if (sourceDatastore != Datastore.candidate){
             throw new DocumentedException( "Only " + Datastore.candidate
-                    + " is supported as source for " + VALIDATE + " but was " + datastoreValue, ErrorType.application, ErrorTag.data_missing, ErrorSeverity.error);
+                    + " is supported as source for " + VALIDATE + " but was " + datastoreValue, ErrorType.APPLICATION, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
         }
     }
 
@@ -60,21 +60,21 @@ public class Validate extends AbstractConfigNetconfOperation {
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(Document document, XmlElement xml) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement xml) throws DocumentedException {
         checkXml(xml);
         try {
             getConfigSubsystemFacade().validateConfiguration();
-        } catch (ValidationException e) {
+        } catch (final ValidationException e) {
             LOG.warn("Validation failed", e);
             throw DocumentedException.wrap(e);
-        } catch (IllegalStateException e) {
+        } catch (final IllegalStateException e) {
             LOG.warn("Validation failed", e);
             final Map<String, String> errorInfo = new HashMap<>();
             errorInfo
-                    .put(ErrorTag.operation_failed.name(),
+                    .put(ErrorTag.OPERATION_FAILED.name(),
                             "Datastore is not present. Use 'get-config' or 'edit-config' before triggering 'operations' operation");
-            throw new DocumentedException(e.getMessage(), e, ErrorType.application, ErrorTag.operation_failed,
-                    ErrorSeverity.error, errorInfo);
+            throw new DocumentedException(e.getMessage(), e, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
+                    ErrorSeverity.ERROR, errorInfo);
 
         }
 

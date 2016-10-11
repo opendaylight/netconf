@@ -38,14 +38,14 @@ public class TransactionProvider implements AutoCloseable{
     private static final String  NO_TRANSACTION_FOUND_FOR_SESSION = "No candidateTransaction found for session ";
 
 
-    public TransactionProvider(DOMDataBroker dataBroker, String netconfSessionIdForReporting) {
+    public TransactionProvider(final DOMDataBroker dataBroker, final String netconfSessionIdForReporting) {
         this.dataBroker = dataBroker;
         this.netconfSessionIdForReporting = netconfSessionIdForReporting;
     }
 
     @Override
     public synchronized void close() throws Exception {
-        for (DOMDataReadWriteTransaction rwt : allOpenReadWriteTransactions) {
+        for (final DOMDataReadWriteTransaction rwt : allOpenReadWriteTransactions) {
             rwt.cancel();
         }
 
@@ -77,15 +77,15 @@ public class TransactionProvider implements AutoCloseable{
             return true;
         }
 
-        CheckedFuture<Void, TransactionCommitFailedException> future = candidateTransaction.submit();
+        final CheckedFuture<Void, TransactionCommitFailedException> future = candidateTransaction.submit();
         try {
             future.checkedGet();
-        } catch (TransactionCommitFailedException e) {
+        } catch (final TransactionCommitFailedException e) {
             LOG.debug("Transaction {} failed on", candidateTransaction, e);
             final String cause = e.getCause() != null ? (" Cause: " + e.getCause().getMessage()) : "";
             throw new DocumentedException("Transaction commit failed on " + e.getMessage() + " " + netconfSessionIdForReporting +
                     cause,
-                    ErrorType.application, ErrorTag.operation_failed, ErrorSeverity.error);
+                    ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         } finally {
             allOpenReadWriteTransactions.remove(candidateTransaction);
             candidateTransaction = null;
@@ -96,7 +96,7 @@ public class TransactionProvider implements AutoCloseable{
 
     public synchronized void abortTransaction() {
         LOG.debug("Aborting current candidateTransaction");
-        Optional<DOMDataReadWriteTransaction> otx = getCandidateTransaction();
+        final Optional<DOMDataReadWriteTransaction> otx = getCandidateTransaction();
         if (!otx.isPresent()) {
             LOG.warn("discard-changes triggerd on an empty transaction for session: {}", netconfSessionIdForReporting );
             return;
@@ -112,7 +112,7 @@ public class TransactionProvider implements AutoCloseable{
         return runningTransaction;
     }
 
-    public synchronized void abortRunningTransaction(DOMDataReadWriteTransaction tx) {
+    public synchronized void abortRunningTransaction(final DOMDataReadWriteTransaction tx) {
         LOG.debug("Aborting current running Transaction");
         Preconditions.checkState(runningTransaction != null, NO_TRANSACTION_FOUND_FOR_SESSION + netconfSessionIdForReporting);
         tx.cancel();

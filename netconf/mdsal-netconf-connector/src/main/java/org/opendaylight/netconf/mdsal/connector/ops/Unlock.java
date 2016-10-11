@@ -39,8 +39,8 @@ public class Unlock extends AbstractSingletonNetconfOperation {
             return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
         }
 
-        throw new DocumentedException("Unable to unlock " + targetDatastore + " datastore", DocumentedException.ErrorType.application,
-                DocumentedException.ErrorTag.operation_not_supported, DocumentedException.ErrorSeverity.error);
+        throw new DocumentedException("Unable to unlock " + targetDatastore + " datastore", DocumentedException.ErrorType.APPLICATION,
+                DocumentedException.ErrorTag.OPERATION_NOT_SUPPORTED, DocumentedException.ErrorSeverity.ERROR);
     }
 
     @Override

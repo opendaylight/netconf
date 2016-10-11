@@ -46,12 +46,12 @@ public class EditConfig extends AbstractConfigNetconfOperation {
 
         try {
             getConfigSubsystemFacade().executeConfigExecution(configExecution);
-        } catch (ValidationException e) {
+        } catch (final ValidationException e) {
             LOG.warn("Test phase for {} failed", EditConfigXmlParser.EDIT_CONFIG, e);
             final Map<String, String> errorInfo = new HashMap<>();
-            errorInfo.put(ErrorTag.operation_failed.name(), e.getMessage());
-            throw new DocumentedException("Test phase: " + e.getMessage(), e, ErrorType.application,
-                    ErrorTag.operation_failed, ErrorSeverity.error, errorInfo);
+            errorInfo.put(ErrorTag.OPERATION_FAILED.name(), e.getMessage());
+            throw new DocumentedException("Test phase: " + e.getMessage(), e, ErrorType.APPLICATION,
+                    ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR, errorInfo);
         }
 
         LOG.trace("Operation {} successful", EditConfigXmlParser.EDIT_CONFIG);
@@ -65,11 +65,11 @@ public class EditConfig extends AbstractConfigNetconfOperation {
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(Document document, XmlElement xml) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement xml) throws DocumentedException {
         // FIXME config mapping getter works on dynamic yang store service and so does later executeConfigExecution method
         // They might have different view of current yangs in ODL and might cause race conditions
-        Config cfg = getConfigSubsystemFacade().getConfigMapping();
-        ConfigExecution configExecution = editConfigXmlParser.fromXml(xml, cfg);
+        final Config cfg = getConfigSubsystemFacade().getConfigMapping();
+        final ConfigExecution configExecution = editConfigXmlParser.fromXml(xml, cfg);
 
         return getResponseInternal(document, configExecution);
     }
