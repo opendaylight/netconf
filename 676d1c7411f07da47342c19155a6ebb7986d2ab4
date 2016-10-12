@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_9df14b98",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/controller/config/yang/md/sal/connector/netconf/NetconfConnectorModule.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-12T15:46:50Z",
+      "side": 1,
+      "message": "this could be set to null to remove the else line 156-158",
+      "range": {
+        "startLine": 150,
+        "startChar": 37,
+        "endLine": 150,
+        "endChar": 55
+      },
+      "revId": "676d1c7411f07da47342c19155a6ebb7986d2ab4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_7deeefb5",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/controller/config/yang/md/sal/connector/netconf/NetconfConnectorModule.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-12T15:46:50Z",
+      "side": 1,
+      "message": "likewise",
+      "range": {
+        "startLine": 160,
+        "startChar": 36,
+        "endLine": 160,
+        "endChar": 57
+      },
+      "revId": "676d1c7411f07da47342c19155a6ebb7986d2ab4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_5d3e932a",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-12T15:46:50Z",
+      "side": 1,
+      "message": "can\u0027t this be hold in a var? it\u0027s used 4 times within the function; I think it will help readability.",
+      "range": {
+        "startLine": 114,
+        "startChar": 51,
+        "endLine": 114,
+        "endChar": 108
+      },
+      "revId": "676d1c7411f07da47342c19155a6ebb7986d2ab4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
