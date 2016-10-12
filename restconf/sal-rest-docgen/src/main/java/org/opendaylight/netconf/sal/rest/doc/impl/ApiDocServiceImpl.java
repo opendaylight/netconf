@@ -47,6 +47,11 @@ public class ApiDocServiceImpl implements ApiDocService {
     @Override
     public synchronized Response getRootDoc(final UriInfo uriInfo) {
         final ApiDocGenerator generator = ApiDocGenerator.getInstance();
+        if (isNew(uriInfo)) {
+            generator.setDraft(true);
+        } else {
+            generator.setDraft(false);
+        }
         final ResourceList rootDoc = generator.getResourceListing(uriInfo);
 
         return Response.ok(rootDoc).build();
@@ -58,7 +63,11 @@ public class ApiDocServiceImpl implements ApiDocService {
     @Override
     public synchronized Response getDocByModule(final String module, final String revision, final UriInfo uriInfo) {
         final ApiDocGenerator generator = ApiDocGenerator.getInstance();
-
+        if (isNew(uriInfo)) {
+            generator.setDraft(true);
+        } else {
+            generator.setDraft(false);
+        }
         final ApiDeclaration doc = generator.getApiDeclaration(module, revision, uriInfo);
         return Response.ok(doc).build();
     }
@@ -95,17 +104,32 @@ public class ApiDocServiceImpl implements ApiDocService {
 
     @Override
     public synchronized Response getMountRootDoc(final String instanceNum, final UriInfo uriInfo) {
-        final ResourceList resourceList = MountPointSwagger.getInstance().getResourceList(uriInfo,
-                Long.parseLong(instanceNum));
+        final ResourceList resourceList;
+        if (isNew(uriInfo)) {
+            resourceList = MountPointSwagger.getInstanceDraft17().getResourceList(uriInfo,
+                    Long.parseLong(instanceNum));
+        } else {
+            resourceList = MountPointSwagger.getInstance().getResourceList(uriInfo,
+                    Long.parseLong(instanceNum));
+        }
         return Response.ok(resourceList).build();
     }
 
     @Override
     public synchronized Response getMountDocByModule(final String instanceNum, final String module,
                                                      final String revision, final UriInfo uriInfo) {
-        final ApiDeclaration api = MountPointSwagger.getInstance().getMountPointApi(uriInfo,
-                Long.parseLong(instanceNum), module, revision);
+        final ApiDeclaration api;
+        if (isNew(uriInfo)) {
+            api = MountPointSwagger.getInstanceDraft17().getMountPointApi(uriInfo,
+                    Long.parseLong(instanceNum), module, revision);
+        } else {
+            api = MountPointSwagger.getInstance().getMountPointApi(uriInfo,
+                    Long.parseLong(instanceNum), module, revision);
+        }
         return Response.ok(api).build();
     }
 
+    private static boolean isNew(final UriInfo uriInfo) {
+        return uriInfo.getBaseUri().toString().contains("/17/");
+    }
 }

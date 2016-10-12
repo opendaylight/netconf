@@ -41,7 +41,7 @@ public class MountPointSwaggerTest {
             .node(QName.create("nodes"))
             .node(QName.create("node"))
             .nodeWithKey(QName.create("node"), QName.create("id"), "123").build();
-    private static final String INSTANCE_URL = "nodes/node/123/";
+    private static final String INSTANCE_URL = "/nodes/node/123/";
     private MountPointSwagger swagger;
     private DocGenTestHelper helper;
     private SchemaContext schemaContext;
@@ -99,6 +99,7 @@ public class MountPointSwaggerTest {
         final UriInfo mockInfo = setUpSwaggerForDocGeneration();
         this.swagger.onMountPointCreated(instanceId); // add this ID into the list of
                                                  // mount points
+
         final ApiDeclaration mountPointApi = this.swagger.getMountPointApi(mockInfo, 1L, "Datastores", "-");
         assertNotNull("failed to find Datastore API", mountPointApi);
         final List<Api> apis = mountPointApi.getApis();
@@ -115,9 +116,9 @@ public class MountPointSwaggerTest {
                     .getNotes());
         }
         final Set<String> expectedApis = new TreeSet<>(Arrays.asList(new String[] {
-                "/config/" + INSTANCE_URL + "yang-ext:mount/",
-                "/operational/" + INSTANCE_URL + "yang-ext:mount/",
-                "/operations/" + INSTANCE_URL + "yang-ext:mount/", }));
+                "/config" + INSTANCE_URL + "yang-ext:mount",
+                "/operational" + INSTANCE_URL + "yang-ext:mount",
+                "/operations" + INSTANCE_URL + "yang-ext:mount",}));
         assertEquals(expectedApis, actualApis);
     }
 
