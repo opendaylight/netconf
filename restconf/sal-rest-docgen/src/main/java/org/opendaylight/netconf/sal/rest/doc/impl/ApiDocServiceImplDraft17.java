@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2014 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
+
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import java.io.ByteArrayOutputStream;
@@ -23,16 +24,16 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
  * href="https://helloreverb.com/developers/swagger"
  * >https://helloreverb.com/developers/swagger</a>) compliant documentation for
  * RESTCONF APIs. The output of this is used by embedded Swagger UI.
- *
+ * <p>
  * <p>NOTE: These API's need to be synchronized due to bug 1198. Thread access to
  * the SchemaContext is not synchronized properly and thus you can end up with
  * missing definitions without this synchronization. There are likely otherways
  * to work around this limitation, but given that this API is a dev only tool
  * and not dependent UI, this was the fastest work around.
  */
-public class ApiDocServiceImpl implements ApiDocService {
+public class ApiDocServiceImplDraft17 implements ApiDocService {
 
-    private static final ApiDocService INSTANCE = new ApiDocServiceImpl();
+    private static final ApiDocService INSTANCE = new ApiDocServiceImplDraft17();
 
     public static ApiDocService getInstance() {
         return INSTANCE;
@@ -46,7 +47,7 @@ public class ApiDocServiceImpl implements ApiDocService {
     @Override
     public synchronized Response getRootDoc(final UriInfo uriInfo) {
         final ApiDocGenerator generator = ApiDocGenerator.getInstance();
-        generator.setDraft(false);
+        generator.setDraft(true);
         final ResourceList rootDoc = generator.getResourceListing(uriInfo);
 
         return Response.ok(rootDoc).build();
@@ -58,7 +59,7 @@ public class ApiDocServiceImpl implements ApiDocService {
     @Override
     public synchronized Response getDocByModule(final String module, final String revision, final UriInfo uriInfo) {
         final ApiDocGenerator generator = ApiDocGenerator.getInstance();
-        generator.setDraft(false);
+        generator.setDraft(true);
         final ApiDeclaration doc = generator.getApiDeclaration(module, revision, uriInfo);
         return Response.ok(doc).build();
     }
@@ -79,7 +80,7 @@ public class ApiDocServiceImpl implements ApiDocService {
         try (OutputStreamWriter streamWriter = new OutputStreamWriter(baos)) {
             final JSONWriter writer = new JSONWriter(streamWriter);
             writer.array();
-            for (final Entry<String, Long> entry : MountPointSwagger.getInstance()
+            for (final Entry<String, Long> entry : MountPointSwagger.getInstanceDraft17()
                     .getInstanceIdentifiers().entrySet()) {
                 writer.object();
                 writer.key("instance").value(entry.getKey());
@@ -95,7 +96,7 @@ public class ApiDocServiceImpl implements ApiDocService {
 
     @Override
     public synchronized Response getMountRootDoc(final String instanceNum, final UriInfo uriInfo) {
-        final ResourceList resourceList = MountPointSwagger.getInstance().getResourceList(uriInfo,
+        final ResourceList resourceList = MountPointSwagger.getInstanceDraft17().getResourceList(uriInfo,
                 Long.parseLong(instanceNum));
         return Response.ok(resourceList).build();
     }
@@ -103,7 +104,7 @@ public class ApiDocServiceImpl implements ApiDocService {
     @Override
     public synchronized Response getMountDocByModule(final String instanceNum, final String module,
                                                      final String revision, final UriInfo uriInfo) {
-        final ApiDeclaration api = MountPointSwagger.getInstance().getMountPointApi(uriInfo,
+        final ApiDeclaration api = MountPointSwagger.getInstanceDraft17().getMountPointApi(uriInfo,
                 Long.parseLong(instanceNum), module, revision);
         return Response.ok(api).build();
     }
