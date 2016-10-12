@@ -62,6 +62,7 @@ public class BaseYangSwaggerGenerator {
     protected static final String API_VERSION = "1.0.0";
     protected static final String SWAGGER_VERSION = "1.2";
     protected static final String RESTCONF_CONTEXT_ROOT = "restconf";
+    private static final String RESTCONF_DRAFT = "17";
 
     static final String MODULE_NAME_SUFFIX = "_module";
     protected static final DateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
@@ -69,6 +70,7 @@ public class BaseYangSwaggerGenerator {
 
     // private Map<String, ApiDeclaration> MODULE_DOC_CACHE = new HashMap<>()
     private final ObjectMapper mapper = new ObjectMapper();
+    private static boolean newDraft;
 
     protected BaseYangSwaggerGenerator() {
         mapper.registerModule(new JsonOrgModule());
@@ -189,30 +191,51 @@ public class BaseYangSwaggerGenerator {
                  * are added for this node.
                  */
                 if (node.isConfiguration()) { // This node's config statement is true.
-                    resourcePath = getDataStorePath("/config/", context);
-
+                    if (newDraft) {
+                        resourcePath = getDataStorePath("/" + RESTCONF_DRAFT + "/data", context);
+                    } else {
+                        resourcePath = getDataStorePath("/config", context);
+                    }
                     /*
                      * When there are two or more top container or list nodes whose config statement is true in module,
                      * make sure that only one root post link is added for this module.
                      */
                     if (!hasAddRootPostLink) {
                         LOG.debug("Has added root post link for module {}", m.getName());
-                        addRootPostLink(m, (DataNodeContainer) node, pathParams, resourcePath, apis);
+                        if (newDraft) {
+                            addRootPostLink(m, (DataNodeContainer) node, pathParams, resourcePath + "?content=config", apis);
+                        } else {
+                            addRootPostLink(m, (DataNodeContainer) node, pathParams, resourcePath + "", apis);
+                        }
                         hasAddRootPostLink = true;
                     }
-
-                    addApis(node, apis, resourcePath, pathParams, schemaContext, true, m.getName());
+                    if (newDraft) {
+                        addApis(node, apis, resourcePath, pathParams, schemaContext, true, m.getName(), "?content=config");
+                    } else {
+                        addApis(node, apis, resourcePath, pathParams, schemaContext, true, m.getName(), "");
+                    }
                 }
 
                 pathParams = new ArrayList<>();
-                resourcePath = getDataStorePath("/operational/", context);
-                addApis(node, apis, resourcePath, pathParams, schemaContext, false, m.getName());
+                if (newDraft) {
+                    resourcePath = getDataStorePath("/" + RESTCONF_DRAFT + "/data", context);
+                    addApis(node, apis, resourcePath, pathParams, schemaContext, false, m.getName(), "?content=nonconfig");
+                } else {
+                    resourcePath = getDataStorePath("/operational", context);
+                    addApis(node, apis, resourcePath, pathParams, schemaContext, false, m.getName(), "");
+                }
+
             }
         }
 
         final Set<RpcDefinition> rpcs = m.getRpcs();
         for (final RpcDefinition rpcDefinition : rpcs) {
-            final String resourcePath = getDataStorePath("/operations/", context);
+            final String resourcePath;
+            if (newDraft) {
+                resourcePath = getDataStorePath("/" + RESTCONF_DRAFT + "/operations", context);
+            } else {
+                resourcePath = getDataStorePath("/operations", context);
+            }
             addRpcs(rpcDefinition, apis, resourcePath, schemaContext);
         }
 
@@ -266,14 +289,14 @@ public class BaseYangSwaggerGenerator {
     }
 
     private void addApis(final DataSchemaNode node, final List<Api> apis, final String parentPath, final List<Parameter> parentPathParams, final SchemaContext schemaContext,
-                         final boolean addConfigApi, final String parentName) {
+                         final boolean addConfigApi, final String parentName, final String suffix) {
 
         final Api api = new Api();
         final List<Parameter> pathParams = new ArrayList<>(parentPathParams);
 
-        final String resourcePath = parentPath + createPath(node, pathParams, schemaContext) + "/";
+        final String resourcePath = parentPath + "/" + createPath(node, pathParams, schemaContext);
         LOG.debug("Adding path: [{}]", resourcePath);
-        api.setPath(resourcePath);
+        api.setPath(resourcePath + suffix);
 
         Iterable<DataSchemaNode> childSchemaNodes = Collections.<DataSchemaNode>emptySet();
         if ((node instanceof ListSchemaNode) || (node instanceof ContainerSchemaNode)) {
@@ -288,7 +311,7 @@ public class BaseYangSwaggerGenerator {
                 // keep config and operation attributes separate.
                 if (childNode.isConfiguration() == addConfigApi) {
                     final String newParent = parentName + "/" + node.getQName().getLocalName();
-                    addApis(childNode, apis, resourcePath, pathParams, schemaContext, addConfigApi, newParent);
+                    addApis(childNode, apis, resourcePath, pathParams, schemaContext, addConfigApi, newParent, suffix);
                 }
             }
         }
@@ -343,12 +366,21 @@ public class BaseYangSwaggerGenerator {
 
         if ((schemaNode instanceof ListSchemaNode)) {
             final List<QName> listKeys = ((ListSchemaNode) schemaNode).getKeyDefinition();
+            StringBuilder keyBuilder = null;
+            if (newDraft) {
+                keyBuilder = new StringBuilder("=");
+            }
+
             for (final QName listKey : listKeys) {
                 final DataSchemaNode dataChildByName = ((DataNodeContainer) schemaNode).getDataChildByName(listKey);
                 pathListParams.add(((LeafSchemaNode) dataChildByName));
-
-                final String pathParamIdentifier = new StringBuilder("/{").append(listKey.getLocalName()).append("}")
-                        .toString();
+                final String pathParamIdentifier;
+                if (newDraft) {
+                    pathParamIdentifier = keyBuilder.append("{").append(listKey.getLocalName()).append("}")
+                            .toString();
+                } else {
+                    pathParamIdentifier = "/{" + listKey.getLocalName() + "}";
+                }
                 path.append(pathParamIdentifier);
 
                 final Parameter pathParam = new Parameter();
@@ -358,6 +390,9 @@ public class BaseYangSwaggerGenerator {
                 pathParam.setParamType("path");
 
                 pathParams.add(pathParam);
+                if (newDraft) {
+                    keyBuilder = new StringBuilder(",");
+                }
             }
         }
         return path.toString();
@@ -365,7 +400,7 @@ public class BaseYangSwaggerGenerator {
 
     protected void addRpcs(final RpcDefinition rpcDefn, final List<Api> apis, final String parentPath, final SchemaContext schemaContext) {
         final Api rpc = new Api();
-        final String resourcePath = parentPath + resolvePathArgumentsName(rpcDefn, schemaContext);
+        final String resourcePath = parentPath + "/" + resolvePathArgumentsName(rpcDefn, schemaContext);
         rpc.setPath(resourcePath);
 
         final Operation operationSpec = new Operation();
@@ -415,4 +450,7 @@ public class BaseYangSwaggerGenerator {
         return sortedModules;
     }
 
+    public void setDraft(final boolean draft) {
+        this.newDraft = draft;
+    }
 }
