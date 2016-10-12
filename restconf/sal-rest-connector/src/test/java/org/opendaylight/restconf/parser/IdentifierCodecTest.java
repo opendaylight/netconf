@@ -10,7 +10,6 @@ package org.opendaylight.restconf.parser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
@@ -25,6 +24,7 @@ public class IdentifierCodecTest {
     private static final String URI_WITH_LIST_AND_LEAF =
             "list-test:top/list1=%2C%27" + '"' + "%3A" + '"' + "%20%2F,,foo/list2=a,b/result";
     private static final String URI_WITH_LEAF_LIST = "list-test:top/Y=x%3Ay";
+    private static final String URI_WITH_INT_VAL_LEAF_LIST = "list-test:top/Y=4";
 
     private SchemaContext schemaContext;
 
@@ -56,11 +56,11 @@ public class IdentifierCodecTest {
     @Test
     public void codecLeafListTest() {
         final YangInstanceIdentifier dataYangII = IdentifierCodec.deserialize(
-                this.URI_WITH_LEAF_LIST, this.schemaContext);
+                this.URI_WITH_INT_VAL_LEAF_LIST, this.schemaContext);
         final String serializedDataYangII = IdentifierCodec.serialize(dataYangII, this.schemaContext);
 
         assertEquals("Failed codec deserialization and serialization test",
-                this.URI_WITH_LEAF_LIST, serializedDataYangII);
+                this.URI_WITH_INT_VAL_LEAF_LIST, serializedDataYangII);
     }
 
     /**
