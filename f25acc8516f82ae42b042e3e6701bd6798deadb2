@@ -319,6 +319,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_3a73dde8",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-12T13:18:37Z",
+      "side": 1,
+      "message": "OK. I must be missing something then, there is something I\u0027m not sure to fully understand. Forget my comment then, I will look into this myself latter.",
+      "parentUuid": "7a6b29fe_5a8859c6",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 5
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_611c8f6b",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
         "patchSetId": 1
@@ -672,6 +696,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_fa7165e1",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyContext.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-12T13:18:37Z",
+      "side": 1,
+      "message": "OK.",
+      "parentUuid": "7a6b29fe_30513fd9",
+      "range": {
+        "startLine": 43,
+        "startChar": 8,
+        "endLine": 43,
+        "endChar": 13
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_4e47024c",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
         "patchSetId": 1
@@ -860,6 +908,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_1a442173",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-12T13:18:37Z",
+      "side": 1,
+      "message": "I\u0027m not sure to fully get your point. All that class does is managing the lifecycle of another class, by instantiating it, and closing it.\nSo you could have a bean instantiating NetconfTopologyManager and define its destroy-method to be close.\n\nRegarding the Preconditions.checkNotNull, those are obviously useless, as the blueprint xml file are providing those instances using the reference keyword. If the blueprint cannot resolve the services, the blueprint container will not start.",
+      "parentUuid": "7a6b29fe_30d77fef",
+      "range": {
+        "startLine": 28,
+        "startChar": 13,
+        "endLine": 28,
+        "endChar": 36
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_53e170cf",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyProvider.java",
         "patchSetId": 1
@@ -895,6 +967,30 @@
       "side": 1,
       "message": "This is set for each node individually, not for all topology.",
       "parentUuid": "7a6b29fe_53e170cf",
+      "range": {
+        "startLine": 46,
+        "startChar": 35,
+        "endLine": 52,
+        "endChar": 58
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_fa484589",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-12T13:18:37Z",
+      "side": 1,
+      "message": "OK, understood.",
+      "parentUuid": "7a6b29fe_704e1798",
       "range": {
         "startLine": 46,
         "startChar": 35,
@@ -1106,6 +1202,30 @@
       "side": 1,
       "message": "My intention was that it applies to concrete package in netconf. But if needed I can change it as well.",
       "parentUuid": "7a6b29fe_33195423",
+      "range": {
+        "startLine": 33,
+        "startChar": 13,
+        "endLine": 33,
+        "endChar": 41
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_5a5df947",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/NetconfMasterDOMTransactions.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-12T13:18:37Z",
+      "side": 1,
+      "message": "OK",
+      "parentUuid": "7a6b29fe_f09ea753",
       "range": {
         "startLine": 33,
         "startChar": 13,
