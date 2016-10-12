@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_1a0c2194",
+        "filename": "netconf/netconf-notifications-api/src/main/yang/netconf-northbound-notification.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-12T12:29:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_6e759e31",
+      "revId": "945d40c86781f15ac86365348227c1b23b812f32",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_4e4a62ad",
         "filename": "netconf/netconf-notifications-impl/src/main/resources/org/opendaylight/blueprint/netconf-notification.xml",
         "patchSetId": 9
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_fa1045aa",
+        "filename": "netconf/netconf-notifications-impl/src/main/resources/org/opendaylight/blueprint/netconf-notification.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-12T12:29:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_4e4a62ad",
+      "revId": "945d40c86781f15ac86365348227c1b23b812f32",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_6e4d9ec4",
         "filename": "netconf/netconf-notifications-impl/src/main/resources/org/opendaylight/blueprint/netconf-notification.xml",
         "patchSetId": 9
@@ -47,6 +83,24 @@
       "writtenOn": "2016-10-10T13:55:40Z",
       "side": 1,
       "message": "Why netconfMonitoringActivator? Shouldn\u0027t be this NetconfNotificationActivator or something similiar?",
+      "revId": "945d40c86781f15ac86365348227c1b23b812f32",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_5a25f908",
+        "filename": "netconf/netconf-notifications-impl/src/main/resources/org/opendaylight/blueprint/netconf-notification.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-12T12:29:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_6e4d9ec4",
       "revId": "945d40c86781f15ac86365348227c1b23b812f32",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
