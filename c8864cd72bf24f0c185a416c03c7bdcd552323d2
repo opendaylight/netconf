@@ -34,6 +34,47 @@
       "revId": "c8864cd72bf24f0c185a416c03c7bdcd552323d2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_3a3bdd39",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/mapper/NetconfMdsalMapperModule.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-12T12:28:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_a4d23532",
+      "revId": "c8864cd72bf24f0c185a416c03c7bdcd552323d2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_5af7b98c",
+        "filename": "netconf/mdsal-netconf-connector/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-connector.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-12T12:28:09Z",
+      "side": 1,
+      "message": "type\u003dmapper-aggregator-registry",
+      "range": {
+        "startLine": 19,
+        "startChar": 4,
+        "endLine": 20,
+        "endChar": 104
+      },
+      "revId": "c8864cd72bf24f0c185a416c03c7bdcd552323d2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
