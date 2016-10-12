@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.3.0"
+           odl:restart-dependents-on-updates="true">
+
+    <reference id="netconfServerDispatcher" interface="org.opendaylight.netconf.api.NetconfServerDispatcher"/>
+    <reference id="globalWorkerGroup" interface="io.netty.channel.EventLoopGroup" odl:type="global-worker-group"/>
+    <reference id="executor" interface="io.netty.util.concurrent.EventExecutor" odl:type="global-event-executor"/>
+    <reference id="authProvider" interface="org.opendaylight.netconf.auth.AuthProvider" odl:type="netconf-auth-provider"/>
+
+    <!--    NETCONF server for MD-SAL (listening by default on port 2830)-->
+
+    <cm:property-placeholder persistent-id="org.opendaylight.netconf.ssh" update-strategy="none">
+        <cm:default-properties>
+            <cm:property name="bindingAddress" value="0.0.0.0"/>
+            <cm:property name="portNumber" value="2830"/>
+        </cm:default-properties>
+    </cm:property-placeholder>
+
+    <bean id="netconfMdsalServer"
+          class="org.opendaylight.netconf.ssh.NetconfNorthboundSshServer"
+          destroy-method="close">
+        <argument ref="netconfServerDispatcher"/>
+        <argument ref="globalWorkerGroup"/>
+        <argument ref="executor"/>
+        <argument value="${bindingAddress}"/>
+        <argument value="${portNumber}"/>
+        <argument ref="authProvider"/>
+    </bean>
+
+</blueprint>
