@@ -80,6 +80,24 @@
       "revId": "00268c29350b0598ab5e5dee6fa09cca0f0d2d46",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_5ada19ea",
+        "filename": "netconf/mdsal-netconf-monitoring/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-monitoring.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-12T12:45:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_ba7d2dea",
+      "revId": "00268c29350b0598ab5e5dee6fa09cca0f0d2d46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
