@@ -98,7 +98,7 @@ public final class YangInstanceIdentifierSerializer {
         path.append(arg.getNodeType().getLocalName());
         path.append(ParserBuilderConstants.Deserializer.EQUAL);
 
-        String value = ((NodeWithValue<String>) arg).getValue();
+        String value = String.valueOf(((NodeWithValue<String>) arg).getValue());
         if (Serializer.PERCENT_ENCODE_CHARS.matchesAnyOf(value)) {
             value = parsePercentEncodeChars(value);
         }

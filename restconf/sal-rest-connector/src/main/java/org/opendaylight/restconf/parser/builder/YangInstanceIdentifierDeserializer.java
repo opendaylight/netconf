@@ -15,10 +15,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.opendaylight.netconf.md.sal.rest.common.RestconfValidationUtils;
+import org.opendaylight.netconf.sal.rest.impl.RestUtil;
+import org.opendaylight.netconf.sal.restconf.impl.RestCodec;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.restconf.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.restconf.utils.schema.context.RestconfSchemaUtil;
+import org.opendaylight.yangtools.concepts.Codec;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
@@ -26,9 +29,16 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.IdentitySchemaNode;
+import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
+import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 
 /**
  * Deserializer for {@link String} to {@link YangInstanceIdentifier} for
@@ -63,7 +73,7 @@ public final class YangInstanceIdentifierDeserializer {
 
             // this is the last identifier (input is consumed) or end of identifier (slash)
             if (allCharsConsumed(variables)
-                    || currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH) {
+                    || (currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH)) {
                 prepareIdentifier(qname, path, variables);
                 path.add(variables.getCurrent().getIdentifier());
             } else if (currentChar(variables.getOffset(),
@@ -96,8 +106,8 @@ public final class YangInstanceIdentifierDeserializer {
         skipCurrentChar(variables);
 
         // read key value separated by comma
-        while (keys.hasNext() && !allCharsConsumed(variables) && currentChar(variables.getOffset(),
-                variables.getData()) != RestconfConstants.SLASH) {
+        while (keys.hasNext() && !allCharsConsumed(variables) && (currentChar(variables.getOffset(),
+                variables.getData()) != RestconfConstants.SLASH)) {
 
             // empty key value
             if (currentChar(variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.COMMA) {
@@ -116,12 +126,22 @@ public final class YangInstanceIdentifierDeserializer {
             );
 
             // parse value
-            values.put(keys.next(), findAndParsePercentEncoded(nextIdentifierFromNextSequence(
-                    ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE, variables)));
+            final QName key = keys.next();
+            DataSchemaNode leafSchemaNode = null;
+            if (dataSchemaNode instanceof ListSchemaNode) {
+                leafSchemaNode = ((ListSchemaNode) dataSchemaNode).getDataChildByName(key);
+            } else if (dataSchemaNode instanceof LeafListSchemaNode) {
+                leafSchemaNode = dataSchemaNode;
+            }
+            final String value = findAndParsePercentEncoded(nextIdentifierFromNextSequence(
+                    ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE, variables));
+            final Object valueByType = prepareValueByType(leafSchemaNode, value, variables);
+            values.put(key, valueByType);
+
 
             // skip comma
-            if (keys.hasNext() && !allCharsConsumed(variables) && currentChar(
-                    variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.COMMA) {
+            if (keys.hasNext() && !allCharsConsumed(variables) && (currentChar(
+                    variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.COMMA)) {
                 skipCurrentChar(variables);
             }
         }
@@ -129,7 +149,7 @@ public final class YangInstanceIdentifierDeserializer {
         // the last key is considered to be empty
         if (keys.hasNext()) {
             if (allCharsConsumed(variables)
-                    || currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH) {
+                    || (currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH)) {
                 values.put(keys.next(), ParserBuilderConstants.Deserializer.EMPTY_STRING);
             }
 
@@ -145,6 +165,70 @@ public final class YangInstanceIdentifierDeserializer {
         path.add(new YangInstanceIdentifier.NodeIdentifierWithPredicates(qname, values.build()));
     }
 
+    private static Object prepareValueByType(final DataSchemaNode schemaNode, final String value,
+            final MainVarsWrapper vars) {
+        Object decoded = null;
+
+        TypeDefinition<? extends TypeDefinition<?>> typedef = null;
+        if (schemaNode instanceof LeafListSchemaNode) {
+            typedef = ((LeafListSchemaNode) schemaNode).getType();
+        } else {
+            typedef = ((LeafSchemaNode) schemaNode).getType();
+        }
+        final TypeDefinition<?> baseType = RestUtil.resolveBaseTypeFrom(typedef);
+        if (baseType instanceof LeafrefTypeDefinition) {
+            typedef = SchemaContextUtil.getBaseTypeForLeafRef((LeafrefTypeDefinition) baseType, vars.getSchemaContext(),
+                    schemaNode);
+        }
+        final Codec<Object, Object> codec = RestCodec.from(typedef, null);
+        decoded = codec.deserialize(value);
+        if (decoded == null) {
+            if ((baseType instanceof IdentityrefTypeDefinition)) {
+                decoded = toQName(value, schemaNode, vars.getSchemaContext());
+            }
+        }
+        return decoded;
+    }
+
+    private static Object toQName(final String value, final DataSchemaNode schemaNode,
+            final SchemaContext schemaContext) {
+        final String moduleName = toModuleName(value);
+        final String nodeName = toNodeName(value);
+        final Module module = schemaContext.findModuleByName(moduleName, null);
+        for (final IdentitySchemaNode identitySchemaNode : module.getIdentities()) {
+            final QName qName = identitySchemaNode.getQName();
+            if (qName.getLocalName().equals(nodeName)) {
+                return qName;
+            }
+        }
+        return QName.create(schemaNode.getQName().getNamespace(), schemaNode.getQName().getRevision(), value);
+    }
+
+    private static String toNodeName(final String str) {
+        final int idx = str.indexOf(':');
+        if (idx == -1) {
+            return str;
+        }
+
+        if (str.indexOf(':', idx + 1) != -1) {
+            return str;
+        }
+
+        return str.substring(idx + 1);
+    }
+
+    private static String toModuleName(final String str) {
+        final int idx = str.indexOf(':');
+        if (idx == -1) {
+            return null;
+        }
+
+        if (str.indexOf(':', idx + 1) != -1) {
+            return null;
+        }
+
+        return str.substring(0, idx);
+    }
 
     private static QName prepareQName(final MainVarsWrapper variables) {
         checkValid(
@@ -173,8 +257,8 @@ public final class YangInstanceIdentifierDeserializer {
                         variables.getOffset());
                 localName = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
 
-                if (!allCharsConsumed(variables) && currentChar
-                        (variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL) {
+                if (!allCharsConsumed(variables) && (currentChar
+                        (variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL)) {
                     return getQNameOfDataSchemaNode(localName, variables);
                 } else {
                     final Module module = moduleForPrefix(prefix, variables.getSchemaContext());
@@ -215,8 +299,9 @@ public final class YangInstanceIdentifierDeserializer {
                 RestconfError.ErrorTag.MISSING_ATTRIBUTE,
                 "Value missing for: " + qname
         );
-
-        path.add(new YangInstanceIdentifier.NodeWithValue<>(qname, findAndParsePercentEncoded(value)));
+        final DataSchemaNode dataSchemaNode = variables.getCurrent().getDataSchemaNode();
+        final Object valueByType = prepareValueByType(dataSchemaNode, findAndParsePercentEncoded(value), variables);
+        path.add(new YangInstanceIdentifier.NodeWithValue<>(qname, valueByType));
     }
 
     private static void prepareIdentifier(final QName qname, final List<PathArgument> path,
