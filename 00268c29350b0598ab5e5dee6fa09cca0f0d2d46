@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "7a6b29fe_7a1c35c2",
+        "filename": "netconf/mdsal-netconf-monitoring/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-monitoring.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-12T12:33:05Z",
+      "side": 1,
+      "message": "type\u003dnetconf-server-monitoring",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 94
+      },
+      "revId": "00268c29350b0598ab5e5dee6fa09cca0f0d2d46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_da78e9fa",
+        "filename": "netconf/mdsal-netconf-monitoring/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-monitoring.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-12T12:33:05Z",
+      "side": 1,
+      "message": "type\u003dmapper-aggregator-registry",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 105
+      },
+      "revId": "00268c29350b0598ab5e5dee6fa09cca0f0d2d46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_8e863a64",
         "filename": "netconf/mdsal-netconf-monitoring/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-monitoring.xml",
         "patchSetId": 6
@@ -13,6 +59,24 @@
       "writtenOn": "2016-10-10T10:41:18Z",
       "side": 1,
       "message": "Are we sure this is right monitoring service instance?",
+      "revId": "00268c29350b0598ab5e5dee6fa09cca0f0d2d46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ba7d2dea",
+        "filename": "netconf/mdsal-netconf-monitoring/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-monitoring.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-12T12:33:05Z",
+      "side": 1,
+      "message": "Will fix this with the appropriate type, as defined here https://git.opendaylight.org/gerrit/#/c/45750/13/netconf/mdsal-netconf-impl/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-impl.xml",
+      "parentUuid": "7a6b29fe_8e863a64",
       "revId": "00268c29350b0598ab5e5dee6fa09cca0f0d2d46",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
