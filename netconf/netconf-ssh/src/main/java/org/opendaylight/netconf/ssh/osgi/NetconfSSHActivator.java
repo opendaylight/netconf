@@ -14,25 +14,25 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
 import org.apache.sshd.common.util.ThreadUtils;
 import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
 import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
 import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
 import org.opendaylight.netconf.util.osgi.NetconfConfiguration;
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfSSHActivator implements BundleActivator {
+public class NetconfSSHActivator {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfSSHActivator.class);
 
     private static final java.lang.String ALGORITHM = "RSA";
     private static final int KEY_SIZE = 4096;
     public static final int POOL_SIZE = 8;
     private static final int DEFAULT_IDLE_TIMEOUT = Integer.MAX_VALUE;
+
+    private final BundleContext bundleContext;
 
     private ScheduledExecutorService minaTimerExecutor;
     private NioEventLoopGroup clientGroup;
@@ -41,21 +41,54 @@ public class NetconfSSHActivator implements BundleActivator {
 
     private SshProxyServer server;
 
-    @Override
-    public void start(final BundleContext bundleContext) throws IOException {
-        minaTimerExecutor = Executors.newScheduledThreadPool(POOL_SIZE, new ThreadFactory() {
-            @Override
-            public Thread newThread(final Runnable r) {
-                return new Thread(r, "netconf-ssh-server-mina-timers");
-            }
-        });
+    public NetconfSSHActivator(final BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
+    }
+
+    /**
+     * Invoke by blueprint
+     */
+    public void start() {
+        minaTimerExecutor = Executors.newScheduledThreadPool(POOL_SIZE, r -> new Thread(r, "netconf-ssh-server-mina-timers"));
         clientGroup = new NioEventLoopGroup();
         nioExecutor = ThreadUtils.newFixedThreadPool("netconf-ssh-server-nio-group", POOL_SIZE);
         server = startSSHServer(bundleContext);
     }
 
-    @Override
-    public void stop(final BundleContext context) throws IOException {
+    private SshProxyServer startSSHServer(final BundleContext bundleContext) {
+        final NetconfConfiguration netconfConfiguration = NetconfConfigUtil.getNetconfConfigurationService(bundleContext).
+                orElseThrow(() -> new IllegalStateException("Configuration for SSH not found."));
+
+        final InetSocketAddress sshSocketAddress = netconfConfiguration.getSshServerAddress();
+        LOG.info("Starting netconf SSH server at {}", sshSocketAddress);
+
+        final LocalAddress localAddress = NetconfConfigUtil.getNetconfLocalAddress();
+        authProviderTracker = new AuthProviderTracker(bundleContext);
+
+        final String path = netconfConfiguration.getPrivateKeyPath();
+        LOG.trace("Starting netconf SSH server with path to ssh private key {}", path);
+
+        final SshProxyServer sshProxyServer = new SshProxyServer(minaTimerExecutor, clientGroup, nioExecutor);
+
+        try {
+            sshProxyServer.bind(
+                    new SshProxyServerConfigurationBuilder()
+                            .setBindingAddress(sshSocketAddress)
+                            .setLocalAddress(localAddress)
+                            .setAuthenticator(authProviderTracker)
+                            .setKeyPairProvider(new PEMGeneratorHostKeyProvider(path, ALGORITHM, KEY_SIZE))
+                            .setIdleTimeout(DEFAULT_IDLE_TIMEOUT)
+                            .createSshProxyServerConfiguration());
+        } catch (IOException e) {
+            LOG.error("Failed to bind ssh proxy server", e);
+        }
+        return sshProxyServer;
+    }
+
+    /**
+     * Invoke by blueprint
+     */
+    public void stop() {
         if (server != null) {
             server.close();
         }
@@ -75,30 +108,5 @@ public class NetconfSSHActivator implements BundleActivator {
         if(minaTimerExecutor != null) {
             minaTimerExecutor.shutdownNow();
         }
-    }
-
-    private SshProxyServer startSSHServer(final BundleContext bundleContext) throws IOException {
-        final NetconfConfiguration netconfConfiguration = NetconfConfigUtil.getNetconfConfigurationService(bundleContext).
-                        orElseThrow(() -> new IllegalStateException("Configuration for SSH not found."));
-
-        final InetSocketAddress sshSocketAddress = netconfConfiguration.getSshServerAddress();
-        LOG.info("Starting netconf SSH server at {}", sshSocketAddress);
-
-        final LocalAddress localAddress = NetconfConfigUtil.getNetconfLocalAddress();
-        authProviderTracker = new AuthProviderTracker(bundleContext);
-
-        final String path = netconfConfiguration.getPrivateKeyPath();
-        LOG.trace("Starting netconf SSH server with path to ssh private key {}", path);
-
-        final SshProxyServer sshProxyServer = new SshProxyServer(minaTimerExecutor, clientGroup, nioExecutor);
-        sshProxyServer.bind(
-                new SshProxyServerConfigurationBuilder()
-                        .setBindingAddress(sshSocketAddress)
-                        .setLocalAddress(localAddress)
-                        .setAuthenticator(authProviderTracker)
-                        .setKeyPairProvider(new PEMGeneratorHostKeyProvider(path, ALGORITHM, KEY_SIZE))
-                        .setIdleTimeout(DEFAULT_IDLE_TIMEOUT)
-                        .createSshProxyServerConfiguration());
-        return sshProxyServer;
     }
 }

@@ -28,6 +28,7 @@
     <module>netconf-config</module>
     <module>netconf-impl</module>
     <module>config-netconf-connector</module>
+    <module>mdsal-netconf-ssh</module>
     <module>mdsal-netconf-connector</module>
     <module>mdsal-netconf-monitoring</module>
     <module>mdsal-netconf-notification</module>
