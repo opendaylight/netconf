@@ -241,6 +241,10 @@
       <artifactId>netconf-monitoring</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>mdsal-netconf-ssh</artifactId>
+    </dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mdsal-netconf-monitoring</artifactId>
     </dependency>
