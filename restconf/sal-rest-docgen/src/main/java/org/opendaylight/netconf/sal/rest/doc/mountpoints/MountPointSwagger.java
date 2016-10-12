@@ -39,6 +39,7 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
 
     private static final String DATASTORES_REVISION = "-";
     private static final String DATASTORES_LABEL = "Datastores";
+    private static final String RESTCONF_DRAFT = "17";
 
     private DOMMountPointService mountService;
     private final Map<YangInstanceIdentifier, Long> instanceIdToLongId = new TreeMap<>(
@@ -50,7 +51,7 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
 
     private static final AtomicReference<MountPointSwagger> selfRef = new AtomicReference<>();
     private SchemaService globalSchema;
-
+    private static boolean newDraft;
     public Map<String, Long> getInstanceIdentifiers() {
         final Map<String, Long> urlToId = new HashMap<>();
         synchronized (lock) {
@@ -81,19 +82,28 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
     private String generateUrlPrefixFromInstanceID(final YangInstanceIdentifier key, final String moduleName) {
         final StringBuilder builder = new StringBuilder();
         if (moduleName != null) {
-            builder.append(moduleName);
-            builder.append(':');
+            builder.append("/")
+                    .append(moduleName)
+                    .append(':');
         }
         for (final PathArgument arg : key.getPathArguments()) {
             final String name = arg.getNodeType().getLocalName();
             if (arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates) {
                 final NodeIdentifierWithPredicates nodeId = (NodeIdentifierWithPredicates) arg;
                 for (final Entry<QName, Object> entry : nodeId.getKeyValues().entrySet()) {
-                    builder.append(entry.getValue()).append('/');
+                    if (newDraft) {
+                        builder.deleteCharAt(builder.length() - 1)
+                                .append("=")
+                                .append(entry.getValue())
+                                .append('/');
+                    } else {
+                        builder.append(entry.getValue())
+                                .append('/');
+                    }
                 }
             } else {
-                builder.append(name);
-                builder.append('/');
+                builder.append(name)
+                        .append('/');
             }
         }
         return builder.toString();
@@ -101,7 +111,7 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
 
     private String getYangMountUrl(final YangInstanceIdentifier key) {
         final String modName = findModuleName(key, globalSchema.getGlobalContext());
-        return generateUrlPrefixFromInstanceID(key, modName) + "yang-ext:mount/";
+        return generateUrlPrefixFromInstanceID(key, modName) + "yang-ext:mount";
     }
 
     public ResourceList getResourceList(final UriInfo uriInfo, final Long id) {
@@ -187,7 +197,17 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
         getConfig.setNotes(note);
 
         final Api api = new Api();
-        api.setPath(getDataStorePath("/" + datastore + "/", context));
+        if (newDraft) {
+            if ("config".contains(datastore)) {
+                api.setPath(getDataStorePath("/" + RESTCONF_DRAFT + "/data", context).concat("?content=" + datastore));
+            } else if ("operational".contains(datastore)) {
+                api.setPath(getDataStorePath("/" + RESTCONF_DRAFT + "/data", context).concat("?content=" + "nonconfig"));
+            } else {
+                api.setPath(getDataStorePath("/" + RESTCONF_DRAFT + "/" + datastore, context));
+            }
+        } else {
+            api.setPath(getDataStorePath("/" + datastore, context));
+        }
         api.setOperations(Collections.singletonList(getConfig));
 
         return api;
@@ -220,7 +240,17 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
             selfRef.compareAndSet(null, new MountPointSwagger());
             swagger = selfRef.get();
         }
+        newDraft = false;
         return swagger;
     }
 
+    public static MountPointSwagger getInstanceDraft17() {
+        MountPointSwagger swagger = selfRef.get();
+        if (swagger == null) {
+            selfRef.compareAndSet(null, new MountPointSwagger());
+            swagger = selfRef.get();
+        }
+        newDraft = true;
+        return swagger;
+    }
 }
