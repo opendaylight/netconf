@@ -24,12 +24,9 @@ import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
@@ -93,30 +90,32 @@ public final class PostDataTransactionUtil {
             final SchemaContext schemaContext) {
         final DOMTransactionChain transactionChain = transactionNode.getTransactionChain();
         final DOMDataReadWriteTransaction transaction = transactionChain.newReadWriteTransaction();
-        final NormalizedNode<?, ?> node = ImmutableNodes.fromInstanceId(schemaContext, path);
-        transaction.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(node.getIdentifier()), node);
-        TransactionUtil.ensureParentsByMerge(path, schemaContext, transaction);
 
         if (data instanceof MapNode) {
+            TransactionUtil.ensureParentsByMerge(path, schemaContext, transaction);
+            final NormalizedNode<?, ?> emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
+            transaction.merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(emptySubTree.getIdentifier()), emptySubTree);
             for (final MapEntryNode child : ((MapNode) data).getValue()) {
-                putChild(child, transactionChain, transaction, path);
+                final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
+                putData(child, transactionChain, transaction, childPath);
             }
+
         } else if (data instanceof AugmentationNode) {
-            for (final DataContainerChild<? extends PathArgument, ?> child : ((AugmentationNode) data).getValue()) {
-                putChild(child, transactionChain, transaction, path);
-            }
+            TransactionUtil.ensureParentsByMerge(path, schemaContext, transaction);
+            putData(data, transactionChain, transaction, path);
+
         } else if (data instanceof ChoiceNode) {
-            for (final DataContainerChild<? extends PathArgument, ?> child : ((ChoiceNode) data).getValue()) {
-                putChild(child, transactionChain, transaction, path);
-            }
+            TransactionUtil.ensureParentsByMerge(path, schemaContext, transaction);
+            putData(data, transactionChain, transaction, path);
+
         } else if (data instanceof LeafSetNode<?>) {
-            for (final LeafSetEntryNode<?> child : ((LeafSetNode<?>) data).getValue()) {
-                putChild(child, transactionChain, transaction, path);
-            }
+            TransactionUtil.ensureParentsByMerge(path, schemaContext, transaction);
+            putData(data, transactionChain, transaction, path);
+
         } else if (data instanceof ContainerNode) {
-            for (final DataContainerChild<? extends PathArgument, ?> child : ((ContainerNode) data).getValue()) {
-                putChild(child, transactionChain, transaction, path);
-            }
+            TransactionUtil.ensureParentsByMerge(path, schemaContext, transaction);
+            putData(data, transactionChain, transaction, path);
+
         } else {
             transaction.cancel();
             RestConnectorProvider.resetTransactionChainForAdapaters(transactionChain);
@@ -142,13 +141,13 @@ public final class PostDataTransactionUtil {
      * @param path
      *            - path to data
      */
-    private static void putChild(final NormalizedNode<?, ?> child, final DOMTransactionChain transactionChain,
-                                 final DOMDataReadWriteTransaction readWriteTx, final YangInstanceIdentifier path) {
-        final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
+    private static void putData(final NormalizedNode<?, ?> child, final DOMTransactionChain transactionChain,
+                                final DOMDataReadWriteTransaction readWriteTx, final YangInstanceIdentifier path) {
         TransactionUtil.checkItemDoesNotExists(
-                transactionChain, readWriteTx, LogicalDatastoreType.CONFIGURATION, childPath,
+                transactionChain, readWriteTx, LogicalDatastoreType.CONFIGURATION, path,
                 RestconfDataServiceConstant.PostData.POST_TX_TYPE);
-        readWriteTx.put(LogicalDatastoreType.CONFIGURATION, childPath, child);
+
+        readWriteTx.put(LogicalDatastoreType.CONFIGURATION, path, child);
     }
 
     /**
