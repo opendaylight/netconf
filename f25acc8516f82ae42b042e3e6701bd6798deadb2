@@ -932,6 +932,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_832ba893",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-13T08:07:53Z",
+      "side": 1,
+      "message": "ok, it is better now. init method register data tree change listener. Moreover if we add some parameter to blueprint xml there is less changes.",
+      "parentUuid": "7a6b29fe_1a442173",
+      "range": {
+        "startLine": 28,
+        "startChar": 13,
+        "endLine": 28,
+        "endChar": 36
+      },
+      "revId": "f25acc8516f82ae42b042e3e6701bd6798deadb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_53e170cf",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyProvider.java",
         "patchSetId": 1
