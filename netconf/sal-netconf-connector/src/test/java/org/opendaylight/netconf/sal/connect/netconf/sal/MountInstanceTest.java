@@ -22,6 +22,7 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -46,6 +47,8 @@ public class MountInstanceTest {
     private DOMMountPointService.DOMMountPointBuilder mountPointBuilder;
     @Mock
     private ObjectRegistration<DOMMountPoint> registration;
+    @Mock
+    private DOMNotification notification;
 
     private NetconfDeviceSalProvider.MountInstance mountInstance;
 
@@ -84,7 +87,7 @@ public class MountInstanceTest {
         verify(registration).close();
         try {
             mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, rpcService, notificationService);
-        } catch (IllegalStateException e) {
+        } catch (final IllegalStateException e) {
             e.printStackTrace();
             Assert.fail("Topology registration still present after disconnect ");
         }
@@ -96,5 +99,15 @@ public class MountInstanceTest {
         mountInstance.close();
         verify(registration).close();
     }
+
+    @Test
+    public void testPublishNotification() throws Exception {
+        mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, rpcService, notificationService);
+        verify(mountPointBuilder).addInitialSchemaContext(SCHEMA_CONTEXT);
+        verify(mountPointBuilder).addService(DOMNotificationService.class, notificationService);
+        mountInstance.publish(notification);
+        verify(notificationService).publishNotification(notification);
+    }
+
 
 }

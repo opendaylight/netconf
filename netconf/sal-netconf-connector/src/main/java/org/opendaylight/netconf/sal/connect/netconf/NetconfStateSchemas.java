@@ -25,9 +25,9 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -92,7 +92,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
     /**
      * Issue get request to remote device and parse response to find all schemas under netconf-state/schemas
      */
-    static NetconfStateSchemas create(final NetconfDeviceRpc deviceRpc, final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id) {
+    static NetconfStateSchemas create(final DOMRpcService deviceRpc, final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id) {
         if(remoteSessionCapabilities.isMonitoringSupported() == false) {
             // TODO - need to search for get-schema support, not just ietf-netconf-monitoring support
             // issue might be a deviation to ietf-netconf-monitoring where get-schema is unsupported...
