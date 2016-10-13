@@ -122,7 +122,8 @@ public class ModelGenerator {
     }
 
     private void processModules(final Module module, final JSONObject models) throws JSONException {
-        createConcreteModelForPost(models, module.getName() + BaseYangSwaggerGenerator.MODULE_NAME_SUFFIX, createPropertiesForPost(module));
+        createConcreteModelForPost(models, module.getName() + BaseYangSwaggerGenerator.MODULE_NAME_SUFFIX,
+                createPropertiesForPost(module, module.getName()));
     }
 
     private void processContainersAndLists(final Module module, final JSONObject models, final SchemaContext schemaContext)
@@ -253,15 +254,15 @@ public class ModelGenerator {
         }
     }
 
-    private JSONObject processDataNodeContainer(final DataNodeContainer dataNode, final String moduleName, final JSONObject models,
+    private JSONObject processDataNodeContainer(final DataNodeContainer dataNode, final String parentName, final JSONObject models,
                                                 final boolean isConfig, final SchemaContext schemaContext) throws JSONException, IOException {
         if (dataNode instanceof ListSchemaNode || dataNode instanceof ContainerSchemaNode) {
             Preconditions.checkArgument(dataNode instanceof SchemaNode, "Data node should be also schema node");
             final Iterable<DataSchemaNode> containerChildren = dataNode.getChildNodes();
-            final JSONObject properties = processChildren(containerChildren, moduleName, models, isConfig, schemaContext);
-
-            final String nodeName = (isConfig ? OperationBuilder.CONFIG : OperationBuilder.OPERATIONAL)
-                    + ((SchemaNode) dataNode).getQName().getLocalName();
+            final String localName = ((SchemaNode) dataNode).getQName().getLocalName();
+            final JSONObject properties = processChildren(containerChildren, parentName + "/" + localName, models, isConfig, schemaContext);
+            final String nodeName = parentName + (isConfig ? OperationBuilder.CONFIG : OperationBuilder.OPERATIONAL)
+                    + localName;
 
             final JSONObject childSchema = getSchemaTemplate();
             childSchema.put(TYPE_KEY, OBJECT_TYPE);
@@ -271,8 +272,8 @@ public class ModelGenerator {
             models.put(nodeName, childSchema);
 
             if (isConfig) {
-                createConcreteModelForPost(models, ((SchemaNode) dataNode).getQName().getLocalName(),
-                        createPropertiesForPost(dataNode));
+                createConcreteModelForPost(models, localName,
+                        createPropertiesForPost(dataNode, parentName + "/" + localName));
             }
 
             return processTopData(nodeName, models, (SchemaNode) dataNode);
@@ -290,12 +291,13 @@ public class ModelGenerator {
         models.put(nodePostName, postSchema);
     }
 
-    private JSONObject createPropertiesForPost(final DataNodeContainer dataNodeContainer) throws JSONException {
+    private JSONObject createPropertiesForPost(final DataNodeContainer dataNodeContainer, final String parentName)
+            throws JSONException {
         final JSONObject properties = new JSONObject();
         for (final DataSchemaNode childNode : dataNodeContainer.getChildNodes()) {
             if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
                 final JSONObject items = new JSONObject();
-                items.put(REF_KEY, "(config)" + childNode.getQName().getLocalName());
+                items.put(REF_KEY, parentName + "(config)" + childNode.getQName().getLocalName());
                 final JSONObject property = new JSONObject();
                 property.put(TYPE_KEY, childNode instanceof ListSchemaNode ? ARRAY_TYPE : OBJECT_TYPE);
                 property.put(ITEMS_KEY, items);
@@ -316,7 +318,7 @@ public class ModelGenerator {
     /**
      * Processes the nodes.
      */
-    private JSONObject processChildren(final Iterable<DataSchemaNode> nodes, final String moduleName, final JSONObject models,
+    private JSONObject processChildren(final Iterable<DataSchemaNode> nodes, final String parentName, final JSONObject models,
                                        final boolean isConfig, final SchemaContext schemaContext)
             throws JSONException, IOException {
         final JSONObject properties = new JSONObject();
@@ -328,20 +330,20 @@ public class ModelGenerator {
                     property = processLeafNode((LeafSchemaNode) node);
 
                 } else if (node instanceof ListSchemaNode) {
-                    property = processDataNodeContainer((ListSchemaNode) node, moduleName, models, isConfig,
+                    property = processDataNodeContainer((ListSchemaNode) node, parentName, models, isConfig,
                             schemaContext);
 
                 } else if (node instanceof LeafListSchemaNode) {
                     property = processLeafListNode((LeafListSchemaNode) node);
 
                 } else if (node instanceof ChoiceSchemaNode) {
-                    property = processChoiceNode((ChoiceSchemaNode) node, moduleName, models, schemaContext);
+                    property = processChoiceNode((ChoiceSchemaNode) node, parentName, models, schemaContext);
 
                 } else if (node instanceof AnyXmlSchemaNode) {
                     property = processAnyXMLNode((AnyXmlSchemaNode) node);
 
                 } else if (node instanceof ContainerSchemaNode) {
-                    property = processDataNodeContainer((ContainerSchemaNode) node, moduleName, models, isConfig,
+                    property = processDataNodeContainer((ContainerSchemaNode) node, parentName, models, isConfig,
                             schemaContext);
 
                 } else {
@@ -368,15 +370,15 @@ public class ModelGenerator {
         return props;
     }
 
-    private JSONObject processChoiceNode(final ChoiceSchemaNode choiceNode, final String moduleName, final JSONObject models,
-            final SchemaContext schemaContext) throws JSONException, IOException {
+    private JSONObject processChoiceNode(final ChoiceSchemaNode choiceNode, final String parentName, final JSONObject models,
+                                         final SchemaContext schemaContext) throws JSONException, IOException {
 
         final Set<ChoiceCaseNode> cases = choiceNode.getCases();
 
         final JSONArray choiceProps = new JSONArray();
         for (final ChoiceCaseNode choiceCase : cases) {
             final String choiceName = choiceCase.getQName().getLocalName();
-            final JSONObject choiceProp = processChildren(choiceCase.getChildNodes(), moduleName, models, schemaContext);
+            final JSONObject choiceProp = processChildren(choiceCase.getChildNodes(), parentName, models, schemaContext);
             final JSONObject choiceObj = new JSONObject();
             choiceObj.put(choiceName, choiceProp);
             choiceObj.put(TYPE_KEY, OBJECT_TYPE);
