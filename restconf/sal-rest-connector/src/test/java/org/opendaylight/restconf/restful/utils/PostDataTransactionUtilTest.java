@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import com.google.common.base.Optional;
+
 import com.google.common.util.concurrent.Futures;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -38,7 +38,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -125,7 +124,7 @@ public class PostDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext = new InstanceIdentifierContext<>(this.iid2, null, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
-        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(this.read).read(LogicalDatastoreType.CONFIGURATION, this.iid2);
+        doReturn(Futures.immediateCheckedFuture(false)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         final YangInstanceIdentifier.NodeIdentifier identifier = ((ContainerNode) ((SingletonSet) payload.getData().getValue()).iterator().next()).getIdentifier();
         final YangInstanceIdentifier node = payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
         doReturn(Futures.immediateCheckedFuture(false)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
@@ -134,8 +133,8 @@ public class PostDataTransactionUtilTest {
         final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain);
         final Response response = PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx);
         assertEquals(201, response.getStatus());
-        verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
-        verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, (NormalizedNode<?, ?>) ((SingletonSet) payload.getData().getValue()).iterator().next());
+        verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
+        verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
     }
 
     @Test
@@ -143,7 +142,6 @@ public class PostDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext = new InstanceIdentifierContext<>(this.iid2, null, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildList);
 
-        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(this.read).read(LogicalDatastoreType.CONFIGURATION, this.iid2);
         final MapNode data = (MapNode) payload.getData();
         final YangInstanceIdentifier.NodeIdentifierWithPredicates identifier = data.getValue().iterator().next().getIdentifier();
         final YangInstanceIdentifier node = payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
@@ -162,7 +160,7 @@ public class PostDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext = new InstanceIdentifierContext<>(this.iid2, null, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
-        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(this.read).read(LogicalDatastoreType.CONFIGURATION, this.iid2);
+        doReturn(Futures.immediateCheckedFuture(false)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         final YangInstanceIdentifier.NodeIdentifier identifier = ((ContainerNode) ((SingletonSet) payload.getData().getValue()).iterator().next()).getIdentifier();
         final YangInstanceIdentifier node = payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
         doReturn(Futures.immediateCheckedFuture(false)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
@@ -172,8 +170,8 @@ public class PostDataTransactionUtilTest {
         final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain);
         final Response response = PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx);
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR, response.getStatusInfo());
-        verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
-        verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, (NormalizedNode<?, ?>) ((SingletonSet) payload.getData().getValue()).iterator().next());
+        verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, iid2);
+        verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
     }
 
 }
