@@ -8,89 +8,77 @@
 
 package org.opendaylight.restconf.restful.services.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import java.util.Iterator;
+import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.Futures;
+import javax.ws.rs.core.UriInfo;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
+import org.opendaylight.restconf.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 public class RestconfInvokeOperationsServiceImplTest {
 
-    private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/streams";
+    private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/invoke-rpc";
 
-    @Test
-    public void testInvokeRpc() throws Exception {
+    private RestconfInvokeOperationsServiceImpl invokeOperationsService;
+
+    @Mock
+    private RpcServiceHandler rpcServiceHandler;
+
+    @Mock
+    private DOMRpcService rpcService;
+
+    @Before
+    public void setup() throws Exception {
+        MockitoAnnotations.initMocks(this);
         final SchemaContextRef contextRef = new SchemaContextRef(TestRestconfUtils.loadSchemaContext(PATH_FOR_NEW_SCHEMA_CONTEXT));
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler();
         schemaContextHandler.onGlobalContextUpdated(contextRef.get());
-        final RestconfInvokeOperationsServiceImpl invokeOperationsService = new RestconfInvokeOperationsServiceImpl(null, schemaContextHandler);
+        this.invokeOperationsService =
+                new RestconfInvokeOperationsServiceImpl(this.rpcServiceHandler, schemaContextHandler);
+        Mockito.when(this.rpcServiceHandler.get()).thenReturn(this.rpcService);
+    }
 
-        final QName qname = QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toasterStatus");
-        final QName qname1 = QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster");
-        final QName rpcQnameInput = QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "2014-01-14", "input");
-        final QName inputQname = QName.create(rpcQnameInput, "path");
-        final YangInstanceIdentifier iid = YangInstanceIdentifier.builder()
-                .node(rpcQnameInput)
-                .build();
-        final YangInstanceIdentifier iidAsLeafValue = YangInstanceIdentifier.builder()
-                .node(qname1)
-                .node(qname)
-                .build();
+    @Test
+    public void testInvokeRpc() throws Exception {
+        final String identifier = "invoke-rpc-module:rpcTest";
+        final NormalizedNode result = Mockito.mock(NormalizedNode.class);
+        final NormalizedNodeContext payload = prepNNC(result);
+        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
 
-        final LeafNode contentLeaf = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(inputQname))
-                .withValue(iidAsLeafValue)
-                .build();
-        final ContainerNode input = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(rpcQnameInput))
-                .withChild(contentLeaf)
-                .build();
-        final Iterator<RpcDefinition> iterator = contextRef.get().getOperations().iterator();
-        RpcDefinition rpcDef = null;
-        while (iterator.hasNext()) {
-            rpcDef = iterator.next();
-            if ("create-data-change-event-subscription".equals(rpcDef.getQName().getLocalName())) {
-                break;
-            }
-        }
+        final NormalizedNodeContext rpc = this.invokeOperationsService.invokeRpc(identifier, payload, uriInfo);
+        Assert.assertEquals(result, rpc.getData());
+    }
 
-        final InstanceIdentifierContext<RpcDefinition> iidContext = new InstanceIdentifierContext<>(iid, rpcDef, null, contextRef.get());
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, input);
-        final NormalizedNodeContext context = invokeOperationsService.invokeRpc(null, payload, null);
-
-        final QName rpcQnameOutput = QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "2014-01-14", "output");
-        final QName outputQname = QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "2014-01-14", "stream-name");
-        final LeafNode contentLeaf2 = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(outputQname))
-                .withValue("toaster:toaster/toasterStatus/datastore=CONFIGURATION/scope=BASE")
-                .build();
-        final ContainerNode output = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(rpcQnameOutput))
-                .withChild(contentLeaf2)
-                .build();
-        final InstanceIdentifierContext<RpcDefinition> iidContextResult = new InstanceIdentifierContext<>(null, rpcDef, null, contextRef.get());
-        final NormalizedNodeContext payloadResult = new NormalizedNodeContext(iidContextResult, output);
-
-        assertNotNull(context);
-        assertEquals(payloadResult.getData(), context.getData());
-        assertEquals(payloadResult.getInstanceIdentifierContext().getSchemaNode(),
-                context.getInstanceIdentifierContext().getSchemaNode());
-        assertEquals(payloadResult.getInstanceIdentifierContext().getSchemaContext(),
-                context.getInstanceIdentifierContext().getSchemaContext());
-        assertNull(context.getInstanceIdentifierContext().getMountPoint());
-        assertNull(context.getInstanceIdentifierContext().getInstanceIdentifier());
+    private NormalizedNodeContext prepNNC(final NormalizedNode result) {
+        final InstanceIdentifierContext context = Mockito.mock(InstanceIdentifierContext.class);
+        final RpcDefinition schemaNode = Mockito.mock(RpcDefinition.class);
+        final QName qname = QName.create("invoke:rpc:module", "2013-12-3", "rpcTest");
+        final SchemaPath schemaPath = SchemaPath.create(true, qname);
+        Mockito.when(schemaNode.getPath()).thenReturn(schemaPath);
+        Mockito.when(schemaNode.getQName()).thenReturn(qname);
+        Mockito.when(context.getSchemaNode()).thenReturn(schemaNode);
+        final NormalizedNode<?, ?> data = Mockito.mock(NormalizedNode.class);
+        final DOMRpcResult domRpcResult = Mockito.mock(DOMRpcResult.class);
+        final CheckedFuture<DOMRpcResult, DOMRpcException> checkdFuture = Futures.immediateCheckedFuture(domRpcResult);
+        Mockito.when(this.rpcService.invokeRpc(schemaPath, data)).thenReturn(checkdFuture);
+        Mockito.when(domRpcResult.getResult()).thenReturn(result);
+        return new NormalizedNodeContext(context, data);
     }
 
 }
