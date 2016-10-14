@@ -17,12 +17,12 @@ import io.netty.util.internal.ConcurrentSet;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -42,6 +42,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 import org.json.JSONObject;
 import org.json.XML;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataChangeEvent;
@@ -63,6 +66,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWrit
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlDocumentUtils;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
@@ -70,6 +74,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 
 /**
  * {@link ListenerAdapter} is responsible to track events, which occurred by changing data in data source.
@@ -92,6 +97,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
     private final NotificationOutputType outputType;
     private Date start = null;
     private Date stop = null;
+    private String filter = null;
 
     /**
      * Creates new {@link ListenerAdapter} listener specified by path and stream
@@ -121,7 +127,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
         final Date now = new Date();
         if (this.stop != null) {
             if ((this.start.compareTo(now) < 0) && (this.stop.compareTo(now) > 0)) {
-                prepareAndPostData(change);
+                checkFilter(change);
             }
             if (this.stop.compareTo(now) < 0) {
                 try {
@@ -133,17 +139,57 @@ public class ListenerAdapter implements DOMDataChangeListener {
         } else if (this.start != null) {
             if (this.start.compareTo(now) < 0) {
                 this.start = null;
-                prepareAndPostData(change);
+                checkFilter(change);
             }
         } else {
-            prepareAndPostData(change);
+            checkFilter(change);
         }
     }
 
-    private void prepareAndPostData(final AsyncDataChangeEvent<YangInstanceIdentifier, NormalizedNode<?, ?>> change) {
-        if (!change.getCreatedData().isEmpty() || !change.getUpdatedData().isEmpty()
-                || !change.getRemovedPaths().isEmpty()) {
-            final String xml = prepareXmlFrom(change);
+    /**
+     * Check if is filter used and then prepare and post data do client
+     *
+     * @param change
+     *            - data of notification
+     */
+    private void checkFilter(final AsyncDataChangeEvent<YangInstanceIdentifier, NormalizedNode<?, ?>> change) {
+        final String xml = prepareXmlFrom(change);
+        if (this.filter == null) {
+            prepareAndPostData(xml);
+        } else {
+            try {
+                if (parseFilter(xml)) {
+                    prepareAndPostData(xml);
+                }
+            } catch (final Exception e) {
+                throw new RestconfDocumentedException("Problem while parsing filter.", e);
+            }
+        }
+    }
+
+    /**
+     * Parse and evaluate filter value by xml
+     *
+     * @param xml
+     *            - notification data in xml
+     * @return true or false - depends on filter expression and data of
+     *         notifiaction
+     * @throws Exception
+     */
+    private boolean parseFilter(final String xml) throws Exception {
+        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        final DocumentBuilder builder = factory.newDocumentBuilder();
+        final Document docOfXml = builder.parse(new InputSource(new StringReader(xml)));
+        final XPath xPath = XPathFactory.newInstance().newXPath();
+        return (boolean) xPath.compile(this.filter).evaluate(docOfXml, XPathConstants.BOOLEAN);
+    }
+
+    /**
+     * Prepare data of notification and data to client
+     *
+     * @param xml
+     */
+    private void prepareAndPostData(final String xml) {
             final Event event = new Event(EventType.NOTIFY);
             if (this.outputType.equals(NotificationOutputType.JSON)) {
                 final JSONObject jsonObject = XML.toJSONObject(xml);
@@ -152,7 +198,6 @@ public class ListenerAdapter implements DOMDataChangeListener {
                 event.setData(xml);
             }
             this.eventBus.post(event);
-        }
     }
 
     /**
@@ -499,24 +544,21 @@ public class ListenerAdapter implements DOMDataChangeListener {
      *            {@link Element}
      */
     private void addPathAsValueToElement(final YangInstanceIdentifier path, final Element element) {
-        // Map< key = namespace, value = prefix>
-        final Map<String, String> prefixes = new HashMap<>();
         final YangInstanceIdentifier normalizedPath = ControllerContext.getInstance().toXpathRepresentation(path);
         final StringBuilder textContent = new StringBuilder();
 
-        // FIXME: BUG-1281: this is duplicated code from yangtools (BUG-1275)
         for (final PathArgument pathArgument : normalizedPath.getPathArguments()) {
             if (pathArgument instanceof YangInstanceIdentifier.AugmentationIdentifier) {
                 continue;
             }
             textContent.append("/");
-            writeIdentifierWithNamespacePrefix(element, textContent, pathArgument.getNodeType(), prefixes);
+            writeIdentifierWithNamespacePrefix(element, textContent, pathArgument.getNodeType());
             if (pathArgument instanceof NodeIdentifierWithPredicates) {
                 final Map<QName, Object> predicates = ((NodeIdentifierWithPredicates) pathArgument).getKeyValues();
                 for (final QName keyValue : predicates.keySet()) {
                     final String predicateValue = String.valueOf(predicates.get(keyValue));
                     textContent.append("[");
-                    writeIdentifierWithNamespacePrefix(element, textContent, keyValue, prefixes);
+                    writeIdentifierWithNamespacePrefix(element, textContent, keyValue);
                     textContent.append("='");
                     textContent.append(predicateValue);
                     textContent.append("'");
@@ -541,21 +583,13 @@ public class ListenerAdapter implements DOMDataChangeListener {
      *            StringBuilder
      * @param qName
      *            QName
-     * @param prefixes
-     *            Map of namespaces and prefixes.
      */
     private static void writeIdentifierWithNamespacePrefix(final Element element, final StringBuilder textContent,
-            final QName qName, final Map<String, String> prefixes) {
-        final String namespace = qName.getNamespace().toString();
-        String prefix = prefixes.get(namespace);
-        if (prefix == null) {
-            prefix = generateNewPrefix(prefixes.values());
-        }
+            final QName qName) {
+        final Module module = ControllerContext.getInstance().getGlobalSchema()
+                .findModuleByNamespaceAndRevision(qName.getNamespace(), qName.getRevision());
 
-        element.setAttribute("xmlns:" + prefix, namespace);
-        textContent.append(prefix);
-        prefixes.put(namespace, prefix);
-
+        textContent.append(module.getName());
         textContent.append(":");
         textContent.append(qName.getLocalName());
     }
@@ -701,10 +735,13 @@ public class ListenerAdapter implements DOMDataChangeListener {
      *            - start-time of getting notification
      * @param stop
      *            - stop-time of getting notification
+     * @param filter
+     *            - indicate which subset of all possible events are of interest
      */
-    public void setTimer(final Date start, final Date stop) {
+    public void setQueryParams(final Date start, final Date stop, final String filter) {
         this.start = start;
         this.stop = stop;
+        this.filter = filter;
     }
 
 }

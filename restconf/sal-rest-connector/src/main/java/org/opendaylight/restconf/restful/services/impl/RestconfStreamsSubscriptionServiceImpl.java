@@ -56,8 +56,10 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     public NormalizedNodeContext subscribeToStream(final String identifier, final UriInfo uriInfo) {
         boolean startTime_used = false;
         boolean stopTime_used = false;
+        boolean filter_used = false;
         Date start = null;
         Date stop = null;
+        String filter = null;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             switch (entry.getKey()) {
@@ -77,6 +79,12 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                         throw new RestconfDocumentedException("Stop-time parameter can be used only once.");
                     }
                     break;
+                case "filter":
+                    if (!filter_used) {
+                        filter_used = true;
+                        filter = entry.getValue().iterator().next();
+                    }
+                    break;
                 default:
                     throw new RestconfDocumentedException("Bad parameter used with notifications: " + entry.getKey());
             }
@@ -86,10 +94,11 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         }
         URI response = null;
         if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCR)) {
-            response = SubscribeToStreamUtil.dataSubs(identifier, uriInfo, start, stop, this.domDataBrokerHandler);
+            response =
+                    SubscribeToStreamUtil.dataSubs(identifier, uriInfo, start, stop, this.domDataBrokerHandler, filter);
         } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
             response = SubscribeToStreamUtil.notifStream(identifier, uriInfo, start, stop,
-                    this.notificationServiceHandler);
+                    this.notificationServiceHandler, filter);
         }
 
         if (response != null) {
