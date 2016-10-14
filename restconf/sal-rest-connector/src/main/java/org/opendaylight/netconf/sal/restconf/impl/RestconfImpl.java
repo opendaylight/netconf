@@ -1060,8 +1060,10 @@ public class RestconfImpl implements RestconfService {
     public NormalizedNodeContext subscribeToStream(final String identifier, final UriInfo uriInfo) {
         boolean startTime_used = false;
         boolean stopTime_used = false;
+        boolean filter_used = false;
         Date start = null;
         Date stop = null;
+        String filter = null;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             switch (entry.getKey()) {
@@ -1081,6 +1083,14 @@ public class RestconfImpl implements RestconfService {
                         throw new RestconfDocumentedException("Stop-time parameter can be used only once.");
                     }
                     break;
+                case "filter":
+                    if (!filter_used) {
+                        filter_used = true;
+                        filter = entry.getValue().iterator().next();
+                    } else {
+                        throw new RestconfDocumentedException("Filter parameter can be used only once.");
+                    }
+                    break;
                 default:
                     throw new RestconfDocumentedException("Bad parameter used with notifications: " + entry.getKey());
             }
@@ -1090,9 +1100,9 @@ public class RestconfImpl implements RestconfService {
         }
         URI response = null;
         if (identifier.contains(DATA_SUBSCR)) {
-            response = dataSubs(identifier, uriInfo, start, stop);
+            response = dataSubs(identifier, uriInfo, start, stop, filter);
         } else if (identifier.contains(NOTIFICATION_STREAM)) {
-            response = notifStream(identifier, uriInfo, start, stop);
+            response = notifStream(identifier, uriInfo, start, stop, filter);
         }
 
         if(response != null){
@@ -1170,9 +1180,12 @@ public class RestconfImpl implements RestconfService {
      *            - stop-time of getting notification
      * @param start
      *            - start-time of getting notification
-     * @return {@link Response}
+     * @param filter
+     *            - indicate wh ich subset of allpossible events are of interest
+     * @return {@link URI} of location
      */
-    private URI notifStream(final String identifier, final UriInfo uriInfo, final Date start, final Date stop) {
+    private URI notifStream(final String identifier, final UriInfo uriInfo, final Date start, final Date stop,
+            final String filter) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -1185,7 +1198,7 @@ public class RestconfImpl implements RestconfService {
 
         for (final NotificationListenerAdapter listener : listeners) {
             this.broker.registerToListenNotification(listener);
-            listener.setTime(start, stop);
+            listener.setQueryParams(start, stop, filter);
         }
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
@@ -1213,9 +1226,12 @@ public class RestconfImpl implements RestconfService {
      *            - start-time of getting notification
      * @param start
      *            - stop-time of getting notification
-     * @return {@link Response}
+     * @param filter
+     *            - indicate which subset of all possible events are of interest
+     * @return {@link URI} of location
      */
-    private URI dataSubs(final String identifier, final UriInfo uriInfo, final Date start, final Date stop) {
+    private URI dataSubs(final String identifier, final UriInfo uriInfo, final Date start, final Date stop,
+            final String filter) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -1225,7 +1241,7 @@ public class RestconfImpl implements RestconfService {
         if (listener == null) {
             throw new RestconfDocumentedException("Stream was not found.", ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
         }
-        listener.setTimer(start, stop);
+        listener.setQueryParams(start, stop, filter);
 
         final Map<String, String> paramToValues = resolveValuesFromUri(identifier);
         final LogicalDatastoreType datastore = parserURIEnumParameter(LogicalDatastoreType.class,
