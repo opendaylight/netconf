@@ -16,6 +16,7 @@ import org.opendaylight.controller.md.sal.common.api.data.TransactionChain;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.sal.core.api.Broker.ProviderSession;
 import org.opendaylight.controller.sal.core.api.Provider;
@@ -25,6 +26,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.restconf.common.wrapper.services.ServicesWrapperImpl;
 import org.opendaylight.restconf.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
@@ -82,8 +84,13 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         final DOMRpcService rpcService = session.getService(DOMRpcService.class);
         final RpcServiceHandler rpcServiceHandler = new RpcServiceHandler(rpcService);
 
+        final DOMNotificationService notificationService = session.getService(DOMNotificationService.class);
+        final NotificationServiceHandler notificationServiceHandler =
+                new NotificationServiceHandler(notificationService);
+
         wrapperServices.setHandlers(schemaCtxHandler, RestConnectorProvider.mountPointServiceHandler,
-                RestConnectorProvider.transactionChainHandler, brokerHandler, rpcServiceHandler);
+                RestConnectorProvider.transactionChainHandler, brokerHandler, rpcServiceHandler,
+                notificationServiceHandler);
     }
 
     /**

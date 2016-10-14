@@ -38,6 +38,7 @@ import org.json.XML;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -74,6 +75,8 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
 
     private final SchemaPath path;
     private final String outputType;
+    private Date start = null;
+    private Date stop = null;
 
     /**
      * Set path of listener and stream name, register event bus.
@@ -98,6 +101,32 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
 
     @Override
     public void onNotification(final DOMNotification notification) {
+        final Date now = new Date();
+        if (this.stop != null) {
+            if ((this.start.compareTo(now) < 0) && (this.stop.compareTo(now) > 0)) {
+                prepareAndPostData(notification);
+            }
+            if (this.stop.compareTo(now) < 0) {
+                try {
+                    this.close();
+                } catch (final Exception e) {
+                    throw new RestconfDocumentedException("Problem with unregister listener." + e);
+                }
+            }
+        } else if (this.start != null) {
+            if (this.start.compareTo(now) < 0) {
+                this.start = null;
+                prepareAndPostData(notification);
+            }
+        } else {
+            prepareAndPostData(notification);
+        }
+    }
+
+    /**
+     * @param notification
+     */
+    private void prepareAndPostData(final DOMNotification notification) {
         final String xml = prepareXmlFrom(notification);
         final Event event = new Event(EventType.NOTIFY);
         if (this.outputType.equals("JSON")) {
@@ -385,5 +414,18 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
      */
     private enum EventType {
         REGISTER, DEREGISTER, NOTIFY
+    }
+
+    /**
+     * Set query parameters for listener
+     *
+     * @param start
+     *            - start-time of getting notification
+     * @param stop
+     *            - stop-time of getting notification
+     */
+    public void setTime(final Date start, final Date stop) {
+        this.start = start;
+        this.stop = stop;
     }
 }

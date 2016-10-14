@@ -16,6 +16,7 @@ import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.restconf.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
@@ -148,7 +149,7 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
     }
 
     @Override
-    public Response subscribeToStream(final String identifier, final UriInfo uriInfo) {
+    public NormalizedNodeContext subscribeToStream(final String identifier, final UriInfo uriInfo) {
         return this.delegRestconfSubscrService.subscribeToStream(identifier, uriInfo);
     }
 
@@ -156,7 +157,7 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
                             final DOMMountPointServiceHandler domMountPointServiceHandler,
                             final TransactionChainHandler transactionChainHandler,
                             final DOMDataBrokerHandler domDataBrokerHandler,
-                            final RpcServiceHandler rpcServiceHandler) {
+            final RpcServiceHandler rpcServiceHandler, final NotificationServiceHandler notificationServiceHandler) {
         this.delegRestModService = new RestconfModulesServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
         this.delegRestOpsService = new RestconfOperationsServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
         this.delegRestSchService = new RestconfSchemaServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
@@ -165,6 +166,8 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
                 domMountPointServiceHandler);
         this.delegRestconfInvokeOpsService = new RestconfInvokeOperationsServiceImpl(rpcServiceHandler,
                 schemaCtxHandler);
-        this.delegRestconfSubscrService = new RestconfStreamsSubscriptionServiceImpl(domDataBrokerHandler);
+        this.delegRestconfSubscrService =
+                new RestconfStreamsSubscriptionServiceImpl(domDataBrokerHandler, notificationServiceHandler,
+                        schemaCtxHandler);
     }
 }
