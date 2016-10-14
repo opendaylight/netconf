@@ -7,10 +7,6 @@
  */
 package org.opendaylight.restconf.parser.builder;
 
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +17,7 @@ import org.opendaylight.restconf.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.restconf.utils.schema.context.RestconfSchemaUtil;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
@@ -28,7 +25,12 @@ import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Deserializer for {@link String} to {@link YangInstanceIdentifier} for
@@ -63,9 +65,13 @@ public final class YangInstanceIdentifierDeserializer {
 
             // this is the last identifier (input is consumed) or end of identifier (slash)
             if (allCharsConsumed(variables)
-                    || currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH) {
+                    || (currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH)) {
                 prepareIdentifier(qname, path, variables);
-                path.add(variables.getCurrent().getIdentifier());
+                if (variables.getCurrent() == null) {
+                    path.add(NodeIdentifier.create(qname));
+                } else {
+                    path.add(variables.getCurrent().getIdentifier());
+                }
             } else if (currentChar(variables.getOffset(),
                     variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL) {
                 if (nextContextNode(qname, path, variables).getDataSchemaNode() instanceof ListSchemaNode) {
@@ -96,8 +102,8 @@ public final class YangInstanceIdentifierDeserializer {
         skipCurrentChar(variables);
 
         // read key value separated by comma
-        while (keys.hasNext() && !allCharsConsumed(variables) && currentChar(variables.getOffset(),
-                variables.getData()) != RestconfConstants.SLASH) {
+        while (keys.hasNext() && !allCharsConsumed(variables) && (currentChar(variables.getOffset(),
+                variables.getData()) != RestconfConstants.SLASH)) {
 
             // empty key value
             if (currentChar(variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.COMMA) {
@@ -120,8 +126,8 @@ public final class YangInstanceIdentifierDeserializer {
                     ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE, variables)));
 
             // skip comma
-            if (keys.hasNext() && !allCharsConsumed(variables) && currentChar(
-                    variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.COMMA) {
+            if (keys.hasNext() && !allCharsConsumed(variables) && (currentChar(
+                    variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.COMMA)) {
                 skipCurrentChar(variables);
             }
         }
@@ -129,7 +135,7 @@ public final class YangInstanceIdentifierDeserializer {
         // the last key is considered to be empty
         if (keys.hasNext()) {
             if (allCharsConsumed(variables)
-                    || currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH) {
+                    || (currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH)) {
                 values.put(keys.next(), ParserBuilderConstants.Deserializer.EMPTY_STRING);
             }
 
@@ -173,8 +179,8 @@ public final class YangInstanceIdentifierDeserializer {
                         variables.getOffset());
                 localName = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
 
-                if (!allCharsConsumed(variables) && currentChar
-                        (variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL) {
+                if (!allCharsConsumed(variables) && (currentChar
+                        (variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL)) {
                     return getQNameOfDataSchemaNode(localName, variables);
                 } else {
                     final Module module = moduleForPrefix(prefix, variables.getSchemaContext());
@@ -222,6 +228,9 @@ public final class YangInstanceIdentifierDeserializer {
     private static void prepareIdentifier(final QName qname, final List<PathArgument> path,
             final MainVarsWrapper variables) {
         final DataSchemaContextNode<?> currentNode = nextContextNode(qname, path, variables);
+        if (currentNode == null) {
+            return;
+        }
         checkValid(!currentNode.isKeyedEntry(), "Entry " + qname + " requires key or value predicate to be present",
                 variables.getData(), variables.getOffset());
     }
@@ -230,6 +239,14 @@ public final class YangInstanceIdentifierDeserializer {
             final MainVarsWrapper variables) {
         variables.setCurrent(variables.getCurrent().getChild(qname));
         DataSchemaContextNode<?> current = variables.getCurrent();
+        if (current == null) {
+            for (final RpcDefinition rpcDefinition : variables.getSchemaContext()
+                    .findModuleByNamespaceAndRevision(qname.getNamespace(), qname.getRevision()).getRpcs()) {
+                if (rpcDefinition.getQName().getLocalName().equals(qname.getLocalName())) {
+                    return null;
+                }
+            }
+        }
         checkValid(current != null, qname + " is not correct schema node identifier.", variables.getData(),
                 variables.getOffset());
         while (current.isMixin()) {
@@ -320,14 +337,15 @@ public final class YangInstanceIdentifierDeserializer {
 
         private final SchemaContext schemaContext;
         private final String data;
+
         private DataSchemaContextNode<?> current;
         private int offset;
 
         public MainVarsWrapper(final String data, final DataSchemaContextNode<?> current, final int offset,
                 final SchemaContext schemaContext) {
             this.data = data;
-            this.setCurrent(current);
-            this.setOffset(offset);
+            this.current = current;
+            this.offset = offset;
             this.schemaContext = schemaContext;
         }
 
