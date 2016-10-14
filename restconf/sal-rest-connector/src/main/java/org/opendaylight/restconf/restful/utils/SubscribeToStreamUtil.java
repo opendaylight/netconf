@@ -153,10 +153,12 @@ public final class SubscribeToStreamUtil {
      *            - stop-time query parameter
      * @param notifiServiceHandler
      *            - DOMNotificationService handler for register listeners
+     * @param filter
+     *            - indicate which subset of all possible events are of interest
      * @return location for listening
      */
     public static URI notifStream(final String identifier, final UriInfo uriInfo, final Date start, final Date stop,
-            final NotificationServiceHandler notifiServiceHandler) {
+            final NotificationServiceHandler notifiServiceHandler, final String filter) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -169,7 +171,7 @@ public final class SubscribeToStreamUtil {
 
         for (final NotificationListenerAdapter listener : listeners) {
             registerToListenNotification(listener, notifiServiceHandler);
-            listener.setTime(start, stop);
+            listener.setQueryParams(start, stop, filter);
         }
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
@@ -232,10 +234,12 @@ public final class SubscribeToStreamUtil {
      *            - stop-time query parameter
      * @param domDataBrokerHandler
      *            - DOMDataBroker handler for register listener
+     * @param filter
+     *            - indicate which subset of all possible events are of interest
      * @return location for listening
      */
     public static URI dataSubs(final String identifier, final UriInfo uriInfo, final Date start, final Date stop,
-            final DOMDataBrokerHandler domDataBrokerHandler) {
+            final DOMDataBrokerHandler domDataBrokerHandler, final String filter) {
         final Map<String, String> mapOfValues = SubscribeToStreamUtil.mapValuesFromUri(identifier);
 
         final LogicalDatastoreType ds = SubscribeToStreamUtil.parseURIEnum(LogicalDatastoreType.class,
@@ -259,7 +263,7 @@ public final class SubscribeToStreamUtil {
         final ListenerAdapter listener = Notificator.getListenerFor(streamName);
         Preconditions.checkNotNull(listener, "Listener doesn't exist : " + streamName);
 
-        listener.setTimer(start, stop);
+        listener.setQueryParams(start, stop, filter);
 
         SubscribeToStreamUtil.registration(ds, scope, listener, domDataBrokerHandler.get());
 
