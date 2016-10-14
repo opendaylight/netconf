@@ -7,9 +7,6 @@
  */
 package org.opendaylight.restconf.utils.parser;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
@@ -30,10 +27,14 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 /**
  * Util class for parsing identifier
@@ -59,14 +60,25 @@ public final class ParserIdentifier {
     public static InstanceIdentifierContext<?> toInstanceIdentifier(@Nullable final String identifier,
             final SchemaContext schemaContext) {
         final YangInstanceIdentifier deserialize;
-        if (identifier != null && identifier.contains(RestconfConstants.MOUNT)) {
+        if ((identifier != null) && identifier.contains(RestconfConstants.MOUNT)) {
             final String mountPointId = identifier.substring(0, identifier.indexOf("/" + RestconfConstants.MOUNT));
             deserialize = IdentifierCodec.deserialize(mountPointId, schemaContext);
         } else {
             deserialize = IdentifierCodec.deserialize(identifier, schemaContext);
         }
         final DataSchemaContextNode<?> child = DataSchemaContextTree.from(schemaContext).getChild(deserialize);
-        return new InstanceIdentifierContext<SchemaNode>(deserialize, child.getDataSchemaNode(), null, schemaContext);
+        if(child != null){
+            return new InstanceIdentifierContext<SchemaNode>(deserialize, child.getDataSchemaNode(), null, schemaContext);
+        }
+        final QName rpcQName = deserialize.getLastPathArgument().getNodeType();
+        RpcDefinition def = null;
+        for (final RpcDefinition rpcDefinition : schemaContext.findModuleByNamespaceAndRevision(rpcQName.getNamespace(), rpcQName.getRevision()).getRpcs()) {
+            if (rpcDefinition.getQName().getLocalName().equals(rpcQName.getLocalName())) {
+                def = rpcDefinition;
+                break;
+            }
+        }
+        return new InstanceIdentifierContext<RpcDefinition>(deserialize, def, null, schemaContext);
     }
 
     /**
