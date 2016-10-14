@@ -23,8 +23,12 @@ import com.google.common.util.concurrent.Futures;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.text.ParseException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
@@ -173,6 +177,10 @@ public class RestconfImplTest {
         when(uriBuilder.build()).thenReturn(new URI(""));
         when(uriBuilder.scheme("ws")).thenReturn(uriBuilder);
         when(uriInfo.getAbsolutePathBuilder()).thenReturn(uriBuilder);
+        final MultivaluedMap<String, String> map = mock(MultivaluedMap.class);
+        final Set<Entry<String, List<String>>> set = new HashSet<>();
+        when(map.entrySet()).thenReturn(set);
+        when(uriInfo.getQueryParameters()).thenReturn(map);
 
         final BrokerFacade brokerFacade = mock(BrokerFacade.class);
         this.restconfImpl.setBroker(brokerFacade);

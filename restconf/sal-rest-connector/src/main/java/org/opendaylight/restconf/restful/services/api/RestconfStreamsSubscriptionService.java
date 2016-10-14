@@ -12,8 +12,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 
 /**
  * Subscribing to streams
@@ -28,9 +28,10 @@ public interface RestconfStreamsSubscriptionService {
      *            - name of stream
      * @param uriInfo
      *            - URI info
-     * @return {@link Response}
+     * @return {@link NormalizedNodeContext}
      */
     @GET
     @Path("data/ietf-restconf-monitoring:restconf-state/streams/stream/{identifier:.+}")
-    Response subscribeToStream(@Encoded @PathParam("identifier") String identifier, @Context UriInfo uriInfo);
+    NormalizedNodeContext subscribeToStream(@Encoded @PathParam("identifier") String identifier,
+            @Context UriInfo uriInfo);
 }

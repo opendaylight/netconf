@@ -47,6 +47,7 @@ import org.json.XML;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataChangeEvent;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -89,6 +90,8 @@ public class ListenerAdapter implements DOMDataChangeListener {
     private final EventBus eventBus;
     private final EventBusChangeRecorder eventBusChangeRecorder;
     private final NotificationOutputType outputType;
+    private Date start = null;
+    private Date stop = null;
 
     /**
      * Creates new {@link ListenerAdapter} listener specified by path and stream
@@ -115,6 +118,29 @@ public class ListenerAdapter implements DOMDataChangeListener {
 
     @Override
     public void onDataChanged(final AsyncDataChangeEvent<YangInstanceIdentifier, NormalizedNode<?, ?>> change) {
+        final Date now = new Date();
+        if (this.stop != null) {
+            if ((this.start.compareTo(now) < 0) && (this.stop.compareTo(now) > 0)) {
+                prepareAndPostData(change);
+            }
+            if (this.stop.compareTo(now) < 0) {
+                try {
+                    this.close();
+                } catch (final Exception e) {
+                    throw new RestconfDocumentedException("Problem with unregister listener." + e);
+                }
+            }
+        } else if (this.start != null) {
+            if (this.start.compareTo(now) < 0) {
+                this.start = null;
+                prepareAndPostData(change);
+            }
+        } else {
+            prepareAndPostData(change);
+        }
+    }
+
+    private void prepareAndPostData(final AsyncDataChangeEvent<YangInstanceIdentifier, NormalizedNode<?, ?>> change) {
         if (!change.getCreatedData().isEmpty() || !change.getUpdatedData().isEmpty()
                 || !change.getRemovedPaths().isEmpty()) {
             final String xml = prepareXmlFrom(change);
@@ -666,6 +692,19 @@ public class ListenerAdapter implements DOMDataChangeListener {
         private Operation(final String value) {
             this.value = value;
         }
+    }
+
+    /**
+     * Set query parameters for listener
+     *
+     * @param start
+     *            - start-time of getting notification
+     * @param stop
+     *            - stop-time of getting notification
+     */
+    public void setTimer(final Date start, final Date stop) {
+        this.start = start;
+        this.stop = stop;
     }
 
 }

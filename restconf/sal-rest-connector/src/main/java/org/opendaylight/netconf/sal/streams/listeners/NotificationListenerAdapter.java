@@ -18,13 +18,9 @@ import io.netty.util.internal.ConcurrentSet;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import javax.xml.stream.XMLOutputFactory;
@@ -38,6 +34,7 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.json.JSONObject;
+import org.json.XML;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
@@ -50,9 +47,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlDocumentUtils;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -74,16 +68,15 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
     private static final TransformerFactory FACTORY = TransformerFactory.newInstance();
 
     private final String streamName;
+    private ListenerRegistration<DOMNotificationListener> registration;
+    private Set<Channel> subscribers = new ConcurrentSet<>();
     private final EventBus eventBus;
     private final EventBusChangeRecorder eventBusChangeRecorder;
 
     private final SchemaPath path;
     private final String outputType;
-
-    private SchemaContext schemaContext;
-    private DOMNotification notification;
-    private ListenerRegistration<DOMNotificationListener> registration;
-    private Set<Channel> subscribers = new ConcurrentSet<>();
+    private Date start = null;
+    private Date stop = null;
 
     /**
      * Set path of listener and stream name, register event bus.
@@ -108,42 +101,41 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
 
     @Override
     public void onNotification(final DOMNotification notification) {
-        this.schemaContext = ControllerContext.getInstance().getGlobalSchema();
-        this.notification = notification;
-        final Event event = new Event(EventType.NOTIFY);
-        if (this.outputType.equals("JSON")) {
-            event.setData(prepareJson());
+        final Date now = new Date();
+        if (this.stop != null) {
+            if ((this.start.compareTo(now) < 0) && (this.stop.compareTo(now) > 0)) {
+                prepareAndPostData(notification);
+            }
+            if (this.stop.compareTo(now) < 0) {
+                try {
+                    this.close();
+                } catch (final Exception e) {
+                    throw new RestconfDocumentedException("Problem with unregister listener." + e);
+                }
+            }
+        } else if (this.start != null) {
+            if (this.start.compareTo(now) < 0) {
+                this.start = null;
+                prepareAndPostData(notification);
+            }
         } else {
-            event.setData(prepareXml());
+            prepareAndPostData(notification);
         }
-        this.eventBus.post(event);
     }
 
     /**
-     * Prepare json from notification data
-     *
-     * @return json as {@link String}
+     * @param notification
      */
-    private String prepareJson() {
-        final JSONObject json = new JSONObject();
-        json.put("ietf-restconf:notification",
-                new JSONObject(writeBodyToString()).put("event-time", ListenerAdapter.toRFC3339(new Date())));
-        return json.toString();
-    }
-
-    private String writeBodyToString() {
-        final Writer writer = new StringWriter();
-        final NormalizedNodeStreamWriter jsonStream =
-                JSONNormalizedNodeStreamWriter.createExclusiveWriter(JSONCodecFactory.create(this.schemaContext),
-                        this.notification.getType(), null, JsonWriterFactory.createJsonWriter(writer));
-        final NormalizedNodeWriter nodeWriter = NormalizedNodeWriter.forStreamWriter(jsonStream);
-        try {
-            nodeWriter.write(this.notification.getBody());
-            nodeWriter.close();
-        } catch (final IOException e) {
-            throw new RestconfDocumentedException("Problem while writing body of notification to JSON. ", e);
+    private void prepareAndPostData(final DOMNotification notification) {
+        final String xml = prepareXmlFrom(notification);
+        final Event event = new Event(EventType.NOTIFY);
+        if (this.outputType.equals("JSON")) {
+            final JSONObject jsonObject = XML.toJSONObject(xml);
+            event.setData(jsonObject.toString());
+        } else {
+            event.setData(xml);
         }
-        return writer.toString();
+        this.eventBus.post(event);
     }
 
     /**
@@ -234,7 +226,8 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
         this.eventBus.post(event);
     }
 
-    private String prepareXml() {
+    private String prepareXmlFrom(final DOMNotification notification) {
+        final SchemaContext schemaContext = ControllerContext.getInstance().getGlobalSchema();
         final Document doc = ListenerAdapter.createDocument();
         final Element notificationElement =
                 doc.createElementNS("urn:ietf:params:xml:ns:netconf:notification:1.0",
@@ -244,10 +237,10 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
         final Element eventTimeElement = doc.createElement("eventTime");
         eventTimeElement.setTextContent(ListenerAdapter.toRFC3339(new Date()));
         notificationElement.appendChild(eventTimeElement);
-
+        final String notificationNamespace = notification.getType().getLastComponent().getNamespace().toString();
         final Element notificationEventElement = doc.createElementNS(
-                "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "create-notification-stream");
-        addValuesToNotificationEventElement(doc, notificationEventElement, this.notification, this.schemaContext);
+                notificationNamespace, "event");
+        addValuesToNotificationEventElement(doc, notificationEventElement, notification, schemaContext);
         notificationElement.appendChild(notificationEventElement);
 
         try {
@@ -280,9 +273,7 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
             final DOMResult domResult = writeNormalizedNode(body,
                     YangInstanceIdentifier.create(body.getIdentifier()), schemaContext);
             final Node result = doc.importNode(domResult.getNode().getFirstChild(), true);
-            final Element dataElement = doc.createElement("notification");
-            dataElement.appendChild(result);
-            element.appendChild(dataElement);
+            element.appendChild(result);
         } catch (final IOException e) {
             LOG.error("Error in writer ", e);
         } catch (final XMLStreamException e) {
@@ -422,6 +413,19 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
      * Type of the event.
      */
     private enum EventType {
-        REGISTER, DEREGISTER, NOTIFY;
+        REGISTER, DEREGISTER, NOTIFY
+    }
+
+    /**
+     * Set query parameters for listener
+     *
+     * @param start
+     *            - start-time of getting notification
+     * @param stop
+     *            - stop-time of getting notification
+     */
+    public void setTime(final Date start, final Date stop) {
+        this.start = start;
+        this.stop = stop;
     }
 }
