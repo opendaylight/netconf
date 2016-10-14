@@ -73,7 +73,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     }
 
     @Test
-    public void testSubscribueToStream() {
+    public void testSubscribeToStream() {
         final UriBuilder uriBuilder = UriBuilder.fromUri(uri);
         doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
