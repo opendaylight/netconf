@@ -40,6 +40,7 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
     // 2. At this level we might be dealing with Chunks of messages(not whole messages) and unexpected behavior might occur
     // when we send/queue 1 chunk and fail the other chunks
 
+    private final Object asyncInLock = new Object();
     private volatile IoOutputStream asyncIn;
 
     // Order has to be preserved for queued writes
@@ -59,7 +60,7 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
         // writes and pending writes would lock the underlyinch channel session
         // window resize write would try to write the message on an already locked channelSession
         // while the pending write was in progress from the write callback
-        synchronized (asyncIn) {
+        synchronized (asyncInLock) {
             // TODO check for isClosed, isClosing might be performed by mina SSH internally and is not required here
             // If we are closed/closing, set immediate fail
             if (asyncIn.isClosed() || asyncIn.isClosing()) {
@@ -92,7 +93,7 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
                     // writes and pending writes would lock the underlyinch channel session
                     // window resize write would try to write the message on an already locked channelSession,
                     // while the pending write was in progress from the write callback
-                    synchronized (asyncIn) {
+                    synchronized (asyncInLock) {
                         if (LOG.isTraceEnabled()) {
                             LOG.trace("Ssh write request finished on channel: {} with result: {}: and ex:{}, message: {}",
                                     ctx.channel(), future.isWritten(), future.getException(), byteBufToString(byteBufMsg));
@@ -131,7 +132,7 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
     }
 
     private void writePendingIfAny() {
-        synchronized (asyncIn) {
+        synchronized (asyncInLock) {
             if (pending.peek() == null) {
                 return;
             }
