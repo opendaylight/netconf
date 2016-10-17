@@ -10,15 +10,18 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.net.URI;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
+import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
@@ -34,16 +37,17 @@ public class NetconfDeviceNotificationServiceTest {
     private DOMNotification notification2;
 
     private NetconfDeviceNotificationService service;
+    private ListenerRegistration<DOMNotificationListener> registration;
 
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        SchemaPath path1 = SchemaPath.create(true, new QName(new URI("namespace1"), "path1"));
-        SchemaPath path2 = SchemaPath.create(true, new QName(new URI("namespace2"), "path2"));
+        final SchemaPath path1 = SchemaPath.create(true, new QName(new URI("namespace1"), "path1"));
+        final SchemaPath path2 = SchemaPath.create(true, new QName(new URI("namespace2"), "path2"));
         service = new NetconfDeviceNotificationService();
         service.registerNotificationListener(listener1, path1);
-        service.registerNotificationListener(listener2, path2);
+        registration = service.registerNotificationListener(listener2, path2);
 
         doReturn(path1).when(notification1).getType();
         doReturn(path2).when(notification2).getType();
@@ -62,4 +66,12 @@ public class NetconfDeviceNotificationServiceTest {
         verify(listener1, never()).onNotification(notification2);
     }
 
+    @Test
+    public void testCloseRegistration() throws Exception {
+        service.publishNotification(notification2);
+        Assert.assertEquals(listener2, registration.getInstance());
+        registration.close();
+        service.publishNotification(notification2);
+        verify(listener2, times(1)).onNotification(notification2);
+    }
 }
