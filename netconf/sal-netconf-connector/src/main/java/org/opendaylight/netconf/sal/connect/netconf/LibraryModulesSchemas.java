@@ -34,8 +34,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
+import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesState;
@@ -140,7 +140,7 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
     }
 
 
-    public static LibraryModulesSchemas create(final NetconfDeviceRpc deviceRpc, final RemoteDeviceId deviceId) {
+    public static LibraryModulesSchemas create(final DOMRpcService deviceRpc, final RemoteDeviceId deviceId) {
         final DOMRpcResult moduleListNodeResult;
         try {
             moduleListNodeResult =
