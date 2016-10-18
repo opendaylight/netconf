@@ -16,6 +16,24 @@
       "revId": "972919bee9265716a24d4d105d2aa8c760feaca4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_dc4d73c6",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/NetconfStateSchemasTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-10-18T12:53:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_5c35e344",
+      "revId": "972919bee9265716a24d4d105d2aa8c760feaca4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
