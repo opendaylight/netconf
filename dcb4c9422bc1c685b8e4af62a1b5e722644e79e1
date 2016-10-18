@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_77c0b87c",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationActivator.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-18T14:12:29Z",
+      "side": 1,
+      "message": "Please remove space",
+      "revId": "dcb4c9422bc1c685b8e4af62a1b5e722644e79e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_97c3d489",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationActivator.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-18T14:12:29Z",
+      "side": 1,
+      "message": "I think this should be more like configService !\u003d null",
+      "revId": "dcb4c9422bc1c685b8e4af62a1b5e722644e79e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_37cf60b2",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationActivator.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-18T14:12:29Z",
+      "side": 1,
+      "message": "please remove trailing whitespace",
+      "revId": "dcb4c9422bc1c685b8e4af62a1b5e722644e79e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
