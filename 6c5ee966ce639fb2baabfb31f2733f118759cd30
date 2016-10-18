@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "7a6b29fe_b1f7008c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-18T09:06:14Z",
+      "side": 1,
+      "message": "sal-netconf-connector",
+      "revId": "6c5ee966ce639fb2baabfb31f2733f118759cd30",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_d1d71cec",
         "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/schema/mapping/BaseRpcSchemalessTransformerTest.java",
         "patchSetId": 1
