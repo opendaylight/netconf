@@ -145,7 +145,7 @@ public class NetconfDeviceCommunicatorTest {
         assertEquals( "containsModuleCapability", false, actualCapabilites.containsNonModuleCapability(testCapability) );
         assertEquals( "getModuleBasedCaps", Sets.newHashSet(
                             QName.create( "urn:opendaylight:params:xml:ns:test", "2014-06-02", "test-module" )),
-                      actualCapabilites.getModuleBasedCaps() );
+                      actualCapabilites.getModuleBasedCaps());
         assertEquals( "isRollbackSupported", true, actualCapabilites.isRollbackSupported() );
         assertEquals( "isMonitoringSupported", true, actualCapabilites.isMonitoringSupported() );
     }

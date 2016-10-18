@@ -15,6 +15,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.messagebus.spi.EventSourceRegistration;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.network.topology.topology.topology.types.TopologyNetconf;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -66,12 +67,12 @@ public class NetconfEventSourceRegistration implements AutoCloseable {
         if (netconfNode.getAvailableCapabilities() == null) {
             return false;
         }
-        final List<String> capabilities = netconfNode.getAvailableCapabilities().getAvailableCapability();
+        final List<AvailableCapability> capabilities = netconfNode.getAvailableCapabilities().getAvailableCapability();
         if (capabilities == null || capabilities.isEmpty()) {
             return false;
         }
-        for (final String capability : netconfNode.getAvailableCapabilities().getAvailableCapability()) {
-            if (capability.startsWith(NotificationCapabilityPrefix)) {
+        for (final AvailableCapability capability : netconfNode.getAvailableCapabilities().getAvailableCapability()) {
+            if (capability.getCapability().startsWith(NotificationCapabilityPrefix)) {
                 return true;
             }
         }
