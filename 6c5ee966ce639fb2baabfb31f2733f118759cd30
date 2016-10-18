@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_3ce2a703",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-10-18T11:29:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_b1f7008c",
+      "revId": "6c5ee966ce639fb2baabfb31f2733f118759cd30",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_d1d71cec",
         "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/schema/mapping/BaseRpcSchemalessTransformerTest.java",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_bc16b7ef",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/schema/mapping/BaseRpcSchemalessTransformerTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-10-18T11:29:49Z",
+      "side": 1,
+      "message": "removed",
+      "parentUuid": "7a6b29fe_d1d71cec",
+      "revId": "6c5ee966ce639fb2baabfb31f2733f118759cd30",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_71fe086d",
         "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/schema/mapping/SchemalessMessageTransformerTest.java",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-10-18T09:05:36Z",
       "side": 1,
       "message": "I think this indentation is somehow strange. Maybe this should be consistent for all XML string constants in this class.",
+      "revId": "6c5ee966ce639fb2baabfb31f2733f118759cd30",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_fcd78f21",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/schema/mapping/SchemalessMessageTransformerTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-10-18T11:29:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_71fe086d",
       "revId": "6c5ee966ce639fb2baabfb31f2733f118759cd30",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
