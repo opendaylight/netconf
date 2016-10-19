@@ -17,20 +17,10 @@ import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFaile
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
-import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
-import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -93,62 +83,33 @@ public final class PostDataTransactionUtil {
             final SchemaContext schemaContext) {
         final DOMTransactionChain transactionChain = transactionNode.getTransactionChain();
         final DOMDataReadWriteTransaction transaction = transactionChain.newReadWriteTransaction();
-        final NormalizedNode<?, ?> node = ImmutableNodes.fromInstanceId(schemaContext, path);
-        transaction.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(node.getIdentifier()), node);
-        TransactionUtil.ensureParentsByMerge(path, schemaContext, transaction);
 
         if (data instanceof MapNode) {
+            boolean merge = false;
             for (final MapEntryNode child : ((MapNode) data).getValue()) {
-                putChild(child, transactionChain, transaction, path);
-            }
-        } else if (data instanceof AugmentationNode) {
-            for (final DataContainerChild<? extends PathArgument, ?> child : ((AugmentationNode) data).getValue()) {
-                putChild(child, transactionChain, transaction, path);
-            }
-        } else if (data instanceof ChoiceNode) {
-            for (final DataContainerChild<? extends PathArgument, ?> child : ((ChoiceNode) data).getValue()) {
-                putChild(child, transactionChain, transaction, path);
-            }
-        } else if (data instanceof LeafSetNode<?>) {
-            for (final LeafSetEntryNode<?> child : ((LeafSetNode<?>) data).getValue()) {
-                putChild(child, transactionChain, transaction, path);
-            }
-        } else if (data instanceof ContainerNode) {
-            for (final DataContainerChild<? extends PathArgument, ?> child : ((ContainerNode) data).getValue()) {
-                putChild(child, transactionChain, transaction, path);
+                final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
+                TransactionUtil.checkItemDoesNotExists(
+                        transactionChain, transaction, LogicalDatastoreType.CONFIGURATION, childPath,
+                        RestconfDataServiceConstant.PostData.POST_TX_TYPE);
+                if (!merge) {
+                    merge = true;
+                    TransactionUtil.ensureParentsByMerge(path, schemaContext, transaction);
+                    final NormalizedNode<?, ?> emptySubTree = ImmutableNodes.fromInstanceId(schemaContext, path);
+                    transaction.merge(LogicalDatastoreType.CONFIGURATION,
+                            YangInstanceIdentifier.create(emptySubTree.getIdentifier()), emptySubTree);
+                }
+                transaction.put(LogicalDatastoreType.CONFIGURATION, childPath, child);
             }
         } else {
-            transaction.cancel();
-            RestConnectorProvider.resetTransactionChainForAdapaters(transactionChain);
+            TransactionUtil.checkItemDoesNotExists(
+                    transactionChain, transaction, LogicalDatastoreType.CONFIGURATION, path,
+                    RestconfDataServiceConstant.PostData.POST_TX_TYPE);
 
-            final String errMsg = "Only Map, Choice, Augmentation, LeafSet and Container nodes are supported";
-            LOG.trace("{}:{}", errMsg, path);
-            throw new RestconfDocumentedException(
-                    "Node not supported", RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT, path);
+            TransactionUtil.ensureParentsByMerge(path, schemaContext, transaction);
+            transaction.put(LogicalDatastoreType.CONFIGURATION, path, data);
         }
 
         return transaction.submit();
-    }
-
-    /**
-     * Prepare data for submit
-     *
-     * @param child
-     *            - data
-     * @param transactionChain
-     *            - transaction chain
-     * @param readWriteTx
-     *            - transaction
-     * @param path
-     *            - path to data
-     */
-    private static void putChild(final NormalizedNode<?, ?> child, final DOMTransactionChain transactionChain,
-                                 final DOMDataReadWriteTransaction readWriteTx, final YangInstanceIdentifier path) {
-        final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
-        TransactionUtil.checkItemDoesNotExists(
-                transactionChain, readWriteTx, LogicalDatastoreType.CONFIGURATION, childPath,
-                RestconfDataServiceConstant.PostData.POST_TX_TYPE);
-        readWriteTx.put(LogicalDatastoreType.CONFIGURATION, childPath, child);
     }
 
     /**
