@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2016 Inocybe Technologies Inc. and others.  All rights reserved.
+
+ This program and the accompanying materials are made available under the
+ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ and is available at http://www.eclipse.org/legal/epl-v10.html
+-->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           odl:use-default-for-reference-types="true">
+
+    <reference id="dataBroker"
+               interface="org.opendaylight.controller.md.sal.binding.api.DataBroker"
+               odl:type="default"/>
+    <reference id="netconfMonitoringService"
+               interface="org.opendaylight.netconf.api.monitoring.NetconfMonitoringService"
+               odl:type="netconf-server-monitoring"/>
+    <reference id="netconfOperationServiceFactoryListener"
+               interface="org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener"
+               odl:type="mapper-aggregator-registry"/>
+
+    <bean id="monitoringToMdsalWriter"
+          class="org.opendaylight.controller.config.yang.netconf.mdsal.monitoring.MonitoringToMdsalWriter"
+          destroy-method="close">
+        <argument ref="netconfMonitoringService"/>
+        <argument ref="dataBroker"/>
+    </bean>
+
+    <bean id="mdsalMonitoringMapperFactory"
+          class="org.opendaylight.controller.config.yang.netconf.mdsal.monitoring.MdSalMonitoringMapperFactory"
+          destroy-method="close">
+        <argument ref="netconfOperationServiceFactoryListener"/>
+        <argument ref="netconfMonitoringService"/>
+        <argument ref="monitoringToMdsalWriter"/>
+    </bean>
+
+</blueprint>

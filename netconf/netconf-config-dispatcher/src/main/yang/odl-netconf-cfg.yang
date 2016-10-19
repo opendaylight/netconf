@@ -1,6 +1,10 @@
 // vi: set smarttab et sw=4 tabstop=4:
 module odl-netconf-cfg {
 
+/**
+* TODO Delete this YANG file as soon as https://git.opendaylight.org/gerrit/#/c/46621/ is merged.
+*/
+
     yang-version 1;
     namespace "urn:opendaylight:params:xml:ns:yang:controller:config:netconf";
     prefix "cfg-net";
@@ -24,7 +28,6 @@ module odl-netconf-cfg {
     }
 
     identity netconf-client-dispatcher {
-
         base "config:service-type";
         config:java-class "org.opendaylight.netconf.client.NetconfClientDispatcher";
     }

@@ -191,10 +191,6 @@
       <artifactId>netconf-impl</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>netconf-config-dispatcher</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.opendaylight.controller</groupId>
       <artifactId>config-manager-facade-xml</artifactId>
     </dependency>
@@ -235,6 +231,18 @@
       <artifactId>netconf-monitoring</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>mdsal-netconf-ssh</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mdsal-notification-mapper</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mdsal-notification-mapper</artifactId>
+    </dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mdsal-netconf-monitoring</artifactId>
     </dependency>
@@ -245,6 +253,10 @@
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>mdsal-netconf-yang-library</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>mdsal-netconf-impl</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

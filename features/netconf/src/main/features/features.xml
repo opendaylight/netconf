@@ -91,7 +91,6 @@
     <feature version='${config.version}'>odl-config-netty</feature>
     <feature version='${project.version}'>odl-netconf-netty-util</feature>
     <bundle>mvn:org.opendaylight.netconf/netconf-client/{{VERSION}}</bundle>
-    <bundle>mvn:org.opendaylight.netconf/netconf-config-dispatcher/{{VERSION}}</bundle>
     <configfile finalname='${config.configfile.directory}/${config.netconf.client.configfile}'>mvn:org.opendaylight.netconf/netconf-config/{{VERSION}}/xml/config</configfile>
   </feature>
 
@@ -132,10 +131,13 @@
     <feature version='${project.version}'>odl-netconf-ssh</feature>
     <feature version='${project.version}'>odl-netconf-client</feature>
     <feature version='${controller.mdsal.version}'>odl-mdsal-broker</feature>
+    <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-ssh/{{VERSION}}</bundle>
     <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-notification/{{VERSION}}</bundle>
     <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-connector/{{VERSION}}</bundle>
+    <bundle>mvn:org.opendaylight.netconf/mdsal-notification-mapper/{{VERSION}}</bundle>
     <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-monitoring/{{VERSION}}</bundle>
     <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-yang-library/{{VERSION}}</bundle>
+    <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-impl/{{VERSION}}</bundle>
     <configfile finalname='${config.configfile.directory}/${config.netconf.mdsal.configfile}'>mvn:org.opendaylight.netconf/netconf-mdsal-config/{{VERSION}}/xml/config</configfile>
   </feature>
 

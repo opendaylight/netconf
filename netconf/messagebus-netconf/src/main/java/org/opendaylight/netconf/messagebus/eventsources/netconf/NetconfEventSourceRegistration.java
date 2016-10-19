@@ -10,7 +10,6 @@ package org.opendaylight.netconf.messagebus.eventsources.netconf;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.util.List;
-import org.opendaylight.controller.md.sal.binding.api.MountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.messagebus.spi.EventSourceRegistration;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;

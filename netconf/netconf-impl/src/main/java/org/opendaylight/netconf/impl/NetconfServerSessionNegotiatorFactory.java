@@ -52,7 +52,7 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSessionNegotiatorFactory.class);
     private final Set<String> baseCapabilities;
 
-    protected NetconfServerSessionNegotiatorFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
+    public NetconfServerSessionNegotiatorFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
                                                  final SessionIdProvider idProvider, final long connectionTimeoutMillis,
                                                  final NetconfMonitoringService monitoringService, final Set<String> baseCapabilities) {
         this.timer = timer;

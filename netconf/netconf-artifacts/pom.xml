@@ -41,11 +41,6 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-config-dispatcher</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>config-netconf-connector</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -124,6 +119,11 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>mdsal-netconf-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-netty-util</artifactId>
                 <version>${project.version}</version>
@@ -131,6 +131,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-ssh</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>mdsal-netconf-ssh</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -164,13 +169,6 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>messagebus-netconf</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>messagebus-netconf</artifactId>
-                <version>${project.version}</version>
-                <classifier>config</classifier>
-                <type>xml</type>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -225,10 +223,36 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-notifications-impl</artifactId>
                 <version>${project.version}</version>
+            </dependency><dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>mdsal-netconf-notification</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>mdsal-netconf-notification</artifactId>
+                <artifactId>mdsal-notification-mapper</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>mdsal-notification-mapper</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>netconf-topology</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>netconf-topology-config</artifactId>
+                <version>${project.version}</version>
+                <classifier>config</classifier>
+                <type>xml</type>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>netconf-topology</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -248,13 +272,6 @@
                 <artifactId>netconf-topology-config</artifactId>
                 <version>${project.version}</version>
                 <classifier>clustered-config</classifier>
-                <type>xml</type>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>yanglib-config</artifactId>
-                <version>${project.version}</version>
-                <classifier>config</classifier>
                 <type>xml</type>
             </dependency>
             <dependency>

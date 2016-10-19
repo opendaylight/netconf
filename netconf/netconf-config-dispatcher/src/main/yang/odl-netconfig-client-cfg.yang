@@ -1,6 +1,10 @@
 // vi: set smarttab et sw=4 tabstop=4:
 module odl-netconfig-client-cfg {
 
+/**
+* TODO Delete this YANG file as soon as https://git.opendaylight.org/gerrit/#/c/46621/ is merged.
+*/
+
     yang-version 1;
     namespace "urn:opendaylight:params:xml:ns:yang:controller:config:netconf:client:dispatcher";
     prefix "cfg-net-client";
@@ -34,30 +38,6 @@ module odl-netconfig-client-cfg {
     augment "/config:modules/config:module/config:configuration" {
         case netconf-client-dispatcher {
             when "/config:modules/config:module/config:type = 'netconf-client-dispatcher'";
-
-            container boss-thread-group {
-                uses config:service-ref {
-                    refine type {
-                        config:required-identity netty:netty-threadgroup;
-                    }
-                }
-            }
-
-            container worker-thread-group {
-                uses config:service-ref {
-                    refine type {
-                        config:required-identity netty:netty-threadgroup;
-                    }
-                }
-            }
-
-            container timer {
-                uses config:service-ref {
-                    refine type {
-                        config:required-identity netty:netty-timer;
-                    }
-                }
-            }
         }
     }
 
