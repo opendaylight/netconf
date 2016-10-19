@@ -22,9 +22,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
-import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -56,22 +54,6 @@ public class WriteCandidateTx extends AbstractWriteTx {
 
     private static final Logger LOG  = LoggerFactory.getLogger(WriteCandidateTx.class);
 
-    private static final Function<DOMRpcResult, RpcResult<TransactionStatus>> RPC_RESULT_TO_TX_STATUS = new Function<DOMRpcResult, RpcResult<TransactionStatus>>() {
-        @Override
-        public RpcResult<TransactionStatus> apply(final DOMRpcResult input) {
-            if (isSuccess(input)) {
-                return RpcResultBuilder.success(TransactionStatus.COMMITED).build();
-            } else {
-                final RpcResultBuilder<TransactionStatus> failed = RpcResultBuilder.failed();
-                for (final RpcError rpcError : input.getErrors()) {
-                    failed.withError(rpcError.getErrorType(), rpcError.getTag(), rpcError.getMessage(),
-                            rpcError.getApplicationTag(), rpcError.getInfo(), rpcError.getCause());
-                }
-                return failed.build();
-            }
-        }
-    };
-
     public WriteCandidateTx(final RemoteDeviceId id, final NetconfBaseOps rpc, final boolean rollbackSupport) {
         super(rpc, id, rollbackSupport);
     }
@@ -85,7 +67,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
     private void lock() {
         final FutureCallback<DOMRpcResult> lockCandidateCallback = new FutureCallback<DOMRpcResult>() {
             @Override
-            public void onSuccess(DOMRpcResult result) {
+            public void onSuccess(final DOMRpcResult result) {
                 if (isSuccess(result)) {
                     if (LOG.isTraceEnabled()) {
                         LOG.trace("Lock candidate successful");
@@ -96,7 +78,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFailure(final Throwable t) {
                 LOG.warn("Lock candidate operation failed. {}", t);
                 discardChanges();
             }
@@ -138,16 +120,16 @@ public class WriteCandidateTx extends AbstractWriteTx {
     @Override
     public synchronized ListenableFuture<RpcResult<TransactionStatus>> performCommit() {
         resultsFutures.add(netOps.commit(new NetconfRpcFutureCallback("Commit", id)));
-        ListenableFuture<RpcResult<TransactionStatus>> txResult = resultsToTxStatus();
+        final ListenableFuture<RpcResult<TransactionStatus>> txResult = resultsToTxStatus();
 
         Futures.addCallback(txResult, new FutureCallback<RpcResult<TransactionStatus>>() {
             @Override
-            public void onSuccess(@Nullable RpcResult<TransactionStatus> result) {
+            public void onSuccess(@Nullable final RpcResult<TransactionStatus> result) {
                 cleanupOnSuccess();
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFailure(final Throwable t) {
                 // TODO If lock is cause of this failure cleanup will issue warning log
                 // cleanup is trying to do unlock, but this will fail
                 cleanup();
@@ -168,7 +150,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
                               final Optional<ModifyAction> defaultOperation,
                               final String operation) {
 
-        NetconfRpcFutureCallback editConfigCallback = new NetconfRpcFutureCallback("Edit candidate", id);
+        final NetconfRpcFutureCallback editConfigCallback = new NetconfRpcFutureCallback("Edit candidate", id);
 
         if (defaultOperation.isPresent()) {
             resultsFutures.add(netOps.editConfigCandidate(
