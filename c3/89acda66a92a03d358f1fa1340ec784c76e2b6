@@ -1,0 +1,9 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+1: Ivan Hrasko <ivan.hrasko@pantheon.tech>
+Code-Review+1: Jakub Toth <jatoth@cisco.com>
+Code-Review+2: Tomas Cere <tcere@cisco.com>
+Submitted-by: Tomas Cere <tcere@cisco.com>
+Submitted-at: Wed, 19 Oct 2016 14:30:08 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/47127
+Project: netconf
+Branch: refs/heads/stable/boron
