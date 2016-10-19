@@ -10,9 +10,18 @@ package org.opendaylight.restconf.restful.utils;
 class FutureDataFactory<T> {
 
     protected T result;
+    private boolean statusFail = false;
 
     void setResult(final T result) {
         this.result = result;
+    }
+
+    void setFailureStatus() {
+        this.statusFail = true;
+    }
+
+    boolean getFailureStatus() {
+        return statusFail;
     }
 
 }

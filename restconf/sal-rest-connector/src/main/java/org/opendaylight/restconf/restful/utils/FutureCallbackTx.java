@@ -90,6 +90,7 @@ final class FutureCallbackTx {
     protected static <T> void handlingLoggerAndValues(@Nullable final Throwable t, final String txType,
             final T result, final FutureDataFactory<T> dataFactory) {
         if (t != null) {
+            dataFactory.setFailureStatus();
             LOG.warn("Transaction({}) FAILED!", txType, t);
             if (t instanceof DOMRpcException) {
                 final List<RpcError> rpcErrorList = new ArrayList<>();
