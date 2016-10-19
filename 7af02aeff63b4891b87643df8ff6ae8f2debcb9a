@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_b24a5baa",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/ReadOnlyTxTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-19T11:29:19Z",
+      "side": 1,
+      "message": "Maybe something like testIdentifiersNotSame, testUniqueIdentifiers something similar would be better name for this test",
+      "revId": "7af02aeff63b4891b87643df8ff6ae8f2debcb9a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_d2fb9745",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/ReadWriteTxTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-19T11:29:19Z",
+      "side": 1,
+      "message": "For the future, I think it would be better to have consistent naming convention in tests. I think tests named testMethod or something similar would be better.",
+      "revId": "7af02aeff63b4891b87643df8ff6ae8f2debcb9a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
