@@ -174,7 +174,6 @@ public class Notificator {
      */
     public static boolean existNotificationListenerFor(final String streamName) {
         return notificationListenersByStreamName.containsKey(streamName);
-
     }
 
     /**
