@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.ssh.osgi;
 
-import com.google.common.base.Optional;
 import io.netty.channel.local.LocalAddress;
 import io.netty.channel.nio.NioEventLoopGroup;
 import java.io.IOException;
@@ -21,7 +20,7 @@ import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
 import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
 import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
-import org.opendaylight.netconf.util.osgi.NetconfConfigUtil.InfixProp;
+import org.opendaylight.netconf.util.osgi.NetconfConfiguration;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -79,25 +78,17 @@ public class NetconfSSHActivator implements BundleActivator {
     }
 
     private SshProxyServer startSSHServer(final BundleContext bundleContext) throws IOException {
-        final Optional<InetSocketAddress> maybeSshSocketAddress = NetconfConfigUtil.extractNetconfServerAddress(bundleContext, InfixProp.ssh);
-        if (!maybeSshSocketAddress.isPresent()) {
-            LOG.warn("SSH bridge not configured. Using default value {}", NetconfConfigUtil.DEFAULT_SSH_SERVER_ADRESS);
-        }
-        final InetSocketAddress sshSocketAddress = maybeSshSocketAddress
-                .or(NetconfConfigUtil.DEFAULT_SSH_SERVER_ADRESS);
-        LOG.info("Starting netconf SSH bridge at {}", sshSocketAddress);
+        final NetconfConfiguration netconfConfiguration = NetconfConfigUtil.getNetconfConfigurationService(bundleContext).
+                        orElseThrow(() -> new IllegalStateException("Configuration for SSH not found."));
+
+        final InetSocketAddress sshSocketAddress = netconfConfiguration.getSshServerAddress();
+        LOG.info("Starting netconf SSH server at {}", sshSocketAddress);
 
         final LocalAddress localAddress = NetconfConfigUtil.getNetconfLocalAddress();
-
         authProviderTracker = new AuthProviderTracker(bundleContext);
 
-        final Optional<String> maybePath = NetconfConfigUtil.getPrivateKeyPath(bundleContext);
-        if(!maybePath.isPresent()) {
-            LOG.warn("Private key path not configured. Using default value {}",
-                    NetconfConfigUtil.DEFAULT_PRIVATE_KEY_PATH);
-        }
-        final String path = maybePath.or(NetconfConfigUtil.DEFAULT_PRIVATE_KEY_PATH);
-        LOG.trace("Starting netconf SSH bridge with path to ssh private key {}", path);
+        final String path = netconfConfiguration.getPrivateKeyPath();
+        LOG.trace("Starting netconf SSH server with path to ssh private key {}", path);
 
         final SshProxyServer sshProxyServer = new SshProxyServer(minaTimerExecutor, clientGroup, nioExecutor);
         sshProxyServer.bind(
@@ -110,5 +101,4 @@ public class NetconfSSHActivator implements BundleActivator {
                         .createSshProxyServerConfiguration());
         return sshProxyServer;
     }
-
 }
