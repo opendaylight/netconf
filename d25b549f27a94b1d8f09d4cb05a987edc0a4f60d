@@ -87,6 +87,23 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_5e8b0d1e",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-20T10:44:48Z",
+      "side": 1,
+      "message": "break;",
+      "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_941c67c3",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyContext.java",
         "patchSetId": 12
