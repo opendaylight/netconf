@@ -1,0 +1,160 @@
+module system-connector {
+    namespace "urn:system:connector";
+    prefix connector;
+
+    import ietf-inet-types { prefix inet; revision-date 2010-09-24; }
+    import yang-ext { prefix ext; revision-date 2013-07-09; }
+
+    revision "2016-05-10" {
+        description
+                "Initial revision.";
+    }
+
+    typedef connector-id {
+        type int16;
+        description
+                "Identifier for a connector.";
+    }
+
+    identity connector-admin-status {
+        description
+                "Admin Status.";
+    }
+
+    identity locked {
+        base connector-admin-status;
+        description "Locked.";
+    }
+
+    identity unlocked {
+        base connector-admin-status;
+        description "Unlocked";
+    }
+
+    identity connector-oper-status {
+        description
+                "Operational Status.";
+    }
+
+    identity connected {
+        base connector-oper-status;
+        description "Connected.";
+    }
+
+    identity disconnected {
+        base connector-oper-status;
+        description "Disconnected.";
+    }
+
+    identity not-reachable {
+        base connector-oper-status;
+        description "Not reachable.";
+    }
+
+    identity login-failed {
+        base connector-oper-status;
+        description "Login failed.";
+    }
+
+    identity errored {
+        base connector-oper-status;
+        description "Errored.";
+    }
+
+    grouping auth-credential {
+        container auth-credential {
+            leaf user-name {
+                mandatory true;
+                type string;
+                description
+                                "The user name used for logging into the system.";
+            }
+
+            leaf password {
+                mandatory true;
+                type string;
+                description
+                                "The password information used for logging into the system";
+            }
+        }
+    }
+
+    grouping connector-config-attributes {
+        leaf name {
+            mandatory true;
+            type string {
+                length "1..64";
+             }
+            description
+                        "Name of the connector";
+        }
+
+        leaf description {
+            mandatory false;
+            type string {
+                length "1..256";
+            }
+            description
+                        "Description of the connector";
+        }
+
+        leaf admin-status {
+            mandatory true;
+            type identityref {
+                base connector-admin-status;
+            }
+            description
+                        "Indentifies the connector admin status.";
+        }
+
+        leaf host {
+            mandatory true;
+            type inet:host;
+        }
+    }
+
+    grouping connector-config {
+        container config {
+            uses connector-config-attributes;
+        }
+    }
+
+    grouping connector-state-attributes {
+        leaf oper-status {
+            type identityref {
+                base connector-oper-status;
+            }
+            description
+                        "Indentifies the connector operational status.";
+        }
+    }
+
+    grouping connector-state {
+        container state {
+            config false;
+            uses connector-state-attributes;
+            uses connector-config-attributes;
+        }
+    }
+
+    grouping connector {
+        leaf id {
+            type connector-id;
+            description
+                "An identifer that identifies a connector uniquely.";
+        }
+        uses connector-config;
+        uses connector-state;
+    }
+
+    grouping connectors {
+        container connectors {
+            list connector {
+                key "id";
+                description
+                            "connector to communicate to network element";
+                uses connector;
+            }
+        }
+    }
+}
