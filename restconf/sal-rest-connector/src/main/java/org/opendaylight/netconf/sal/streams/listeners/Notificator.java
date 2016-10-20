@@ -166,7 +166,6 @@ public class Notificator {
      */
     public static boolean existNotificationListenerFor(final String streamName) {
         return notificationListenersByStreamName.containsKey(streamName);
-
     }
 
     public static List<NotificationListenerAdapter> createNotificationListener(final List<SchemaPath> paths,
