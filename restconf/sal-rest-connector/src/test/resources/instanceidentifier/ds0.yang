@@ -1,0 +1,21 @@
+module ds0-module{
+    namespace "http://example.com/schema/ds0";
+    prefix interf;
+
+    import interface-module {
+        prefix "if";
+        revision-date 2016-10-07;
+    }
+
+    revision "2016-10-07" {
+        description
+                "Initial revision.";
+    }
+
+    augment "/if:notifi/if:interfaces/if:ifEntry" {
+        when "if:ifType='ds0'";
+        leaf ds0ChannelNumber {
+            type string;
+        }
+    }
+}
