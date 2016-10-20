@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_f42b1b31",
+        "filename": "features/netconf-connector/src/main/features/features.xml",
+        "patchSetId": 12
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-20T08:16:27Z",
+      "side": 1,
+      "message": "What for do you need these two bundles? If you need them, I do not know if hard coding version here is the best idea.",
+      "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_d4309fa0",
+        "filename": "features/netconf/pom.xml",
+        "patchSetId": 12
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-20T08:16:27Z",
+      "side": 1,
+      "message": "Why do you have own version for netconf-topology-singleton module? Why can\u0027t you use just netconf project version?",
+      "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_34abd38a",
+        "filename": "features/netconf/pom.xml",
+        "patchSetId": 12
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-20T08:16:27Z",
+      "side": 1,
+      "message": "I think you should put your new module to netconf-artifacts.\n\nDo not know, why you need to add this also to dependecny management section in this POM.",
+      "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_14b977e9",
+        "filename": "features/netconf/pom.xml",
+        "patchSetId": 12
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-20T08:16:27Z",
+      "side": 1,
+      "message": "Why are you adding this dependency here? You are using it in features-netconf-connector module not here..",
+      "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_14b057f3",
+        "filename": "netconf/netconf-topology-singleton/pom.xml",
+        "patchSetId": 12
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-20T08:16:27Z",
+      "side": 1,
+      "message": "I think you should inherit these versions of artifacts. If it is possible of course.",
+      "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
