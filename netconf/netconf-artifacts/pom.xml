@@ -150,6 +150,13 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>netconf-util</artifactId>
+                <version>${project.version}</version>
+                <classifier>config</classifier>
+                <type>cfg</type>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-mdsal-config</artifactId>
                 <version>${project.version}</version>
                 <classifier>config</classifier>
