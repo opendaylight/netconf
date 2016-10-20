@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_04266216",
+        "filename": "features/netconf/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-20T15:15:05Z",
+      "side": 1,
+      "message": "cfg",
+      "range": {
+        "startLine": 185,
+        "startChar": 12,
+        "endLine": 185,
+        "endChar": 15
+      },
+      "revId": "e533e9a953d8d1fbcc944adaedf85a7a6f8fce6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
