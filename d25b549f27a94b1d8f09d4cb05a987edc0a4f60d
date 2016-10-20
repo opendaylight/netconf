@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_54fe4f39",
+        "filename": "features/netconf/pom.xml",
+        "patchSetId": 12
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-20T15:28:10Z",
+      "side": 1,
+      "message": "deleted",
+      "parentUuid": "7a6b29fe_34abd38a",
+      "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_14b977e9",
         "filename": "features/netconf/pom.xml",
         "patchSetId": 12
@@ -70,6 +88,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_7401cb38",
+        "filename": "features/netconf/pom.xml",
+        "patchSetId": 12
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-20T15:28:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_14b977e9",
+      "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_14b057f3",
         "filename": "netconf/netconf-topology-singleton/pom.xml",
         "patchSetId": 12
@@ -81,6 +117,24 @@
       "writtenOn": "2016-10-20T08:16:27Z",
       "side": 1,
       "message": "I think you should inherit these versions of artifacts. If it is possible of course.",
+      "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_34d113ce",
+        "filename": "netconf/netconf-topology-singleton/pom.xml",
+        "patchSetId": 12
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-20T15:28:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_14b057f3",
       "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -121,6 +175,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_545acf50",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyContext.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-20T15:28:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_941c67c3",
+      "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_345ab383",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyContext.java",
         "patchSetId": 12
@@ -132,6 +204,24 @@
       "writtenOn": "2016-10-20T09:06:05Z",
       "side": 1,
       "message": "I think you are missing {}",
+      "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_b457e325",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyContext.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-20T15:28:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_345ab383",
       "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -155,6 +245,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_74242bc6",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-20T15:28:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_149e9756",
+      "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_94c0e72b",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
         "patchSetId": 12
@@ -166,6 +274,24 @@
       "writtenOn": "2016-10-20T09:06:05Z",
       "side": 1,
       "message": "instanceIdentifier",
+      "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_fe3939d9",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-20T15:28:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_94c0e72b",
       "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -206,6 +332,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_be20619c",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-20T15:28:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_34e753e6",
+      "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_94d747ed",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
         "patchSetId": 12
@@ -217,6 +361,24 @@
       "writtenOn": "2016-10-20T09:06:05Z",
       "side": 1,
       "message": "why clusterSingletonServiceRegistration1 and not just clusterSingletonServiceRegistration",
+      "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_54212fb3",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-20T15:28:10Z",
+      "side": 1,
+      "message": "auto generated x)",
+      "parentUuid": "7a6b29fe_94d747ed",
       "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -240,6 +402,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_b42ec3a3",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-20T15:28:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_14ecd7c6",
+      "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_340c7394",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
         "patchSetId": 12
@@ -251,6 +431,24 @@
       "writtenOn": "2016-10-20T09:06:05Z",
       "side": 1,
       "message": "For the future, I think this builder stuff should look slightly different.\n\nFor example, it can support method chaining.",
+      "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_9e0c853d",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-20T15:28:10Z",
+      "side": 1,
+      "message": "Ok I changed it, it is better.",
+      "parentUuid": "7a6b29fe_340c7394",
       "revId": "d25b549f27a94b1d8f09d4cb05a987edc0a4f60d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
