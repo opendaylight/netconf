@@ -40,6 +40,7 @@ import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
 import org.opendaylight.controller.sal.core.api.Broker;
@@ -83,10 +84,11 @@ public class NetconfTopologyManagerTest {
         final ActorSystemProvider actorSystemProvider = mock(ActorSystemProvider.class);
         final EventExecutor eventExecutor = mock(EventExecutor.class);
         final NetconfClientDispatcher clientDispatcher = mock(NetconfClientDispatcher.class);
+        final DOMMountPointService domMountPointService = mock(DOMMountPointService.class);
 
         netconfTopologyManager = new NetconfTopologyManager(dataBroker, rpcProviderRegistry,
                 clusterSingletonServiceProvider, bindingAwareBroker, keepaliveExecutor, processingExecutor, domBroker,
-                actorSystemProvider, eventExecutor, clientDispatcher, topologyId);
+                actorSystemProvider, eventExecutor, clientDispatcher, domMountPointService, topologyId);
     }
     @Test
     public void testWriteConfiguration() throws Exception {
