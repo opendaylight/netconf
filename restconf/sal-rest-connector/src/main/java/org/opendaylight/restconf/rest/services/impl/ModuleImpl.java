@@ -163,7 +163,7 @@ class ModuleImpl implements Module {
 
     @Override
     public Set<Module> getSubmodules() {
-        throw new UnsupportedOperationException("Not supported operations.");
+        return new HashSet<>();
     }
 
     @Override
