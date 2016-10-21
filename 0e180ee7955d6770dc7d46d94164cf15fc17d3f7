@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_2de2612f",
+        "filename": "features/netconf-connector/src/main/features/features.xml",
+        "patchSetId": 14
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-21T00:19:59Z",
+      "side": 0,
+      "message": "remove its dependency in the features/netconf-connector/pom.xml file",
+      "range": {
+        "startLine": 61,
+        "startChar": 8,
+        "endLine": 61,
+        "endChar": 199
+      },
+      "revId": "0e180ee7955d6770dc7d46d94164cf15fc17d3f7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
