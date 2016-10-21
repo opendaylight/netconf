@@ -41,6 +41,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
@@ -106,7 +107,7 @@ public class WriteOnlyTransactionTest {
         doReturn(readTx).when(delegateDataBroker).newReadOnlyTransaction();
 
         final NetconfDOMTransaction masterDOMTransactions =
-                new NetconfMasterDOMTransaction(delegateDataBroker);
+                new NetconfMasterDOMTransaction(remoteDeviceId, delegateDataBroker);
 
         masterDataBroker =
                 new NetconfDOMDataBroker(system, remoteDeviceId, masterDOMTransactions);
@@ -114,7 +115,7 @@ public class WriteOnlyTransactionTest {
         // Create slave data broker for testing proxy
 
         final NetconfDOMTransaction proxyDOMTransactions =
-                new NetconfProxyDOMTransaction(system, masterRef);
+                new NetconfProxyDOMTransaction(remoteDeviceId, system, masterRef);
 
         slaveDataBroker = new NetconfDOMDataBroker(system, remoteDeviceId, proxyDOMTransactions);
 
