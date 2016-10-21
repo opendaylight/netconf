@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_7bd6d028",
+        "filename": "features/netconf-connector/src/main/features/features.xml",
+        "patchSetId": 14
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-21T11:13:32Z",
+      "side": 1,
+      "message": "ok, i had bad configuration, now it works without it",
+      "parentUuid": "7a6b29fe_6dd3b95f",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 58
+      },
+      "revId": "d585c2ce51c1a8aac0b395764c52bc09521d4964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_cdcacda0",
         "filename": "netconf/netconf-artifacts/pom.xml",
         "patchSetId": 14
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_7b8b701e",
+        "filename": "netconf/netconf-artifacts/pom.xml",
+        "patchSetId": 14
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-21T11:13:32Z",
+      "side": 1,
+      "message": "this will be removed in following patch, which will remove old clustered topology",
+      "parentUuid": "7a6b29fe_cdcacda0",
+      "range": {
+        "startLine": 246,
+        "startChar": 0,
+        "endLine": 252,
+        "endChar": 25
+      },
+      "revId": "d585c2ce51c1a8aac0b395764c52bc09521d4964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_2db9c115",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/api/NetconfTopologyServicesProvider.java",
         "patchSetId": 14
@@ -59,6 +107,30 @@
       "writtenOn": "2016-10-21T00:19:59Z",
       "side": 1,
       "message": "The javadoc isn\u0027t really accurate. You should explain what this service is providing, what it does, and why it is exposed.\nI\u0027m not sure to see the point of exposing this service, as it has no API.",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 3
+      },
+      "revId": "d585c2ce51c1a8aac0b395764c52bc09521d4964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_45721112",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/api/NetconfTopologyServicesProvider.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-21T11:13:32Z",
+      "side": 1,
+      "message": "It is opened in case of adding some methods in future.",
+      "parentUuid": "7a6b29fe_2db9c115",
       "range": {
         "startLine": 11,
         "startChar": 0,
@@ -128,6 +200,30 @@
       "writtenOn": "2016-10-21T00:19:59Z",
       "side": 1,
       "message": "use java primitive Optional type, if possible.",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 39
+      },
+      "revId": "d585c2ce51c1a8aac0b395764c52bc09521d4964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_454971b6",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-21T11:13:32Z",
+      "side": 1,
+      "message": "no it is not possible, main part of code is in guava optional style so I have no choice, when I using something which is provided with actual functionality.",
+      "parentUuid": "7a6b29fe_4d1a3d18",
       "range": {
         "startLine": 16,
         "startChar": 0,
@@ -427,6 +523,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_c85ab829",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-21T11:13:32Z",
+      "side": 1,
+      "message": "I am not sure about this. Because exception at closing has no impact to workflow, so I used warn.",
+      "parentUuid": "7a6b29fe_adae7196",
+      "range": {
+        "startLine": 179,
+        "startChar": 20,
+        "endLine": 179,
+        "endChar": 24
+      },
+      "revId": "d585c2ce51c1a8aac0b395764c52bc09521d4964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_0d95e53f",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
         "patchSetId": 14
@@ -473,6 +593,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_283a4ccd",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-21T11:13:32Z",
+      "side": 1,
+      "message": "Yes it can be debug level. It says nothing needed.",
+      "parentUuid": "7a6b29fe_cd82cdff",
+      "range": {
+        "startLine": 209,
+        "startChar": 12,
+        "endLine": 209,
+        "endChar": 16
+      },
+      "revId": "d585c2ce51c1a8aac0b395764c52bc09521d4964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_ed9d0959",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyYangTextSourceProvider.java",
         "patchSetId": 14
@@ -484,6 +628,30 @@
       "writtenOn": "2016-10-21T00:19:59Z",
       "side": 1,
       "message": "Shouldn\u0027t you return an empty set instead?",
+      "range": {
+        "startLine": 37,
+        "startChar": 15,
+        "endLine": 37,
+        "endChar": 19
+      },
+      "revId": "d585c2ce51c1a8aac0b395764c52bc09521d4964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_684ba459",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyYangTextSourceProvider.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-21T11:13:32Z",
+      "side": 1,
+      "message": "Hard to say. Maybe it is better to use simply unsupported operation. But null can cause some null pointer exceptions, so it is better with empty set and comment.",
+      "parentUuid": "7a6b29fe_ed9d0959",
       "range": {
         "startLine": 37,
         "startChar": 15,
@@ -519,6 +687,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_68c8c474",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImpl.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-21T11:13:32Z",
+      "side": 1,
+      "message": "This is from abstract-topoogy module. It is exactly (or with some little changes) what used clustered topology before.",
+      "parentUuid": "7a6b29fe_6de0d9cc",
+      "range": {
+        "startLine": 76,
+        "startChar": 13,
+        "endLine": 76,
+        "endChar": 38
+      },
+      "revId": "d585c2ce51c1a8aac0b395764c52bc09521d4964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_6db9f9ca",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImpl.java",
         "patchSetId": 14
@@ -530,6 +722,30 @@
       "writtenOn": "2016-10-21T00:19:59Z",
       "side": 1,
       "message": "How about having NetconfConnectorDTO implements Closable, so those two can be close there, and here you just call deviceCommunicatorDTO.close() ?",
+      "range": {
+        "startLine": 153,
+        "startChar": 0,
+        "endLine": 154,
+        "endChar": 50
+      },
+      "revId": "d585c2ce51c1a8aac0b395764c52bc09521d4964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_48bfc8aa",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImpl.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-21T11:13:32Z",
+      "side": 1,
+      "message": "ok better",
+      "parentUuid": "7a6b29fe_6db9f9ca",
       "range": {
         "startLine": 153,
         "startChar": 0,
@@ -680,6 +896,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_0890304d",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImpl.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-21T11:13:32Z",
+      "side": 1,
+      "message": "Yes but it is not in any util class. So in this moment I can only add comment.",
+      "parentUuid": "7a6b29fe_8ddd7517",
+      "range": {
+        "startLine": 333,
+        "startChar": 0,
+        "endLine": 342,
+        "endChar": 5
+      },
+      "revId": "d585c2ce51c1a8aac0b395764c52bc09521d4964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_adeaf1a9",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteOperationTxProcessorImpl.java",
         "patchSetId": 14
@@ -749,6 +989,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_a8049c7e",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteOperationTxProcessorImpl.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-21T11:13:32Z",
+      "side": 1,
+      "message": "because we need only 1 transaction on all read operations, we do not need close it every time when we perform operation.\n\nAnd yep I forgot close readTx in close method :)",
+      "parentUuid": "7a6b29fe_0d3fa526",
+      "range": {
+        "startLine": 43,
+        "startChar": 8,
+        "endLine": 43,
+        "endChar": 58
+      },
+      "revId": "d585c2ce51c1a8aac0b395764c52bc09521d4964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_edcb4948",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteOperationTxProcessorImpl.java",
         "patchSetId": 14
@@ -760,6 +1024,30 @@
       "writtenOn": "2016-10-21T00:19:59Z",
       "side": 1,
       "message": "the javadoc of SubmitReply is saying we\u0027re sending this message if the submit succeeded. Here, it hasn\u0027t occurred, because the transaction is already closed. Something is confusing. Can you clarify?",
+      "range": {
+        "startLine": 70,
+        "startChar": 31,
+        "endLine": 70,
+        "endChar": 42
+      },
+      "revId": "d585c2ce51c1a8aac0b395764c52bc09521d4964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_c80f5887",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteOperationTxProcessorImpl.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-21T11:13:32Z",
+      "side": 1,
+      "message": "I agree, but master have to send something to slave, if not slave will be timeouted. I add new message SubmitFailedReply, and at slave side I log proper state. But here is the question how slave will react on this state.",
+      "parentUuid": "7a6b29fe_edcb4948",
       "range": {
         "startLine": 70,
         "startChar": 31,
@@ -795,6 +1083,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_c88638db",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteOperationTxProcessorImpl.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-21T11:13:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_2ded41b8",
+      "range": {
+        "startLine": 71,
+        "startChar": 12,
+        "endLine": 71,
+        "endChar": 67
+      },
+      "revId": "d585c2ce51c1a8aac0b395764c52bc09521d4964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_cd35ad47",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteOperationTxProcessorImpl.java",
         "patchSetId": 14
@@ -806,6 +1118,30 @@
       "writtenOn": "2016-10-21T00:19:59Z",
       "side": 1,
       "message": "is this possible?",
+      "range": {
+        "startLine": 132,
+        "startChar": 20,
+        "endLine": 132,
+        "endChar": 33
+      },
+      "revId": "d585c2ce51c1a8aac0b395764c52bc09521d4964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_48722812",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteOperationTxProcessorImpl.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-21T11:13:32Z",
+      "side": 1,
+      "message": "I do not know. I added it for sure because if it is possible, then it fail on sending null message;",
+      "parentUuid": "7a6b29fe_cd35ad47",
       "range": {
         "startLine": 132,
         "startChar": 20,
@@ -887,6 +1223,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_88f1e06c",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/SlaveSalFacade.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-21T11:13:32Z",
+      "side": 1,
+      "message": "I do not agree.\nI have not registered bindingAwareBroker. So: \nClose method:\n\nmountInstance.close();\ntopologyDatastoreAdapter.close();\ntopologyDatastoreAdapter \u003d null;\ntxChain.close();\n\nwill fail. I have only mount instance created and this one I close.",
+      "parentUuid": "7a6b29fe_2d1b81cb",
+      "range": {
+        "startLine": 71,
+        "startChar": 12,
+        "endLine": 71,
+        "endChar": 51
+      },
+      "revId": "d585c2ce51c1a8aac0b395764c52bc09521d4964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_cd83edca",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/SlaveSalFacade.java",
         "patchSetId": 14
@@ -921,6 +1281,30 @@
       "writtenOn": "2016-10-21T00:19:59Z",
       "side": 1,
       "message": "should be Optional, as only master have it.",
+      "range": {
+        "startLine": 68,
+        "startChar": 4,
+        "endLine": 68,
+        "endChar": 59
+      },
+      "revId": "d585c2ce51c1a8aac0b395764c52bc09521d4964",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_a8181c85",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfNodeActor.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-21T11:13:32Z",
+      "side": 1,
+      "message": "I do not need replace null variable and optional is not designed for replacing every single null reference.",
+      "parentUuid": "7a6b29fe_4d77dd02",
       "range": {
         "startLine": 68,
         "startChar": 4,
