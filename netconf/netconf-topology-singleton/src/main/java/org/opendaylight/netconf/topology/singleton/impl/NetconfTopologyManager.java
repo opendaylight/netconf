@@ -83,16 +83,16 @@ public class NetconfTopologyManager
                                   final NetconfClientDispatcher clientDispatcher,
                                   final DOMMountPointService domMountPointService,
                                   final String topologyId) {
-        this.dataBroker = Preconditions.checkNotNull(dataBroker);
-        this.rpcProviderRegistry = Preconditions.checkNotNull(rpcProviderRegistry);
-        this.clusterSingletonServiceProvider = Preconditions.checkNotNull(clusterSingletonServiceProvider);
-        this.keepaliveExecutor = Preconditions.checkNotNull(keepaliveExecutor);
-        this.processingExecutor = Preconditions.checkNotNull(processingExecutor);
-        this.actorSystem = Preconditions.checkNotNull(actorSystemProvider).getActorSystem();
-        this.eventExecutor = Preconditions.checkNotNull(eventExecutor);
-        this.clientDispatcher = Preconditions.checkNotNull(clientDispatcher);
+        this.dataBroker = dataBroker;
+        this.rpcProviderRegistry = rpcProviderRegistry;
+        this.clusterSingletonServiceProvider = clusterSingletonServiceProvider;
+        this.keepaliveExecutor = keepaliveExecutor;
+        this.processingExecutor = processingExecutor;
+        this.actorSystem = actorSystemProvider.getActorSystem();
+        this.eventExecutor = eventExecutor;
+        this.clientDispatcher = clientDispatcher;
         this.domMountPointService = domMountPointService;
-        this.topologyId = Preconditions.checkNotNull(topologyId);
+        this.topologyId = topologyId;
     }
 
     // Blueprint init method
