@@ -169,7 +169,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                 ? NetconfTopologyUtils.DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
 
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade =  new MasterSalFacade(remoteDeviceId,
-                netconfTopologyDeviceSetup.getDomBroker(), netconfTopologyDeviceSetup.getBindingAwareBroker(),
+                netconfTopologyDeviceSetup.getDataBroker(), netconfTopologyDeviceSetup.getDOMMountPointService(),
                 netconfTopologyDeviceSetup.getActorSystem(), deviceContextActorRef);
         if (keepaliveDelay > 0) {
             LOG.info("{}: Adding keepalive facade.", remoteDeviceId);
