@@ -12,6 +12,7 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 public class DeleteRequest implements TransactionRequest {
+    private static final long serialVersionUID = 1L;
 
     private final LogicalDatastoreType store;
     private final YangInstanceIdentifier path;

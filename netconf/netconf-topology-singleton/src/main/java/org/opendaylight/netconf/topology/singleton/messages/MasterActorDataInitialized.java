@@ -15,4 +15,5 @@ import java.io.Serializable;
  * when this message is received by master, operational data-store is changed.
  */
 public class MasterActorDataInitialized implements Serializable {
+    private static final long serialVersionUID = 1L;
 }

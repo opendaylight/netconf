@@ -14,4 +14,5 @@ import java.io.Serializable;
  * Message is sended when read result do not present any value.
  */
 public class EmptyReadResponse implements Serializable {
+    private static final long serialVersionUID = 1L;
 }

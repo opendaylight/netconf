@@ -9,4 +9,5 @@
 package org.opendaylight.netconf.topology.singleton.messages.transactions;
 
 public class SubmitRequest implements TransactionRequest {
+    private static final long serialVersionUID = 1L;
 }

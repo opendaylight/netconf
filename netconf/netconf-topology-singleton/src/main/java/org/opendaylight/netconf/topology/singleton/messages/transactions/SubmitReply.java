@@ -14,4 +14,5 @@ import java.io.Serializable;
  * Message sent from master back to the slave when submit is successfully performed.
  */
 public class SubmitReply implements Serializable {
+    private static final long serialVersionUID = 1L;
 }
