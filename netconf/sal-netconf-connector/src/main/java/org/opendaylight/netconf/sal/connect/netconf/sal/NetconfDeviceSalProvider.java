@@ -64,6 +64,20 @@ public class NetconfDeviceSalProvider implements AutoCloseable, Provider, Bindin
         this.id = deviceId;
     }
 
+    public NetconfDeviceSalProvider(final RemoteDeviceId deviceId, final DOMMountPointService domMountPointService) {
+        this(deviceId);
+        mountInstance = new MountInstance(domMountPointService, id);
+    }
+
+    public NetconfDeviceSalProvider(final RemoteDeviceId deviceId,
+                                    final DOMMountPointService domMountPointService,
+                                    final DataBroker dataBroker) {
+        this(deviceId, domMountPointService);
+
+        this.dataBroker = dataBroker;
+        txChain = Preconditions.checkNotNull(dataBroker).createTransactionChain(transactionChainListener);
+    }
+
     public MountInstance getMountInstance() {
         Preconditions.checkState(mountInstance != null,
                 "%s: Mount instance was not initialized by sal. Cannot get mount instance", id);

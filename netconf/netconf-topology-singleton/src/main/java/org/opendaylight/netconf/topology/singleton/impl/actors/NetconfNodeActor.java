@@ -20,6 +20,7 @@ import javax.annotation.Nonnull;
 import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.RemoteSchemaProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.RemoteOperationTxProcessor;
@@ -60,24 +61,26 @@ public class NetconfNodeActor extends UntypedActor {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeActor.class);
 
-    private NetconfTopologySetup setup;
-    private RemoteDeviceId id;
     private final SchemaSourceRegistry schemaRegistry;
     private final SchemaRepository schemaRepository;
 
+    private NetconfTopologySetup setup;
+    private RemoteDeviceId id;
     private RemoteOperationTxProcessor operationsProcessor;
     private List<SourceIdentifier> sourceIdentifiers;
     private SlaveSalFacade slaveSalManager;
 
     public static Props props(final NetconfTopologySetup setup,
-                              final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
+                              final RemoteDeviceId id,
+                              final SchemaSourceRegistry schemaRegistry,
                               final SchemaRepository schemaRepository) {
         return Props.create(NetconfNodeActor.class, () ->
                 new NetconfNodeActor(setup, id, schemaRegistry, schemaRepository));
     }
 
     private NetconfNodeActor(final NetconfTopologySetup setup,
-                             final RemoteDeviceId id, SchemaSourceRegistry schemaRegistry,
+                             final RemoteDeviceId id,
+                             final SchemaSourceRegistry schemaRegistry,
                              final SchemaRepository schemaRepository) {
         this.setup = setup;
         this.id = id;
@@ -191,7 +194,7 @@ public class NetconfNodeActor extends UntypedActor {
         if (this.slaveSalManager != null) {
             slaveSalManager.close();
         }
-        slaveSalManager = new SlaveSalFacade(id, setup.getDomBroker(), setup.getActorSystem());
+        slaveSalManager = new SlaveSalFacade(id, setup.getActorSystem(), setup.getDOMMountPointService());
 
         final CheckedFuture<SchemaContext, SchemaResolutionException> remoteSchemaContext =
                 getSchemaContext(masterReference);
