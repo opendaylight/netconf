@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.topology.singleton.messages;
+package org.opendaylight.netconf.topology.singleton.messages.transactions;
 
 import java.io.Serializable;
 
