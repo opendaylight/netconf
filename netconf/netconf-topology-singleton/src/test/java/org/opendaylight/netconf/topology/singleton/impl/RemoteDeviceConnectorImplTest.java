@@ -30,6 +30,7 @@ import org.mockito.Mock;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
 import org.opendaylight.controller.sal.core.api.Broker;
@@ -91,6 +92,9 @@ public class RemoteDeviceConnectorImplTest {
     @Mock
     private NetconfClientDispatcher clientDispatcher;
 
+    @Mock
+    private DOMMountPointService domMountPointService;
+
     private NetconfTopologySetup.NetconfTopologySetupBuilder builder;
     private RemoteDeviceId remoteDeviceId;
 
@@ -105,14 +109,13 @@ public class RemoteDeviceConnectorImplTest {
         builder.setDataBroker(dataBroker);
         builder.setRpcProviderRegistry(rpcProviderRegistry);
         builder.setClusterSingletonServiceProvider(clusterSingletonServiceProvider);
-        builder.setBindingAwareBroker(bindingAwareBroker);
         builder.setKeepaliveExecutor(keepaliveExecutor);
         builder.setProcessingExecutor(processingExecutor);
-        builder.setDomBroker(domBroker);
         builder.setActorSystem(actorSystem);
         builder.setEventExecutor(eventExecutor);
         builder.setNetconfClientDispatcher(clientDispatcher);
         builder.setTopologyId(TOPOLOGY_ID);
+        builder.setDOMMountPointService(domMountPointService);
 
     }
 

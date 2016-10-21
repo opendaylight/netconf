@@ -17,11 +17,11 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
-import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -56,24 +56,14 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     private DOMDataBroker deviceDataBroker = null;
 
     MasterSalFacade(final RemoteDeviceId id,
-                           final Broker domBroker,
-                           final BindingAwareBroker bindingBroker,
-                           final ActorSystem actorSystem,
-                           final ActorRef masterActorRef) {
+                    final DataBroker dataBroker,
+                    final DOMMountPointService domMountPointService,
+                    final ActorSystem actorSystem,
+                    final ActorRef masterActorRef) {
         this.id = id;
-        this.salProvider = new NetconfDeviceSalProvider(id);
+        this.salProvider = new NetconfDeviceSalProvider(id, domMountPointService, dataBroker);
         this.actorSystem = actorSystem;
         this.masterActorRef = masterActorRef;
-
-        registerToSal(domBroker, bindingBroker);
-    }
-
-    private void registerToSal(final Broker domRegistryDependency, final BindingAwareBroker bindingBroker) {
-        // TODO: remove use of provider, there is possible directly create mount instance and
-        // TODO: NetconfDeviceTopologyAdapter in constructor = less complexity
-
-        domRegistryDependency.registerProvider(salProvider);
-        bindingBroker.registerProvider(salProvider);
     }
 
     @Override
