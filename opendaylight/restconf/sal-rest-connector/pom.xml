@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>restconf-parent</artifactId>
-    <version>1.3.4-SNAPSHOT</version>
+    <version>1.3.5-SNAPSHOT</version>
   </parent>
   <artifactId>sal-rest-connector</artifactId>
   <packaging>bundle</packaging>
