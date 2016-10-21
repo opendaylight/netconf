@@ -27,6 +27,7 @@ import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
 import org.opendaylight.controller.sal.core.api.Broker;
@@ -73,14 +74,21 @@ public class NetconfTopologyManager
     private final ActorSystem actorSystem;
     private final EventExecutor eventExecutor;
     private final NetconfClientDispatcher clientDispatcher;
+    private final DOMMountPointService domMountPointService;
     private final String topologyId;
 
-    public NetconfTopologyManager(final DataBroker dataBroker, final RpcProviderRegistry rpcProviderRegistry,
-                           final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
-                           final BindingAwareBroker bindingAwareBroker,
-                           final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
-                           final Broker domBroker, final ActorSystemProvider actorSystemProvider, final EventExecutor eventExecutor,
-                           final NetconfClientDispatcher clientDispatcher, final String topologyId) {
+    public NetconfTopologyManager(final DataBroker dataBroker,
+                                  final RpcProviderRegistry rpcProviderRegistry,
+                                  final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
+                                  final BindingAwareBroker bindingAwareBroker,
+                                  final ScheduledThreadPool keepaliveExecutor,
+                                  final ThreadPool processingExecutor,
+                                  final Broker domBroker,
+                                  final ActorSystemProvider actorSystemProvider,
+                                  final EventExecutor eventExecutor,
+                                  final NetconfClientDispatcher clientDispatcher,
+                                  final DOMMountPointService domMountPointService,
+                                  final String topologyId) {
         this.dataBroker = Preconditions.checkNotNull(dataBroker);
         this.rpcProviderRegistry = Preconditions.checkNotNull(rpcProviderRegistry);
         this.clusterSingletonServiceProvider = Preconditions.checkNotNull(clusterSingletonServiceProvider);
@@ -91,6 +99,7 @@ public class NetconfTopologyManager
         this.actorSystem = Preconditions.checkNotNull(actorSystemProvider).getActorSystem();
         this.eventExecutor = Preconditions.checkNotNull(eventExecutor);
         this.clientDispatcher = Preconditions.checkNotNull(clientDispatcher);
+        this.domMountPointService = domMountPointService;
         this.topologyId = Preconditions.checkNotNull(topologyId);
     }
 
@@ -229,14 +238,13 @@ public class NetconfTopologyManager
                 .setInstanceIdentifier(instanceIdentifier)
                 .setRpcProviderRegistry(rpcProviderRegistry)
                 .setNode(node)
-                .setBindingAwareBroker(bindingAwareBroker)
                 .setActorSystem(actorSystem)
                 .setEventExecutor(eventExecutor)
-                .setDomBroker(domBroker)
                 .setKeepaliveExecutor(keepaliveExecutor)
                 .setProcessingExecutor(processingExecutor)
                 .setTopologyId(topologyId)
-                .setNetconfClientDispatcher(clientDispatcher);
+                .setNetconfClientDispatcher(clientDispatcher)
+                .setDOMMountPointService(domMountPointService);
 
         return builder.build();
     }

@@ -17,6 +17,7 @@ import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
@@ -44,15 +45,17 @@ class NetconfNodeManager
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeManager.class);
 
+    private final SchemaSourceRegistry schemaRegistry;
+    private final SchemaRepository schemaRepository;
+
     private NetconfTopologySetup setup;
     private ListenerRegistration<NetconfNodeManager> dataChangeListenerRegistration;
     private RemoteDeviceId id;
-    private final SchemaSourceRegistry schemaRegistry;
-    private final SchemaRepository schemaRepository;
     private ActorRef slaveActorRef;
 
     NetconfNodeManager(final NetconfTopologySetup setup,
-                       final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
+                       final RemoteDeviceId id,
+                       final SchemaSourceRegistry schemaRegistry,
                        final SchemaRepository schemaRepository) {
         this.setup = setup;
         this.id = id;
