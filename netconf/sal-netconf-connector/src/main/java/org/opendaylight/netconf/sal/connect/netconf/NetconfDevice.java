@@ -111,7 +111,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
         return new NetconfDeviceRpc(baseSchema.getSchemaContext(), listener, new NetconfMessageTransformer(baseSchema.getSchemaContext(), false, baseSchema));
     }
 
-    protected NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
+    public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
                          final ExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange) {
         this.id = id;
         this.reconnectOnSchemasChange = reconnectOnSchemasChange;
@@ -203,7 +203,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
         return remoteSessionCapabilities.isNotificationsSupported() && reconnectOnSchemasChange;
     }
 
-    protected void handleSalInitializationSuccess(final SchemaContext result, final NetconfSessionPreferences remoteSessionCapabilities, final DOMRpcService deviceRpc) {
+    void handleSalInitializationSuccess(final SchemaContext result, final NetconfSessionPreferences remoteSessionCapabilities, final DOMRpcService deviceRpc) {
         final BaseSchema baseSchema =
                 remoteSessionCapabilities.isNotificationsSupported() ?
                 BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS :
@@ -218,7 +218,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
         LOG.info("{}: Netconf connector initialized successfully", id);
     }
 
-    protected void handleSalInitializationFailure(final Throwable t, final RemoteDeviceCommunicator<NetconfMessage> listener) {
+    void handleSalInitializationFailure(final Throwable t, final RemoteDeviceCommunicator<NetconfMessage> listener) {
         LOG.error("{}: Initialization in sal failed, disconnecting from device", id, t);
         listener.close();
         onRemoteSessionDown();

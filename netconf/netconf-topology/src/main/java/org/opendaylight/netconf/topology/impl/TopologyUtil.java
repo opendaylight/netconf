@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.topology.util;
+package org.opendaylight.netconf.topology.impl;
 
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -46,13 +46,5 @@ public final class TopologyUtil {
     public static KeyedInstanceIdentifier<Topology, TopologyKey> createTopologyListPath(final String topologyId) {
         final InstanceIdentifier<NetworkTopology> networkTopology = InstanceIdentifier.create(NetworkTopology.class);
         return networkTopology.child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
-    }
-
-    public static InstanceIdentifier<Node> createTopologyNodeListPath(final NodeKey key, final String topologyId) {
-        return createTopologyListPath(topologyId).child(Node.class, new NodeKey(new NodeId(key.getNodeId().getValue())));
-    }
-
-    public static InstanceIdentifier<Node> createTopologyNodePath(final String topologyId) {
-        return createTopologyListPath(topologyId).child(Node.class);
     }
 }
