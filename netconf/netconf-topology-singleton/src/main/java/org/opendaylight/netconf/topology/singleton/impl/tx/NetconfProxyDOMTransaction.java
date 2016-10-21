@@ -15,6 +15,7 @@ import akka.pattern.Patterns;
 import com.google.common.base.Optional;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
@@ -39,10 +40,14 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfProxyDOMTransaction.class);
 
+    private final RemoteDeviceId id;
     private final ActorSystem actorSystem;
     private final ActorRef masterContextRef;
 
-    public NetconfProxyDOMTransaction(final ActorSystem actorSystem, final ActorRef masterContextRef) {
+    public NetconfProxyDOMTransaction(final RemoteDeviceId id,
+                                      final ActorSystem actorSystem,
+                                      final ActorRef masterContextRef) {
+        this.id = id;
         this.actorSystem = actorSystem;
         this.masterContextRef = masterContextRef;
     }
@@ -54,13 +59,15 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
         final Future<Object> readScalaFuture =
                 Patterns.ask(masterContextRef, new ReadRequest(store, path), NetconfTopologyUtils.TIMEOUT);
 
+        LOG.trace("{}: Read {} via NETCONF: {}", id, store, path);
+
         final DefaultPromise<Optional<NormalizedNodeMessage>> promise = new DefaultPromise<>();
 
         readScalaFuture.onComplete(new OnComplete<Object>() {
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) { // ask timeout
-                    Exception exception = new DocumentedException("Master is down. Please try again.",
+                    Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
                             DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
                             DocumentedException.ErrorSeverity.WARNING);
                     promise.failure(exception);
@@ -87,12 +94,14 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
         final Future<Object> existsScalaFuture =
                 Patterns.ask(masterContextRef, new ExistsRequest(store, path), NetconfTopologyUtils.TIMEOUT);
 
+        LOG.trace("{}: Exists {} via NETCONF: {}", id, store, path);
+
         final DefaultPromise<Boolean> promise = new DefaultPromise<>();
         existsScalaFuture.onComplete(new OnComplete<Object>() {
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) { // ask timeout
-                    Exception exception = new DocumentedException("Master is down. Please try again.",
+                    Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
                             DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
                             DocumentedException.ErrorSeverity.WARNING);
                     promise.failure(exception);
@@ -110,17 +119,23 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
 
     @Override
     public void put(final LogicalDatastoreType store, final NormalizedNodeMessage data) {
+        LOG.trace("{}: Write {} via NETCONF: {} with payload {}", id, store, data.getIdentifier(), data.getNode());
+
         masterContextRef.tell(new PutRequest(store, data), ActorRef.noSender());
 
     }
 
     @Override
     public void merge(final LogicalDatastoreType store, final NormalizedNodeMessage data) {
+        LOG.trace("{}: Merge {} via NETCONF: {} with payload {}", id, store, data.getIdentifier(), data.getNode());
+
         masterContextRef.tell(new MergeRequest(store, data), ActorRef.noSender());
     }
 
     @Override
     public void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        LOG.trace("{}: Delete {} via NETCONF: {}", id, store, path);
+
         masterContextRef.tell(new DeleteRequest(store, path), ActorRef.noSender());
     }
 
@@ -128,6 +143,9 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
     public boolean cancel() {
         final Future<Object> cancelScalaFuture =
                 Patterns.ask(masterContextRef, new CancelRequest(), NetconfTopologyUtils.TIMEOUT);
+
+        LOG.trace("{}: Cancel {} via NETCONF", id);
+
         try {
             // here must be Await because AsyncWriteTransaction do not return future
             return (boolean) Await.result(cancelScalaFuture, NetconfTopologyUtils.TIMEOUT.duration());
@@ -141,13 +159,15 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
         final Future<Object> submitScalaFuture =
                 Patterns.ask(masterContextRef, new SubmitRequest(), NetconfTopologyUtils.TIMEOUT);
 
+        LOG.trace("{}: Submit {} via NETCONF", id);
+
         final DefaultPromise<Void> promise = new DefaultPromise<>();
 
         submitScalaFuture.onComplete(new OnComplete<Object>() {
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) { // ask timeout
-                    Exception exception = new DocumentedException("Master is down. Please try again.",
+                    Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
                             DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
                             DocumentedException.ErrorSeverity.WARNING);
                     promise.failure(exception);
@@ -157,7 +177,7 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
                     promise.failure((Throwable) success);
                 } else {
                     if (success instanceof SubmitFailedReply) {
-                        LOG.error("Transaction was not submitted.");
+                        LOG.error("{}: Transaction was not submitted because already closed.", id);
                     }
                     promise.success(null);
                 }

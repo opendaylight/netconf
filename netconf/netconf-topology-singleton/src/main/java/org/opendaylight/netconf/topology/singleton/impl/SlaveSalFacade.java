@@ -50,7 +50,7 @@ public class SlaveSalFacade {
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
 
         final NetconfDOMTransaction proxyDOMTransactions =
-                new NetconfProxyDOMTransaction(actorSystem, masterActorRef);
+                new NetconfProxyDOMTransaction(id, actorSystem, masterActorRef);
 
         final NetconfDOMDataBroker netconfDeviceDataBroker =
                 new NetconfDOMDataBroker(actorSystem, id, proxyDOMTransactions);
