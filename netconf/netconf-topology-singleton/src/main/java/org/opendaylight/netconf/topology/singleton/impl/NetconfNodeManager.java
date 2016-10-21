@@ -67,23 +67,23 @@ class NetconfNodeManager
             final NodeId nodeId = NetconfTopologyUtils.getNodeId(rootNode.getIdentifier());
             switch (rootNode.getModificationType()) {
                 case SUBTREE_MODIFIED:
-                    LOG.debug("Operational for node {} updated. Trying to register slave mount point", nodeId);
+                    LOG.debug("{}: Operational for node {} updated. Trying to register slave mount point", id, nodeId);
                     handleSlaveMountPoint(rootNode);
                     break;
                 case WRITE:
                     if (rootNode.getDataBefore() != null) {
-                        LOG.debug("Operational for node {} rewrited. Trying to register slave mount point", nodeId);
+                        LOG.debug("{}: Operational for node {} rewrited. Trying to register slave mount point", id, nodeId);
                     } else {
-                        LOG.debug("Operational for node {} created. Trying to register slave mount point", nodeId);
+                        LOG.debug("{}: Operational for node {} created. Trying to register slave mount point", id, nodeId);
                     }
                     handleSlaveMountPoint(rootNode);
                     break;
                 case DELETE:
-                    LOG.debug("Operational for node {} deleted. Trying to remove slave mount point", nodeId);
+                    LOG.debug("{}: Operational for node {} deleted. Trying to remove slave mount point", id, nodeId);
                     closeActor();
                     break;
                 default:
-                    LOG.debug("Uknown operation for node: {}", nodeId);
+                    LOG.debug("{}: Uknown operation for node: {}", id, nodeId);
             }
         }
     }
@@ -107,7 +107,7 @@ class NetconfNodeManager
     }
 
     void registerDataTreeChangeListener(final String topologyId, final NodeKey key) {
-        LOG.debug("Registering data tree change listener on node {}", key);
+        LOG.debug("{}: Registering data tree change listener on node {}", id, key);
         dataChangeListenerRegistration = setup.getDataBroker().registerDataTreeChangeListener(
                 new DataTreeIdentifier<>(LogicalDatastoreType.OPERATIONAL,
                         NetconfTopologyUtils.createTopologyNodeListPath(key, topologyId)), this);

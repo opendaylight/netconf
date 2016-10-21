@@ -137,23 +137,23 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         Futures.addCallback(future, new FutureCallback<NetconfDeviceCapabilities>() {
             @Override
             public void onSuccess(NetconfDeviceCapabilities result) {
-                LOG.debug("{}: Connector started succesfully", nodeId.getValue());
+                LOG.debug("{}: Connector started successfully", remoteDeviceId);
             }
 
             @Override
             public void onFailure(@Nullable Throwable throwable) {
-                LOG.error("{}: Connector failed, {}", nodeId.getValue(), throwable);
+                LOG.error("{}: Connector failed, {}", remoteDeviceId, throwable);
             }
         });
     }
 
     @Override
     public void stopRemoteDeviceConnection() {
-        Preconditions.checkNotNull(deviceCommunicatorDTO, "Device communicator was not created.");
+        Preconditions.checkNotNull(deviceCommunicatorDTO, remoteDeviceId + ": Device communicator was not created.");
         try {
             deviceCommunicatorDTO.close();
         } catch (Exception e) {
-            LOG.warn("{}: Error at closing device communicator.", remoteDeviceId);
+            LOG.error("{}: Error at closing device communicator.", remoteDeviceId, e);
         }
     }
 
@@ -172,7 +172,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                 netconfTopologyDeviceSetup.getDomBroker(), netconfTopologyDeviceSetup.getBindingAwareBroker(),
                 netconfTopologyDeviceSetup.getActorSystem(), deviceContextActorRef);
         if (keepaliveDelay > 0) {
-            LOG.info("Device: {} , Adding keepalive facade.", nodeId);
+            LOG.info("{}: Adding keepalive facade.", remoteDeviceId);
             salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade,
                     netconfTopologyDeviceSetup.getKeepaliveExecutor().getExecutor(), keepaliveDelay,
                     defaultRequestTimeoutMillis);
@@ -226,7 +226,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                         ? NetconfTopologyUtils.DEFAULT_CONCURRENT_RPC_LIMIT : node.getConcurrentRpcLimit();
 
         if (rpcMessageLimit < 1) {
-            LOG.info("Device: {}, Concurrent rpc limit is smaller than 1, no limit will be enforced.", remoteDeviceId);
+            LOG.info("{}: Concurrent rpc limit is smaller than 1, no limit will be enforced.", remoteDeviceId);
         }
 
         return new NetconfConnectorDTO(
@@ -249,8 +249,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         final NetconfSessionPreferences parsedOverrideCapabilities =
                 NetconfSessionPreferences.fromStrings(capabilities);
-        Preconditions.checkState(parsedOverrideCapabilities.getNonModuleCaps().isEmpty(),
-                "Capabilities to override can only contain module based capabilities, non-module capabilities "
+        Preconditions.checkState(parsedOverrideCapabilities.getNonModuleCaps().isEmpty(), remoteDeviceId +
+                ": Capabilities to override can only contain module based capabilities, non-module capabilities "
                         + "will be retrieved from the device, configured non-module capabilities: "
                         + parsedOverrideCapabilities.getNonModuleCaps());
 
@@ -283,11 +283,11 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                     }
                 }
                 LOG.info("{} : netconf connector will use schema cache directory {} instead of {}",
-                        nodeId.getValue(), moduleSchemaCacheDirectory, NetconfTopologyUtils.DEFAULT_CACHE_DIRECTORY);
+                        remoteDeviceId, moduleSchemaCacheDirectory, NetconfTopologyUtils.DEFAULT_CACHE_DIRECTORY);
             }
         } else {
             LOG.info("{} : using the default directory {}",
-                    nodeId.getValue(), NetconfTopologyUtils.QUALIFIED_DEFAULT_CACHE_DIRECTORY);
+                    remoteDeviceId, NetconfTopologyUtils.QUALIFIED_DEFAULT_CACHE_DIRECTORY);
         }
 
         if (schemaResourcesDTO == null) {
@@ -402,7 +402,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                     ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getUsername(),
                     ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getPassword());
         } else {
-            throw new IllegalStateException("Only login/password authentification is supported");
+            throw new IllegalStateException(remoteDeviceId + ": Only login/password authentication is supported");
         }
 
         return NetconfReconnectingClientConfigurationBuilder.create()

@@ -131,7 +131,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
 
-        LOG.info("Creating master data broker for device {}", id);
+        LOG.info("{}: Creating master data broker for device", id);
 
         final NetconfDOMTransaction masterDOMTransactions =
                 new NetconfMasterDOMTransaction(id, remoteSchemaContext, deviceRpc, netconfSessionPreferences);
@@ -169,7 +169,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
             try {
                 resource.close();
             } catch (final Exception e) {
-                LOG.warn("{}: Ignoring exception while closing {}", id, resource, e);
+                LOG.error("{}: Ignoring exception while closing {}", id, resource, e);
             }
         }
     }
