@@ -16,6 +16,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
  * Master responds with resolved schema source.
  */
 public class YangTextSchemaSourceRequest implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final SourceIdentifier sourceIdentifier;
 

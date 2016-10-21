@@ -14,4 +14,5 @@ import java.io.Serializable;
  * Message sent from master back to the slave when submit is not performed, tx is closed
  */
 public class SubmitFailedReply implements Serializable {
+    private static final long serialVersionUID = 1L;
 }
