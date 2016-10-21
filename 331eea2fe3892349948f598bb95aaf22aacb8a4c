@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_2f208e48",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyDOMRpcService.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-21T22:23:39Z",
+      "side": 1,
+      "message": "please inline.",
+      "range": {
+        "startLine": 70,
+        "startChar": 8,
+        "endLine": 72,
+        "endChar": 21
+      },
+      "revId": "331eea2fe3892349948f598bb95aaf22aacb8a4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_0f1b121d",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/InvokeRpcMessage.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-21T22:23:39Z",
+      "side": 1,
+      "message": "missing serialVersionUID",
+      "revId": "331eea2fe3892349948f598bb95aaf22aacb8a4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_4f150ae4",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/InvokeRpcMessageReply.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-21T22:23:39Z",
+      "side": 1,
+      "message": "missing serialVersionUID",
+      "revId": "331eea2fe3892349948f598bb95aaf22aacb8a4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
