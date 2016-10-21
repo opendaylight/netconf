@@ -176,14 +176,14 @@ public class NetconfTopologyManager
             try {
                 netconfTopologyContext.closeFinal();
             } catch (Exception e) {
-                LOG.warn("Error at closing topology context. InstanceIdentifier: " + instanceIdentifier);
+                LOG.error("Error at closing topology context. InstanceIdentifier: " + instanceIdentifier, e);
             }
         });
         clusterRegistrations.forEach((instanceIdentifier, clusterSingletonServiceRegistration) -> {
             try {
                 clusterSingletonServiceRegistration.close();
             } catch (Exception e) {
-                LOG.warn("Error at unregistering from cluster. InstanceIdentifier: " + instanceIdentifier);
+                LOG.error("Error at unregistering from cluster. InstanceIdentifier: " + instanceIdentifier, e);
             }
         });
         contexts.clear();
