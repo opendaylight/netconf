@@ -126,12 +126,6 @@
       <type>xml</type>
     </dependency>
     <dependency>
-       <groupId>${project.groupId}</groupId>
-       <artifactId>netconf-topology-config</artifactId>
-       <classifier>clustered-config</classifier>
-       <type>xml</type>
-    </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-tcp</artifactId>
     </dependency>
@@ -146,6 +140,10 @@
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk15on</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>netconf-topology-singleton</artifactId>
     </dependency>
 
     <dependency>
