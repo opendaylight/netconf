@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_08aaf0d1",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/netconf/sal/restconf/impl/InstanceIdentifierCodecImplTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-10-21T08:46:56Z",
+      "side": 1,
+      "message": "if possible, try to import it, in general, it should improve readability",
+      "range": {
+        "startLine": 34,
+        "startChar": 36,
+        "endLine": 34,
+        "endChar": 73
+      },
+      "revId": "ea0c4822444d0522ec4f7972f3b1144f094c6be8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
