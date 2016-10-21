@@ -5,12 +5,12 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>odlparent</artifactId>
-        <version>1.6.4-SNAPSHOT</version>
+        <version>1.6.4-Beryllium-SR4</version>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-parent</artifactId>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.4-Beryllium-SR4</version>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
 
@@ -23,30 +23,30 @@
     </modules>
 
     <properties>
-        <aaa.version>0.3.4-SNAPSHOT</aaa.version>
+        <aaa.version>0.3.4-Beryllium-SR4</aaa.version>
         <akka.version>2.3.14</akka.version>
-        <commons.logback_settings.version>0.2.4-SNAPSHOT</commons.logback_settings.version>
-        <commons.opendaylight.version>1.6.4-SNAPSHOT</commons.opendaylight.version>
-        <config.version>0.4.4-SNAPSHOT</config.version>
+        <commons.logback_settings.version>0.2.4-Beryllium-SR4</commons.logback_settings.version>
+        <commons.opendaylight.version>1.6.4-Beryllium-SR4</commons.opendaylight.version>
+        <config.version>0.4.4-Beryllium-SR4</config.version>
         <config.configfile.directory>etc/opendaylight/karaf</config.configfile.directory>
         <exi.nagasena.version>0000.0002.0053.0</exi.nagasena.version>
-        <features.test.version>1.6.4-SNAPSHOT</features.test.version>
-        <ietf-inet-types.version>2010.09.24.8.4-SNAPSHOT</ietf-inet-types.version>
-        <ietf-restconf.version>2013.10.19.8.4-SNAPSHOT</ietf-restconf.version>
-        <ietf-topology.version>2013.10.21.8.4-SNAPSHOT</ietf-topology.version>
-        <ietf-yang-types.version>2010.09.24.8.4-SNAPSHOT</ietf-yang-types.version>
+        <features.test.version>1.6.4-Beryllium-SR4</features.test.version>
+        <ietf-inet-types.version>2010.09.24.8.4-Beryllium-SR4</ietf-inet-types.version>
+        <ietf-restconf.version>2013.10.19.8.4-Beryllium-SR4</ietf-restconf.version>
+        <ietf-topology.version>2013.10.21.8.4-Beryllium-SR4</ietf-topology.version>
+        <ietf-yang-types.version>2010.09.24.8.4-Beryllium-SR4</ietf-yang-types.version>
 
-        <mdsal.version>2.0.4-SNAPSHOT</mdsal.version>
-        <mdsal.model.version>0.8.4-SNAPSHOT</mdsal.model.version>
-        <controller.mdsal.version>1.3.4-SNAPSHOT</controller.mdsal.version>
-        <netconf.version>1.0.4-SNAPSHOT</netconf.version>
-        <restconf.version>1.3.4-SNAPSHOT</restconf.version>
-        <protocol-framework.version>0.7.4-SNAPSHOT</protocol-framework.version>
+        <mdsal.version>2.0.4-Beryllium-SR4</mdsal.version>
+        <mdsal.model.version>0.8.4-Beryllium-SR4</mdsal.model.version>
+        <controller.mdsal.version>1.3.4-Beryllium-SR4</controller.mdsal.version>
+        <netconf.version>1.0.4-Beryllium-SR4</netconf.version>
+        <restconf.version>1.3.4-Beryllium-SR4</restconf.version>
+        <protocol-framework.version>0.7.4-Beryllium-SR4</protocol-framework.version>
         <sshd-core.version>0.14.0</sshd-core.version>
         <scala.major.version>2.11</scala.major.version>
         <scala.minor.version>7</scala.minor.version>
         <surefire.version>2.15</surefire.version>
-        <yangtools.version>0.8.4-SNAPSHOT</yangtools.version>
+        <yangtools.version>0.8.4-Beryllium-SR4</yangtools.version>
 
         <jmxGeneratorPath>src/main/yang-gen-config</jmxGeneratorPath>
         <salGeneratorPath>src/main/yang-gen-sal</salGeneratorPath>
@@ -120,7 +120,7 @@
                         <dependency>
                             <groupId>org.opendaylight.controller</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>0.2.4-SNAPSHOT</version>
+                            <version>0.2.4-Beryllium-SR4</version>
                         </dependency>
                     </dependencies>
                     <executions>
