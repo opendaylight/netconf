@@ -6,26 +6,29 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.sal.rest.impl.test.providers;
+package org.opendaylight.restconf.jersey.providers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.sal.rest.impl.test.providers.TestXmlBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
-import org.opendaylight.restconf.jersey.providers.XmlToPATCHBodyReader;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
-public class TestDraft17XmlPATCHBodyReader extends Draft17AbstractBodyReaderTest {
+public class XmlPATCHBodyReaderTest extends AbstractBodyReaderTest {
 
     private final XmlToPATCHBodyReader xmlPATCHBodyReader;
     private static SchemaContext schemaContext;
 
-    public TestDraft17XmlPATCHBodyReader() throws NoSuchFieldException, SecurityException {
+    public XmlPATCHBodyReaderTest() throws Exception {
         super();
         xmlPATCHBodyReader = new XmlToPATCHBodyReader();
     }
@@ -36,8 +39,9 @@ public class TestDraft17XmlPATCHBodyReader extends Draft17AbstractBodyReaderTest
     }
 
     @BeforeClass
-    public static void initialization() throws NoSuchFieldException, SecurityException {
+    public static void initialization() {
         schemaContext = schemaContextLoader("/instanceidentifier/yang", schemaContext);
+        when(mountPointServiceHandler.get()).thenReturn(mock(DOMMountPointService.class));
         controllerContext.setSchemas(schemaContext);
     }
 
