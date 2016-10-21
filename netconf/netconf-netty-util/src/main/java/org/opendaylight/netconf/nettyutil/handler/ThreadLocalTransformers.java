@@ -22,39 +22,28 @@ final class ThreadLocalTransformers {
     private static final ThreadLocal<Transformer> DEFAULT_TRANSFORMER = new ThreadLocal<Transformer>() {
         @Override
         protected Transformer initialValue() {
-            try {
-                return FACTORY.newTransformer();
-            } catch (TransformerConfigurationException | TransformerFactoryConfigurationError e) {
-                throw new IllegalStateException("Unexpected error while instantiating a Transformer", e);
-            }
-        };
+            return createTransformer();
+        }
 
         @Override
         public void set(final Transformer value) {
             throw new UnsupportedOperationException();
-        };
+        }
     };
 
     private static final ThreadLocal<Transformer> PRETTY_TRANSFORMER = new ThreadLocal<Transformer>() {
         @Override
         protected Transformer initialValue() {
-            final Transformer ret;
-
-            try {
-                ret = FACTORY.newTransformer();
-            } catch (TransformerConfigurationException | TransformerFactoryConfigurationError e) {
-                throw new IllegalStateException("Unexpected error while instantiating a Transformer", e);
-            }
-
+            final Transformer ret = createTransformer();
             ret.setOutputProperty(OutputKeys.INDENT, "yes");
             ret.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
             return ret;
-        };
+        }
 
         @Override
         public void set(final Transformer value) {
             throw new UnsupportedOperationException();
-        };
+        }
     };
 
     private ThreadLocalTransformers() {
@@ -66,7 +55,7 @@ final class ThreadLocalTransformers {
      *
      * @return A transformer with default configuration based on the default implementation.
      */
-    public static Transformer getDefaultTransformer() {
+    static Transformer getDefaultTransformer() {
         return DEFAULT_TRANSFORMER.get();
     }
 
@@ -76,7 +65,15 @@ final class ThreadLocalTransformers {
      *
      * @return A transformer with human-friendly configuration.
      */
-    public static Transformer getPrettyTransformer() {
+    static Transformer getPrettyTransformer() {
         return PRETTY_TRANSFORMER.get();
+    }
+
+    private static Transformer createTransformer() {
+        try {
+            return FACTORY.newTransformer();
+        } catch (TransformerConfigurationException | TransformerFactoryConfigurationError e) {
+            throw new IllegalStateException("Unexpected error while instantiating a Transformer", e);
+        }
     }
 }
