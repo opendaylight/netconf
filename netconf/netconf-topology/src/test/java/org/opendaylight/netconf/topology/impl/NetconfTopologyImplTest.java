@@ -16,7 +16,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import akka.actor.ActorContext;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -42,11 +41,8 @@ import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
-import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
-import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.topology.SchemaRepositoryProvider;
-import org.opendaylight.netconf.topology.util.TopologyUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -111,23 +107,6 @@ public class NetconfTopologyImplTest {
                 mockedDataBroker, mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, mockedSchemaRepositoryProvider);
 
         spyTopology = spy(topology);
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testRegisterMountPointNotSupported() {
-        ActorContext context = mock(ActorContext.class);
-        topology.registerMountPoint(context, NODE_ID);
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testUnregisterMountPointNotSupported() {
-        topology.unregisterMountPoint(NODE_ID);
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testRegisterConnectionStatusListener() {
-        RemoteDeviceHandler<NetconfSessionPreferences> listener = mock(RemoteDeviceHandler.class);
-        topology.registerConnectionStatusListener(NODE_ID, listener);
     }
 
     @Test
