@@ -36,11 +36,6 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>abstract-topology</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-config-dispatcher</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -248,13 +243,6 @@
                 <artifactId>netconf-topology-config</artifactId>
                 <version>${project.version}</version>
                 <classifier>config</classifier>
-                <type>xml</type>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-topology-config</artifactId>
-                <version>${project.version}</version>
-                <classifier>clustered-config</classifier>
                 <type>xml</type>
             </dependency>
             <dependency>

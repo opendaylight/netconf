@@ -8,8 +8,6 @@
 
 package org.opendaylight.netconf.topology.impl;
 
-import akka.actor.ActorContext;
-import akka.actor.ActorRef;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import io.netty.util.concurrent.EventExecutor;
@@ -34,11 +32,8 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.SchemaRepositoryProvider;
-import org.opendaylight.netconf.topology.pipeline.TopologyMountPointFacade.ConnectionStatusListenerRegistration;
-import org.opendaylight.netconf.topology.util.TopologyUtil;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyBuilder;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyBuilder;
@@ -82,26 +77,6 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
     @Override
     protected RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(RemoteDeviceId id, Broker domBroker, BindingAwareBroker bindingBroker) {
         return new NetconfDeviceSalFacade(id, domBroker, bindingAwareBroker);
-    }
-
-    @Override
-    public void registerMountPoint(ActorContext context, NodeId nodeId) {
-        throw new UnsupportedOperationException("MountPoint registration is not supported in regular topology, this happens automaticaly in the netconf pipeline");
-    }
-
-    @Override
-    public void registerMountPoint(ActorContext context, NodeId nodeId, ActorRef masterRef) {
-        throw new UnsupportedOperationException("MountPoint registration is not supported in regular topology, this happens automaticaly in the netconf pipeline");
-    }
-
-    @Override
-    public void unregisterMountPoint(NodeId nodeId) {
-        throw new UnsupportedOperationException("MountPoint registration is not supported in regular topology, this happens automaticaly in the netconf pipeline");
-    }
-
-    @Override
-    public ConnectionStatusListenerRegistration registerConnectionStatusListener(NodeId node, RemoteDeviceHandler<NetconfSessionPreferences> listener) {
-        throw new UnsupportedOperationException("Registering a listener on a regular netconf device is not supported(supported only in clustered netconf topology)");
     }
 
     @Override
