@@ -57,7 +57,6 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.UserPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.netconf.topology.pipeline.TopologyMountPointFacade.ConnectionStatusListenerRegistration;
 import org.opendaylight.protocol.framework.ReconnectStrategy;
 import org.opendaylight.protocol.framework.ReconnectStrategyFactory;
 import org.opendaylight.protocol.framework.TimedReconnectStrategy;
@@ -203,16 +202,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
 
     @Override
     public abstract void onSessionInitiated(ProviderContext session);
-
-    @Override
-    public String getTopologyId() {
-        return topologyId;
-    }
-
-    @Override
-    public DataBroker getDataBroker() {
-        return dataBroker;
-    }
 
     @Override
     public ListenableFuture<NetconfDeviceCapabilities> connectNode(NodeId nodeId, Node configNode) {
@@ -448,9 +437,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     }
 
     protected abstract RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id, final Broker domBroker, final BindingAwareBroker bindingBroker);
-
-    @Override
-    public abstract ConnectionStatusListenerRegistration registerConnectionStatusListener(NodeId node, RemoteDeviceHandler<NetconfSessionPreferences> listener);
 
     @Override
     public void onSessionInitiated(ProviderSession session) {
