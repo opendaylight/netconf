@@ -203,6 +203,11 @@
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.opendaylight.controller</groupId>
+      <artifactId>sal-distributed-datastore</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <scm>
