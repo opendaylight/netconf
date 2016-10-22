@@ -86,7 +86,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
         }
 
         for (final GenericNotificationListenerReg listenerReg : notificationListeners.get(BASE_STREAM_NAME)) {
-            listenerReg.getListener().onNotification(BASE_STREAM_NAME, notification);
+            listenerReg.getListener().onNotification(stream, notification);
         }
     }
 
