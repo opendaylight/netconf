@@ -16,6 +16,7 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySet
  * Master sends this message to the own actor to refresh setup data
  */
 public class RefreshSetupMasterActorData implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final NetconfTopologySetup netconfTopologyDeviceSetup;
     private final RemoteDeviceId remoteDeviceId;

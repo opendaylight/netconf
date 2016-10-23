@@ -15,4 +15,5 @@ import java.io.Serializable;
  * close method). Message must be sended before slave actor is poisoned.
  */
 public class UnregisterSlaveMountPoint implements Serializable {
+    private static final long serialVersionUID = 1L;
 }

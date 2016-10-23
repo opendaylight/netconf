@@ -15,4 +15,5 @@ import java.io.Serializable;
  * with reply 'RegisterMountPoint' which includes needed parameters.
  */
 public class AskForMasterMountPoint implements Serializable {
+    private static final long serialVersionUID = 1L;
 }

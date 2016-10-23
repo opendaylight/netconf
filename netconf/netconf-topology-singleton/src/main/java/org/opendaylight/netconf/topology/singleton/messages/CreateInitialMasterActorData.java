@@ -17,6 +17,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
  * Master sends this message to the own actor to set necessary parameters.
  */
 public class CreateInitialMasterActorData implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final DOMDataBroker deviceDataBroker;
     private final List<SourceIdentifier> allSourceIdentifiers;

@@ -12,6 +12,7 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 
 public class MergeRequest implements TransactionRequest {
+    private static final long serialVersionUID = 1L;
 
     private final NormalizedNodeMessage data;
     private final LogicalDatastoreType store;

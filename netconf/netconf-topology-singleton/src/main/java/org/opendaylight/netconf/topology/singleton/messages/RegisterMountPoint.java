@@ -16,6 +16,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
  * Master sends the message to slave with necessary parameters for creating slave mount point.
  */
 public class RegisterMountPoint implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final List<SourceIdentifier> allSourceIdentifiers;
 
