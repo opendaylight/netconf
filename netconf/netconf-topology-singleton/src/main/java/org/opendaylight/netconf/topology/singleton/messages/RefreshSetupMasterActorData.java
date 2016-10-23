@@ -9,11 +9,8 @@
 package org.opendaylight.netconf.topology.singleton.messages;
 
 import java.io.Serializable;
-import java.util.List;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 
 /**
  * Master sends this message to the own actor to refresh setup data
