@@ -16,18 +16,6 @@
         <module>
           <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:client:dispatcher">prefix:netconf-client-dispatcher</type>
           <name>global-netconf-dispatcher</name>
-          <boss-thread-group xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:client:dispatcher">
-            <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netty">prefix:netty-threadgroup</type>
-            <name>global-boss-group</name>
-          </boss-thread-group>
-          <worker-thread-group xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:client:dispatcher">
-            <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netty">prefix:netty-threadgroup</type>
-            <name>global-worker-group</name>
-          </worker-thread-group>
-          <timer xmlns="urn:opendaylight:params:xml:ns:yang:controller:config:netconf:client:dispatcher">
-            <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netty">prefix:netty-timer</type>
-            <name>global-timer</name>
-          </timer>
         </module>
 
         <!-- Thread factory to be used by all threadpools in netconf-connectors -->
