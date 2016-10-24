@@ -14,9 +14,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.util.concurrent.Futures;
-
 import java.net.InetSocketAddress;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -61,5 +60,25 @@ public class ReadOnlyTxTest {
         verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)), any(NormalizedNode.class));
         readOnlyTx.read(LogicalDatastoreType.OPERATIONAL, path);
         verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(NetconfMessageTransformUtil.NETCONF_GET_QNAME)), any(NormalizedNode.class));
+    }
+
+    @Test
+    public void testExists() throws Exception {
+        final NetconfBaseOps netconfOps = new NetconfBaseOps(rpc, mock(SchemaContext.class));
+
+        final ReadOnlyTx readOnlyTx = new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)));
+
+        readOnlyTx.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create());
+        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)), any(NormalizedNode.class));
+        readOnlyTx.exists(LogicalDatastoreType.OPERATIONAL, path);
+        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(NetconfMessageTransformUtil.NETCONF_GET_QNAME)), any(NormalizedNode.class));
+    }
+
+    @Test
+    public void testIdentifier() throws Exception {
+        final NetconfBaseOps netconfOps = new NetconfBaseOps(rpc, mock(SchemaContext.class));
+        final ReadOnlyTx tx1 = new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)));
+        final ReadOnlyTx tx2 = new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)));
+        Assert.assertNotEquals(tx1.getIdentifier(), tx2.getIdentifier());
     }
 }

@@ -11,7 +11,6 @@ package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -30,7 +29,7 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
-public class WriteRunningTxTest {
+public class WriteCandidateTxTest {
 
     @Mock
     private DOMRpcService rpc;
@@ -48,17 +47,18 @@ public class WriteRunningTxTest {
 
     @Test
     public void testSubmit() throws Exception {
-        final WriteRunningTx tx = new WriteRunningTx(id, netconfOps, true);
+        final WriteCandidateTx tx = new WriteCandidateTx(id, netconfOps, true);
         //check, if lock is called
         verify(rpc).invokeRpc(eq(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_LOCK_QNAME)), any());
+
         tx.put(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getContainerId(), TxTestUtils.getContainerNode());
         tx.merge(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId(), TxTestUtils.getLeafNode());
-        //check, if no edit-config is called before submit
-        verify(rpc, never()).invokeRpc(eq(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)), any());
-        tx.submit().get();
         //check, if both edits are called
         verify(rpc, times(2)).invokeRpc(eq(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)), any());
+        tx.submit().get();
         //check, if unlock is called
+        verify(rpc).invokeRpc(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME), NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
         verify(rpc).invokeRpc(eq(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME)), any());
     }
+
 }
