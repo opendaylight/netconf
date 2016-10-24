@@ -77,12 +77,12 @@ public class NetconfNotificationManagerTest {
         final NetconfCapabilityChangeBuilder capabilityChangedBuilder = new NetconfCapabilityChangeBuilder();
 
         final NetconfNotificationListener listener = mock(NetconfNotificationListener.class);
-        doNothing().when(listener).onNotification(any(StreamNameType.class), any(NetconfNotification.class));
+        doNothing().when(listener).onNotification(any(NetconfNotification.class));
         final NotificationListenerRegistration notificationListenerRegistration = netconfNotificationManager.registerNotificationListener(NetconfNotificationManager.BASE_NETCONF_STREAM.getName(), listener);
         final NetconfCapabilityChange notification = capabilityChangedBuilder.build();
         baseNotificationPublisherRegistration.onCapabilityChanged(notification);
 
-        verify(listener).onNotification(any(StreamNameType.class), any(NetconfNotification.class));
+        verify(listener).onNotification(any(NetconfNotification.class));
 
         notificationListenerRegistration.close();
 
@@ -97,7 +97,7 @@ public class NetconfNotificationManagerTest {
         final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration = netconfNotificationManager.registerBaseNotificationPublisher();
 
         final NetconfNotificationListener listener = mock(NetconfNotificationListener.class);
-        doNothing().when(listener).onNotification(any(StreamNameType.class), any(NetconfNotification.class));
+        doNothing().when(listener).onNotification(any(NetconfNotification.class));
 
         netconfNotificationManager.registerNotificationListener(NetconfNotificationManager.BASE_NETCONF_STREAM.getName(), listener);
 
