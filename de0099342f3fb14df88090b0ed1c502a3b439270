@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a682502_24047c14",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 14
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-24T13:56:37Z",
+      "side": 1,
+      "message": "Can you point me to same documentation where this is specified? I am not expert in reflection and I haven\u0027t found anything about this.",
+      "revId": "de0099342f3fb14df88090b0ed1c502a3b439270",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a682502_a92185b6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 14
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-24T13:56:37Z",
+      "side": 1,
+      "message": "needs",
+      "revId": "de0099342f3fb14df88090b0ed1c502a3b439270",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a682502_c97681d8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 14
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-24T13:56:37Z",
+      "side": 1,
+      "message": "eligible",
+      "revId": "de0099342f3fb14df88090b0ed1c502a3b439270",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a682502_640e7436",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/controller/config/yang/config/netconf/client/dispatcher/NetconfClientDispatcherModule.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-24T13:56:37Z",
+      "side": 1,
+      "message": "Is there some advantage to using Proxy over anonymous inner class?",
+      "revId": "de0099342f3fb14df88090b0ed1c502a3b439270",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a682502_e9a6dd52",
+        "filename": "netconf/netconf-client/src/main/resources/org/opendaylight/blueprint/netconf-client.xml",
+        "patchSetId": 14
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-24T13:56:37Z",
+      "side": 1,
+      "message": "What are these service-properties good for?",
+      "revId": "de0099342f3fb14df88090b0ed1c502a3b439270",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a682502_09aa3919",
+        "filename": "netconf/netconf-config/src/main/resources/initial/01-netconf.xml",
+        "patchSetId": 14
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-24T13:56:37Z",
+      "side": 1,
+      "message": "Is there any point in reordering services?",
+      "revId": "de0099342f3fb14df88090b0ed1c502a3b439270",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
