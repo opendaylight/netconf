@@ -210,6 +210,30 @@
       "revId": "273216561662ebaf4c16a59c7d0119c301d67e2f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a682502_a4508c5f",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/InvokeRpcMessage.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-24T15:20:48Z",
+      "side": 1,
+      "message": "Make sense. OK.",
+      "parentUuid": "5a682502_046220d8",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 35
+      },
+      "revId": "273216561662ebaf4c16a59c7d0119c301d67e2f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
