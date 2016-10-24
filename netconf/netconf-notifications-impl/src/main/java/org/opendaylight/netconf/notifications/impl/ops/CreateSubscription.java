@@ -124,7 +124,7 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation implem
         }
 
         @Override
-        public void onNotification(final StreamNameType stream, final NetconfNotification notification) {
+        public void onNotification(final NetconfNotification notification) {
             if (filter.isPresent()) {
                 try {
                     final Optional<Document> filtered = SubtreeFilter.applySubtreeNotificationFilter(this.filter.get(), notification.getDocument());

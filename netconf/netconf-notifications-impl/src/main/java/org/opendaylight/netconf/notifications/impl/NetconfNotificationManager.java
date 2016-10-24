@@ -79,14 +79,14 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
     private final Set<GenericNotificationPublisherReg> notificationPublishers = Sets.newHashSet();
 
     @Override
-    public synchronized void onNotification(final StreamNameType stream, final NetconfNotification notification) {
-        LOG.debug("Notification of type {} detected", stream);
+    public synchronized void onNotification(final NetconfNotification notification) {
+        LOG.debug("Notification of type {} detected", BASE_STREAM_NAME);
         if (LOG.isTraceEnabled()) {
-            LOG.debug("Notification of type {} detected: {}", stream, notification);
+            LOG.debug("Notification of type {} detected: {}", BASE_STREAM_NAME, notification);
         }
 
         for (final GenericNotificationListenerReg listenerReg : notificationListeners.get(BASE_STREAM_NAME)) {
-            listenerReg.getListener().onNotification(BASE_STREAM_NAME, notification);
+            listenerReg.getListener().onNotification(notification);
         }
     }
 
@@ -239,10 +239,10 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
         }
 
         @Override
-        public void onNotification(final StreamNameType stream, final NetconfNotification notification) {
+        public void onNotification(final NetconfNotification notification) {
             Preconditions.checkState(baseListener != null, "Already closed");
-            Preconditions.checkArgument(stream.equals(registeredStream));
-            baseListener.onNotification(stream, notification);
+//            Preconditions.checkArgument(stream.equals(registeredStream));
+            baseListener.onNotification(notification);
         }
     }
 
@@ -269,17 +269,17 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
 
         @Override
         public void onCapabilityChanged(final NetconfCapabilityChange capabilityChange) {
-            baseRegistration.onNotification(BASE_STREAM_NAME, serializeNotification(capabilityChange, CAPABILITY_CHANGE_SCHEMA_PATH));
+            baseRegistration.onNotification(serializeNotification(capabilityChange, CAPABILITY_CHANGE_SCHEMA_PATH));
         }
 
         @Override
         public void onSessionStarted(NetconfSessionStart start) {
-            baseRegistration.onNotification(BASE_STREAM_NAME, serializeNotification(start, SESSION_START_PATH));
+            baseRegistration.onNotification(serializeNotification(start, SESSION_START_PATH));
         }
 
         @Override
         public void onSessionEnded(NetconfSessionEnd end) {
-            baseRegistration.onNotification(BASE_STREAM_NAME, serializeNotification(end, SESSION_END_PATH));
+            baseRegistration.onNotification(serializeNotification(end, SESSION_END_PATH));
         }
     }
 
