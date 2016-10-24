@@ -22,6 +22,30 @@
       "revId": "e2c2c0783dfb34071ce58ebd7521b314342455c8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a682502_29d57543",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-24T12:22:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a682502_3eddad15",
+      "range": {
+        "startLine": 94,
+        "startChar": 36,
+        "endLine": 94,
+        "endChar": 56
+      },
+      "revId": "e2c2c0783dfb34071ce58ebd7521b314342455c8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
