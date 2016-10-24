@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "5a682502_e447244a",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyDOMRpcService.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-24T15:19:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a682502_a93b4537",
+      "range": {
+        "startLine": 70,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 102
+      },
+      "revId": "273216561662ebaf4c16a59c7d0119c301d67e2f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a682502_491271b5",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyDOMRpcService.java",
         "patchSetId": 7
@@ -59,6 +83,30 @@
       "writtenOn": "2016-10-24T13:27:35Z",
       "side": 1,
       "message": "You seem to swallow the exception, is that intended? cannot we add the exception, or at least its message,  in the RpcErrorsException?",
+      "range": {
+        "startLine": 76,
+        "startChar": 67,
+        "endLine": 76,
+        "endChar": 68
+      },
+      "revId": "273216561662ebaf4c16a59c7d0119c301d67e2f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a682502_a43d2cbe",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyDOMRpcService.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-24T15:19:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a682502_491271b5",
       "range": {
         "startLine": 76,
         "startChar": 67,
@@ -94,6 +142,30 @@
     },
     {
       "key": {
+        "uuid": "5a682502_044b405a",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyDOMRpcService.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-24T15:19:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a682502_69880de8",
+      "range": {
+        "startLine": 77,
+        "startChar": 89,
+        "endLine": 77,
+        "endChar": 93
+      },
+      "revId": "273216561662ebaf4c16a59c7d0119c301d67e2f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a682502_e94a5dab",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/InvokeRpcMessage.java",
         "patchSetId": 7
@@ -105,6 +177,30 @@
       "writtenOn": "2016-10-24T13:27:35Z",
       "side": 1,
       "message": "From what I\u0027ve seen in ProxyDOMRpcService and NetconfNodeActor, you can use SchemaPath directly.\n\nBasically, in ProxyDOMRpcService you get those two elements from SchemaPath, and in NetconfNodeActor you re-construct a SchemaPath instance from those two elements. \nThose operations are useless, and you can directly hold SchemaPath.\n\nOr maybe SchemaPath is a really big object, and serializing it cost a lot? If that\u0027s the case, please add a comment here explaining so.",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 35
+      },
+      "revId": "273216561662ebaf4c16a59c7d0119c301d67e2f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a682502_046220d8",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/InvokeRpcMessage.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-24T15:19:46Z",
+      "side": 1,
+      "message": "SchemaPath is not serializable. So, it is not working in different VMs. + I send only what I need.",
+      "parentUuid": "5a682502_e94a5dab",
       "range": {
         "startLine": 18,
         "startChar": 0,
