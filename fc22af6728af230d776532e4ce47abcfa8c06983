@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5a682502_f4e1919b",
+        "filename": "netconf/netconf-tcp/src/main/java/org/opendaylight/controller/config/yang/netconf/northbound/tcp/NetconfNorthboundTcpModule.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-25T12:59:32Z",
+      "side": 1,
+      "message": "Well it is true it hasn\u0027t, but it\u0027s unused anyway. Reverting.",
+      "parentUuid": "5a682502_3494a936",
+      "revId": "fc22af6728af230d776532e4ce47abcfa8c06983",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a682502_d4945546",
         "filename": "netconf/netconf-tcp/src/main/resources/org/opendaylight/blueprint/netconf-tcp.xml",
         "patchSetId": 11
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-25T12:30:18Z",
       "side": 1,
       "message": "CSS NETCONF server does not have to be moved to bleuprint.",
+      "revId": "fc22af6728af230d776532e4ce47abcfa8c06983",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a682502_b4d719bf",
+        "filename": "netconf/netconf-tcp/src/main/resources/org/opendaylight/blueprint/netconf-tcp.xml",
+        "patchSetId": 11
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-25T12:59:32Z",
+      "side": 1,
+      "message": "I missed it. Reverting.",
+      "parentUuid": "5a682502_d4945546",
       "revId": "fc22af6728af230d776532e4ce47abcfa8c06983",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
