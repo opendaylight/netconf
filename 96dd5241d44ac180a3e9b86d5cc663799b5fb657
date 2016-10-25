@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a682502_a15a3981",
+        "filename": "netconf/aaa-authn-odl-plugin/src/main/java/org/opendaylight/yang/gen/v1/config/aaa/authn/netconf/plugin/rev150715/AuthProviderModule.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-25T10:57:09Z",
+      "side": 1,
+      "message": "Maybe we should also add google guava dependency to pom file.\n\nIt has been used here also before this change, but maybe we can add it with this patch",
+      "revId": "96dd5241d44ac180a3e9b86d5cc663799b5fb657",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a682502_61602136",
+        "filename": "netconf/aaa-authn-odl-plugin/src/main/resources/org/opendaylight/blueprint/aaa-authn-netconf.xml",
+        "patchSetId": 15
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-25T10:57:09Z",
+      "side": 1,
+      "message": "Don\u0027t you need here to specify properties like config-module-namespace etc.\n\nI have tried this patch and it worked fine also without them, but other patches specify them and also you have mentioned that they are needed..",
+      "revId": "96dd5241d44ac180a3e9b86d5cc663799b5fb657",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
