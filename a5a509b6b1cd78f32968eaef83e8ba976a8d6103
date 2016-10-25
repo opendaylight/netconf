@@ -22,6 +22,30 @@
       "revId": "a5a509b6b1cd78f32968eaef83e8ba976a8d6103",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a682502_be91b854",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandlerWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-10-25T06:37:03Z",
+      "side": 1,
+      "message": "asyncIn field is set to null in close method, so I\u0027ve created another lock field.",
+      "parentUuid": "5a682502_cad02ffa",
+      "range": {
+        "startLine": 44,
+        "startChar": 12,
+        "endLine": 44,
+        "endChar": 20
+      },
+      "revId": "a5a509b6b1cd78f32968eaef83e8ba976a8d6103",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
