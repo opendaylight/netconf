@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5a682502_f44a31ab",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/osgi/NetconfSSHActivator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-25T12:56:53Z",
+      "side": 1,
+      "message": "Reverting anyway.",
+      "parentUuid": "5a682502_f4c4f160",
+      "revId": "75a6c8db0e0ed8f65e3e8338ec677049e41f9fa7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a682502_74e2a104",
         "filename": "netconf/netconf-ssh/src/main/resources/org/opendaylight/blueprint/netconf-ssh.xml",
         "patchSetId": 10
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-25T12:27:22Z",
       "side": 1,
       "message": "I think, there has been made an agreement, that NETCONF CSS server won\u0027t be moved to blueprint",
+      "revId": "75a6c8db0e0ed8f65e3e8338ec677049e41f9fa7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a682502_144ecdc1",
+        "filename": "netconf/netconf-ssh/src/main/resources/org/opendaylight/blueprint/netconf-ssh.xml",
+        "patchSetId": 10
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-25T12:56:53Z",
+      "side": 1,
+      "message": "Correct, I missed it.",
+      "parentUuid": "5a682502_74e2a104",
       "revId": "75a6c8db0e0ed8f65e3e8338ec677049e41f9fa7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
