@@ -46,6 +46,30 @@
       "revId": "a5a509b6b1cd78f32968eaef83e8ba976a8d6103",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a682502_57ba07e2",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandlerWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-25T14:16:55Z",
+      "side": 1,
+      "message": "I\u0027m not sure it needs to be set to null, as I believe the ClientSession holding it will take care if it. Else ok.",
+      "parentUuid": "5a682502_be91b854",
+      "range": {
+        "startLine": 44,
+        "startChar": 12,
+        "endLine": 44,
+        "endChar": 20
+      },
+      "revId": "a5a509b6b1cd78f32968eaef83e8ba976a8d6103",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
