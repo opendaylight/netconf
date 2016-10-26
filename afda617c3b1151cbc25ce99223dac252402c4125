@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_bd7b8328",
+        "filename": "netconf/mdsal-notification-mapper/src/main/resources/org/opendaylight/blueprint/mdsal-notification-mapper.xml",
+        "patchSetId": 18
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-26T13:37:50Z",
+      "side": 1,
+      "message": "Maybe this can go to mdsal-netconf-notification module and then there won\u0027t be a need for new module..",
+      "revId": "afda617c3b1151cbc25ce99223dac252402c4125",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
