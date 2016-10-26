@@ -16,10 +16,14 @@ module netconf-northbound-notification {
     identity netconf-notification-collector {
             base "config:service-type";
             config:java-class "org.opendaylight.netconf.notifications.NetconfNotificationCollector";
+            config:disable-osgi-service-registration;
+            status deprecated;
         }
 
     identity netconf-notification-registry {
            base "config:service-type";
            config:java-class "org.opendaylight.netconf.notifications.NetconfNotificationRegistry";
+           config:disable-osgi-service-registration;
+           status deprecated;
     }
 }

@@ -16,6 +16,30 @@
 * Do not modify this file unless it is present under src/main directory
 */
 package org.opendaylight.controller.config.yang.netconf.northbound.notification.impl;
-public class NetconfNotificationManagerModuleFactory extends org.opendaylight.controller.config.yang.netconf.northbound.notification.impl.AbstractNetconfNotificationManagerModuleFactory {
 
+import org.opendaylight.controller.config.api.DependencyResolver;
+import org.osgi.framework.BundleContext;
+
+/**
+ * @deprecated Replaced by blueprint wiring
+ */
+@Deprecated
+public class NetconfNotificationManagerModuleFactory extends AbstractNetconfNotificationManagerModuleFactory {
+
+    @Override
+    public NetconfNotificationManagerModule instantiateModule(String instanceName, DependencyResolver dependencyResolver,
+                                                              NetconfNotificationManagerModule oldModule, AutoCloseable oldInstance, BundleContext bundleContext) {
+        NetconfNotificationManagerModule module = super.instantiateModule(instanceName, dependencyResolver, oldModule,
+                oldInstance, bundleContext);
+        module.setBundleContext(bundleContext);
+        return module;
+    }
+
+    @Override
+    public NetconfNotificationManagerModule instantiateModule(String instanceName, DependencyResolver dependencyResolver,
+                                                           BundleContext bundleContext) {
+        NetconfNotificationManagerModule module = super.instantiateModule(instanceName, dependencyResolver, bundleContext);
+        module.setBundleContext(bundleContext);
+        return module;
+    }
 }
