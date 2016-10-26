@@ -19,6 +19,70 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_3ad3f939",
+        "filename": "netconf/mdsal-netconf-impl/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-impl.xml",
+        "patchSetId": 19
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-26T11:32:01Z",
+      "side": 1,
+      "message": "Those properties are mapping the service definition in the CSS file: https://github.com/opendaylight/netconf/blob/master/netconf/netconf-mdsal-config/src/main/resources/initial/08-netconf-mdsal.xml#L204-L210\n\n            \u003cservice\u003e\n                \u003ctype xmlns:prefix\u003d\"urn:opendaylight:params:xml:ns:yang:controller:netconf:north:mapper\"\u003eprefix:netconf-mapper-registry\u003c/type\u003e\n                \u003cinstance\u003e\n                    \u003cname\u003emapper-aggregator-registry\u003c/name\u003e\n                    \u003cprovider\u003e/modules/module[type\u003d\u0027netconf-mapper-aggregator\u0027][name\u003d\u0027mapper-aggregator\u0027]\u003c/provider\u003e\n                \u003c/instance\u003e\n            \u003c/service\u003e",
+      "parentUuid": "3a65312a_3a3779b2",
+      "revId": "75b31331b74da0484916ccb9d5fac96a96f7a925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_daeda5f1",
+        "filename": "netconf/mdsal-netconf-impl/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-impl.xml",
+        "patchSetId": 19
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-26T11:32:01Z",
+      "side": 1,
+      "message": "those matches https://github.com/opendaylight/netconf/blob/master/netconf/netconf-mdsal-config/src/main/resources/initial/08-netconf-mdsal.xml#L211-L217",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 29
+      },
+      "revId": "75b31331b74da0484916ccb9d5fac96a96f7a925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_1abf1dd2",
+        "filename": "netconf/mdsal-netconf-impl/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-impl.xml",
+        "patchSetId": 19
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-26T11:32:01Z",
+      "side": 1,
+      "message": "those matches https://github.com/opendaylight/netconf/blob/master/netconf/netconf-mdsal-config/src/main/resources/initial/08-netconf-mdsal.xml#L183-L189",
+      "range": {
+        "startLine": 102,
+        "startChar": 0,
+        "endLine": 106,
+        "endChar": 29
+      },
+      "revId": "75b31331b74da0484916ccb9d5fac96a96f7a925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a682502_ed40a037",
         "filename": "netconf/netconf-impl/src/main/yang/netconf-northbound-impl.yang",
         "patchSetId": 19
