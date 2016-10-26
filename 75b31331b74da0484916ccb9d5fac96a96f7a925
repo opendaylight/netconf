@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "3a65312a_ba7b8928",
+        "filename": "netconf/mdsal-netconf-impl/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-impl.xml",
+        "patchSetId": 19
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-26T11:40:22Z",
+      "side": 1,
+      "message": "Just one more thing. Why are using version v1.3.0 here and not 1.1.0?",
+      "revId": "75b31331b74da0484916ccb9d5fac96a96f7a925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_3a3779b2",
         "filename": "netconf/mdsal-netconf-impl/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-impl.xml",
         "patchSetId": 19
