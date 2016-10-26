@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_1dd55743",
+        "filename": "netconf/mdsal-netconf-connector/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-connector.xml",
+        "patchSetId": 14
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-26T13:11:13Z",
+      "side": 1,
+      "message": "No one is pulling in netconf-mdsal-mapper service as exposed in the file you linked:\nif you look for netconf-mdsal-mapper in the 08-netconf-mdsal.xml file (within this patch), you will find only two occurrence: \n- the definition, line 19 \n- the service, line 122. \n\nBut no other module is using this.\n\nWhereas in the other patch, netconf-impl(https://git.opendaylight.org/gerrit/#/c/45750/), let\u0027s take mapper-aggregator-registry for example and look at the 08-netconf-mdsal.xml file (within the patch):\n- It is coming from mapper-aggregator module, defined line 62\n- the service, line 145 ([name\u003d\u0027mapper-aggregator\u0027] tells you from which module this service is coming from)\n- It is used line 88, line 34 and line 56\n\n\nIn this patch here, I simply forget to remove the service in the config file, I\u0027ll remove it in a follow-up patch if this is OK.",
+      "parentUuid": "3a65312a_1a4f1d94",
+      "revId": "4a01d137d1c00514a1df0d1844fe263eb04a166f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_3a12d9b4",
         "filename": "netconf/mdsal-netconf-connector/src/main/yang/netconf-mdsal-mapper.yang",
         "patchSetId": 14
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-26T12:29:47Z",
       "side": 1,
       "message": "Deprecated?",
+      "revId": "4a01d137d1c00514a1df0d1844fe263eb04a166f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_9dc0477e",
+        "filename": "netconf/mdsal-netconf-connector/src/main/yang/netconf-mdsal-mapper.yang",
+        "patchSetId": 14
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-26T13:11:13Z",
+      "side": 1,
+      "message": "Yes, I\u0027ll address this in a follow-up patch",
+      "parentUuid": "3a65312a_3a12d9b4",
       "revId": "4a01d137d1c00514a1df0d1844fe263eb04a166f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
