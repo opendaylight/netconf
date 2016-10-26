@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_3a3779b2",
+        "filename": "netconf/mdsal-netconf-impl/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-impl.xml",
+        "patchSetId": 19
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-26T11:25:22Z",
+      "side": 1,
+      "message": "Just for explanation, how are these properties used in CSS? Couldn\u0027t found it anywhere..",
+      "revId": "75b31331b74da0484916ccb9d5fac96a96f7a925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a682502_ed40a037",
+        "filename": "netconf/netconf-impl/src/main/yang/netconf-northbound-impl.yang",
+        "patchSetId": 19
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-26T11:25:22Z",
+      "side": 1,
+      "message": "I think you are missing here that this is deprecated, but anyway, this will be removed in follow up patches so I guess it\u0027s not a big deal.",
+      "revId": "75b31331b74da0484916ccb9d5fac96a96f7a925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a682502_cd3de4bd",
+        "filename": "netconf/netconf-impl/src/main/yang/netconf-northbound-impl.yang",
+        "patchSetId": 19
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-26T11:25:22Z",
+      "side": 1,
+      "message": "Also here",
+      "revId": "75b31331b74da0484916ccb9d5fac96a96f7a925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_17cc1635",
+        "filename": "netconf/netconf-impl/src/main/yang/netconf-northbound-impl.yang",
+        "patchSetId": 19
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-26T11:25:22Z",
+      "side": 1,
+      "message": "Deprecated",
+      "revId": "75b31331b74da0484916ccb9d5fac96a96f7a925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_b7da82e7",
+        "filename": "netconf/netconf-impl/src/main/yang/netconf-northbound-impl.yang",
+        "patchSetId": 19
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-26T11:25:22Z",
+      "side": 1,
+      "message": "Also here",
+      "revId": "75b31331b74da0484916ccb9d5fac96a96f7a925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
