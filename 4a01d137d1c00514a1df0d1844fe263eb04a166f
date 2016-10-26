@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_1a4f1d94",
+        "filename": "netconf/mdsal-netconf-connector/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-connector.xml",
+        "patchSetId": 14
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-26T12:29:47Z",
+      "side": 1,
+      "message": "Here, there are no service properties..\n\nBut isn\u0027t this service advertised here?\nhttps://github.com/opendaylight/netconf/blob/03cd91edfcb91ebad953158eca8418806314b335/netconf/netconf-mdsal-config/src/main/resources/initial/08-netconf-mdsal.xml#L190",
+      "revId": "4a01d137d1c00514a1df0d1844fe263eb04a166f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_3a12d9b4",
+        "filename": "netconf/mdsal-netconf-connector/src/main/yang/netconf-mdsal-mapper.yang",
+        "patchSetId": 14
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-26T12:29:47Z",
+      "side": 1,
+      "message": "Deprecated?",
+      "revId": "4a01d137d1c00514a1df0d1844fe263eb04a166f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_da73e513",
+        "filename": "netconf/mdsal-netconf-connector/src/main/yang/netconf-mdsal-mapper.yang",
+        "patchSetId": 14
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-26T12:29:47Z",
+      "side": 1,
+      "message": "Also here",
+      "revId": "4a01d137d1c00514a1df0d1844fe263eb04a166f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
