@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_680e4b36",
+        "filename": "netconf/mdsal-netconf-notification/src/main/yang/netconf-mdsal-notification.yang",
+        "patchSetId": 14
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-26T15:07:03Z",
+      "side": 1,
+      "message": "Will fix this in a follow-up patch",
+      "parentUuid": "3a65312a_7de8cb7c",
+      "revId": "62bbbb6930db5e9783b22688b2718986131b7612",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_5ded0f8b",
         "filename": "netconf/mdsal-netconf-notification/src/main/yang/netconf-mdsal-notification.yang",
         "patchSetId": 14
