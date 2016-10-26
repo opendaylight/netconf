@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_3a8f7925",
+        "filename": "netconf/mdsal-netconf-impl/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-impl.xml",
+        "patchSetId": 19
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-26T11:48:46Z",
+      "side": 1,
+      "message": "No particular reason, both have the \"property-placeholder\", so both can be used. 1.3.0 is simply a newer version.\n\n1.1.0 def: http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.1.0.xsd\n\n1.3.0 def: http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.3.0.xsd",
+      "parentUuid": "3a65312a_ba7b8928",
+      "revId": "75b31331b74da0484916ccb9d5fac96a96f7a925",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_3a3779b2",
         "filename": "netconf/mdsal-netconf-impl/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-impl.xml",
         "patchSetId": 19
