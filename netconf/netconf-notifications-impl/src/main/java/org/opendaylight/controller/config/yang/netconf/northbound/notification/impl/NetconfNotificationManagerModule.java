@@ -8,9 +8,22 @@
 
 package org.opendaylight.controller.config.yang.netconf.northbound.notification.impl;
 
-import org.opendaylight.netconf.notifications.impl.NetconfNotificationManager;
+import com.google.common.reflect.AbstractInvocationHandler;
+import com.google.common.reflect.Reflection;
+import java.lang.reflect.Method;
+import org.opendaylight.controller.config.api.osgi.WaitingServiceTracker;
+import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
+import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
+import org.osgi.framework.BundleContext;
 
-public class NetconfNotificationManagerModule extends org.opendaylight.controller.config.yang.netconf.northbound.notification.impl.AbstractNetconfNotificationManagerModule {
+/**
+ * @deprecated Replaced by blueprint wiring
+ */
+@Deprecated
+public class NetconfNotificationManagerModule extends AbstractNetconfNotificationManagerModule {
+
+    private BundleContext bundleContext;
+
     public NetconfNotificationManagerModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier, org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
         super(identifier, dependencyResolver);
     }
@@ -26,7 +39,29 @@ public class NetconfNotificationManagerModule extends org.opendaylight.controlle
 
     @Override
     public java.lang.AutoCloseable createInstance() {
-        return new NetconfNotificationManager();
+
+        final WaitingServiceTracker<NetconfNotificationCollector> tracker =
+                WaitingServiceTracker.create(NetconfNotificationCollector.class, bundleContext, "(type=netconf-notification-manager)");
+        final NetconfNotificationCollector service = tracker.waitForService(WaitingServiceTracker.FIVE_MINUTES);
+
+        return Reflection.newProxy(AutoCloseableNetconfNotification.class, new AbstractInvocationHandler() {
+            @Override
+            protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable {
+                if (method.getName().equals("close")) {
+                    tracker.close();
+                    return null;
+                } else {
+                    return method.invoke(service, args);
+                }
+            }
+        });
+    }
+
+    void setBundleContext(BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
+    }
+
+    private static interface AutoCloseableNetconfNotification extends NetconfNotificationCollector, NetconfNotificationRegistry, AutoCloseable {
     }
 
 }
