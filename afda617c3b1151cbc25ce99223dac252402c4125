@@ -34,6 +34,24 @@
       "revId": "afda617c3b1151cbc25ce99223dac252402c4125",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_fd805b8d",
+        "filename": "netconf/mdsal-notification-mapper/src/main/resources/org/opendaylight/blueprint/mdsal-notification-mapper.xml",
+        "patchSetId": 18
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-26T14:37:30Z",
+      "side": 1,
+      "message": "How would you like to proceed for this? Should I update this patch, or I can do it in a follow-up?",
+      "parentUuid": "3a65312a_9df4c788",
+      "revId": "afda617c3b1151cbc25ce99223dac252402c4125",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
