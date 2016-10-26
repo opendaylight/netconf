@@ -89,6 +89,13 @@ public class NetconfUpdateDeviceCommand extends AbstractAction {
             multiValued = false)
     private String newConnectionType = "false";
 
+    @Option(name = "-sl",
+            aliases = { "--schemaless" },
+            description = "Schemaless surpport, true for schemaless",
+            required = false,
+            multiValued = false)
+    private String newSchemaless = "false";
+
     @Override
     protected Object doExecute() throws Exception {
 
@@ -98,6 +105,7 @@ public class NetconfUpdateDeviceCommand extends AbstractAction {
         updated.put(NetconfConsoleConstants.USERNAME, newUsername);
         updated.put(NetconfConsoleConstants.PASSWORD, newPassword);
         updated.put(NetconfConsoleConstants.TCP_ONLY, newConnectionType);
+        updated.put(NetconfConsoleConstants.SCHEMALESS,newSchemaless);
         updated.values().remove(null);
 
         if (updated.isEmpty()) {

@@ -73,6 +73,13 @@ public class NetconfConnectDeviceCommand extends AbstractAction {
             multiValued = false)
     private String connectionType = "false";
 
+    @Option(name = "-sl",
+            aliases = { "--schemaless" },
+            description = "Schemaless surpport, true for schemaless",
+            required = false,
+            multiValued = false)
+    private String schemaless = "false";
+
     @Option(name = "-id",
             aliases = { "--identifier" },
             description = "Node Identifier of the netconf device",
@@ -87,12 +94,14 @@ public class NetconfConnectDeviceCommand extends AbstractAction {
         }
 
         final boolean isTcpOnly = (connectionType.equals("true")) ? true : false;
+        final boolean isSchemaless = (schemaless.equals("true")) ? true : false;
         final Credentials credentials = new LoginPasswordBuilder().setPassword(password).setUsername(username).build();
 
         final NetconfNode netconfNode = new NetconfNodeBuilder()
                                         .setHost(new Host(new IpAddress(new Ipv4Address(deviceIp))))
                                         .setPort(new PortNumber(Integer.decode(devicePort)))
                                         .setTcpOnly(isTcpOnly)
+                                        .setSchemaless(isSchemaless)
                                         .setCredentials(credentials)
                                         .build();
 

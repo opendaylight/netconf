@@ -203,6 +203,7 @@ public class NetconfCommandsImplTest {
         final Map<String, String> update = new HashMap<>();
         update.put(NetconfConsoleConstants.NETCONF_IP, "7.7.7.7");
         update.put(NetconfConsoleConstants.TCP_ONLY, "true");
+        update.put(NetconfConsoleConstants.SCHEMALESS, "true");
 
         netconfCommands.updateDevice(NODE_ID, "admin", "admin", update);
         NetconfConsoleUtils.waitForUpdate("7.7.7.7");

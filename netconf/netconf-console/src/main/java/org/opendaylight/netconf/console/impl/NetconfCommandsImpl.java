@@ -189,6 +189,7 @@ public class NetconfCommandsImpl implements NetconfCommands {
             final String devicePort = Strings.isNullOrEmpty(updated.get(NetconfConsoleConstants.NETCONF_PORT)) ?
                     netconfNode.getPort().getValue().toString() : updated.get(NetconfConsoleConstants.NETCONF_PORT);
             final Boolean tcpOnly = (updated.get(NetconfConsoleConstants.TCP_ONLY).equals("true")) ? true : false;
+            final Boolean isSchemaless = (updated.get(NetconfConsoleConstants.SCHEMALESS).equals("true")) ? true : false;
             final String newUsername = Strings.isNullOrEmpty(updated.get(NetconfConsoleConstants.USERNAME)) ? updated.get(NetconfConsoleConstants.USERNAME) : username;
             final String newPassword = Strings.isNullOrEmpty(updated.get(NetconfConsoleConstants.PASSWORD)) ? updated.get(NetconfConsoleConstants.PASSWORD) : password;
 
@@ -197,6 +198,7 @@ public class NetconfCommandsImpl implements NetconfCommands {
                     .setHost(new Host(new IpAddress(new Ipv4Address(deviceIp))))
                     .setPort(new PortNumber(Integer.decode(devicePort)))
                     .setTcpOnly(tcpOnly)
+                    .setSchemaless(isSchemaless)
                     .setCredentials(credentials)
                     .build();
 
