@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_5ab515cc",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyDOMRpcService.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-26T11:56:28Z",
+      "side": 1,
+      "message": "would be super useful to have the RemoteDeviceId here, so we know what device it it.\n\nLOG.trace(\"{}: Rpc operation invoked with schema type: {} and node: {}.\", id, type, input);",
+      "revId": "a42b9bc914c2d5f82ff0dee31bd68a977f558300",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_5aecf5c7",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyDOMRpcService.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-26T11:56:28Z",
+      "side": 1,
+      "message": "I think you should pass the whole exception in the RpcError\n\nRpcResultBuilder.newError(ErrorType.RPC, \"operation-failed\",\nmessage, null, null, exception));",
+      "range": {
+        "startLine": 88,
+        "startChar": 56,
+        "endLine": 88,
+        "endChar": 64
+      },
+      "revId": "a42b9bc914c2d5f82ff0dee31bd68a977f558300",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_bad0a9f8",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/InvokeRpcMessage.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-26T11:56:28Z",
+      "side": 1,
+      "message": "I think this belong to the transactions package",
+      "revId": "a42b9bc914c2d5f82ff0dee31bd68a977f558300",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_9acded60",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/InvokeRpcMessageReply.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-26T11:56:28Z",
+      "side": 1,
+      "message": "I think this belong to the transactions package",
+      "revId": "a42b9bc914c2d5f82ff0dee31bd68a977f558300",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_fada2116",
+        "filename": "netconf/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/TestingRemoteDeviceConnectorImpl.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-26T11:56:28Z",
+      "side": 1,
+      "message": "whitespaces",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 8
+      },
+      "revId": "a42b9bc914c2d5f82ff0dee31bd68a977f558300",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
