@@ -68,9 +68,15 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
     }
 
     @Override
-    public void close() throws Exception {
-        currentSchemaContext.close();
-        netconfOperationServiceFactoryListener.onRemoveNetconfOperationServiceFactory(this);
+    public void close() {
+        try {
+            currentSchemaContext.close();
+            if (netconfOperationServiceFactoryListener != null) {
+                netconfOperationServiceFactoryListener.onRemoveNetconfOperationServiceFactory(this);
+            }
+        } catch(Exception e) {
+            LOG.error("Failed to close resources correctly - ignore", e);
+        }
     }
 
     @Override

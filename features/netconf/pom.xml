@@ -34,7 +34,6 @@
 
     <config.configfile.directory>etc/opendaylight/karaf</config.configfile.directory>
     <config.netconf.client.configfile>01-netconf.xml</config.netconf.client.configfile>
-    <config.netconf.mdsal.configfile>08-mdsal-netconf.xml</config.netconf.mdsal.configfile>
   </properties>
 
   <dependencyManagement>
@@ -259,12 +258,6 @@
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>mdsal-netconf-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-mdsal-config</artifactId>
-      <classifier>config</classifier>
-      <type>xml</type>
     </dependency>
   </dependencies>
 
