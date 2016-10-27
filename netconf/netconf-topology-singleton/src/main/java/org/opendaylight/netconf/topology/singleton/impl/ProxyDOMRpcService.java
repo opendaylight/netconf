@@ -13,13 +13,11 @@ import akka.actor.ActorSystem;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcAvailabilityListener;
@@ -35,7 +33,6 @@ import org.opendaylight.netconf.topology.singleton.messages.InvokeRpcMessageRepl
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyResultResponse;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -65,13 +62,12 @@ public class ProxyDOMRpcService implements DOMRpcService {
     public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull final SchemaPath type,
                                                                   @Nullable final NormalizedNode<?, ?> input) {
         LOG.trace("Rpc operation invoked with schema type: {} and node: {}.", type, input);
-        final List<QName> path = Lists.newArrayList(type.getPathTowardsRoot());
-        final boolean absolute = type.isAbsolute();
+
         final NormalizedNodeMessage normalizedNodeMessage =
                 new NormalizedNodeMessage(YangInstanceIdentifier.EMPTY, input);
         final Future<Object> scalaFuture =
                 Patterns.ask(masterActorRef,
-                        new InvokeRpcMessage(path, absolute, normalizedNodeMessage), NetconfTopologyUtils.TIMEOUT);
+                        new InvokeRpcMessage(type, normalizedNodeMessage), NetconfTopologyUtils.TIMEOUT);
 
         final SettableFuture<DOMRpcResult> settableFuture = SettableFuture.create();
 

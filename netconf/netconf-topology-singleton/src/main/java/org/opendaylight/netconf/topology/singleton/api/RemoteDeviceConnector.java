@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.topology.singleton.api;
 
 import akka.actor.ActorRef;
+import org.opendaylight.netconf.topology.singleton.impl.utils.StateHolder;
 
 /**
  * Provides API for connection odl (master) with device
@@ -18,8 +19,9 @@ public interface RemoteDeviceConnector {
     /**
      * Create device communicator and open device connection
      * @param masterActorRef master actor reference
+     * @param stateHolder actual state of node
      */
-    void startRemoteDeviceConnection(ActorRef masterActorRef);
+    void startRemoteDeviceConnection(ActorRef masterActorRef, final StateHolder stateHolder);
 
     /**
      * Stop device communicator

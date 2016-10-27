@@ -51,6 +51,7 @@ import org.opendaylight.netconf.topology.singleton.api.RemoteDeviceConnector;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfConnectorDTO;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
+import org.opendaylight.netconf.topology.singleton.impl.utils.StateHolder;
 import org.opendaylight.protocol.framework.ReconnectStrategy;
 import org.opendaylight.protocol.framework.ReconnectStrategyFactory;
 import org.opendaylight.protocol.framework.TimedReconnectStrategy;
@@ -118,7 +119,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     }
 
     @Override
-    public void startRemoteDeviceConnection(final ActorRef deviceContextActorRef) {
+    public void startRemoteDeviceConnection(final ActorRef deviceContextActorRef, final StateHolder stateHolder) {
 
         final NetconfNode netconfNode = netconfTopologyDeviceSetup.getNode().getAugmentation(NetconfNode.class);
         final NodeId nodeId = netconfTopologyDeviceSetup.getNode().getNodeId();
@@ -126,7 +127,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         Preconditions.checkNotNull(netconfNode.getPort());
         Preconditions.checkNotNull(netconfNode.isTcpOnly());
 
-        this.deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode, deviceContextActorRef);
+        this.deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode, deviceContextActorRef, stateHolder);
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
         final NetconfClientSessionListener netconfClientSessionListener = deviceCommunicatorDTO.getSessionListener();
         final NetconfReconnectingClientConfiguration clientConfig =
@@ -159,7 +160,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
     @VisibleForTesting
     NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
-                                                         final ActorRef deviceContextActorRef) {
+                                                 final ActorRef deviceContextActorRef, final StateHolder stateHolder) {
         //setup default values since default value is not supported in mdsal
         final Long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null
                 ? NetconfTopologyUtils.DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
@@ -170,7 +171,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade =  new MasterSalFacade(remoteDeviceId,
                 netconfTopologyDeviceSetup.getDomBroker(), netconfTopologyDeviceSetup.getBindingAwareBroker(),
-                netconfTopologyDeviceSetup.getActorSystem(), deviceContextActorRef);
+                netconfTopologyDeviceSetup.getActorSystem(), deviceContextActorRef, stateHolder);
         if (keepaliveDelay > 0) {
             LOG.info("{}: Adding keepalive facade.", remoteDeviceId);
             salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade,

@@ -21,24 +21,32 @@ import javax.annotation.Nullable;
 import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.RemoteSchemaProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
+import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
+import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.RemoteOperationTxProcessor;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMRpcService;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyYangTextSourceProvider;
 import org.opendaylight.netconf.topology.singleton.impl.RemoteOperationTxProcessorImpl;
 import org.opendaylight.netconf.topology.singleton.impl.SlaveSalFacade;
+import org.opendaylight.netconf.topology.singleton.impl.notifications.RemoteSlaveNotificationListener;
+import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfRemoteDOMNotification;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
+import org.opendaylight.netconf.topology.singleton.impl.utils.StateHolder;
 import org.opendaylight.netconf.topology.singleton.messages.AskForMasterMountPoint;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
+import org.opendaylight.netconf.topology.singleton.messages.InvokeNotificationListener;
 import org.opendaylight.netconf.topology.singleton.messages.InvokeRpcMessage;
 import org.opendaylight.netconf.topology.singleton.messages.InvokeRpcMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.MasterActorDataInitialized;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.RegisterMountPoint;
+import org.opendaylight.netconf.topology.singleton.messages.RegisterSlaveListenerRequest;
 import org.opendaylight.netconf.topology.singleton.messages.UnregisterSlaveMountPoint;
 import org.opendaylight.netconf.topology.singleton.messages.YangTextSchemaSourceRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.CancelRequest;
@@ -78,7 +86,11 @@ public class NetconfNodeActor extends UntypedActor {
     private RemoteOperationTxProcessor operationsProcessor;
     private List<SourceIdentifier> sourceIdentifiers;
     private DOMRpcService deviceRpc;
+    private NetconfDeviceNotificationService notificationService;
+
     private SlaveSalFacade slaveSalManager;
+
+    private final StateHolder stateHolder;
 
     public static Props props(final NetconfTopologySetup setup,
                               final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
@@ -87,13 +99,27 @@ public class NetconfNodeActor extends UntypedActor {
                 new NetconfNodeActor(setup, id, schemaRegistry, schemaRepository));
     }
 
+    public static Props propsSlave(final NetconfTopologySetup setup, final RemoteDeviceId id,
+                              final SchemaSourceRegistry schemaRegistry, final SchemaRepository schemaRepository,
+                              final StateHolder stateHolder) {
+        return Props.create(NetconfNodeActor.class, () ->
+                new NetconfNodeActor(setup, id, schemaRegistry, schemaRepository, stateHolder));
+    }
+
     private NetconfNodeActor(final NetconfTopologySetup setup,
                              final RemoteDeviceId id, SchemaSourceRegistry schemaRegistry,
                              final SchemaRepository schemaRepository) {
+        this(setup, id, schemaRegistry, schemaRepository, null);
+    }
+
+    private NetconfNodeActor(final NetconfTopologySetup setup,
+                             final RemoteDeviceId id, SchemaSourceRegistry schemaRegistry,
+                             final SchemaRepository schemaRepository, final StateHolder stateHolder) {
         this.setup = setup;
         this.id = id;
         this.schemaRegistry = schemaRegistry;
         this.schemaRepository = schemaRepository;
+        this.stateHolder = stateHolder;
     }
 
     @Override
@@ -104,7 +130,8 @@ public class NetconfNodeActor extends UntypedActor {
             operationsProcessor =
                     new RemoteOperationTxProcessorImpl(((CreateInitialMasterActorData) message).getDeviceDataBroker(),
                             id);
-            this.deviceRpc = ((CreateInitialMasterActorData) message).getDeviceRpc();
+            deviceRpc = ((CreateInitialMasterActorData) message).getDeviceRpc();
+            notificationService = ((CreateInitialMasterActorData) message).getNotificationService();
 
             sender().tell(new MasterActorDataInitialized(), self());
 
@@ -146,6 +173,23 @@ public class NetconfNodeActor extends UntypedActor {
                 slaveSalManager = null;
             }
 
+        } else if (message instanceof RegisterSlaveListenerRequest) { // master
+            // register slave listeners to master
+            final DOMNotificationListener slaveNotificationListener =
+                    new RemoteSlaveNotificationListener(self(), sender());
+            LOG.debug("{} : Register notification: {} from SLAVE.", id, sender());
+            notificationService
+                    .registerNotificationListener(slaveNotificationListener,
+                            ((RegisterSlaveListenerRequest) message).getSchemaPaths());
+
+        } else if (message instanceof InvokeNotificationListener) {
+
+            final InvokeNotificationListener invokeNotificationListener = (InvokeNotificationListener) message;
+            final DOMNotification domNotificationReply =
+                    new NetconfRemoteDOMNotification(invokeNotificationListener.getContainerNode(),
+                            invokeNotificationListener.getSchemaPath(), invokeNotificationListener.getEventTime());
+            LOG.debug("{} : Publishing notification: {} on SLAVE.", id, domNotificationReply);
+            slaveSalManager.onNotification(domNotificationReply);
         }
     }
 
@@ -248,7 +292,7 @@ public class NetconfNodeActor extends UntypedActor {
             @Override
             public void onSuccess(final SchemaContext result) {
                 LOG.info("{}: Schema context resolved: {}", id, result.getModules());
-                slaveSalManager.registerSlaveMountPoint(result, deviceRpc, masterReference);
+                slaveSalManager.registerSlaveMountPoint(result, deviceRpc, masterReference, self(), stateHolder);
             }
 
             @Override

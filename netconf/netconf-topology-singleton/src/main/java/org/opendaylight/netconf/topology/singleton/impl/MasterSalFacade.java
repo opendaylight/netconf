@@ -25,12 +25,13 @@ import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
+import org.opendaylight.netconf.topology.singleton.impl.notifications.MasterNotificationService;
 import org.opendaylight.netconf.topology.singleton.impl.tx.NetconfMasterDOMTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
+import org.opendaylight.netconf.topology.singleton.impl.utils.StateHolder;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -54,17 +55,16 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     private final ActorRef masterActorRef;
     private final ActorSystem actorSystem;
     private DOMDataBroker deviceDataBroker = null;
+    private MasterNotificationService notificationService;
+    private final StateHolder stateHolder;
 
-    MasterSalFacade(final RemoteDeviceId id,
-                           final Broker domBroker,
-                           final BindingAwareBroker bindingBroker,
-                           final ActorSystem actorSystem,
-                           final ActorRef masterActorRef) {
+    MasterSalFacade(final RemoteDeviceId id, final Broker domBroker, final BindingAwareBroker bindingBroker,
+                    final ActorSystem actorSystem, final ActorRef masterActorRef, final StateHolder stateHolder) {
         this.id = id;
         this.salProvider = new NetconfDeviceSalProvider(id);
         this.actorSystem = actorSystem;
         this.masterActorRef = masterActorRef;
-
+        this.stateHolder = stateHolder;
         registerToSal(domBroker, bindingBroker);
     }
 
@@ -129,7 +129,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
         Preconditions.checkNotNull(netconfSessionPreferences,
                 "Device has no capabilities yet. Probably not fully connected.");
 
-        final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
+        notificationService = new MasterNotificationService(stateHolder);
 
         LOG.info("{}: Creating master data broker for device", id);
 
@@ -151,7 +151,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
         // send initial data to master actor and create actor for providing it
         return Patterns.ask(masterActorRef, new CreateInitialMasterActorData(deviceDataBroker, sourceIdentifiers,
-                        deviceRpc), NetconfTopologyUtils.TIMEOUT);
+                        deviceRpc, notificationService), NetconfTopologyUtils.TIMEOUT);
     }
 
     private void updateDeviceData() {

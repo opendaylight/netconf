@@ -51,6 +51,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.controller.remote.rpc.RpcErrorsException;
+import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
@@ -91,6 +92,9 @@ public class NetconfNodeActorTest {
     @Mock
     private DOMRpcService domRpcService;
 
+    @Mock
+    private NetconfDeviceNotificationService notificationService;
+
     @Before
     public void setup() throws UnknownHostException {
         initMocks
@@ -123,7 +127,7 @@ public class NetconfNodeActorTest {
 
         final Future<Object> initialDataToActor =
                 Patterns.ask(masterRef, new CreateInitialMasterActorData(domDataBroker, sourceIdentifiers,
-                                domRpcService), TIMEOUT);
+                                domRpcService, notificationService), TIMEOUT);
 
         final Object success = Await.result(initialDataToActor, TIMEOUT.duration());
         assertTrue(success instanceof MasterActorDataInitialized);
@@ -156,7 +160,7 @@ public class NetconfNodeActorTest {
 
         final Future<Object> initialDataToActor =
                 Patterns.ask(masterRef, new CreateInitialMasterActorData(domDataBroker, sourceIdentifiers,
-                                domRpcService), TIMEOUT);
+                                domRpcService, notificationService), TIMEOUT);
 
         final Object successInit = Await.result(initialDataToActor, TIMEOUT.duration());
 
@@ -246,7 +250,7 @@ public class NetconfNodeActorTest {
 
         final Future<Object> initialDataToActor =
                 Patterns.ask(masterRef, new CreateInitialMasterActorData(domDataBroker, sourceIdentifiers,
-                        domRpcService), TIMEOUT);
+                        domRpcService, notificationService), TIMEOUT);
 
         final Object successInit = Await.result(initialDataToActor, TIMEOUT.duration());
 

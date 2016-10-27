@@ -44,6 +44,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfConnectorDTO;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
+import org.opendaylight.netconf.topology.singleton.impl.utils.StateHolder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -142,7 +143,7 @@ public class RemoteDeviceConnectorImplTest {
 
         final ActorRef masterRef = mock(ActorRef.class);
 
-        remoteDeviceConnection.startRemoteDeviceConnection(masterRef);
+        remoteDeviceConnection.startRemoteDeviceConnection(masterRef, new StateHolder());
 
         remoteDeviceConnection.stopRemoteDeviceConnection();
 
@@ -174,7 +175,7 @@ public class RemoteDeviceConnectorImplTest {
         final ActorRef masterRef = mock(ActorRef.class);
 
         final NetconfConnectorDTO connectorDTO =
-                remoteDeviceConnection.createDeviceCommunicator(NODE_ID, netconfNode, masterRef);
+                remoteDeviceConnection.createDeviceCommunicator(NODE_ID, netconfNode, masterRef, new StateHolder());
 
         assertTrue(connectorDTO.getFacade() instanceof MasterSalFacade);
     }
@@ -206,7 +207,7 @@ public class RemoteDeviceConnectorImplTest {
         final ActorRef masterRef = mock(ActorRef.class);
 
         final NetconfConnectorDTO connectorDTO =
-                remoteDeviceConnection.createDeviceCommunicator(NODE_ID, netconfNode, masterRef);
+                remoteDeviceConnection.createDeviceCommunicator(NODE_ID, netconfNode, masterRef, new StateHolder());
 
         assertTrue(connectorDTO.getFacade() instanceof KeepaliveSalFacade);
     }
@@ -263,7 +264,7 @@ public class RemoteDeviceConnectorImplTest {
 
         final ActorRef masterRef = mock(ActorRef.class);
 
-        remoteDeviceConnection.createDeviceCommunicator(NODE_ID, netconfNode, masterRef);
+        remoteDeviceConnection.createDeviceCommunicator(NODE_ID, netconfNode, masterRef, new StateHolder());
 
         assertTrue(remoteDeviceConnection.getSchemaResourcesDTOs().containsKey("schemas-test"));
     }
