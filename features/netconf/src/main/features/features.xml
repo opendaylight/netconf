@@ -141,7 +141,6 @@
     <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-monitoring/{{VERSION}}</bundle>
     <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-yang-library/{{VERSION}}</bundle>
     <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-impl/{{VERSION}}</bundle>
-    <configfile finalname='${config.configfile.directory}/${config.netconf.mdsal.configfile}'>mvn:org.opendaylight.netconf/netconf-mdsal-config/{{VERSION}}/xml/config</configfile>
   </feature>
 
   <feature name='odl-aaa-netconf-plugin' description='OpenDaylight :: AAA :: ODL NETCONF Plugin'
