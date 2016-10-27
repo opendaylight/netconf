@@ -28,6 +28,8 @@ public class NetconfConsoleConstants {
 
     public static final String TCP_ONLY = "tcp-only";
 
+    public static final String SCHEMALESS = "schemaless";
+
     public static final int DEFAULT_INDEX = 0;
 
     public static final String AVAILABLE_CAPABILITIES = "Available Capabilities";
