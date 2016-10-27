@@ -16,6 +16,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -52,7 +53,7 @@ public class NetconfMessageToXMLEncoder extends MessageToByteEncoder<NetconfMess
 
             // Using custom BufferedWriter that does not provide newLine method as performance improvement
             // see javadoc for BufferedWriter
-            StreamResult result = new StreamResult(new BufferedWriter(new OutputStreamWriter(os)));
+            StreamResult result = new StreamResult(new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8)));
             DOMSource source = new DOMSource(msg.getDocument());
             ThreadLocalTransformers.getPrettyTransformer().transform(source, result);
         }

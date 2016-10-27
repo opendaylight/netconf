@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Map.Entry;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -75,7 +76,7 @@ public class ApiDocServiceImpl implements ApiDocService {
     @Override
     public synchronized Response getListOfMounts(final UriInfo uriInfo) {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (OutputStreamWriter streamWriter = new OutputStreamWriter(baos)) {
+        try (OutputStreamWriter streamWriter = new OutputStreamWriter(baos, StandardCharsets.UTF_8)) {
             final JSONWriter writer = new JSONWriter(streamWriter);
             writer.array();
             for (final Entry<String, Long> entry : MountPointSwagger.getInstance()

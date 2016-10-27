@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -114,9 +115,10 @@ public final class TestUtils {
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
-            transformer.transform(new DOMSource(doc), new StreamResult(new OutputStreamWriter(out, "UTF-8")));
+            transformer.transform(new DOMSource(doc), new StreamResult(new OutputStreamWriter(out,
+                StandardCharsets.UTF_8)));
             final byte[] charData = out.toByteArray();
-            return new String(charData, "UTF-8");
+            return new String(charData, StandardCharsets.UTF_8);
         } catch (IOException | TransformerException e) {
             final String msg = "Error during transformation of Document into String";
             LOG.error(msg, e);
