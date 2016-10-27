@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_a90fc52d",
+        "filename": "netconf/netconf-notifications-impl/src/main/java/org/opendaylight/controller/config/yang/netconf/northbound/notification/impl/NetconfNotificationManagerModule.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-27T10:17:56Z",
+      "side": 1,
+      "message": "I don\u0027t really see the point in adding here logger and not logging anything. Also loggers can be static and final.\n\nSince this class will be hopefully deleted really soon I don\u0027t really care..",
+      "revId": "b83ef29e31740e7a7d65a6b03791addca7b0e382",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
