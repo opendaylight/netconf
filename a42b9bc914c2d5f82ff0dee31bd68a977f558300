@@ -110,6 +110,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_8e7c8f74",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/InvokeRpcMessage.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2016-10-27T04:26:44Z",
+      "side": 1,
+      "message": "I meant to say \"Serializable isn\u0027t very efficient\".",
+      "parentUuid": "3a65312a_eeb54332",
+      "revId": "a42b9bc914c2d5f82ff0dee31bd68a977f558300",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_9acded60",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/InvokeRpcMessageReply.java",
         "patchSetId": 9
