@@ -22,6 +22,7 @@ import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonS
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
+import org.opendaylight.netconf.topology.singleton.impl.utils.StateHolder;
 import org.opendaylight.netconf.topology.singleton.messages.AskForMasterMountPoint;
 import org.opendaylight.netconf.topology.singleton.messages.UnregisterSlaveMountPoint;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
@@ -50,14 +51,16 @@ class NetconfNodeManager
     private final SchemaSourceRegistry schemaRegistry;
     private final SchemaRepository schemaRepository;
     private ActorRef slaveActorRef;
+    private final StateHolder stateHolder;
 
     NetconfNodeManager(final NetconfTopologySetup setup,
                        final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
-                       final SchemaRepository schemaRepository) {
+                       final SchemaRepository schemaRepository, final StateHolder stateHolder) {
         this.setup = setup;
         this.id = id;
         this.schemaRegistry = schemaRegistry;
         this.schemaRepository = schemaRepository;
+        this.stateHolder = stateHolder;
     }
 
     @Override
@@ -131,8 +134,8 @@ class NetconfNodeManager
 
     private void createActorRef() {
         if (slaveActorRef == null) {
-            slaveActorRef = setup.getActorSystem().actorOf(NetconfNodeActor.props(setup, id, schemaRegistry,
-                    schemaRepository), id.getName());
+            slaveActorRef = setup.getActorSystem().actorOf(NetconfNodeActor.propsSlave(setup, id, schemaRegistry,
+                    schemaRepository, stateHolder), id.getName());
         }
     }
 

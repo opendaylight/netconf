@@ -10,13 +10,15 @@ package org.opendaylight.netconf.topology.singleton.impl;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.sal.core.api.Broker;
-import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
+import org.opendaylight.netconf.topology.singleton.impl.notifications.SlaveNotificationService;
 import org.opendaylight.netconf.topology.singleton.impl.tx.NetconfProxyDOMTransaction;
+import org.opendaylight.netconf.topology.singleton.impl.utils.StateHolder;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,12 +44,19 @@ public class SlaveSalFacade {
 
     private void registerToSal(final Broker domRegistryDependency) {
         domRegistryDependency.registerProvider(salProvider);
+    }
 
+    public void onNotification(final DOMNotification domNotification) {
+        salProvider.getMountInstance().publish(domNotification);
+        LOG.debug("{} : Remote Notification published.", id);
     }
 
     public void registerSlaveMountPoint(final SchemaContext remoteSchemaContext, final DOMRpcService deviceRpc,
-                                        final ActorRef masterActorRef) {
-        final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
+                                        final ActorRef masterActorRef, final ActorRef myRef,
+                                        final StateHolder stateHolder) {
+
+        final SlaveNotificationService notificationService = new SlaveNotificationService(masterActorRef, myRef,
+                stateHolder);
 
         final NetconfDOMTransaction proxyDOMTransactions =
                 new NetconfProxyDOMTransaction(id, actorSystem, masterActorRef);

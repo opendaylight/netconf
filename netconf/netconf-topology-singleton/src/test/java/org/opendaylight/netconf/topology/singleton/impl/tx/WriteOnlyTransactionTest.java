@@ -41,13 +41,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.NetconfDOMDataBroker;
@@ -83,6 +83,9 @@ public class WriteOnlyTransactionTest {
 
     @Mock
     private DOMRpcService domRpcService;
+
+    @Mock
+    private NetconfDeviceNotificationService notificationService;
 
     @Before
     public void setup() throws UnknownHostException {
@@ -252,7 +255,7 @@ public class WriteOnlyTransactionTest {
     private void initializeDataTest() throws Exception {
         final Future<Object> initialDataToActor =
                 Patterns.ask(masterRef, new CreateInitialMasterActorData(masterDataBroker, sourceIdentifiers,
-                                domRpcService), TIMEOUT);
+                                domRpcService, notificationService), TIMEOUT);
 
         final Object success = Await.result(initialDataToActor, TIMEOUT.duration());
 

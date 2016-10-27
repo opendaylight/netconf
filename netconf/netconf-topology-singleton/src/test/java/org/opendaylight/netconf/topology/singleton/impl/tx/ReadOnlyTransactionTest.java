@@ -42,6 +42,7 @@ import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.NetconfDOMDataBroker;
@@ -77,6 +78,9 @@ public class ReadOnlyTransactionTest {
 
     @Mock
     private DOMRpcService domRpcService;
+
+    @Mock
+    private NetconfDeviceNotificationService notificationService;
 
     @Before
     public void setup() throws UnknownHostException {
@@ -257,7 +261,7 @@ public class ReadOnlyTransactionTest {
     private void initializeDataTest() throws Exception {
         final Future<Object> initialDataToActor =
                 Patterns.ask(masterRef, new CreateInitialMasterActorData(masterDataBroker, sourceIdentifiers,
-                                domRpcService), TIMEOUT);
+                                domRpcService, notificationService), TIMEOUT);
 
         final Object success = Await.result(initialDataToActor, TIMEOUT.duration());
 

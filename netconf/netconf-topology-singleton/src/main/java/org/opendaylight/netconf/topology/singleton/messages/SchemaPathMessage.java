@@ -8,33 +8,33 @@
 
 package org.opendaylight.netconf.topology.singleton.messages;
 
+import com.google.common.collect.Lists;
 import java.io.Serializable;
 import java.util.List;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
-public class InvokeRpcMessage implements Serializable {
+public class SchemaPathMessage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // Schema types parameters
-    private final SchemaPathMessage schemaTypeMessage;
+    private final List<QName> path;
+    private final boolean absolute;
 
-    private final NormalizedNodeMessage normalizedNodeMessage;
-
-    public InvokeRpcMessage(final SchemaPath type, final NormalizedNodeMessage normalizedNodeMessage) {
-        this.schemaTypeMessage = new SchemaPathMessage(type);
-        this.normalizedNodeMessage = normalizedNodeMessage;
+    public SchemaPathMessage(final SchemaPath type) {
+        this.path = Lists.newArrayList(type.getPathTowardsRoot());
+        this.absolute = type.isAbsolute();
     }
 
     public List<QName> getPath() {
-        return schemaTypeMessage.getPath();
+        return path;
     }
 
     public boolean isAbsolute() {
-        return schemaTypeMessage.isAbsolute();
+        return absolute;
     }
 
-    public NormalizedNodeMessage getNormalizedNodeMessage() {
-        return normalizedNodeMessage;
+    public SchemaPath getSchemaPath() {
+        return SchemaPath.create(path, absolute);
     }
 }

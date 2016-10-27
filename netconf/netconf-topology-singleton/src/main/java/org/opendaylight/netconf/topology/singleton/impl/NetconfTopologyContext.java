@@ -25,6 +25,7 @@ import org.opendaylight.netconf.topology.singleton.api.RemoteDeviceConnector;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
+import org.opendaylight.netconf.topology.singleton.impl.utils.StateHolder;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.slf4j.Logger;
@@ -44,6 +45,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
     private boolean isMaster;
 
     private ActorRef masterActorRef;
+    private final StateHolder stateHolder;
 
     NetconfTopologyContext(final NetconfTopologySetup netconfTopologyDeviceSetup,
                            final ServiceGroupIdentifier serviceGroupIdent) {
@@ -54,7 +56,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
                 netconfTopologyDeviceSetup.getNode().getAugmentation(NetconfNode.class));
 
         remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId);
-
+        stateHolder = new StateHolder();
         netconfNodeManager = createNodeDeviceManager();
 
     }
@@ -77,7 +79,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
                     netconfTopologyDeviceSetup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY),
                     NetconfTopologyUtils.createMasterActorName(remoteDeviceId.getName(), masterAddress));
 
-            remoteDeviceConnector.startRemoteDeviceConnection(masterActorRef);
+            remoteDeviceConnector.startRemoteDeviceConnection(masterActorRef, stateHolder);
         }
 
     }
@@ -109,7 +111,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
     private NetconfNodeManager createNodeDeviceManager() {
         final NetconfNodeManager ndm =
                 new NetconfNodeManager(netconfTopologyDeviceSetup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY,
-                        DEFAULT_SCHEMA_REPOSITORY);
+                        DEFAULT_SCHEMA_REPOSITORY, stateHolder);
         ndm.registerDataTreeChangeListener(netconfTopologyDeviceSetup.getTopologyId(),
                 netconfTopologyDeviceSetup.getNode().getKey());
 
@@ -161,7 +163,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
                         LOG.error("Failed to refresh master actor data: {}", failure);
                         return;
                     }
-                    remoteDeviceConnector.startRemoteDeviceConnection(masterActorRef);
+                    remoteDeviceConnector.startRemoteDeviceConnection(masterActorRef, stateHolder);
                 }
             }, netconfTopologyDeviceSetup.getActorSystem().dispatcher());
         }
