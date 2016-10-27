@@ -16,6 +16,24 @@
       "revId": "8fd89becd667bd1cc6c7fae23464bc9c43ac531f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_bef536cd",
+        "filename": "netconf/mdsal-netconf-monitoring/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-monitoring.xml",
+        "patchSetId": 15
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-10-27T21:30:32Z",
+      "side": 1,
+      "message": "So I was able to fix this by actually removing all the css yang and xml file, so with this patch you might still face the issue, but if you grab the whole chain, e.g. https://git.opendaylight.org/gerrit/#/c/47700/ everything should be all cleared for the logout issue and the deadlock. I couldn\u0027t squash that patch in each existing patch, hence had to put it on top of the current stack. Hope this is OK with you.",
+      "parentUuid": "3a65312a_9bca0ca0",
+      "revId": "8fd89becd667bd1cc6c7fae23464bc9c43ac531f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
