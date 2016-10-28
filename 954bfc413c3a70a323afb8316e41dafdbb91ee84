@@ -142,6 +142,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_8a5c7427",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-10-28T16:00:58Z",
+      "side": 1,
+      "message": "I don\u0027t think the tail recursion argument is true since java does not have tail recursion optimization unlike what is the norm for functional languages: http://stackoverflow.com/questions/22866491/does-java8-have-tail-call-optimization",
+      "parentUuid": "3a65312a_745f3d73",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_5b1234b5",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
         "patchSetId": 3
