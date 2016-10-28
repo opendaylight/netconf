@@ -84,7 +84,7 @@ public class NetconfSSHActivator implements BundleActivator {
         final InetSocketAddress sshSocketAddress = netconfConfiguration.getSshServerAddress();
         LOG.info("Starting netconf SSH server at {}", sshSocketAddress);
 
-        final LocalAddress localAddress = NetconfConfigUtil.getNetconfLocalAddress();
+        final LocalAddress localAddress = NetconfConfiguration.getNetconfLocalAddress();
         authProviderTracker = new AuthProviderTracker(bundleContext);
 
         final String path = netconfConfiguration.getPrivateKeyPath();
