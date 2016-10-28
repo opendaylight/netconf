@@ -12,6 +12,17 @@ module sal-remote-augment {
     revision "2014-07-08" {
     }
 
+    grouping notification-output-type-grouping{
+        leaf notification-output-type {
+            type enumeration {
+                enum JSON;
+                enum XML;
+            }
+            default "XML";
+            description "Input parameter which type of output will be parsed on notification";
+        }
+    }
+
     augment "/salrmt:create-data-change-event-subscription/salrmt:input" {
         leaf datastore {
             type enumeration {
@@ -26,17 +37,11 @@ module sal-remote-augment {
                 enum SUBTREE;
             }
         }
+        uses notification-output-type-grouping;
     }
 
     augment "/salrmt:create-notification-stream/salrmt:input" {
-        leaf notification-output-type {
-            type enumeration {
-                enum JSON;
-                enum XML;
-            }
-            default "XML";
-            description "Input parameter which type of output will be parsed on notification";
-        }
+        uses notification-output-type-grouping;
     }
 
 }
