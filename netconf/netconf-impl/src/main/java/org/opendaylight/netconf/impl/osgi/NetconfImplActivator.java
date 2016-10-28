@@ -24,6 +24,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListen
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
+import org.opendaylight.netconf.util.osgi.NetconfConfiguration;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -52,7 +53,11 @@ public class NetconfImplActivator implements BundleActivator {
 
             SessionIdProvider idProvider = new SessionIdProvider();
             timer = new HashedWheelTimer();
-            long connectionTimeoutMillis = NetconfConfigUtil.extractTimeoutMillis(context);
+
+            final NetconfConfiguration netconfConfiguration = NetconfConfigUtil.getNetconfConfigurationService(context).
+                    orElseThrow(() -> new IllegalStateException("Configuration for CSS netconf server not found."));
+
+            long connectionTimeoutMillis = netconfConfiguration.getConnectionTimeoutMillis();
 
             final NetconfMonitoringServiceImpl monitoringService = startMonitoringService(context, factoriesListener);
 
@@ -70,7 +75,7 @@ public class NetconfImplActivator implements BundleActivator {
                     serverNegotiatorFactory);
             NetconfServerDispatcherImpl dispatch = new NetconfServerDispatcherImpl(serverChannelInitializer, eventLoopGroup, eventLoopGroup);
 
-            LocalAddress address = NetconfConfigUtil.getNetconfLocalAddress();
+            LocalAddress address = NetconfConfiguration.getNetconfLocalAddress();
             LOG.trace("Starting local netconf server at {}", address);
             dispatch.createLocalServer(address);
 

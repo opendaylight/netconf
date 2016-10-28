@@ -15,11 +15,16 @@ final class NetconfConfigurationHolder {
     private final InetSocketAddress tcpServerAddress;
     private final InetSocketAddress sshServerAddress;
     private final String privateKeyPath;
+    private final long connectionTimeoutMillis;
 
-    NetconfConfigurationHolder(InetSocketAddress tcpServerAddress, InetSocketAddress sshServerAddress, String privateKeyPath){
+    NetconfConfigurationHolder(final InetSocketAddress tcpServerAddress,
+                               final InetSocketAddress sshServerAddress,
+                               final String privateKeyPath,
+                               final Long connectionTimeoutMillis) {
         this.tcpServerAddress = tcpServerAddress;
         this.sshServerAddress = sshServerAddress;
         this.privateKeyPath = privateKeyPath;
+        this.connectionTimeoutMillis = connectionTimeoutMillis;
     }
 
     String getPrivateKeyPath() {
@@ -32,6 +37,10 @@ final class NetconfConfigurationHolder {
 
     InetSocketAddress getTcpServerAddress() {
         return tcpServerAddress;
+    }
+
+    long getConnectionTimeoutMillis() {
+        return connectionTimeoutMillis;
     }
 
 }
