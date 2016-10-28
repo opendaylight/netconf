@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_de5d924a",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyDOMRpcService.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T07:52:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_5ab515cc",
+      "revId": "a42b9bc914c2d5f82ff0dee31bd68a977f558300",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_5aecf5c7",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyDOMRpcService.java",
         "patchSetId": 9
@@ -47,6 +65,30 @@
       "writtenOn": "2016-10-26T11:56:28Z",
       "side": 1,
       "message": "I think you should pass the whole exception in the RpcError\n\nRpcResultBuilder.newError(ErrorType.RPC, \"operation-failed\",\nmessage, null, null, exception));",
+      "range": {
+        "startLine": 88,
+        "startChar": 56,
+        "endLine": 88,
+        "endChar": 64
+      },
+      "revId": "a42b9bc914c2d5f82ff0dee31bd68a977f558300",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_be5a564e",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyDOMRpcService.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T07:52:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_5aecf5c7",
       "range": {
         "startLine": 88,
         "startChar": 56,
@@ -76,6 +118,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_1e2f0aa3",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyDOMRpcService.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T07:52:50Z",
+      "side": 1,
+      "message": "Ok, so if I can use APIs and interface DOMRpcException, then I create own Exception for clustering. It could be better solution then moving exception between packages. I also do not need define own RpcError list, what is in this case useless.",
+      "parentUuid": "3a65312a_6eaad3d5",
+      "revId": "a42b9bc914c2d5f82ff0dee31bd68a977f558300",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_bad0a9f8",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/InvokeRpcMessage.java",
         "patchSetId": 9
@@ -87,6 +147,24 @@
       "writtenOn": "2016-10-26T11:56:28Z",
       "side": 1,
       "message": "I think this belong to the transactions package",
+      "revId": "a42b9bc914c2d5f82ff0dee31bd68a977f558300",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_de0bd229",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/InvokeRpcMessage.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T07:52:50Z",
+      "side": 1,
+      "message": "I don`t think so. It is not operation for transaction and their replies. It could be confusing to search RPC in transactions package. Maybe another package rpc could be good and easy to find messages of this type. Also with reply.",
+      "parentUuid": "3a65312a_bad0a9f8",
       "revId": "a42b9bc914c2d5f82ff0dee31bd68a977f558300",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -128,6 +206,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_715d8fe9",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/InvokeRpcMessage.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T07:52:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_eeb54332",
+      "revId": "a42b9bc914c2d5f82ff0dee31bd68a977f558300",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_9acded60",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/InvokeRpcMessageReply.java",
         "patchSetId": 9
@@ -156,6 +252,24 @@
       "writtenOn": "2016-10-27T04:25:39Z",
       "side": 1,
       "message": "See comment in InvokeRpcMessage wrt Serializable.",
+      "revId": "a42b9bc914c2d5f82ff0dee31bd68a977f558300",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_d1710379",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/InvokeRpcMessageReply.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T07:52:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_4e827753",
       "revId": "a42b9bc914c2d5f82ff0dee31bd68a977f558300",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
