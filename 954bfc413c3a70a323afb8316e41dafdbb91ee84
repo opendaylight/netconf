@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_71874f10",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-28T10:51:25Z",
+      "side": 1,
+      "message": "final List\u003cElement\u003e nodes",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_b19f2750",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-28T10:51:25Z",
+      "side": 1,
+      "message": "InstanceIdentifiers to the read locations",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_719e2f58",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-28T10:51:25Z",
+      "side": 1,
+      "message": "I think this method needs more documentation. It\u0027s not really that trivial.",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_91994b71",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-28T10:51:25Z",
+      "side": 1,
+      "message": "Is this tree representation and its processing really the best and efficient one?",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_5b1234b5",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-28T10:51:25Z",
+      "side": 1,
+      "message": "unchecked assignment",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_9b0ccc96",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-28T10:51:25Z",
+      "side": 1,
+      "message": "secondLevelPathArg -\u003e finalIdentifiers.add (space)",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_9182ebfe",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-28T10:51:25Z",
+      "side": 1,
+      "message": "Can we count on this? Will there always be at least two levels?",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_71b58fcc",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-28T10:51:25Z",
+      "side": 1,
+      "message": "final modifier can stay here\n\nAlso you are not throwing DocumentedException anymore so throws clause is not necessary.",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_d439f1d9",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/Get.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-28T10:51:25Z",
+      "side": 1,
+      "message": "Why list of map entries and not just map? Do you really need list?",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_54ffa101",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/Get.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-28T10:51:25Z",
+      "side": 1,
+      "message": "You don\u0027t have to change ReadFailedException handling",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_34d82553",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/GetConfig.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-10-28T10:51:25Z",
+      "side": 1,
+      "message": "Comments for Get class apply also here",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
