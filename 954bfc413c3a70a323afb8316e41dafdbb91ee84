@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_74b0ddf4",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T12:12:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_71874f10",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_b19f2750",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-10-28T10:51:25Z",
       "side": 1,
       "message": "InstanceIdentifiers to the read locations",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_d4945146",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T12:12:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_b19f2750",
       "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_14c4093f",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T12:12:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_719e2f58",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_91994b71",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2016-10-28T10:51:25Z",
       "side": 1,
       "message": "Is this tree representation and its processing really the best and efficient one?",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_745f3d73",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T12:12:46Z",
+      "side": 1,
+      "message": "Time:\nWe can use situation that we have each list of path arguments \"sorted\" from root to last child. So we do not need construct exact tree structure (left, right, parent..)  and we can use HashTable. We simply add next child (path arguments as key + reference) at appropriate depth in time O(1). On the other hand with some other tree structure (common - left, right, parent, or list of lists etc.) there is needed to search each depth manually and find place for reference to next child (it can take O(N) or O(log N) if we consider binary search).\n\nMemory:\nI am not sure how memory take HashMap in Java actually, but I am sure that memory should be certianly reduced with some simpler structure, but there is always trade of between time and memory complexity.\n\nFor traversing tree is used tail recursion, so we do not append results to stack. So there is certainly no problem with memory and also with time complexity.",
+      "parentUuid": "3a65312a_91994b71",
       "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_54c7a112",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T12:12:46Z",
+      "side": 1,
+      "message": "I know that one, but I wanted to avoid unchecked for all method, I cannot solve it.",
+      "parentUuid": "3a65312a_5b1234b5",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_9b0ccc96",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
         "patchSetId": 3
@@ -98,6 +188,24 @@
       "writtenOn": "2016-10-28T10:51:25Z",
       "side": 1,
       "message": "secondLevelPathArg -\u003e finalIdentifiers.add (space)",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_34cca535",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T12:12:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_9b0ccc96",
       "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_5495e1e2",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T12:12:46Z",
+      "side": 1,
+      "message": "If there is one level then user wants all data and he used for that filter. Is this possible? I think that no, but I added there check and in this case I add instance identifier with the one path argument.",
+      "parentUuid": "3a65312a_9182ebfe",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_71b58fcc",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
         "patchSetId": 3
@@ -132,6 +258,24 @@
       "writtenOn": "2016-10-28T10:51:25Z",
       "side": 1,
       "message": "final modifier can stay here\n\nAlso you are not throwing DocumentedException anymore so throws clause is not necessary.",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_d488d1c8",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T12:12:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_71b58fcc",
       "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_d4af312a",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/Get.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T12:12:46Z",
+      "side": 1,
+      "message": "Yes now, We do not need list, because we assume that we will have only unique instance identifiers. Before this patch I needed list of tuples which Java don`t know.",
+      "parentUuid": "3a65312a_d439f1d9",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_54ffa101",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/Get.java",
         "patchSetId": 3
@@ -166,6 +328,24 @@
       "writtenOn": "2016-10-28T10:51:25Z",
       "side": 1,
       "message": "You don\u0027t have to change ReadFailedException handling",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_94449975",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/Get.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T12:12:46Z",
+      "side": 1,
+      "message": "Oh ok, you cannot throw nothing only RuntimeException from foreach statement and moreover I assumed that when we iterate over list, it is runtime exception cause Illegal state is from the last one which failed.",
+      "parentUuid": "3a65312a_54ffa101",
       "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
