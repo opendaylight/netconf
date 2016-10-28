@@ -11,7 +11,6 @@ package org.opendaylight.netconf.tcp.osgi;
 import java.net.InetSocketAddress;
 import org.opendaylight.netconf.tcp.netty.ProxyServer;
 import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
-import org.opendaylight.netconf.util.osgi.NetconfConfigUtil.InfixProp;
 import org.opendaylight.netconf.util.osgi.NetconfConfiguration;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -33,11 +32,11 @@ public class NetconfTCPActivator implements BundleActivator {
         final InetSocketAddress address = netconfConfiguration.getTcpServerAddress();
 
         if (address.getAddress().isAnyLocalAddress()) {
-            LOG.warn("Unprotected netconf TCP address is configured to ANY local address. This is a security risk. Consider changing {} to 127.0.0.1",
-                    NetconfConfigUtil.getNetconfServerAddressKey(InfixProp.tcp));
+            LOG.warn("Unprotected netconf TCP address is configured to ANY local address. This is a security risk. " +
+                            "Consider changing tcp-address in netconf.cfg to 127.0.0.1");
         }
         LOG.info("Starting TCP netconf server at {}", address);
-        proxyServer = new ProxyServer(address, NetconfConfigUtil.getNetconfLocalAddress());
+        proxyServer = new ProxyServer(address, NetconfConfiguration.getNetconfLocalAddress());
     }
 
     @Override
