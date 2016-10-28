@@ -56,7 +56,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfStateSchemas.class);
 
-    public static final NetconfStateSchemas EMPTY = new NetconfStateSchemas(Collections.<RemoteYangSchema>emptySet());
+    public static final NetconfStateSchemas EMPTY = new NetconfStateSchemas(Collections.emptySet());
 
     private static final YangInstanceIdentifier STATE_SCHEMAS_IDENTIFIER =
             YangInstanceIdentifier.builder().node(NetconfState.QNAME).node(Schemas.QNAME).build();
@@ -236,7 +236,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
         private static Optional<String> getValueOfSimpleNode(final NormalizedNode<? extends YangInstanceIdentifier.PathArgument, ?> node) {
             final Object value = node.getValue();
-            return value == null || Strings.isNullOrEmpty(value.toString()) ? Optional.<String>absent() : Optional.of(value.toString().trim());
+            return value == null || Strings.isNullOrEmpty(value.toString()) ? Optional.absent() : Optional.of(value.toString().trim());
         }
 
         @Override
@@ -250,11 +250,8 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
             final RemoteYangSchema that = (RemoteYangSchema) o;
 
-            if (!qname.equals(that.qname)) {
-                return false;
-            }
+            return qname.equals(that.qname);
 
-            return true;
         }
 
         @Override

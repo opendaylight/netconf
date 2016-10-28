@@ -382,17 +382,9 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
      */
     private boolean checkDataPresence(@Nonnull final String operation, final boolean hasData) {
         if (isPatchOperationWithValue(operation)) {
-            if (hasData) {
-                return true;
-            } else {
-                return false;
-            }
+            return hasData;
         } else  {
-            if (!hasData) {
-                return true;
-            } else {
-                return false;
-            }
+            return !hasData;
         }
     }
 

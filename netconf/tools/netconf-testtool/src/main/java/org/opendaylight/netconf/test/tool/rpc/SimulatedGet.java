@@ -28,7 +28,7 @@ public class SimulatedGet extends AbstractConfigNetconfOperation {
 
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
-        final Element element = XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.<String>absent());
+        final Element element = XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.absent());
 
         for(final XmlElement e : storage.getConfigList()) {
             final Element domElement = e.getDomElement();

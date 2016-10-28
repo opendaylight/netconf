@@ -99,7 +99,7 @@ final class NotificationHandler {
         messageTransformer = null;
     }
 
-    static interface NotificationFilter {
+    interface NotificationFilter {
 
         Optional<DOMNotification> filterNotification(DOMNotification notification);
     }

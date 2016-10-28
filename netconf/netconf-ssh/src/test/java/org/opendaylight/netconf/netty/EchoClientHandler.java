@@ -31,7 +31,7 @@ public class EchoClientHandler extends ChannelInboundHandlerAdapter implements C
     private ChannelHandlerContext ctx;
     private final StringBuilder fromServer = new StringBuilder();
 
-    public static enum State {CONNECTING, CONNECTED, FAILED_TO_CONNECT, CONNECTION_CLOSED}
+    public enum State {CONNECTING, CONNECTED, FAILED_TO_CONNECT, CONNECTION_CLOSED}
 
 
     private State state = State.CONNECTING;

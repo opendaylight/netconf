@@ -97,7 +97,7 @@ public class ConfigReader extends AbstractReader<DataSchemaNode> {
             previous = Collections.<NormalizedNode<?, ?>>singletonList(
                     ImmutableContainerNodeBuilder.create()
                             .withNodeIdentifier(new NodeIdentifier(qName))
-                            .withValue(previous == null ? Collections.<DataContainerChild<?, ?>>emptyList() : (Collection) previous).build()
+                            .withValue(previous == null ? Collections.emptyList() : (Collection) previous).build()
             );
         }
 
@@ -109,7 +109,7 @@ public class ConfigReader extends AbstractReader<DataSchemaNode> {
         builder.withNodeIdentifier(new NodeIdentifier(schemaNode.getQName()));
         builder.withValue((Collection<DataContainerChild<?, ?>>) previous);
 
-        return Collections.<NormalizedNode<?, ?>> singletonList(builder.build());
+        return Collections.singletonList(builder.build());
     }
 
     private List<NormalizedNode<?, ?>> readInnerNode(final String pathString) throws ReadingException {
@@ -134,7 +134,7 @@ public class ConfigReader extends AbstractReader<DataSchemaNode> {
 
         @Override
         protected List<Completer> getAdditionalCompleters() {
-            return Collections.<Completer> singletonList(new FilterCompleter(remoteSchemaContext));
+            return Collections.singletonList(new FilterCompleter(remoteSchemaContext));
         }
     }
 

@@ -306,15 +306,15 @@ public class NetconfMappingTest extends AbstractConfigTest {
 
         edit("netconfMessages/editConfig_replace_default.xml");
         config = getConfigCandidate();
-        assertCorrectServiceNames(config, Collections.<String>emptySet());
+        assertCorrectServiceNames(config, Collections.emptySet());
 
         edit("netconfMessages/editConfig_remove.xml");
         config = getConfigCandidate();
-        assertCorrectServiceNames(config, Collections.<String>emptySet());
+        assertCorrectServiceNames(config, Collections.emptySet());
 
         commit();
         config = getConfigCandidate();
-        assertCorrectServiceNames(config, Collections.<String>emptySet());
+        assertCorrectServiceNames(config, Collections.emptySet());
 
     }
 
@@ -488,13 +488,13 @@ public class NetconfMappingTest extends AbstractConfigTest {
 
     private Document getConfigCandidate() throws ParserConfigurationException, SAXException, IOException,
             DocumentedException {
-        final GetConfig getConfigOp = new GetConfig(configSubsystemFacade, Optional.<String>absent(), NETCONF_SESSION_ID);
+        final GetConfig getConfigOp = new GetConfig(configSubsystemFacade, Optional.absent(), NETCONF_SESSION_ID);
         return executeOp(getConfigOp, "netconfMessages/getConfig_candidate.xml");
     }
 
     private Document getConfigRunning() throws ParserConfigurationException, SAXException, IOException,
             DocumentedException {
-        final GetConfig getConfigOp = new GetConfig(configSubsystemFacade, Optional.<String>absent(), NETCONF_SESSION_ID);
+        final GetConfig getConfigOp = new GetConfig(configSubsystemFacade, Optional.absent(), NETCONF_SESSION_ID);
         return executeOp(getConfigOp, "netconfMessages/getConfig.xml");
     }
 
@@ -874,7 +874,7 @@ public class NetconfMappingTest extends AbstractConfigTest {
         p2.setCoreSize(44L);
         p2.setPort("port23");
         p2.setSimpleInt3(456);
-        mxBean.setPeers(Lists.<Peers> newArrayList(p1, p2));
+        mxBean.setPeers(Lists.newArrayList(p1, p2));
         // //
         mxBean.setSimpleLong(454545L);
         mxBean.setSimpleLong2(44L);
@@ -883,8 +883,8 @@ public class NetconfMappingTest extends AbstractConfigTest {
         mxBean.setSimpleShort(new Short((short) 4));
         mxBean.setSimpleTest(545);
 
-        mxBean.setComplexList(Lists.<ComplexList> newArrayList());
-        mxBean.setSimpleList(Lists.<Integer> newArrayList());
+        mxBean.setComplexList(Lists.newArrayList());
+        mxBean.setSimpleList(Lists.newArrayList());
 
         final ObjectName testingDepOn = transaction.createModule(this.factory2.getImplementationName(), depName);
         int i = 1;

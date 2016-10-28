@@ -23,7 +23,7 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
     private static final String GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM = "Got byte {} while waiting for {}-{}";
     public static final int DEFAULT_MAXIMUM_CHUNK_SIZE = 16 * 1024 * 1024;
 
-    private static enum State {
+    private enum State {
         HEADER_ONE, // \n
         HEADER_TWO, // #
         HEADER_LENGTH_FIRST, // [1-9]

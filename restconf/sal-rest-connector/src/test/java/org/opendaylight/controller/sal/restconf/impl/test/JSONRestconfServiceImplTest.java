@@ -353,7 +353,7 @@ public class JSONRestconfServiceImplTest {
 
         final String uriPath = "toaster:cancel-toast";
 
-        final Optional<String> output = this.service.invokeRpc(uriPath, Optional.<String>absent());
+        final Optional<String> output = this.service.invokeRpc(uriPath, Optional.absent());
 
         assertEquals("Output present", false, output.isPresent());
 
@@ -373,7 +373,7 @@ public class JSONRestconfServiceImplTest {
 
         final String uriPath = "toaster:testOutput";
 
-        final Optional<String> output = this.service.invokeRpc(uriPath, Optional.<String>absent());
+        final Optional<String> output = this.service.invokeRpc(uriPath, Optional.absent());
 
         assertEquals("Output present", true, output.isPresent());
         assertNotNull("Returned null response", output.get());
@@ -390,7 +390,7 @@ public class JSONRestconfServiceImplTest {
 
         final String uriPath = "toaster:cancel-toast";
 
-        this.service.invokeRpc(uriPath, Optional.<String>absent());
+        this.service.invokeRpc(uriPath, Optional.absent());
     }
 
     void testGet(final LogicalDatastoreType datastoreType) throws OperationFailedException {

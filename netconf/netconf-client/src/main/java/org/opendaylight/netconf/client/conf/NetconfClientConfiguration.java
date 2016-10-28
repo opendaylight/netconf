@@ -108,7 +108,7 @@ public class NetconfClientConfiguration {
                 .add("authHandler", authHandler);
     }
 
-    public static enum NetconfClientProtocol {
+    public enum NetconfClientProtocol {
         TCP, SSH
     }
 }

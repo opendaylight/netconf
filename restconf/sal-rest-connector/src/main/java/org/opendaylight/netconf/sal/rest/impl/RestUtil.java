@@ -125,7 +125,7 @@ public final class RestUtil {
     }
 
     public interface PrefixesMaping {
-        public String getNamespace(String prefix);
+        String getNamespace(String prefix);
     }
 
     public static class PrefixMapingFromXml implements PrefixesMaping {

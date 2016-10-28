@@ -58,7 +58,7 @@ public class CapabilityChangeNotificationProducerTest {
         Map<InstanceIdentifier<?>, DataObject> createdData = Maps.newHashMap();
         createdData.put(capabilitiesIdentifier, newCapabilities);
         verifyDataTreeChange(DataObjectModification.ModificationType.WRITE, null, newCapabilities,
-                changedCapabilitesFrom(newCapabilitiesList, Collections.<Uri>emptyList()));
+                changedCapabilitesFrom(newCapabilitiesList, Collections.emptyList()));
     }
 
     @Test
@@ -100,7 +100,7 @@ public class CapabilityChangeNotificationProducerTest {
         netconfCapabilityChangeBuilder.setChangedBy(new ChangedByBuilder().setServerOrUser(
                 new ServerBuilder().setServer(true).build()).build());
 
-        netconfCapabilityChangeBuilder.setModifiedCapability(Collections.<Uri>emptyList());
+        netconfCapabilityChangeBuilder.setModifiedCapability(Collections.emptyList());
         netconfCapabilityChangeBuilder.setAddedCapability(added);
         netconfCapabilityChangeBuilder.setDeletedCapability(deleted);
 

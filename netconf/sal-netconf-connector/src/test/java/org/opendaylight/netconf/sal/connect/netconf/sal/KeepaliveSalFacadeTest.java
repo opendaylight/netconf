@@ -88,7 +88,7 @@ public class KeepaliveSalFacadeTest {
                 return currentKeepalive;
             }
         }).when(executorServiceSpy).schedule(Mockito.<Runnable> any(),
-                Mockito.anyLong(), Matchers.<TimeUnit> any());
+                Mockito.anyLong(), Matchers.any());
 
         Mockito.when(currentKeepalive.isDone()).thenReturn(true);
     }

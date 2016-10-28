@@ -37,7 +37,7 @@ public class CurrentSchemaContext implements SchemaContextListener, AutoCloseabl
         this.rootSchemaSourceProvider = rootSchemaSourceProvider;
         schemaContextListenerListenerRegistration = schemaService.registerSchemaContextListener(this);
     }
-
+n
     @Override
     public void onGlobalContextUpdated(final SchemaContext schemaContext) {
         currentContext.set(schemaContext);

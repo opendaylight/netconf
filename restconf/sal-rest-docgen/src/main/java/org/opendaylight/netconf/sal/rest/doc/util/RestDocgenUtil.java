@@ -82,10 +82,7 @@ public class RestDocgenUtil {
 
     private static boolean isEqualNamespaceAndRevision(final QName parentQName, final QName nodeQName) {
         if (parentQName == null) {
-            if (nodeQName == null) {
-                return true;
-            }
-            return false;
+            return nodeQName == null;
         }
         return parentQName.getNamespace().equals(nodeQName.getNamespace())
                 && parentQName.getRevision().equals(nodeQName.getRevision());

@@ -34,7 +34,7 @@ public interface RestconfModulesService {
     @Path("data/ietf-yang-library:modules-state")
     @Produces({ Draft17.MediaTypes.DATA + RestconfConstants.JSON, Draft17.MediaTypes.DATA, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public NormalizedNodeContext getModules(@Context UriInfo uriInfo);
+    NormalizedNodeContext getModules(@Context UriInfo uriInfo);
 
     /**
      * Valid only for mount points. Get identifiers for the YANG data model
@@ -50,7 +50,7 @@ public interface RestconfModulesService {
     @Path("data/ietf-yang-library:modules-state/{identifier:.+}")
     @Produces({ Draft17.MediaTypes.DATA + RestconfConstants.JSON, Draft17.MediaTypes.DATA, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public NormalizedNodeContext getModules(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
+    NormalizedNodeContext getModules(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 
     /**
      * Get entry for each YANG data model module supported by the server. There
@@ -67,5 +67,5 @@ public interface RestconfModulesService {
     @Path("data/ietf-yang-library:modules-state/module/{identifier:.+}")
     @Produces({ Draft17.MediaTypes.DATA + RestconfConstants.JSON, Draft17.MediaTypes.DATA, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public NormalizedNodeContext getModule(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
+    NormalizedNodeContext getModule(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 }

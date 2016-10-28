@@ -86,11 +86,8 @@ public final class HandlingPriority implements Comparable<HandlingPriority> {
 
         HandlingPriority that = (HandlingPriority) o;
 
-        if (priority != null ? !priority.equals(that.priority) : that.priority != null){
-            return false;
-        }
+        return priority != null ? priority.equals(that.priority) : that.priority == null;
 
-        return true;
     }
 
     @Override

@@ -177,7 +177,7 @@ public class InvokeRpcMethodTest {
             fail("Expected an exception to be thrown.");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
-                    Optional.<String> absent(), Optional.<String> absent());
+                    Optional.absent(), Optional.absent());
         }
     }
 
@@ -227,7 +227,7 @@ public class InvokeRpcMethodTest {
             fail("Expected an exception to be thrown.");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED, Optional.of("foo"),
-                    Optional.<String> absent());
+                    Optional.absent());
             verifyRestconfDocumentedException(e, 1, ErrorType.RPC, ErrorTag.IN_USE, Optional.of("bar"),
                     Optional.of("app-tag"));
         }
@@ -261,7 +261,7 @@ public class InvokeRpcMethodTest {
             fail("Expected an exception");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                    Optional.<String> absent(), Optional.<String> absent());
+                    Optional.absent(), Optional.absent());
         }
     }
 
@@ -272,7 +272,7 @@ public class InvokeRpcMethodTest {
             fail("Expected an exception");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.RPC, ErrorTag.UNKNOWN_ELEMENT,
-                    Optional.<String> absent(), Optional.<String> absent());
+                    Optional.absent(), Optional.absent());
         }
     }
 
@@ -329,7 +329,7 @@ public class InvokeRpcMethodTest {
             fail("Expected an exception.");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                    Optional.<String> absent(), Optional.<String> absent());
+                    Optional.absent(), Optional.absent());
         }
     }
 
