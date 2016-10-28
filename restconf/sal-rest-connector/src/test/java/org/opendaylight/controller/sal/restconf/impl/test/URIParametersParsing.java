@@ -32,6 +32,7 @@ import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder;
@@ -86,7 +87,7 @@ public class URIParametersParsing {
         final String datastoreValue = datastore == null ? "CONFIGURATION" : datastore;
         final String scopeValue = scope == null ? "BASE" : scope + "";
         Notificator.createListener(iiBuilder.build(), "dummyStreamName/datastore=" + datastoreValue + "/scope="
-                + scopeValue);
+                + scopeValue, NotificationOutputType.XML);
 
         final UriInfo mockedUriInfo = mock(UriInfo.class);
         @SuppressWarnings("unchecked")

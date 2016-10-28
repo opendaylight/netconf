@@ -42,9 +42,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.json.JSONObject;
+import org.json.XML;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataChangeEvent;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -85,16 +88,22 @@ public class ListenerAdapter implements DOMDataChangeListener {
     private Set<Channel> subscribers = new ConcurrentSet<>();
     private final EventBus eventBus;
     private final EventBusChangeRecorder eventBusChangeRecorder;
+    private final NotificationOutputType outputType;
 
     /**
-     * Creates new {@link ListenerAdapter} listener specified by path and stream name.
+     * Creates new {@link ListenerAdapter} listener specified by path and stream
+     * name.
      *
      * @param path
      *            Path to data in data store.
      * @param streamName
      *            The name of the stream.
+     * @param outputType
+     *            - type of output on notification (JSON, XML)
      */
-    ListenerAdapter(final YangInstanceIdentifier path, final String streamName) {
+    ListenerAdapter(final YangInstanceIdentifier path, final String streamName,
+            final NotificationOutputType outputType) {
+        this.outputType = outputType;
         Preconditions.checkNotNull(path);
         Preconditions.checkArgument((streamName != null) && !streamName.isEmpty());
         this.path = path;
@@ -110,7 +119,12 @@ public class ListenerAdapter implements DOMDataChangeListener {
                 || !change.getRemovedPaths().isEmpty()) {
             final String xml = prepareXmlFrom(change);
             final Event event = new Event(EventType.NOTIFY);
-            event.setData(xml);
+            if (this.outputType.equals(NotificationOutputType.JSON)) {
+                final JSONObject jsonObject = XML.toJSONObject(xml);
+                event.setData(jsonObject.toString());
+            } else {
+                event.setData(xml);
+            }
             this.eventBus.post(event);
         }
     }
@@ -230,6 +244,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
         final Document doc = createDocument();
         final Element notificationElement = doc.createElementNS("urn:ietf:params:xml:ns:netconf:notification:1.0",
                 "notification");
+
         doc.appendChild(notificationElement);
 
         final Element eventTimeElement = doc.createElement("eventTime");
@@ -238,6 +253,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
 
         final Element dataChangedNotificationEventElement = doc.createElementNS(
                 "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "data-changed-notification");
+
         addValuesToDataChangedNotificationEventElement(doc, dataChangedNotificationEventElement, change,
                 schemaContext, dataContextTree);
         notificationElement.appendChild(dataChangedNotificationEventElement);
