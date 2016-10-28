@@ -117,7 +117,7 @@ public class NetconfTopologyImplTest {
         WriteTransaction wtx = mock(WriteTransaction.class);
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(wtx);
         doNothing().when(wtx).merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
-        when(wtx.submit()).thenReturn(Futures.<Void, TransactionCommitFailedException>immediateCheckedFuture(null));
+        when(wtx.submit()).thenReturn(Futures.immediateCheckedFuture(null));
         topology.onSessionInitiated(session);
 
         //verify initialization of topology

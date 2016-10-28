@@ -87,7 +87,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
     @Override
     public AutoCloseable registerCapabilityListener(
             CapabilityListener listener) {
-        listener.onCapabilitiesChanged(caps, Collections.<Capability>emptySet());
+        listener.onCapabilitiesChanged(caps, Collections.emptySet());
         return new AutoCloseable() {
             @Override
             public void close() throws Exception {
@@ -202,7 +202,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
 
             ContainerNode schemasContainer = Builders.containerBuilder().withNodeIdentifier(
                     new YangInstanceIdentifier.NodeIdentifier(Schemas.QNAME)).withChild(schemaList).build();
-            return (ContainerNode) Builders.containerBuilder().withNodeIdentifier(
+            return Builders.containerBuilder().withNodeIdentifier(
                     new YangInstanceIdentifier.NodeIdentifier(NetconfState.QNAME)).withChild(schemasContainer).build();
         }
 

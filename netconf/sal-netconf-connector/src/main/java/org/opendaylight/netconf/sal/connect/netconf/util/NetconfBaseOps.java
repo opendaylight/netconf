@@ -234,7 +234,7 @@ public final class NetconfBaseOps {
     }
 
     public ListenableFuture<DOMRpcResult> editConfigCandidate(final FutureCallback<? super DOMRpcResult> callback, final DataContainerChild<?, ?> editStructure, final boolean rollback) {
-        return editConfig(callback, NETCONF_CANDIDATE_QNAME, editStructure, Optional.<ModifyAction>absent(), rollback);
+        return editConfig(callback, NETCONF_CANDIDATE_QNAME, editStructure, Optional.absent(), rollback);
     }
 
     public ListenableFuture<DOMRpcResult> editConfigRunning(final FutureCallback<? super DOMRpcResult> callback, final DataContainerChild<?, ?> editStructure, final ModifyAction modifyAction, final boolean rollback) {
@@ -242,7 +242,7 @@ public final class NetconfBaseOps {
     }
 
     public ListenableFuture<DOMRpcResult> editConfigRunning(final FutureCallback<? super DOMRpcResult> callback, final DataContainerChild<?, ?> editStructure, final boolean rollback) {
-        return editConfig(callback, NETCONF_RUNNING_QNAME, editStructure, Optional.<ModifyAction>absent(), rollback);
+        return editConfig(callback, NETCONF_RUNNING_QNAME, editStructure, Optional.absent(), rollback);
     }
 
     public ListenableFuture<DOMRpcResult> editConfig(final FutureCallback<? super DOMRpcResult> callback, final QName datastore, final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> modifyAction, final boolean rollback) {

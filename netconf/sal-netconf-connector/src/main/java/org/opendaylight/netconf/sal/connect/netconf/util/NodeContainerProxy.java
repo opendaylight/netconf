@@ -44,7 +44,7 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     }
 
     public NodeContainerProxy(final QName qName, final Collection<DataSchemaNode> childNodes) {
-        this(qName, asMap(childNodes), Collections.<AugmentationSchema>emptySet());
+        this(qName, asMap(childNodes), Collections.emptySet());
     }
 
     public NodeContainerProxy(final QName qName, final Collection<DataSchemaNode> childNodes, final Set<AugmentationSchema> availableAugmentations) {

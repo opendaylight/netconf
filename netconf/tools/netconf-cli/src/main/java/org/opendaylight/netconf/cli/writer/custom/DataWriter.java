@@ -49,7 +49,7 @@ public class DataWriter extends AbstractWriter<DataSchemaNode> {
             final NormalizedNode<?, ?> childNode = (NormalizedNode<?, ?>) oChildNode;
             final Optional<DataSchemaNode> schemaNode = XmlDocumentUtils.findFirstSchema(childNode.getNodeType(), remoteSchemaContext.getDataDefinitions());
             Preconditions.checkState(schemaNode.isPresent(), "Unknown data node %s, not defined in schema", childNode.getNodeType());
-            new NormalizedNodeWriter(console, out).write(schemaNode.get(), Collections.<NormalizedNode<?, ?>>singletonList(childNode));
+            new NormalizedNodeWriter(console, out).write(schemaNode.get(), Collections.singletonList(childNode));
         }
 
         output = new StringBuilder();

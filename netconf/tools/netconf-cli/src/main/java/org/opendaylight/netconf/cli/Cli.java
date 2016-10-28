@@ -133,7 +133,7 @@ public class Cli implements Runnable {
     private void handleEmptyOutput(final Command command, final Output response) {
         try {
             new NormalizedNodeWriter(consoleIO, new OutFormatter()).write(null,
-                    Collections.<NormalizedNode<?, ?>>singletonList(response.getOutput()));
+                    Collections.singletonList(response.getOutput()));
         } catch (final WriteException e) {
             throw new IllegalStateException("Unable to write value for: " + response.getOutput().getNodeType()
                     + " from: " + command.getCommandId(), e);
@@ -164,7 +164,7 @@ public class Cli implements Runnable {
                 try {
                     final Class<?> argumentClass = Class.forName(argumentHandlerClassName);
                     // TODO add check before cast
-                    return Optional.<Class<? extends T>> of((Class<? extends T>) argumentClass);
+                    return Optional.of((Class<? extends T>) argumentClass);
                 } catch (final ClassNotFoundException e) {
                     throw new IllegalArgumentException("Unknown custom reader class " + argumentHandlerClassName
                             + " for: " + dataSchemaNode.getQName());

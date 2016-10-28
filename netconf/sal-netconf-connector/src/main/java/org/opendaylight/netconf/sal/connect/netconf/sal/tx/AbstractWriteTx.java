@@ -95,7 +95,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
             return;
         }
 
-        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>fromNullable(data), Optional.of(ModifyAction.REPLACE), path);
+        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.fromNullable(data), Optional.of(ModifyAction.REPLACE), path);
         editConfig(path, Optional.fromNullable(data), editStructure, Optional.of(ModifyAction.NONE), "put");
     }
 
@@ -109,8 +109,8 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
             return;
         }
 
-        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>fromNullable(data), Optional.<ModifyAction>absent(), path);
-        editConfig(path, Optional.fromNullable(data), editStructure, Optional.<ModifyAction>absent(), "merge");
+        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.fromNullable(data), Optional.absent(), path);
+        editConfig(path, Optional.fromNullable(data), editStructure, Optional.absent(), "merge");
     }
 
     /**
@@ -125,8 +125,8 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
     @Override
     public synchronized void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         checkEditable(store);
-        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>absent(), Optional.of(ModifyAction.DELETE), path);
-        editConfig(path, Optional.<NormalizedNode<?, ?>>absent(), editStructure, Optional.of(ModifyAction.NONE), "delete");
+        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.absent(), Optional.of(ModifyAction.DELETE), path);
+        editConfig(path, Optional.absent(), editStructure, Optional.of(ModifyAction.NONE), "delete");
     }
 
     @Override

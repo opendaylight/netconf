@@ -39,7 +39,7 @@ public class Output {
         final Map<DataSchemaNode, List<NormalizedNode<?, ?>>> mappedNodesToSchema = Maps.newHashMap();
 
         final DataSchemaNode schemaNode = mappedSchemaNodes.get(output.getNodeType().withoutRevision());
-        final List<NormalizedNode<?, ?>> list = mappedNodesToSchema.get(schemaNode) == null ? Lists.<NormalizedNode<?, ?>>newArrayList()
+        final List<NormalizedNode<?, ?>> list = mappedNodesToSchema.get(schemaNode) == null ? Lists.newArrayList()
                 : mappedNodesToSchema.get(schemaNode);
         list.add(output);
         mappedNodesToSchema.put(schemaNode, list);

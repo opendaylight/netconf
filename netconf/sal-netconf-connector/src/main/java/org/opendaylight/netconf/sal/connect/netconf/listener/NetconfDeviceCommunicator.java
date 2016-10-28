@@ -83,7 +83,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     public NetconfDeviceCommunicator(final RemoteDeviceId id,
                                      final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice,
                                      final int rpcMessageLimit) {
-        this(id, remoteDevice, Optional.<UserPreferences>absent(), rpcMessageLimit);
+        this(id, remoteDevice, Optional.absent(), rpcMessageLimit);
     }
 
     private NetconfDeviceCommunicator(final RemoteDeviceId id, final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice,

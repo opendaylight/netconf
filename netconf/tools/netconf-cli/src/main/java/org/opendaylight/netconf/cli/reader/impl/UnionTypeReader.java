@@ -50,7 +50,7 @@ class UnionTypeReader {
             }
             final TypeDefinition<?> value = mapping.get(rawValue);
             if (value != null) {
-                return Optional.<TypeDefinition<?>> of(value);
+                return Optional.of(value);
             } else {
                 final String message = String.format("Incorrect type (%s) was specified for union type definition", rawValue);
                 LOG.error(message);
@@ -83,7 +83,7 @@ class UnionTypeReader {
         public Completer getCompleter() {
             List<TypeDefinition<?>> subtypesForMenu = resolveSubtypesFrom(typeDef);
             if (subtypesForMenu.isEmpty()) {
-                subtypesForMenu = Collections.<TypeDefinition<?>> singletonList(typeDef);
+                subtypesForMenu = Collections.singletonList(typeDef);
             }
             final Collection<String> menuItems = toMenuItem(subtypesForMenu);
             return new AggregateCompleter(new StringsCompleter(menuItems), new StringsCompleter(IOUtil.SKIP));

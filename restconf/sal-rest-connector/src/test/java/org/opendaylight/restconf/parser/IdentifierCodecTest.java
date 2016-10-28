@@ -41,11 +41,11 @@ public class IdentifierCodecTest {
     @Test
     public void codecListAndLeafTest() {
         final YangInstanceIdentifier dataYangII = IdentifierCodec.deserialize(
-                this.URI_WITH_LIST_AND_LEAF, this.schemaContext);
+                URI_WITH_LIST_AND_LEAF, this.schemaContext);
         final String serializedDataYangII = IdentifierCodec.serialize(dataYangII, this.schemaContext);
 
         assertEquals("Failed codec deserialization and serialization test",
-                this.URI_WITH_LIST_AND_LEAF, serializedDataYangII);
+                URI_WITH_LIST_AND_LEAF, serializedDataYangII);
     }
 
     /**
@@ -56,11 +56,11 @@ public class IdentifierCodecTest {
     @Test
     public void codecLeafListTest() {
         final YangInstanceIdentifier dataYangII = IdentifierCodec.deserialize(
-                this.URI_WITH_INT_VAL_LEAF_LIST, this.schemaContext);
+                URI_WITH_INT_VAL_LEAF_LIST, this.schemaContext);
         final String serializedDataYangII = IdentifierCodec.serialize(dataYangII, this.schemaContext);
 
         assertEquals("Failed codec deserialization and serialization test",
-                this.URI_WITH_INT_VAL_LEAF_LIST, serializedDataYangII);
+                URI_WITH_INT_VAL_LEAF_LIST, serializedDataYangII);
     }
 
     /**

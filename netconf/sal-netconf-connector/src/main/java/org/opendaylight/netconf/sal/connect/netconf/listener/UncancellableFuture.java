@@ -35,7 +35,7 @@ final class UncancellableFuture<V> extends AbstractFuture<V> {
 
     @Override
     public synchronized boolean cancel(final boolean mayInterruptIfRunning) {
-        return uncancellable ? false : super.cancel(mayInterruptIfRunning);
+        return !uncancellable && super.cancel(mayInterruptIfRunning);
     }
 
     @Override

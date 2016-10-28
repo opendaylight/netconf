@@ -77,7 +77,7 @@ public class ContainerReader extends AbstractReader<ContainerSchemaNode> {
             nodesToAdd.addAll(argumentHandlerRegistry.getGenericReader(getSchemaContext(),
                     getReadConfigNode()).read(childNode));
         }
-        return Collections.<NormalizedNode<?, ?>> singletonList(builder.withValue((ArrayList) nodesToAdd).build());
+        return Collections.singletonList(builder.withValue((ArrayList) nodesToAdd).build());
     }
 
     private List<DataSchemaNode> sortChildren(final Set<DataSchemaNode> unsortedNodes) {

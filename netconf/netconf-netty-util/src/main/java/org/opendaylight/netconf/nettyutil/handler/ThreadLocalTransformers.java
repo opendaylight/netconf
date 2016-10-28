@@ -27,12 +27,12 @@ final class ThreadLocalTransformers {
             } catch (TransformerConfigurationException | TransformerFactoryConfigurationError e) {
                 throw new IllegalStateException("Unexpected error while instantiating a Transformer", e);
             }
-        };
+        }
 
         @Override
         public void set(final Transformer value) {
             throw new UnsupportedOperationException();
-        };
+        }
     };
 
     private static final ThreadLocal<Transformer> PRETTY_TRANSFORMER = new ThreadLocal<Transformer>() {
@@ -49,12 +49,12 @@ final class ThreadLocalTransformers {
             ret.setOutputProperty(OutputKeys.INDENT, "yes");
             ret.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
             return ret;
-        };
+        }
 
         @Override
         public void set(final Transformer value) {
             throw new UnsupportedOperationException();
-        };
+        }
     };
 
     private ThreadLocalTransformers() {

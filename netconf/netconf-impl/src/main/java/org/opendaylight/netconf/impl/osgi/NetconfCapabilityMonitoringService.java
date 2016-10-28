@@ -246,7 +246,7 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
         netconfCapabilityChangeBuilder.setDeletedCapability(Lists.newArrayList(Collections2.transform(removed, CAPABILITY_TO_URI)));
         netconfCapabilityChangeBuilder.setAddedCapability(Lists.newArrayList(Collections2.transform(added, CAPABILITY_TO_URI)));
         // TODO modified should be computed ... but why ?
-        netconfCapabilityChangeBuilder.setModifiedCapability(Collections.<Uri>emptyList());
+        netconfCapabilityChangeBuilder.setModifiedCapability(Collections.emptyList());
         return netconfCapabilityChangeBuilder.build();
     }
 

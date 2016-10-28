@@ -99,7 +99,7 @@ public class RuntimeRpcTest {
         @Nonnull
         @Override
         public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull final SchemaPath type, @Nullable final NormalizedNode<?, ?> input) {
-            return Futures.immediateCheckedFuture((DOMRpcResult) new DefaultDOMRpcResult(null, Collections.<RpcError>emptyList()));
+            return Futures.immediateCheckedFuture(new DefaultDOMRpcResult(null, Collections.emptyList()));
         }
 
         @Nonnull
@@ -113,7 +113,7 @@ public class RuntimeRpcTest {
         @Nonnull
         @Override
         public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull final SchemaPath type, @Nullable final NormalizedNode<?, ?> input) {
-            return Futures.immediateFailedCheckedFuture((DOMRpcException) new DOMRpcException("rpc invocation not implemented yet") {
+            return Futures.immediateFailedCheckedFuture(new DOMRpcException("rpc invocation not implemented yet") {
             });
         }
 
@@ -136,7 +136,7 @@ public class RuntimeRpcTest {
                     .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(outputSchemaNode.getQName()))
                     .withValue(children).build();
 
-            return Futures.immediateCheckedFuture((DOMRpcResult) new DefaultDOMRpcResult(node));
+            return Futures.immediateCheckedFuture(new DefaultDOMRpcResult(node));
         }
 
         @Nonnull

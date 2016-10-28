@@ -82,7 +82,7 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation implem
                 notifications.registerNotificationListener(streamNameType, new NotificationSubscription(netconfSession, filter));
         subscriptions.add(notificationListenerRegistration);
 
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
     }
 
     private static StreamNameType parseStreamIfPresent(final XmlElement operationElement) throws DocumentedException {

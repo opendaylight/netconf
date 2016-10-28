@@ -91,7 +91,7 @@ public class CommandArgHandlerRegistry {
     /**
      * Reader providers, in order to construct readers lazily
      */
-    private static interface ReaderProvider {
+    private interface ReaderProvider {
         Reader<? extends DataSchemaNode> provide(ConsoleIO consoleIO,
                 final CommandArgHandlerRegistry commandArgHandlerRegistry,
                 final SchemaContextRegistry schemaContextRegistry);
@@ -138,7 +138,7 @@ public class CommandArgHandlerRegistry {
     /**
      * Writer providers, in order to construct readers lazily
      */
-    private static interface WriterProvider {
+    private interface WriterProvider {
         Writer<DataSchemaNode> provide(ConsoleIO consoleIO, SchemaContext schema,
                 final CommandArgHandlerRegistry commandArgHandlerRegistry);
     }

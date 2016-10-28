@@ -163,7 +163,7 @@ public class NetconfMessageTransformerTest {
         assertTrue(compositeNodeRpcResult.getErrors().isEmpty());
         assertNotNull(compositeNodeRpcResult.getResult());
         final DOMSource schemaContent = ((AnyXmlNode) ((ContainerNode) compositeNodeRpcResult.getResult()).getValue().iterator().next()).getValue();
-        assertThat(((Element) schemaContent.getNode()).getTextContent(), CoreMatchers.containsString("Random YANG SCHEMA"));
+        assertThat(schemaContent.getNode().getTextContent(), CoreMatchers.containsString("Random YANG SCHEMA"));
     }
 
     @Test
@@ -246,7 +246,7 @@ public class NetconfMessageTransformerTest {
         final MapEntryNode schemaNode = Builders.mapEntryBuilder().withNodeIdentifier(identifierWithPredicates).withValue(values).build();
 
         final YangInstanceIdentifier id = YangInstanceIdentifier.builder().node(NetconfState.QNAME).node(Schemas.QNAME).node(Schema.QNAME).nodeWithKey(Schema.QNAME, keys).build();
-        final DataContainerChild<?, ?> editConfigStructure = createEditConfigStructure(BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext(), id, Optional.<ModifyAction>absent(), Optional.<NormalizedNode<?, ?>>fromNullable(schemaNode));
+        final DataContainerChild<?, ?> editConfigStructure = createEditConfigStructure(BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext(), id, Optional.absent(), Optional.fromNullable(schemaNode));
 
         final DataContainerChild<?, ?> target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_QNAME);
 

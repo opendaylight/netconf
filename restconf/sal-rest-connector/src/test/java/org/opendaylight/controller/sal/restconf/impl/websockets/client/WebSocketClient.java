@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 public class WebSocketClient {
 
     private final URI uri;
-    private Bootstrap bootstrap = new Bootstrap();;
+    private Bootstrap bootstrap = new Bootstrap();
     private final WebSocketClientHandler clientHandler;
     private static final Logger logger = LoggerFactory.getLogger(WebSocketClient.class);
     private Channel clientChannel;

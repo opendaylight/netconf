@@ -17,7 +17,7 @@ import org.opendaylight.yangtools.yang.common.QName;
  */
 @Deprecated
 public class Draft02 {
-    public static interface MediaTypes {
+    public interface MediaTypes {
         String API = "application/yang.api";
         String DATASTORE = "application/yang.datastore";
         String DATA = "application/yang.data";
@@ -27,7 +27,7 @@ public class Draft02 {
         String STREAM = "application/yang.stream";
     }
 
-    public static interface RestConfModule {
+    public interface RestConfModule {
         String REVISION = "2013-10-19";
 
         String NAME = "ietf-restconf";
@@ -72,7 +72,7 @@ public class Draft02 {
         QName ERROR_INFO_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-info");
     }
 
-    public static interface Paths {
+    public interface Paths {
 
     }
 }
