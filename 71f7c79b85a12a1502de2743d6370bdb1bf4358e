@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_efc9ba5b",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/rpc/InvokeRpcMessage.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2016-10-28T14:01:09Z",
+      "side": 1,
+      "message": "It\u0027s better to make this Serializable and use writeReplace to delegate to an internal Externalizable Proxy class (my previous comment links to an example of this). The main advantage of this is that it allows for much easier versioning in case this class changes its serialized format - you create a new Externalizable Proxy class and maintain backwards compatibility with the old one. The other advantage is mainly cosmetic - you don\u0027t need a public no-arg ctor on this class and readExternal/writeExternal aren\u0027t exposed publicly.",
+      "revId": "71f7c79b85a12a1502de2743d6370bdb1bf4358e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_cfc67e49",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/rpc/InvokeRpcMessageReply.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2016-10-28T14:01:09Z",
+      "side": 1,
+      "message": "See comment in InvokeRpcMessage.",
+      "revId": "71f7c79b85a12a1502de2743d6370bdb1bf4358e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
