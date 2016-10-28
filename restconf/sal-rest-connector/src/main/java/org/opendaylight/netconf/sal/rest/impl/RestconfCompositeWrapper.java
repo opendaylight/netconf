@@ -9,7 +9,6 @@
 package org.opendaylight.netconf.sal.rest.impl;
 
 import com.google.common.base.Preconditions;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
@@ -31,97 +30,100 @@ public class RestconfCompositeWrapper implements RestconfService, SchemaRetrieva
 
     @Override
     public Object getRoot() {
-        return restconf.getRoot();
+        return this.restconf.getRoot();
     }
 
     @Override
     public NormalizedNodeContext getModules(final UriInfo uriInfo) {
-        return restconf.getModules(uriInfo);
+        return this.restconf.getModules(uriInfo);
     }
 
     @Override
     public NormalizedNodeContext getModules(final String identifier, final UriInfo uriInfo) {
-        return restconf.getModules(identifier, uriInfo);
+        return this.restconf.getModules(identifier, uriInfo);
     }
 
     @Override
     public NormalizedNodeContext getModule(final String identifier, final UriInfo uriInfo) {
-        return restconf.getModule(identifier, uriInfo);
+        return this.restconf.getModule(identifier, uriInfo);
     }
 
     @Override
     public NormalizedNodeContext getOperations(final UriInfo uriInfo) {
-        return restconf.getOperations(uriInfo);
+        return this.restconf.getOperations(uriInfo);
     }
 
     @Override
     public NormalizedNodeContext getOperations(final String identifier, final UriInfo uriInfo) {
-        return restconf.getOperations(identifier, uriInfo);
+        return this.restconf.getOperations(identifier, uriInfo);
     }
 
     @Override
-    public NormalizedNodeContext invokeRpc(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
-        return restconf.invokeRpc(identifier, payload, uriInfo);
+    public NormalizedNodeContext invokeRpc(final String identifier, final NormalizedNodeContext payload,
+            final UriInfo uriInfo) {
+        return this.restconf.invokeRpc(identifier, payload, uriInfo);
     }
 
     @Override
     @Deprecated
     public NormalizedNodeContext invokeRpc(final String identifier, final String noPayload, final UriInfo uriInfo) {
-        return restconf.invokeRpc(identifier, noPayload, uriInfo);
+        return this.restconf.invokeRpc(identifier, noPayload, uriInfo);
     }
 
     @Override
     public NormalizedNodeContext readConfigurationData(final String identifier, final UriInfo uriInfo) {
-        return restconf.readConfigurationData(identifier, uriInfo);
+        return this.restconf.readConfigurationData(identifier, uriInfo);
     }
 
     @Override
     public NormalizedNodeContext readOperationalData(final String identifier, final UriInfo uriInfo) {
-        return restconf.readOperationalData(identifier, uriInfo);
+        return this.restconf.readOperationalData(identifier, uriInfo);
     }
 
     @Override
     public Response updateConfigurationData(final String identifier, final NormalizedNodeContext payload) {
-        return restconf.updateConfigurationData(identifier, payload);
+        return this.restconf.updateConfigurationData(identifier, payload);
     }
 
     @Override
-    public Response createConfigurationData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
-        return restconf.createConfigurationData(identifier, payload, uriInfo);
+    public Response createConfigurationData(final String identifier, final NormalizedNodeContext payload,
+            final UriInfo uriInfo) {
+        return this.restconf.createConfigurationData(identifier, payload, uriInfo);
     }
 
     @Override
     public Response createConfigurationData(final NormalizedNodeContext payload, final UriInfo uriInfo) {
-        return restconf.createConfigurationData(payload, uriInfo);
+        return this.restconf.createConfigurationData(payload, uriInfo);
     }
 
     @Override
     public Response deleteConfigurationData(final String identifier) {
-        return restconf.deleteConfigurationData(identifier);
+        return this.restconf.deleteConfigurationData(identifier);
     }
 
     @Override
     public Response subscribeToStream(final String identifier, final UriInfo uriInfo) {
-        return restconf.subscribeToStream(identifier, uriInfo);
+        return this.restconf.subscribeToStream(identifier, uriInfo);
     }
 
     @Override
     public NormalizedNodeContext getAvailableStreams(final UriInfo uriInfo) {
-        return restconf.getAvailableStreams(uriInfo);
+        return this.restconf.getAvailableStreams(uriInfo);
     }
 
     @Override
-    public PATCHStatusContext patchConfigurationData(final String identifier, PATCHContext payload, UriInfo uriInfo) {
-        return restconf.patchConfigurationData(identifier, payload, uriInfo);
+    public PATCHStatusContext patchConfigurationData(final String identifier, final PATCHContext payload,
+            final UriInfo uriInfo) {
+        return this.restconf.patchConfigurationData(identifier, payload, uriInfo);
     }
 
     @Override
     public PATCHStatusContext patchConfigurationData(final PATCHContext context, final UriInfo uriInfo) {
-        return restconf.patchConfigurationData(context, uriInfo);
+        return this.restconf.patchConfigurationData(context, uriInfo);
     }
 
     @Override
     public SchemaExportContext getSchema(final String mountId) {
-        return schema.getSchema(mountId);
+        return this.schema.getSchema(mountId);
     }
 }

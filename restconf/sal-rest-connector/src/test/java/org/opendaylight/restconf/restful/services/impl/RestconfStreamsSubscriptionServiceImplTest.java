@@ -12,7 +12,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +35,8 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 
 public class RestconfStreamsSubscriptionServiceImplTest {
 
-    private static final String uri = "/restconf/15/data/ietf-restconf-monitoring:restconf-state/streams/stream/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE";
+    private static final String uri = "/restconf/17/data/ietf-restconf-monitoring:restconf-state/streams/stream/"
+            + "toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE";
     private static Field listenersByStreamName;
 
     @Mock
@@ -49,7 +49,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         MockitoAnnotations.initMocks(this);
         final DOMDataBroker dataBroker = mock(DOMDataBroker.class);
         final ListenerRegistration<DOMDataChangeListener> listener = mock(ListenerRegistration.class);
-        doReturn(dataBroker).when(dataBrokerHandler).get();
+        doReturn(dataBroker).when(this.dataBrokerHandler).get();
         doReturn(listener).when(dataBroker).registerDataChangeListener(any(), any(), any(), any());
     }
 
@@ -59,7 +59,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         final ListenerAdapter adapter = mock(ListenerAdapter.class);
         doReturn(false).when(adapter).isListening();
         listenersByStreamNameSetter.put("toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE", adapter);
-        listenersByStreamName = Notificator.class.getDeclaredField("listenersByStreamName");
+        listenersByStreamName = Notificator.class.getDeclaredField("dataChangeListener");
 
         listenersByStreamName.setAccessible(true);
         listenersByStreamName.set(Notificator.class, listenersByStreamNameSetter);
@@ -73,29 +73,35 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     }
 
     @Test
-    public void testSubscribeToStream() {
+    public void testSubscribueToStream() {
         final UriBuilder uriBuilder = UriBuilder.fromUri(uri);
-        doReturn(uriBuilder).when(uriInfo).getAbsolutePathBuilder();
-        final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService = new RestconfStreamsSubscriptionServiceImpl(dataBrokerHandler);
-        final Response response = streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE", uriInfo);
+        doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
+        final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
+                new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler);
+        final Response response = streamsSubscriptionService
+                .subscribeToStream("toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE", this.uriInfo);
         assertEquals(200, response.getStatus());
-        assertEquals("ws://:8181/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE", response.getHeaderString("Location"));
+        assertEquals("ws://:8181/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
+                response.getHeaderString("Location"));
     }
 
     @Test(expected = RestconfDocumentedException.class)
     public void testSubscribeToStreamMissingDatastoreInPath() {
         final UriBuilder uriBuilder = UriBuilder.fromUri(uri);
-        doReturn(uriBuilder).when(uriInfo).getAbsolutePathBuilder();
-        final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService = new RestconfStreamsSubscriptionServiceImpl(dataBrokerHandler);
-        final Response response = streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/scope=ONE", uriInfo);
+        doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
+        final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
+                new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler);
+        streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/scope=ONE", this.uriInfo);
     }
 
     @Test(expected = RestconfDocumentedException.class)
     public void testSubscribeToStreamMissingScopeInPath() {
         final UriBuilder uriBuilder = UriBuilder.fromUri(uri);
-        doReturn(uriBuilder).when(uriInfo).getAbsolutePathBuilder();
-        final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService = new RestconfStreamsSubscriptionServiceImpl(dataBrokerHandler);
-        final Response response = streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/datastore=OPERATIONAL", uriInfo);
+        doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
+        final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
+                new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler);
+        streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/datastore=OPERATIONAL",
+                this.uriInfo);
     }
 
 }

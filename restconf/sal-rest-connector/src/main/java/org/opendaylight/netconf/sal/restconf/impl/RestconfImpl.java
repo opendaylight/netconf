@@ -62,6 +62,7 @@ import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -131,6 +132,8 @@ public class RestconfImpl implements RestconfService {
 
     private static final String SCOPE_PARAM_NAME = "scope";
 
+    private static final String OUTPUT_TYPE_PARAM_NAME = "notification-output-type";
+
     private static final String NETCONF_BASE = "urn:ietf:params:xml:ns:netconf:base:1.0";
 
     private static final String NETCONF_BASE_PAYLOAD_NAME = "data";
@@ -150,11 +153,14 @@ public class RestconfImpl implements RestconfService {
     static {
         try {
             final Date eventSubscriptionAugRevision = new SimpleDateFormat("yyyy-MM-dd").parse("2014-07-08");
-            NETCONF_BASE_QNAME = QName.create(QNameModule.create(new URI(NETCONF_BASE), null), NETCONF_BASE_PAYLOAD_NAME );
+            NETCONF_BASE_QNAME = QName.create(QNameModule.create(new URI(NETCONF_BASE), null),
+                    NETCONF_BASE_PAYLOAD_NAME);
             SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT,
                     eventSubscriptionAugRevision);
-            SAL_REMOTE_AUG_IDENTIFIER = new YangInstanceIdentifier.AugmentationIdentifier(Sets.newHashSet(QName.create(SAL_REMOTE_AUGMENT, "scope"),
-                    QName.create(SAL_REMOTE_AUGMENT, "datastore")));
+            SAL_REMOTE_AUG_IDENTIFIER = new YangInstanceIdentifier.AugmentationIdentifier(Sets.newHashSet(
+                    QName.create(SAL_REMOTE_AUGMENT, "scope"),
+                    QName.create(SAL_REMOTE_AUGMENT, "datastore"),
+                    QName.create(SAL_REMOTE_AUGMENT, "notification-output-type")));
         } catch (final ParseException e) {
             final String errMsg = "It wasn't possible to convert revision date of sal-remote-augment to date";
             LOG.debug(errMsg);
@@ -214,7 +220,8 @@ public class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
-        final InstanceIdentifierContext<?> mountPointIdentifier = this.controllerContext.toMountPointIdentifier(identifier);
+        final InstanceIdentifierContext<?> mountPointIdentifier = this.controllerContext
+                .toMountPointIdentifier(identifier);
         final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
         final Set<Module> modules = this.controllerContext.getAllModules(mountPoint);
         final MapNode mountPointModulesMap = makeModuleMapNode(modules);
@@ -241,7 +248,8 @@ public class RestconfImpl implements RestconfService {
         DOMMountPoint mountPoint = null;
         final SchemaContext schemaContext;
         if (identifier.contains(ControllerContext.MOUNT)) {
-            final InstanceIdentifierContext<?> mountPointIdentifier = this.controllerContext.toMountPointIdentifier(identifier);
+            final InstanceIdentifierContext<?> mountPointIdentifier = this.controllerContext
+                    .toMountPointIdentifier(identifier);
             mountPoint = mountPointIdentifier.getMountPoint();
             module = this.controllerContext.findModuleByNameAndRevision(mountPoint, moduleNameAndRevision);
             schemaContext = mountPoint.getSchemaContext();
@@ -274,8 +282,8 @@ public class RestconfImpl implements RestconfService {
         final SchemaContext schemaContext = this.controllerContext.getGlobalSchema();
         final Set<String> availableStreams = Notificator.getStreamNames();
         final Module restconfModule = getRestconfModule();
-        final DataSchemaNode streamSchemaNode = this.controllerContext.getRestconfModuleRestConfSchemaNode(restconfModule,
-                Draft02.RestConfModule.STREAM_LIST_SCHEMA_NODE);
+        final DataSchemaNode streamSchemaNode = this.controllerContext
+                .getRestconfModuleRestConfSchemaNode(restconfModule, Draft02.RestConfModule.STREAM_LIST_SCHEMA_NODE);
         Preconditions.checkState(streamSchemaNode instanceof ListSchemaNode);
 
         final CollectionNodeBuilder<MapEntryNode, MapNode> listStreamsBuilder = Builders
@@ -309,14 +317,17 @@ public class RestconfImpl implements RestconfService {
         Set<Module> modules = null;
         DOMMountPoint mountPoint = null;
         if (identifier.contains(ControllerContext.MOUNT)) {
-            final InstanceIdentifierContext<?> mountPointIdentifier = this.controllerContext.toMountPointIdentifier(identifier);
+            final InstanceIdentifierContext<?> mountPointIdentifier = this.controllerContext
+                    .toMountPointIdentifier(identifier);
             mountPoint = mountPointIdentifier.getMountPoint();
             modules = this.controllerContext.getAllModules(mountPoint);
 
         } else {
-            final String errMsg = "URI has bad format. If operations behind mount point should be showed, URI has to end with ";
+            final String errMsg = "URI has bad format. If operations behind mount point should be showed, URI has to "
+                    + "end with ";
             LOG.debug(errMsg + ControllerContext.MOUNT + " for " + identifier);
-            throw new RestconfDocumentedException(errMsg + ControllerContext.MOUNT, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+            throw new RestconfDocumentedException(errMsg + ControllerContext.MOUNT, ErrorType.PROTOCOL,
+                    ErrorTag.INVALID_VALUE);
         }
 
         return operationsFromModulesToNormalizedContext(modules, mountPoint);
@@ -361,8 +372,8 @@ public class RestconfImpl implements RestconfService {
         final Set<Module> fakeModules = new HashSet<>();
         fakeModules.add(fakeModule);
         final SchemaContext fakeSchemaCtx = EffectiveSchemaContext.resolveSchemaContext(fakeModules);
-        final InstanceIdentifierContext<ContainerSchemaNode> instanceIdentifierContext = new InstanceIdentifierContext<>(
-                null, fakeContSchNode, mountPoint, fakeSchemaCtx);
+        final InstanceIdentifierContext<ContainerSchemaNode> instanceIdentifierContext =
+                new InstanceIdentifierContext<>(null, fakeContSchNode, mountPoint, fakeSchemaCtx);
         return new NormalizedNodeContext(instanceIdentifierContext, containerBuilder.build());
     }
 
@@ -414,7 +425,8 @@ public class RestconfImpl implements RestconfService {
     }
 
     @Override
-    public NormalizedNodeContext invokeRpc(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+    public NormalizedNodeContext invokeRpc(final String identifier, final NormalizedNodeContext payload,
+            final UriInfo uriInfo) {
         final SchemaPath type = payload.getInstanceIdentifierContext().getSchemaNode().getPath();
         final URI namespace = payload.getInstanceIdentifierContext().getSchemaNode().getQName().getNamespace();
         final CheckedFuture<DOMRpcResult, DOMRpcException> response;
@@ -485,11 +497,14 @@ public class RestconfImpl implements RestconfService {
                     throw new RestconfDocumentedException(cause.getMessage(), ErrorType.PROTOCOL,
                             ErrorTag.INVALID_VALUE);
                 } else if (cause instanceof DOMRpcImplementationNotAvailableException) {
-                    throw new RestconfDocumentedException(cause.getMessage(), ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED);
+                    throw new RestconfDocumentedException(cause.getMessage(), ErrorType.APPLICATION,
+                            ErrorTag.OPERATION_NOT_SUPPORTED);
                 }
-                throw new RestconfDocumentedException("The operation encountered an unexpected error while executing.",cause);
+                throw new RestconfDocumentedException("The operation encountered an unexpected error while executing.",
+                        cause);
             } else {
-                throw new RestconfDocumentedException("The operation encountered an unexpected error while executing.",e);
+                throw new RestconfDocumentedException("The operation encountered an unexpected error while executing.",
+                        e);
             }
         } catch (final CancellationException e) {
             final String errMsg = "The operation was cancelled while executing.";
@@ -508,7 +523,8 @@ public class RestconfImpl implements RestconfService {
         }
     }
 
-    private CheckedFuture<DOMRpcResult, DOMRpcException> invokeSalRemoteRpcSubscribeRPC(final NormalizedNodeContext payload) {
+    private CheckedFuture<DOMRpcResult, DOMRpcException>
+            invokeSalRemoteRpcSubscribeRPC(final NormalizedNodeContext payload) {
         final ContainerNode value = (ContainerNode) payload.getData();
         final QName rpcQName = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
         final Optional<DataContainerChild<? extends PathArgument, ?>> path = value.getChild(new NodeIdentifier(
@@ -523,15 +539,21 @@ public class RestconfImpl implements RestconfService {
 
         final YangInstanceIdentifier pathIdentifier = ((YangInstanceIdentifier) pathValue);
         String streamName = (String) CREATE_DATA_SUBSCR;
+        NotificationOutputType outputType = null;
         if (!pathIdentifier.isEmpty()) {
             final String fullRestconfIdentifier = DATA_SUBSCR
                     + this.controllerContext.toFullRestconfIdentifier(pathIdentifier, null);
 
-            LogicalDatastoreType datastore = parseEnumTypeParameter(value, LogicalDatastoreType.class, DATASTORE_PARAM_NAME);
+            LogicalDatastoreType datastore =
+                    parseEnumTypeParameter(value, LogicalDatastoreType.class, DATASTORE_PARAM_NAME);
             datastore = datastore == null ? DEFAULT_DATASTORE : datastore;
 
             DataChangeScope scope = parseEnumTypeParameter(value, DataChangeScope.class, SCOPE_PARAM_NAME);
             scope = scope == null ? DEFAULT_SCOPE : scope;
+
+            outputType = parseEnumTypeParameter(value, NotificationOutputType.class,
+                    OUTPUT_TYPE_PARAM_NAME);
+            outputType = outputType == null ? NotificationOutputType.XML : outputType;
 
             streamName = Notificator.createStreamNameFromUri(fullRestconfIdentifier + "/datastore=" + datastore
                     + "/scope=" + scope);
@@ -546,11 +568,12 @@ public class RestconfImpl implements RestconfService {
         final QName outputQname = QName.create(rpcQName, "output");
         final QName streamNameQname = QName.create(rpcQName, "stream-name");
 
-        final ContainerNode output = ImmutableContainerNodeBuilder.create().withNodeIdentifier(new NodeIdentifier(outputQname))
-                .withChild(ImmutableNodes.leafNode(streamNameQname, streamName)).build();
+        final ContainerNode output =
+                ImmutableContainerNodeBuilder.create().withNodeIdentifier(new NodeIdentifier(outputQname))
+                        .withChild(ImmutableNodes.leafNode(streamNameQname, streamName)).build();
 
         if (!Notificator.existListenerFor(streamName)) {
-            Notificator.createListener(pathIdentifier, streamName);
+            Notificator.createListener(pathIdentifier, streamName, outputType);
         }
 
         final DOMRpcResult defaultDOMRpcResult = new DefaultDOMRpcResult(output);
@@ -828,14 +851,16 @@ public class RestconfImpl implements RestconfService {
 
             if ( ! uriKeyValue.equals(dataKeyValue)) {
                 final String errMsg = "The value '" + uriKeyValue + "' for key '" + keyDefinition.getLocalName() +
-                        "' specified in the URI doesn't match the value '" + dataKeyValue + "' specified in the message body. ";
+                        "' specified in the URI doesn't match the value '" + dataKeyValue
+                        + "' specified in the message body. ";
                 throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
             }
         }
     }
 
     @Override
-    public Response createConfigurationData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+    public Response createConfigurationData(final String identifier, final NormalizedNodeContext payload,
+            final UriInfo uriInfo) {
        return createConfigurationData(payload, uriInfo);
     }
 
@@ -939,7 +964,8 @@ public class RestconfImpl implements RestconfService {
         }
     }
 
-    private URI resolveLocation(final UriInfo uriInfo, final String uriBehindBase, final DOMMountPoint mountPoint, final YangInstanceIdentifier normalizedII) {
+    private URI resolveLocation(final UriInfo uriInfo, final String uriBehindBase, final DOMMountPoint mountPoint,
+            final YangInstanceIdentifier normalizedII) {
         if(uriInfo == null) {
             // This is null if invoked internally
             return null;
@@ -1116,7 +1142,8 @@ public class RestconfImpl implements RestconfService {
     }
 
     @Override
-    public PATCHStatusContext patchConfigurationData(final String identifier, final PATCHContext context, final UriInfo uriInfo) {
+    public PATCHStatusContext patchConfigurationData(final String identifier, final PATCHContext context,
+            final UriInfo uriInfo) {
         if (context == null) {
             throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
@@ -1157,7 +1184,8 @@ public class RestconfImpl implements RestconfService {
             return null;
         }
         final Optional<DataContainerChild<? extends PathArgument, ?>> enumNode =
-                ((AugmentationNode) augNode.get()).getChild(new NodeIdentifier(QName.create(SAL_REMOTE_AUGMENT, paramName)));
+                ((AugmentationNode) augNode.get())
+                        .getChild(new NodeIdentifier(QName.create(SAL_REMOTE_AUGMENT, paramName)));
         if (!enumNode.isPresent()) {
             return null;
         }
