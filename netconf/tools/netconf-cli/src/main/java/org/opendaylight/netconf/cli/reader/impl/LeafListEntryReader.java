@@ -47,7 +47,7 @@ class LeafListEntryReader extends BasicDataHolderReader<LeafListSchemaNode> impl
 
             @Override
             protected List<Completer> getAdditionalCompleters() {
-                return Lists.<Completer> newArrayList(getBaseCompleter(getDataSchemaNode()));
+                return Lists.newArrayList(getBaseCompleter(getDataSchemaNode()));
             }
         };
     }

@@ -181,7 +181,7 @@ public class EditConfigTest {
         Map<String, AttributeConfigElement> attributes = Maps.newHashMap();
         AttributeConfigElement ace1 = mock(AttributeConfigElement.class);
         doReturn("abcd").when(ace1).getResolvedDefaultValue();
-        doReturn(Optional.<String> of("abc")).when(ace1).getResolvedValue();
+        doReturn(Optional.of("abc")).when(ace1).getResolvedValue();
         doReturn("mockedAce1").when(ace1).toString();
         doReturn("jmxNameAce1").when(ace1).getJmxName();
         attributes.put("a1", ace1);

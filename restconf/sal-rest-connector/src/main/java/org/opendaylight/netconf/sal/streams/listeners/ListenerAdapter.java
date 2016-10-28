@@ -214,7 +214,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
     private enum EventType {
         REGISTER,
         DEREGISTER,
-        NOTIFY;
+        NOTIFY
     }
 
     /**
@@ -580,7 +580,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
      * @return True if exist, false otherwise.
      */
     public boolean isListening() {
-        return this.registration == null ? false : true;
+        return this.registration != null;
     }
 
     /**
@@ -624,13 +624,13 @@ public class ListenerAdapter implements DOMDataChangeListener {
     /**
      * Consists of two types {@link Store#CONFIG} and {@link Store#OPERATION}.
      */
-    private static enum Store {
+    private enum Store {
         CONFIG("config"),
         OPERATION("operation");
 
         private final String value;
 
-        private Store(final String value) {
+        Store(final String value) {
             this.value = value;
         }
     }
@@ -638,14 +638,14 @@ public class ListenerAdapter implements DOMDataChangeListener {
     /**
      * Consists of three types {@link Operation#CREATED}, {@link Operation#UPDATED} and {@link Operation#DELETED}.
      */
-    private static enum Operation {
+    private enum Operation {
         CREATED("created"),
         UPDATED("updated"),
         DELETED("deleted");
 
         private final String value;
 
-        private Operation(final String value) {
+        Operation(final String value) {
             this.value = value;
         }
     }

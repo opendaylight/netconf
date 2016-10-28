@@ -28,7 +28,7 @@ public interface NetconfOperationChainedExecution {
      */
     Document execute(Document requestMessage) throws DocumentedException;
 
-    public static final NetconfOperationChainedExecution EXECUTION_TERMINATION_POINT = new NetconfOperationChainedExecution() {
+    NetconfOperationChainedExecution EXECUTION_TERMINATION_POINT = new NetconfOperationChainedExecution() {
         @Override
         public boolean isExecutionTermination() {
             return true;

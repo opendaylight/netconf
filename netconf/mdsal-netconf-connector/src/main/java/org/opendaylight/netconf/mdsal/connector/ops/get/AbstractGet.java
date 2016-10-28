@@ -192,7 +192,7 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
                     XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
 
             return  sourceElement.isPresent() ?
-                    Optional.of(Datastore.valueOf(sourceElement.get().getOnlyChildElement().getName())) : Optional.<Datastore>absent();
+                    Optional.of(Datastore.valueOf(sourceElement.get().getOnlyChildElement().getName())) : Optional.absent();
         }
 
         private static void validateInputRpc(final XmlElement xml, final String operationName) throws DocumentedException {

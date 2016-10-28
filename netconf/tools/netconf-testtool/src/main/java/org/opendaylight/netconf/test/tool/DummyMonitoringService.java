@@ -39,7 +39,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 
 public class DummyMonitoringService implements NetconfMonitoringService {
 
-    private static final Sessions EMPTY_SESSIONS = new SessionsBuilder().setSession(Collections.<Session>emptyList()).build();
+    private static final Sessions EMPTY_SESSIONS = new SessionsBuilder().setSession(Collections.emptyList()).build();
     private static final Function<Capability, Uri> CAPABILITY_URI_FUNCTION = new Function<Capability, Uri>() {
         @Nullable
         @Override

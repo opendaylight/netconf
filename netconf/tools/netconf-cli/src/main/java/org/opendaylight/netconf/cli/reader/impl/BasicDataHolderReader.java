@@ -120,7 +120,7 @@ public abstract class BasicDataHolderReader<T extends DataSchemaNode> extends Ab
         final NormalizedNode<?, ?> newNode = ImmutableLeafNodeBuilder.create()
                 .withNodeIdentifier(new NodeIdentifier(schemaNode.getQName()))
                 .withValue(value).build();
-        return Collections.<NormalizedNode<?, ?>>singletonList(newNode);
+        return Collections.singletonList(newNode);
     }
 
     protected abstract TypeDefinition<?> getType(final T schemaNode);
@@ -141,7 +141,7 @@ public abstract class BasicDataHolderReader<T extends DataSchemaNode> extends Ab
         return currentCompleter;
     }
 
-    private static interface DataHolderCompleter extends Completer {
+    private interface DataHolderCompleter extends Completer {
 
         Object resolveValue(String rawValue) throws ReadingException;
     }
@@ -164,7 +164,7 @@ public abstract class BasicDataHolderReader<T extends DataSchemaNode> extends Ab
                 final TypeDefinition<?> type) {
             if (type != null) {
                 return Optional
-                        .<TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>>> fromNullable(TypeDefinitionAwareCodec
+                        .fromNullable(TypeDefinitionAwareCodec
                                 .from(type));
             }
             return Optional.absent();

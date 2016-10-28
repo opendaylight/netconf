@@ -124,7 +124,7 @@ class NetconfNodeManager
                     NetconfTopologyUtils.createMasterActorName(id.getName(),
                             netconfNodeAfter.getClusteredConnectionStatus().getNetconfMasterNode()));
             setup.getActorSystem().actorSelection(path).tell(new AskForMasterMountPoint(), slaveActorRef);
-        } else {            ;
+        } else {
             closeActor();
         }
     }

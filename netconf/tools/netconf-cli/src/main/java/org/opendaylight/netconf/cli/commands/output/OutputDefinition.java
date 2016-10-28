@@ -18,7 +18,7 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
  */
 public class OutputDefinition implements Iterable<DataSchemaNode> {
 
-    public static final OutputDefinition EMPTY_OUTPUT = new OutputDefinition(Collections.<DataSchemaNode>emptySet());
+    public static final OutputDefinition EMPTY_OUTPUT = new OutputDefinition(Collections.emptySet());
     private final Iterable<DataSchemaNode> childNodes;
 
     public OutputDefinition(final Iterable<DataSchemaNode> childNodes) {

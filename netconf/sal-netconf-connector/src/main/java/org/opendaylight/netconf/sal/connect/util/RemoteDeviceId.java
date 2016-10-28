@@ -147,11 +147,8 @@ public final class RemoteDeviceId {
         if (!name.equals(that.name)) {
             return false;
         }
-        if (!bindingPath.equals(that.bindingPath)) {
-            return false;
-        }
+        return bindingPath.equals(that.bindingPath);
 
-        return true;
     }
 
     @Override

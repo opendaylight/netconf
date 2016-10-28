@@ -144,7 +144,7 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
      * @return - true if is registered, otherwise null
      */
     public boolean isListening() {
-        return this.registration == null ? false : true;
+        return this.registration != null;
     }
 
     /**

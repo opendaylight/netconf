@@ -62,7 +62,7 @@ public class ProxyServer implements Runnable {
             workerGroup.shutdownGracefully();
         }
     }
-    public static interface ProxyHandlerFactory {
+    public interface ProxyHandlerFactory {
         ChannelHandler create(EventLoopGroup bossGroup, LocalAddress localAddress);
     }
 

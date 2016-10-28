@@ -505,7 +505,7 @@ public class ControllerContext implements SchemaContextListener {
     private InstanceIdentifierContext<?> collectPathArguments(final InstanceIdentifierBuilder builder,
             final List<String> strings, final DataNodeContainer parentNode, final DOMMountPoint mountPoint,
             final boolean returnJustMountPoint) {
-        Preconditions.<List<String>> checkNotNull(strings);
+        Preconditions.checkNotNull(strings);
 
         if (parentNode == null) {
             return null;
@@ -695,7 +695,7 @@ public class ControllerContext implements SchemaContextListener {
 
     public static DataSchemaNode findInstanceDataChildByNameAndNamespace(final DataNodeContainer container, final String name,
             final URI namespace) {
-        Preconditions.<URI> checkNotNull(namespace);
+        Preconditions.checkNotNull(namespace);
 
         final List<DataSchemaNode> potentialSchemaNodes = findInstanceDataChildrenByName(container, name);
 
@@ -711,8 +711,8 @@ public class ControllerContext implements SchemaContextListener {
     }
 
     public static List<DataSchemaNode> findInstanceDataChildrenByName(final DataNodeContainer container, final String name) {
-        Preconditions.<DataNodeContainer> checkNotNull(container);
-        Preconditions.<String> checkNotNull(name);
+        Preconditions.checkNotNull(container);
+        Preconditions.checkNotNull(name);
 
         final List<DataSchemaNode> instantiatedDataNodeContainers = new ArrayList<DataSchemaNode>();
         collectInstanceDataNodeContainers(instantiatedDataNodeContainers, container, name);
@@ -749,7 +749,7 @@ public class ControllerContext implements SchemaContextListener {
         final Iterable<ChoiceSchemaNode> choiceNodes = Iterables.filter(container.getChildNodes(), ChoiceSchemaNode.class);
         final Iterable<Set<ChoiceCaseNode>> map = Iterables.transform(choiceNodes, CHOICE_FUNCTION);
 
-        final Iterable<ChoiceCaseNode> allCases = Iterables.<ChoiceCaseNode> concat(map);
+        final Iterable<ChoiceCaseNode> allCases = Iterables.concat(map);
         for (final ChoiceCaseNode caze : allCases) {
             collectInstanceDataNodeContainers(potentialSchemaNodes, caze, name);
         }
@@ -897,7 +897,7 @@ public class ControllerContext implements SchemaContextListener {
             throw new IllegalArgumentException("Conversion of generic path argument is not supported");
         } else {
             throw new IllegalArgumentException("Unhandled parameter types: "
-                    + Arrays.<Object> asList(argument, node).toString());
+                    + Arrays.asList(argument, node).toString());
         }
     }
 
@@ -957,7 +957,7 @@ public class ControllerContext implements SchemaContextListener {
             return childByQName((Module) container, name);
         } else {
             throw new IllegalArgumentException("Unhandled parameter types: "
-                    + Arrays.<Object> asList(container, name).toString());
+                    + Arrays.asList(container, name).toString());
         }
     }
 

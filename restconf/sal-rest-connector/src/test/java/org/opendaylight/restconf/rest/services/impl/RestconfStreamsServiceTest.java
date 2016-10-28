@@ -55,7 +55,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  * Unit tests for {@link RestconfStreamsServiceImpl}
  */
 public class RestconfStreamsServiceTest {
-    private static final List<String> expectedStreams = Arrays.asList(new String[] {"stream-1", "stream-2", "stream-3"});
+    private static final List<String> expectedStreams = Arrays.asList("stream-1", "stream-2", "stream-3");
 
     @Rule public ExpectedException thrown = ExpectedException.none();
 

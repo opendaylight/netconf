@@ -212,7 +212,7 @@ public class AsyncSshHandlerTest {
             @Override
             public void onSuccess(final SshFutureListener<IoReadFuture> result) {
                 doReturn(new IllegalStateException()).when(mockedReadFuture).getException();
-                doReturn(mockedReadFuture).when(mockedReadFuture).removeListener(Matchers.<SshFutureListener<IoReadFuture>>any());
+                doReturn(mockedReadFuture).when(mockedReadFuture).removeListener(Matchers.any());
                 doReturn(true).when(asyncOut).isClosing();
                 doReturn(true).when(asyncOut).isClosed();
                 result.operationComplete(mockedReadFuture);
@@ -242,7 +242,7 @@ public class AsyncSshHandlerTest {
             @Override
             public void onSuccess(final SshFutureListener<IoReadFuture> result) {
                 doReturn(new IllegalStateException()).when(mockedReadFuture).getException();
-                doReturn(mockedReadFuture).when(mockedReadFuture).removeListener(Matchers.<SshFutureListener<IoReadFuture>>any());
+                doReturn(mockedReadFuture).when(mockedReadFuture).removeListener(Matchers.any());
                 result.operationComplete(mockedReadFuture);
             }
         });
@@ -479,7 +479,7 @@ public class AsyncSshHandlerTest {
     private static IoOutputStream getMockedIoOutputStream() {
         final IoOutputStream mock = mock(IoOutputStream.class);
         final IoWriteFuture ioWriteFuture = mock(IoWriteFuture.class);
-        doReturn(ioWriteFuture).when(ioWriteFuture).addListener(Matchers.<SshFutureListener<IoWriteFuture>>any());
+        doReturn(ioWriteFuture).when(ioWriteFuture).addListener(Matchers.any());
         doReturn(true).when(ioWriteFuture).isWritten();
 
         Futures.addCallback(stubAddListener(ioWriteFuture), new SuccessFutureListener<IoWriteFuture>() {
@@ -499,10 +499,10 @@ public class AsyncSshHandlerTest {
         final IoInputStream mock = mock(IoInputStream.class);
         final IoReadFuture ioReadFuture = mock(IoReadFuture.class);
         doReturn(null).when(ioReadFuture).getException();
-        doReturn(ioReadFuture).when(ioReadFuture).removeListener(Matchers.<SshFutureListener<IoReadFuture>>any());
+        doReturn(ioReadFuture).when(ioReadFuture).removeListener(Matchers.any());
         doReturn(5).when(ioReadFuture).getRead();
         doReturn(new Buffer(new byte[]{0, 1, 2, 3, 4})).when(ioReadFuture).getBuffer();
-        doReturn(ioReadFuture).when(ioReadFuture).addListener(Matchers.<SshFutureListener<IoReadFuture>>any());
+        doReturn(ioReadFuture).when(ioReadFuture).addListener(Matchers.any());
 
         // Always success for read
         Futures.addCallback(stubAddListener(ioReadFuture), new SuccessFutureListener<IoReadFuture>() {

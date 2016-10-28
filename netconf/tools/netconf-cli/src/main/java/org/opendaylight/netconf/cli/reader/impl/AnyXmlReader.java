@@ -70,7 +70,7 @@ public class AnyXmlReader extends AbstractReader<AnyXmlSchemaNode> {
     private Optional<DataContainerChild<?, ?>> tryParse(final String rawValue, final AnyXmlSchemaNode schemaNode) {
         try {
             final Document dom = XmlUtil.readXmlToDocument(rawValue);
-            return Optional.<DataContainerChild<?, ?>> of(
+            return Optional.of(
                     DomToNormalizedNodeParserFactory.
                             getInstance(DomUtils.defaultValueCodecProvider(), getSchemaContext()).
                             getAnyXmlNodeParser().

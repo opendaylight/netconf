@@ -36,7 +36,7 @@ public interface RestconfOperationsService {
     @Path("/operations")
     @Produces({ Draft17.MediaTypes.DATA + RestconfConstants.JSON, Draft17.MediaTypes.DATA, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public NormalizedNodeContext getOperations(@Context UriInfo uriInfo);
+    NormalizedNodeContext getOperations(@Context UriInfo uriInfo);
 
     /**
      * Valid for mount points. List of operations supported by the server.
@@ -51,5 +51,5 @@ public interface RestconfOperationsService {
     @Path("/operations/{identifier:.+}")
     @Produces({ Draft17.MediaTypes.DATA + RestconfConstants.JSON, Draft17.MediaTypes.DATA, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public NormalizedNodeContext getOperations(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
+    NormalizedNodeContext getOperations(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 }

@@ -132,7 +132,7 @@ class EditOperationStrategyProvider extends DomToNormalizedNodeParserFactory.Bui
             }
 
             if(builder instanceof AttributesBuilder<?>) {
-                ((AttributesBuilder<?>) builder).withAttributes(Collections.<QName, String>emptyMap());
+                ((AttributesBuilder<?>) builder).withAttributes(Collections.emptyMap());
             }
 
             node = builder.build();
@@ -176,7 +176,7 @@ class EditOperationStrategyProvider extends DomToNormalizedNodeParserFactory.Bui
             }
 
             if (builder instanceof AttributesBuilder<?>) {
-                ((AttributesBuilder<?>) builder).withAttributes(Collections.<QName, String>emptyMap());
+                ((AttributesBuilder<?>) builder).withAttributes(Collections.emptyMap());
             }
 
             node = builder.build();
@@ -214,7 +214,7 @@ class EditOperationStrategyProvider extends DomToNormalizedNodeParserFactory.Bui
         @Override
         public N build(final NormalizedNodeBuilder<P, ?, N> builder) {
             if (builder instanceof AttributesBuilder<?>) {
-                ((AttributesBuilder<?>) builder).withAttributes(Collections.<QName, String>emptyMap());
+                ((AttributesBuilder<?>) builder).withAttributes(Collections.emptyMap());
             }
 
             final N node = builder.build();

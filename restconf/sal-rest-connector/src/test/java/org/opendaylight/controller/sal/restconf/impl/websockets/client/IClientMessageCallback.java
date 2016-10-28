@@ -13,5 +13,5 @@ package org.opendaylight.controller.sal.restconf.impl.websockets.client;
  */
 public interface IClientMessageCallback {
 
-    public void onMessageReceived(Object message);
+    void onMessageReceived(Object message);
 }

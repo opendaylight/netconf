@@ -100,8 +100,8 @@ public class FilterReader extends AbstractReader<DataSchemaNode> {
 
                 for (final QName qName : Lists.reverse(filterPartsQNames)) {
                     previous = ImmutableContainerNodeBuilder.create().withNodeIdentifier(new NodeIdentifier(qName))
-                            .withValue(previous == null ? Collections.<DataContainerChild<?, ?>>emptyList()
-                                    : Collections.<DataContainerChild<?, ?>>singletonList(previous)).build();
+                            .withValue(previous == null ? Collections.emptyList()
+                                    : Collections.singletonList(previous)).build();
                 }
 
                 final Map<QName, String> attributes = Collections.singletonMap(FILTER_TYPE_QNAME,
@@ -115,7 +115,7 @@ public class FilterReader extends AbstractReader<DataSchemaNode> {
                 console.writeLn(message);
             }
         } while (!redSuccessfuly);
-        return Collections.<NormalizedNode<?, ?>> singletonList(newNode);
+        return Collections.singletonList(newNode);
     }
 
     @Override
@@ -134,7 +134,7 @@ public class FilterReader extends AbstractReader<DataSchemaNode> {
 
         @Override
         protected List<Completer> getAdditionalCompleters() {
-            return Collections.<Completer> singletonList(new FilterCompleter(remoteSchemaContext));
+            return Collections.singletonList(new FilterCompleter(remoteSchemaContext));
         }
 
     }
