@@ -22,7 +22,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.CheckedFuture;
@@ -61,6 +60,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -97,10 +97,10 @@ public class BrokerFacadeTest {
     private final BrokerFacade brokerFacade = BrokerFacade.getInstance();
     private final NormalizedNode<?, ?> dummyNode = createDummyNode("test:module", "2014-01-09", "interfaces");
     private final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> dummyNodeInFuture =
-            wrapDummyNode(dummyNode);
+            wrapDummyNode(this.dummyNode);
     private final QName qname = TestUtils.buildQName("interfaces","test:module", "2014-01-09");
-    private final SchemaPath type = SchemaPath.create(true, qname);
-    private final YangInstanceIdentifier instanceID = YangInstanceIdentifier.builder().node(qname).build();
+    private final SchemaPath type = SchemaPath.create(true, this.qname);
+    private final YangInstanceIdentifier instanceID = YangInstanceIdentifier.builder().node(this.qname).build();
 
     @Before
     public void setUp() throws Exception {
@@ -299,7 +299,8 @@ public class BrokerFacadeTest {
 
     @Test
     public void testRegisterToListenDataChanges() {
-        final ListenerAdapter listener = Notificator.createListener(this.instanceID, "stream");
+        final ListenerAdapter listener = Notificator.createListener(this.instanceID, "stream",
+                NotificationOutputType.XML);
 
         @SuppressWarnings("unchecked")
         final ListenerRegistration<DOMDataChangeListener> mockRegistration = mock(ListenerRegistration.class);
