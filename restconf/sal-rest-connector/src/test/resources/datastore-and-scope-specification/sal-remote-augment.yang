@@ -26,6 +26,14 @@ module sal-remote-augment {
                 enum SUBTREE;
             }
         }
+        leaf notification-output-type {
+            type enumeration {
+                enum JSON;
+                enum XML;
+            }
+            default "XML";
+            description "Input parameter which type of output will be parsed on notification";
+        }
     }
 
 }

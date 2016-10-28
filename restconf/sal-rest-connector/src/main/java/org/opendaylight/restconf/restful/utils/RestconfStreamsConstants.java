@@ -70,7 +70,8 @@ public final class RestconfStreamsConstants {
         }
         SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT, eventSubscriptionAugRevision);
         SAL_REMOTE_AUG_IDENTIFIER = new YangInstanceIdentifier.AugmentationIdentifier(Sets
-                .newHashSet(QName.create(SAL_REMOTE_AUGMENT, "scope"), QName.create(SAL_REMOTE_AUGMENT, "datastore")));
+                .newHashSet(QName.create(SAL_REMOTE_AUGMENT, "scope"), QName.create(SAL_REMOTE_AUGMENT, "datastore"),
+                        QName.create(SAL_REMOTE_AUGMENT, "notification-output-type")));
     }
 
     private RestconfStreamsConstants() {

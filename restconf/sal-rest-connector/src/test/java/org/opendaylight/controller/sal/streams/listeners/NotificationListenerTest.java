@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -24,6 +25,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
@@ -32,7 +34,6 @@ import org.opendaylight.controller.sal.restconf.impl.test.TestUtils;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateNotificationStreamInput1.NotificationOutputType;
 import org.opendaylight.yangtools.util.SingletonSet;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -239,7 +240,7 @@ public class NotificationListenerTest {
         final List<SchemaPath> paths = new ArrayList<>();
         paths.add(schemaPathNotifi);
         final List<NotificationListenerAdapter> listNotifi =
-                Notificator.createNotificationListener(paths, "stream-name", NotificationOutputType.JSON.toString());
+                Notificator.createNotificationListener(paths, "stream-name", "JSON");
         final NotificationListenerAdapter notifi = listNotifi.get(0);
 
         final Class<?> vars[] = {};

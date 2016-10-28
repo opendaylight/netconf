@@ -42,6 +42,7 @@ import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.rest.services.api.RestconfStreamsService;
 import org.opendaylight.restconf.utils.mapping.RestconfMappingNodeConstants;
 import org.opendaylight.restconf.utils.mapping.RestconfMappingStreamConstants;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -82,9 +83,12 @@ public class RestconfStreamsServiceTest {
         Notificator.removeAllListeners();
 
         // put test streams
-        Notificator.createListener(EMPTY, RestconfStreamsServiceTest.expectedStreams.get(0));
-        Notificator.createListener(EMPTY, RestconfStreamsServiceTest.expectedStreams.get(1));
-        Notificator.createListener(EMPTY, RestconfStreamsServiceTest.expectedStreams.get(2));
+        Notificator.createListener(EMPTY, RestconfStreamsServiceTest.expectedStreams.get(0),
+                NotificationOutputType.XML);
+        Notificator.createListener(EMPTY, RestconfStreamsServiceTest.expectedStreams.get(1),
+                NotificationOutputType.XML);
+        Notificator.createListener(EMPTY, RestconfStreamsServiceTest.expectedStreams.get(2),
+                NotificationOutputType.XML);
     }
 
     @AfterClass
