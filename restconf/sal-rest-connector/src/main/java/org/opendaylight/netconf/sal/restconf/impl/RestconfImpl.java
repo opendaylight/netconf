@@ -62,6 +62,7 @@ import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -131,6 +132,8 @@ public class RestconfImpl implements RestconfService {
 
     private static final String SCOPE_PARAM_NAME = "scope";
 
+    private static final String OUTPUT_TYPE_PARAM_NAME = "notification-output-type";
+
     private static final String NETCONF_BASE = "urn:ietf:params:xml:ns:netconf:base:1.0";
 
     private static final String NETCONF_BASE_PAYLOAD_NAME = "data";
@@ -153,8 +156,10 @@ public class RestconfImpl implements RestconfService {
             NETCONF_BASE_QNAME = QName.create(QNameModule.create(new URI(NETCONF_BASE), null), NETCONF_BASE_PAYLOAD_NAME );
             SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT,
                     eventSubscriptionAugRevision);
-            SAL_REMOTE_AUG_IDENTIFIER = new YangInstanceIdentifier.AugmentationIdentifier(Sets.newHashSet(QName.create(SAL_REMOTE_AUGMENT, "scope"),
-                    QName.create(SAL_REMOTE_AUGMENT, "datastore")));
+            SAL_REMOTE_AUG_IDENTIFIER = new YangInstanceIdentifier.AugmentationIdentifier(Sets.newHashSet(
+                    QName.create(SAL_REMOTE_AUGMENT, "scope"),
+                    QName.create(SAL_REMOTE_AUGMENT, "datastore"),
+                    QName.create(SAL_REMOTE_AUGMENT, "notification-output-type")));
         } catch (final ParseException e) {
             final String errMsg = "It wasn't possible to convert revision date of sal-remote-augment to date";
             LOG.debug(errMsg);
@@ -523,6 +528,7 @@ public class RestconfImpl implements RestconfService {
 
         final YangInstanceIdentifier pathIdentifier = ((YangInstanceIdentifier) pathValue);
         String streamName = (String) CREATE_DATA_SUBSCR;
+        NotificationOutputType outputType = null;
         if (!pathIdentifier.isEmpty()) {
             final String fullRestconfIdentifier = DATA_SUBSCR
                     + this.controllerContext.toFullRestconfIdentifier(pathIdentifier, null);
@@ -532,6 +538,10 @@ public class RestconfImpl implements RestconfService {
 
             DataChangeScope scope = parseEnumTypeParameter(value, DataChangeScope.class, SCOPE_PARAM_NAME);
             scope = scope == null ? DEFAULT_SCOPE : scope;
+
+            outputType = parseEnumTypeParameter(value, NotificationOutputType.class,
+                    OUTPUT_TYPE_PARAM_NAME);
+            outputType = outputType == null ? NotificationOutputType.XML : outputType;
 
             streamName = Notificator.createStreamNameFromUri(fullRestconfIdentifier + "/datastore=" + datastore
                     + "/scope=" + scope);
@@ -550,7 +560,7 @@ public class RestconfImpl implements RestconfService {
                 .withChild(ImmutableNodes.leafNode(streamNameQname, streamName)).build();
 
         if (!Notificator.existListenerFor(streamName)) {
-            Notificator.createListener(pathIdentifier, streamName);
+            Notificator.createListener(pathIdentifier, streamName, outputType);
         }
 
         final DOMRpcResult defaultDOMRpcResult = new DefaultDOMRpcResult(output);
