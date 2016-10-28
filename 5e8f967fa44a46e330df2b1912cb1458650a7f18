@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5a682502_bec9bd5c",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T12:12:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_149262f5",
+      "revId": "5e8f967fa44a46e330df2b1912cb1458650a7f18",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_7443d612",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "5a682502_9ec68148",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T12:12:46Z",
+      "side": 1,
+      "message": "i forgot to delete.",
+      "parentUuid": "7a6b29fe_7443d612",
+      "revId": "5e8f967fa44a46e330df2b1912cb1458650a7f18",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_148f0276",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2016-09-29T08:42:51Z",
       "side": 1,
       "message": "Documentation for this method is now outdated.",
+      "revId": "5e8f967fa44a46e330df2b1912cb1458650a7f18",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a682502_dec0f92c",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-10-28T12:12:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_148f0276",
       "revId": "5e8f967fa44a46e330df2b1912cb1458650a7f18",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
