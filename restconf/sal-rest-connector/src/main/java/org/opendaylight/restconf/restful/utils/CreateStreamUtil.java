@@ -20,6 +20,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -45,6 +46,7 @@ import org.slf4j.LoggerFactory;
 public final class CreateStreamUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(CreateStreamUtil.class);
+    private static final String OUTPUT_TYPE_PARAM_NAME = "notification-output-type";
 
     private CreateStreamUtil() {
         throw new UnsupportedOperationException("Util class");
@@ -98,12 +100,23 @@ public final class CreateStreamUtil {
         final ContainerNode output = ImmutableContainerNodeBuilder.create()
                 .withNodeIdentifier(new NodeIdentifier(outputQname))
                 .withChild(ImmutableNodes.leafNode(streamNameQname, streamName)).build();
+        final NotificationOutputType outputType = prepareOutputType(data);
 
         if (!Notificator.existListenerFor(streamName)) {
-            Notificator.createListener(path, streamName);
+            Notificator.createListener(path, streamName, outputType);
         }
 
         return new DefaultDOMRpcResult(output);
+    }
+
+    /**
+     * @param data
+     *            - data of notification
+     * @return output type fo notification
+     */
+    private static NotificationOutputType prepareOutputType(final ContainerNode data) {
+        NotificationOutputType outputType = parseEnum(data, NotificationOutputType.class, OUTPUT_TYPE_PARAM_NAME);
+        return outputType = outputType == null ? NotificationOutputType.XML : outputType;
     }
 
     private static String prepareStream(final YangInstanceIdentifier path, final SchemaContext schemaContext,
