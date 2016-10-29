@@ -83,7 +83,9 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -1027,15 +1029,43 @@ public class RestconfImpl implements RestconfService {
      * </ul>
      */
     @Override
-    public Response subscribeToStream(final String identifier, final UriInfo uriInfo) {
+    public NormalizedNodeContext subscribeToStream(final String identifier, final UriInfo uriInfo) {
+        URI response = null;
         if (identifier.contains(DATA_SUBSCR)) {
-            return dataSubs(identifier, uriInfo);
+            response = dataSubs(identifier, uriInfo);
         } else if (identifier.contains(NOTIFICATION_STREAM)) {
-            return notifStream(identifier, uriInfo);
+            response = notifStream(identifier, uriInfo);
         }
+
+        if(response != null){
+            final InstanceIdentifierContext<?> iid = prepareIIDSubsStreamOutput();
+            final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> builder = ImmutableLeafNodeBuilder
+                    .create().withValue(response.toString());
+            builder.withNodeIdentifier(
+                    NodeIdentifier.create(QName.create("subscribe:to:notification", "2016-10-28", "location")));
+            return new NormalizedNodeContext(iid, builder.build());
+        }
+
         final String msg = "Bad type of notification of sal-remote";
         LOG.warn(msg);
         throw new RestconfDocumentedException(msg);
+    }
+
+    /**
+     * @return {@link InstanceIdentifierContext} of location leaf for
+     *         notification
+     */
+    private InstanceIdentifierContext<?> prepareIIDSubsStreamOutput() {
+        final QName qnameBase = QName.create("subscribe:to:notification", "2016-10-28", "notifi");
+        final SchemaContext schemaCtx = ControllerContext.getInstance().getGlobalSchema();
+        final DataSchemaNode location = ((ContainerSchemaNode) schemaCtx.findModuleByNamespaceAndRevision(qnameBase.getNamespace(), qnameBase.getRevision()).getDataChildByName(qnameBase))
+                        .getDataChildByName(QName.create(qnameBase, "location"));
+        final List<PathArgument> path = new ArrayList<>();
+        path.add(NodeIdentifier.create(qnameBase));
+        path.add(NodeIdentifier.create(QName.create(qnameBase, "location")));
+
+        return new InstanceIdentifierContext<SchemaNode>(YangInstanceIdentifier.create(path), location, null,
+                schemaCtx);
     }
 
     /**
@@ -1047,7 +1077,7 @@ public class RestconfImpl implements RestconfService {
      *            - uriInfo
      * @return {@link Response}
      */
-    private Response notifStream(final String identifier, final UriInfo uriInfo) {
+    private URI notifStream(final String identifier, final UriInfo uriInfo) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -1073,7 +1103,7 @@ public class RestconfImpl implements RestconfService {
         final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme("ws");
         final URI uriToWebsocketServer = uriToWebsocketServerBuilder.replacePath(streamName).build();
 
-        return Response.status(Status.OK).location(uriToWebsocketServer).build();
+        return uriToWebsocketServer;
     }
 
     /**
@@ -1085,7 +1115,7 @@ public class RestconfImpl implements RestconfService {
      *            - uri info
      * @return {@link Response}
      */
-    private Response dataSubs(final String identifier, final UriInfo uriInfo) {
+    private URI dataSubs(final String identifier, final UriInfo uriInfo) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -1122,7 +1152,7 @@ public class RestconfImpl implements RestconfService {
         final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme("ws");
         final URI uriToWebsocketServer = uriToWebsocketServerBuilder.replacePath(streamName).build();
 
-        return Response.status(Status.OK).location(uriToWebsocketServer).build();
+        return uriToWebsocketServer;
     }
 
     @Override
