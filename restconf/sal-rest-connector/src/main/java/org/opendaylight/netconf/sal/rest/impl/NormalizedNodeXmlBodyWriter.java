@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Map.Entry;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -73,6 +74,9 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             final Annotation[] annotations, final MediaType mediaType,
             final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws IOException,
             WebApplicationException {
+        for (final Entry<String, Object> entry : t.getNewHeaders().entrySet()) {
+            httpHeaders.add(entry.getKey(), entry.getValue());
+        }
         final InstanceIdentifierContext<?> pathContext = t.getInstanceIdentifierContext();
         if (t.getData() == null) {
             return;

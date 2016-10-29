@@ -16,7 +16,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -26,7 +25,6 @@ import java.net.URI;
 import java.text.ParseException;
 import java.util.Set;
 import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
@@ -179,8 +177,7 @@ public class RestconfImplTest {
         this.restconfImpl.setBroker(brokerFacade);
 
         // subscribe to stream and verify response
-        final Response response = this.restconfImpl.subscribeToStream(identifier, uriInfo);
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        final NormalizedNodeContext response = this.restconfImpl.subscribeToStream(identifier, uriInfo);
 
         // remove test notification stream
         Notificator.removeAllListeners();
