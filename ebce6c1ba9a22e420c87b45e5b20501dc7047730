@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "3a65312a_a5e8817d",
+        "filename": "netconf/netconf-console/src/test/resources/schemas/netconf-node-topology.yang",
+        "patchSetId": 8
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2016-10-29T15:26:35Z",
+      "side": 1,
+      "message": "This API change has broken Of-config project. Compilation currently fails on this two-line expression [0], I assume many more changes in Of-config are needed.\n\n[0] https://git.opendaylight.org/gerrit/gitweb?p\u003dof-config.git;a\u003dblob;f\u003dsouthbound/southbound-impl/src/main/java/org/opendaylight/ofconfig/southbound/impl/utils/OfconfigHelper.java;h\u003d21267a306febf2ada848dbdfa7919f2067675d9f;hb\u003drefs/heads/master#l142",
+      "range": {
+        "startLine": 165,
+        "startChar": 12,
+        "endLine": 165,
+        "endChar": 16
+      },
+      "revId": "ebce6c1ba9a22e420c87b45e5b20501dc7047730",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_9eee48b3",
         "filename": "netconf/netconf-console/src/test/resources/schemas/netconf-node-topology.yang",
         "patchSetId": 8
