@@ -16,6 +16,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Map.Entry;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -54,26 +55,32 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
     private static final int DEFAULT_INDENT_SPACES_NUM = 2;
 
     @Override
-    public boolean isWriteable(final Class<?> type, final Type genericType, final Annotation[] annotations, final MediaType mediaType) {
+    public boolean isWriteable(final Class<?> type, final Type genericType, final Annotation[] annotations,
+            final MediaType mediaType) {
         return type.equals(NormalizedNodeContext.class);
     }
 
     @Override
-    public long getSize(final NormalizedNodeContext t, final Class<?> type, final Type genericType, final Annotation[] annotations, final MediaType mediaType) {
+    public long getSize(final NormalizedNodeContext t, final Class<?> type, final Type genericType,
+            final Annotation[] annotations, final MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(final NormalizedNodeContext t, final Class<?> type, final Type genericType, final Annotation[] annotations,
-            final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream)
-                    throws IOException, WebApplicationException {
+    public void writeTo(final NormalizedNodeContext t, final Class<?> type, final Type genericType,
+            final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,
+            final OutputStream entityStream) throws IOException, WebApplicationException {
+        for (final Entry<String, Object> entry : t.getNewHeaders().entrySet()) {
+            httpHeaders.add(entry.getKey(), entry.getValue());
+        }
         final NormalizedNode<?, ?> data = t.getData();
         if (data == null) {
             return;
         }
 
         @SuppressWarnings("unchecked")
-        final InstanceIdentifierContext<SchemaNode> context = (InstanceIdentifierContext<SchemaNode>) t.getInstanceIdentifierContext();
+        final InstanceIdentifierContext<SchemaNode> context =
+                (InstanceIdentifierContext<SchemaNode>) t.getInstanceIdentifierContext();
 
         final SchemaPath path = context.getSchemaNode().getPath();
         final JsonWriter jsonWriter = createJsonWriter(entityStream, t.getWriterParameters().isPrettyPrint());
@@ -84,8 +91,8 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
     }
 
     private void writeNormalizedNode(final JsonWriter jsonWriter, SchemaPath path,
-            final InstanceIdentifierContext<SchemaNode> context, NormalizedNode<?, ?> data, final Optional<Integer> depth) throws
-            IOException {
+            final InstanceIdentifierContext<SchemaNode> context, NormalizedNode<?, ?> data,
+            final Optional<Integer> depth) throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
         if (SchemaPath.ROOT.equals(path)) {
             /*
@@ -139,7 +146,8 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         } else {
             initialNs = null;
         }
-        final NormalizedNodeStreamWriter streamWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(codecs,path,initialNs,jsonWriter);
+        final NormalizedNodeStreamWriter streamWriter =
+                JSONNormalizedNodeStreamWriter.createNestedWriter(codecs, path, initialNs, jsonWriter);
         if (depth.isPresent()) {
             return DepthAwareNormalizedNodeWriter.forStreamWriter(streamWriter, depth.get());
         } else {
