@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Map.Entry;
 import javanet.staxutils.IndentingXMLStreamWriter;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -75,6 +76,9 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             final Annotation[] annotations, final MediaType mediaType,
             final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws IOException,
             WebApplicationException {
+        for (final Entry<String, Object> entry : t.getNewHeaders().entrySet()) {
+            httpHeaders.add(entry.getKey(), entry.getValue());
+        }
         final InstanceIdentifierContext<?> pathContext = t.getInstanceIdentifierContext();
         if (t.getData() == null) {
             return;
@@ -97,8 +101,9 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
         writeNormalizedNode(xmlWriter, schemaPath, pathContext, data, Optional.fromNullable(t.getWriterParameters().getDepth()));
     }
 
-    private void writeNormalizedNode(final XMLStreamWriter xmlWriter, final SchemaPath schemaPath, final InstanceIdentifierContext<?>
-            pathContext, NormalizedNode<?, ?> data, final Optional<Integer> depth) throws IOException {
+    private void writeNormalizedNode(final XMLStreamWriter xmlWriter, final SchemaPath schemaPath,
+            final InstanceIdentifierContext<?> pathContext, NormalizedNode<?, ?> data, final Optional<Integer> depth)
+            throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
         final SchemaContext schemaCtx = pathContext.getSchemaContext();
         if (SchemaPath.ROOT.equals(schemaPath)) {
@@ -121,8 +126,9 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
     }
 
     private RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
-                                                                        final SchemaContext schemaContext, final SchemaPath schemaPath, final Optional<Integer> depth) {
-        final NormalizedNodeStreamWriter xmlStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, schemaContext, schemaPath);
+            final SchemaContext schemaContext, final SchemaPath schemaPath, final Optional<Integer> depth) {
+        final NormalizedNodeStreamWriter xmlStreamWriter =
+                XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, schemaContext, schemaPath);
         if (depth.isPresent()) {
             return DepthAwareNormalizedNodeWriter.forStreamWriter(xmlStreamWriter, depth.get());
         } else {
@@ -135,7 +141,8 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             throws IOException {
         try {
             final QName name = data.getNodeType();
-            xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, name.getLocalName(), name.getNamespace().toString());
+            xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, name.getLocalName(),
+                    name.getNamespace().toString());
             xmlWriter.writeDefaultNamespace(name.getNamespace().toString());
             for(final NormalizedNode<?,?> child : data.getValue()) {
                 nnWriter.write(child);
