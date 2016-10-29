@@ -16,6 +16,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Map.Entry;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -67,6 +68,9 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
     public void writeTo(final NormalizedNodeContext t, final Class<?> type, final Type genericType, final Annotation[] annotations,
             final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream)
                     throws IOException, WebApplicationException {
+        for (final Entry<String, Object> entry : t.getNewHeaders().entrySet()) {
+            httpHeaders.add(entry.getKey(), entry.getValue());
+        }
         final NormalizedNode<?, ?> data = t.getData();
         if (data == null) {
             return;
