@@ -100,7 +100,7 @@ public class RestconfCompositeWrapper implements RestconfService, SchemaRetrieva
     }
 
     @Override
-    public Response subscribeToStream(final String identifier, final UriInfo uriInfo) {
+    public NormalizedNodeContext subscribeToStream(final String identifier, final UriInfo uriInfo) {
         return this.restconf.subscribeToStream(identifier, uriInfo);
     }
 

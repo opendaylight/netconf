@@ -212,7 +212,8 @@ public interface RestconfService {
 
     @GET
     @Path("/streams/stream/{identifier:.+}")
-    public Response subscribeToStream(@Encoded @PathParam("identifier") String identifier, @Context UriInfo uriInfo);
+    public NormalizedNodeContext subscribeToStream(@Encoded @PathParam("identifier") String identifier,
+            @Context UriInfo uriInfo);
 
     /**
      * @deprecated do not use this method. It will be replaced by
