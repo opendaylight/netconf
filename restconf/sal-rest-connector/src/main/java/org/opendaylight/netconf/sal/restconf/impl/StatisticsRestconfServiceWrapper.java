@@ -9,7 +9,6 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -48,60 +47,60 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
 
     @Override
     public Object getRoot() {
-        return delegate.getRoot();
+        return this.delegate.getRoot();
     }
 
     @Override
     public NormalizedNodeContext getModules(final UriInfo uriInfo) {
-        return delegate.getModules(uriInfo);
+        return this.delegate.getModules(uriInfo);
     }
 
     @Override
     public NormalizedNodeContext getModules(final String identifier, final UriInfo uriInfo) {
-        return delegate.getModules(identifier, uriInfo);
+        return this.delegate.getModules(identifier, uriInfo);
     }
 
     @Override
     public NormalizedNodeContext getModule(final String identifier, final UriInfo uriInfo) {
-        return delegate.getModule(identifier, uriInfo);
+        return this.delegate.getModule(identifier, uriInfo);
     }
 
     @Override
     public NormalizedNodeContext getOperations(final UriInfo uriInfo) {
-        return delegate.getOperations(uriInfo);
+        return this.delegate.getOperations(uriInfo);
     }
 
     @Override
     public NormalizedNodeContext getOperations(final String identifier, final UriInfo uriInfo) {
-        return delegate.getOperations(identifier, uriInfo);
+        return this.delegate.getOperations(identifier, uriInfo);
     }
 
     @Override
     public NormalizedNodeContext invokeRpc(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
-        rpc.incrementAndGet();
-        return delegate.invokeRpc(identifier, payload, uriInfo);
+        this.rpc.incrementAndGet();
+        return this.delegate.invokeRpc(identifier, payload, uriInfo);
     }
 
     @Override
     public NormalizedNodeContext invokeRpc(final String identifier, final String noPayload, final UriInfo uriInfo) {
-        rpc.incrementAndGet();
-        return delegate.invokeRpc(identifier, noPayload, uriInfo);
+        this.rpc.incrementAndGet();
+        return this.delegate.invokeRpc(identifier, noPayload, uriInfo);
     }
 
     @Override
     public NormalizedNodeContext readConfigurationData(final String identifier, final UriInfo uriInfo) {
-        configGet.incrementAndGet();
+        this.configGet.incrementAndGet();
         NormalizedNodeContext normalizedNodeContext = null;
         try {
-            normalizedNodeContext = delegate.readConfigurationData(identifier, uriInfo);
+            normalizedNodeContext = this.delegate.readConfigurationData(identifier, uriInfo);
             if (normalizedNodeContext.getData() != null) {
-                successGetConfig.incrementAndGet();
+                this.successGetConfig.incrementAndGet();
             }
             else {
-                failureGetConfig.incrementAndGet();
+                this.failureGetConfig.incrementAndGet();
             }
-        } catch (Exception e) {
-            failureGetConfig.incrementAndGet();
+        } catch (final Exception e) {
+            this.failureGetConfig.incrementAndGet();
             throw e;
         }
         return normalizedNodeContext;
@@ -109,18 +108,18 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
 
     @Override
     public NormalizedNodeContext readOperationalData(final String identifier, final UriInfo uriInfo) {
-        operationalGet.incrementAndGet();
+        this.operationalGet.incrementAndGet();
         NormalizedNodeContext normalizedNodeContext = null;
         try {
-            normalizedNodeContext = delegate.readOperationalData(identifier, uriInfo);
+            normalizedNodeContext = this.delegate.readOperationalData(identifier, uriInfo);
             if (normalizedNodeContext.getData() != null) {
-                successGetOperational.incrementAndGet();
+                this.successGetOperational.incrementAndGet();
             }
             else {
-                failureGetOperational.incrementAndGet();
+                this.failureGetOperational.incrementAndGet();
             }
-        } catch (Exception e) {
-            failureGetOperational.incrementAndGet();
+        } catch (final Exception e) {
+            this.failureGetOperational.incrementAndGet();
             throw e;
         }
         return normalizedNodeContext;
@@ -128,18 +127,18 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
 
     @Override
     public Response updateConfigurationData(final String identifier, final NormalizedNodeContext payload) {
-        configPut.incrementAndGet();
+        this.configPut.incrementAndGet();
         Response response = null;
         try {
-            response = delegate.updateConfigurationData(identifier, payload);
+            response = this.delegate.updateConfigurationData(identifier, payload);
             if (response.getStatus() == Status.OK.getStatusCode()) {
-                successPut.incrementAndGet();
+                this.successPut.incrementAndGet();
             }
             else {
-                failurePut.incrementAndGet();
+                this.failurePut.incrementAndGet();
             }
-        } catch (Exception e) {
-            failurePut.incrementAndGet();
+        } catch (final Exception e) {
+            this.failurePut.incrementAndGet();
             throw e;
         }
         return response;
@@ -147,18 +146,18 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
 
     @Override
     public Response createConfigurationData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
-        configPost.incrementAndGet();
+        this.configPost.incrementAndGet();
         Response response = null;
         try {
-            response = delegate.createConfigurationData(identifier, payload, uriInfo);
+            response = this.delegate.createConfigurationData(identifier, payload, uriInfo);
             if (response.getStatus() == Status.OK.getStatusCode()) {
-                successPost.incrementAndGet();
+                this.successPost.incrementAndGet();
             }
             else {
-                failurePost.incrementAndGet();
+                this.failurePost.incrementAndGet();
             }
-        } catch (Exception e) {
-            failurePost.incrementAndGet();
+        } catch (final Exception e) {
+            this.failurePost.incrementAndGet();
             throw e;
         }
         return response;
@@ -166,18 +165,18 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
 
     @Override
     public Response createConfigurationData(final NormalizedNodeContext payload, final UriInfo uriInfo) {
-        configPost.incrementAndGet();
+        this.configPost.incrementAndGet();
         Response response = null;
         try {
-            response = delegate.createConfigurationData(payload, uriInfo);
+            response = this.delegate.createConfigurationData(payload, uriInfo);
             if (response.getStatus() == Status.OK.getStatusCode()) {
-                successPost.incrementAndGet();
+                this.successPost.incrementAndGet();
             }
             else {
-                failurePost.incrementAndGet();
+                this.failurePost.incrementAndGet();
             }
-        }catch (Exception e) {
-            failurePost.incrementAndGet();
+        }catch (final Exception e) {
+            this.failurePost.incrementAndGet();
             throw e;
         }
         return response;
@@ -185,105 +184,105 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
 
     @Override
     public Response deleteConfigurationData(final String identifier) {
-        configDelete.incrementAndGet();
+        this.configDelete.incrementAndGet();
         Response response = null;
         try {
-            response = delegate.deleteConfigurationData(identifier);
+            response = this.delegate.deleteConfigurationData(identifier);
             if (response.getStatus() == Status.OK.getStatusCode()) {
-                successDelete.incrementAndGet();
+                this.successDelete.incrementAndGet();
             }
             else {
-                failureDelete.incrementAndGet();
+                this.failureDelete.incrementAndGet();
             }
-        } catch (Exception e) {
-            failureDelete.incrementAndGet();
+        } catch (final Exception e) {
+            this.failureDelete.incrementAndGet();
             throw e;
         }
         return response;
     }
 
     @Override
-    public Response subscribeToStream(final String identifier, final UriInfo uriInfo) {
-        return delegate.subscribeToStream(identifier, uriInfo);
+    public NormalizedNodeContext subscribeToStream(final String identifier, final UriInfo uriInfo) {
+        return this.delegate.subscribeToStream(identifier, uriInfo);
     }
 
     @Override
     public NormalizedNodeContext getAvailableStreams(final UriInfo uriInfo) {
-        return delegate.getAvailableStreams(uriInfo);
+        return this.delegate.getAvailableStreams(uriInfo);
     }
 
     @Override
     public PATCHStatusContext patchConfigurationData(final String identifier, final PATCHContext payload, final UriInfo
             uriInfo) {
-        return delegate.patchConfigurationData(identifier, payload, uriInfo);
+        return this.delegate.patchConfigurationData(identifier, payload, uriInfo);
     }
 
     @Override
     public PATCHStatusContext patchConfigurationData(final PATCHContext payload, final UriInfo uriInfo) {
-        return delegate.patchConfigurationData(payload, uriInfo);
+        return this.delegate.patchConfigurationData(payload, uriInfo);
     }
 
     public BigInteger getConfigDelete() {
-        return BigInteger.valueOf(configDelete.get());
+        return BigInteger.valueOf(this.configDelete.get());
     }
 
     public BigInteger getConfigGet() {
-        return BigInteger.valueOf(configGet.get());
+        return BigInteger.valueOf(this.configGet.get());
     }
 
     public BigInteger getConfigPost() {
-        return BigInteger.valueOf(configPost.get());
+        return BigInteger.valueOf(this.configPost.get());
     }
 
     public BigInteger getConfigPut() {
-        return BigInteger.valueOf(configPut.get());
+        return BigInteger.valueOf(this.configPut.get());
     }
 
     public BigInteger getOperationalGet() {
-        return BigInteger.valueOf(operationalGet.get());
+        return BigInteger.valueOf(this.operationalGet.get());
     }
 
     public BigInteger getRpc() {
-        return BigInteger.valueOf(rpc.get());
+        return BigInteger.valueOf(this.rpc.get());
     }
 
     public BigInteger getSuccessGetConfig() {
-        return BigInteger.valueOf(successGetConfig.get());
+        return BigInteger.valueOf(this.successGetConfig.get());
     }
 
     public BigInteger getSuccessGetOperational() {
-        return BigInteger.valueOf(successGetOperational.get());
+        return BigInteger.valueOf(this.successGetOperational.get());
     }
 
     public BigInteger getSuccessPost() {
-        return BigInteger.valueOf(successPost.get());
+        return BigInteger.valueOf(this.successPost.get());
     }
 
     public BigInteger getSuccessPut() {
-        return BigInteger.valueOf(successPut.get());
+        return BigInteger.valueOf(this.successPut.get());
     }
 
     public BigInteger getSuccessDelete() {
-        return BigInteger.valueOf(successDelete.get());
+        return BigInteger.valueOf(this.successDelete.get());
     }
 
     public BigInteger getFailureGetConfig() {
-        return BigInteger.valueOf(failureGetConfig.get());
+        return BigInteger.valueOf(this.failureGetConfig.get());
     }
 
     public BigInteger getFailureGetOperational() {
-        return BigInteger.valueOf(failureGetOperational.get());
+        return BigInteger.valueOf(this.failureGetOperational.get());
     }
 
     public BigInteger getFailurePost() {
-        return BigInteger.valueOf(failurePost.get());
+        return BigInteger.valueOf(this.failurePost.get());
     }
 
     public BigInteger getFailurePut() {
-        return BigInteger.valueOf(failurePut.get());
+        return BigInteger.valueOf(this.failurePut.get());
     }
 
     public BigInteger getFailureDelete() {
-        return BigInteger.valueOf(failureDelete.get());
+        return BigInteger.valueOf(this.failureDelete.get());
     }
 }
