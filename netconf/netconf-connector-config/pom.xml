@@ -12,14 +12,14 @@
   <parent>
     <groupId>org.opendaylight.odlparent</groupId>
     <artifactId>odlparent-lite</artifactId>
-    <version>1.7.1-SNAPSHOT</version>
+    <version>1.7.1-Boron-SR1</version>
     <relativePath/>
   </parent>
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>netconf-connector-config</artifactId>
   <description>Configuration files for netconf-connector</description>
-  <version>1.1.1-SNAPSHOT</version>
+  <version>1.1.1-Boron-SR1</version>
   <packaging>jar</packaging>
 
   <build>

@@ -12,22 +12,22 @@
   <parent>
     <groupId>org.opendaylight.odlparent</groupId>
     <artifactId>features-parent</artifactId>
-    <version>1.7.1-SNAPSHOT</version>
+    <version>1.7.1-Boron-SR1</version>
     <relativePath/>
   </parent>
   <artifactId>features-restconf</artifactId>
   <groupId>org.opendaylight.netconf</groupId>
-  <version>1.4.1-SNAPSHOT</version>
+  <version>1.4.1-Boron-SR1</version>
   <packaging>jar</packaging>
   <properties>
-    <aaa.version>0.4.1-SNAPSHOT</aaa.version>
-    <commons.opendaylight.version>1.7.1-SNAPSHOT</commons.opendaylight.version>
-    <controller.mdsal.version>1.4.1-SNAPSHOT</controller.mdsal.version>
-    <features.test.version>1.7.1-SNAPSHOT</features.test.version>
-    <mdsal.version>2.1.1-SNAPSHOT</mdsal.version>
-    <mdsal.model.version>0.9.1-SNAPSHOT</mdsal.model.version>
-    <restconf.version>1.4.1-SNAPSHOT</restconf.version>
-    <yangtools.version>1.0.1-SNAPSHOT</yangtools.version>
+    <aaa.version>0.4.1-Boron-SR1</aaa.version>
+    <commons.opendaylight.version>1.7.1-Boron-SR1</commons.opendaylight.version>
+    <controller.mdsal.version>1.4.1-Boron-SR1</controller.mdsal.version>
+    <features.test.version>1.7.1-Boron-SR1</features.test.version>
+    <mdsal.version>2.1.1-Boron-SR1</mdsal.version>
+    <mdsal.model.version>0.9.1-Boron-SR1</mdsal.model.version>
+    <restconf.version>1.4.1-Boron-SR1</restconf.version>
+    <yangtools.version>1.0.1-Boron-SR1</yangtools.version>
 
     <features.file>features.xml</features.file>
     <config.configfile.directory>etc/opendaylight/karaf</config.configfile.directory>
@@ -40,7 +40,7 @@
       <dependency>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>odlparent-artifacts</artifactId>
-        <version>1.7.1-SNAPSHOT</version>
+        <version>1.7.1-Boron-SR1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
