@@ -152,18 +152,18 @@ public class NetconfMasterDOMTransaction implements NetconfDOMTransaction {
         LOG.trace("{}: Submit[{}} via NETCONF", id, writeTx.getIdentifier());
 
         final CheckedFuture<Void, TransactionCommitFailedException> submitFuture = writeTx.submit();
+        writeTx = null;
+        
         final DefaultPromise<Void> promise = new DefaultPromise<>();
         Futures.addCallback(submitFuture, new FutureCallback<Void>() {
             @Override
             public void onSuccess(final Void result) {
                 promise.success(result);
-                writeTx = null;
             }
 
             @Override
             public void onFailure(@Nonnull final Throwable throwable) {
                 promise.failure(throwable);
-                writeTx = null;
             }
         });
         return promise.future();
