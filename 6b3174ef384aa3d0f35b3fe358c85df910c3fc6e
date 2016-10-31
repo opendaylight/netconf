@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_c635c447",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-10-31T09:15:40Z",
+      "side": 1,
+      "message": "If you initialize INSTANCE before initializing default values(DEFAULT_TCP_SERVER_ADRESS etc.), which are used by NetconfConfiguration() constructor, then values passed to NetconfConfigurationHolder constructor are null.",
+      "range": {
+        "startLine": 22,
+        "startChar": 4,
+        "endLine": 22,
+        "endChar": 84
+      },
+      "revId": "6b3174ef384aa3d0f35b3fe358c85df910c3fc6e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
