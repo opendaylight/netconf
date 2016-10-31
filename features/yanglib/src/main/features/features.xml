@@ -7,20 +7,20 @@
  terms of the Eclipse Public License v1.0 which accompanies this distribution,
  and is available at http://www.eclipse.org/legal/epl-v10.html
 -->
-<features name="odl-yanglib-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.2.0"
+<features name="odl-yanglib-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.3.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.2.0 http://karaf.apache.org/xmlns/features/v1.2.0">
+          xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
     <repository>mvn:org.opendaylight.mdsal.model/features-mdsal-model/{{VERSION}}/xml/features</repository>
     <repository>mvn:org.opendaylight.controller/features-mdsal/{{VERSION}}/xml/features</repository>
     <repository>mvn:org.opendaylight.yangtools/features-yangtools/{{VERSION}}/xml/features</repository>
     <repository>mvn:org.opendaylight.netconf/features-restconf/{{VERSION}}/xml/features</repository>
 
     <feature name='odl-yanglib' description='OpenDaylight :: Yanglib' version='${project.version}'>
+        <feature version='${yangtools.version}' dependency="true">odl-yangtools-yang-data</feature>
+        <feature version='${restconf.version}' dependency="true">odl-restconf</feature>
+        <feature version='${mdsal.model.version}' dependency="true">odl-mdsal-models</feature>
+        <feature version='${yangtools.version}' dependency="true">odl-yangtools-yang-data</feature>
         <bundle>mvn:org.opendaylight.netconf/yanglib/{{VERSION}}</bundle>
-        <feature version='${yangtools.version}'>odl-yangtools-yang-data</feature>
-        <feature version='${restconf.version}'>odl-restconf</feature>
-        <feature version='${mdsal.model.version}'>odl-mdsal-models</feature>
-        <feature version='${yangtools.version}'>odl-yangtools-yang-data</feature>
         <bundle>mvn:org.opendaylight.netconf/ietf-netconf-yang-library/{{VERSION}}</bundle>
         <feature>war</feature>
         <bundle>mvn:org.opendaylight.netconf/ietf-netconf-yang-library/{{VERSION}}</bundle>
