@@ -7,9 +7,9 @@
  terms of the Eclipse Public License v1.0 which accompanies this distribution,
  and is available at http://www.eclipse.org/legal/epl-v10.html
 -->
-<features name="odl-controller-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.2.0"
+<features name="odl-controller-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.3.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.2.0 http://karaf.apache.org/xmlns/features/v1.2.0">
+          xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
 
     <repository>mvn:org.opendaylight.mdsal.model/features-mdsal-model/{{VERSION}}/xml/features</repository>
     <repository>mvn:org.opendaylight.controller/features-mdsal/{{VERSION}}/xml/features</repository>
@@ -17,51 +17,51 @@
     <repository>mvn:org.opendaylight.netconf/features-netconf/{{VERSION}}/xml/features</repository>
 
     <feature name='odl-netconf-connector-all' version='${project.version}' description='OpenDaylight :: Netconf Connector :: All'>
-        <feature version='${project.version}'>odl-netconf-connector</feature>
-        <feature version='${project.version}'>odl-netconf-connector-ssh</feature>
+        <feature version='${project.version}' dependency="true">odl-netconf-connector</feature>
+        <feature version='${project.version}' dependency="true">odl-netconf-connector-ssh</feature>
     </feature>
 
     <feature name='odl-message-bus' version='${project.version}'>
         <!-- messagebus endpoint for netconf connector-->
-        <feature version='${project.version}'>odl-netconf-connector-all</feature>
-        <feature version='${controller.mdsal.version}'>odl-message-bus-collector</feature>
+        <feature version='${project.version}' dependency="true">odl-netconf-connector-all</feature>
+        <feature version='${controller.mdsal.version}' dependency="true">odl-message-bus-collector</feature>
         <bundle>mvn:org.opendaylight.netconf/messagebus-netconf/{{VERSION}}</bundle>
     </feature>
 
     <feature name='odl-netconf-connector' version='${project.version}' description="OpenDaylight :: Netconf Connector :: Netconf Connector">
-        <feature version='${controller.mdsal.version}'>odl-mdsal-broker</feature>
-        <feature version='${project.version}'>odl-netconf-notifications-api</feature>
-        <feature version='${project.version}'>odl-netconf-client</feature>
-        <feature version='${mdsal.model.version}'>odl-mdsal-models</feature>
-        <bundle>mvn:com.google.code.gson/gson/{{VERSION}}</bundle>
-        <bundle>mvn:org.opendaylight.netconf/sal-netconf-connector/{{VERSION}}</bundle>
+        <feature version='${controller.mdsal.version}' dependency="true">odl-mdsal-broker</feature>
+        <feature version='${project.version}' dependency="true">odl-netconf-notifications-api</feature>
+        <feature version='${project.version}' dependency="true">odl-netconf-client</feature>
+        <feature version='${mdsal.model.version}' dependency="true">odl-mdsal-models</feature>
+        <bundle dependency="true">mvn:com.google.code.gson/gson/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.controller.model/model-inventory/{{VERSION}}</bundle>
+        <bundle>mvn:org.opendaylight.netconf/sal-netconf-connector/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.netconf/netconf-topology/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.netconf/sal-netconf-connector/{{VERSION}}</bundle>
         <configfile finalname='${config.configfile.directory}/${config.netconf.client.configfile}'>mvn:org.opendaylight.netconf/netconf-config/{{VERSION}}/xml/config</configfile>
     </feature>
 
     <feature name='odl-netconf-connector-ssh' version='${project.version}' description="OpenDaylight :: Netconf Connector :: Netconf Connector + Netconf SSH Server + loopback connection configuration">
-        <feature version='${project.version}'>odl-netconf-topology</feature>
+        <feature version='${project.version}' dependency="true">odl-netconf-topology</feature>
         <configfile finalname="${config.configfile.directory}/${config.netconf.connector.configfile}">mvn:org.opendaylight.netconf/netconf-connector-config/{{VERSION}}/xml/config</configfile>
     </feature>
 
     <feature name='odl-netconf-topology' version='${project.version}' description="OpenDaylight :: Netconf Topology :: Netconf Connector + Netconf SSH Server + Netconf configuration via config topology datastore">
-        <feature version='${project.version}'>odl-netconf-ssh</feature>
-        <feature version='${project.version}'>odl-netconf-connector</feature>
+        <feature version='${project.version}' dependency="true">odl-netconf-ssh</feature>
+        <feature version='${project.version}' dependency="true">odl-netconf-connector</feature>
         <configfile finalname='${config.configfile.directory}/${config.netconf.topology.configfile}'>mvn:org.opendaylight.netconf/netconf-topology-config/{{VERSION}}/xml/config</configfile>
     </feature>
 
     <feature name='odl-netconf-clustered-topology' version='${project.version}' description="OpenDaylight :: Clustered Netconf Topology :: Netconf Connector + Netconf SSH Server">
-        <feature version='${project.version}'>odl-netconf-ssh</feature>
-        <feature version='${project.version}'>odl-netconf-connector</feature>
+        <feature version='${project.version}' dependency="true">odl-netconf-ssh</feature>
+        <feature version='${project.version}' dependency="true">odl-netconf-connector</feature>
         <bundle>mvn:org.opendaylight.netconf/netconf-topology-singleton/{{VERSION}}</bundle>
     </feature>
 
     <feature name='odl-netconf-console' version='${project.version}' description="OpenDaylight :: Netconf Console + Karaf CLI for netconf CRUD operations">
-       <feature version='${controller.mdsal.version}'>odl-netconf-mdsal</feature>
-       <feature version='${project.version}'>odl-netconf-connector-all</feature>
-       <feature version='${project.version}'>odl-netconf-topology</feature>
+       <feature version='${controller.mdsal.version}' dependency="true">odl-netconf-mdsal</feature>
+       <feature version='${project.version}' dependency="true">odl-netconf-connector-all</feature>
+       <feature version='${project.version}' dependency="true">odl-netconf-topology</feature>
        <bundle>mvn:org.opendaylight.netconf/netconf-console/{{VERSION}}</bundle>
     </feature>
 
