@@ -96,10 +96,6 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-config-dispatcher</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>netconf-console</artifactId>
       <version>${project.version}</version>
     </dependency>
