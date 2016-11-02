@@ -38,18 +38,17 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
-import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
+import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 import org.openexi.proc.common.EXIOptions;
 
 public class AbstractNetconfSessionTest {
 
     @Mock
-    private NetconfSessionListener<NetconfSession> listener;
+    private NetconfSessionListener<TestingNetconfSession> listener;
     @Mock
     private Channel channel;
     @Mock
@@ -64,10 +63,10 @@ public class AbstractNetconfSessionTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        doNothing().when(listener).onMessage(any(NetconfSession.class), any(NetconfMessage.class));
-        doNothing().when(listener).onSessionUp(any(NetconfSession.class));
-        doNothing().when(listener).onSessionDown(any(NetconfSession.class), any(Exception.class));
-        doNothing().when(listener).onSessionTerminated(any(NetconfSession.class), any(NetconfTerminationReason.class));
+        doNothing().when(listener).onMessage(any(TestingNetconfSession.class), any(NetconfMessage.class));
+        doNothing().when(listener).onSessionUp(any(TestingNetconfSession.class));
+        doNothing().when(listener).onSessionDown(any(TestingNetconfSession.class), any(Exception.class));
+        doNothing().when(listener).onSessionTerminated(any(TestingNetconfSession.class), any(NetconfTerminationReason.class));
 
         doReturn(writeFuture).when(writeFuture).addListener(any(GenericFutureListener.class));
 
@@ -81,7 +80,7 @@ public class AbstractNetconfSessionTest {
         doReturn(eventLoop).when(channel).eventLoop();
         doAnswer(new Answer<Void>() {
             @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
+            public Void answer(final InvocationOnMock invocation) throws Throwable {
                 final Object[] args = invocation.getArguments();
                 final Runnable runnable = (Runnable) args[0];
                 runnable.run();
@@ -113,7 +112,7 @@ public class AbstractNetconfSessionTest {
         testingNetconfSession.sessionUp();
         testingNetconfSession.close();
         verify(channel).close();
-        verify(listener).onSessionTerminated(any(NetconfSession.class), any(NetconfTerminationReason.class));
+        verify(listener).onSessionTerminated(any(TestingNetconfSession.class), any(NetconfTerminationReason.class));
     }
 
     @Test
@@ -149,7 +148,7 @@ public class AbstractNetconfSessionTest {
         verifyZeroInteractions(listener);
         testingNetconfSession.sessionUp();
         testingNetconfSession.endOfInput();
-        verify(listener).onSessionDown(any(NetconfSession.class), any(Exception.class));
+        verify(listener).onSessionDown(any(TestingNetconfSession.class), any(Exception.class));
     }
 
     @Test
@@ -160,21 +159,4 @@ public class AbstractNetconfSessionTest {
         verify(channel).writeAndFlush(clientHello);
     }
 
-    private static class TestingNetconfSession extends AbstractNetconfSession<NetconfSession, NetconfSessionListener<NetconfSession>> {
-
-        protected TestingNetconfSession(final NetconfSessionListener<NetconfSession> sessionListener, final Channel channel, final long sessionId) {
-            super(sessionListener, channel, sessionId);
-        }
-
-        @Override
-        protected NetconfSession thisInstance() {
-            return this;
-        }
-
-        @Override
-        protected void addExiHandlers(final ByteToMessageDecoder decoder, final MessageToByteEncoder<NetconfMessage> encoder) {}
-
-        @Override
-        public void stopExiCommunication() {}
-    }
 }
