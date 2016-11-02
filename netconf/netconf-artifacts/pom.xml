@@ -85,11 +85,6 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-mdsal-config</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>mdsal-netconf-connector</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -116,6 +111,11 @@
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>mdsal-netconf-yang-library</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>mdsal-netconf-impl</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -149,13 +149,6 @@
                 <version>${project.version}</version>
                 <classifier>config</classifier>
                 <type>cfg</type>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-mdsal-config</artifactId>
-                <version>${project.version}</version>
-                <classifier>config</classifier>
-                <type>xml</type>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -235,19 +228,17 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>mdsal-netconf-ssh</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-topology</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-topology-config</artifactId>
-                <version>${project.version}</version>
-                <classifier>config</classifier>
-                <type>xml</type>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>yanglib-config</artifactId>
                 <version>${project.version}</version>
                 <classifier>config</classifier>
                 <type>xml</type>

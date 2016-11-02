@@ -15,19 +15,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.controller.config.util.capability.YangModuleCapability;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.sal.core.api.Broker.ConsumerSession;
-import org.opendaylight.controller.sal.core.api.Consumer;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
+import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -38,19 +35,30 @@ import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MdsalNetconfOperationServiceFactory implements NetconfOperationServiceFactory, Consumer, AutoCloseable {
+public class MdsalNetconfOperationServiceFactory implements NetconfOperationServiceFactory, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MdsalNetconfOperationServiceFactory.class);
 
-    private ConsumerSession session = null;
-    private DOMDataBroker dataBroker = null;
-    private DOMRpcService rpcService = null;
+    private final DOMDataBroker dataBroker;
+    private final DOMRpcService rpcService;
+
     private final CurrentSchemaContext currentSchemaContext;
     private final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency;
+    private final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener;
 
-    public MdsalNetconfOperationServiceFactory(final SchemaService schemaService, final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency) {
+    public MdsalNetconfOperationServiceFactory(final SchemaService schemaService,
+                                               final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency,
+                                               final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
+                                               final DOMDataBroker dataBroker,
+                                               final DOMRpcService rpcService) {
+
+        this.dataBroker = dataBroker;
+        this.rpcService = rpcService;
+
         this.rootSchemaSourceProviderDependency = rootSchemaSourceProviderDependency;
         this.currentSchemaContext = new CurrentSchemaContext(Preconditions.checkNotNull(schemaService), rootSchemaSourceProviderDependency);
+        this.netconfOperationServiceFactoryListener = netconfOperationServiceFactoryListener;
+        this.netconfOperationServiceFactoryListener.onAddNetconfOperationServiceFactory(this);
     }
 
     @Override
@@ -60,8 +68,15 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
     }
 
     @Override
-    public void close() throws Exception {
-        currentSchemaContext.close();
+    public void close() {
+        try {
+            currentSchemaContext.close();
+            if (netconfOperationServiceFactoryListener != null) {
+                netconfOperationServiceFactoryListener.onRemoveNetconfOperationServiceFactory(this);
+            }
+        } catch(Exception e) {
+            LOG.error("Failed to close resources correctly - ignore", e);
+        }
     }
 
     @Override
@@ -129,17 +144,5 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
     @Override
     public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
         return currentSchemaContext.registerCapabilityListener(listener);
-    }
-
-    @Override
-    public void onSessionInitiated(ConsumerSession session) {
-        this.session = Preconditions.checkNotNull(session);
-        this.dataBroker = this.session.getService(DOMDataBroker.class);
-        this.rpcService = this.session.getService(DOMRpcService.class);
-    }
-
-    @Override
-    public Collection<ConsumerFunctionality> getConsumerFunctionality() {
-        return Collections.emptySet();
     }
 }

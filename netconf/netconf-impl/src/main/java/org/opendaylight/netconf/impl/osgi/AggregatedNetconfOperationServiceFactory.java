@@ -13,8 +13,11 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
+import io.netty.util.internal.ConcurrentSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opendaylight.controller.config.util.capability.Capability;
@@ -34,9 +37,16 @@ public class AggregatedNetconfOperationServiceFactory implements NetconfOperatio
 
     private static final Logger LOG = LoggerFactory.getLogger(AggregatedNetconfOperationServiceFactory.class);
 
-    private final Set<NetconfOperationServiceFactory> factories = new HashSet<>();
-    private final Multimap<NetconfOperationServiceFactory, AutoCloseable> registrations = HashMultimap.create();
-    private final Set<CapabilityListener> listeners = Sets.newHashSet();
+    private final Set<NetconfOperationServiceFactory> factories = new ConcurrentSet<>();
+    private final Multimap<NetconfOperationServiceFactory, AutoCloseable> registrations = Multimaps.synchronizedMultimap(HashMultimap.create());
+    private final Set<CapabilityListener> listeners = new ConcurrentSet<>();
+
+    public AggregatedNetconfOperationServiceFactory() {
+    }
+
+    public AggregatedNetconfOperationServiceFactory(final List<NetconfOperationServiceFactory> mappers) {
+        mappers.forEach(this::onAddNetconfOperationServiceFactory);
+    }
 
     @Override
     public synchronized void onAddNetconfOperationServiceFactory(NetconfOperationServiceFactory service) {
@@ -64,7 +74,7 @@ public class AggregatedNetconfOperationServiceFactory implements NetconfOperatio
     }
 
     @Override
-    public synchronized Set<Capability> getCapabilities() {
+    public Set<Capability> getCapabilities() {
         final HashSet<Capability> capabilities = Sets.newHashSet();
         for (final NetconfOperationServiceFactory factory : factories) {
             capabilities.addAll(factory.getCapabilities());

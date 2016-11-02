@@ -88,8 +88,11 @@ public final class CredentialServiceAuthProvider implements AuthProvider, AutoCl
         return true;
     }
 
+    /**
+     * Invoke by blueprint
+     */
     @Override
-    public void close() throws Exception {
+    public void close() {
         listenerTracker.close();
         nullableCredService = null;
     }

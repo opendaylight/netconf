@@ -17,6 +17,8 @@ module netconf-auth {
     identity netconf-auth-provider {
         base "config:service-type";
         config:java-class "org.opendaylight.netconf.auth.AuthProvider";
+        config:disable-osgi-service-registration;
+        status deprecated;
     }
 
 }
