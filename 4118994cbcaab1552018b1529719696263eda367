@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_4d5f0c0f",
+        "filename": "netconf/netconf-client/src/test/resources/helloMessage1.xml",
+        "patchSetId": 17
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-02T15:28:45Z",
+      "side": 0,
+      "message": "I don\u0027t really see the point in deleting this capability here..",
+      "revId": "4118994cbcaab1552018b1529719696263eda367",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
