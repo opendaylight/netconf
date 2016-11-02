@@ -73,6 +73,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_2003b810",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/rpc/InvokeRpcMessage.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2016-11-02T12:19:14Z",
+      "side": 1,
+      "message": "The Externalizable proxy pattern allows for easier versioning. Plus a public  no-arg ctor isn\u0027t exposed along with the readExternal/writeExternal methods. Robert introduced this pattern in CDS and I\u0027m an advocate.",
+      "parentUuid": "3a65312a_2069f88b",
+      "revId": "71f7c79b85a12a1502de2743d6370bdb1bf4358e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_cfc67e49",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/rpc/InvokeRpcMessageReply.java",
         "patchSetId": 12
