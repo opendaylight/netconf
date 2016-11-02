@@ -81,7 +81,8 @@
     <!--NetconfServerMonitoring -->
 
     <bean id="netconfMonitoringService"
-          class="org.opendaylight.netconf.impl.osgi.NetconfMonitoringServiceImpl">
+          class="org.opendaylight.netconf.impl.osgi.NetconfMonitoringServiceImpl"
+          destroy-method="close">
         <argument ref="aggregatedNetconfOperationServiceFactory"/>
         <argument ref="scheduledThreadPool"/>
         <argument value="${monitoring-update-interval}"/>
