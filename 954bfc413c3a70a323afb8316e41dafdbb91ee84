@@ -160,6 +160,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_80ff2c01",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-11-02T09:31:05Z",
+      "side": 1,
+      "message": "Interesting, I did not know it. Technically, it is tail with termination point but without optimization. :) And I think that we could be sure that stack never blows up.\nI would mention, these types of recursion are really easy to rewrite to loop solutions (see last patch). But for me it is ugly and less readable to use while with true at least in this case.",
+      "parentUuid": "3a65312a_8a5c7427",
+      "revId": "954bfc413c3a70a323afb8316e41dafdbb91ee84",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_5b1234b5",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
         "patchSetId": 3
