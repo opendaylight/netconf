@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_2d89f0ca",
+        "filename": "netconf/messagebus-netconf/src/main/java/org/opendaylight/netconf/messagebus/eventsources/netconf/NetconfEventSourceManager.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-02T18:54:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_2d41f039",
+      "revId": "cf7ce2f496fe737ea5078a5890035dc503c52c66",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_8d52c411",
         "filename": "netconf/messagebus-netconf/src/main/resources/org/opendaylight/blueprint/messagebus-netconf.xml",
         "patchSetId": 7
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_0d86b4b9",
+        "filename": "netconf/messagebus-netconf/src/main/resources/org/opendaylight/blueprint/messagebus-netconf.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-02T18:54:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_8d52c411",
+      "revId": "cf7ce2f496fe737ea5078a5890035dc503c52c66",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_ed57f800",
         "filename": "netconf/messagebus-netconf/src/main/resources/org/opendaylight/blueprint/messagebus-netconf.xml",
         "patchSetId": 7
@@ -47,6 +83,24 @@
       "writtenOn": "2016-11-02T15:23:08Z",
       "side": 1,
       "message": "Also here",
+      "revId": "cf7ce2f496fe737ea5078a5890035dc503c52c66",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_6d93e8fa",
+        "filename": "netconf/messagebus-netconf/src/main/resources/org/opendaylight/blueprint/messagebus-netconf.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-02T18:54:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_ed57f800",
       "revId": "cf7ce2f496fe737ea5078a5890035dc503c52c66",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
