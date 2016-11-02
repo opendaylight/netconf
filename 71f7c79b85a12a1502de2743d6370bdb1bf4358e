@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_c0f3e408",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/rpc/InvokeRpcMessage.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-11-02T10:06:28Z",
+      "side": 1,
+      "message": "I cannot get it. Do you mean that it is better to have for objects which we want to serialize with externalizable own class? And then use simply serializable, with externalizable objects? Because in presented link I cannot see any advantage.\nSimilarly as in NormalizedNodeMessage, I can write SchemaPathMessage and in InvokeRPCMessage I can use Serializable with both messages. This is better solution in my opinion: with reusable objects for serialization not with private inner Proxy class.",
+      "parentUuid": "3a65312a_efc9ba5b",
+      "revId": "71f7c79b85a12a1502de2743d6370bdb1bf4358e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_cfc67e49",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/rpc/InvokeRpcMessageReply.java",
         "patchSetId": 12
