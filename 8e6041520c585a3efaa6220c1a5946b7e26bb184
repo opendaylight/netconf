@@ -69,6 +69,24 @@
       "revId": "8e6041520c585a3efaa6220c1a5946b7e26bb184",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_6daac81a",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-02T19:06:17Z",
+      "side": 1,
+      "message": "Removing it completely, it is not used.",
+      "parentUuid": "3a65312a_edb098df",
+      "revId": "8e6041520c585a3efaa6220c1a5946b7e26bb184",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
