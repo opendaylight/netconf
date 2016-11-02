@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_2d41f039",
+        "filename": "netconf/messagebus-netconf/src/main/java/org/opendaylight/netconf/messagebus/eventsources/netconf/NetconfEventSourceManager.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-02T15:23:08Z",
+      "side": 1,
+      "message": "Why public?",
+      "revId": "cf7ce2f496fe737ea5078a5890035dc503c52c66",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_8d52c411",
+        "filename": "netconf/messagebus-netconf/src/main/resources/org/opendaylight/blueprint/messagebus-netconf.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-02T15:23:08Z",
+      "side": 1,
+      "message": "This name is somewhat strange.. Shouldn\u0027t this be domMountPointService?",
+      "revId": "cf7ce2f496fe737ea5078a5890035dc503c52c66",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_ed57f800",
+        "filename": "netconf/messagebus-netconf/src/main/resources/org/opendaylight/blueprint/messagebus-netconf.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-02T15:23:08Z",
+      "side": 1,
+      "message": "Also here",
+      "revId": "cf7ce2f496fe737ea5078a5890035dc503c52c66",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_cd5cbc28",
+        "filename": "netconf/messagebus-netconf/src/main/resources/org/opendaylight/blueprint/messagebus-netconf.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-02T15:23:08Z",
+      "side": 1,
+      "message": "Do we have to pass stream map this way?\n\nCannot we use static factory method as before?",
+      "revId": "cf7ce2f496fe737ea5078a5890035dc503c52c66",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
