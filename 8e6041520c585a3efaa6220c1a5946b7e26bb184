@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_6dada888",
+        "filename": "netconf/mdsal-netconf-monitoring/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/monitoring/MdSalMonitoringMapperFactory.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-02T17:20:29Z",
+      "side": 1,
+      "message": "Ok, I will rename it in a follow-up, if ok with you.",
+      "parentUuid": "3a65312a_adba20df",
+      "revId": "8e6041520c585a3efaa6220c1a5946b7e26bb184",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_8d8da434",
         "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
         "patchSetId": 20
@@ -30,6 +48,24 @@
       "writtenOn": "2016-11-02T17:15:27Z",
       "side": 1,
       "message": "I don\u0027t really get this change here. Why are you using concurrent collections in this class?\n\nI guess, if the fix is needed, you would want to do it in follow up patch, so it\u0027s OK for now.",
+      "revId": "8e6041520c585a3efaa6220c1a5946b7e26bb184",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_edb098df",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-02T17:20:29Z",
+      "side": 1,
+      "message": "Maybe this is not needed, I will look into it and revert his in a follow-up if it is indeed not required. Thank you",
+      "parentUuid": "3a65312a_8d8da434",
       "revId": "8e6041520c585a3efaa6220c1a5946b7e26bb184",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
