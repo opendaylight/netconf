@@ -148,21 +148,6 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
         return sortedPriority;
     }
 
-    public static final NetconfOperationChainedExecution EXECUTION_TERMINATION_POINT = new NetconfOperationChainedExecution() {
-        @Override
-        public boolean isExecutionTermination() {
-            return true;
-        }
-
-        @Override
-        public Document execute(final Document requestMessage) throws DocumentedException {
-            throw new DocumentedException("This execution represents the termination point in operation execution and cannot be executed itself",
-                    DocumentedException.ErrorType.APPLICATION,
-                    DocumentedException.ErrorTag.OPERATION_FAILED,
-                    DocumentedException.ErrorSeverity.ERROR);
-        }
-    };
-
     private static class NetconfOperationExecution implements NetconfOperationChainedExecution {
         private final NetconfOperation netconfOperation;
         private final NetconfOperationChainedExecution subsequentExecution;
