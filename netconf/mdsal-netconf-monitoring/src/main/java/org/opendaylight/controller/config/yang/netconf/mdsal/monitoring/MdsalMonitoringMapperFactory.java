@@ -20,7 +20,7 @@ import org.opendaylight.netconf.monitoring.GetSchema;
 import java.util.Collections;
 import java.util.Set;
 
-public class MdSalMonitoringMapperFactory implements NetconfOperationServiceFactory, AutoCloseable {
+public class MdsalMonitoringMapperFactory implements NetconfOperationServiceFactory, AutoCloseable {
 
     private final NetconfOperationService operationService;
     private final MonitoringToMdsalWriter monitoringToMdsalWriter;
@@ -28,7 +28,7 @@ public class MdSalMonitoringMapperFactory implements NetconfOperationServiceFact
 
     private static final Set<Capability> CAPABILITIES = Collections.emptySet();
 
-    public MdSalMonitoringMapperFactory(final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
+    public MdsalMonitoringMapperFactory(final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
                                         final NetconfMonitoringService netconfMonitoringService,
                                         final MonitoringToMdsalWriter monitoringToMdsalWriter) {
 

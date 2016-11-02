@@ -28,7 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.opendaylight.controller.config.util.capability.BasicCapability;
 import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
-import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
@@ -58,13 +57,12 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
         }
     };
 
-    private final Set<NetconfManagementSession> sessions = new ConcurrentSet<>();
     private final NetconfOperationServiceFactory netconfOperationProvider;
-    private final Map<Uri, Capability> capabilities = new ConcurrentHashMap<>();
-    private final Map<String, Map<String, String>> mappedModulesToRevisionToSchema = new ConcurrentHashMap<>();
+    private final Map<Uri, Capability> capabilities = Maps.newHashMap();
+    private final Map<String, Map<String, String>> mappedModulesToRevisionToSchema = Maps.newHashMap();
 
 
-    private final Set<NetconfMonitoringService.CapabilitiesListener> listeners = new ConcurrentSet<>();
+    private final Set<NetconfMonitoringService.CapabilitiesListener> listeners = Sets.newHashSet();
     private volatile BaseNotificationPublisherRegistration notificationPublisher;
 
     NetconfCapabilityMonitoringService(final NetconfOperationServiceFactory netconfOperationProvider) {
@@ -216,7 +214,6 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
     @Override
     public synchronized void close() throws Exception {
         listeners.clear();
-        sessions.clear();
         capabilities.clear();
     }
 
