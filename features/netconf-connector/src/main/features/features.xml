@@ -65,7 +65,6 @@
        <feature version='${project.version}'>odl-netconf-connector-all</feature>
        <feature version='${project.version}'>odl-netconf-topology</feature>
        <bundle>mvn:org.opendaylight.netconf/netconf-console/{{VERSION}}</bundle>
-       <configfile finalname='${config.configfile.directory}/${config.netconf.console.configfile}'>mvn:org.opendaylight.netconf/netconf-console/{{VERSION}}/xml/config</configfile>
     </feature>
 
 </features>
