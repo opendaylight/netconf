@@ -228,8 +228,6 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-topology-config</artifactId>
                 <version>${project.version}</version>
-                <classifier>config</classifier>
-                <type>xml</type>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
