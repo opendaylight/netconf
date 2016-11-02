@@ -16,6 +16,24 @@
       "revId": "8e6041520c585a3efaa6220c1a5946b7e26bb184",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_0df51483",
+        "filename": "netconf/mdsal-netconf-yang-library/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/yang/library/NetconfMdsalYanglibModule.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-02T17:31:03Z",
+      "side": 0,
+      "message": "I\u0027ll put it back somewhere that make sense in the follow-up patch. Probably in the blueprint file itself.",
+      "parentUuid": "3a65312a_adb6a0da",
+      "revId": "8e6041520c585a3efaa6220c1a5946b7e26bb184",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
