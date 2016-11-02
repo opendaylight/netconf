@@ -20,8 +20,6 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.URL;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,11 +28,7 @@ import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker.ProviderContext;
-import org.opendaylight.controller.sal.binding.api.BindingAwareProvider;
 import org.opendaylight.controller.sal.core.api.Broker;
-import org.opendaylight.controller.sal.core.api.Broker.ProviderSession;
-import org.opendaylight.controller.sal.core.api.Provider;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
@@ -57,6 +51,8 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.UserPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.topology.api.NetconfTopology;
+import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
 import org.opendaylight.protocol.framework.ReconnectStrategy;
 import org.opendaylight.protocol.framework.ReconnectStrategyFactory;
 import org.opendaylight.protocol.framework.TimedReconnectStrategy;
@@ -81,7 +77,7 @@ import org.opendaylight.yangtools.yang.parser.util.TextToASTTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractNetconfTopology implements NetconfTopology, BindingAwareProvider, Provider {
+public abstract class AbstractNetconfTopology implements NetconfTopology {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfTopology.class);
 
@@ -164,19 +160,20 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     protected final ScheduledThreadPool keepaliveExecutor;
     protected final ThreadPool processingExecutor;
     protected final SharedSchemaRepository sharedSchemaRepository;
+    protected final DataBroker dataBroker;
+    protected final DOMMountPointService mountPointService;
 
     protected SchemaSourceRegistry schemaRegistry = DEFAULT_SCHEMA_REPOSITORY;
     protected SchemaRepository schemaRepository = DEFAULT_SCHEMA_REPOSITORY;
     protected SchemaContextFactory schemaContextFactory = DEFAULT_SCHEMA_CONTEXT_FACTORY;
 
-    protected DOMMountPointService mountPointService = null;
-    protected DataBroker dataBroker = null;
     protected final HashMap<NodeId, NetconfConnectorDTO> activeConnectors = new HashMap<>();
 
     protected AbstractNetconfTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                                       final BindingAwareBroker bindingAwareBroker, final Broker domBroker,
                                       final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
-                                      final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider) {
+                                      final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
+                                      final DataBroker dataBroker, final DOMMountPointService mountPointService) {
         this.topologyId = topologyId;
         this.clientDispatcher = clientDispatcher;
         this.bindingAwareBroker = bindingAwareBroker;
@@ -185,11 +182,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         this.keepaliveExecutor = keepaliveExecutor;
         this.processingExecutor = processingExecutor;
         this.sharedSchemaRepository = schemaRepositoryProvider.getSharedSchemaRepository();
-    }
-
-    protected void registerToSal(BindingAwareProvider baProvider, Provider provider) {
-        domBroker.registerProvider(provider);
-        bindingAwareBroker.registerProvider(baProvider);
+        this.dataBroker = dataBroker;
+        this.mountPointService = mountPointService;
     }
 
     public void setSchemaRegistry(final SchemaSourceRegistry schemaRegistry) {
@@ -199,9 +193,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     public void setSchemaContextFactory(final SchemaContextFactory schemaContextFactory) {
         this.schemaContextFactory = schemaContextFactory;
     }
-
-    @Override
-    public abstract void onSessionInitiated(ProviderContext session);
 
     @Override
     public ListenableFuture<NetconfDeviceCapabilities> connectNode(NodeId nodeId, Node configNode) {
@@ -437,16 +428,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     }
 
     protected abstract RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id, final Broker domBroker, final BindingAwareBroker bindingBroker);
-
-    @Override
-    public void onSessionInitiated(ProviderSession session) {
-         mountPointService = session.getService(DOMMountPointService.class);
-    }
-
-    @Override
-    public Collection<ProviderFunctionality> getProviderFunctionality() {
-        return Collections.emptySet();
-    }
 
     private InetSocketAddress getSocketAddress(final Host host, int port) {
         if(host.getDomainName() != null) {
