@@ -34,6 +34,24 @@
       "revId": "21460931d1a6f553b4fa8ec78b31f5faf65efb01",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_4d738c4d",
+        "filename": "netconf/mdsal-netconf-impl/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-impl.xml",
+        "patchSetId": 21
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-02T17:16:59Z",
+      "side": 1,
+      "message": "Yeah, you can",
+      "parentUuid": "3a65312a_ad886023",
+      "revId": "21460931d1a6f553b4fa8ec78b31f5faf65efb01",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
