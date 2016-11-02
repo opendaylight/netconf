@@ -34,7 +34,6 @@
     <features.file>features.xml</features.file>
     <config.configfile.directory>etc/opendaylight/karaf</config.configfile.directory>
     <config.netconf.client.configfile>01-netconf.xml</config.netconf.client.configfile>
-    <config.netconf.topology.configfile>02-netconf-topology.xml</config.netconf.topology.configfile>
     <config.netconf.connector.configfile>99-netconf-connector.xml</config.netconf.connector.configfile>
   </properties>
 
@@ -100,8 +99,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-topology-config</artifactId>
-      <classifier>config</classifier>
-      <type>xml</type>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
