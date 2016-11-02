@@ -37,12 +37,13 @@ import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
-import org.opendaylight.netconf.topology.SchemaRepositoryProvider;
+import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -90,6 +91,11 @@ public class NetconfTopologyImplTest {
     @Mock
     private SchemaRepositoryProvider mockedSchemaRepositoryProvider;
 
+    @Mock
+    private DataBroker dataBroker;
+
+    @Mock
+    private DOMMountPointService domMountPointService;
 
     private TestingNetconfTopologyImpl topology;
     private TestingNetconfTopologyImpl spyTopology;
@@ -104,21 +110,19 @@ public class NetconfTopologyImplTest {
         when(mockedClientDispatcher.createReconnectingClient(any(NetconfReconnectingClientConfiguration.class))).thenReturn(future);
 
         topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedBindingAwareBroker,
-                mockedDataBroker, mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, mockedSchemaRepositoryProvider);
+                mockedDataBroker, mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, mockedSchemaRepositoryProvider,
+                dataBroker, domMountPointService);
 
         spyTopology = spy(topology);
     }
 
     @Test
-    public void testOnSessionInitiated() {
-        BindingAwareBroker.ProviderContext session = mock(BindingAwareBroker.ProviderContext.class);
-        DataBroker dataBroker = mock(DataBroker.class);
-        when(session.getSALService(DataBroker.class)).thenReturn(dataBroker);
+    public void testInit() {
         WriteTransaction wtx = mock(WriteTransaction.class);
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(wtx);
         doNothing().when(wtx).merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
         when(wtx.submit()).thenReturn(Futures.<Void, TransactionCommitFailedException>immediateCheckedFuture(null));
-        topology.onSessionInitiated(session);
+        topology.init();
 
         //verify initialization of topology
         final InstanceIdentifier<NetworkTopology> networkTopologyId = InstanceIdentifier.builder(NetworkTopology.class).build();
@@ -185,8 +189,13 @@ public class NetconfTopologyImplTest {
 
     public static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
 
-        public TestingNetconfTopologyImpl(String topologyId, NetconfClientDispatcher clientDispatcher, BindingAwareBroker bindingAwareBroker, Broker domBroker, EventExecutor eventExecutor, ScheduledThreadPool keepaliveExecutor, ThreadPool processingExecutor, SchemaRepositoryProvider schemaRepositoryProvider) {
-            super(topologyId, clientDispatcher, bindingAwareBroker, domBroker, eventExecutor, keepaliveExecutor, processingExecutor, schemaRepositoryProvider);
+        public TestingNetconfTopologyImpl(String topologyId, NetconfClientDispatcher clientDispatcher,
+                                          BindingAwareBroker bindingAwareBroker, Broker domBroker,
+                                          EventExecutor eventExecutor, ScheduledThreadPool keepaliveExecutor,
+                                          ThreadPool processingExecutor, SchemaRepositoryProvider schemaRepositoryProvider,
+                                          DataBroker dataBroker, DOMMountPointService domMountPointService) {
+            super(topologyId, clientDispatcher, bindingAwareBroker, domBroker, eventExecutor, keepaliveExecutor,
+                    processingExecutor, schemaRepositoryProvider, dataBroker, domMountPointService);
         }
 
         @Override
