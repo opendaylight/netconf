@@ -22,8 +22,8 @@ import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker.ProviderContext;
 import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
@@ -31,7 +31,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPrefe
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.AbstractNetconfTopology;
-import org.opendaylight.netconf.topology.SchemaRepositoryProvider;
+import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -48,16 +48,16 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyImpl.class);
 
-        private ListenerRegistration<NetconfTopologyImpl> datastoreListenerRegistration = null;
+    private ListenerRegistration<NetconfTopologyImpl> datastoreListenerRegistration = null;
 
     public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                                final BindingAwareBroker bindingAwareBroker, final Broker domBroker,
                                final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
-                               final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider) {
+                               final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
+                               final DataBroker dataBroker, final DOMMountPointService mountPointService) {
         super(topologyId, clientDispatcher,
                 bindingAwareBroker, domBroker, eventExecutor,
-                keepaliveExecutor, processingExecutor, schemaRepositoryProvider);
-        registerToSal(this, this);
+                keepaliveExecutor, processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService);
     }
 
     @Override
@@ -79,10 +79,10 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
         return new NetconfDeviceSalFacade(id, domBroker, bindingAwareBroker);
     }
 
-    @Override
-    public void onSessionInitiated(ProviderContext session) {
-        dataBroker = session.getSALService(DataBroker.class);
-
+    /**
+     * Invoke by blueprint
+     */
+    public void init() {
         final WriteTransaction wtx = dataBroker.newWriteOnlyTransaction();
         initTopology(wtx, LogicalDatastoreType.CONFIGURATION);
         initTopology(wtx, LogicalDatastoreType.OPERATIONAL);
