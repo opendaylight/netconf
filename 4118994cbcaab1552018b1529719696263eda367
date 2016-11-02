@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_6dfc883f",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfOperationRouterImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-02T18:36:46Z",
+      "side": 0,
+      "message": "You have also deleted unused code, so you should also mention this in commit message..",
+      "revId": "4118994cbcaab1552018b1529719696263eda367",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
