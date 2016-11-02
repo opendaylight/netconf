@@ -46,6 +46,30 @@
       "revId": "8cad33ad313d43405c8252320cab67cb23c17c1f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_db47551c",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigUtil.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-11-02T12:52:56Z",
+      "side": 1,
+      "message": "I do not see any reason to create next follow-up patch. In my opinion, it should be part of this cleanup as it is related to this cleanup.",
+      "parentUuid": "3a65312a_402fd4a1",
+      "range": {
+        "startLine": 32,
+        "startChar": 27,
+        "endLine": 32,
+        "endChar": 45
+      },
+      "revId": "8cad33ad313d43405c8252320cab67cb23c17c1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
