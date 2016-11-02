@@ -70,6 +70,30 @@
       "revId": "8cad33ad313d43405c8252320cab67cb23c17c1f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_5bd86553",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigUtil.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-02T13:12:12Z",
+      "side": 1,
+      "message": "Fair enough, done.",
+      "parentUuid": "3a65312a_db47551c",
+      "range": {
+        "startLine": 32,
+        "startChar": 27,
+        "endLine": 32,
+        "endChar": 45
+      },
+      "revId": "8cad33ad313d43405c8252320cab67cb23c17c1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
