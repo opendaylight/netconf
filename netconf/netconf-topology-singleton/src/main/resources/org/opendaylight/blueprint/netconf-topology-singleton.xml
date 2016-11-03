@@ -31,7 +31,8 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
                interface="io.netty.util.concurrent.EventExecutor"
                odl:type="global-event-executor"/>
     <reference id="clientDispatcherDependency"
-               interface="org.opendaylight.netconf.client.NetconfClientDispatcher"/>
+               interface="org.opendaylight.netconf.client.NetconfClientDispatcher"
+               odl:type="netconf-client-dispatcher"/>
 
     <bean id="netconfTopologyManager"
           class="org.opendaylight.netconf.topology.singleton.impl.NetconfTopologyManager"
