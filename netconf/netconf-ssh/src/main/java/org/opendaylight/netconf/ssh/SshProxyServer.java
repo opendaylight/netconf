@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableList;
 import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
 import java.nio.channels.AsynchronousChannelGroup;
+import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.apache.sshd.common.util.CloseableUtils;
 import org.apache.sshd.server.PasswordAuthenticator;
 import org.apache.sshd.server.ServerFactoryManager;
 import org.apache.sshd.server.session.ServerSession;
+import org.opendaylight.netconf.ssh.osgi.NetconfSSHActivator;
 
 /**
  * Proxy SSH server that just delegates decrypted content to a delegate server within same VM.
@@ -72,12 +74,16 @@ public class SshProxyServer implements AutoCloseable {
                 i.remove();
             }
         }
+
         sshServer.setPasswordAuthenticator(new PasswordAuthenticator() {
             @Override
             public boolean authenticate(final String username, final String password, final ServerSession session) {
                 return sshProxyServerConfiguration.getAuthenticator().authenticated(username, password);
             }
         });
+
+        sshServer.setPublickeyAuthenticator((user, publicKey, serverSession) ->
+                serverSession.getKex().getServerKey().equals(publicKey));
 
         sshServer.setKeyPairProvider(sshProxyServerConfiguration.getKeyPairProvider());
 

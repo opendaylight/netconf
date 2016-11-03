@@ -58,6 +58,8 @@ public class SSHServerTest {
     private final EventLoopGroup clientGroup = new NioEventLoopGroup();
     private final ScheduledExecutorService minaTimerEx = Executors.newScheduledThreadPool(1);
 
+    private PEMGeneratorHostKeyProvider pemGeneratorHostKeyProvider;
+
     @Before
     public void setUp() throws Exception {
         sshKeyPair = Files.createTempFile("sshKeyPair", ".pem").toFile();
@@ -72,13 +74,14 @@ public class SSHServerTest {
 
         final InetSocketAddress addr = InetSocketAddress.createUnresolved(HOST, PORT);
         server = new SshProxyServer(minaTimerEx, clientGroup, nioExec);
+        pemGeneratorHostKeyProvider = new PEMGeneratorHostKeyProvider(sshKeyPair.toPath().toAbsolutePath().toString());
         server.bind(
                 new SshProxyServerConfigurationBuilder().setBindingAddress(addr).setLocalAddress(NetconfConfigUtil.getNetconfLocalAddress()).setAuthenticator(new AuthProvider() {
                     @Override
                     public boolean authenticated(final String username, final String password) {
                         return true;
                     }
-                }).setKeyPairProvider(new PEMGeneratorHostKeyProvider(sshKeyPair.toPath().toAbsolutePath().toString())).setIdleTimeout(Integer.MAX_VALUE).createSshProxyServerConfiguration());
+                }).setKeyPairProvider(pemGeneratorHostKeyProvider).setIdleTimeout(Integer.MAX_VALUE).createSshProxyServerConfiguration());
         LOG.info("SSH server started on {}", PORT);
     }
 
@@ -89,12 +92,34 @@ public class SSHServerTest {
         try {
             final ConnectFuture connect = sshClient.connect(USER, HOST, PORT);
             connect.await(30, TimeUnit.SECONDS);
-            org.junit.Assert.assertTrue(connect.isConnected());
+            org.junit.Assert.assertTrue("Connected", connect.isConnected());
             final ClientSession session = connect.getSession();
             session.addPasswordIdentity(PASSWORD);
             final AuthFuture auth = session.auth();
             auth.await(30, TimeUnit.SECONDS);
-            org.junit.Assert.assertTrue(auth.isSuccess());
+            org.junit.Assert.assertTrue("Success", auth.isSuccess());
+        } finally {
+            sshClient.close(true);
+            server.close();
+            clientGroup.shutdownGracefully().await();
+            minaTimerEx.shutdownNow();
+            nioExec.shutdownNow();
+        }
+    }
+
+    @Test
+    public void connectWithPublicAuth() throws Exception {
+        final SshClient sshClient = SshClient.setUpDefaultClient();
+        sshClient.start();
+        try {
+            final ConnectFuture connect = sshClient.connect(USER, HOST, PORT);
+            connect.await(30, TimeUnit.SECONDS);
+            org.junit.Assert.assertTrue("Connected", connect.isConnected());
+            final ClientSession session = connect.getSession();
+            session.addPublicKeyIdentity(pemGeneratorHostKeyProvider.loadKeys().iterator().next());
+            final AuthFuture auth = session.auth();
+            auth.await(30, TimeUnit.SECONDS);
+            org.junit.Assert.assertTrue("Success", auth.isSuccess());
         } finally {
             sshClient.close(true);
             server.close();
