@@ -42,6 +42,13 @@ public class NetconfConfiguration implements ManagedService {
     private static final InetSocketAddress DEFAULT_TCP_SERVER_ADRESS = new InetSocketAddress(LOCAL_HOST, 8383);
     private static final InetSocketAddress DEFAULT_SSH_SERVER_ADRESS = new InetSocketAddress(INADDR_ANY, 1830);
 
+    public static final String KEY_SSH_ADDRESS = "ssh-address";
+    public static final String KEY_SSH_PORT = "ssh-port";
+    public static final String KEY_TCP_ADDRESS = "tcp-address";
+    public static final String KEY_TCP_PORT = "tcp-port";
+    public static final String KEY_SSH_PK_PATH = "ssh-pk-path";
+    public static final String KEY_SSH_AUTHORIZED_KEYS = "ssh-authorized-keys";
+
     /**
      * Singleton instance of this class, registered as a service in the OSGi registry.
      */
@@ -55,7 +62,7 @@ public class NetconfConfiguration implements ManagedService {
 
     private NetconfConfiguration() {
         netconfConfiguration = new NetconfConfigurationHolder(DEFAULT_TCP_SERVER_ADRESS,
-                DEFAULT_SSH_SERVER_ADRESS, DEFAULT_PRIVATE_KEY_PATH);
+                DEFAULT_SSH_SERVER_ADRESS, DEFAULT_PRIVATE_KEY_PATH, "");
     }
 
     @Override
@@ -69,9 +76,9 @@ public class NetconfConfiguration implements ManagedService {
         final InetSocketAddress tcpServerAddress = new InetSocketAddress((String) dictionaryConfig.get(TCP_ADDRESS_PROP),
                 Integer.parseInt((String) dictionaryConfig.get(TCP_PORT_PROP)));
 
-        netconfConfiguration = new NetconfConfigurationHolder(tcpServerAddress,
-                sshServerAddress,
-                (String) dictionaryConfig.get(SSH_PK_PATH_PROP));
+        final String authorizedKeysPath = (String) dictionaryConfig.get(KEY_SSH_AUTHORIZED_KEYS);
+        netconfConfiguration = new NetconfConfigurationHolder(tcpServerAddress, sshServerAddress,
+                (String) dictionaryConfig.get(KEY_SSH_PK_PATH), authorizedKeysPath);
 
         LOG.debug("CSS netconf server configuration was updated: {}", dictionaryConfig.toString());
     }
@@ -86,5 +93,9 @@ public class NetconfConfiguration implements ManagedService {
 
     public String getPrivateKeyPath() {
         return netconfConfiguration.getPrivateKeyPath();
+    }
+
+    public String getAuthorizedKeysPath() {
+        return netconfConfiguration.getAuthorizedKeysPath();
     }
 }

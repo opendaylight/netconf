@@ -15,6 +15,7 @@ final class NetconfConfigurationHolder {
     private final InetSocketAddress tcpServerAddress;
     private final InetSocketAddress sshServerAddress;
     private final String privateKeyPath;
+    private final String authorizedKeysPath;
 
     NetconfConfigurationHolder(final InetSocketAddress tcpServerAddress,
                                final InetSocketAddress sshServerAddress,
@@ -22,6 +23,15 @@ final class NetconfConfigurationHolder {
         this.tcpServerAddress = tcpServerAddress;
         this.sshServerAddress = sshServerAddress;
         this.privateKeyPath = privateKeyPath;
+        this.authorizedKeysPath = null;
+    }
+
+    NetconfConfigurationHolder(final InetSocketAddress tcpServerAddress, final InetSocketAddress sshServerAddress,
+                               final String privateKeyPath, final String authorizedKeysPath){
+        this.tcpServerAddress = tcpServerAddress;
+        this.sshServerAddress = sshServerAddress;
+        this.privateKeyPath = privateKeyPath;
+        this.authorizedKeysPath = authorizedKeysPath;
     }
 
     String getPrivateKeyPath() {
@@ -34,5 +44,9 @@ final class NetconfConfigurationHolder {
 
     InetSocketAddress getTcpServerAddress() {
         return tcpServerAddress;
+    }
+
+    String getAuthorizedKeysPath() {
+        return authorizedKeysPath;
     }
 }
