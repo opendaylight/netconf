@@ -27,6 +27,7 @@ module odl-sal-netconf-connector-cfg {
     identity sal-netconf-connector {
         base config:module-type;
         config:java-name-prefix NetconfConnector;
+        status deprecated;
     }
 
     grouping server {
@@ -40,6 +41,7 @@ module odl-sal-netconf-connector-cfg {
     }
 
     augment "/config:modules/config:module/config:configuration" {
+        status deprecated;
         case sal-netconf-connector {
             when "/config:modules/config:module/config:type = 'sal-netconf-connector'";
 
