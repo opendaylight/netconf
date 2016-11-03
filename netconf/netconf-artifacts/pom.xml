@@ -75,8 +75,6 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-connector-config</artifactId>
                 <version>${project.version}</version>
-                <type>xml</type>
-                <classifier>config</classifier>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
