@@ -227,12 +227,6 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-connector-config</artifactId>
-      <type>xml</type>
-      <classifier>config</classifier>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>netconf-monitoring</artifactId>
     </dependency>
     <dependency>

@@ -48,4 +48,8 @@
         <argument ref="domMountPointService"/>
     </bean>
 
+    <bean id="netconfConnectorFactory" class="org.opendaylight.netconf.topology.impl.NetconfConnectorFactoryImpl"/>
+    <service ref="netconfConnectorFactory" interface="org.opendaylight.netconf.topology.api.NetconfConnectorFactory"
+             odl:type="default"/>
+
 </blueprint>
