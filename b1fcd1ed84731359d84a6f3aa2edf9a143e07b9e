@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_23773fd6",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-03T11:55:49Z",
+      "side": 1,
+      "message": "No need for fully qualified name..",
+      "revId": "b1fcd1ed84731359d84a6f3aa2edf9a143e07b9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_c372cbe4",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-03T11:55:49Z",
+      "side": 1,
+      "message": "No need for fully qualified name here",
+      "revId": "b1fcd1ed84731359d84a6f3aa2edf9a143e07b9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_23029f3e",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-03T11:55:49Z",
+      "side": 1,
+      "message": "Why do you somewhere have blank line after comment and somewhere don\u0027t?",
+      "revId": "b1fcd1ed84731359d84a6f3aa2edf9a143e07b9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_6381378f",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-03T11:55:49Z",
+      "side": 1,
+      "message": "This should be also configurable.. At least it was configurable before.\n\nBut if we want to return just constant value, why do we need to wrap it in getter?",
+      "revId": "b1fcd1ed84731359d84a6f3aa2edf9a143e07b9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_0374c3cd",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-03T11:55:49Z",
+      "side": 1,
+      "message": "Cannot we use directly NETCONF_LOCAL_ADRESS?",
+      "revId": "b1fcd1ed84731359d84a6f3aa2edf9a143e07b9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
