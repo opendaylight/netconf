@@ -16,6 +16,24 @@
       "revId": "4bf7a338e4ba6f713a39bcc2a9492a19c9e0fc94",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_c69e5956",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/rpc/InvokeRpcMessage.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-11-03T13:54:15Z",
+      "side": 1,
+      "message": "No, both of the fields are serialized like Externalizable. \nIf this fields are serialized with Externalizable why it is inefficient? I only reuse things. This is exactly what is done in Externalizable Pattern in way: public class is serialializable, inner class is externalizable.",
+      "parentUuid": "3a65312a_e66ef5c8",
+      "revId": "4bf7a338e4ba6f713a39bcc2a9492a19c9e0fc94",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
