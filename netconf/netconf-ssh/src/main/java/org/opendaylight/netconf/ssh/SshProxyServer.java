@@ -79,6 +79,9 @@ public class SshProxyServer implements AutoCloseable {
             }
         });
 
+        sshServer.setPublickeyAuthenticator((user, publicKey, serverSession) ->
+                sshProxyServerConfiguration.getPublicKeyAuthenticator().authenticate(user, publicKey, serverSession));
+
         sshServer.setKeyPairProvider(sshProxyServerConfiguration.getKeyPairProvider());
 
         sshServer.setIoServiceFactoryFactory(nioServiceWithPoolFactoryFactory);
