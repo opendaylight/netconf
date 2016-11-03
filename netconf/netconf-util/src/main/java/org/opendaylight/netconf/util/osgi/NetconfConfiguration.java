@@ -28,6 +28,7 @@ public class NetconfConfiguration implements ManagedService {
     private static final String TCP_ADDRESS_PROP = "tcp-address";
     private static final String TCP_PORT_PROP = "tcp-port";
     private static final String SSH_PK_PATH_PROP = "ssh-pk-path";
+    private static final String SSH_AUTHORIZED_KEYS_PROP = "ssh-authorized-keys";
 
     /**
      * Default values used if no dictionary is provided.
@@ -55,7 +56,7 @@ public class NetconfConfiguration implements ManagedService {
 
     private NetconfConfiguration() {
         netconfConfiguration = new NetconfConfigurationHolder(DEFAULT_TCP_SERVER_ADRESS,
-                DEFAULT_SSH_SERVER_ADRESS, DEFAULT_PRIVATE_KEY_PATH);
+                DEFAULT_SSH_SERVER_ADRESS, DEFAULT_PRIVATE_KEY_PATH, "");
     }
 
     @Override
@@ -69,9 +70,9 @@ public class NetconfConfiguration implements ManagedService {
         final InetSocketAddress tcpServerAddress = new InetSocketAddress((String) dictionaryConfig.get(TCP_ADDRESS_PROP),
                 Integer.parseInt((String) dictionaryConfig.get(TCP_PORT_PROP)));
 
-        netconfConfiguration = new NetconfConfigurationHolder(tcpServerAddress,
-                sshServerAddress,
-                (String) dictionaryConfig.get(SSH_PK_PATH_PROP));
+        final String authorizedKeysPath = (String) dictionaryConfig.get(SSH_AUTHORIZED_KEYS_PROP);
+        netconfConfiguration = new NetconfConfigurationHolder(tcpServerAddress, sshServerAddress,
+                (String) dictionaryConfig.get(SSH_PK_PATH_PROP), authorizedKeysPath);
 
         LOG.debug("CSS netconf server configuration was updated: {}", dictionaryConfig.toString());
     }
@@ -86,5 +87,9 @@ public class NetconfConfiguration implements ManagedService {
 
     public String getPrivateKeyPath() {
         return netconfConfiguration.getPrivateKeyPath();
+    }
+
+    public String getAuthorizedKeysPath() {
+        return netconfConfiguration.getAuthorizedKeysPath();
     }
 }

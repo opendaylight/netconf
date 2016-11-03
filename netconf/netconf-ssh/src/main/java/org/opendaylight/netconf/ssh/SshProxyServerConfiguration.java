@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import io.netty.channel.local.LocalAddress;
 import java.net.InetSocketAddress;
 import org.apache.sshd.common.KeyPairProvider;
+import org.apache.sshd.server.PublickeyAuthenticator;
 import org.opendaylight.netconf.auth.AuthProvider;
 
 public final class SshProxyServerConfiguration {
@@ -20,8 +21,10 @@ public final class SshProxyServerConfiguration {
     private final AuthProvider authenticator;
     private final KeyPairProvider keyPairProvider;
     private final int idleTimeout;
+    private PublickeyAuthenticator publicKeyAuthenticator;
 
-    SshProxyServerConfiguration(final InetSocketAddress bindingAddress, final LocalAddress localAddress, final AuthProvider authenticator, final KeyPairProvider keyPairProvider, final int idleTimeout) {
+    SshProxyServerConfiguration(final InetSocketAddress bindingAddress, final LocalAddress localAddress, final AuthProvider authenticator, final KeyPairProvider keyPairProvider, final int idleTimeout,
+                                final PublickeyAuthenticator publicKeyAuthenticator) {
         this.bindingAddress = Preconditions.checkNotNull(bindingAddress);
         this.localAddress = Preconditions.checkNotNull(localAddress);
         this.authenticator = Preconditions.checkNotNull(authenticator);
@@ -29,6 +32,7 @@ public final class SshProxyServerConfiguration {
         // Idle timeout cannot be disabled in the sshd by using =< 0 value
         Preconditions.checkArgument(idleTimeout > 0, "Idle timeout has to be > 0");
         this.idleTimeout = idleTimeout;
+        this.publicKeyAuthenticator = publicKeyAuthenticator;
     }
 
     public InetSocketAddress getBindingAddress() {
@@ -51,5 +55,7 @@ public final class SshProxyServerConfiguration {
         return idleTimeout;
     }
 
-
+    public PublickeyAuthenticator getPublicKeyAuthenticator() {
+        return publicKeyAuthenticator;
+    }
 }
