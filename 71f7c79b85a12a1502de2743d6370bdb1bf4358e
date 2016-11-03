@@ -91,6 +91,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_83bf33d0",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/rpc/InvokeRpcMessage.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-11-03T09:49:25Z",
+      "side": 1,
+      "message": "OK I changed it + little refactoring but I think the one good advantage is that we are able to serialize singletons with this pattern.",
+      "parentUuid": "3a65312a_2003b810",
+      "revId": "71f7c79b85a12a1502de2743d6370bdb1bf4358e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_cfc67e49",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/rpc/InvokeRpcMessageReply.java",
         "patchSetId": 12
