@@ -34,6 +34,24 @@
       "revId": "4bf7a338e4ba6f713a39bcc2a9492a19c9e0fc94",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_c649398d",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/rpc/InvokeRpcMessage.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2016-11-03T14:36:28Z",
+      "side": 1,
+      "message": "The inefficiency is with the Serializable class itself, not whether or not its field are  Externalizable. Normal java serialization serializes class information, including class hierarchy and field info. This makes it very flexible to handle changes to the class but also adds a lot of bloat. Externalizable was added to avoid this. However making the class directly implement Externalizable has disadvantages that I outlined earlier. The Externalizable proxy pattern alleviates those disadvantages with the added benefit of easier versioning and backwards/forwards compatibility if the class should change.",
+      "parentUuid": "3a65312a_c69e5956",
+      "revId": "4bf7a338e4ba6f713a39bcc2a9492a19c9e0fc94",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
