@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_c18803ea",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-03T16:27:21Z",
+      "side": 0,
+      "message": "This was not about useless parameter. This was more about concurrent collections. You don\u0027t need them here.",
+      "revId": "72418928523aeb198af69f9ccc8388ff903a66a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
