@@ -42,8 +42,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Instead of using loopback (controller-config mount point) to create your netconf-connector, you should use the network-topology capability.
+ * <p>
+ * Follow instructions provided in this <a href="https://wiki.opendaylight.org/view/OpenDaylight_Controller:Config:Examples:Netconf#Spawning_netconf_connectors_via_topology_configuration">wiki</a>.
+ * <p>
+ * Deprecation notice in Carbon, removal planned for Nitrogen.
  */
+@Deprecated
 public final class NetconfConnectorModule extends org.opendaylight.controller.config.yang.md.sal.connector.netconf.AbstractNetconfConnectorModule implements BindingAwareConsumer {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfConnectorModule.class);
 
