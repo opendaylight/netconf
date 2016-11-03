@@ -16,7 +16,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import org.apache.sshd.common.util.ThreadUtils;
+import org.apache.sshd.server.PublickeyAuthenticator;
 import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
+import org.opendaylight.netconf.ssh.NetconfPublickeyAuthenticator;
 import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
 import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
@@ -38,6 +40,7 @@ public class NetconfSSHActivator implements BundleActivator {
     private NioEventLoopGroup clientGroup;
     private ExecutorService nioExecutor;
     private AuthProviderTracker authProviderTracker;
+    private PublickeyAuthenticator publicAuthProviderTracker;
 
     private SshProxyServer server;
 
@@ -75,6 +78,7 @@ public class NetconfSSHActivator implements BundleActivator {
         if(minaTimerExecutor != null) {
             minaTimerExecutor.shutdownNow();
         }
+
     }
 
     private SshProxyServer startSSHServer(final BundleContext bundleContext) throws IOException {
@@ -86,7 +90,7 @@ public class NetconfSSHActivator implements BundleActivator {
 
         final LocalAddress localAddress = NetconfConfigUtil.getNetconfLocalAddress();
         authProviderTracker = new AuthProviderTracker(bundleContext);
-
+        publicAuthProviderTracker = new NetconfPublickeyAuthenticator(netconfConfiguration.getAuthorizedKeysPath());
         final String path = netconfConfiguration.getPrivateKeyPath();
         LOG.trace("Starting netconf SSH server with path to ssh private key {}", path);
 
@@ -98,6 +102,7 @@ public class NetconfSSHActivator implements BundleActivator {
                         .setAuthenticator(authProviderTracker)
                         .setKeyPairProvider(new PEMGeneratorHostKeyProvider(path, ALGORITHM, KEY_SIZE))
                         .setIdleTimeout(DEFAULT_IDLE_TIMEOUT)
+                        .setPublicKeyAuthenticator(publicAuthProviderTracker)
                         .createSshProxyServerConfiguration());
         return sshProxyServer;
     }
