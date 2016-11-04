@@ -214,6 +214,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_a16220d6",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-04T16:43:16Z",
+      "side": 1,
+      "message": "\u003e How do you know if it was never used?\n\nBased on the history of the custom.properties file, I can tell it wasn\u0027t used, at least upstream.\n\nYou\u0027re right, maybe downstream consumer used/are using it. That I really don\u0027t know. But since it wasn\u0027t configurable for the last month and nobody complained, I figured downstream consumer aren\u0027t using it.\n\nTo be honest, I\u0027m fine having that configuration, as long it\u0027s proven to be used. Else I think it\u0027s just noise in the code.",
+      "parentUuid": "3a65312a_c1791c95",
+      "revId": "b1fcd1ed84731359d84a6f3aa2edf9a143e07b9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_0374c3cd",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
         "patchSetId": 5
