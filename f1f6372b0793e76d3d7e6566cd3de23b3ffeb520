@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_0182f44e",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/NetconfPublickeyAuthenticator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2016-11-04T16:54:10Z",
+      "side": 1,
+      "message": "trailing space",
+      "range": {
+        "startLine": 17,
+        "startChar": 31,
+        "endLine": 17,
+        "endChar": 32
+      },
+      "revId": "f1f6372b0793e76d3d7e6566cd3de23b3ffeb520",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
