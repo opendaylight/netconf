@@ -124,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_bb17efa2",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-04T12:36:41Z",
+      "side": 1,
+      "message": "Actually it\u0027s patch set 1 where this was configurable.",
+      "parentUuid": "3a65312a_1b36e352",
+      "revId": "b1fcd1ed84731359d84a6f3aa2edf9a143e07b9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_0374c3cd",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
         "patchSetId": 5
