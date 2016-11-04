@@ -52,6 +52,7 @@ public class ApiDocGeneratorTest {
     @Before
     public void setUp() throws Exception {
         this.generator = new ApiDocGenerator();
+        generator.setDraft(false);
         this.helper = new DocGenTestHelper();
         this.helper.setUp();
 
@@ -88,21 +89,21 @@ public class ApiDocGeneratorTest {
      */
     private void validateSwaggerApisForPost(final ApiDeclaration doc) {
         // two POST URI with concrete schema name in summary
-        final Api lstApi = findApi("/config/toaster2:lst/", doc);
-        assertNotNull("Api /config/toaster2:lst/ wasn't found", lstApi);
+        final Api lstApi = findApi("/config/toaster2:lst", doc);
+        assertNotNull("Api /config/toaster2:lst wasn't found", lstApi);
         assertTrue("POST for cont1 in lst is missing",
                 findOperation(lstApi.getOperations(), "POST", "(config)lstPOST", "toaster2/lst(config)lst1-TOP",
                         "toaster2/lst(config)cont1-TOP"));
 
-        final Api cont1Api = findApi("/config/toaster2:lst/cont1/", doc);
-        assertNotNull("Api /config/toaster2:lst/cont1/ wasn't found", cont1Api);
+        final Api cont1Api = findApi("/config/toaster2:lst/cont1", doc);
+        assertNotNull("Api /config/toaster2:lst/cont1 wasn't found", cont1Api);
         assertTrue("POST for cont11 in cont1 is missing",
                 findOperation(cont1Api.getOperations(), "POST", "(config)cont1POST", "toaster2/lst/cont1(config)cont11-TOP",
                         "toaster2/lst/cont1(config)lst11-TOP"));
 
         // no POST URI
-        final Api cont11Api = findApi("/config/toaster2:lst/cont1/cont11/", doc);
-        assertNotNull("Api /config/toaster2:lst/cont1/cont11/ wasn't found", cont11Api);
+        final Api cont11Api = findApi("/config/toaster2:lst/cont1/cont11", doc);
+        assertNotNull("Api /config/toaster2:lst/cont1/cont11 wasn't found", cont11Api);
         assertTrue("POST operation shouldn't be present.", findOperations(cont11Api.getOperations(), "POST").isEmpty());
 
     }
@@ -284,10 +285,10 @@ public class ApiDocGeneratorTest {
      * @throws Exception
      */
     private void validateToaster(final ApiDeclaration doc) throws Exception {
-        final Set<String> expectedUrls = new TreeSet<>(Arrays.asList(new String[] { "/config/toaster2:toaster/",
-                "/operational/toaster2:toaster/", "/operations/toaster2:cancel-toast",
+        final Set<String> expectedUrls = new TreeSet<>(Arrays.asList(new String[]{"/config/toaster2:toaster",
+                "/operational/toaster2:toaster", "/operations/toaster2:cancel-toast",
                 "/operations/toaster2:make-toast", "/operations/toaster2:restock-toaster",
-                "/config/toaster2:toaster/toasterSlot/{slotId}/toaster-augmented:slotInfo/" }));
+                "/config/toaster2:toaster/toasterSlot/{slotId}/toaster-augmented:slotInfo"}));
 
         final Set<String> actualUrls = new TreeSet<>();
 

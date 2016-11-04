@@ -43,6 +43,10 @@ public class ApiDocGenerator extends BaseYangSwaggerGenerator {
         return INSTANCE;
     }
 
+    public void setDraft(final boolean newDraft) {
+        super.setDraft(newDraft);
+    }
+
     public void setSchemaService(final SchemaService schemaService) {
         this.schemaService = schemaService;
     }
