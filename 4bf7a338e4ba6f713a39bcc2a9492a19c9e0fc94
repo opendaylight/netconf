@@ -52,6 +52,24 @@
       "revId": "4bf7a338e4ba6f713a39bcc2a9492a19c9e0fc94",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_3ef62dd8",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/rpc/InvokeRpcMessage.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 6439
+      },
+      "writtenOn": "2016-11-04T13:59:27Z",
+      "side": 1,
+      "message": "Yes, it is substantial if fields are Externalizable or not. If serialization hit object which is externalizable, then it is serialized in externalizable way \u003d no bloat, no slow recursive strategy, which creates object tree etc what you mention. This approach in comparing with using Externalizable Pattern must be equally effective. \n\nFor example, on the other hand if writeExternal hit object which is serializable, then it is serialized with ineffective way and does not matter if we use externalizable. Both are related and we can combine it, what gives different efficiency.\n\nI do not want say that this pattern do not have benefits, I only want to mention that implement everywhere this pattern (e. g. externalizable externalizable) is also not good and add lot of unnecessary code.",
+      "parentUuid": "3a65312a_c649398d",
+      "revId": "4bf7a338e4ba6f713a39bcc2a9492a19c9e0fc94",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
