@@ -12,6 +12,7 @@ import io.netty.channel.local.LocalAddress;
 import java.net.InetSocketAddress;
 import java.util.Dictionary;
 import java.util.concurrent.TimeUnit;
+import org.opendaylight.netconf.util.osgi.NetconfConfigurationHolder.NetconfConfigurationHolderBuilder;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,14 +29,15 @@ public class NetconfConfiguration implements ManagedService {
     private static final String TCP_ADDRESS_PROP = "tcp-address";
     private static final String TCP_PORT_PROP = "tcp-port";
     private static final String SSH_PK_PATH_PROP = "ssh-pk-path";
+    private static final String CONNECTION_TIMEOUT_SECS_PROP = "connection-timeout-seconds";
 
     /**
      * Default values used if no dictionary is provided.
      */
 
     public static final LocalAddress NETCONF_LOCAL_ADDRESS = new LocalAddress("netconf");
-    public static final long DEFAULT_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(30);
 
+    private static final long DEFAULT_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(30);
     private static final String LOCAL_HOST = "127.0.0.1";
     private static final String INADDR_ANY = "0.0.0.0";
     private static final String DEFAULT_PRIVATE_KEY_PATH = "./configuration/RSA.pk";
@@ -54,8 +56,12 @@ public class NetconfConfiguration implements ManagedService {
     }
 
     private NetconfConfiguration() {
-        netconfConfiguration = new NetconfConfigurationHolder(DEFAULT_TCP_SERVER_ADRESS,
-                DEFAULT_SSH_SERVER_ADRESS, DEFAULT_PRIVATE_KEY_PATH);
+        netconfConfiguration = NetconfConfigurationHolderBuilder.create()
+                .setTcpServerAddress(DEFAULT_TCP_SERVER_ADRESS)
+                .setSshServerAddress(DEFAULT_SSH_SERVER_ADRESS)
+                .setPrivateKeyPath(DEFAULT_PRIVATE_KEY_PATH)
+                .setConnectionTimeoutMillis(DEFAULT_TIMEOUT_MILLIS)
+                .build();
     }
 
     @Override
@@ -68,10 +74,15 @@ public class NetconfConfiguration implements ManagedService {
                 Integer.parseInt((String) dictionaryConfig.get(SSH_PORT_PROP)));
         final InetSocketAddress tcpServerAddress = new InetSocketAddress((String) dictionaryConfig.get(TCP_ADDRESS_PROP),
                 Integer.parseInt((String) dictionaryConfig.get(TCP_PORT_PROP)));
+        final long connectionTimeoutMillis = Long
+                .parseLong((String) dictionaryConfig.get(CONNECTION_TIMEOUT_SECS_PROP));
 
-        netconfConfiguration = new NetconfConfigurationHolder(tcpServerAddress,
-                sshServerAddress,
-                (String) dictionaryConfig.get(SSH_PK_PATH_PROP));
+        netconfConfiguration =  NetconfConfigurationHolderBuilder.create()
+                .setTcpServerAddress(tcpServerAddress)
+                .setSshServerAddress(sshServerAddress)
+                .setPrivateKeyPath((String) dictionaryConfig.get(SSH_PK_PATH_PROP))
+                .setConnectionTimeoutMillis(TimeUnit.SECONDS.toMillis(connectionTimeoutMillis))
+                .build();
 
         LOG.debug("CSS netconf server configuration was updated: {}", dictionaryConfig.toString());
     }
@@ -86,5 +97,9 @@ public class NetconfConfiguration implements ManagedService {
 
     public String getPrivateKeyPath() {
         return netconfConfiguration.getPrivateKeyPath();
+    }
+
+    public long getConnectionTimeoutMillis() {
+        return netconfConfiguration.getConnectionTimeoutMillis();
     }
 }
