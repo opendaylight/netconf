@@ -12,6 +12,8 @@ import io.netty.channel.local.LocalAddress;
 import java.net.InetSocketAddress;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -29,15 +31,19 @@ public class NetconfConfigurationTest {
         final int newSshPort = 1234;
         final int newTcpPort = 4567;
         final String newSshKeyPath = "./new_folder/configuration/RSA.pk";
+        final String connectionTimeoutSeconds = "1";
         newValues.put("ssh-address", newSshIp);
         newValues.put("ssh-port", Integer.toString(newSshPort));
         newValues.put("tcp-address", newTcpIp);
         newValues.put("tcp-port", Integer.toString(newTcpPort));
         newValues.put("ssh-pk-path", newSshKeyPath);
+        newValues.put("connection-timeout-seconds", connectionTimeoutSeconds);
         config.updated(newValues);
         Assert.assertEquals(new InetSocketAddress(newSshIp, newSshPort), config.getSshServerAddress());
         Assert.assertEquals(new InetSocketAddress(newTcpIp, newTcpPort), config.getTcpServerAddress());
         Assert.assertEquals(newSshKeyPath, config.getPrivateKeyPath());
+        Assert.assertEquals(TimeUnit.SECONDS.toMillis(Long.parseLong(connectionTimeoutSeconds)),
+                config.getConnectionTimeoutMillis());
     }
 
     @Test
