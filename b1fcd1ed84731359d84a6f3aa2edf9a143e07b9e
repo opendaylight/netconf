@@ -196,6 +196,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_c1791c95",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-04T16:38:26Z",
+      "side": 1,
+      "message": "How do you know if it was never used? It was configurable and maybe some deployment used different than default connection timeout..\n\nAt least that\u0027s my point of view..",
+      "parentUuid": "3a65312a_8131e4ee",
+      "revId": "b1fcd1ed84731359d84a6f3aa2edf9a143e07b9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_0374c3cd",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
         "patchSetId": 5
