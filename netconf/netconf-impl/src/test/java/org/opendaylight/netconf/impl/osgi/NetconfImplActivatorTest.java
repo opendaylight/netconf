@@ -12,6 +12,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
@@ -20,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.netconf.util.osgi.NetconfConfiguration;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceListener;
@@ -43,13 +45,17 @@ public class NetconfImplActivatorTest {
         doReturn(filter).when(bundle).createFilter(anyString());
         doNothing().when(bundle).addServiceListener(any(ServiceListener.class), anyString());
 
-        ServiceReference<?>[] refs = {};
+        final ServiceReference managedServiceRef = mock(ServiceReference.class);
+        ServiceReference<?>[] refs = {managedServiceRef};
         doReturn(refs).when(bundle).getServiceReferences(anyString(), anyString());
         doReturn(Arrays.asList(refs)).when(bundle).getServiceReferences(any(Class.class), anyString());
         doReturn("").when(bundle).getProperty(anyString());
         doReturn(registration).when(bundle).registerService(any(Class.class), any(AggregatedNetconfOperationServiceFactory.class), any(Dictionary.class));
         doNothing().when(registration).unregister();
         doNothing().when(bundle).removeServiceListener(any(ServiceListener.class));
+
+        doReturn(NetconfConfiguration.getInstance()).when(bundle).getService(managedServiceRef);
+        doReturn("ManagedService").when(managedServiceRef).getProperty("name");
     }
 
     @Test
