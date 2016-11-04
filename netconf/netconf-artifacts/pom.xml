@@ -14,17 +14,17 @@
     <parent>
       <groupId>org.opendaylight.odlparent</groupId>
       <artifactId>odlparent-lite</artifactId>
-      <version>1.7.1-SNAPSHOT</version>
+      <version>1.7.2-SNAPSHOT</version>
       <relativePath/>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-artifacts</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
-        <mdsal.version>1.4.1-SNAPSHOT</mdsal.version>
+        <mdsal.version>1.4.2-SNAPSHOT</mdsal.version>
     </properties>
 
     <dependencyManagement>
