@@ -48,13 +48,16 @@ public class NetconfImplActivator implements BundleActivator {
     @Override
     public void start(final BundleContext context) {
         try {
+            final NetconfConfiguration netconfConfiguration = NetconfConfigUtil.getNetconfConfigurationService(context).
+                    orElseThrow(() -> new IllegalStateException("Configuration for Netconf not found."));
+
             AggregatedNetconfOperationServiceFactory factoriesListener = new AggregatedNetconfOperationServiceFactory();
             startOperationServiceFactoryTracker(context, factoriesListener);
 
             SessionIdProvider idProvider = new SessionIdProvider();
             timer = new HashedWheelTimer();
 
-            long connectionTimeoutMillis = NetconfConfiguration.DEFAULT_TIMEOUT_MILLIS;
+            long connectionTimeoutMillis = netconfConfiguration.getConnectionTimeoutMillis();
 
             final NetconfMonitoringServiceImpl monitoringService = startMonitoringService(context, factoriesListener);
 

@@ -15,13 +15,13 @@ final class NetconfConfigurationHolder {
     private final InetSocketAddress tcpServerAddress;
     private final InetSocketAddress sshServerAddress;
     private final String privateKeyPath;
+    private long connectionTimeoutMillis;
 
-    NetconfConfigurationHolder(final InetSocketAddress tcpServerAddress,
-                               final InetSocketAddress sshServerAddress,
-                               final String privateKeyPath) {
-        this.tcpServerAddress = tcpServerAddress;
-        this.sshServerAddress = sshServerAddress;
-        this.privateKeyPath = privateKeyPath;
+    NetconfConfigurationHolder(final NetconfConfigurationHolderBuilder builder) {
+        this.tcpServerAddress = builder.getTcpServerAddress();
+        this.sshServerAddress = builder.getSshServerAddress();
+        this.privateKeyPath = builder.getPrivateKeyPath();
+        this.connectionTimeoutMillis = builder.getConnectionTimeoutMillis();
     }
 
     String getPrivateKeyPath() {
@@ -34,5 +34,64 @@ final class NetconfConfigurationHolder {
 
     InetSocketAddress getTcpServerAddress() {
         return tcpServerAddress;
+    }
+
+    long getConnectionTimeoutMillis() {
+        return connectionTimeoutMillis;
+    }
+
+    public static class NetconfConfigurationHolderBuilder {
+
+        private InetSocketAddress tcpServerAddress;
+        private InetSocketAddress sshServerAddress;
+        private String privateKeyPath;
+        private long connectionTimeoutMillis;
+
+        private NetconfConfigurationHolderBuilder() {
+        }
+
+        public NetconfConfigurationHolder build() {
+            return new NetconfConfigurationHolder(this);
+        }
+
+        private String getPrivateKeyPath() {
+            return privateKeyPath;
+        }
+
+        private InetSocketAddress getSshServerAddress() {
+            return sshServerAddress;
+        }
+
+        private InetSocketAddress getTcpServerAddress() {
+            return tcpServerAddress;
+        }
+
+        private long getConnectionTimeoutMillis() {
+            return connectionTimeoutMillis;
+        }
+
+        public NetconfConfigurationHolderBuilder setConnectionTimeoutMillis(long connectionTimeoutMillis) {
+            this.connectionTimeoutMillis = connectionTimeoutMillis;
+            return this;
+        }
+
+        NetconfConfigurationHolderBuilder setPrivateKeyPath(String privateKeyPath) {
+            this.privateKeyPath = privateKeyPath;
+            return this;
+        }
+
+        NetconfConfigurationHolderBuilder setSshServerAddress(InetSocketAddress sshServerAddress) {
+            this.sshServerAddress = sshServerAddress;
+            return this;
+        }
+
+        NetconfConfigurationHolderBuilder setTcpServerAddress(InetSocketAddress tcpServerAddress) {
+            this.tcpServerAddress = tcpServerAddress;
+            return this;
+        }
+
+        static NetconfConfigurationHolderBuilder create() {
+            return new NetconfConfigurationHolderBuilder();
+        }
     }
 }
