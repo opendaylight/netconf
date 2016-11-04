@@ -178,6 +178,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_8131e4ee",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-04T16:32:55Z",
+      "side": 1,
+      "message": "\u003e It was configurable in old way, \n\nI know, what I\u0027m saying is it was *never* used.\n\nThat configuration was introduced in this patch under the property: netconf.connectionTimeoutMillis\n\nhttps://git.opendaylight.org/gerrit/#/c/6176/4/opendaylight/netconf/netconf-util/src/main/java/org/opendaylight/controller/netconf/util/osgi/NetconfConfigUtil.java@40\n\nBut at no point (at least that I could find), this property was present in custom.properties file. Hence it lead me to think that configuration was useless, as the default value was always picked up.\n\nSo I don\u0027t see any value in providing configuration for that property, because it\u0027s unused.",
+      "parentUuid": "3a65312a_3e5bcd55",
+      "revId": "b1fcd1ed84731359d84a6f3aa2edf9a143e07b9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_0374c3cd",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
         "patchSetId": 5
