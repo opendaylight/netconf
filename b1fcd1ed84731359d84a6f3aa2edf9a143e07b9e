@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_fb1167ad",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-04T12:38:10Z",
+      "side": 1,
+      "message": "I left a blank space because those comments applies to all the fields behind it, not to only one field.\n\nWhen the comment is tied to a given field, I put it right on top of it with no blank space. \n\nHope this is fine",
+      "parentUuid": "3a65312a_23029f3e",
+      "revId": "b1fcd1ed84731359d84a6f3aa2edf9a143e07b9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_6381378f",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
         "patchSetId": 5
