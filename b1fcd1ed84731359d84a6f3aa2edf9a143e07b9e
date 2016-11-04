@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_3b3c7f2f",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-04T12:35:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_23773fd6",
+      "revId": "b1fcd1ed84731359d84a6f3aa2edf9a143e07b9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_c372cbe4",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigUtil.java",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2016-11-03T11:55:49Z",
       "side": 1,
       "message": "No need for fully qualified name here",
+      "revId": "b1fcd1ed84731359d84a6f3aa2edf9a143e07b9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_9b4953d3",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-04T12:35:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_c372cbe4",
       "revId": "b1fcd1ed84731359d84a6f3aa2edf9a143e07b9e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -70,6 +106,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_1b36e352",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-04T12:35:17Z",
+      "side": 1,
+      "message": "\u003e  At least it was configurable before.\n\nI look over in the past and couldn\u0027t find any occurrence where this configuration was used. Checkout patch set 3, I made it configurable there but then reverted those changes as nobody configures it, always picking up the default value.\n\n\u003e why do we need to wrap it in getter?\n\nGood point, I can get rid of the getter",
+      "parentUuid": "3a65312a_6381378f",
+      "revId": "b1fcd1ed84731359d84a6f3aa2edf9a143e07b9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_0374c3cd",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
         "patchSetId": 5
@@ -81,6 +135,24 @@
       "writtenOn": "2016-11-03T11:55:49Z",
       "side": 1,
       "message": "Cannot we use directly NETCONF_LOCAL_ADRESS?",
+      "revId": "b1fcd1ed84731359d84a6f3aa2edf9a143e07b9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_5b3fbb25",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-04T12:35:17Z",
+      "side": 1,
+      "message": "Good point, I can get rid of the getter",
+      "parentUuid": "3a65312a_0374c3cd",
       "revId": "b1fcd1ed84731359d84a6f3aa2edf9a143e07b9e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
