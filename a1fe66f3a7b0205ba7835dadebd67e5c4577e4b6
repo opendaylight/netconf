@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_a24fbb91",
+        "filename": "netconf/netconf-topology-config/src/main/resources/org/opendaylight/blueprint/netconf-topology.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-07T13:43:24Z",
+      "side": 1,
+      "message": "Why do we keep blueprint in separate module?\n\nOther bundles contain their own blueprints, at least if it\u0027s possible.",
+      "revId": "a1fe66f3a7b0205ba7835dadebd67e5c4577e4b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_e249b38c",
+        "filename": "netconf/netconf-topology-config/src/main/resources/org/opendaylight/blueprint/netconf-topology.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-07T13:43:24Z",
+      "side": 1,
+      "message": "It\u0027s just id but why networkTopology and not netconfTopology?",
+      "revId": "a1fe66f3a7b0205ba7835dadebd67e5c4577e4b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_551adf6e",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-07T13:43:24Z",
+      "side": 1,
+      "message": "Do we have to implement also BindingAwareProvider and Provider interfaces?",
+      "revId": "a1fe66f3a7b0205ba7835dadebd67e5c4577e4b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
