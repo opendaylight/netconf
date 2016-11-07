@@ -140,6 +140,24 @@
       "revId": "a1fe66f3a7b0205ba7835dadebd67e5c4577e4b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_7549dbcf",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-07T15:19:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_b50533c4",
+      "revId": "a1fe66f3a7b0205ba7835dadebd67e5c4577e4b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
