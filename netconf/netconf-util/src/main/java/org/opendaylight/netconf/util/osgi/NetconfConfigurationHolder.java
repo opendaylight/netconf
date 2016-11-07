@@ -16,7 +16,9 @@ final class NetconfConfigurationHolder {
     private final InetSocketAddress sshServerAddress;
     private final String privateKeyPath;
 
-    NetconfConfigurationHolder(InetSocketAddress tcpServerAddress, InetSocketAddress sshServerAddress, String privateKeyPath){
+    NetconfConfigurationHolder(final InetSocketAddress tcpServerAddress,
+                               final InetSocketAddress sshServerAddress,
+                               final String privateKeyPath) {
         this.tcpServerAddress = tcpServerAddress;
         this.sshServerAddress = sshServerAddress;
         this.privateKeyPath = privateKeyPath;
@@ -33,5 +35,4 @@ final class NetconfConfigurationHolder {
     InetSocketAddress getTcpServerAddress() {
         return tcpServerAddress;
     }
-
 }

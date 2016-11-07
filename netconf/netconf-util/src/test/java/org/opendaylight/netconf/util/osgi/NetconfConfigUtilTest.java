@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -8,76 +8,73 @@
 
 package org.opendaylight.netconf.util.osgi;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
-import com.google.common.base.Optional;
-import io.netty.channel.local.LocalAddress;
-import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.Collection;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.ManagedService;
 
 public class NetconfConfigUtilTest {
 
-    private BundleContext bundleContext;
+    @Mock
+    private ServiceReference<ManagedService> serviceRef;
+
+    @Mock
+    private ServiceReference<ManagedService> netconfConfigurationRef;
 
     @Before
-    public void setUp() throws Exception {
-        bundleContext = mock(BundleContext.class);
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    public void testNetconfConfigUtil() throws Exception {
-        assertEquals(NetconfConfigUtil.getNetconfLocalAddress(), new LocalAddress("netconf"));
+    public void testGetNetconfConfigurationService() throws Exception {
+        final Collection<ServiceReference<ManagedService>> services = new ArrayList<>();
+        services.add(serviceRef);
+        services.add(netconfConfigurationRef);
+        final BundleContext context = mock(BundleContext.class);
+        doReturn(services).when(context).getServiceReferences(ManagedService.class, null);
+        final ManagedService service = mock(ManagedService.class);
+        doReturn(service).when(context).getService(serviceRef);
+        doReturn(NetconfConfiguration.getInstance()).when(context).getService(netconfConfigurationRef);
+        final java.util.Optional<NetconfConfiguration> netconfConfigurationOptional =
+                NetconfConfigUtil.getNetconfConfigurationService(context);
+        Assert.assertTrue(netconfConfigurationOptional.isPresent());
+        Assert.assertEquals(NetconfConfiguration.getInstance(), netconfConfigurationOptional.get());
 
-        doReturn("").when(bundleContext).getProperty("netconf.connectionTimeoutMillis");
-        assertEquals(NetconfConfigUtil.extractTimeoutMillis(bundleContext), NetconfConfigUtil.DEFAULT_TIMEOUT_MILLIS);
-
-        doReturn("a").when(bundleContext).getProperty("netconf.connectionTimeoutMillis");
-        assertEquals(NetconfConfigUtil.extractTimeoutMillis(bundleContext), NetconfConfigUtil.DEFAULT_TIMEOUT_MILLIS);
     }
 
     @Test
-    public void testgetPrivateKeyKey() throws Exception {
-        assertEquals(NetconfConfigUtil.getPrivateKeyKey(), "netconf.ssh.pk.path");
+    public void testGetNetconfConfigurationServiceAbsent() throws Exception {
+        final Collection<ServiceReference<ManagedService>> services = new ArrayList<>();
+        services.add(serviceRef);
+        final BundleContext context = mock(BundleContext.class);
+        doReturn(services).when(context).getServiceReferences(ManagedService.class, null);
+        final ManagedService service = mock(ManagedService.class);
+        doReturn(service).when(context).getService(serviceRef);
+        final java.util.Optional<NetconfConfiguration> netconfConfigurationOptional =
+                NetconfConfigUtil.getNetconfConfigurationService(context);
+        Assert.assertFalse(netconfConfigurationOptional.isPresent());
     }
 
     @Test
-    public void testgetNetconfServerAddressKey() throws Exception {
-        NetconfConfigUtil.InfixProp prop = NetconfConfigUtil.InfixProp.tcp;
-        assertEquals(NetconfConfigUtil.getNetconfServerAddressKey(prop), "netconf.tcp.address");
-    }
-
-    @Test
-    public void testExtractNetconfServerAddress() throws Exception {
-        NetconfConfigUtil.InfixProp prop = NetconfConfigUtil.InfixProp.tcp;
-        doReturn("").when(bundleContext).getProperty(anyString());
-        assertEquals(NetconfConfigUtil.extractNetconfServerAddress(bundleContext, prop), Optional.absent());
-    }
-
-    @Test
-    public void testExtractNetconfServerAddress2() throws Exception {
-        NetconfConfigUtil.InfixProp prop = NetconfConfigUtil.InfixProp.tcp;
-        doReturn("1.1.1.1").when(bundleContext).getProperty("netconf.tcp.address");
-        doReturn("20").when(bundleContext).getProperty("netconf.tcp.port");
-        Optional<InetSocketAddress> inetSocketAddressOptional = NetconfConfigUtil.extractNetconfServerAddress(bundleContext, prop);
-        assertTrue(inetSocketAddressOptional.isPresent());
-        assertEquals(inetSocketAddressOptional.get(), new InetSocketAddress("1.1.1.1", 20));
-    }
-
-    @Test
-    public void testGetPrivateKeyPath() throws Exception {
-        doReturn("path").when(bundleContext).getProperty("netconf.ssh.pk.path");
-        assertEquals(NetconfConfigUtil.getPrivateKeyPath(bundleContext).get(), "path");
-    }
-
-    @Test
-    public void testGetPrivateKeyPathNotPresent() throws Exception {
-        doReturn(null).when(bundleContext).getProperty("netconf.ssh.pk.path");
-        assertEquals(NetconfConfigUtil.getPrivateKeyPath(bundleContext), Optional.absent());
+    public void testGetNetconfConfigurationServiceInvalidSyntax() throws Exception {
+        final BundleContext context = mock(BundleContext.class);
+        final InvalidSyntaxException exception = new InvalidSyntaxException("Invalid syntax", "filter");
+        doThrow(exception).when(context).getServiceReferences(ManagedService.class, null);
+        final java.util.Optional<NetconfConfiguration> netconfConfigurationOptional =
+                NetconfConfigUtil.getNetconfConfigurationService(context);
+        Assert.assertFalse(netconfConfigurationOptional.isPresent());
     }
 }

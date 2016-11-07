@@ -28,12 +28,12 @@ public class NetconfConfigurationActivator implements BundleActivator {
     @Override
     public void stop(BundleContext bundleContext) {
         if (configService != null) {
-          configService.unregister();
-          configService = null;
+            configService.unregister();
+            configService = null;
         }
     }
 
-    private Hashtable<String, String> getNetconfConfigProperties(){
+    private Hashtable<String, String> getNetconfConfigProperties() {
         Hashtable<String, String> properties = new Hashtable<>();
         properties.put(Constants.SERVICE_PID, CONFIG_PID);
         return properties;
