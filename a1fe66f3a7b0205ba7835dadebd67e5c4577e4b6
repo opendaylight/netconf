@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_55b65f3e",
+        "filename": "netconf/netconf-topology-config/src/main/resources/org/opendaylight/blueprint/netconf-topology.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-07T14:02:11Z",
+      "side": 1,
+      "message": "\u003e Why do we keep blueprint in separate module?\n\nBecause a feature is pulling in the bundle, without pulling prior config system file.\n\nodl-netconf-connector, as per as the feature definition, requires the bundle netconf-topology, but does not require netconf-topology-config, so if I have the blueprint in netconf-topology, odl-netconf-connector will instantiate load the netconf-topology-config bluepinrt, which don\u0027t seem to be what we want. See https://github.com/opendaylight/netconf/blob/9c0f7d90a86e898cb2dd5e32fdd9120f87633ed0/features/netconf-connector/src/main/features/features.xml#L39\n\nIf you believe this is not the intended behavior, I can rework the patch.",
+      "parentUuid": "3a65312a_a24fbb91",
+      "revId": "a1fe66f3a7b0205ba7835dadebd67e5c4577e4b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_e249b38c",
         "filename": "netconf/netconf-topology-config/src/main/resources/org/opendaylight/blueprint/netconf-topology.xml",
         "patchSetId": 4
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_b5825350",
+        "filename": "netconf/netconf-topology-config/src/main/resources/org/opendaylight/blueprint/netconf-topology.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-07T14:02:11Z",
+      "side": 1,
+      "message": "Agree, this is an oversight. Will fix this.",
+      "parentUuid": "3a65312a_e249b38c",
+      "revId": "a1fe66f3a7b0205ba7835dadebd67e5c4577e4b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_551adf6e",
         "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
         "patchSetId": 4
@@ -47,6 +83,24 @@
       "writtenOn": "2016-11-07T13:43:24Z",
       "side": 1,
       "message": "Do we have to implement also BindingAwareProvider and Provider interfaces?",
+      "revId": "a1fe66f3a7b0205ba7835dadebd67e5c4577e4b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_f57ccb74",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-07T14:02:11Z",
+      "side": 1,
+      "message": "\u003e Do we have to implement also BindingAwareProvider and Provider interfaces?\n\nNo we actually can get rid of those as I\u0027ve done here https://git.opendaylight.org/gerrit/#/c/47371/\n\nBut I\u0027m not sure this falls into this patch\u0027s scope. I can amend gerrit 47371 to remove those interface for netconf-topology as well.",
+      "parentUuid": "3a65312a_551adf6e",
       "revId": "a1fe66f3a7b0205ba7835dadebd67e5c4577e4b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
