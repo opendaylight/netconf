@@ -14,23 +14,24 @@ import javax.ws.rs.core.Application;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYangBodyWriter;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYinBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
-import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
-import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.PATCHJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.PATCHXmlBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.RestconfDocumentedExceptionMapper;
 import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.restconf.common.wrapper.services.ServicesWrapperImpl;
 import org.opendaylight.restconf.jersey.providers.JsonToPATCHBodyReader;
+import org.opendaylight.restconf.jersey.providers.NormalizedNodeJsonBodyWriter;
+import org.opendaylight.restconf.jersey.providers.NormalizedNodeXmlBodyWriter;
 import org.opendaylight.restconf.jersey.providers.XmlToPATCHBodyReader;
 
 public class RestconfApplication extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-        return ImmutableSet.<Class<?>> builder().add(NormalizedNodeJsonBodyWriter.class)
-                .add(NormalizedNodeXmlBodyWriter.class).add(JsonNormalizedNodeBodyReader.class)
-                .add(XmlNormalizedNodeBodyReader.class).add(SchemaExportContentYinBodyWriter.class)
+        return ImmutableSet.<Class<?>> builder()
+                .add(NormalizedNodeJsonBodyWriter.class).add(NormalizedNodeXmlBodyWriter.class)
+                .add(JsonNormalizedNodeBodyReader.class).add(XmlNormalizedNodeBodyReader.class)
+                .add(SchemaExportContentYinBodyWriter.class)
                 .add(JsonToPATCHBodyReader.class).add(XmlToPATCHBodyReader.class)
                 .add(PATCHJsonBodyWriter.class).add(PATCHXmlBodyWriter.class)
                 .add(SchemaExportContentYangBodyWriter.class).add(RestconfDocumentedExceptionMapper.class)

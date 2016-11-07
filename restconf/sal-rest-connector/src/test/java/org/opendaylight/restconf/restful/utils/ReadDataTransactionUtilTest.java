@@ -9,9 +9,8 @@
 package org.opendaylight.restconf.restful.utils;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
@@ -41,122 +40,140 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class ReadDataTransactionUtilTest {
 
-    private static final TestData data = new TestData();
-    private static final YangInstanceIdentifier.NodeIdentifier nodeIdentifier = new YangInstanceIdentifier
+    private static final TestData DATA = new TestData();
+    private static final YangInstanceIdentifier.NodeIdentifier NODE_IDENTIFIER = new YangInstanceIdentifier
             .NodeIdentifier(QName.create("ns", "2016-02-28", "container"));
 
     private TransactionVarsWrapper wrapper;
     @Mock
     private DOMTransactionChain transactionChain;
     @Mock
-    private InstanceIdentifierContext<?> context;
+    private InstanceIdentifierContext<ContainerSchemaNode> context;
     @Mock
     private DOMDataReadOnlyTransaction read;
+    @Mock
+    private SchemaContext schemaContext;
+    @Mock
+    private ContainerSchemaNode containerSchemaNode;
+    @Mock
+    private LeafSchemaNode containerChildNode;
+    private QName containerChildQName;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        doReturn(read).when(transactionChain).newReadOnlyTransaction();
+        containerChildQName = QName.create("ns", "2016-02-28", "container-child");
+
+        when(transactionChain.newReadOnlyTransaction()).thenReturn(read);
+        when(context.getSchemaContext()).thenReturn(schemaContext);
+        when(context.getSchemaNode()).thenReturn(containerSchemaNode);
+        when(containerSchemaNode.getQName()).thenReturn(NODE_IDENTIFIER.getNodeType());
+        when(containerChildNode.getQName()).thenReturn(containerChildQName);
+        when(containerSchemaNode.getDataChildByName(containerChildQName)).thenReturn(containerChildNode);
+
         wrapper = new TransactionVarsWrapper(this.context, null, this.transactionChain);
     }
 
     @Test
     public void readDataConfigTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.of(data.data3))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, data.path);
-        doReturn(data.path).when(context).getInstanceIdentifier();
+        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.data3))).when(read)
+                .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
+        doReturn(DATA.path).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.CONFIG;
         final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(valueOfContent, wrapper);
-        assertEquals(data.data3, normalizedNode);
+        assertEquals(DATA.data3, normalizedNode);
     }
 
     @Test
     public void readAllHavingOnlyConfigTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.of(data.data3))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, data.path);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.data3))).when(read)
+                .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
         doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, data.path);
-        doReturn(data.path).when(context).getInstanceIdentifier();
+                .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
+        doReturn(DATA.path).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
         final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(valueOfContent, wrapper);
-        assertEquals(data.data3, normalizedNode);
+        assertEquals(DATA.data3, normalizedNode);
     }
 
     @Test
     public void readAllHavingOnlyNonConfigTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.of(data.data2))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, data.path2);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.data2))).when(read)
+                .read(LogicalDatastoreType.OPERATIONAL, DATA.path2);
         doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, data.path2);
-        doReturn(data.path2).when(context).getInstanceIdentifier();
+                .read(LogicalDatastoreType.CONFIGURATION, DATA.path2);
+        doReturn(DATA.path2).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
         final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(valueOfContent, wrapper);
-        assertEquals(data.data2, normalizedNode);
+        assertEquals(DATA.data2, normalizedNode);
     }
 
     @Test
     public void readDataNonConfigTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.of(data.data2))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, data.path2);
-        doReturn(data.path2).when(context).getInstanceIdentifier();
+        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.data2))).when(read)
+                .read(LogicalDatastoreType.OPERATIONAL, DATA.path2);
+        doReturn(DATA.path2).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.NONCONFIG;
         final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(valueOfContent, wrapper);
-        assertEquals(data.data2, normalizedNode);
+        assertEquals(DATA.data2, normalizedNode);
     }
 
     @Test
     public void readContainerDataAllTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.of(data.data3))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, data.path);
-        doReturn(Futures.immediateCheckedFuture(Optional.of(data.data4))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, data.path);
-        doReturn(data.path).when(context).getInstanceIdentifier();
+        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.data3))).when(read)
+                .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.data4))).when(read)
+                .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
+        doReturn(DATA.path).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
         final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(valueOfContent, wrapper);
         final ContainerNode checkingData = Builders
                 .containerBuilder()
-                .withNodeIdentifier(nodeIdentifier)
-                .withChild(data.contentLeaf)
-                .withChild(data.contentLeaf2)
+                .withNodeIdentifier(NODE_IDENTIFIER)
+                .withChild(DATA.contentLeaf)
+                .withChild(DATA.contentLeaf2)
                 .build();
         assertEquals(checkingData, normalizedNode);
     }
 
     @Test
     public void readContainerDataConfigNoValueOfContentTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.of(data.data3))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, data.path);
-        doReturn(Futures.immediateCheckedFuture(Optional.of(data.data4))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, data.path);
-        doReturn(data.path).when(context).getInstanceIdentifier();
+        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.data3))).when(read)
+                .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.data4))).when(read)
+                .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
+        doReturn(DATA.path).when(context).getInstanceIdentifier();
         final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(
                 RestconfDataServiceConstant.ReadData.ALL, wrapper);
         final ContainerNode checkingData = Builders
                 .containerBuilder()
-                .withNodeIdentifier(nodeIdentifier)
-                .withChild(data.contentLeaf)
-                .withChild(data.contentLeaf2)
+                .withNodeIdentifier(NODE_IDENTIFIER)
+                .withChild(DATA.contentLeaf)
+                .withChild(DATA.contentLeaf2)
                 .build();
         assertEquals(checkingData, normalizedNode);
     }
 
     @Test
     public void readListDataAllTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.of(data.listData))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, data.path3);
-        doReturn(Futures.immediateCheckedFuture(Optional.of(data.listData2))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, data.path3);
-        doReturn(data.path3).when(context).getInstanceIdentifier();
+        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.listData))).when(read)
+                .read(LogicalDatastoreType.OPERATIONAL, DATA.path3);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.listData2))).when(read)
+                .read(LogicalDatastoreType.CONFIGURATION, DATA.path3);
+        doReturn(DATA.path3).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
         final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(valueOfContent, wrapper);
         final MapNode checkingData = Builders
                 .mapBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("ns", "2016-02-28", "list")))
-                .withChild(data.checkData)
+                .withChild(DATA.checkData)
                 .build();
         assertEquals(checkingData, normalizedNode);
     }
@@ -164,8 +181,8 @@ public class ReadDataTransactionUtilTest {
     @Test
     public void readDataWrongPathOrNoContentTest() {
         doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, data.path2);
-        doReturn(data.path2).when(context).getInstanceIdentifier();
+                .read(LogicalDatastoreType.CONFIGURATION, DATA.path2);
+        doReturn(DATA.path2).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.CONFIG;
         final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(valueOfContent, wrapper);
         assertNull(normalizedNode);
@@ -174,7 +191,8 @@ public class ReadDataTransactionUtilTest {
     @Test(expected = RestconfDocumentedException.class)
     public void readDataFailTest() {
         final String valueOfContent = RestconfDataServiceConstant.ReadData.READ_TYPE_TX;
-        final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(valueOfContent, null);
+        final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(
+                valueOfContent, wrapper);
         assertNull(normalizedNode);
     }
 
@@ -189,12 +207,14 @@ public class ReadDataTransactionUtilTest {
         // no parameters, default values should be used
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
-        final WriterParameters parsedParameters = ReadDataTransactionUtil.parseUriParameters(uriInfo);
+        final WriterParameters parsedParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
 
         assertEquals("Not correctly parsed URI parameter",
                 RestconfDataServiceConstant.ReadData.ALL, parsedParameters.getContent());
-        assertFalse("Not correctly parsed URI parameter",
-                parsedParameters.getDepth().isPresent());
+        assertNull("Not correctly parsed URI parameter",
+                parsedParameters.getDepth());
+        assertNull("Not correctly parsed URI parameter",
+                parsedParameters.getFields());
     }
 
     /**
@@ -207,20 +227,35 @@ public class ReadDataTransactionUtilTest {
 
         final String content = "config";
         final String depth = "10";
+        final String fields = containerChildQName.getLocalName();
 
         parameters.put("content", Collections.singletonList(content));
         parameters.put("depth", Collections.singletonList(depth));
+        parameters.put("fields", Collections.singletonList(fields));
 
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
-        final WriterParameters parsedParameters = ReadDataTransactionUtil.parseUriParameters(uriInfo);
+        final WriterParameters parsedParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
 
+        // content
         assertEquals("Not correctly parsed URI parameter",
                 content, parsedParameters.getContent());
-        assertTrue("Not correctly parsed URI parameter",
-                parsedParameters.getDepth().isPresent());
+
+        // depth
+        assertNotNull("Not correctly parsed URI parameter",
+                parsedParameters.getDepth());
         assertEquals("Not correctly parsed URI parameter",
-                depth, parsedParameters.getDepth().get().toString());
+                depth, parsedParameters.getDepth().toString());
+
+        // fields
+        assertNotNull("Not correctly parsed URI parameter",
+                parsedParameters.getFields());
+        assertEquals("Not correctly parsed URI parameter",
+                1, parsedParameters.getFields().size());
+        assertEquals("Not correctly parsed URI parameter",
+                1, parsedParameters.getFields().get(0).size());
+        assertEquals("Not correctly parsed URI parameter",
+                containerChildQName, parsedParameters.getFields().get(0).iterator().next());
     }
 
     /**
@@ -235,7 +270,7 @@ public class ReadDataTransactionUtilTest {
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         try {
-            ReadDataTransactionUtil.parseUriParameters(uriInfo);
+            ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
             fail("Test expected to fail due to not allowed parameter value");
         } catch (final RestconfDocumentedException e) {
             // Bad request
@@ -258,7 +293,7 @@ public class ReadDataTransactionUtilTest {
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         try {
-            ReadDataTransactionUtil.parseUriParameters(uriInfo);
+            ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
             fail("Test expected to fail due to not allowed parameter value");
         } catch (final RestconfDocumentedException e) {
             // Bad request
@@ -282,7 +317,7 @@ public class ReadDataTransactionUtilTest {
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         try {
-            ReadDataTransactionUtil.parseUriParameters(uriInfo);
+            ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
             fail("Test expected to fail due to not allowed parameter value");
         } catch (final RestconfDocumentedException e) {
             // Bad request
@@ -306,7 +341,7 @@ public class ReadDataTransactionUtilTest {
         when(uriInfo.getQueryParameters()).thenReturn(parameters);
 
         try {
-            ReadDataTransactionUtil.parseUriParameters(uriInfo);
+            ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
             fail("Test expected to fail due to not allowed parameter value");
         } catch (final RestconfDocumentedException e) {
             // Bad request
