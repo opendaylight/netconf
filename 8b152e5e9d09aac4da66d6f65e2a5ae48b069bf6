@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_03920357",
+        "filename": "netconf/netconf-util/src/test/java/org/opendaylight/netconf/util/osgi/NetconfConfigUtilTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-07T11:59:26Z",
+      "side": 1,
+      "message": "It\u0027s 2016 already",
+      "revId": "8b152e5e9d09aac4da66d6f65e2a5ae48b069bf6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
