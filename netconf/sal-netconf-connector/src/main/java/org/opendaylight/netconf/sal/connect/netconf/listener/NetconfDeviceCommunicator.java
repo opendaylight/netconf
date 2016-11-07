@@ -35,6 +35,7 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
+import org.opendaylight.netconf.client.conf.NetconfReversedClientConfiguration;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -132,12 +133,14 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
      *
      * @param dispatcher
      * @param config
-     * @return future that returns succes on first succesfull connection and failure when the underlying
+     * @return future that returns success on first successful connection and failure when the underlying
      * reconnecting strategy runs out of reconnection attempts
      */
     public ListenableFuture<NetconfDeviceCapabilities> initializeRemoteConnection(final NetconfClientDispatcher dispatcher, final NetconfClientConfiguration config) {
         if(config instanceof NetconfReconnectingClientConfiguration) {
             initFuture = dispatcher.createReconnectingClient((NetconfReconnectingClientConfiguration) config);
+        } else if(config instanceof NetconfReversedClientConfiguration){
+            initFuture = dispatcher.createReversedClient((NetconfReversedClientConfiguration) config);
         } else {
             initFuture = dispatcher.createClient(config);
         }

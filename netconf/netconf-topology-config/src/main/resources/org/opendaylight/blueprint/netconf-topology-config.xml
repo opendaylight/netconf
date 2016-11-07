@@ -54,4 +54,10 @@
     <service ref="netconfConnectorFactory" interface="org.opendaylight.netconf.topology.api.NetconfConnectorFactory"
              odl:type="default"/>
 
+    <bean id="netconfCallHome" class="org.opendaylight.netconf.topology.NetconfCallHome"
+          init-method="init"
+          destroy-method="close">
+        <argument ref="networkTopology"/>
+    </bean>
+
 </blueprint>
