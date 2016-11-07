@@ -8,12 +8,14 @@
 
 package org.opendaylight.netconf.client;
 
+import com.google.common.base.Preconditions;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.Future;
 import java.io.Closeable;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
+import org.opendaylight.netconf.client.conf.NetconfCallHomeClientConfiguration;
 import org.opendaylight.protocol.framework.AbstractDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +58,12 @@ public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClien
         throw new IllegalArgumentException("Unknown client protocol " + clientConfiguration.getProtocol());
     }
 
+    @Override
+    public Future<NetconfClientSession> createCallHomeClient(final NetconfCallHomeClientConfiguration clientConfiguration) {
+        Preconditions.checkArgument(clientConfiguration.getProtocol() == NetconfClientConfiguration.NetconfClientProtocol.SSH, "Reversed client is only available with SSH");
+        return createReversedSshClient(clientConfiguration);
+    }
+
     private Future<NetconfClientSession> createTcpClient(final NetconfClientConfiguration currentConfiguration) {
         LOG.debug("Creating TCP client with configuration: {}", currentConfiguration);
         return super.createClient(currentConfiguration.getAddress(), currentConfiguration.getReconnectStrategy(),
@@ -87,6 +95,15 @@ public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClien
 
         return super.createReconnectingClient(currentConfiguration.getAddress(), currentConfiguration.getConnectStrategyFactory(), currentConfiguration.getReconnectStrategy(),
                 init::initialize);
+    }
+
+    private Future<NetconfClientSession> createReversedSshClient(final NetconfCallHomeClientConfiguration currentConfiguration) {
+        LOG.debug("Creating reversed SSH client with configuration: {}", currentConfiguration);
+        return super.createClient(currentConfiguration.getAddress(), currentConfiguration.getReconnectStrategy(),
+                (ch, sessionPromise) ->  new CallHomeClientChannelInitializer(currentConfiguration.getAuthHandler(),
+                        getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener(),
+                        currentConfiguration.getTcpSession())
+                        .initialize(ch, sessionPromise));
     }
 
     protected NetconfClientSessionNegotiatorFactory getNegotiatorFactory(final NetconfClientConfiguration cfg) {
