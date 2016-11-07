@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_55693f8a",
+        "filename": "netconf/netconf-topology-config/src/main/resources/org/opendaylight/blueprint/netconf-topology.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-07T14:37:45Z",
+      "side": 1,
+      "message": "Yeah, looks like you are right. We must think this trough, though. Dependencies between those two bundles are strange somehow.",
+      "parentUuid": "3a65312a_55b65f3e",
+      "revId": "a1fe66f3a7b0205ba7835dadebd67e5c4577e4b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_e249b38c",
         "filename": "netconf/netconf-topology-config/src/main/resources/org/opendaylight/blueprint/netconf-topology.xml",
         "patchSetId": 4
@@ -101,6 +119,24 @@
       "side": 1,
       "message": "\u003e Do we have to implement also BindingAwareProvider and Provider interfaces?\n\nNo we actually can get rid of those as I\u0027ve done here https://git.opendaylight.org/gerrit/#/c/47371/\n\nBut I\u0027m not sure this falls into this patch\u0027s scope. I can amend gerrit 47371 to remove those interface for netconf-topology as well.",
       "parentUuid": "3a65312a_551adf6e",
+      "revId": "a1fe66f3a7b0205ba7835dadebd67e5c4577e4b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_b50533c4",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-07T14:37:45Z",
+      "side": 1,
+      "message": "With other blueprint patches, you have done this in one change. So I think we can say that it is in the scope of this change..",
+      "parentUuid": "3a65312a_f57ccb74",
       "revId": "a1fe66f3a7b0205ba7835dadebd67e5c4577e4b6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
