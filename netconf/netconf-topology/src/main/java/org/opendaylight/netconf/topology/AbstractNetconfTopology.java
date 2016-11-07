@@ -157,7 +157,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     }
 
     protected final String topologyId;
-    private final NetconfClientDispatcher clientDispatcher;
+    protected final NetconfClientDispatcher clientDispatcher;
     protected final BindingAwareBroker bindingAwareBroker;
     protected final Broker domBroker;
     private final EventExecutor eventExecutor;
@@ -224,7 +224,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     }
 
     protected ListenableFuture<NetconfDeviceCapabilities> setupConnection(final NodeId nodeId,
-                                                                        final Node configNode) {
+                                                                          final Node configNode) {
         final NetconfNode netconfNode = configNode.getAugmentation(NetconfNode.class);
 
         Preconditions.checkNotNull(netconfNode.getHost());
@@ -256,7 +256,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
     }
 
     protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId,
-                                                         final NetconfNode node) {
+                                                           final NetconfNode node) {
         //setup default values since default value is not supported in mdsal
         final Long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null ? DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
         final Long keepaliveDelay = node.getKeepaliveDelay() == null ? DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay();
@@ -399,7 +399,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         return new FilesystemSchemaSourceCache<>(schemaRegistry, YangTextSchemaSource.class, new File(relativeSchemaCacheDirectory));
     }
 
-    public NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener, NetconfNode node) {
+    private NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener, NetconfNode node) {
 
         //setup default values since default value is not supported in mdsal
         final long clientConnectionTimeoutMillis = node.getConnectionTimeoutMillis() == null ? DEFAULT_CONNECTION_TIMEOUT_MILLIS : node.getConnectionTimeoutMillis();
