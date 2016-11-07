@@ -138,6 +138,8 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     public ListenableFuture<NetconfDeviceCapabilities> initializeRemoteConnection(final NetconfClientDispatcher dispatcher, final NetconfClientConfiguration config) {
         if(config instanceof NetconfReconnectingClientConfiguration) {
             initFuture = dispatcher.createReconnectingClient((NetconfReconnectingClientConfiguration) config);
+        } else if(config instanceof NetconfReversedClientConfiguration){
+            initFuture = dispatch.createReversedClient((NetconfReversedClientConfiguration) config);
         } else {
             initFuture = dispatcher.createClient(config);
         }
