@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_95659747",
+        "filename": "features/netconf/src/main/features/features.xml",
+        "patchSetId": 15
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-07T15:33:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_958d9734",
+      "revId": "1c2447c7c3869cfe52f229952ae7674dc4593490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_d52b8f2e",
         "filename": "netconf/mdsal-netconf-tcp/pom.xml",
         "patchSetId": 15
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "Oversight. Will use bundle-parent.",
       "parentUuid": "3a65312a_d52b8f2e",
+      "revId": "1c2447c7c3869cfe52f229952ae7674dc4593490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_f55a0b82",
+        "filename": "netconf/mdsal-netconf-tcp/pom.xml",
+        "patchSetId": 15
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-07T15:33:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_f5820bff",
       "revId": "1c2447c7c3869cfe52f229952ae7674dc4593490",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -107,6 +143,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_f5d16bce",
+        "filename": "netconf/mdsal-netconf-tcp/src/main/resources/org/opendaylight/blueprint/netconf-tcp.xml",
+        "patchSetId": 15
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-07T15:33:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_d5870f0e",
+      "revId": "1c2447c7c3869cfe52f229952ae7674dc4593490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_55001faa",
         "filename": "netconf/netconf-tcp/src/main/java/org/opendaylight/netconf/tcp/NetconfNorthboundTcpServer.java",
         "patchSetId": 15
@@ -142,6 +196,24 @@
     },
     {
       "key": {
+        "uuid": "3a65312a_f5b68b89",
+        "filename": "netconf/netconf-tcp/src/main/java/org/opendaylight/netconf/tcp/NetconfNorthboundTcpServer.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-07T15:33:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_357c8320",
+      "revId": "1c2447c7c3869cfe52f229952ae7674dc4593490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_b52c134c",
         "filename": "netconf/netconf-tcp/src/main/java/org/opendaylight/netconf/tcp/NetconfNorthboundTcpServer.java",
         "patchSetId": 15
@@ -171,6 +243,24 @@
       "side": 1,
       "message": "Will wrap the line.",
       "parentUuid": "3a65312a_b52c134c",
+      "revId": "1c2447c7c3869cfe52f229952ae7674dc4593490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_d5bb8f70",
+        "filename": "netconf/netconf-tcp/src/main/java/org/opendaylight/netconf/tcp/NetconfNorthboundTcpServer.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-07T15:33:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a65312a_1579872f",
       "revId": "1c2447c7c3869cfe52f229952ae7674dc4593490",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
