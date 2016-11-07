@@ -88,6 +88,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     }
 
     public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler) throws IOException {
+        LOG.warn("Create AsyncSshHandler");
         return new AsyncSshHandler(authenticationHandler, DEFAULT_CLIENT);
     }
 
