@@ -485,7 +485,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
     }
 
-    protected static class NetconfConnectorDTO {
+    protected static class NetconfConnectorDTO implements AutoCloseable {
 
         private final NetconfDeviceCommunicator communicator;
         private final RemoteDeviceHandler<NetconfSessionPreferences> facade;
@@ -505,6 +505,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         public NetconfClientSessionListener getSessionListener() {
             return communicator;
+        }
+
+        @Override
+        public void close() {
+            communicator.close();
+            facade.close();
         }
     }
 
