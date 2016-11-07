@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_62aac371",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-07T12:48:05Z",
+      "side": 1,
+      "message": "I think this would look better without dot at the end of this statement..\n\nhave them concurrent: https://git.opendaylight.org/gerrit/#/c/45608/",
+      "revId": "0497b2a1b95d79a70e293747c09b4c37a100f693",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
