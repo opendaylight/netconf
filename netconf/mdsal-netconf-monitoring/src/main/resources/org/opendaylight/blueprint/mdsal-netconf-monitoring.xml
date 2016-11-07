@@ -29,7 +29,7 @@
     </bean>
 
     <bean id="mdsalMonitoringMapperFactory"
-          class="org.opendaylight.controller.config.yang.netconf.mdsal.monitoring.MdSalMonitoringMapperFactory"
+          class="org.opendaylight.controller.config.yang.netconf.mdsal.monitoring.MdsalMonitoringMapperFactory"
           destroy-method="close">
         <argument ref="netconfOperationServiceFactoryListener"/>
         <argument ref="netconfMonitoringService"/>

@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
  * Listens for updates on global schema context, transforms context to ietf-yang-library:modules-state and
  * writes this state to operational data store
  */
+// TODO Implement also yang-library-change notfication
 public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(SchemaServiceToMdsalWriter.class);
