@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_d098cb6c",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/TxChain.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-07T09:31:17Z",
+      "side": 1,
+      "message": "that haven\u0027t",
+      "revId": "4651ed2c85baa58cbc1d6281c73e6547af2c7d9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_10a2439a",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/TxChain.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-07T09:31:17Z",
+      "side": 1,
+      "message": "that has not been submitted or canceled yet",
+      "revId": "4651ed2c85baa58cbc1d6281c73e6547af2c7d9e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
