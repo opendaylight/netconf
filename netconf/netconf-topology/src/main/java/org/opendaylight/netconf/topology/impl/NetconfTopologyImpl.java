@@ -64,7 +64,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
     public void close() throws Exception {
         // close all existing connectors, delete whole topology in datastore?
         for (NetconfConnectorDTO connectorDTO : activeConnectors.values()) {
-            connectorDTO.getCommunicator().close();
+            connectorDTO.close();
         }
         activeConnectors.clear();
 

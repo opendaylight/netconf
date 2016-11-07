@@ -17,6 +17,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.util.concurrent.EventExecutor;
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.URL;
@@ -504,7 +505,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
         }
     }
 
-    protected static class NetconfConnectorDTO {
+    protected static class NetconfConnectorDTO implements AutoCloseable {
 
         private final NetconfDeviceCommunicator communicator;
         private final RemoteDeviceHandler<NetconfSessionPreferences> facade;
@@ -524,6 +525,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology, Bindin
 
         public NetconfClientSessionListener getSessionListener() {
             return communicator;
+        }
+
+        @Override
+        public void close() throws IOException {
+            communicator.close();
+            facade.close();
         }
     }
 
