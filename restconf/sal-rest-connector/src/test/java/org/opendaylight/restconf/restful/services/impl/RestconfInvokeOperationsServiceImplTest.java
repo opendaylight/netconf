@@ -11,7 +11,6 @@ package org.opendaylight.restconf.restful.services.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
 import java.util.Iterator;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
@@ -68,7 +67,8 @@ public class RestconfInvokeOperationsServiceImplTest {
 
         final InstanceIdentifierContext<RpcDefinition> iidContext = new InstanceIdentifierContext<>(iid, rpcDef, null, contextRef.get());
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, input);
-        final NormalizedNodeContext context = invokeOperationsService.invokeRpc(null, payload, null);
+        final NormalizedNodeContext context =
+                invokeOperationsService.invokeRpc("create-data-change-event-subscription", payload, null);
 
         final QName rpcQnameOutput = QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "2014-01-14", "output");
         final QName outputQname = QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "2014-01-14", "stream-name");

@@ -13,6 +13,9 @@ import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
@@ -51,7 +54,14 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
 
         if (mountPoint == null) {
             if (namespace.toString().equals(RestconfStreamsConstants.SAL_REMOTE_NAMESPACE)) {
-                response = CreateStreamUtil.createStream(payload, refSchemaCtx);
+                if (identifier.contains(RestconfStreamsConstants.CREATE_DATA_SUBSCR)) {
+                    response = CreateStreamUtil.createStream(payload, refSchemaCtx);
+                } else if (identifier.contains(RestconfStreamsConstants.CREATE_NOTIFICATION_STREAM)) {
+                    response = CreateStreamUtil.createStreamNotification(payload, refSchemaCtx);
+                } else {
+                    throw new RestconfDocumentedException("Not supported operation", ErrorType.RPC,
+                            ErrorTag.OPERATION_NOT_SUPPORTED);
+                }
             } else {
                 response = RestconfInvokeOperationsUtil.invokeRpc(payload.getData(), schemaPath,
                         this.rpcServiceHandler);
