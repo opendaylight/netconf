@@ -22,6 +22,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
@@ -62,6 +64,7 @@ import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -1046,11 +1049,41 @@ public class RestconfImpl implements RestconfService {
      */
     @Override
     public NormalizedNodeContext subscribeToStream(final String identifier, final UriInfo uriInfo) {
+        boolean startTime_used = false;
+        boolean stopTime_used = false;
+        Date start = null;
+        Date stop = null;
+
+        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
+            switch (entry.getKey()) {
+                case "start-time":
+                    if (!startTime_used) {
+                        startTime_used = true;
+                        start = parseDateFromQueryParam(entry);
+                    } else {
+                        throw new RestconfDocumentedException("Start-time parameter can be used only once.");
+                    }
+                    break;
+                case "stop-time":
+                    if (!stopTime_used) {
+                        stopTime_used = true;
+                        stop = parseDateFromQueryParam(entry);
+                    } else {
+                        throw new RestconfDocumentedException("Stop-time parameter can be used only once.");
+                    }
+                    break;
+                default:
+                    throw new RestconfDocumentedException("Bad parameter used with notifications: " + entry.getKey());
+            }
+        }
+        if(!startTime_used && stopTime_used){
+            throw new RestconfDocumentedException("Stop-time parameter has to be used with start-time parameter.");
+        }
         URI response = null;
         if (identifier.contains(DATA_SUBSCR)) {
-            response = dataSubs(identifier, uriInfo);
+            response = dataSubs(identifier, uriInfo, start, stop);
         } else if (identifier.contains(NOTIFICATION_STREAM)) {
-            response = notifStream(identifier, uriInfo);
+            response = notifStream(identifier, uriInfo, start, stop);
         }
 
         if(response != null){
@@ -1071,6 +1104,32 @@ public class RestconfImpl implements RestconfService {
         final String msg = "Bad type of notification of sal-remote";
         LOG.warn(msg);
         throw new RestconfDocumentedException(msg);
+    }
+
+    private Date parseDateFromQueryParam(final Entry<String, List<String>> entry) {
+        final DateAndTime event = new DateAndTime(entry.getValue().iterator().next());
+        String numOf_ms = "";
+        final String value = event.getValue();
+        if (value.contains(".")) {
+            numOf_ms = numOf_ms + ".";
+            final int lastChar = value.contains("Z") ? value.indexOf("Z") : (value.contains("+") ? value.indexOf("+")
+                    : (value.contains("-") ? value.indexOf("-") : value.length()));
+            for (int i = 0; i < (lastChar - value.indexOf(".") - 1); i++) {
+                numOf_ms = numOf_ms + "S";
+            }
+        }
+        String zone = "";
+        if (!value.contains("Z")) {
+            zone = zone + "XXX";
+        }
+        final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss" + numOf_ms + zone);
+
+        try {
+            return dateFormatter.parse(value.contains("Z") ? value.replace('T', ' ').substring(0, value.indexOf("Z"))
+                    : value.replace('T', ' '));
+        } catch (final ParseException e) {
+            throw new RestconfDocumentedException("Cannot parse of value in date: " + value + e);
+        }
     }
 
     /**
@@ -1098,9 +1157,11 @@ public class RestconfImpl implements RestconfService {
      *            - stream name
      * @param uriInfo
      *            - uriInfo
+     * @param stop
+     * @param start
      * @return {@link Response}
      */
-    private URI notifStream(final String identifier, final UriInfo uriInfo) {
+    private URI notifStream(final String identifier, final UriInfo uriInfo, final Date start, final Date stop) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -1113,6 +1174,7 @@ public class RestconfImpl implements RestconfService {
 
         for (final NotificationListenerAdapter listener : listeners) {
             this.broker.registerToListenNotification(listener);
+            listener.setTime(start, stop);
         }
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
@@ -1136,9 +1198,13 @@ public class RestconfImpl implements RestconfService {
      *            - stream name
      * @param uriInfo
      *            - uri info
+     * @param stop
+     *            - start-time of getting notification
+     * @param start
+     *            - stop-time of getting notification
      * @return {@link Response}
      */
-    private URI dataSubs(final String identifier, final UriInfo uriInfo) {
+    private URI dataSubs(final String identifier, final UriInfo uriInfo, final Date start, final Date stop) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -1148,6 +1214,7 @@ public class RestconfImpl implements RestconfService {
         if (listener == null) {
             throw new RestconfDocumentedException("Stream was not found.", ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
         }
+        listener.setTimer(start, stop);
 
         final Map<String, String> paramToValues = resolveValuesFromUri(identifier);
         final LogicalDatastoreType datastore = parserURIEnumParameter(LogicalDatastoreType.class,

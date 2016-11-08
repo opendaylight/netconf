@@ -8,22 +8,26 @@
 package org.opendaylight.restconf.restful.services.impl;
 
 import java.net.URI;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
+import java.util.Map.Entry;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
+import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
-import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
-import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.restconf.handlers.DOMDataBrokerHandler;
+import org.opendaylight.restconf.handlers.NotificationServiceHandler;
+import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.restful.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.restful.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.restful.utils.SubscribeToStreamUtil;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeAttrBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,41 +41,75 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
     private final DOMDataBrokerHandler domDataBrokerHandler;
 
-    public RestconfStreamsSubscriptionServiceImpl(final DOMDataBrokerHandler domDataBrokerHandler) {
+    private final NotificationServiceHandler notificationServiceHandler;
+
+    private final SchemaContextHandler schemaHandler;
+
+    public RestconfStreamsSubscriptionServiceImpl(final DOMDataBrokerHandler domDataBrokerHandler,
+            final NotificationServiceHandler notificationServiceHandler, final SchemaContextHandler schemaHandler) {
         this.domDataBrokerHandler = domDataBrokerHandler;
+        this.notificationServiceHandler = notificationServiceHandler;
+        this.schemaHandler = schemaHandler;
     }
 
     @Override
-    public Response subscribeToStream(final String identifier, final UriInfo uriInfo) {
-        final Map<String, String> mapOfValues = SubscribeToStreamUtil.mapValuesFromUri(identifier);
+    public NormalizedNodeContext subscribeToStream(final String identifier, final UriInfo uriInfo) {
+        boolean startTime_used = false;
+        boolean stopTime_used = false;
+        Date start = null;
+        Date stop = null;
 
-        final LogicalDatastoreType ds = SubscribeToStreamUtil.parseURIEnum(LogicalDatastoreType.class,
-                mapOfValues.get(RestconfStreamsConstants.DATASTORE_PARAM_NAME));
-        if (ds == null) {
-            final String msg = "Stream name doesn't contains datastore value (pattern /datastore=)";
-            LOG.debug(msg);
-            throw new RestconfDocumentedException(msg, ErrorType.APPLICATION, ErrorTag.MISSING_ATTRIBUTE);
+        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
+            switch (entry.getKey()) {
+                case "start-time":
+                    if (!startTime_used) {
+                        startTime_used = true;
+                        start = SubscribeToStreamUtil.parseDateFromQueryParam(entry);
+                    } else {
+                        throw new RestconfDocumentedException("Start-time parameter can be used only once.");
+                    }
+                    break;
+                case "stop-time":
+                    if (!stopTime_used) {
+                        stopTime_used = true;
+                        stop = SubscribeToStreamUtil.parseDateFromQueryParam(entry);
+                    } else {
+                        throw new RestconfDocumentedException("Stop-time parameter can be used only once.");
+                    }
+                    break;
+                default:
+                    throw new RestconfDocumentedException("Bad parameter used with notifications: " + entry.getKey());
+            }
+        }
+        if (!startTime_used && stopTime_used) {
+            throw new RestconfDocumentedException("Stop-time parameter has to be used with start-time parameter.");
+        }
+        URI response = null;
+        if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCR)) {
+            response = SubscribeToStreamUtil.dataSubs(identifier, uriInfo, start, stop, this.domDataBrokerHandler);
+        } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
+            response = SubscribeToStreamUtil.notifStream(identifier, uriInfo, start, stop,
+                    this.notificationServiceHandler);
         }
 
-        final DataChangeScope scope = SubscribeToStreamUtil.parseURIEnum(DataChangeScope.class,
-                mapOfValues.get(RestconfStreamsConstants.SCOPE_PARAM_NAME));
-        if (scope == null) {
-            final String msg = "Stream name doesn't contains datastore value (pattern /scope=)";
-            LOG.warn(msg);
-            throw new RestconfDocumentedException(msg, ErrorType.APPLICATION, ErrorTag.MISSING_ATTRIBUTE);
+        if (response != null) {
+            // prepare node with value of location
+            final InstanceIdentifierContext<?> iid =
+                    SubscribeToStreamUtil.prepareIIDSubsStreamOutput(this.schemaHandler);
+            final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> builder =
+                    ImmutableLeafNodeBuilder.create().withValue(response.toString());
+            builder.withNodeIdentifier(
+                    NodeIdentifier.create(QName.create("subscribe:to:notification", "2016-10-28", "location")));
+
+            // prepare new header with location
+            final Map<String, Object> headers = new HashMap<>();
+            headers.put("Location", response);
+
+            return new NormalizedNodeContext(iid, builder.build(), headers);
         }
 
-        final String streamName = Notificator.createStreamNameFromUri(identifier);
-
-        final ListenerAdapter listener = Notificator.getListenerFor(streamName);
-        SubscribeToStreamUtil.registration(ds, scope, listener, this.domDataBrokerHandler.get());
-
-        final int port = SubscribeToStreamUtil.prepareNotificationPort();
-
-        final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
-        final UriBuilder uriToWebSocketServer = uriBuilder.port(port).scheme(RestconfStreamsConstants.SCHEMA_SUBSCIBRE_URI);
-        final URI uri = uriToWebSocketServer.replacePath(streamName).build();
-
-        return Response.status(Status.OK).location(uri).build();
+        final String msg = "Bad type of notification of sal-remote";
+        LOG.warn(msg);
+        throw new RestconfDocumentedException(msg);
     }
 }
