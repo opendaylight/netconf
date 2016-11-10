@@ -99,7 +99,7 @@ public class ReadOnlyTransactionTest {
         doReturn(readTx).when(delegateDataBroker).newReadOnlyTransaction();
 
         final NetconfDOMTransaction masterDOMTransactions =
-                new NetconfMasterDOMTransaction(delegateDataBroker);
+                new NetconfMasterDOMTransaction(remoteDeviceId, delegateDataBroker);
 
         masterDataBroker =
                 new NetconfDOMDataBroker(system, remoteDeviceId, masterDOMTransactions);
@@ -107,7 +107,7 @@ public class ReadOnlyTransactionTest {
         // Create slave data broker for testing proxy
 
         final NetconfDOMTransaction proxyDOMTransactions =
-                new NetconfProxyDOMTransaction(system, masterRef);
+                new NetconfProxyDOMTransaction(remoteDeviceId, system, masterRef);
 
         slaveDataBroker = new NetconfDOMDataBroker(system, remoteDeviceId, proxyDOMTransactions);
 
