@@ -18,11 +18,14 @@ import io.netty.util.internal.ConcurrentSet;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -33,6 +36,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 import org.json.JSONObject;
 import org.json.XML;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
@@ -56,6 +62,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 
 /**
  * {@link NotificationListenerAdapter} is responsible to track events on
@@ -77,6 +84,7 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
     private final String outputType;
     private Date start = null;
     private Date stop = null;
+    private String filter;
 
     /**
      * Set path of listener and stream name, register event bus.
@@ -104,7 +112,7 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
         final Date now = new Date();
         if (this.stop != null) {
             if ((this.start.compareTo(now) < 0) && (this.stop.compareTo(now) > 0)) {
-                prepareAndPostData(notification);
+                checkFilter(notification);
             }
             if (this.stop.compareTo(now) < 0) {
                 try {
@@ -116,18 +124,40 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
         } else if (this.start != null) {
             if (this.start.compareTo(now) < 0) {
                 this.start = null;
-                prepareAndPostData(notification);
+                checkFilter(notification);
             }
         } else {
-            prepareAndPostData(notification);
+            checkFilter(notification);
         }
+    }
+
+    private void checkFilter(final DOMNotification notification) {
+        final String xml = prepareXmlFrom(notification);
+        if (this.filter == null) {
+            prepareAndPostData(xml);
+        } else {
+            try {
+                if (parseFilter(xml)) {
+                    prepareAndPostData(xml);
+                }
+            } catch (final Exception e) {
+                throw new RestconfDocumentedException("Problem while parsing filter.", e);
+            }
+        }
+    }
+
+    private boolean parseFilter(final String xml) throws Exception {
+        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        final DocumentBuilder builder = factory.newDocumentBuilder();
+        final Document docOfXml = builder.parse(new InputSource(new StringReader(xml)));
+        final XPath xPath = XPathFactory.newInstance().newXPath();
+        return (boolean) xPath.compile(this.filter).evaluate(docOfXml, XPathConstants.BOOLEAN);
     }
 
     /**
      * @param notification
      */
-    private void prepareAndPostData(final DOMNotification notification) {
-        final String xml = prepareXmlFrom(notification);
+    private void prepareAndPostData(final String xml) {
         final Event event = new Event(EventType.NOTIFY);
         if (this.outputType.equals("JSON")) {
             final JSONObject jsonObject = XML.toJSONObject(xml);
@@ -417,11 +447,18 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
     }
 
     /**
+     * Set query parameters to listener
+     *
      * @param start
+     *            - start-time
      * @param stop
+     *            - stop-time
+     * @param filter
+     *            - filter
      */
-    public void setTime(final Date start, final Date stop) {
+    public void queryParams(final Date start, final Date stop, final String filter) {
         this.start = start;
         this.stop = stop;
+        this.filter = filter;
     }
 }
