@@ -153,10 +153,10 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
             return;
         }
 
-        throw new DocumentedException("Missing attribute" + rootNode.getNodeName(),
-                DocumentedException.ErrorType.protocol, DocumentedException.ErrorTag.missing_attribute,
+        throw new DocumentedException("Missing attribute " + rootNode.getNodeName(),
+                DocumentedException.ErrorType.rpc, DocumentedException.ErrorTag.missing_attribute,
                 DocumentedException.ErrorSeverity.error,
-                ImmutableMap.of(DocumentedException.ErrorTag.missing_attribute.toString(),
-                        XmlNetconfConstants.MESSAGE_ID));
+                ImmutableMap.of("bad-attribute", XmlNetconfConstants.MESSAGE_ID,
+                        "bad-element", XmlNetconfConstants.RPC_KEY));
     }
 }

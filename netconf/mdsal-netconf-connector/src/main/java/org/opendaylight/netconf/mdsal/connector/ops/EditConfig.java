@@ -9,11 +9,13 @@
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeverity;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
@@ -193,7 +195,9 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         final NodeList elementsByTagName = operationElement.getDomElement().getElementsByTagName(TARGET_KEY);
         // Direct lookup instead of using XmlElement class due to performance
         if (elementsByTagName.getLength() == 0) {
-            throw new DocumentedException("Missing target element", ErrorType.rpc, ErrorTag.missing_attribute, ErrorSeverity.error);
+            Map<String, String> errorInfo = ImmutableMap.of("bad-attribute", TARGET_KEY, "bad-element", OPERATION_NAME);
+            throw new DocumentedException("Missing target element",
+                    ErrorType.protocol, ErrorTag.missing_attribute, ErrorSeverity.error, errorInfo);
         } else if (elementsByTagName.getLength() > 1) {
             throw new DocumentedException("Multiple target elements", ErrorType.rpc, ErrorTag.unknown_attribute, ErrorSeverity.error);
         } else {
