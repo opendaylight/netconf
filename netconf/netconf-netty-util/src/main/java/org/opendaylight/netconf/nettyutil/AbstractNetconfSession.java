@@ -17,6 +17,7 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.FutureListener;
 import java.io.IOException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
+import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.NetconfExiSession;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSession;
@@ -60,7 +61,7 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
 
     @Override
     protected void handleMessage(final NetconfMessage netconfMessage) {
-        LOG.debug("handling incoming message");
+        LOG.debug("handling incoming message:" + XmlUtil.toString(netconfMessage.getDocument()));
         sessionListener.onMessage(thisInstance(), netconfMessage);
     }
 
@@ -79,6 +80,7 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
             @Override
             public void run() {
                 final ChannelFuture future = channel.writeAndFlush(netconfMessage);
+                LOG.debug("sending netconfMessage:" + XmlUtil.toString(netconfMessage.getDocument()));
                 future.addListener(new FutureListener<Void>() {
                     @Override
                     public void operationComplete(Future<Void> future) throws Exception {
