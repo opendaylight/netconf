@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.netconf.api;
+package org.opendaylight.netconf.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -22,7 +22,6 @@ import javax.xml.xpath.XPathFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -66,7 +65,7 @@ public class NetconfDocumentedExceptionTest {
                 DocumentedException.ErrorType.PROTOCOL,
                 DocumentedException.ErrorTag.DATA_EXISTS,
                 DocumentedException.ErrorSeverity.WARNING,
-                                                                        ImmutableMap.of( "foo", "bar" ) );
+                ImmutableMap.of( "foo", "bar" ) );
 
         final Document doc = ex.toXMLDocument();
         assertNotNull( "Document is null", doc );
@@ -81,7 +80,7 @@ public class NetconfDocumentedExceptionTest {
 
         final Node errorTypeNode = getNode("netconf:error-type", rpcErrorNode);
         assertNotNull( "error-type not found", errorTypeNode );
-        assertEquals("error-type", DocumentedException.ErrorType.PROTOCOL.getTagValue(),
+        assertEquals("error-type", DocumentedException.ErrorType.PROTOCOL.getTypeValue(),
                       errorTypeNode.getTextContent() );
 
         final Node errorTagNode = getNode("netconf:error-tag", rpcErrorNode);
@@ -91,7 +90,7 @@ public class NetconfDocumentedExceptionTest {
 
         final Node errorSeverityNode = getNode("netconf:error-severity", rpcErrorNode);
         assertNotNull( "error-severity not found", errorSeverityNode );
-        assertEquals("error-severity", DocumentedException.ErrorSeverity.WARNING.getTagValue(),
+        assertEquals("error-severity", DocumentedException.ErrorSeverity.WARNING.getSeverityValue(),
                       errorSeverityNode.getTextContent() );
 
         final Node errorInfoNode = getNode("netconf:error-info/netconf:foo", rpcErrorNode);
