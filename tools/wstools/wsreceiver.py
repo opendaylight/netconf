@@ -72,6 +72,7 @@ class WSReceiver(object):
         logger.info("Data received:\n%s", data)
         return data
 
+
 if __name__ == "__main__":
     args = parse_arguments()
     logger = logging.getLogger("logger")
