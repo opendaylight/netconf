@@ -193,7 +193,7 @@ public class BrokerFacadeTest {
         when(this.rwTransaction.read(LogicalDatastoreType.CONFIGURATION, this.instanceID)).thenReturn(readFuture);
 
         final PutResult result = this.brokerFacade.commitConfigurationDataPut(mock(SchemaContext.class),
-                this.instanceID, this.dummyNode);
+                this.instanceID, this.dummyNode, null, null);
 
         final Future<Void> actualFuture = result.getFutureOfPutData();
 
@@ -216,7 +216,7 @@ public class BrokerFacadeTest {
         when(this.rwTransaction.submit()).thenReturn(expFuture);
 
         final CheckedFuture<Void, TransactionCommitFailedException> actualFuture = this.brokerFacade
-                .commitConfigurationDataPost(mock(SchemaContext.class), this.instanceID, this.dummyNode);
+                .commitConfigurationDataPost(mock(SchemaContext.class), this.instanceID, this.dummyNode, null, null);
 
         assertSame("commitConfigurationDataPost", expFuture, actualFuture);
 
@@ -234,7 +234,8 @@ public class BrokerFacadeTest {
                 .thenReturn(successFuture);
         try {
             // Schema context is only necessary for ensuring parent structure
-            this.brokerFacade.commitConfigurationDataPost((SchemaContext) null, this.instanceID, this.dummyNode);
+            this.brokerFacade.commitConfigurationDataPost((SchemaContext) null, this.instanceID, this.dummyNode, null,
+                    null);
         } catch (final RestconfDocumentedException e) {
             assertEquals("getErrorTag", RestconfError.ErrorTag.DATA_EXISTS, e.getErrors().get(0).getErrorTag());
             throw e;

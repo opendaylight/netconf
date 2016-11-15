@@ -9,7 +9,6 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.OPERATIONAL;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -46,10 +45,19 @@ import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapte
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.OrderedLeafSetNode;
+import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
@@ -132,10 +140,13 @@ public class BrokerFacade {
      *            - path of node
      * @param payload
      *            - input data
+     * @param point
+     * @param insert
      * @return wrapper of status and future of PUT
      */
     public PutResult commitConfigurationDataPut(
-            final SchemaContext globalSchema, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload) {
+            final SchemaContext globalSchema, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
+            final String insert, final String point) {
         Preconditions.checkNotNull(globalSchema);
         Preconditions.checkNotNull(path);
         Preconditions.checkNotNull(payload);
@@ -146,7 +157,7 @@ public class BrokerFacade {
         final Status status = readDataViaTransaction(newReadWriteTransaction, CONFIGURATION, path) != null ? Status.OK
                 : Status.CREATED;
         final CheckedFuture<Void, TransactionCommitFailedException> future = putDataViaTransaction(
-                newReadWriteTransaction, CONFIGURATION, path, payload, globalSchema);
+                newReadWriteTransaction, CONFIGURATION, path, payload, globalSchema, insert, point);
         return new PutResult(status, future);
     }
 
@@ -163,10 +174,13 @@ public class BrokerFacade {
      *            - path of node
      * @param payload
      *            - input data
+     * @param point
+     * @param insert
      * @return wrapper of status and future of PUT
      */
     public PutResult commitMountPointDataPut(
-            final DOMMountPoint mountPoint, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload) {
+            final DOMMountPoint mountPoint, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
+            final String insert, final String point) {
         Preconditions.checkNotNull(mountPoint);
         Preconditions.checkNotNull(path);
         Preconditions.checkNotNull(payload);
@@ -177,8 +191,8 @@ public class BrokerFacade {
             final Status status = readDataViaTransaction(newReadWriteTransaction, CONFIGURATION, path) != null
                     ? Status.OK : Status.CREATED;
             final CheckedFuture<Void, TransactionCommitFailedException> future = putDataViaTransaction(
-                    newReadWriteTransaction, CONFIGURATION, path,
-                    payload, mountPoint.getSchemaContext());
+                    newReadWriteTransaction, CONFIGURATION, path, payload, mountPoint.getSchemaContext(), insert,
+                    point);
             return new PutResult(status, future);
         }
         final String errMsg = "DOM data broker service isn't available for mount point " + path;
@@ -361,17 +375,20 @@ public class BrokerFacade {
 
     // POST configuration
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataPost(
-            final SchemaContext globalSchema, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload) {
+            final SchemaContext globalSchema, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
+            final String insert, final String point) {
         checkPreconditions();
-        return postDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path, payload, globalSchema);
+        return postDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path, payload,
+                globalSchema, insert, point);
     }
 
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataPost(
-            final DOMMountPoint mountPoint, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload) {
+            final DOMMountPoint mountPoint, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
+            final String insert, final String point) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
             return postDataViaTransaction(domDataBrokerService.get().newReadWriteTransaction(), CONFIGURATION, path,
-                    payload, mountPoint.getSchemaContext());
+                    payload, mountPoint.getSchemaContext(), insert, point);
         }
         final String errMsg = "DOM data broker service isn't available for mount point " + path;
         LOG.warn(errMsg);
@@ -455,13 +472,13 @@ public class BrokerFacade {
 
     /**
      * POST data and submit transaction {@link DOMDataReadWriteTransaction}
-     * @return
      */
     private CheckedFuture<Void, TransactionCommitFailedException> postDataViaTransaction(
             final DOMDataReadWriteTransaction rWTransaction, final LogicalDatastoreType datastore,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
+            final String insert, final String point) {
         LOG.trace("POST {} via Restconf: {} with payload {}", datastore.name(), path, payload);
-        postData(rWTransaction, datastore, path, payload, schemaContext);
+        postData(rWTransaction, datastore, path, payload, schemaContext, insert, point);
         return rWTransaction.submit();
     }
 
@@ -472,13 +489,188 @@ public class BrokerFacade {
             final DOMDataReadWriteTransaction rWTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         LOG.trace("POST {} within Restconf PATCH: {} with payload {}", datastore.name(), path, payload);
-        postData(rWTransaction, datastore, path, payload, schemaContext);
+        postData(rWTransaction, datastore, path, payload, schemaContext, null, null);
     }
 
-    // FIXME: This is doing correct post for container and list children, not sure if this will work for choice case
     private void postData(final DOMDataReadWriteTransaction rWTransaction, final LogicalDatastoreType datastore,
                           final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
-                          final SchemaContext schemaContext) {
+            final SchemaContext schemaContext, final String insert, final String point) {
+        if (insert == null) {
+            makeNormalPost(rWTransaction, datastore, path, payload, schemaContext);
+        } else {
+            final DataSchemaNode schemaNode = checkListAndOrderedType(schemaContext, path);
+            checkItemDoesNotExists(rWTransaction, datastore, path);
+            switch (insert) {
+                case "first":
+                    if(schemaNode instanceof ListSchemaNode){
+                        final OrderedMapNode readList =
+                                (OrderedMapNode) this.readConfigurationData(path.getParent().getParent());
+                        if ((readList == null) || readList.getValue().isEmpty()) {
+                            simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+                        } else {
+                            rWTransaction.delete(datastore, path.getParent().getParent());
+                            simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+                            makeNormalPost(rWTransaction, datastore, path.getParent().getParent(), readList,
+                                    schemaContext);
+                        }
+                    } else {
+                        final OrderedLeafSetNode readLeafList =
+                                (OrderedLeafSetNode) readConfigurationData(path.getParent());
+                        if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
+                            simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+                        } else {
+                            rWTransaction.delete(datastore, path.getParent());
+                            simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+                            makeNormalPost(rWTransaction, datastore, path.getParent().getParent(), readLeafList,
+                                    schemaContext);
+                        }
+                    }
+                    break;
+                case "last":
+                    simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+                    break;
+                case "before":
+                    if(schemaNode instanceof ListSchemaNode){
+                        final OrderedMapNode readList =
+                                (OrderedMapNode) this.readConfigurationData(path.getParent().getParent());
+                        if ((readList == null) || readList.getValue().isEmpty()) {
+                            simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+                        } else {
+                            insertWithPointListPost(rWTransaction, datastore, path, payload, schemaContext, point,
+                                    readList,
+                                    true);
+                        }
+                    } else {
+                        final OrderedLeafSetNode<?> readLeafList =
+                                (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
+                        if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
+                            simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+                        } else {
+                            insertWithPointLeafListPost(rWTransaction, datastore, path, payload, schemaContext, point,
+                                    readLeafList, true);
+                        }
+                    }
+                    break;
+                case "after":
+                    if (schemaNode instanceof ListSchemaNode) {
+                        final OrderedMapNode readList =
+                                (OrderedMapNode) this.readConfigurationData(path.getParent().getParent());
+                        if ((readList == null) || readList.getValue().isEmpty()) {
+                            simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+                        } else {
+                            insertWithPointListPost(rWTransaction, datastore, path, payload, schemaContext, point,
+                                    readList,
+                                    false);
+                        }
+                    } else {
+                        final OrderedLeafSetNode<?> readLeafList =
+                                (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
+                        if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
+                            simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+                        } else {
+                            insertWithPointLeafListPost(rWTransaction, datastore, path, payload, schemaContext, point,
+                                    readLeafList, false);
+                        }
+                    }
+                    break;
+                default:
+                    throw new RestconfDocumentedException(
+                            "Used bad value of insert parameter. Possible values are first, last, before or after, "
+                                    + "but was: " + insert);
+            }
+        }
+    }
+
+    private void insertWithPointLeafListPost(final DOMDataReadWriteTransaction rWTransaction,
+            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
+            final SchemaContext schemaContext, final String point, final OrderedLeafSetNode<?> readLeafList,
+            final boolean before) {
+        rWTransaction.delete(datastore, path.getParent().getParent());
+        final InstanceIdentifierContext<?> instanceIdentifier =
+                ControllerContext.getInstance().toInstanceIdentifier(point);
+        int p = 0;
+        for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
+            if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
+                break;
+            }
+            p++;
+        }
+        if (!before) {
+            p++;
+        }
+        int h = 0;
+        final NormalizedNode<?, ?> emptySubtree =
+                ImmutableNodes.fromInstanceId(schemaContext, path.getParent().getParent());
+        rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+        for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
+            if (h == p) {
+                checkItemDoesNotExists(rWTransaction, datastore, path);
+                simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+            }
+            final YangInstanceIdentifier childPath = path.getParent().getParent().node(nodeChild.getIdentifier());
+            checkItemDoesNotExists(rWTransaction, datastore, childPath);
+            rWTransaction.put(datastore, childPath, nodeChild);
+            h++;
+        }
+    }
+
+    private void insertWithPointListPost(final DOMDataReadWriteTransaction rWTransaction,
+            final LogicalDatastoreType datastore,
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
+            final String point, final MapNode readList, final boolean before) {
+        rWTransaction.delete(datastore, path.getParent().getParent());
+        final InstanceIdentifierContext<?> instanceIdentifier =
+                ControllerContext.getInstance().toInstanceIdentifier(point);
+        int p = 0;
+        for (final MapEntryNode mapEntryNode : readList.getValue()) {
+            if (mapEntryNode.getIdentifier()
+                    .equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
+                break;
+            }
+            p++;
+        }
+        if (!before) {
+            p++;
+        }
+        int h = 0;
+        final NormalizedNode<?, ?> emptySubtree =
+                ImmutableNodes.fromInstanceId(schemaContext, path.getParent().getParent());
+        rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+        for (final MapEntryNode mapEntryNode : readList.getValue()) {
+            if (h == p) {
+                checkItemDoesNotExists(rWTransaction, datastore, path);
+                simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+            }
+            final YangInstanceIdentifier childPath = path.getParent().getParent().node(mapEntryNode.getIdentifier());
+            checkItemDoesNotExists(rWTransaction, datastore, childPath);
+            rWTransaction.put(datastore, childPath, mapEntryNode);
+            h++;
+        }
+    }
+
+    private DataSchemaNode checkListAndOrderedType(final SchemaContext ctx,
+            final YangInstanceIdentifier path) {
+        final YangInstanceIdentifier parent = path.getParent();
+        final DataSchemaContextNode<?> node = DataSchemaContextTree.from(ctx).getChild(parent);
+        final DataSchemaNode dataSchemaNode = node.getDataSchemaNode();
+
+        if (dataSchemaNode instanceof ListSchemaNode) {
+            if(!((ListSchemaNode) dataSchemaNode).isUserOrdered()) {
+                throw new RestconfDocumentedException("Insert parameter can be used only with ordered-by user list.");
+            }
+            return dataSchemaNode;
+        }
+        if (dataSchemaNode instanceof LeafListSchemaNode) {
+            if(!((LeafListSchemaNode) dataSchemaNode).isUserOrdered()) {
+                throw new RestconfDocumentedException("Insert parameter can be used only with ordered-by user leaf-list.");
+            }
+            return dataSchemaNode;
+        }
+        throw new RestconfDocumentedException("Insert parameter can be used only with list or leaf-list");
+    }
+
+    private void makeNormalPost(final DOMDataReadWriteTransaction rWTransaction, final LogicalDatastoreType datastore,
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         if (payload instanceof MapNode) {
             final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
             rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
@@ -488,11 +680,25 @@ public class BrokerFacade {
                 checkItemDoesNotExists(rWTransaction, datastore, childPath);
                 rWTransaction.put(datastore, childPath, child);
             }
-        } else {
-            checkItemDoesNotExists(rWTransaction, datastore, path);
+        } else if (payload instanceof LeafSetNode) {
+            final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
+            rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
             ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
-            rWTransaction.put(datastore, path, payload);
+            for (final LeafSetEntryNode<?> child : ((LeafSetNode<?>) payload).getValue()) {
+                final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
+                checkItemDoesNotExists(rWTransaction, datastore, childPath);
+                rWTransaction.put(datastore, childPath, child);
+            }
+        } else {
+            simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
         }
+    }
+
+    private void simplePostPut(final DOMDataReadWriteTransaction rWTransaction, final LogicalDatastoreType datastore,
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
+        checkItemDoesNotExists(rWTransaction, datastore, path);
+        ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
+        rWTransaction.put(datastore, path, payload);
     }
 
     /**
@@ -583,27 +789,182 @@ public class BrokerFacade {
 
     /**
      * PUT data and submit {@link DOMDataReadWriteTransaction}
+     *
+     * @param point
+     * @param insert
      */
     private CheckedFuture<Void, TransactionCommitFailedException> putDataViaTransaction(
             final DOMDataReadWriteTransaction readWriteTransaction, final LogicalDatastoreType datastore,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
+            final String insert, final String point) {
         LOG.trace("Put {} via Restconf: {} with payload {}", datastore.name(), path, payload);
-        putData(readWriteTransaction, datastore, path, payload, schemaContext);
+        putData(readWriteTransaction, datastore, path, payload, schemaContext, insert, point);
         return readWriteTransaction.submit();
     }
 
     /**
      * PUT data and do NOT submit {@link DOMDataReadWriteTransaction}
+     *
+     * @param insert
+     * @param point
      */
     private void putDataWithinTransaction(
             final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         LOG.trace("Put {} within Restconf PATCH: {} with payload {}", datastore.name(), path, payload);
-        putData(writeTransaction, datastore, path, payload, schemaContext);
+        putData(writeTransaction, datastore, path, payload, schemaContext, null, null);
     }
 
     // FIXME: This is doing correct put for container and list children, not sure if this will work for choice case
-    private void putData(final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
+    private void putData(final DOMDataReadWriteTransaction rWTransaction, final LogicalDatastoreType datastore,
+            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
+            final String insert, final String point) {
+        if (insert == null) {
+            makePut(rWTransaction, datastore, path, payload, schemaContext);
+        } else {
+            final DataSchemaNode schemaNode = checkListAndOrderedType(schemaContext, path);
+            checkItemDoesNotExists(rWTransaction, datastore, path);
+            switch (insert) {
+                case "first":
+                    if (schemaNode instanceof ListSchemaNode) {
+                        final OrderedMapNode readList =
+                                (OrderedMapNode) this.readConfigurationData(path.getParent());
+                        if ((readList == null) || readList.getValue().isEmpty()) {
+                            simplePut(datastore, path, rWTransaction, schemaContext, payload);
+                        } else {
+                            rWTransaction.delete(datastore, path.getParent());
+                            simplePut(datastore, path, rWTransaction, schemaContext, payload);
+                            makePut(rWTransaction, datastore, path.getParent(), readList, schemaContext);
+                        }
+                    } else {
+                        final OrderedLeafSetNode<?> readLeafList =
+                                (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
+                        if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
+                            simplePut(datastore, path, rWTransaction, schemaContext, payload);
+                        } else {
+                            rWTransaction.delete(datastore, path.getParent());
+                            simplePut(datastore, path, rWTransaction, schemaContext, payload);
+                            makePut(rWTransaction, datastore, path.getParent(), readLeafList,
+                                    schemaContext);
+                        }
+                    }
+                    break;
+                case "last":
+                    simplePut(datastore, path, rWTransaction, schemaContext, payload);
+                    break;
+                case "before":
+                    if (schemaNode instanceof ListSchemaNode) {
+                        final OrderedMapNode readList =
+                                (OrderedMapNode) this.readConfigurationData(path.getParent());
+                        if ((readList == null) || readList.getValue().isEmpty()) {
+                            simplePut(datastore, path, rWTransaction, schemaContext, payload);
+                        } else {
+                            insertWithPointListPut(rWTransaction, datastore, path, payload, schemaContext, point,
+                                    readList, true);
+                        }
+                    } else {
+                        final OrderedLeafSetNode<?> readLeafList =
+                                (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
+                        if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
+                            simplePut(datastore, path, rWTransaction, schemaContext, payload);
+                        } else {
+                            insertWithPointLeafListPut(rWTransaction, datastore, path, payload, schemaContext, point,
+                                    readLeafList, true);
+                        }
+                    }
+                    break;
+                case "after":
+                    if (schemaNode instanceof ListSchemaNode) {
+                        final OrderedMapNode readList =
+                                (OrderedMapNode) this.readConfigurationData(path.getParent());
+                        if ((readList == null) || readList.getValue().isEmpty()) {
+                            simplePut(datastore, path, rWTransaction, schemaContext, payload);
+                        } else {
+                            insertWithPointListPut(rWTransaction, datastore, path, payload, schemaContext, point,
+                                    readList, false);
+                        }
+                    } else {
+                        final OrderedLeafSetNode<?> readLeafList =
+                                (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
+                        if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
+                            simplePut(datastore, path, rWTransaction, schemaContext, payload);
+                        } else {
+                            insertWithPointLeafListPut(rWTransaction, datastore, path, payload, schemaContext, point,
+                                    readLeafList, false);
+                        }
+                    }
+                    break;
+                default:
+                    throw new RestconfDocumentedException(
+                            "Used bad value of insert parameter. Possible values are first, last, before or after, "
+                                    + "but was: " + insert);
+            }
+        }
+    }
+
+    private void insertWithPointLeafListPut(final DOMDataReadWriteTransaction rWTransaction,
+            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
+            final SchemaContext schemaContext, final String point, final OrderedLeafSetNode<?> readLeafList,
+            final boolean before) {
+        rWTransaction.delete(datastore, path.getParent());
+        final InstanceIdentifierContext<?> instanceIdentifier =
+                ControllerContext.getInstance().toInstanceIdentifier(point);
+        int p = 0;
+        for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
+            if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
+                break;
+            }
+            p++;
+        }
+        if (!before) {
+            p++;
+        }
+        int h = 0;
+        final NormalizedNode<?, ?> emptySubtree =
+                ImmutableNodes.fromInstanceId(schemaContext, path.getParent());
+        rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+        for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
+            if (h == p) {
+                simplePut(datastore, path, rWTransaction, schemaContext, payload);
+            }
+            final YangInstanceIdentifier childPath = path.getParent().node(nodeChild.getIdentifier());
+            rWTransaction.put(datastore, childPath, nodeChild);
+            h++;
+        }
+    }
+
+    private void insertWithPointListPut(final DOMDataReadWriteTransaction rWTransaction,
+            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
+            final SchemaContext schemaContext, final String point, final OrderedMapNode readList,
+            final boolean before) {
+        rWTransaction.delete(datastore, path.getParent());
+        final InstanceIdentifierContext<?> instanceIdentifier =
+                ControllerContext.getInstance().toInstanceIdentifier(point);
+        int p = 0;
+        for (final MapEntryNode mapEntryNode : readList.getValue()) {
+            if (mapEntryNode.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
+                break;
+            }
+            p++;
+        }
+        if (!before) {
+            p++;
+        }
+        int h = 0;
+        final NormalizedNode<?, ?> emptySubtree =
+                ImmutableNodes.fromInstanceId(schemaContext, path.getParent());
+        rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+        for (final MapEntryNode mapEntryNode : readList.getValue()) {
+            if (h == p) {
+                simplePut(datastore, path, rWTransaction, schemaContext, payload);
+            }
+            final YangInstanceIdentifier childPath = path.getParent().node(mapEntryNode.getIdentifier());
+            rWTransaction.put(datastore, childPath, mapEntryNode);
+            h++;
+        }
+    }
+
+    private void makePut(final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         if (payload instanceof MapNode) {
             final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
@@ -614,9 +975,15 @@ public class BrokerFacade {
                 writeTransaction.put(datastore, childPath, child);
             }
         } else {
-            ensureParentsByMerge(datastore, path, writeTransaction, schemaContext);
-            writeTransaction.put(datastore, path, payload);
+            simplePut(datastore, path, writeTransaction, schemaContext, payload);
         }
+    }
+
+    private void simplePut(final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
+            final DOMDataReadWriteTransaction writeTransaction, final SchemaContext schemaContext,
+            final NormalizedNode<?, ?> payload) {
+        ensureParentsByMerge(datastore, path, writeTransaction, schemaContext);
+        writeTransaction.put(datastore, path, payload);
     }
 
     private CheckedFuture<Void, TransactionCommitFailedException> deleteDataViaTransaction(

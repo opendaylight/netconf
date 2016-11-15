@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.restconf.api;
 
 import com.google.common.base.Optional;
 import javax.annotation.Nonnull;
+import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 
@@ -29,7 +30,7 @@ public interface JSONRestconfService {
      * @param payload the payload data in JSON format.
      * @throws OperationFailedException if the request fails.
      */
-    void put(String uriPath, @Nonnull String payload) throws OperationFailedException;
+    void put(String uriPath, @Nonnull String payload, UriInfo uriInfo) throws OperationFailedException;
 
     /**
      * Issues a restconf POST request to the configuration data store.
@@ -39,7 +40,7 @@ public interface JSONRestconfService {
      * @param payload the payload data in JSON format.
      * @throws OperationFailedException if the request fails.
      */
-    void post(String uriPath, @Nonnull String payload) throws OperationFailedException;
+    void post(String uriPath, @Nonnull String payload, UriInfo uriInfo) throws OperationFailedException;
 
     /**
      * Issues a restconf DELETE request to the configuration data store.
