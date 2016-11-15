@@ -19,9 +19,11 @@ import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.List;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.controller.sal.restconf.impl.test.TestUtils;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
@@ -75,7 +77,7 @@ public class RestPutListDataTest {
         restconfImpl.setControllerContext(controllerContext);
         final PutResult result = mock(PutResult.class);
         when(brokerFacade.commitConfigurationDataPut(any(SchemaContext.class), any(YangInstanceIdentifier.class),
-                any(NormalizedNode.class)))
+                any(NormalizedNode.class), Mockito.anyString(), Mockito.anyString()))
                         .thenReturn(result);
         when(result.getFutureOfPutData()).thenReturn(mock(CheckedFuture.class));
         when(result.getStatus()).thenReturn(Status.OK);
@@ -200,7 +202,8 @@ public class RestPutListDataTest {
         final NormalizedNodeContext testCompositeContext = new NormalizedNodeContext(new InstanceIdentifierContext<>(
                 null, testNodeSchemaNode, null, schemaContextTestModule), testNodeContainer.build());
 
-        restconfImpl.updateConfigurationData(toUri(uriKey1, uriKey2), testCompositeContext);
+        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        restconfImpl.updateConfigurationData(toUri(uriKey1, uriKey2), testCompositeContext, uriInfo);
     }
 
     public void putListDataWithWrapperTest(final String uriKey1, final String uriKey2, final String payloadKey1,

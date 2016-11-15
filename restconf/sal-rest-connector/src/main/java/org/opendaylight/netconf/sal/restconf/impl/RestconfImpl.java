@@ -437,6 +437,7 @@ public class RestconfImpl implements RestconfService {
         final CheckedFuture<DOMRpcResult, DOMRpcException> response;
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final SchemaContext schemaContext;
+
         if (mountPoint != null) {
             final Optional<DOMRpcService> mountRpcServices = mountPoint.getService(DOMRpcService.class);
             if ( ! mountRpcServices.isPresent()) {
@@ -710,8 +711,46 @@ public class RestconfImpl implements RestconfService {
     }
 
     @Override
-    public Response updateConfigurationData(final String identifier, final NormalizedNodeContext payload) {
+    public Response updateConfigurationData(final String identifier, final NormalizedNodeContext payload,
+            final UriInfo uriInfo) {
+        boolean insert_used = false;
+        boolean point_used = false;
+        String insert = null;
+        String point = null;
+
+        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
+            switch (entry.getKey()) {
+                case "insert":
+                    if (!insert_used) {
+                        insert_used = true;
+                        insert = entry.getValue().iterator().next();
+                    } else {
+                        throw new RestconfDocumentedException("Insert parameter can be used only once.");
+                    }
+                    break;
+                case "point":
+                    if (!point_used) {
+                        point_used = true;
+                        point = entry.getValue().iterator().next();
+                    } else {
+                        throw new RestconfDocumentedException("Point parameter can be used only once.");
+                    }
+                    break;
+                default:
+                    throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey());
+            }
+        }
+
+        if (point_used && !insert_used) {
+            throw new RestconfDocumentedException("Point parameter can't be used without Insert parameter.");
+        }
+        if (point_used && (insert.equals("first") || insert.equals("last"))) {
+            throw new RestconfDocumentedException(
+                    "Point parameter can be used only with 'after' or 'before' values of Insert parameter.");
+        }
+
         Preconditions.checkNotNull(identifier);
+
         final InstanceIdentifierContext<?> iiWithData = payload.getInstanceIdentifierContext();
 
         validateInput(iiWithData.getSchemaNode(), payload);
@@ -739,10 +778,11 @@ public class RestconfImpl implements RestconfService {
         while(true) {
             if (mountPoint != null) {
 
-                result = this.broker.commitMountPointDataPut(mountPoint, normalizedII, payload.getData());
+                result = this.broker.commitMountPointDataPut(mountPoint, normalizedII, payload.getData(), insert,
+                        point);
             } else {
                 result = this.broker.commitConfigurationDataPut(this.controllerContext.getGlobalSchema(), normalizedII,
-                        payload.getData());
+                        payload.getData(), insert, point);
             }
             final CountDownLatch waiter = new CountDownLatch(1);
             Futures.addCallback(result.getFutureOfPutData(), new FutureCallback<Void>() {
@@ -905,25 +945,53 @@ public class RestconfImpl implements RestconfService {
         if (payload == null) {
             throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
-
-        // FIXME: move this to parsing stage (we can have augmentation nodes here which do not have namespace)
-//        final URI payloadNS = payload.getData().getNodeType().getNamespace();
-//        if (payloadNS == null) {
-//            throw new RestconfDocumentedException(
-//                    "Data has bad format. Root element node must have namespace (XML format) or module name(JSON format)",
-//                    ErrorType.PROTOCOL, ErrorTag.UNKNOWN_NAMESPACE);
-//        }
-
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final InstanceIdentifierContext<?> iiWithData = payload.getInstanceIdentifierContext();
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
 
+        boolean insert_used = false;
+        boolean point_used = false;
+        String insert = null;
+        String point = null;
+
+        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
+            switch (entry.getKey()) {
+                case "insert":
+                    if (!insert_used) {
+                        insert_used = true;
+                        insert = entry.getValue().iterator().next();
+                    } else {
+                        throw new RestconfDocumentedException("Insert parameter can be used only once.");
+                    }
+                    break;
+                case "point":
+                    if (!point_used) {
+                        point_used = true;
+                        point = entry.getValue().iterator().next();
+                    } else {
+                        throw new RestconfDocumentedException("Point parameter can be used only once.");
+                    }
+                    break;
+                default:
+                    throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey());
+            }
+        }
+
+        if (point_used && !insert_used) {
+            throw new RestconfDocumentedException("Point parameter can't be used without Insert parameter.");
+        }
+        if (point_used && (insert.equals("first") || insert.equals("last"))) {
+            throw new RestconfDocumentedException(
+                    "Point parameter can be used only with 'after' or 'before' values of Insert parameter.");
+        }
+
         CheckedFuture<Void, TransactionCommitFailedException> future;
         if (mountPoint != null) {
-            future = this.broker.commitConfigurationDataPost(mountPoint, normalizedII, payload.getData());
+            future = this.broker.commitConfigurationDataPost(mountPoint, normalizedII, payload.getData(), insert,
+                    point);
         } else {
             future = this.broker.commitConfigurationDataPost(this.controllerContext.getGlobalSchema(), normalizedII,
-                    payload.getData());
+                    payload.getData(), insert, point);
         }
 
         final CountDownLatch waiter = new CountDownLatch(1);
