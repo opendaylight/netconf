@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.mdsal.connector.ops.get;
 
+import static org.opendaylight.yangtools.yang.data.util.ParserStreamUtils.findSchemaNodeByNameAndNamespace;
+
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
@@ -23,8 +23,6 @@ import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.ChoiceCaseNode;
-import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -141,59 +139,6 @@ public class FilterContentValidator {
             tree = child;
         }
         return builder.build();
-    }
-
-    //FIXME this method will also be in yangtools ParserUtils, use that when https://git.opendaylight.org/gerrit/#/c/37031/ will be merged
-    /**
-     * Returns stack of schema nodes via which it was necessary to pass to get schema node with specified
-     * {@code childName} and {@code namespace}
-     *
-     * @param dataSchemaNode
-     * @param childName
-     * @param namespace
-     * @return stack of schema nodes via which it was passed through. If found schema node is direct child then stack
-     *         contains only one node. If it is found under choice and case then stack should contains 2*n+1 element
-     *         (where n is number of choices through it was passed)
-     */
-    private Deque<DataSchemaNode> findSchemaNodeByNameAndNamespace(final DataSchemaNode dataSchemaNode,
-                                                                   final String childName, final URI namespace) {
-        final Deque<DataSchemaNode> result = new ArrayDeque<>();
-        final List<ChoiceSchemaNode> childChoices = new ArrayList<>();
-        DataSchemaNode potentialChildNode = null;
-        if (dataSchemaNode instanceof DataNodeContainer) {
-            for (final DataSchemaNode childNode : ((DataNodeContainer) dataSchemaNode).getChildNodes()) {
-                if (childNode instanceof ChoiceSchemaNode) {
-                    childChoices.add((ChoiceSchemaNode) childNode);
-                } else {
-                    final QName childQName = childNode.getQName();
-
-                    if (childQName.getLocalName().equals(childName) && childQName.getNamespace().equals(namespace)) {
-                        if (potentialChildNode == null ||
-                                childQName.getRevision().after(potentialChildNode.getQName().getRevision())) {
-                            potentialChildNode = childNode;
-                        }
-                    }
-                }
-            }
-        }
-        if (potentialChildNode != null) {
-            result.push(potentialChildNode);
-            return result;
-        }
-
-        // try to find data schema node in choice (looking for first match)
-        for (final ChoiceSchemaNode choiceNode : childChoices) {
-            for (final ChoiceCaseNode concreteCase : choiceNode.getCases()) {
-                final Deque<DataSchemaNode> resultFromRecursion = findSchemaNodeByNameAndNamespace(concreteCase, childName,
-                        namespace);
-                if (!resultFromRecursion.isEmpty()) {
-                    resultFromRecursion.push(concreteCase);
-                    resultFromRecursion.push(choiceNode);
-                    return resultFromRecursion;
-                }
-            }
-        }
-        return result;
     }
 
     /**
