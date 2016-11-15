@@ -113,8 +113,8 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
     }
 
     @Override
-    public Response putData(final String identifier, final NormalizedNodeContext payload) {
-        return this.delegRestconfDataService.putData(identifier, payload);
+    public Response putData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+        return this.delegRestconfDataService.putData(identifier, payload, uriInfo);
     }
 
     @Override

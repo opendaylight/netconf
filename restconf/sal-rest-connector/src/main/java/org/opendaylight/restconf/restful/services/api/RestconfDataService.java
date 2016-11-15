@@ -75,7 +75,8 @@ public interface RestconfDataService {
     @Path("/data/{identifier:.+}")
     @Consumes({ Draft17.MediaTypes.DATA + RestconfConstants.JSON, Draft17.MediaTypes.DATA, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    Response putData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload);
+    Response putData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
+            @Context UriInfo uriInfo);
 
     /**
      * Create a data resource in target.

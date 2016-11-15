@@ -12,7 +12,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-
 import com.google.common.util.concurrent.Futures;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -133,7 +132,8 @@ public class PostDataTransactionUtilTest {
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain);
-        final Response response = PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx);
+        final Response response =
+                PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);
         assertEquals(201, response.getStatus());
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
@@ -151,7 +151,8 @@ public class PostDataTransactionUtilTest {
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain);
-        final Response response = PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx);
+        final Response response =
+                PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);
         assertEquals(201, response.getStatus());
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, data.getValue().iterator().next());
@@ -170,9 +171,10 @@ public class PostDataTransactionUtilTest {
                 payload.getData());
         doReturn(Futures.immediateFailedCheckedFuture(new DOMException((short) 414, "Post request failed"))).when(this.readWrite).submit();
         final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain);
-        final Response response = PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx);
+        final Response response =
+                PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);
         assertEquals(Response.Status.INTERNAL_SERVER_ERROR, response.getStatusInfo());
-        verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, iid2);
+        verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
     }
 

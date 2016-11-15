@@ -128,11 +128,12 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
     }
 
     @Override
-    public Response updateConfigurationData(final String identifier, final NormalizedNodeContext payload) {
+    public Response updateConfigurationData(final String identifier, final NormalizedNodeContext payload,
+            final UriInfo uriInfo) {
         this.configPut.incrementAndGet();
         Response response = null;
         try {
-            response = this.delegate.updateConfigurationData(identifier, payload);
+            response = this.delegate.updateConfigurationData(identifier, payload, uriInfo);
             if (response.getStatus() == Status.OK.getStatusCode()) {
                 this.successPut.incrementAndGet();
             }

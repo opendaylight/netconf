@@ -130,7 +130,7 @@ public class RestPutOperationTest extends JerseyTest {
         final PutResult result = mock(PutResult.class);
         when(
                 brokerFacade.commitMountPointDataPut(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
-                        any(NormalizedNode.class))).thenReturn(result);
+                        any(NormalizedNode.class), null, null)).thenReturn(result);
         when(result.getFutureOfPutData()).thenReturn(dummyFuture);
         when(result.getStatus()).thenReturn(Status.OK);
 
@@ -153,7 +153,7 @@ public class RestPutOperationTest extends JerseyTest {
         final CheckedFuture<Void, TransactionCommitFailedException> dummyFuture = Futures.immediateCheckedFuture(null);
         final PutResult result = mock(PutResult.class);
         doReturn(result).when(brokerFacade).commitMountPointDataPut(any(DOMMountPoint.class),
-                any(YangInstanceIdentifier.class), any(NormalizedNode.class));
+                any(YangInstanceIdentifier.class), any(NormalizedNode.class), null, null);
         when(result.getFutureOfPutData()).thenReturn(dummyFuture);
         when(result.getStatus()).thenReturn(Status.OK);
 
@@ -175,13 +175,14 @@ public class RestPutOperationTest extends JerseyTest {
 
         doThrow(OptimisticLockFailedException.class).
             when(brokerFacade).commitConfigurationDataPut(
-                        any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class));
+                        any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), null,
+                        null);
 
         assertEquals(500, put(uri, MediaType.APPLICATION_XML, xmlData));
 
         doThrow(OptimisticLockFailedException.class).doReturn(mock(PutResult.class)).when(brokerFacade)
                 .commitConfigurationDataPut(any(SchemaContext.class), any(YangInstanceIdentifier.class),
-                        any(NormalizedNode.class));
+                        any(NormalizedNode.class), null, null);
 
         assertEquals(500, put(uri, MediaType.APPLICATION_XML, xmlData));
     }
@@ -193,7 +194,8 @@ public class RestPutOperationTest extends JerseyTest {
 
         doThrow(TransactionCommitFailedException.class).
             when(brokerFacade).commitConfigurationDataPut(
-                        any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class));
+                        any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), null,
+                        null);
 
         assertEquals(500, put(uri, MediaType.APPLICATION_XML, xmlData));
     }
@@ -206,10 +208,10 @@ public class RestPutOperationTest extends JerseyTest {
         final PutResult putResMock = mock(PutResult.class);
         if (noErrors) {
             doReturn(putResMock).when(brokerFacade).commitConfigurationDataPut(
-                    any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class));
+                    any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), null, null);
         } else {
             doThrow(RestconfDocumentedException.class).when(brokerFacade).commitConfigurationDataPut(
-                    any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class));
+                    any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), null, null);
         }
     }
 
