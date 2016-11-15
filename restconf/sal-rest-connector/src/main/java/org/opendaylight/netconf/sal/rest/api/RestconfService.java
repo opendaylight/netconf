@@ -33,23 +33,24 @@ import org.opendaylight.restconf.restful.services.api.RestconfDataService;
 import org.opendaylight.restconf.restful.services.api.RestconfInvokeOperationsService;
 
 /**
- * The URI hierarchy for the RESTCONF resources consists of an entry point container, 4 top-level resources, and 1
- * field.
+ * The URI hierarchy for the RESTCONF resources consists of an entry point
+ * container, 4 top-level resources, and 1 field.
  * <ul>
  * <li><b>/restconf</b> - {@link #getRoot()}
  * <ul>
- *      <li><b>/config</b> - {@link #readConfigurationData(String, UriInfo)}
- *                              {@link #updateConfigurationData(String, NormalizedNodeContext)}
- *                              {@link #createConfigurationData(NormalizedNodeContext, UriInfo)}
- *                              {@link #createConfigurationData(String, NormalizedNodeContext, UriInfo)}
+ * <li><b>/config</b> - {@link #readConfigurationData(String, UriInfo)}
+ * {@link #updateConfigurationData(String, NormalizedNodeContext, UriInfo)}
+ * {@link #createConfigurationData(NormalizedNodeContext, UriInfo)}
+ * {@link #createConfigurationData(String, NormalizedNodeContext, UriInfo)}
  * {@link #deleteConfigurationData(String)}
  * <li><b>/operational</b> - {@link #readOperationalData(String, UriInfo)}
  * <li>/modules - {@link #getModules(UriInfo)}
  * <ul>
  * <li>/module
  * </ul>
- *      <li><b>/operations</b> - {@link #invokeRpc(String, NormalizedNodeContext, UriInfo)}
- *                               {@link #invokeRpc(String, NormalizedNodeContext, UriInfo)}
+ * <li><b>/operations</b> -
+ * {@link #invokeRpc(String, NormalizedNodeContext, UriInfo)}
+ * {@link #invokeRpc(String, NormalizedNodeContext, UriInfo)}
  * <li>/version (field)
  * </ul>
  * </ul>
@@ -169,14 +170,15 @@ public interface RestconfService {
 
     /**
      * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfDataService#putData(String, NormalizedNodeContext)}
+     *             {@link RestconfDataService#putData(String, NormalizedNodeContext, UriInfo)}
      */
     @Deprecated
     @PUT
     @Path("/config/{identifier:.+}")
     @Consumes({ Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public Response updateConfigurationData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload);
+    public Response updateConfigurationData(@Encoded @PathParam("identifier") String identifier,
+            NormalizedNodeContext payload, @Context UriInfo uriInfo);
 
     /**
      * @deprecated do not use this method. It will be replaced by

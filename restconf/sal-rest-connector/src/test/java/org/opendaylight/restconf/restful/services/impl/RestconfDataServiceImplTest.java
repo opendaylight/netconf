@@ -17,14 +17,15 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.Futures;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -111,84 +112,88 @@ public class RestconfDataServiceImplTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
-        containerPlayerQname = QName.create(baseQName, "player");
-        leafQname = QName.create(baseQName, "gap");
+        final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
+        Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
+        Mockito.when(this.uriInfo.getQueryParameters()).thenReturn(value);
 
-        final QName containerLibraryQName = QName.create(baseQName, "library");
-        final QName listPlaylistQName = QName.create(baseQName, "playlist");
+        this.baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
+        this.containerPlayerQname = QName.create(this.baseQName, "player");
+        this.leafQname = QName.create(this.baseQName, "gap");
+
+        final QName containerLibraryQName = QName.create(this.baseQName, "library");
+        final QName listPlaylistQName = QName.create(this.baseQName, "playlist");
 
         final LeafNode buildLeaf = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(leafQname))
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(this.leafQname))
                 .withValue(0.2)
                 .build();
 
-        buildPlayerCont = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(containerPlayerQname))
+        this.buildPlayerCont = Builders.containerBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(this.containerPlayerQname))
                 .withChild(buildLeaf)
                 .build();
 
-        buildLibraryCont = Builders.containerBuilder()
+        this.buildLibraryCont = Builders.containerBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(containerLibraryQName))
                 .build();
 
-        buildPlaylistList = Builders.mapBuilder()
+        this.buildPlaylistList = Builders.mapBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(listPlaylistQName))
                 .build();
 
-        buildBaseCont = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(baseQName))
-                .withChild(buildPlayerCont)
+        this.buildBaseCont = Builders.containerBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(this.baseQName))
+                .withChild(this.buildPlayerCont)
                 .build();
 
         // config contains one child the same as in operational and one additional
-        buildBaseContConfig = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(baseQName))
-                .withChild(buildPlayerCont)
-                .withChild(buildLibraryCont)
+        this.buildBaseContConfig = Builders.containerBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(this.baseQName))
+                .withChild(this.buildPlayerCont)
+                .withChild(this.buildLibraryCont)
                 .build();
 
         // operational contains one child the same as in config and one additional
-        buildBaseContOperational = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(baseQName))
-                .withChild(buildPlayerCont)
-                .withChild(buildPlaylistList)
+        this.buildBaseContOperational = Builders.containerBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(this.baseQName))
+                .withChild(this.buildPlayerCont)
+                .withChild(this.buildPlaylistList)
                 .build();
 
-        iidBase = YangInstanceIdentifier.builder()
-                .node(baseQName)
+        this.iidBase = YangInstanceIdentifier.builder()
+                .node(this.baseQName)
                 .build();
 
-        contextRef = new SchemaContextRef(TestRestconfUtils.loadSchemaContext(PATH_FOR_NEW_SCHEMA_CONTEXT));
-        schemaNode = DataSchemaContextTree.from(contextRef.get()).getChild(iidBase).getDataSchemaNode();
+        this.contextRef = new SchemaContextRef(TestRestconfUtils.loadSchemaContext(PATH_FOR_NEW_SCHEMA_CONTEXT));
+        this.schemaNode = DataSchemaContextTree.from(this.contextRef.get()).getChild(this.iidBase).getDataSchemaNode();
 
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler();
 
-        schemaContextHandler.onGlobalContextUpdated(contextRef.get());
-        dataService = new RestconfDataServiceImpl(schemaContextHandler, transactionChainHandler, mountPointServiceHandler);
-        doReturn(domTransactionChain).when(transactionChainHandler).get();
-        doReturn(read).when(domTransactionChain).newReadOnlyTransaction();
-        doReturn(readWrite).when(domTransactionChain).newReadWriteTransaction();
-        doReturn(write).when(domTransactionChain).newWriteOnlyTransaction();
-        doReturn(mountPointService).when(mountPointServiceHandler).get();
-        doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
-        doReturn(contextRef.get()).when(mountPoint).getSchemaContext();
-        doReturn(Optional.of(mountDataBroker)).when(mountPoint).getService(DOMDataBroker.class);
-        doReturn(transactionChain).when(mountDataBroker).createTransactionChain(any(TransactionChainListener.class));
-        doReturn(read).when(transactionChain).newReadOnlyTransaction();
-        doReturn(readWrite).when(transactionChain).newReadWriteTransaction();
+        schemaContextHandler.onGlobalContextUpdated(this.contextRef.get());
+        this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler, this.mountPointServiceHandler);
+        doReturn(this.domTransactionChain).when(this.transactionChainHandler).get();
+        doReturn(this.read).when(this.domTransactionChain).newReadOnlyTransaction();
+        doReturn(this.readWrite).when(this.domTransactionChain).newReadWriteTransaction();
+        doReturn(this.write).when(this.domTransactionChain).newWriteOnlyTransaction();
+        doReturn(this.mountPointService).when(this.mountPointServiceHandler).get();
+        doReturn(Optional.of(this.mountPoint)).when(this.mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
+        doReturn(this.contextRef.get()).when(this.mountPoint).getSchemaContext();
+        doReturn(Optional.of(this.mountDataBroker)).when(this.mountPoint).getService(DOMDataBroker.class);
+        doReturn(this.transactionChain).when(this.mountDataBroker).createTransactionChain(any(TransactionChainListener.class));
+        doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
+        doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
     }
 
     @Test
     public void testReadData() {
-        doReturn(new MultivaluedHashMap<String, String>()).when(uriInfo).getQueryParameters();
-        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseCont))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, iidBase);
-        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(read).read(LogicalDatastoreType.OPERATIONAL, iidBase);
-        final Response response = dataService.readData("example-jukebox:jukebox", uriInfo);
+        doReturn(new MultivaluedHashMap<String, String>()).when(this.uriInfo).getQueryParameters();
+        doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseCont))).when(this.read)
+                .read(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(this.read).read(LogicalDatastoreType.OPERATIONAL, this.iidBase);
+        final Response response = this.dataService.readData("example-jukebox:jukebox", this.uriInfo);
         assertNotNull(response);
         assertEquals(200, response.getStatus());
-        assertEquals(buildBaseCont, ((NormalizedNodeContext) response.getEntity()).getData());
+        assertEquals(this.buildBaseCont, ((NormalizedNodeContext) response.getEntity()).getData());
     }
 
     /**
@@ -197,14 +202,14 @@ public class RestconfDataServiceImplTest {
      */
     @Test
     public void testReadDataMountPoint() {
-        doReturn(new MultivaluedHashMap<String, String>()).when(uriInfo).getQueryParameters();
-        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseContConfig))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, iidBase);
-        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseContOperational))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, iidBase);
+        doReturn(new MultivaluedHashMap<String, String>()).when(this.uriInfo).getQueryParameters();
+        doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseContConfig))).when(this.read)
+                .read(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseContOperational))).when(this.read)
+                .read(LogicalDatastoreType.OPERATIONAL, this.iidBase);
 
-        final Response response = dataService.readData(
-                "example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox", uriInfo);
+        final Response response = this.dataService.readData(
+                "example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox", this.uriInfo);
 
         assertNotNull(response);
         assertEquals(200, response.getStatus());
@@ -213,19 +218,19 @@ public class RestconfDataServiceImplTest {
         final NormalizedNode<?, ?> data = ((NormalizedNodeContext) response.getEntity()).getData();
         assertTrue(data instanceof ContainerNode);
         assertEquals(3, ((ContainerNode) data).getValue().size());
-        assertTrue(((ContainerNode) data).getChild(buildPlayerCont.getIdentifier()).isPresent());
-        assertTrue(((ContainerNode) data).getChild(buildLibraryCont.getIdentifier()).isPresent());
-        assertTrue(((ContainerNode) data).getChild(buildPlaylistList.getIdentifier()).isPresent());
+        assertTrue(((ContainerNode) data).getChild(this.buildPlayerCont.getIdentifier()).isPresent());
+        assertTrue(((ContainerNode) data).getChild(this.buildLibraryCont.getIdentifier()).isPresent());
+        assertTrue(((ContainerNode) data).getChild(this.buildPlaylistList.getIdentifier()).isPresent());
     }
 
     @Test(expected = RestconfDocumentedException.class)
     public void testReadDataNoData() {
-        doReturn(new MultivaluedHashMap<String, String>()).when(uriInfo).getQueryParameters();
-        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(read).read(LogicalDatastoreType.CONFIGURATION,
-                iidBase);
-        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(read).read(LogicalDatastoreType.OPERATIONAL,
-                iidBase);
-        dataService.readData("example-jukebox:jukebox", uriInfo);
+        doReturn(new MultivaluedHashMap<String, String>()).when(this.uriInfo).getQueryParameters();
+        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(this.read).read(LogicalDatastoreType.CONFIGURATION,
+                this.iidBase);
+        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(this.read).read(LogicalDatastoreType.OPERATIONAL,
+                this.iidBase);
+        this.dataService.readData("example-jukebox:jukebox", this.uriInfo);
     }
 
     /**
@@ -236,13 +241,13 @@ public class RestconfDataServiceImplTest {
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
         parameters.put("content", Collections.singletonList("config"));
 
-        doReturn(parameters).when(uriInfo).getQueryParameters();
-        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseContConfig))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, iidBase);
-        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseContOperational))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, iidBase);
+        doReturn(parameters).when(this.uriInfo).getQueryParameters();
+        doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseContConfig))).when(this.read)
+                .read(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseContOperational))).when(this.read)
+                .read(LogicalDatastoreType.OPERATIONAL, this.iidBase);
 
-        final Response response = dataService.readData("example-jukebox:jukebox", uriInfo);
+        final Response response = this.dataService.readData("example-jukebox:jukebox", this.uriInfo);
 
         assertNotNull(response);
         assertEquals(200, response.getStatus());
@@ -251,11 +256,11 @@ public class RestconfDataServiceImplTest {
         final NormalizedNode<?, ?> data = ((NormalizedNodeContext) response.getEntity()).getData();
 
         // config data present
-        assertTrue(((ContainerNode) data).getChild(buildPlayerCont.getIdentifier()).isPresent());
-        assertTrue(((ContainerNode) data).getChild(buildLibraryCont.getIdentifier()).isPresent());
+        assertTrue(((ContainerNode) data).getChild(this.buildPlayerCont.getIdentifier()).isPresent());
+        assertTrue(((ContainerNode) data).getChild(this.buildLibraryCont.getIdentifier()).isPresent());
 
         // state data absent
-        assertFalse(((ContainerNode) data).getChild(buildPlaylistList.getIdentifier()).isPresent());
+        assertFalse(((ContainerNode) data).getChild(this.buildPlaylistList.getIdentifier()).isPresent());
     }
 
     /**
@@ -266,13 +271,13 @@ public class RestconfDataServiceImplTest {
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
         parameters.put("content", Collections.singletonList("nonconfig"));
 
-        doReturn(parameters).when(uriInfo).getQueryParameters();
-        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseContConfig))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, iidBase);
-        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseContOperational))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, iidBase);
+        doReturn(parameters).when(this.uriInfo).getQueryParameters();
+        doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseContConfig))).when(this.read)
+                .read(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseContOperational))).when(this.read)
+                .read(LogicalDatastoreType.OPERATIONAL, this.iidBase);
 
-        final Response response = dataService.readData("example-jukebox:jukebox", uriInfo);
+        final Response response = this.dataService.readData("example-jukebox:jukebox", this.uriInfo);
 
         assertNotNull(response);
         assertEquals(200, response.getStatus());
@@ -281,23 +286,23 @@ public class RestconfDataServiceImplTest {
         final NormalizedNode<?, ?> data = ((NormalizedNodeContext) response.getEntity()).getData();
 
         // state data present
-        assertTrue(((ContainerNode) data).getChild(buildPlayerCont.getIdentifier()).isPresent());
-        assertTrue(((ContainerNode) data).getChild(buildPlaylistList.getIdentifier()).isPresent());
+        assertTrue(((ContainerNode) data).getChild(this.buildPlayerCont.getIdentifier()).isPresent());
+        assertTrue(((ContainerNode) data).getChild(this.buildPlaylistList.getIdentifier()).isPresent());
 
         // config data absent
-        assertFalse(((ContainerNode) data).getChild(buildLibraryCont.getIdentifier()).isPresent());
+        assertFalse(((ContainerNode) data).getChild(this.buildLibraryCont.getIdentifier()).isPresent());
     }
 
     @Test
     public void testPutData() {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext = new InstanceIdentifierContext<>(iidBase, schemaNode, null, contextRef.get());
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, buildBaseCont);
+        final InstanceIdentifierContext<DataSchemaNode> iidContext = new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, null, this.contextRef.get());
+        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
-        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseCont))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, iidBase);
-        doNothing().when(write).put(LogicalDatastoreType.CONFIGURATION, iidBase, payload.getData());
-        doReturn(Futures.immediateCheckedFuture(null)).when(write).submit();
-        final Response response = dataService.putData(null, payload);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseCont))).when(this.read)
+                .read(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, payload.getData());
+        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
+        final Response response = this.dataService.putData(null, payload, this.uriInfo);
         assertNotNull(response);
         assertEquals(200, response.getStatus());
     }
@@ -307,31 +312,31 @@ public class RestconfDataServiceImplTest {
         final DOMDataBroker dataBroker = Mockito.mock(DOMDataBroker.class);
         final DOMMountPoint mountPoint = Mockito.mock(DOMMountPoint.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
-        doReturn(transactionChainHandler.get()).when(dataBroker).createTransactionChain(RestConnectorProvider.transactionListener);
-        final InstanceIdentifierContext<DataSchemaNode> iidContext = new InstanceIdentifierContext<>(iidBase, schemaNode, mountPoint, contextRef.get());
-        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, buildBaseCont);
+        doReturn(this.transactionChainHandler.get()).when(dataBroker).createTransactionChain(RestConnectorProvider.transactionListener);
+        final InstanceIdentifierContext<DataSchemaNode> iidContext = new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, mountPoint, this.contextRef.get());
+        final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
-        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseCont))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, iidBase);
-        doNothing().when(write).put(LogicalDatastoreType.CONFIGURATION, iidBase, payload.getData());
-        doReturn(Futures.immediateCheckedFuture(null)).when(write).submit();
-        final Response response = dataService.putData(null, payload);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseCont))).when(this.read)
+                .read(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, payload.getData());
+        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
+        final Response response = this.dataService.putData(null, payload, this.uriInfo);
         assertNotNull(response);
         assertEquals(200, response.getStatus());
     }
 
     @Test
     public void testPostData() {
-        final QName listQname = QName.create(baseQName, "playlist");
-        final QName listKeyQname = QName.create(baseQName, "name");
+        final QName listQname = QName.create(this.baseQName, "playlist");
+        final QName listKeyQname = QName.create(this.baseQName, "name");
         final YangInstanceIdentifier.NodeIdentifierWithPredicates nodeWithKey =
                 new YangInstanceIdentifier.NodeIdentifierWithPredicates(listQname, listKeyQname, "name of band");
         final LeafNode<Object> content = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(baseQName, "name")))
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(this.baseQName, "name")))
                 .withValue("name of band")
                 .build();
         final LeafNode<Object> content2 = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(baseQName, "description")))
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(this.baseQName, "description")))
                 .withValue("band description")
                 .build();
         final MapEntryNode mapEntryNode = Builders.mapEntryBuilder()
@@ -344,28 +349,28 @@ public class RestconfDataServiceImplTest {
                 .withChild(mapEntryNode)
                 .build();
 
-        doReturn(new MultivaluedHashMap<String, String>()).when(uriInfo).getQueryParameters();
-        final InstanceIdentifierContext<? extends SchemaNode> iidContext = new InstanceIdentifierContext<>(iidBase, null, null, contextRef.get());
+        doReturn(new MultivaluedHashMap<String, String>()).when(this.uriInfo).getQueryParameters();
+        final InstanceIdentifierContext<? extends SchemaNode> iidContext = new InstanceIdentifierContext<>(this.iidBase, null, null, this.contextRef.get());
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, buildList);
-        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(read).read(LogicalDatastoreType.CONFIGURATION, iidBase);
+        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(this.read).read(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         final MapNode data = (MapNode) payload.getData();
         final YangInstanceIdentifier.NodeIdentifierWithPredicates identifier = data.getValue().iterator().next().getIdentifier();
         final YangInstanceIdentifier node = payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
-        doReturn(Futures.immediateCheckedFuture(false)).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
-        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
-        doReturn(Futures.immediateCheckedFuture(null)).when(readWrite).submit();
-        doReturn(UriBuilder.fromUri("http://localhost:8181/restconf/15/")).when(uriInfo).getBaseUriBuilder();
+        doReturn(Futures.immediateCheckedFuture(false)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
+        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
+        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
+        doReturn(UriBuilder.fromUri("http://localhost:8181/restconf/15/")).when(this.uriInfo).getBaseUriBuilder();
 
-        final Response response = dataService.postData(null, payload, uriInfo);
+        final Response response = this.dataService.postData(null, payload, this.uriInfo);
         assertEquals(201, response.getStatus());
     }
 
     @Test
     public void testDeleteData() {
-        doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidBase);
-        doReturn(Futures.immediateCheckedFuture(null)).when(readWrite).submit();
-        doReturn(Futures.immediateCheckedFuture(true)).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidBase);
-        final Response response = dataService.deleteData("example-jukebox:jukebox");
+        doNothing().when(this.readWrite).delete(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
+        doReturn(Futures.immediateCheckedFuture(true)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        final Response response = this.dataService.deleteData("example-jukebox:jukebox");
         assertNotNull(response);
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     }
@@ -375,36 +380,36 @@ public class RestconfDataServiceImplTest {
      */
     @Test
     public void testDeleteDataMountPoint() {
-        doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidBase);
-        doReturn(Futures.immediateCheckedFuture(null)).when(readWrite).submit();
-        doReturn(Futures.immediateCheckedFuture(true)).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidBase);
-        final Response response = dataService.deleteData("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox");
+        doNothing().when(this.readWrite).delete(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
+        doReturn(Futures.immediateCheckedFuture(true)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        final Response response = this.dataService.deleteData("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox");
         assertNotNull(response);
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     }
 
     @Test
     public void testPatchData() throws Exception {
-        final InstanceIdentifierContext<? extends SchemaNode> iidContext = new InstanceIdentifierContext<>(iidBase, schemaNode, null, contextRef.get());
+        final InstanceIdentifierContext<? extends SchemaNode> iidContext = new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, null, this.contextRef.get());
         final List<PATCHEntity> entity = new ArrayList<>();
-        final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
-                .node(containerPlayerQname)
-                .node(leafQname)
+        final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(this.iidBase)
+                .node(this.containerPlayerQname)
+                .node(this.leafQname)
                 .build();
-        entity.add(new PATCHEntity("create data", "CREATE", iidBase, buildBaseCont));
-        entity.add(new PATCHEntity("replace data", "REPLACE", iidBase, buildBaseCont));
+        entity.add(new PATCHEntity("create data", "CREATE", this.iidBase, this.buildBaseCont));
+        entity.add(new PATCHEntity("replace data", "REPLACE", this.iidBase, this.buildBaseCont));
         entity.add(new PATCHEntity("delete data", "DELETE", iidleaf));
         final PATCHContext patch = new PATCHContext(iidContext, entity, "test patch id");
 
-        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseCont))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, iidBase);
-        doNothing().when(write).put(LogicalDatastoreType.CONFIGURATION, iidBase, buildBaseCont);
-        doReturn(Futures.immediateCheckedFuture(null)).when(write).submit();
-        doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidleaf);
-        doReturn(Futures.immediateCheckedFuture(null)).when(readWrite).submit();
-        doReturn(Futures.immediateCheckedFuture(false)).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidBase);
-        doReturn(Futures.immediateCheckedFuture(true)).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
-        final PATCHStatusContext status = dataService.patchData(patch, uriInfo);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseCont))).when(this.read)
+                .read(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, this.buildBaseCont);
+        doReturn(Futures.immediateCheckedFuture(null)).when(this.write).submit();
+        doNothing().when(this.readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidleaf);
+        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
+        doReturn(Futures.immediateCheckedFuture(false)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        doReturn(Futures.immediateCheckedFuture(true)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
+        final PATCHStatusContext status = this.dataService.patchData(patch, this.uriInfo);
         assertTrue(status.isOk());
         assertEquals(3, status.getEditCollection().size());
         assertEquals("replace data", status.getEditCollection().get(1).getEditId());
@@ -413,27 +418,27 @@ public class RestconfDataServiceImplTest {
     @Test
     public void testPatchDataMountPoint() throws Exception {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext = new InstanceIdentifierContext<>(
-                iidBase, schemaNode, mountPoint, contextRef.get());
+                this.iidBase, this.schemaNode, this.mountPoint, this.contextRef.get());
         final List<PATCHEntity> entity = new ArrayList<>();
-        final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
-                .node(containerPlayerQname)
-                .node(leafQname)
+        final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(this.iidBase)
+                .node(this.containerPlayerQname)
+                .node(this.leafQname)
                 .build();
-        entity.add(new PATCHEntity("create data", "CREATE", iidBase, buildBaseCont));
-        entity.add(new PATCHEntity("replace data", "REPLACE", iidBase, buildBaseCont));
+        entity.add(new PATCHEntity("create data", "CREATE", this.iidBase, this.buildBaseCont));
+        entity.add(new PATCHEntity("replace data", "REPLACE", this.iidBase, this.buildBaseCont));
         entity.add(new PATCHEntity("delete data", "DELETE", iidleaf));
         final PATCHContext patch = new PATCHContext(iidContext, entity, "test patch id");
 
-        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseCont))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, iidBase);
-        doNothing().when(write).put(LogicalDatastoreType.CONFIGURATION, iidBase, buildBaseCont);
-        doReturn(Futures.immediateCheckedFuture(null)).when(write).submit();
-        doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidleaf);
-        doReturn(Futures.immediateCheckedFuture(null)).when(readWrite).submit();
-        doReturn(Futures.immediateCheckedFuture(false)).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidBase);
-        doReturn(Futures.immediateCheckedFuture(true)).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseCont))).when(this.read)
+                .read(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, this.buildBaseCont);
+        doReturn(Futures.immediateCheckedFuture(null)).when(this.write).submit();
+        doNothing().when(this.readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidleaf);
+        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
+        doReturn(Futures.immediateCheckedFuture(false)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        doReturn(Futures.immediateCheckedFuture(true)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
 
-        final PATCHStatusContext status = dataService.patchData(patch, uriInfo);
+        final PATCHStatusContext status = this.dataService.patchData(patch, this.uriInfo);
         assertTrue(status.isOk());
         assertEquals(3, status.getEditCollection().size());
         assertNull(status.getGlobalErrors());
@@ -449,27 +454,27 @@ public class RestconfDataServiceImplTest {
 
         broker.setAccessible(true);
         broker.set(RestConnectorProvider.class, mock(DOMDataBroker.class));
-        final InstanceIdentifierContext<? extends SchemaNode> iidContext = new InstanceIdentifierContext<>(iidBase, schemaNode, null, contextRef.get());
+        final InstanceIdentifierContext<? extends SchemaNode> iidContext = new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, null, this.contextRef.get());
         final List<PATCHEntity> entity = new ArrayList<>();
-        final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(iidBase)
-                .node(containerPlayerQname)
-                .node(leafQname)
+        final YangInstanceIdentifier iidleaf = YangInstanceIdentifier.builder(this.iidBase)
+                .node(this.containerPlayerQname)
+                .node(this.leafQname)
                 .build();
-        entity.add(new PATCHEntity("create data", "CREATE", iidBase, buildBaseCont));
+        entity.add(new PATCHEntity("create data", "CREATE", this.iidBase, this.buildBaseCont));
         entity.add(new PATCHEntity("remove data", "REMOVE", iidleaf));
         entity.add(new PATCHEntity("delete data", "DELETE", iidleaf));
         final PATCHContext patch = new PATCHContext(iidContext, entity, "test patch id");
 
-        doReturn(Futures.immediateCheckedFuture(Optional.of(buildBaseCont))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, iidBase);
-        doNothing().when(write).put(LogicalDatastoreType.CONFIGURATION, iidBase, buildBaseCont);
-        doReturn(Futures.immediateCheckedFuture(null)).when(write).submit();
-        doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidleaf);
-        doReturn(Futures.immediateCheckedFuture(null)).when(readWrite).submit();
-        doReturn(Futures.immediateCheckedFuture(false)).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidBase);
-        doReturn(Futures.immediateCheckedFuture(false)).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
-        doReturn(true).when(readWrite).cancel();
-        final PATCHStatusContext status = dataService.patchData(patch, uriInfo);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseCont))).when(this.read)
+                .read(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, this.buildBaseCont);
+        doReturn(Futures.immediateCheckedFuture(null)).when(this.write).submit();
+        doNothing().when(this.readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidleaf);
+        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
+        doReturn(Futures.immediateCheckedFuture(false)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        doReturn(Futures.immediateCheckedFuture(false)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
+        doReturn(true).when(this.readWrite).cancel();
+        final PATCHStatusContext status = this.dataService.patchData(patch, this.uriInfo);
 
         handler.set(RestConnectorProvider.class, null);
         handler.setAccessible(false);

@@ -81,8 +81,9 @@ public class RestconfCompositeWrapper implements RestconfService, SchemaRetrieva
     }
 
     @Override
-    public Response updateConfigurationData(final String identifier, final NormalizedNodeContext payload) {
-        return this.restconf.updateConfigurationData(identifier, payload);
+    public Response updateConfigurationData(final String identifier, final NormalizedNodeContext payload,
+            final UriInfo uriInfo) {
+        return this.restconf.updateConfigurationData(identifier, payload, uriInfo);
     }
 
     @Override

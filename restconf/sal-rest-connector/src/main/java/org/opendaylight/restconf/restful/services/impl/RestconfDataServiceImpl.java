@@ -11,6 +11,8 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.TimeZone;
 import javax.annotation.Nonnull;
 import javax.ws.rs.core.Response;
@@ -117,8 +119,38 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public Response putData(final String identifier, final NormalizedNodeContext payload) {
+    public Response putData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
         Preconditions.checkNotNull(payload);
+
+        boolean insert_used = false;
+        boolean point_used = false;
+        String insert = null;
+        String point = null;
+
+        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
+            switch (entry.getKey()) {
+                case "insert":
+                    if (!insert_used) {
+                        insert_used = true;
+                        insert = entry.getValue().iterator().next();
+                    } else {
+                        throw new RestconfDocumentedException("Insert parameter can be used only once.");
+                    }
+                    break;
+                case "point":
+                    if (!point_used) {
+                        point_used = true;
+                        point = entry.getValue().iterator().next();
+                    } else {
+                        throw new RestconfDocumentedException("Point parameter can be used only once.");
+                    }
+                    break;
+                default:
+                    throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey());
+            }
+        }
+
+        checkQueryParams(insert_used, point_used, insert);
 
         final InstanceIdentifierContext<? extends SchemaNode> iid = payload
                 .getInstanceIdentifierContext();
@@ -140,7 +172,17 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
                 payload.getInstanceIdentifierContext(), mountPoint, transactionChain);
-        return PutDataTransactionUtil.putData(payload, ref, transactionNode);
+        return PutDataTransactionUtil.putData(payload, ref, transactionNode, insert, point);
+    }
+
+    private void checkQueryParams(final boolean insert_used, final boolean point_used, final String insert) {
+        if (point_used && !insert_used) {
+            throw new RestconfDocumentedException("Point parameter can't be used without Insert parameter.");
+        }
+        if (point_used && (insert.equals("first") || insert.equals("last"))) {
+            throw new RestconfDocumentedException(
+                    "Point parameter can be used only with 'after' or 'before' values of Insert parameter.");
+        }
     }
 
     @Override
@@ -151,6 +193,36 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     @Override
     public Response postData(final NormalizedNodeContext payload, final UriInfo uriInfo) {
         Preconditions.checkNotNull(payload);
+
+        boolean insert_used = false;
+        boolean point_used = false;
+        String insert = null;
+        String point = null;
+
+        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
+            switch (entry.getKey()) {
+                case "insert":
+                    if (!insert_used) {
+                        insert_used = true;
+                        insert = entry.getValue().iterator().next();
+                    } else {
+                        throw new RestconfDocumentedException("Insert parameter can be used only once.");
+                    }
+                    break;
+                case "point":
+                    if (!point_used) {
+                        point_used = true;
+                        point = entry.getValue().iterator().next();
+                    } else {
+                        throw new RestconfDocumentedException("Point parameter can be used only once.");
+                    }
+                    break;
+                default:
+                    throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey());
+            }
+        }
+
+        checkQueryParams(insert_used, point_used, insert);
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final DOMTransactionChain transactionChain;
@@ -164,7 +236,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
                 payload.getInstanceIdentifierContext(), mountPoint, transactionChain);
-        return PostDataTransactionUtil.postData(uriInfo, payload, transactionNode, ref);
+        return PostDataTransactionUtil.postData(uriInfo, payload, transactionNode, ref, insert, point);
     }
 
     @Override

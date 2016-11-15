@@ -10,7 +10,10 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
+import java.util.HashSet;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -76,7 +79,11 @@ public class RestPutConfigTest {
 
         mockingBrokerPut(iiCx.getInstanceIdentifier(), data);
 
-        this.restconfService.updateConfigurationData(identifier, payload);
+        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
+        Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
+        Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
+        this.restconfService.updateConfigurationData(identifier, payload, uriInfo);
     }
 
     @Test
@@ -93,7 +100,11 @@ public class RestPutConfigTest {
 
         mockingBrokerPut(iiCx.getInstanceIdentifier(), data);
 
-        this.restconfService.updateConfigurationData(identifier, payload);
+        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
+        Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
+        Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
+        this.restconfService.updateConfigurationData(identifier, payload, uriInfo);
     }
 
     @Test(expected=RestconfDocumentedException.class)
@@ -116,13 +127,17 @@ public class RestPutConfigTest {
 
         mockingBrokerPut(iiCx.getInstanceIdentifier(), data);
 
-        this.restconfService.updateConfigurationData(identifier, payload);
+        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
+        Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
+        Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
+        this.restconfService.updateConfigurationData(identifier, payload, uriInfo);
     }
 
     private void mockingBrokerPut(final YangInstanceIdentifier yii, final NormalizedNode<?, ?> data) {
         final PutResult result = Mockito.mock(PutResult.class);
         final CheckedFuture<Void, TransactionCommitFailedException> checkedFuture = Futures.immediateCheckedFuture(null);
-        Mockito.when(this.brokerFacade.commitConfigurationDataPut(this.schemaCx, yii, data))
+        Mockito.when(this.brokerFacade.commitConfigurationDataPut(this.schemaCx, yii, data, null, null))
                 .thenReturn(result);
         Mockito.when(result.getFutureOfPutData()).thenReturn(checkedFuture);
         Mockito.when(result.getStatus()).thenReturn(Status.OK);
