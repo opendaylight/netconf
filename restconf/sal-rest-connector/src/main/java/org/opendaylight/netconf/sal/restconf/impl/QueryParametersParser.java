@@ -24,12 +24,17 @@ public class QueryParametersParser {
 
         @Override
         public String toString() {
-            return uriParameterName;
+            return this.uriParameterName;
         }
     }
 
     public static WriterParameters parseWriterParameters(final UriInfo info) {
-        WriterParameters.WriterParametersBuilder wpBuilder = new WriterParameters.WriterParametersBuilder();
+        return parseParams(info, false);
+    }
+
+    private static WriterParameters parseParams(final UriInfo info, final boolean tagged) {
+        final WriterParameters.WriterParametersBuilder wpBuilder = new WriterParameters.WriterParametersBuilder();
+        wpBuilder.setTagged(tagged);
         if(info == null) {
             return wpBuilder.build();
         }
@@ -53,6 +58,10 @@ public class QueryParametersParser {
         param = info.getQueryParameters(false).getFirst(UriParameters.PRETTY_PRINT.toString());
         wpBuilder.setPrettyPrint("true".equals(param));
         return wpBuilder.build();
+    }
+
+    public static WriterParameters parseWriterParameters(final UriInfo uriInfo, final boolean tagged) {
+        return parseParams(uriInfo, tagged);
     }
 
 }

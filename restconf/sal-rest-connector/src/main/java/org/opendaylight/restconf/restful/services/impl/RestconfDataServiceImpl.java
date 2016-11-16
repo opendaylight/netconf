@@ -76,8 +76,34 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
                 identifier, schemaContextRef.get(), Optional.of(this.mountPointServiceHandler.get()));
 
+        boolean withDefa_used = false;
+        String withDefa = null;
+
+        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
+            switch (entry.getKey()) {
+                case "with-defaults":
+                    if (!withDefa_used) {
+                        withDefa_used = true;
+                        withDefa = entry.getValue().iterator().next();
+                    } else {
+                        throw new RestconfDocumentedException("Point parameter can be used only once.");
+                    }
+                    break;
+            }
+        }
+        boolean tagged = false;
+        if (withDefa_used) {
+            if (withDefa.equals("report-all-tagged")) {
+                tagged = true;
+                withDefa = null;
+            }
+            if (withDefa.equals("report-all")) {
+                withDefa = null;
+            }
+        }
+
         final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(
-                instanceIdentifier, uriInfo);
+                instanceIdentifier, uriInfo, tagged);
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final DOMTransactionChain transactionChain;
@@ -89,7 +115,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
                 instanceIdentifier, mountPoint, transactionChain);
-        final NormalizedNode<?, ?> node = ReadDataTransactionUtil.readData(parameters.getContent(), transactionNode);
+        final NormalizedNode<?, ?> node =
+                ReadDataTransactionUtil.readData(parameters.getContent(), transactionNode, withDefa);
         if (node == null) {
             throw new RestconfDocumentedException(
                     "Request could not be completed because the relevant data model content does not exist",

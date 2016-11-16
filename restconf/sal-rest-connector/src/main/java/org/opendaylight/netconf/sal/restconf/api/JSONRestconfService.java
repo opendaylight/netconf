@@ -61,7 +61,8 @@ public interface JSONRestconfService {
      * @return an Optional containing the data in JSON format if present.
      * @throws OperationFailedException if the request fails.
      */
-    Optional<String> get(String uriPath, LogicalDatastoreType datastoreType) throws OperationFailedException;
+    Optional<String> get(String uriPath, LogicalDatastoreType datastoreType, UriInfo uriInfo)
+            throws OperationFailedException;
 
     /**
      * Invokes a yang-defined RPC.

@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
+import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
@@ -28,7 +29,9 @@ import org.opendaylight.netconf.sal.restconf.impl.WriterParameters;
 import org.opendaylight.netconf.sal.restconf.impl.WriterParameters.WriterParametersBuilder;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.restconf.utils.parser.ParserFieldsParameter;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -36,6 +39,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgum
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
@@ -45,8 +49,15 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeContainerBuilder;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * Util class for read data from data store via transaction.
@@ -63,6 +74,11 @@ public final class ReadDataTransactionUtil {
         throw new UnsupportedOperationException("Util class.");
     }
 
+    public static @Nonnull WriterParameters parseUriParameters(@Nonnull final InstanceIdentifierContext<?> identifier,
+            @Nullable final UriInfo uriInfo, final boolean tagged) {
+        return parseParams(identifier, uriInfo, tagged);
+    }
+
     /**
      * Parse parameters from URI request and check their types and values.
      *
@@ -75,7 +91,13 @@ public final class ReadDataTransactionUtil {
      */
     public static @Nonnull WriterParameters parseUriParameters(@Nonnull final InstanceIdentifierContext<?> identifier,
                                                                @Nullable final UriInfo uriInfo) {
+        return parseParams(identifier, uriInfo, false);
+    }
+
+    private static WriterParameters parseParams(final InstanceIdentifierContext<?> identifier, final UriInfo uriInfo,
+            final boolean tagged) {
         final WriterParametersBuilder builder = new WriterParametersBuilder();
+        builder.setTagged(tagged);
 
         if (uriInfo == null) {
             return builder.build();
@@ -87,7 +109,7 @@ public final class ReadDataTransactionUtil {
                 uriInfo.getQueryParameters().keySet(),
                 RestconfDataServiceConstant.ReadData.CONTENT,
                 RestconfDataServiceConstant.ReadData.DEPTH,
-                RestconfDataServiceConstant.ReadData.FIELDS);
+                RestconfDataServiceConstant.ReadData.FIELDS, RestconfDataServiceConstant.ReadData.WITH_DEFAULTS);
 
         // read parameters from URI or set default values
         final List<String> content = uriInfo.getQueryParameters().getOrDefault(
@@ -124,9 +146,9 @@ public final class ReadDataTransactionUtil {
         if (!depth.get(0).equals(RestconfDataServiceConstant.ReadData.UNBOUNDED)) {
             final Integer value = Ints.tryParse(depth.get(0));
 
-            if (value == null
-                    || (!(value >= RestconfDataServiceConstant.ReadData.MIN_DEPTH
-                        && value <= RestconfDataServiceConstant.ReadData.MAX_DEPTH))) {
+            if ((value == null)
+                    || (!((value >= RestconfDataServiceConstant.ReadData.MIN_DEPTH)
+                        && (value <= RestconfDataServiceConstant.ReadData.MAX_DEPTH)))) {
                 throw new RestconfDocumentedException(
                         new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
                                 "Invalid depth parameter: " + depth, null,
@@ -144,6 +166,10 @@ public final class ReadDataTransactionUtil {
         return builder.build();
     }
 
+    public static @Nullable NormalizedNode<?, ?> readData(@Nonnull final String valueOfContent,
+            @Nonnull final TransactionVarsWrapper transactionNode) {
+        return readData(valueOfContent, transactionNode, null);
+    }
     /**
      * Read specific type of data from data store via transaction.
      *
@@ -154,24 +180,152 @@ public final class ReadDataTransactionUtil {
      * @return {@link NormalizedNode}
      */
     public static @Nullable NormalizedNode<?, ?> readData(@Nonnull final String valueOfContent,
-                                                          @Nonnull final TransactionVarsWrapper transactionNode) {
+            @Nonnull final TransactionVarsWrapper transactionNode, final String withDefa) {
         switch (valueOfContent) {
             case RestconfDataServiceConstant.ReadData.CONFIG:
                 transactionNode.setLogicalDatastoreType(LogicalDatastoreType.CONFIGURATION);
-                return readDataViaTransaction(transactionNode);
-
+                if (withDefa == null) {
+                    return readDataViaTransaction(transactionNode);
+                } else {
+                    return prepareDataByParamWithDef(readDataViaTransaction(transactionNode),
+                            transactionNode.getInstanceIdentifier().getInstanceIdentifier(), withDefa);
+                }
             case RestconfDataServiceConstant.ReadData.NONCONFIG:
                 transactionNode.setLogicalDatastoreType(LogicalDatastoreType.OPERATIONAL);
                 return readDataViaTransaction(transactionNode);
 
             case RestconfDataServiceConstant.ReadData.ALL:
-                return readAllData(transactionNode);
+                return readAllData(transactionNode, withDefa);
 
             default:
                 throw new RestconfDocumentedException(
                         new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
                                 "Invalid content parameter: " + valueOfContent, null,
                                 "The content parameter value must be either config, nonconfig or all (default)"));
+        }
+    }
+
+    private static NormalizedNode<?, ?> prepareDataByParamWithDef(final NormalizedNode<?, ?> result,
+            final YangInstanceIdentifier path, final String withDefa) {
+        boolean trim;
+        switch (withDefa) {
+            case "trim":
+                trim = true;
+                break;
+            case "explicit":
+                trim = false;
+                break;
+            default:
+                throw new RestconfDocumentedException("");
+        }
+
+        final SchemaContext ctx = ControllerContext.getInstance().getGlobalSchema();
+        final DataSchemaContextTree baseSchemaCtxTree = DataSchemaContextTree.from(ctx);
+        final DataSchemaNode baseSchemaNode = baseSchemaCtxTree.getChild(path).getDataSchemaNode();
+        if (result instanceof ContainerNode) {
+            final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builder =
+                    Builders.containerBuilder((ContainerSchemaNode) baseSchemaNode);
+            buildCont(builder, (ContainerNode) result, baseSchemaCtxTree, path, trim);
+            return builder.build();
+        } else {
+            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder =
+                    Builders.mapEntryBuilder((ListSchemaNode) baseSchemaNode);
+            buildMapEntryBuilder(builder, (MapEntryNode) result, baseSchemaCtxTree, path, trim,
+                    ((ListSchemaNode) baseSchemaNode).getKeyDefinition());
+            return builder.build();
+        }
+    }
+
+    private static void buildMapEntryBuilder(
+            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder,
+            final MapEntryNode result, final DataSchemaContextTree baseSchemaCtxTree,
+            final YangInstanceIdentifier actualPath, final boolean trim, final List<QName> keys) {
+        for (final DataContainerChild<? extends PathArgument, ?> child : result.getValue()) {
+            final YangInstanceIdentifier path = actualPath.node(child.getIdentifier());
+            final DataSchemaNode childSchema = baseSchemaCtxTree.getChild(path).getDataSchemaNode();
+            if (child instanceof ContainerNode) {
+                final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> childBuilder =
+                        Builders.containerBuilder((ContainerSchemaNode) childSchema);
+                buildCont(childBuilder, (ContainerNode) child, baseSchemaCtxTree, path, trim);
+                builder.withChild(childBuilder.build());
+            } else if (child instanceof MapNode) {
+                final CollectionNodeBuilder<MapEntryNode, MapNode> childBuilder =
+                        Builders.mapBuilder((ListSchemaNode) childSchema);
+                buildList(childBuilder, (MapNode) child, baseSchemaCtxTree, path, trim,
+                        ((ListSchemaNode) childSchema).getKeyDefinition());
+                builder.withChild(childBuilder.build());
+            } else if (child instanceof LeafNode) {
+                final String defaultVal = ((LeafSchemaNode) childSchema).getDefault();
+                final String nodeVal = ((LeafNode<String>) child).getValue();
+                final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
+                        Builders.leafBuilder((LeafSchemaNode) childSchema);
+                if (keys.contains(child.getNodeType())) {
+                    leafBuilder.withValue(((LeafNode) child).getValue());
+                    builder.withChild(leafBuilder.build());
+                } else {
+                    if (trim) {
+                        if ((defaultVal == null) || !defaultVal.equals(nodeVal)) {
+                            leafBuilder.withValue(((LeafNode) child).getValue());
+                            builder.withChild(leafBuilder.build());
+                        }
+                    } else {
+                        if ((defaultVal != null) && defaultVal.equals(nodeVal)) {
+                            leafBuilder.withValue(((LeafNode) child).getValue());
+                            builder.withChild(leafBuilder.build());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static void buildList(final CollectionNodeBuilder<MapEntryNode, MapNode> builder, final MapNode result,
+            final DataSchemaContextTree baseSchemaCtxTree, final YangInstanceIdentifier path, final boolean trim,
+            final List<QName> keys) {
+        for (final MapEntryNode mapEntryNode : result.getValue()) {
+            final YangInstanceIdentifier actualNode = path.node(mapEntryNode.getIdentifier());
+            final DataSchemaNode childSchema = baseSchemaCtxTree.getChild(actualNode).getDataSchemaNode();
+            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder =
+                    Builders.mapEntryBuilder((ListSchemaNode) childSchema);
+            buildMapEntryBuilder(mapEntryBuilder, mapEntryNode, baseSchemaCtxTree, actualNode, trim, keys);
+            builder.withChild(mapEntryBuilder.build());
+        }
+    }
+
+    private static void buildCont(final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builder,
+            final ContainerNode result, final DataSchemaContextTree baseSchemaCtxTree,
+            final YangInstanceIdentifier actualPath, final boolean trim) {
+        for (final DataContainerChild<? extends PathArgument, ?> child : result.getValue()) {
+            final YangInstanceIdentifier path = actualPath.node(child.getIdentifier());
+            final DataSchemaNode childSchema = baseSchemaCtxTree.getChild(path).getDataSchemaNode();
+            if (child instanceof ContainerNode) {
+                final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builderChild =
+                        Builders.containerBuilder((ContainerSchemaNode) childSchema);
+                buildCont(builderChild, result, baseSchemaCtxTree, actualPath, trim);
+                builder.withChild(builderChild.build());
+            } else if (child instanceof MapNode) {
+                final CollectionNodeBuilder<MapEntryNode, MapNode> childBuilder =
+                        Builders.mapBuilder((ListSchemaNode) childSchema);
+                buildList(childBuilder, (MapNode) child, baseSchemaCtxTree, path, trim,
+                        ((ListSchemaNode) childSchema).getKeyDefinition());
+                builder.withChild(childBuilder.build());
+            } else if (child instanceof LeafNode) {
+                final String defaultVal = ((LeafSchemaNode) childSchema).getDefault();
+                final String nodeVal = ((LeafNode<String>) child).getValue();
+                final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
+                        Builders.leafBuilder((LeafSchemaNode) childSchema);
+                if (trim) {
+                    if ((defaultVal == null) || !defaultVal.equals(nodeVal)) {
+                        leafBuilder.withValue(((LeafNode) child).getValue());
+                        builder.withChild(leafBuilder.build());
+                    }
+                } else {
+                    if ((defaultVal != null) && defaultVal.equals(nodeVal)) {
+                        leafBuilder.withValue(((LeafNode) child).getValue());
+                        builder.withChild(leafBuilder.build());
+                    }
+                }
+            }
         }
     }
 
@@ -200,16 +354,24 @@ public final class ReadDataTransactionUtil {
      *
      * @param transactionNode
      *            - {@link TransactionVarsWrapper} - wrapper for variables
+     * @param withDefa
      * @return {@link NormalizedNode}
      */
-    private static @Nullable NormalizedNode<?, ?> readAllData(@Nonnull final TransactionVarsWrapper transactionNode) {
+    private static @Nullable NormalizedNode<?, ?> readAllData(@Nonnull final TransactionVarsWrapper transactionNode,
+            final String withDefa) {
         // PREPARE STATE DATA NODE
         transactionNode.setLogicalDatastoreType(LogicalDatastoreType.OPERATIONAL);
         final NormalizedNode<?, ?> stateDataNode = readDataViaTransaction(transactionNode);
 
         // PREPARE CONFIG DATA NODE
         transactionNode.setLogicalDatastoreType(LogicalDatastoreType.CONFIGURATION);
-        final NormalizedNode<?, ?> configDataNode = readDataViaTransaction(transactionNode);
+        final NormalizedNode<?, ?> configDataNode;
+        if (withDefa == null) {
+            configDataNode = readDataViaTransaction(transactionNode);
+        } else {
+            configDataNode = prepareDataByParamWithDef(readDataViaTransaction(transactionNode),
+                    transactionNode.getInstanceIdentifier().getInstanceIdentifier(), withDefa);
+        }
 
         // if no data exists
         if ((stateDataNode == null) && (configDataNode == null)) {

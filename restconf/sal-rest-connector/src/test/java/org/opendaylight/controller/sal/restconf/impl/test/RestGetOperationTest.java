@@ -46,6 +46,7 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
@@ -172,7 +173,8 @@ public class RestGetOperationTest extends JerseyTest {
     @SuppressWarnings("unchecked")
     @Test
     public void getDataWithUrlMountPoint() throws UnsupportedEncodingException, URISyntaxException, ParseException {
-        when(brokerFacade.readConfigurationData(any(DOMMountPoint.class), any(YangInstanceIdentifier.class))).thenReturn(
+        when(brokerFacade.readConfigurationData(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
+                Mockito.anyString())).thenReturn(
                 prepareCnDataForMountPointTest(false));
         final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
@@ -202,8 +204,8 @@ public class RestGetOperationTest extends JerseyTest {
     @Test
     public void getDataWithSlashesBehindMountPoint() throws Exception {
         final YangInstanceIdentifier awaitedInstanceIdentifier = prepareInstanceIdentifierForList();
-        when(brokerFacade.readConfigurationData(any(DOMMountPoint.class), eq(awaitedInstanceIdentifier))).thenReturn(
-                prepareCnDataForSlashesBehindMountPointTest());
+        when(brokerFacade.readConfigurationData(any(DOMMountPoint.class), eq(awaitedInstanceIdentifier),
+                Mockito.anyString())).thenReturn(prepareCnDataForSlashesBehindMountPointTest());
         final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
         final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
@@ -238,7 +240,8 @@ public class RestGetOperationTest extends JerseyTest {
     @Test
     public void getDataMountPointIntoHighestElement() throws UnsupportedEncodingException, URISyntaxException,
             ParseException {
-        when(brokerFacade.readConfigurationData(any(DOMMountPoint.class), any(YangInstanceIdentifier.class))).thenReturn(
+        when(brokerFacade.readConfigurationData(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
+                Mockito.anyString())).thenReturn(
                 prepareCnDataForMountPointTest(true));
         final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
@@ -270,7 +273,7 @@ public class RestGetOperationTest extends JerseyTest {
                         .withChild(ImmutableNodes.leafNode(newTestModuleQName("type"), newTestModuleQName("test-identity")))
                         .withChild(ImmutableNodes.leafNode(newTestModuleQName("name"), "foo"))
                         .withChild(ImmutableNodes.leafNode(newTestModuleQName("data"), "bar")).build()).build();
-        when(brokerFacade.readConfigurationData(iid)).thenReturn(data);
+        when(brokerFacade.readConfigurationData(iid, null)).thenReturn(data);
 
         final String uri = "/config/test-module:modules/module/test-module:test-identity/foo";
         assertEquals(200, get(uri, MediaType.APPLICATION_XML));
@@ -670,7 +673,8 @@ public class RestGetOperationTest extends JerseyTest {
 
     @SuppressWarnings("unchecked")
     private void mockReadConfigurationDataMethod() {
-        when(brokerFacade.readConfigurationData(any(YangInstanceIdentifier.class))).thenReturn(answerFromGet);
+        when(brokerFacade.readConfigurationData(any(YangInstanceIdentifier.class), Mockito.anyString()))
+                .thenReturn(answerFromGet);
     }
 
     @SuppressWarnings("rawtypes")
