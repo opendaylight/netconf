@@ -43,8 +43,14 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -52,11 +58,17 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.OrderedLeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -96,28 +108,89 @@ public class BrokerFacade {
         }
     }
 
-    // READ configuration
+    /**
+     * Read config data by path
+     *
+     * @param path
+     *            - path of data
+     * @return read date
+     */
     public NormalizedNode<?, ?> readConfigurationData(final YangInstanceIdentifier path) {
-        checkPreconditions();
-        return readDataViaTransaction(this.domDataBroker.newReadOnlyTransaction(), CONFIGURATION, path);
+        return readConfigurationData(path, null);
     }
 
-    public NormalizedNode<?, ?> readConfigurationData(final DOMMountPoint mountPoint, final YangInstanceIdentifier path) {
+    /**
+     * Read config data by path
+     *
+     * @param path
+     *            - path of data
+     * @param withDefa
+     *            - value of with-defaults parameter
+     * @return read date
+     */
+    public NormalizedNode<?, ?> readConfigurationData(final YangInstanceIdentifier path, final String withDefa) {
+        checkPreconditions();
+        return readDataViaTransaction(this.domDataBroker.newReadOnlyTransaction(), CONFIGURATION, path, withDefa);
+    }
+
+    /**
+     * Read config data from mount point by path.
+     *
+     * @param mountPoint
+     *            - mount point for reading data
+     * @param path
+     *            - path of data
+     * @return read data
+     */
+    public NormalizedNode<?, ?> readConfigurationData(final DOMMountPoint mountPoint,
+            final YangInstanceIdentifier path) {
+        return readConfigurationData(mountPoint, path, null);
+    }
+
+    /**
+     * Read config data from mount point by path.
+     *
+     * @param mountPoint
+     *            - mount point for reading data
+     * @param path
+     *            - path of data
+     * @param withDefa
+     *            - value of with-defaults parameter
+     * @return read data
+     */
+    public NormalizedNode<?, ?> readConfigurationData(final DOMMountPoint mountPoint, final YangInstanceIdentifier path,
+            final String withDefa) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
-            return readDataViaTransaction(domDataBrokerService.get().newReadOnlyTransaction(), CONFIGURATION, path);
+            return readDataViaTransaction(domDataBrokerService.get().newReadOnlyTransaction(), CONFIGURATION, path,
+                    withDefa);
         }
         final String errMsg = "DOM data broker service isn't available for mount point " + path;
         LOG.warn(errMsg);
         throw new RestconfDocumentedException(errMsg);
     }
 
-    // READ operational
+    /**
+     * Read operational data by path.
+     *
+     * @param path
+     *            - path of data
+     * @return read data
+     */
     public NormalizedNode<?, ?> readOperationalData(final YangInstanceIdentifier path) {
         checkPreconditions();
         return readDataViaTransaction(this.domDataBroker.newReadOnlyTransaction(), OPERATIONAL, path);
     }
 
+    /**
+     * Read operational data from mount point by path.
+     *
+     * @param mountPoint
+     *            - mount point for reading data
+     * @param path
+     *            - path of data
+     * @return read data
+     */
     public NormalizedNode<?, ?> readOperationalData(final DOMMountPoint mountPoint, final YangInstanceIdentifier path) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
@@ -440,6 +513,11 @@ public class BrokerFacade {
 
     private NormalizedNode<?, ?> readDataViaTransaction(final DOMDataReadTransaction transaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
+        return readDataViaTransaction(transaction, datastore, path, null);
+    }
+
+    private NormalizedNode<?, ?> readDataViaTransaction(final DOMDataReadTransaction transaction,
+            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final String withDefa) {
         LOG.trace("Read {} via Restconf: {}", datastore.name(), path);
         final ListenableFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = transaction.read(datastore, path);
         final ReadDataResult<NormalizedNode<?, ?>> readData = new ReadDataResult<>();
@@ -467,7 +545,135 @@ public class BrokerFacade {
             LOG.warn(msg);
             throw new RestconfDocumentedException(msg, e);
         }
-        return readData.getResult();
+        if (withDefa == null) {
+            return readData.getResult();
+        } else {
+            return prepareDataByParamWithDef(readData.getResult(), path, withDefa);
+        }
+
+    }
+
+    private NormalizedNode<?, ?> prepareDataByParamWithDef(final NormalizedNode<?, ?> result,
+            final YangInstanceIdentifier path, final String withDefa) {
+        boolean trim;
+        switch (withDefa) {
+            case "trim":
+                trim = true;
+                break;
+            case "explicit":
+                trim = false;
+                break;
+            default:
+                throw new RestconfDocumentedException("Bad value used with with-defaults parameter : " + withDefa);
+        }
+
+        final SchemaContext ctx = ControllerContext.getInstance().getGlobalSchema();
+        final DataSchemaContextTree baseSchemaCtxTree = DataSchemaContextTree.from(ctx);
+        final DataSchemaNode baseSchemaNode = baseSchemaCtxTree.getChild(path).getDataSchemaNode();
+        if (result instanceof ContainerNode) {
+            final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builder =
+                    Builders.containerBuilder((ContainerSchemaNode) baseSchemaNode);
+            buildCont(builder, (ContainerNode) result, baseSchemaCtxTree, path, trim);
+            return builder.build();
+        } else {
+            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder =
+                    Builders.mapEntryBuilder((ListSchemaNode) baseSchemaNode);
+            buildMapEntryBuilder(builder, (MapEntryNode) result, baseSchemaCtxTree, path, trim,
+                    ((ListSchemaNode) baseSchemaNode).getKeyDefinition());
+            return builder.build();
+        }
+    }
+
+    private void buildMapEntryBuilder(final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder,
+            final MapEntryNode result, final DataSchemaContextTree baseSchemaCtxTree,
+            final YangInstanceIdentifier actualPath, final boolean trim, final List<QName> keys) {
+        for (final DataContainerChild<? extends PathArgument, ?> child : result.getValue()) {
+            final YangInstanceIdentifier path = actualPath.node(child.getIdentifier());
+            final DataSchemaNode childSchema = baseSchemaCtxTree.getChild(path).getDataSchemaNode();
+            if (child instanceof ContainerNode) {
+                final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> childBuilder =
+                        Builders.containerBuilder((ContainerSchemaNode) childSchema);
+                buildCont(childBuilder, (ContainerNode) child, baseSchemaCtxTree, path, trim);
+                builder.withChild(childBuilder.build());
+            } else if (child instanceof MapNode) {
+                final CollectionNodeBuilder<MapEntryNode, MapNode> childBuilder =
+                        Builders.mapBuilder((ListSchemaNode) childSchema);
+                buildList(childBuilder, (MapNode) child, baseSchemaCtxTree, path, trim,
+                        ((ListSchemaNode) childSchema).getKeyDefinition());
+                builder.withChild(childBuilder.build());
+            } else if (child instanceof LeafNode) {
+                final String defaultVal = ((LeafSchemaNode) childSchema).getDefault();
+                final String nodeVal = ((LeafNode<String>) child).getValue();
+                final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
+                        Builders.leafBuilder((LeafSchemaNode) childSchema);
+                if (keys.contains(child.getNodeType())) {
+                    leafBuilder.withValue(((LeafNode) child).getValue());
+                    builder.withChild(leafBuilder.build());
+                } else {
+                    if (trim) {
+                        if ((defaultVal == null) || !defaultVal.equals(nodeVal)) {
+                            leafBuilder.withValue(((LeafNode) child).getValue());
+                            builder.withChild(leafBuilder.build());
+                        }
+                    } else {
+                        if ((defaultVal != null) && defaultVal.equals(nodeVal)) {
+                            leafBuilder.withValue(((LeafNode) child).getValue());
+                            builder.withChild(leafBuilder.build());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void buildList(final CollectionNodeBuilder<MapEntryNode, MapNode> builder, final MapNode result,
+            final DataSchemaContextTree baseSchemaCtxTree, final YangInstanceIdentifier path, final boolean trim,
+            final List<QName> keys) {
+        for (final MapEntryNode mapEntryNode : result.getValue()) {
+            final YangInstanceIdentifier actualNode = path.node(mapEntryNode.getIdentifier());
+            final DataSchemaNode childSchema = baseSchemaCtxTree.getChild(actualNode).getDataSchemaNode();
+            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder =
+                    Builders.mapEntryBuilder((ListSchemaNode) childSchema);
+            buildMapEntryBuilder(mapEntryBuilder, mapEntryNode, baseSchemaCtxTree, actualNode, trim, keys);
+            builder.withChild(mapEntryBuilder.build());
+        }
+    }
+
+    private void buildCont(final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builder,
+            final ContainerNode result, final DataSchemaContextTree baseSchemaCtxTree,
+            final YangInstanceIdentifier actualPath, final boolean trim) {
+        for (final DataContainerChild<? extends PathArgument, ?> child : result.getValue()) {
+            final YangInstanceIdentifier path = actualPath.node(child.getIdentifier());
+            final DataSchemaNode childSchema = baseSchemaCtxTree.getChild(path).getDataSchemaNode();
+            if(child instanceof ContainerNode){
+                final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builderChild =
+                        Builders.containerBuilder((ContainerSchemaNode) childSchema);
+                buildCont(builderChild, result, baseSchemaCtxTree, actualPath, trim);
+                builder.withChild(builderChild.build());
+            } else if (child instanceof MapNode) {
+                final CollectionNodeBuilder<MapEntryNode, MapNode> childBuilder =
+                        Builders.mapBuilder((ListSchemaNode) childSchema);
+                buildList(childBuilder, (MapNode) child, baseSchemaCtxTree, path, trim,
+                        ((ListSchemaNode) childSchema).getKeyDefinition());
+                builder.withChild(childBuilder.build());
+            } else if (child instanceof LeafNode) {
+                final String defaultVal = ((LeafSchemaNode) childSchema).getDefault();
+                final String nodeVal = ((LeafNode<String>) child).getValue();
+                final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
+                        Builders.leafBuilder((LeafSchemaNode) childSchema);
+                if (trim) {
+                    if ((defaultVal == null) || !defaultVal.equals(nodeVal)) {
+                        leafBuilder.withValue(((LeafNode) child).getValue());
+                        builder.withChild(leafBuilder.build());
+                    }
+                } else {
+                    if ((defaultVal != null) && defaultVal.equals(nodeVal)) {
+                        leafBuilder.withValue(((LeafNode) child).getValue());
+                        builder.withChild(leafBuilder.build());
+                    }
+                }
+            }
+        }
     }
 
     /**

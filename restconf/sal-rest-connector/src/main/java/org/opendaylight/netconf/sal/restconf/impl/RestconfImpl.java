@@ -674,21 +674,48 @@ public class RestconfImpl implements RestconfService {
 
     @Override
     public NormalizedNodeContext readConfigurationData(final String identifier, final UriInfo uriInfo) {
+        boolean withDefa_used = false;
+        String withDefa = null;
+
+        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
+            switch (entry.getKey()) {
+                case "with-defaults":
+                    if (!withDefa_used) {
+                        withDefa_used = true;
+                        withDefa = entry.getValue().iterator().next();
+                    } else {
+                        throw new RestconfDocumentedException("With-defaults parameter can be used only once.");
+                    }
+                    break;
+            }
+        }
+        boolean tagged = false;
+        if (withDefa_used) {
+            if (withDefa.equals("report-all-tagged")) {
+                tagged = true;
+                withDefa = null;
+            }
+            if (withDefa.equals("report-all")) {
+                withDefa = null;
+            }
+        }
+
         final InstanceIdentifierContext<?> iiWithData = this.controllerContext.toInstanceIdentifier(identifier);
         final DOMMountPoint mountPoint = iiWithData.getMountPoint();
         NormalizedNode<?, ?> data = null;
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
         if (mountPoint != null) {
-            data = this.broker.readConfigurationData(mountPoint, normalizedII);
+            data = this.broker.readConfigurationData(mountPoint, normalizedII, withDefa);
         } else {
-            data = this.broker.readConfigurationData(normalizedII);
+            data = this.broker.readConfigurationData(normalizedII, withDefa);
         }
         if(data == null) {
             final String errMsg = "Request could not be completed because the relevant data model content does not exist ";
             LOG.debug(errMsg + identifier);
             throw new RestconfDocumentedException(errMsg, ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
         }
-        return new NormalizedNodeContext(iiWithData, data, QueryParametersParser.parseWriterParameters(uriInfo));
+        return new NormalizedNodeContext(iiWithData, data,
+                QueryParametersParser.parseWriterParameters(uriInfo, tagged));
     }
 
     @Override
@@ -739,7 +766,7 @@ public class RestconfImpl implements RestconfService {
                 default:
                     throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey());
             }
-        }
+            }
 
         if (point_used && !insert_used) {
             throw new RestconfDocumentedException("Point parameter can't be used without Insert parameter.");
