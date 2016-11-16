@@ -92,15 +92,16 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
     }
 
     @Override
-    public Optional<String> get(final String uriPath, final LogicalDatastoreType datastoreType) throws OperationFailedException {
+    public Optional<String> get(final String uriPath, final LogicalDatastoreType datastoreType, final UriInfo uriInfo)
+            throws OperationFailedException {
         LOG.debug("get: uriPath: {}", uriPath);
 
         try {
             NormalizedNodeContext readData;
             if(datastoreType == LogicalDatastoreType.CONFIGURATION) {
-                readData = RestconfImpl.getInstance().readConfigurationData(uriPath, null);
+                readData = RestconfImpl.getInstance().readConfigurationData(uriPath, uriInfo);
             } else {
-                readData = RestconfImpl.getInstance().readOperationalData(uriPath, null);
+                readData = RestconfImpl.getInstance().readOperationalData(uriPath, uriInfo);
             }
 
             final Optional<String> result = Optional.of(toJson(readData));

@@ -346,16 +346,24 @@ public class JSONRestconfServiceImplTest {
 
     @Test
     public void testGetWithNoData() throws OperationFailedException {
-        doReturn(null).when(brokerFacade).readConfigurationData(notNull(YangInstanceIdentifier.class));
+        doReturn(null).when(brokerFacade).readConfigurationData(notNull(YangInstanceIdentifier.class),
+                Mockito.anyString());
         final String uriPath = "ietf-interfaces:interfaces";
-        this.service.get(uriPath, LogicalDatastoreType.CONFIGURATION);
+        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
+        Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
+        Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
+        this.service.get(uriPath, LogicalDatastoreType.CONFIGURATION, uriInfo);
     }
 
     @Test(expected=OperationFailedException.class)
     public void testGetFailure() throws Exception {
         final String invalidUriPath = "/ietf-interfaces:interfaces/invalid";
-
-        this.service.get(invalidUriPath, LogicalDatastoreType.CONFIGURATION);
+        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
+        Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
+        Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
+        this.service.get(invalidUriPath, LogicalDatastoreType.CONFIGURATION, uriInfo);
     }
 
     @SuppressWarnings("rawtypes")
@@ -443,14 +451,21 @@ public class JSONRestconfServiceImplTest {
                 .build();
 
         if(datastoreType == LogicalDatastoreType.CONFIGURATION) {
-            doReturn(entryNode).when(brokerFacade).readConfigurationData(notNull(YangInstanceIdentifier.class));
+            doReturn(entryNode).when(brokerFacade).readConfigurationData(notNull(YangInstanceIdentifier.class),
+                    Mockito.anyString());
         } else {
             doReturn(entryNode).when(brokerFacade).readOperationalData(notNull(YangInstanceIdentifier.class));
         }
 
         final String uriPath = "/ietf-interfaces:interfaces/interface/eth0";
+        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
+        Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
+        Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
+        Mockito.when(uriInfo.getQueryParameters(false)).thenReturn(value);
+        Mockito.when(value.getFirst("depth")).thenReturn("");
 
-        final Optional<String> optionalResp = this.service.get(uriPath, datastoreType);
+        final Optional<String> optionalResp = this.service.get(uriPath, datastoreType, uriInfo);
         assertEquals("Response present", true, optionalResp.isPresent());
         final String jsonResp = optionalResp.get();
 
@@ -462,7 +477,7 @@ public class JSONRestconfServiceImplTest {
 
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         if (datastoreType == LogicalDatastoreType.CONFIGURATION) {
-            verify(brokerFacade).readConfigurationData(capturedPath.capture());
+            verify(brokerFacade).readConfigurationData(capturedPath.capture(), Mockito.anyString());
         } else {
             verify(brokerFacade).readOperationalData(capturedPath.capture());
         }

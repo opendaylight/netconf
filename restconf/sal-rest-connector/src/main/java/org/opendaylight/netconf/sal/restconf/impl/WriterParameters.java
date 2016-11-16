@@ -17,28 +17,34 @@ public class WriterParameters {
     private final Integer depth;
     private final List<Set<QName>> fields;
     private final boolean prettyPrint;
+    private final boolean tagged;
 
     private WriterParameters(final WriterParametersBuilder builder) {
         this.content = builder.content;
         this.depth = builder.depth;
         this.fields = builder.fields;
         this.prettyPrint = builder.prettyPrint;
+        this.tagged = builder.tagged;
     }
 
     public String getContent() {
-        return content;
+        return this.content;
     }
 
     public Integer getDepth() {
-        return depth;
+        return this.depth;
     }
 
     public List<Set<QName>> getFields() {
-        return fields;
+        return this.fields;
     }
 
     public boolean isPrettyPrint() {
-        return prettyPrint;
+        return this.prettyPrint;
+    }
+
+    public boolean isTagged() {
+        return this.tagged;
     }
 
     public static class WriterParametersBuilder {
@@ -46,6 +52,7 @@ public class WriterParameters {
         private Integer depth;
         private List<Set<QName>> fields;
         private boolean prettyPrint;
+        private boolean tagged;
 
         public WriterParametersBuilder() {}
 
@@ -71,6 +78,10 @@ public class WriterParameters {
 
         public WriterParameters build() {
             return new WriterParameters(this);
+        }
+
+        public void setTagged(final boolean tagged) {
+            this.tagged = tagged;
         }
     }
 }
