@@ -12,7 +12,6 @@ import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Lists;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
@@ -36,9 +35,12 @@ public class NotificationsTransformUtilTest {
             "<added-capability>uri1</added-capability>" +
             "</netconf-capability-change>";
 
-    private static final String expectedNotification = "<notification xmlns=\"urn:ietf:params:netconf:capability:notification:1.0\">" +
-            innerNotification +
-            "<eventTime>" + new SimpleDateFormat(NetconfNotification.RFC3339_DATE_FORMAT_BLUEPRINT).format(DATE) + "</eventTime>" +
+    private static final String expectedNotification =
+            "<notification xmlns=\"urn:ietf:params:netconf:capability:notification:1.0\">"
+                    + innerNotification
+                    + "<eventTime>"
+                        + NetconfNotification.RFC3339_DATE_FORMATTER.apply(DATE)
+                    + "</eventTime>" +
             "</notification>";
 
     @Test
