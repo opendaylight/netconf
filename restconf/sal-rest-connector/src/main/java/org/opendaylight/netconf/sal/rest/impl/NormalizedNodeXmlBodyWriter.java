@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.Map.Entry;
 import javanet.staxutils.IndentingXMLStreamWriter;
 import javax.ws.rs.Produces;
@@ -86,7 +87,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
 
         XMLStreamWriter xmlWriter;
         try {
-            xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream);
+            xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
             if (t.getWriterParameters().isPrettyPrint()) {
                 xmlWriter = new IndentingXMLStreamWriter(xmlWriter);
             }

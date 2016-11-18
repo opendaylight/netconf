@@ -282,7 +282,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
         final XMLStreamWriter xmlWriter;
         try {
-            xmlWriter = XML_FACTORY.createXMLStreamWriter(outStream, "UTF-8");
+            xmlWriter = XML_FACTORY.createXMLStreamWriter(outStream, StandardCharsets.UTF_8.name());
         } catch (final XMLStreamException e) {
             throw new IllegalStateException(e);
         } catch (final FactoryConfigurationError e) {
