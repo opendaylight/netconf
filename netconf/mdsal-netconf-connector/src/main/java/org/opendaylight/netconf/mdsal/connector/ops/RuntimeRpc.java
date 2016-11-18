@@ -14,6 +14,7 @@ import com.google.common.util.concurrent.CheckedFuture;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -226,7 +227,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
     private XMLStreamWriter getXmlStreamWriter(final DOMResult result) {
         try {
-            return XML_OUTPUT_FACTORY.createXMLStreamWriter(result);
+            return XML_OUTPUT_FACTORY.createXMLStreamWriter(result, StandardCharsets.UTF_8.name());
         } catch (final XMLStreamException e) {
             throw new RuntimeException(e);
         }

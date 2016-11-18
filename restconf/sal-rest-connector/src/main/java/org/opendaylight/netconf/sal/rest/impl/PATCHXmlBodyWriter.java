@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -62,7 +63,7 @@ public class PATCHXmlBodyWriter implements MessageBodyWriter<PATCHStatusContext>
             throws IOException, WebApplicationException {
 
         try {
-            final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream);
+            final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
             writeDocument(xmlWriter, patchStatusContext);
         } catch (final XMLStreamException e) {
             throw new IllegalStateException(e);
