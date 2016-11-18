@@ -8,14 +8,17 @@
 
 package org.opendaylight.netconf.mdsal.connector.ops;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.base.Strings;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Objects;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeverity;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
@@ -219,8 +222,9 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         return dataSchemaNode;
     }
 
-    private Datastore extractTargetParameter(final XmlElement operationElement) throws DocumentedException {
-        final NodeList elementsByTagName = operationElement.getDomElement().getElementsByTagName(TARGET_KEY);
+    @VisibleForTesting
+    Datastore extractTargetParameter(final XmlElement operationElement) throws DocumentedException {
+        final NodeList elementsByTagName = getElementsByTagName(operationElement, TARGET_KEY);
         // Direct lookup instead of using XmlElement class due to performance
         if (elementsByTagName.getLength() == 0) {
             Map<String, String> errorInfo = ImmutableMap.of("bad-attribute", TARGET_KEY, "bad-element", OPERATION_NAME);
@@ -235,7 +239,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
     }
 
     private ModifyAction getDefaultOperation(final XmlElement operationElement) throws DocumentedException {
-        final NodeList elementsByTagName = operationElement.getDomElement().getElementsByTagName(DEFAULT_OPERATION_KEY);
+        final NodeList elementsByTagName = getElementsByTagName(operationElement, DEFAULT_OPERATION_KEY);
         if(elementsByTagName.getLength() == 0) {
             return ModifyAction.MERGE;
         } else if(elementsByTagName.getLength() > 1) {
@@ -257,6 +261,24 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         }
 
         return childNode.get();
+    }
+
+    private NodeList getElementsByTagName(final XmlElement operationElement, final String key) throws DocumentedException {
+        final Element element = operationElement.getDomElement();
+        NodeList elementsByTagName = null;
+        if (Strings.isNullOrEmpty(element.getPrefix())) {
+            elementsByTagName = element.getElementsByTagName(key);
+        } else {
+            elementsByTagName = element.getElementsByTagNameNS(operationElement.getNamespace(), key);
+        }
+        if (Objects.isNull(elementsByTagName)){
+            throw new DocumentedException("No element for operation=" + operationElement.getName() + " with key=" + key,
+                    ErrorType.PROTOCOL,
+                    ErrorTag.MISSING_ELEMENT,
+                    ErrorSeverity.ERROR);
+        }
+
+        return elementsByTagName;
     }
 
     @Override
