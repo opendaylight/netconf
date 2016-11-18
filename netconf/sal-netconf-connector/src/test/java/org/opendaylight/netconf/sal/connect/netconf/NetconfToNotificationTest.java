@@ -14,7 +14,6 @@ import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Iterables;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -100,7 +99,7 @@ public class NetconfToNotificationTest {
         assertNotNull(root);
         assertEquals(6, Iterables.size(root.getValue()));
         assertEquals("user-visited-page", root.getNodeType().getLocalName());
-        assertEquals(new SimpleDateFormat(NetconfNotification.RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT).parse("2015-10-23T09:42:27.67175+00:00"),
+        assertEquals(NetconfNotification.RFC3339_DATE_PARSER.apply("2015-10-23T09:42:27.67175+00:00"),
                 ((DOMEvent) domNotification).getEventTime());
     }
 }
