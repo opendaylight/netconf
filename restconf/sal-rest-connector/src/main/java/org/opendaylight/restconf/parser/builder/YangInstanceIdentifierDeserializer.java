@@ -207,7 +207,7 @@ public final class YangInstanceIdentifierDeserializer {
                 return qName;
             }
         }
-        return QName.create(schemaNode.getQName().getNamespace(), schemaNode.getQName().getRevision(), value);
+        return QName.create(schemaNode.getQName().getNamespace(), schemaNode.getQName().getRevision(), nodeName);
     }
 
     private static String toNodeName(final String str) {
