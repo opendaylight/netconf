@@ -8,8 +8,10 @@
 
 package org.opendaylight.netconf.mdsal.connector.ops;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -257,7 +259,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
     }
 
     private static Datastore extractTargetParameter(final XmlElement operationElement) throws DocumentedException {
-        final NodeList elementsByTagName = operationElement.getDomElement().getElementsByTagName(TARGET_KEY);
+        final NodeList elementsByTagName = getElementsByTagName(operationElement, TARGET_KEY);
         // Direct lookup instead of using XmlElement class due to performance
         if (elementsByTagName.getLength() == 0) {
             final Map<String, String> errorInfo = ImmutableMap.of("bad-attribute", TARGET_KEY, "bad-element",
@@ -275,7 +277,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
     }
 
     private static ModifyAction getDefaultOperation(final XmlElement operationElement) throws DocumentedException {
-        final NodeList elementsByTagName = operationElement.getDomElement().getElementsByTagName(DEFAULT_OPERATION_KEY);
+        final NodeList elementsByTagName = getElementsByTagName(operationElement, DEFAULT_OPERATION_KEY);
         if (elementsByTagName.getLength() == 0) {
             return ModifyAction.MERGE;
         } else if (elementsByTagName.getLength() > 1) {
@@ -298,6 +300,21 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         }
 
         return childNode.get();
+    }
+
+    @VisibleForTesting
+    static NodeList getElementsByTagName(final XmlElement operationElement, final String key) throws
+            DocumentedException {
+        final Element element = operationElement.getDomElement();
+        final NodeList elementsByTagName;
+
+        if (Strings.isNullOrEmpty(element.getPrefix())) {
+            elementsByTagName = element.getElementsByTagName(key);
+        } else {
+            elementsByTagName = element.getElementsByTagNameNS(operationElement.getNamespace(), key);
+        }
+
+        return elementsByTagName;
     }
 
     @Override
