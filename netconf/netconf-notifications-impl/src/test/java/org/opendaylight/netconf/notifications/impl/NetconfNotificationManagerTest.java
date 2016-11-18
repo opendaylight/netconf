@@ -16,8 +16,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import com.google.common.collect.Lists;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeParseException;
+import java.util.Date;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -45,27 +48,32 @@ public class NetconfNotificationManagerTest {
 
 
     @Test public void testEventTime() throws Exception {
-        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-            NetconfNotification.RFC3339_DATE_FORMAT_BLUEPRINT);
-        final SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat(
-            NetconfNotification.RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT);
-
         for (String time : Lists.newArrayList(
             "2001-07-04T12:08:56.235-07:00",
             "2015-10-23T09:42:27.67175+00:00",
             "1970-01-01T17:17:22.229568+00:00",
             "1937-01-01T12:00:27.87+00:20",
-            "1990-12-31T15:59:60-08:00",
-            "1990-12-31T23:59:60Z",
-            "1996-12-19T16:39:57-08:00"
-//          ,"1985-04-12T23:20:50.52Z"
+            "1990-12-31T15:59:59-08:00",
+            "1990-12-31T23:59:59Z",
+            "1996-12-19T16:39:57-08:00",
+            "2015-10-23T09:42:27Z",
+            "2015-10-23T09:42:27.200001Z",
+            "1985-04-12T23:20:50.52Z"
         )) {
             try {
-                simpleDateFormat.parse(time);
-            } catch (ParseException e) {
-                simpleDateFormat2.parse(time);
+                NetconfNotification.RFC3339_DATE_PARSER.apply(time);
+
+            } catch (DateTimeParseException e) {
+                fail("Failed to parse time value = " + time);
+                throw e;
             }
         }
+
+        Date date0 = Date.from(Instant.ofEpochMilli(0));
+        String dateString = date0.toInstant().atOffset(ZoneOffset.UTC).toString();
+        Date date1 = NetconfNotification.RFC3339_DATE_PARSER.apply(dateString);
+
+        Assert.assertEquals(date0, date1);
     }
 
     @Test

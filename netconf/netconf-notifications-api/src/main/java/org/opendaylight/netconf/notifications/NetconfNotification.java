@@ -9,8 +9,14 @@
 package org.opendaylight.netconf.notifications;
 
 import com.google.common.base.Preconditions;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.function.Function;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -22,17 +28,23 @@ public final class NetconfNotification extends NetconfMessage {
 
     public static final String NOTIFICATION = "notification";
     public static final String NOTIFICATION_NAMESPACE = "urn:ietf:params:netconf:capability:notification:1.0";
-    public static final String RFC3339_DATE_FORMAT_BLUEPRINT = "yyyy-MM-dd'T'HH:mm:ssXXX";
-    // The format with milliseconds is a bit fragile, it cannot be used for timestamps without millis (thats why its a separate format)
-    // + it might not work properly with more than 6 digits
-    // TODO try to find a better solution with Java8
-    public static final String RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX";
+
+    public static final Function<Date, String> RFC3339_DATE_FORMATTER = date ->
+            DateTimeFormatter.ISO_DATE_TIME.format(date.toInstant().atOffset(ZoneOffset.UTC));
+    public static final Function<String, Date> RFC3339_DATE_PARSER = time -> {
+        ZonedDateTime zdt = ZonedDateTime.ofInstant(
+                LocalDateTime.parse(time, DateTimeFormatter.ISO_DATE_TIME),
+                ZoneOffset.UTC,
+                ZoneId.systemDefault());
+        return Date.from(Instant.from(zdt));
+    };
+
     public static final String EVENT_TIME = "eventTime";
 
     /**
      * Used for unknown/un-parse-able event-times
      */
-    public static final Date UNKNOWN_EVENT_TIME = new Date(0);
+    public static final Date UNKNOWN_EVENT_TIME = Date.from(Instant.ofEpochMilli(0));
 
     private final Date eventTime;
 
@@ -75,7 +87,6 @@ public final class NetconfNotification extends NetconfMessage {
     }
 
     private static String getSerializedEventTime(final Date eventTime) {
-        // SimpleDateFormat is not threadsafe, cannot be in a constant
-        return new SimpleDateFormat(RFC3339_DATE_FORMAT_BLUEPRINT).format(eventTime);
+        return RFC3339_DATE_FORMATTER.apply(eventTime);
     }
 }

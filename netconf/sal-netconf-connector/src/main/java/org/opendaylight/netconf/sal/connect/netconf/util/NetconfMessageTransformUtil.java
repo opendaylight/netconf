@@ -13,8 +13,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.net.URI;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeParseException;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Collections;
@@ -316,33 +315,6 @@ public class NetconfMessageTransformUtil {
         return SchemaPath.create(true, rpc);
     }
 
-    private static final ThreadLocal<SimpleDateFormat> EVENT_TIME_FORMAT = new ThreadLocal<SimpleDateFormat>() {
-        @Override
-        protected SimpleDateFormat initialValue() {
-
-            final SimpleDateFormat withMillis = new SimpleDateFormat(
-                    NetconfNotification.RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT);
-
-            return new SimpleDateFormat(NetconfNotification.RFC3339_DATE_FORMAT_BLUEPRINT) {
-                private static final long serialVersionUID = 1L;
-
-                @Override public Date parse(final String source) throws ParseException {
-                    try {
-                        return super.parse(source);
-                    } catch (final ParseException e) {
-                        // In case of failure, try to parse with milliseconds
-                        return withMillis.parse(source);
-                    }
-                }
-            };
-        }
-
-        @Override
-        public void set(final SimpleDateFormat value) {
-            throw new UnsupportedOperationException();
-        }
-    };
-
     public static Map.Entry<Date, XmlElement> stripNotification(final NetconfMessage message) {
         final XmlElement xmlElement = XmlElement.fromDomDocument(message.getDocument());
         final List<XmlElement> childElements = xmlElement.getChildElements();
@@ -364,10 +336,12 @@ public class NetconfMessageTransformUtil {
         }
 
         try {
-            return new AbstractMap.SimpleEntry<>(EVENT_TIME_FORMAT.get().parse(eventTimeElement.getTextContent()), notificationElement);
+            return new AbstractMap.SimpleEntry<>(
+                    NetconfNotification.RFC3339_DATE_PARSER.apply(eventTimeElement.getTextContent()),
+                    notificationElement);
         } catch (final DocumentedException e) {
             throw new IllegalArgumentException("Notification payload does not contain " + EVENT_TIME + " " + message);
-        } catch (final ParseException e) {
+        } catch (final DateTimeParseException e) {
             LOG.warn("Unable to parse event time from {}. Setting time to {}", eventTimeElement, NetconfNotification.UNKNOWN_EVENT_TIME, e);
             return new AbstractMap.SimpleEntry<>(NetconfNotification.UNKNOWN_EVENT_TIME, notificationElement);
         }
