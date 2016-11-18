@@ -32,9 +32,11 @@ import javax.xml.transform.stream.StreamResult;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.cluster.databroker.ConcurrentDOMDataBroker;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
@@ -69,12 +71,14 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class NetconfMDSalMappingTest {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMDSalMappingTest.class);
 
+    private static final String TARGET_KEY = "target";
     private static final String RPC_REPLY_ELEMENT = "rpc-reply";
     private static final String DATA_ELEMENT = "data";
     private static final String FILTER_NODE = "filter";
@@ -536,6 +540,61 @@ public class NetconfMDSalMappingTest {
                         + "/editConfig_merge_multiple_operations_4_delete_children_operations_control.xml"));
 
         deleteDatastore();
+    }
+
+    @Test
+    public void testEditConfigGetElementByTagName() throws Exception {
+        EditConfig editConfig = new EditConfig("test_edit-config", Mockito.mock(CurrentSchemaContext.class),
+                Mockito.mock(TransactionProvider.class));
+
+        String stringWithoutPrefix =
+                "<rpc xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"0\">\n" +
+                        "  <edit-config>\n" +
+                        "    <target>\n" +
+                        "      <candidate/>\n" +
+                        "    </target>\n" +
+                        "  </edit-config>\n" +
+                        "</rpc>";
+        XmlElement xe = getXmlElement(stringWithoutPrefix);
+        NodeList nodeList = editConfig.getElementsByTagName(xe, TARGET_KEY);
+        Assert.assertEquals(1, nodeList.getLength());
+
+        String stringWithPrefix =
+                "<nc:rpc xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"0\">\n" +
+                        "  <nc:edit-config>\n" +
+                        "    <nc:target>\n" +
+                        "      <nc:candidate/>\n" +
+                        "    </nc:target>\n" +
+                        "  </nc:edit-config>\n" +
+                        "</nc:rpc>";
+
+        xe = getXmlElement(stringWithPrefix);
+        nodeList = editConfig.getElementsByTagName(xe, TARGET_KEY);
+        Assert.assertEquals(1, nodeList.getLength());
+
+        String stringWithoutTarget =
+                "<nc:rpc xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"0\">\n" +
+                        "  <nc:edit-config>\n" +
+                        "    <nc:target>\n" +
+                        "    </nc:target>\n" +
+                        "  </nc:edit-config>\n" +
+                        "</nc:rpc>";
+        xe = getXmlElement(stringWithoutTarget);
+
+        try {
+            nodeList = editConfig.getElementsByTagName(xe, TARGET_KEY);
+            XmlElement.fromDomElement((Element) nodeList.item(0)).getOnlyChildElement();
+            Assert.fail("Not specified target, we should fail");
+        } catch (DocumentedException documentedException) {
+            // Ignore
+        }
+
+    }
+
+    private XmlElement getXmlElement(final String elementAsString) throws Exception {
+        Document d = XmlUtil.readXmlToDocument(elementAsString);
+        Element e = d.getDocumentElement();
+        return XmlElement.fromDomElement(e);
     }
 
     @Test
