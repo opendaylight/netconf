@@ -8,7 +8,9 @@
 
 package org.opendaylight.netconf.mdsal.connector.ops;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
@@ -217,8 +219,15 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         return dataSchemaNode;
     }
 
-    private Datastore extractTargetParameter(final XmlElement operationElement) throws DocumentedException {
-        final NodeList elementsByTagName = operationElement.getDomElement().getElementsByTagName(TARGET_KEY);
+    @VisibleForTesting
+    Datastore extractTargetParameter(final XmlElement operationElement) throws DocumentedException {
+        Element element = operationElement.getDomElement();
+        NodeList elementsByTagName;
+        if (Strings.isNullOrEmpty(element.getPrefix())) {
+            elementsByTagName = element.getElementsByTagName(TARGET_KEY);
+        } else {
+            elementsByTagName = element.getElementsByTagNameNS(operationElement.getNamespace(), TARGET_KEY);
+        }
         // Direct lookup instead of using XmlElement class due to performance
         if (elementsByTagName.getLength() == 0) {
             throw new DocumentedException("Missing target element", ErrorType.RPC, ErrorTag.MISSING_ATTRIBUTE, ErrorSeverity.ERROR);
@@ -230,8 +239,15 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         }
     }
 
-    private ModifyAction getDefaultOperation(final XmlElement operationElement) throws DocumentedException {
-        final NodeList elementsByTagName = operationElement.getDomElement().getElementsByTagName(DEFAULT_OPERATION_KEY);
+    @VisibleForTesting
+    ModifyAction getDefaultOperation(final XmlElement operationElement) throws DocumentedException {
+        Element element = operationElement.getDomElement();
+        NodeList elementsByTagName;
+        if (Strings.isNullOrEmpty(element.getPrefix())) {
+            elementsByTagName = element.getElementsByTagName(DEFAULT_OPERATION_KEY);
+        } else {
+            elementsByTagName = element.getElementsByTagNameNS(operationElement.getNamespace(), DEFAULT_OPERATION_KEY);
+        }
         if(elementsByTagName.getLength() == 0) {
             return ModifyAction.MERGE;
         } else if(elementsByTagName.getLength() > 1) {
