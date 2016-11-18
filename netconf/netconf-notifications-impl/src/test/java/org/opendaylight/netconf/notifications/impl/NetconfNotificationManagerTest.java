@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.notifications.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -16,8 +17,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import com.google.common.collect.Lists;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -37,34 +43,92 @@ public class NetconfNotificationManagerTest {
 
     @Mock
     private NetconfNotificationRegistry notificationRegistry;
+    public static final String RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
     }
 
+    @Test
+    public void testEventTime() throws Exception {
+        //Testing values with SimpleDateFormat
+        final ArrayList<String> checkWith = Lists.newArrayList(
+                "2001-07-04T12:08:56.235-07:00",
+                "2015-10-23T09:42:27.671+00:00",
+                "1970-01-01T17:17:22.229+00:00",
+                "1937-01-01T12:00:27.870+00:20",
+                "2015-06-30T23:59:59.000+00:00",
+                "1996-12-19T16:39:57.000-08:00",
+                "2015-10-23T09:42:27.000+00:00",
+                "2015-10-23T09:42:27.200+00:00",
+                "1985-04-12T23:20:50.520+00:00",
+                // Values with leap second
+                "2001-07-04T23:59:59.235-07:00",
+                "1990-12-31T23:59:59.000-08:00",
+                "2015-10-23T23:59:59.671+00:00",
+                "1970-01-01T23:59:59.229+00:00",
+                "1937-01-01T23:59:59.870+00:20",
+                "1990-12-31T23:59:59.000+00:00",
+                "2015-10-23T23:59:59.200+00:00",
+                "1985-04-12T23:59:59.520+00:00");
+        final Iterator<String> iterator = checkWith.iterator();
 
-    @Test public void testEventTime() throws Exception {
-        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-            NetconfNotification.RFC3339_DATE_FORMAT_BLUEPRINT);
-        final SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat(
-            NetconfNotification.RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT);
-
-        for (String time : Lists.newArrayList(
-            "2001-07-04T12:08:56.235-07:00",
-            "2015-10-23T09:42:27.67175+00:00",
-            "1970-01-01T17:17:22.229568+00:00",
-            "1937-01-01T12:00:27.87+00:20",
-            "1990-12-31T15:59:60-08:00",
-            "1990-12-31T23:59:60Z",
-            "1996-12-19T16:39:57-08:00"
-//          ,"1985-04-12T23:20:50.52Z"
+        // Testing correct values
+        for (final String time : Lists.newArrayList(
+                "2001-07-04T12:08:56.235-07:00",
+                "2015-10-23T09:42:27.67175+00:00",
+                "1970-01-01T17:17:22.229568+00:00",
+                "1937-01-01T12:00:27.87+00:20",
+                "2015-06-30T23:59:59Z",
+                "1996-12-19T16:39:57-08:00",
+                "2015-10-23T09:42:27Z",
+                "2015-10-23T09:42:27.200001Z",
+                "1985-04-12T23:20:50.52Z",
+                // Values with leap second
+                "2001-07-04T23:59:60.235-07:00",
+                "1990-12-31T23:59:60-08:00",
+                "2015-10-23T23:59:60.67175+00:00",
+                "1970-01-01T23:59:60.229568+00:00",
+                "1937-01-01T23:59:60.87+00:20",
+                "1990-12-31T23:59:60Z",
+                "2015-10-23T23:59:60.20001Z",
+                "1985-04-12T23:59:60.52Z"
         )) {
             try {
-                simpleDateFormat.parse(time);
-            } catch (ParseException e) {
-                simpleDateFormat2.parse(time);
+                final Date apply = NetconfNotification.RFC3339_DATE_PARSER.apply(time);
+                final Date parse = new SimpleDateFormat(RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT).parse(iterator.next());
+                assertEquals(parse.getTime(), apply.getTime());
+                final String dateString = NetconfNotification.RFC3339_DATE_FORMATTER.apply(apply);
+            } catch (final DateTimeParseException e) {
+                fail("Failed to parse time value = " + time + " " + e);
+                throw e;
             }
+        }
+
+        // Testing that we're consistent from formatting to parsing.
+        final Date date0 = Date.from(Instant.ofEpochMilli(0));
+        final String dateString0 = NetconfNotification.RFC3339_DATE_FORMATTER.apply(date0);
+        final Date date1 = NetconfNotification.RFC3339_DATE_PARSER.apply(dateString0);
+        final String dateString1 = NetconfNotification.RFC3339_DATE_FORMATTER.apply(date1);
+        Assert.assertEquals(date0, date1);
+        Assert.assertEquals(dateString0, dateString1);
+
+        // Testing wrong values
+        for (final String time : Lists.newArrayList(
+                "0",
+                "205-10-23T09:42:27.67175+00:00",
+                "1970-01-01T17:60:22.229568+00:00",
+                "1937-01-01T32:00:27.87+00:20",
+                "2060-13-31T15:59:90-08:00",
+                "1990-12-31T23:58:60Z"
+        )) {
+            try {
+                NetconfNotification.RFC3339_DATE_PARSER.apply(time);
+            } catch (final DateTimeParseException e) {
+                continue;
+            }
+            fail("Should have thrown an exception; value= " + time);
         }
     }
 
