@@ -86,7 +86,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
 
         XMLStreamWriter xmlWriter;
         try {
-            xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream);
+            xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream, "UTF-8");
             if (t.getWriterParameters().isPrettyPrint()) {
                 xmlWriter = new IndentingXMLStreamWriter(xmlWriter);
             }
