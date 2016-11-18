@@ -8,8 +8,10 @@
 
 package org.opendaylight.netconf.mdsal.connector.ops;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -298,6 +300,20 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         }
 
         return childNode.get();
+    }
+
+    @VisibleForTesting
+    NodeList getElementsByTagName(final XmlElement operationElement, final String key) throws DocumentedException {
+        final Element element = operationElement.getDomElement();
+        final NodeList elementsByTagName;
+
+        if (Strings.isNullOrEmpty(element.getPrefix())) {
+            elementsByTagName = element.getElementsByTagName(key);
+        } else {
+            elementsByTagName = element.getElementsByTagNameNS(operationElement.getNamespace(), key);
+        }
+
+        return elementsByTagName;
     }
 
     @Override
