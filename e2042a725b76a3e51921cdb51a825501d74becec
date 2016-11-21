@@ -16,6 +16,24 @@
       "revId": "e2042a725b76a3e51921cdb51a825501d74becec",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_159b1973",
+        "filename": "netconf/mdsal-netconf-tcp/src/main/resources/org/opendaylight/blueprint/netconf-tcp.xml",
+        "patchSetId": 17
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-21T14:28:23Z",
+      "side": 1,
+      "message": "Yes it should, I think both need to be separated. Because we don\u0027t want to restart one when configuring the other.",
+      "parentUuid": "3a65312a_23bee2d4",
+      "revId": "e2042a725b76a3e51921cdb51a825501d74becec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
