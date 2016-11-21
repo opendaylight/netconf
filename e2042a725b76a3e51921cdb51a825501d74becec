@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_23bee2d4",
+        "filename": "netconf/mdsal-netconf-tcp/src/main/resources/org/opendaylight/blueprint/netconf-tcp.xml",
+        "patchSetId": 17
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-21T13:58:27Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be tcp? Or do we want to store TCP configuration in ssh cfg file?",
+      "revId": "e2042a725b76a3e51921cdb51a825501d74becec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
