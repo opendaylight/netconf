@@ -1,4 +1,120 @@
 {
   "pushCert": "certificate version 0.1\npusher F566C9B1 1479748248 -0500\npushee ssh://git.opendaylight.org:29418/netconf.git\nnonce 1479748248-FFCFB3966F48FD9280B4F804A7484B0A65521FE5\n\n0000000000000000000000000000000000000000 d3c7ada613bb74ccec35d7770af45c8553c844bf refs/publish/master/bug/5817\n-----BEGIN PGP SIGNATURE-----\nVersion: GnuPG v2\n\niQIcBAABCAAGBQJYMyqYAAoJEF3VDEv1ZsmxU6kP/1UH06PuX2klq4r13YCSfk6F\nnVT9QqvpyYccisT77oAiQEAWX5lNNEMvycOjGG2TlvOZ2JEjOUe7hxV1jWGygNuJ\nC9+6CI6mpCHZnxoA+5DeWcw0l4DVvK6K0nWA0avojgJh7AGd20WaXcjKwbfLxK+x\nQlqd/De0YyiBnVpyeywBKI6Q2Xh944pPwGQo8YU/k4Fzm46Lo6tunT75cER4yika\nDTKAEh6ExaqU934FuT1ZHJhutQK++48H+Au7tLgtEj+CnWTCdRUPG4LF4gyl/TUt\nbQQyTMG496w4kP+LU7eUfryxzFBof13WEmfmH9UzC1j51Ec4NPyCHtFXIAWFAj04\n5/6p2YAOz45qeL13L1Ll+vP4gy9GLUDmRpi9/KK5SS09jFn9xxcILuIELevy/U7k\n8jJVE3mJInZJauR0RW3rqr0IgbOAFMiQJOGM96fCQVIvSdzmA/FuKtxAJq7iodit\nnRUN5FxahkkHBL/Vnv6KvU0Xwiw1bo1hH4iR94tRzcUUh+ZXev5Q1qRf8eKCAFMy\nbvDRMeClDa8kzlnQg8ctLPnXcCvnT2Ebz+xGAgVvyJzQaFIzSY4UEPdhO3s+wqyc\nv7cCzzqC4/DKmFATXOV7RkSdJReYWLi1/rYxoFlBwOtUCau1cMOoTAtHaB/b9MEY\np3oFsa2UI+k8kWH42WTv\n\u003dau0+\n-----END PGP SIGNATURE-----\n",
-  "comments": []
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_6bdef012",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/AuthorizedKeysDecoder.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2016-11-21T20:04:23Z",
+      "side": 1,
+      "message": "What if the RSA key is a different size?",
+      "range": {
+        "startLine": 48,
+        "startChar": 11,
+        "endLine": 48,
+        "endChar": 77
+      },
+      "revId": "d3c7ada613bb74ccec35d7770af45c8553c844bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_4be174cf",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/AuthorizedKeysDecoder.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2016-11-21T20:04:23Z",
+      "side": 1,
+      "message": "This is sorta messy... I would love to think there is a better way to parse out the Base64 encoded section.",
+      "range": {
+        "startLine": 50,
+        "startChar": 12,
+        "endLine": 50,
+        "endChar": 42
+      },
+      "revId": "d3c7ada613bb74ccec35d7770af45c8553c844bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_cbc5843e",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/NetconfPublickeyAuthenticator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2016-11-21T20:04:23Z",
+      "side": 1,
+      "message": "This shouldn\u0027t need to be transient as PublickeyAuthenticator is not Serializable, and this is not either.",
+      "range": {
+        "startLine": 21,
+        "startChar": 25,
+        "endLine": 21,
+        "endChar": 34
+      },
+      "revId": "d3c7ada613bb74ccec35d7770af45c8553c844bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_4bba14c1",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfiguration.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2016-11-21T20:04:23Z",
+      "side": 1,
+      "message": "Could be null, in which case casting null to String will give you a ClassCastException.",
+      "range": {
+        "startLine": 73,
+        "startChar": 8,
+        "endLine": 73,
+        "endChar": 39
+      },
+      "revId": "d3c7ada613bb74ccec35d7770af45c8553c844bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_8bb42cd2",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/osgi/NetconfConfigurationHolder.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2016-11-21T20:04:23Z",
+      "side": 1,
+      "message": "Why use a \"String\" instead of a \"File\"?",
+      "range": {
+        "startLine": 30,
+        "startChar": 66,
+        "endLine": 30,
+        "endChar": 72
+      },
+      "revId": "d3c7ada613bb74ccec35d7770af45c8553c844bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
 }
