@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_44d4c146",
+        "filename": "netconf/netconf-notifications-impl/src/test/java/org/opendaylight/netconf/notifications/impl/NetconfNotificationManagerTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2016-11-22T15:31:36Z",
+      "side": 1,
+      "message": "Does this edit mean that leap seconds [0] will not get handled properly?\n\n[0] https://en.wikipedia.org/wiki/Leap_second",
+      "range": {
+        "startLine": 56,
+        "startChar": 30,
+        "endLine": 56,
+        "endChar": 32
+      },
+      "revId": "eea72112873beb5726728ab2a3ac3273fc8fb618",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
