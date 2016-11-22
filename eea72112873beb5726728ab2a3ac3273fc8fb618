@@ -70,6 +70,30 @@
       "revId": "eea72112873beb5726728ab2a3ac3273fc8fb618",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_04680986",
+        "filename": "netconf/netconf-notifications-impl/src/test/java/org/opendaylight/netconf/notifications/impl/NetconfNotificationManagerTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-22T15:43:23Z",
+      "side": 1,
+      "message": "Vratko, I\u0027ll rework the patch as this is cover in new java API: http://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#parsedLeapSecond--",
+      "parentUuid": "3a65312a_845c19ef",
+      "range": {
+        "startLine": 56,
+        "startChar": 30,
+        "endLine": 56,
+        "endChar": 32
+      },
+      "revId": "eea72112873beb5726728ab2a3ac3273fc8fb618",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
