@@ -124,9 +124,9 @@ public class NetconfServerSessionListenerTest {
         final Document reply =
                 XmlUtil.readXmlToDocument("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
                         "<rpc-error>\n" +
-                        "<error-type>PROTOCOL</error-type>\n" +
+                        "<error-type>protocol</error-type>\n" +
                         "<error-tag>unknown-element</error-tag>\n" +
-                        "<error-severity>ERROR</error-severity>\n" +
+                        "<error-severity>error</error-severity>\n" +
                         "<error-message>Unknown tag bad-rpc in message:\n" +
                         "&lt;bad-rpc/&gt;\n" +
                         "</error-message>\n" +
