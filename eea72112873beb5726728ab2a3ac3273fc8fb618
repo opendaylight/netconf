@@ -46,6 +46,30 @@
       "revId": "eea72112873beb5726728ab2a3ac3273fc8fb618",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_845c19ef",
+        "filename": "netconf/netconf-notifications-impl/src/test/java/org/opendaylight/netconf/notifications/impl/NetconfNotificationManagerTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-22T15:41:23Z",
+      "side": 1,
+      "message": "The exception we would get:\n\njava.time.format.DateTimeParseException: Text \u00271990-12-31T15:59:60-08:00\u0027 could not be parsed: Invalid value for SecondOfMinute (valid values 0 - 59): 60",
+      "parentUuid": "3a65312a_24bf05fd",
+      "range": {
+        "startLine": 56,
+        "startChar": 30,
+        "endLine": 56,
+        "endChar": 32
+      },
+      "revId": "eea72112873beb5726728ab2a3ac3273fc8fb618",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
