@@ -22,6 +22,30 @@
       "revId": "eea72112873beb5726728ab2a3ac3273fc8fb618",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_24bf05fd",
+        "filename": "netconf/netconf-notifications-impl/src/test/java/org/opendaylight/netconf/notifications/impl/NetconfNotificationManagerTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-22T15:36:24Z",
+      "side": 1,
+      "message": "Yes correct. While testing this was throwing DateTimeParseException. This is based on the java API, hence there isn\u0027t much I can do.\n\nAny suggestion?",
+      "parentUuid": "3a65312a_44d4c146",
+      "range": {
+        "startLine": 56,
+        "startChar": 30,
+        "endLine": 56,
+        "endChar": 32
+      },
+      "revId": "eea72112873beb5726728ab2a3ac3273fc8fb618",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
