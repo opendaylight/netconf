@@ -1,0 +1,9 @@
+Code-Review+1: Juraj Kosmel <juraj.kosmel@pantheon.tech>
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+1: Martin Ciglan <mciglan@cisco.com>
+Code-Review+2: Jakub Morvay <jmorvay@cisco.com>
+Submitted-by: Jakub Morvay <jmorvay@cisco.com>
+Submitted-at: Wed, 23 Nov 2016 12:16:56 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/48479
+Project: netconf
+Branch: refs/heads/master
