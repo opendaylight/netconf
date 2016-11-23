@@ -22,6 +22,30 @@
       "revId": "167f872e01b24de6bd1a6bba379bfe074cad4ba7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_e0821693",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-11-23T15:23:46Z",
+      "side": 1,
+      "message": "I agree, I think it doesn\u0027t hurt. \n\nIf we want to be stricter I can add that to the if condition line 100.\nBecause as you said, the leap second can only happen at 23:59.",
+      "parentUuid": "3a65312a_c08f1acb",
+      "range": {
+        "startLine": 107,
+        "startChar": 19,
+        "endLine": 107,
+        "endChar": 41
+      },
+      "revId": "167f872e01b24de6bd1a6bba379bfe074cad4ba7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
