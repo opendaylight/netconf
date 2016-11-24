@@ -12,7 +12,7 @@ import java.net.URI;
 import java.util.Date;
 import java.util.Set;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.restconf.Draft17;
+import org.opendaylight.restconf.Draft18;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -73,13 +73,13 @@ public final class SchemaContextRef {
 
     /**
      * Get {@link Module} by ietf-restconf qname from
-     * {@link Draft17.RestconfModule}
+     * {@link Draft18.RestconfModule}
      *
      * @return {@link Module}
      */
     public Module getRestconfModule() {
-        return this.findModuleByNamespaceAndRevision(Draft17.RestconfModule.IETF_RESTCONF_QNAME.getNamespace(),
-                Draft17.RestconfModule.IETF_RESTCONF_QNAME.getRevision());
+        return this.findModuleByNamespaceAndRevision(Draft18.RestconfModule.IETF_RESTCONF_QNAME.getNamespace(),
+                Draft18.RestconfModule.IETF_RESTCONF_QNAME.getRevision());
     }
 
     /**

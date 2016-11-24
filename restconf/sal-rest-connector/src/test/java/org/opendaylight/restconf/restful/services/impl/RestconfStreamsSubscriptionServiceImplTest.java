@@ -44,7 +44,7 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 
 public class RestconfStreamsSubscriptionServiceImplTest {
 
-    private static final String uri = "/restconf/17/data/ietf-restconf-monitoring:restconf-state/streams/stream/"
+    private static final String uri = "/restconf/18/data/ietf-restconf-monitoring:restconf-state/streams/stream/"
             + "toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE";
     private static Field listenersByStreamName;
 

@@ -36,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Provider for restconf draft17.
+ * Provider for restconf draft18.
  *
  */
 public class RestConnectorProvider implements Provider, RestConnector, AutoCloseable {
