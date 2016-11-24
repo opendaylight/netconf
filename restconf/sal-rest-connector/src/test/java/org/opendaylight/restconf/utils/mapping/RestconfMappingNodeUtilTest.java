@@ -35,9 +35,9 @@ import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
-import org.opendaylight.restconf.Draft17;
-import org.opendaylight.restconf.Draft17.MonitoringModule;
-import org.opendaylight.restconf.Draft17.RestconfModule;
+import org.opendaylight.restconf.Draft18;
+import org.opendaylight.restconf.Draft18.MonitoringModule;
+import org.opendaylight.restconf.Draft18.RestconfModule;
 import org.opendaylight.restconf.utils.schema.context.RestconfSchemaUtil;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
@@ -756,7 +756,7 @@ public class RestconfMappingNodeUtilTest {
      */
     private Module getTestingRestconfModule(final String s) {
         return RestconfMappingNodeUtilTest.schemaContext.findModuleByName(
-                s, Draft17.RestconfModule.IETF_RESTCONF_QNAME.getRevision());
+                s, Draft18.RestconfModule.IETF_RESTCONF_QNAME.getRevision());
     }
 
     /**

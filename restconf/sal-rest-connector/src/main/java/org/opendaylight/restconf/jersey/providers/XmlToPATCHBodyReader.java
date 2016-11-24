@@ -35,7 +35,7 @@ import org.opendaylight.netconf.sal.restconf.impl.PATCHEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
-import org.opendaylight.restconf.Draft17;
+import org.opendaylight.restconf.Draft18;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -58,7 +58,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @Provider
-@Consumes({Draft17.MediaTypes.PATCH + RestconfConstants.XML})
+@Consumes({Draft18.MediaTypes.PATCH + RestconfConstants.XML})
 public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider implements
         MessageBodyReader<PATCHContext> {
 

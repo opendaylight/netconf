@@ -37,7 +37,7 @@ import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
-import org.opendaylight.restconf.Draft17;
+import org.opendaylight.restconf.Draft18;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.rest.services.api.RestconfStreamsService;
 import org.opendaylight.restconf.utils.mapping.RestconfMappingNodeConstants;
@@ -112,8 +112,8 @@ public class RestconfStreamsServiceTest {
     public void getAvailableStreamsTest() throws Exception {
         // prepare conditions - get correct Restconf module
         when(this.contextHandler.get()).thenReturn(this.mockSchemaContext);
-        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft17.RestconfModule.IETF_RESTCONF_QNAME
-                .getNamespace(), Draft17.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
+        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft18.RestconfModule.IETF_RESTCONF_QNAME
+                .getNamespace(), Draft18.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
                 .thenReturn(getTestingRestconfModule("ietf-restconf"));
 
         // make test
@@ -146,8 +146,8 @@ public class RestconfStreamsServiceTest {
     public void getAvailableStreamsMissingRestconfModuleNegativeTest() {
         // prepare conditions - get null Restconf module
         when(this.contextHandler.get()).thenReturn(this.mockSchemaContext);
-        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft17.RestconfModule.IETF_RESTCONF_QNAME
-                .getNamespace(), Draft17.RestconfModule.IETF_RESTCONF_QNAME.getRevision())).thenReturn(null);
+        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft18.RestconfModule.IETF_RESTCONF_QNAME
+                .getNamespace(), Draft18.RestconfModule.IETF_RESTCONF_QNAME.getRevision())).thenReturn(null);
 
         // make test
         this.thrown.expect(NullPointerException.class);
@@ -163,8 +163,8 @@ public class RestconfStreamsServiceTest {
     public void getAvailableStreamsMissingListStreamNegativeTest() {
         // prepare conditions - get Restconf module with missing list stream
         when(this.contextHandler.get()).thenReturn(this.mockSchemaContext);
-        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft17.RestconfModule.IETF_RESTCONF_QNAME
-                .getNamespace(), Draft17.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
+        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft18.RestconfModule.IETF_RESTCONF_QNAME
+                .getNamespace(), Draft18.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
                 .thenReturn(getTestingRestconfModule("restconf-module-with-missing-list-stream"));
 
         // make test and verify
@@ -190,8 +190,8 @@ public class RestconfStreamsServiceTest {
     public void getAvailableStreamsMissingContainerStreamsNegativeTest() {
         // prepare conditions - get Restconf module with missing container streams
         when(this.contextHandler.get()).thenReturn(this.mockSchemaContext);
-        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft17.RestconfModule.IETF_RESTCONF_QNAME
-                .getNamespace(), Draft17.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
+        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft18.RestconfModule.IETF_RESTCONF_QNAME
+                .getNamespace(), Draft18.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
                 .thenReturn(getTestingRestconfModule("restconf-module-with-missing-container-streams"));
 
         // make test and verify
@@ -216,8 +216,8 @@ public class RestconfStreamsServiceTest {
     public void getAvailableStreamsIllegalListStreamNegativeTest() {
         // prepare conditions - get Restconf module with illegal list stream
         when(this.contextHandler.get()).thenReturn(this.mockSchemaContext);
-        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft17.RestconfModule.IETF_RESTCONF_QNAME
-                .getNamespace(), Draft17.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
+        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft18.RestconfModule.IETF_RESTCONF_QNAME
+                .getNamespace(), Draft18.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
                 .thenReturn(getTestingRestconfModule("restconf-module-with-illegal-list-stream"));
 
         // make test
@@ -233,8 +233,8 @@ public class RestconfStreamsServiceTest {
     public void getAvailableStreamsIllegalContainerStreamsNegativeTest() {
         // prepare conditions - get Restconf module with illegal container streams
         when(this.contextHandler.get()).thenReturn(this.mockSchemaContext);
-        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft17.RestconfModule.IETF_RESTCONF_QNAME
-                .getNamespace(), Draft17.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
+        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft18.RestconfModule.IETF_RESTCONF_QNAME
+                .getNamespace(), Draft18.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
                 .thenReturn(getTestingRestconfModule("restconf-module-with-illegal-container-streams"));
 
         // make test
@@ -250,8 +250,8 @@ public class RestconfStreamsServiceTest {
     public void getAvailableStreamsIllegalLeafDescriptionNegativeTest() {
         // prepare conditions - get Restconf module with illegal leaf description in list stream
         when(this.contextHandler.get()).thenReturn(this.mockSchemaContext);
-        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft17.RestconfModule.IETF_RESTCONF_QNAME
-                .getNamespace(), Draft17.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
+        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft18.RestconfModule.IETF_RESTCONF_QNAME
+                .getNamespace(), Draft18.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
                 .thenReturn(getTestingRestconfModule("restconf-module-with-illegal-leaf-description"));
 
         // make test
@@ -266,7 +266,7 @@ public class RestconfStreamsServiceTest {
      * @return Restconf module
      */
     private Module getTestingRestconfModule(final String s) {
-        return this.schemaContext.findModuleByName(s, Draft17.RestconfModule.IETF_RESTCONF_QNAME.getRevision());
+        return this.schemaContext.findModuleByName(s, Draft18.RestconfModule.IETF_RESTCONF_QNAME.getRevision());
     }
 
     /**
