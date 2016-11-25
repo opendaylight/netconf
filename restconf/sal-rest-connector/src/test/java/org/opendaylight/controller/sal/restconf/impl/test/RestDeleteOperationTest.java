@@ -13,6 +13,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
@@ -24,6 +25,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
@@ -83,6 +85,16 @@ public class RestDeleteOperationTest extends JerseyTest {
         doThrow(RestconfDocumentedException.class).when(brokerFacade).commitConfigurationDataDelete(
                 any(YangInstanceIdentifier.class));
         response = target(uri).request(MediaType.APPLICATION_XML).delete();
+        assertEquals(500, response.getStatus());
+    }
+
+    @Test
+    public void deleteFailTest() throws Exception {
+        final String uri = "/config/test-interface:interfaces";
+        final Exception exception = new TransactionCommitFailedException("failed test");
+        final CheckedFuture future = Futures.immediateFailedCheckedFuture(exception);
+        when(brokerFacade.commitConfigurationDataDelete(any(YangInstanceIdentifier.class))).thenReturn(future);
+        final Response response = target(uri).request(MediaType.APPLICATION_XML).delete();
         assertEquals(500, response.getStatus());
     }
 }
