@@ -970,18 +970,19 @@ public class RestconfImpl implements RestconfService {
         }
 
         final CountDownLatch waiter = new CountDownLatch(1);
+        final ResultOperation result = new ResultOperation();
         Futures.addCallback(future, new FutureCallback<Void>() {
 
             @Override
             public void onSuccess(final Void result) {
-                handlerLoggerDelete(null);
+                LOG.trace("Successfuly delete data.");
                 waiter.countDown();
             }
 
             @Override
             public void onFailure(final Throwable t) {
                 waiter.countDown();
-                handlerLoggerDelete(t);
+                result.setFailed(t);
             }
 
         });
@@ -993,17 +994,25 @@ public class RestconfImpl implements RestconfService {
             LOG.warn(msg);
             throw new RestconfDocumentedException(msg, e);
         }
-
+        if (result.failed() != null) {
+            final Throwable t = result.failed();
+            final String errMsg = "Error while deleting data";
+            LOG.info(errMsg, t);
+            throw new RestconfDocumentedException(errMsg, RestconfError.ErrorType.APPLICATION,
+                    RestconfError.ErrorTag.OPERATION_FAILED, t);
+        }
         return Response.status(Status.OK).build();
     }
 
-    protected void handlerLoggerDelete(final Throwable t) {
-        if (t != null) {
-            final String errMsg = "Error while deleting data";
-            LOG.info(errMsg, t);
-            throw new RestconfDocumentedException(errMsg, t);
-        } else {
-            LOG.trace("Successfuly delete data.");
+    private class ResultOperation {
+        private Throwable t = null;
+
+        public void setFailed(final Throwable t) {
+            this.t = t;
+        }
+
+        public Throwable failed() {
+            return this.t;
         }
     }
 
