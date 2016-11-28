@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a622d24_995a1b4f",
+        "filename": "netconf/mdsal-netconf-impl/src/main/resources/org/opendaylight/blueprint/mdsal-netconf-impl.xml",
+        "patchSetId": 14
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2016-11-28T14:45:40Z",
+      "side": 1,
+      "message": "please remove whitespaces",
+      "revId": "36ed2807ef1739bfed9e18d07cfee155693ed11e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
