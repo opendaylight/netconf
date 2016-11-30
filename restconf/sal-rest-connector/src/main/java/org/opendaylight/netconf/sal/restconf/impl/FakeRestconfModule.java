@@ -7,15 +7,18 @@
  */
 package org.opendaylight.netconf.sal.restconf.impl;
 
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
@@ -39,35 +42,32 @@ import org.opendaylight.yangtools.yang.model.api.UsesNode;
  * Special case only use by GET restconf/operations (since moment of old Yang
  * parser and old yang model API removal) to build and use fake module to create
  * new schema context
- *
  */
-class ModuleImpl implements Module {
+final class FakeRestconfModule implements Module {
 
-    private final List<DataSchemaNode> listChild = new ArrayList<>();
-    static QNameModule moduleQName;
+    static final QNameModule QNAME;
     static {
-        Date date = null;
+        Date date;
         try {
             date = SimpleDateFormatUtil.getRevisionFormat().parse("2016-06-28");
         } catch (final ParseException e) {
-            throw new RestconfDocumentedException("Problem while parsing revision.", e);
+            throw new ExceptionInInitializerError(e);
         }
-        try {
-            moduleQName = QNameModule.create(new URI("urn:ietf:params:xml:ns:yang:ietf-restconf"), date);
-        } catch (final URISyntaxException e) {
-            throw new RestconfDocumentedException("Problem while creating URI.", e);
-        }
+        QNAME = QNameModule.create(URI.create("urn:ietf:params:xml:ns:yang:ietf-restconf"), date).intern();
     }
 
+    private final Collection<DataSchemaNode> children;
+    private final ImmutableSet<ModuleImport> imports;
+
     /**
-     * Set container for this module
+     * Instantiate a new fake module
      *
-     * @param fakeContSchNode
-     *            - fake container schema node
-     *
+     * @param neededModules needed import statements
+     * @param child fake child container
      */
-    public ModuleImpl(final ContainerSchemaNode fakeContSchNode) {
-        this.listChild.add(fakeContSchNode);
+    public FakeRestconfModule(final Collection<Module> neededModules, final ContainerSchemaNode child) {
+        this.children = ImmutableList.of(child);
+        this.imports = ImmutableSet.copyOf(Collections2.transform(neededModules, FakeModuleImport::new));
     }
 
     @Override
@@ -77,7 +77,7 @@ class ModuleImpl implements Module {
 
     @Override
     public Collection<DataSchemaNode> getChildNodes() {
-        return this.listChild;
+        return this.children;
     }
 
     @Override
@@ -87,22 +87,22 @@ class ModuleImpl implements Module {
 
     @Override
     public DataSchemaNode getDataChildByName(final QName name) {
-        for (final DataSchemaNode node : this.listChild) {
+        for (final DataSchemaNode node : this.children) {
             if (node.getQName().equals(name)) {
                 return node;
             }
         }
-        throw new RestconfDocumentedException(name + " is not in child of " + ModuleImpl.moduleQName);
+        throw new RestconfDocumentedException(name + " is not in child of " + FakeRestconfModule.QNAME);
     }
 
     @Override
     public DataSchemaNode getDataChildByName(final String name) {
-        for (final DataSchemaNode node : this.listChild) {
+        for (final DataSchemaNode node : this.children) {
             if (node.getQName().getLocalName().equals(name)) {
                 return node;
             }
         }
-        throw new RestconfDocumentedException(name + " is not in child of " + ModuleImpl.moduleQName);
+        throw new RestconfDocumentedException(name + " is not in child of " + FakeRestconfModule.QNAME);
     }
 
     @Override
@@ -117,7 +117,7 @@ class ModuleImpl implements Module {
 
     @Override
     public QNameModule getQNameModule() {
-        return moduleQName;
+        return QNAME;
     }
 
     @Override
@@ -127,12 +127,12 @@ class ModuleImpl implements Module {
 
     @Override
     public URI getNamespace() {
-        return moduleQName.getNamespace();
+        return QNAME.getNamespace();
     }
 
     @Override
     public Date getRevision() {
-        return moduleQName.getRevision();
+        return QNAME.getRevision();
     }
 
     @Override
@@ -167,12 +167,12 @@ class ModuleImpl implements Module {
 
     @Override
     public Set<ModuleImport> getImports() {
-        return new HashSet<>();
+        return this.imports;
     }
 
     @Override
     public Set<Module> getSubmodules() {
-        throw new UnsupportedOperationException("Not supported operations.");
+        return ImmutableSet.of();
     }
 
     @Override

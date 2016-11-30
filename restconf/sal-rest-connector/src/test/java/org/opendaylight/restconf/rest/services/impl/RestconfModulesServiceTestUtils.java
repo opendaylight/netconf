@@ -30,6 +30,7 @@ import org.opendaylight.controller.md.sal.dom.broker.impl.mount.DOMMountPointSer
 import org.opendaylight.controller.md.sal.dom.broker.spi.mount.SimpleDOMMountPoint;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.restconf.Draft18;
+import org.opendaylight.restconf.base.services.impl.RestconfModulesServiceImpl;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.utils.RestconfConstants;

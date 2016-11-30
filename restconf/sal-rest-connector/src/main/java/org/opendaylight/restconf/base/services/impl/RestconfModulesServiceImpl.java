@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.rest.services.impl;
+package org.opendaylight.restconf.base.services.impl;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
@@ -19,10 +19,10 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.restconf.Draft18;
+import org.opendaylight.restconf.base.services.api.RestconfModulesService;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.rest.services.api.RestconfModulesService;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.restconf.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;

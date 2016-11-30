@@ -5,13 +5,13 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.rest.services.impl;
+package org.opendaylight.restconf.base.services.impl;
 
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
+import org.opendaylight.restconf.base.services.api.RestconfSchemaService;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.rest.services.api.RestconfSchemaService;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
