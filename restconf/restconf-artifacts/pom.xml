@@ -28,6 +28,11 @@
         <dependencies>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>ietf-yang-library</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>sal-rest-connector</artifactId>
                 <version>${project.version}</version>
             </dependency>
