@@ -5,19 +5,21 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.restconf.impl;
+package org.opendaylight.restconf.base.services.impl;
 
-import java.util.ArrayList;
+import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchema;
 import org.opendaylight.yangtools.yang.model.api.ConstraintDefinition;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.GroupingDefinition;
+import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.Status;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
@@ -25,14 +27,18 @@ import org.opendaylight.yangtools.yang.model.api.UnknownSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.UsesNode;
 
 /**
- * Special case only use by GET restconf/operations (since moment of pre-Beryllium Yang
- * parser and yang model API removal) to build and use fake container for module
+ * Special case only use by GET restconf/operations (since moment of old Yang
+ * parser and old yang model API removal) to build and use fake container for
+ * module.
  */
-class ContainerSchemaNodeImpl implements ContainerSchemaNode {
+class FakeContainerSchemaNode implements ContainerSchemaNode {
+    static final SchemaPath PATH = SchemaPath.create(true, QName.create(FakeRestconfModule.QNAME, "operations").intern());
 
-    List<DataSchemaNode> child = new ArrayList<>();
-    private final QName qname = QName.create(ModuleImpl.moduleQName, "operations");
-    private final SchemaPath path = SchemaPath.create(true, this.qname);
+    private final Collection<DataSchemaNode> children;
+
+    FakeContainerSchemaNode(final Collection<LeafSchemaNode> children) {
+        this.children = ImmutableList.copyOf(children);
+    }
 
     @Override
     public Set<TypeDefinition<?>> getTypeDefinitions() {
@@ -41,7 +47,7 @@ class ContainerSchemaNodeImpl implements ContainerSchemaNode {
 
     @Override
     public Collection<DataSchemaNode> getChildNodes() {
-        return this.child;
+        return this.children;
     }
 
     @Override
@@ -51,12 +57,12 @@ class ContainerSchemaNodeImpl implements ContainerSchemaNode {
 
     @Override
     public DataSchemaNode getDataChildByName(final QName name) {
-        for (final DataSchemaNode node : this.child) {
+        for (final DataSchemaNode node : this.children) {
             if (node.getQName().equals(name)) {
                 return node;
             }
         }
-        throw new RestconfDocumentedException(name + " is not in child of " + this.qname);
+        throw new RestconfDocumentedException(name + " is not in child of " + PATH.getLastComponent());
     }
 
     @Override
@@ -91,12 +97,12 @@ class ContainerSchemaNodeImpl implements ContainerSchemaNode {
 
     @Override
     public QName getQName() {
-        return this.qname;
+        return PATH.getLastComponent();
     }
 
     @Override
     public SchemaPath getPath() {
-        return this.path;
+        return PATH;
     }
 
     @Override
@@ -122,15 +128,5 @@ class ContainerSchemaNodeImpl implements ContainerSchemaNode {
     @Override
     public boolean isPresenceContainer() {
         throw new UnsupportedOperationException("Not supported.");
-    }
-
-    /**
-     * Adding new schema node to this container
-     *
-     * @param fakeLeaf
-     *            - fake schema leaf node
-     */
-    public void addNodeChild(final DataSchemaNode fakeLeaf) {
-        this.child.add(fakeLeaf);
     }
 }

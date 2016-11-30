@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.rest.services.impl;
+package org.opendaylight.restconf.base.services.impl;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
@@ -20,10 +20,10 @@ import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.restconf.base.services.api.RestconfOperationsService;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.rest.services.api.RestconfOperationsService;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -76,13 +76,14 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
         final DOMMountPoint mountPoint;
         final SchemaContextRef ref = new SchemaContextRef(this.schemaContextHandler.get());
         if (identifier.contains(RestconfConstants.MOUNT)) {
-            final InstanceIdentifierContext<?> mountPointIdentifier = ParserIdentifier.toInstanceIdentifier(
-                    identifier, ref.get(), Optional.of(this.domMountPointServiceHandler.get()));
+            final InstanceIdentifierContext<?> mountPointIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
+                    ref.get(), Optional.of(this.domMountPointServiceHandler.get()));
             mountPoint = mountPointIdentifier.getMountPoint();
             modules = ref.getModules(mountPoint);
 
         } else {
-            final String errMsg = "URI has bad format. If operations behind mount point should be showed, URI has to end with ";
+            final String errMsg =
+                    "URI has bad format. If operations behind mount point should be showed, URI has to end with ";
             LOG.debug(errMsg + ControllerContext.MOUNT + " for " + identifier);
             throw new RestconfDocumentedException(errMsg + ControllerContext.MOUNT, ErrorType.PROTOCOL,
                     ErrorTag.INVALID_VALUE);
@@ -118,8 +119,8 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
         }
 
         final ContainerSchemaNode fakeCont = new FakeContainerSchemaNode(fakeRpcSchema);
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder = Builders
-                .containerBuilder(fakeCont);
+        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder =
+                Builders.containerBuilder(fakeCont);
 
         for (final LeafSchemaNode leaf : fakeRpcSchema) {
             containerBuilder.withChild(Builders.leafBuilder(leaf).build());
@@ -129,10 +130,10 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
         neededModules.forEach(imp -> fakeModules.add(new FakeImportedModule(imp)));
         fakeModules.add(new FakeRestconfModule(neededModules, fakeCont));
 
-        final SchemaContext fakeSchemaCtx = EffectiveSchemaContext.resolveSchemaContext(
-            ImmutableSet.copyOf(fakeModules));
-        final InstanceIdentifierContext<ContainerSchemaNode> instanceIdentifierContext = new InstanceIdentifierContext<>(
-                null, fakeCont, mountPoint, fakeSchemaCtx);
+        final SchemaContext fakeSchemaCtx =
+                EffectiveSchemaContext.resolveSchemaContext(ImmutableSet.copyOf(fakeModules));
+        final InstanceIdentifierContext<ContainerSchemaNode> instanceIdentifierContext =
+                new InstanceIdentifierContext<>(null, fakeCont, mountPoint, fakeSchemaCtx);
         return new NormalizedNodeContext(instanceIdentifierContext, containerBuilder.build());
     }
 
