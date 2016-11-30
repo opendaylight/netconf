@@ -7,7 +7,16 @@
  */
 package org.opendaylight.restconf;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base Draft for Restconf project
@@ -97,6 +106,82 @@ public final class Draft18 {
         public static final QName ERROR_INFO_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-info");
 
         public static final QName ERROR_PATH_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-path");
+    }
+
+    /**
+     * Constants for ietf-yang-library model
+     *
+     */
+    public static final class IetfYangLibrary {
+
+        private static final Logger LOG = LoggerFactory.getLogger(NotificationListenerAdapter.class);
+
+        private IetfYangLibrary() {
+            throw new UnsupportedOperationException("Util class");
+        }
+
+        public static final String NAME = "ietf-yang-library";
+        public static final String NAMESPACE = "urn:ietf:params:xml:ns:yang:ietf-yang-library";
+        public static final String REVISION = "2016-06-21";
+
+        public static Date DATE = null;
+        public static URI URI_MODULE = null;
+
+        static {
+            try {
+                DATE = new SimpleDateFormat("yyyy-MM-dd").parse(REVISION);
+                URI_MODULE = new URI(NAMESPACE);
+            } catch (final ParseException | URISyntaxException e) {
+                LOG.error(e.getMessage());
+            }
+        }
+
+        public static final QNameModule MODULE_QNAME = QNameModule.create(URI_MODULE, DATE);
+
+        public static final String MODULE_SET_ID_LEAF = "module-set-id";
+        public static final QName MODULE_SET_ID_LEAF_QNAME = QName.create(MODULE_QNAME, MODULE_SET_ID_LEAF);
+
+        public static final String GROUPING_MODULE_LIST = "module-list";
+        public static final QName GROUPING_MODULE_LIST_QNAME = QName.create(MODULE_QNAME, GROUPING_MODULE_LIST);
+
+        public static final String MODULES_STATE_CONT = "modules-state";
+        public static final QName MODUELS_STATE_CONT_QNAME = QName.create(MODULE_QNAME, MODULES_STATE_CONT);
+
+        public static final String MODULE_LIST = "module";
+        public static final QName MODULE_QNAME_LIST = QName.create(MODULE_QNAME, MODULE_LIST);
+
+        public static final String SPECIFIC_MODULE_NAME_LEAF = "name";
+        public static final QName SPECIFIC_MODULE_NAME_LEAF_QNAME =
+                QName.create(MODULE_QNAME, SPECIFIC_MODULE_NAME_LEAF);
+
+        public static final String SPECIFIC_MODULE_REVISION_LEAF = "revision";
+        public static final QName SPECIFIC_MODULE_REVISION_LEAF_QNAME =
+                QName.create(MODULE_QNAME, SPECIFIC_MODULE_REVISION_LEAF);
+
+        public static final String BASE_URI_OF_SCHEMA = "/data/ietf-yang-library:modules-state/module/";
+        public static final String SPECIFIC_MODULE_SCHEMA_LEAF = "schema";
+        public static final QName SPECIFIC_MODULE_SCHEMA_LEAF_QNAME =
+                QName.create(MODULE_QNAME, SPECIFIC_MODULE_SCHEMA_LEAF);
+
+        public static final String SPECIFIC_MODULE_NAMESPACE_LEAF = "namespace";
+        public static final QName SPECIFIC_MODULE_NAMESPACE_LEAF_QNAME =
+                QName.create(MODULE_QNAME, SPECIFIC_MODULE_NAMESPACE_LEAF);
+
+        public static final String SPECIFIC_MODULE_FEATURE_LEAF_LIST = "feature";
+        public static final QName SPECIFIC_MODULE_FEATURE_LEAF_LIST_QNAME =
+                QName.create(MODULE_QNAME, SPECIFIC_MODULE_FEATURE_LEAF_LIST);
+
+        public static final String SPECIFIC_MODULE_DEVIATION_LIST = "deviation";
+        public static final QName SPECIFIC_MODULE_DEVIATION_LIST_QNAME =
+                QName.create(MODULE_QNAME, SPECIFIC_MODULE_DEVIATION_LIST);
+
+        public static final String SPECIFIC_MODULE_CONFORMANCE_LEAF = "conformance-type";
+        public static final QName SPECIFIC_MODULE_CONFORMANCE_LEAF_QNAME =
+                QName.create(MODULE_QNAME, SPECIFIC_MODULE_CONFORMANCE_LEAF);
+
+        public static final String SPECIFIC_MODULE_SUBMODULE_LIST = "submodule";
+        public static final QName SPECIFIC_MODULE_SUBMODULE_LIST_QNAME =
+                QName.create(MODULE_QNAME, SPECIFIC_MODULE_SUBMODULE_LIST);
     }
 
     /**
