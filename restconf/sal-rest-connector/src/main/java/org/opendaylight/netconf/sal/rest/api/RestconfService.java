@@ -26,9 +26,9 @@ import org.opendaylight.netconf.sal.rest.impl.PATCH;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
-import org.opendaylight.restconf.rest.services.api.RestconfModulesService;
-import org.opendaylight.restconf.rest.services.api.RestconfOperationsService;
-import org.opendaylight.restconf.rest.services.api.RestconfStreamsService;
+import org.opendaylight.restconf.base.services.api.RestconfModulesService;
+import org.opendaylight.restconf.base.services.api.RestconfOperationsService;
+import org.opendaylight.restconf.base.services.api.RestconfStreamsService;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
 import org.opendaylight.restconf.restful.services.api.RestconfInvokeOperationsService;
 
