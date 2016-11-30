@@ -30,6 +30,7 @@
         <feature version='${controller.mdsal.version}'>odl-mdsal-broker</feature>
         <feature version='[4.0.30,4.1.0)'>odl-netty</feature>
         <feature>war</feature>
+        <bundle>mvn:org.opendaylight.netconf/ietf-yang-library/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.netconf/sal-rest-connector/{{VERSION}}</bundle>
         <bundle>mvn:com.google.code.gson/gson/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.yangtools/yang-data-codec-gson/{{VERSION}}</bundle>
