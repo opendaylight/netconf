@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.restconf.impl;
+package org.opendaylight.restconf.base.services.impl;
 
 import java.util.List;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -21,24 +21,19 @@ import org.opendaylight.yangtools.yang.model.util.type.BaseTypes;
  * Special case only use by GET restconf/operations (since moment of old Yang
  * parser and old yang model API removal) to build and use fake leaf like child
  * in container
- *
  */
-class LeafSchemaNodeImpl implements LeafSchemaNode {
+final class FakeLeafSchemaNode implements LeafSchemaNode {
 
     private final SchemaPath path;
-    private final QName qname;
 
     /**
      * Base values for fake leaf schema node
      *
-     * @param basePath
-     *            - schema path
      * @param qname
      *            - qname
      */
-    LeafSchemaNodeImpl(final SchemaPath basePath, final QName qname) {
-        this.path = basePath.createChild(qname);
-        this.qname = qname;
+    FakeLeafSchemaNode(final QName qname) {
+        this.path = FakeContainerSchemaNode.PATH.createChild(qname);
     }
 
     @Override
@@ -63,12 +58,12 @@ class LeafSchemaNodeImpl implements LeafSchemaNode {
 
     @Override
     public QName getQName() {
-        return this.qname;
+        return path.getLastComponent();
     }
 
     @Override
     public SchemaPath getPath() {
-        return this.path;
+        return path;
     }
 
     @Override
@@ -107,4 +102,3 @@ class LeafSchemaNodeImpl implements LeafSchemaNode {
     }
 
 }
-
