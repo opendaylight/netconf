@@ -122,6 +122,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>ietf-yang-library</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>net.java.dev.stax-utils</groupId>
       <artifactId>stax-utils</artifactId>
     </dependency>
@@ -192,6 +197,8 @@
               org.opendaylight.netconf.sal.restconf.impl,
               org.opendaylight.netconf.md.sal.rest.common.*,
               org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.rest.connector.rev140724.*,
+              org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114,
+              org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.*,
               javax.annotation
             </Private-Package>
             <Import-Package>
