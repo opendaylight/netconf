@@ -26,7 +26,6 @@ import org.opendaylight.netconf.sal.rest.impl.PATCH;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
-import org.opendaylight.restconf.base.services.api.RestconfModulesService;
 import org.opendaylight.restconf.base.services.api.RestconfOperationsService;
 import org.opendaylight.restconf.base.services.api.RestconfStreamsService;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
@@ -66,7 +65,7 @@ public interface RestconfService {
 
     /**
      * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfModulesService#getModules(UriInfo)}
+     *             {@link RestconfDataService#readData(UriInfo)}
      */
     @Deprecated
     @GET
@@ -77,7 +76,7 @@ public interface RestconfService {
 
     /**
      * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfModulesService#getModules(String, UriInfo)}
+     *             {@link RestconfDataService#readData(String, UriInfo)}
      */
     @Deprecated
     @GET
@@ -88,7 +87,7 @@ public interface RestconfService {
 
     /**
      * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfModulesService#getModule(String, UriInfo)}
+     *             {@link RestconfDataService#readData(String, UriInfo)}
      */
     @Deprecated
     @GET

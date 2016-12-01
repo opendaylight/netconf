@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.rest.services.impl;
 
+import com.google.common.util.concurrent.CheckedFuture;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.UriInfo;
@@ -14,13 +15,17 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.restconf.base.services.impl.RestconfOperationsServiceImpl;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -44,7 +49,17 @@ public class RestconfOperationsServiceTest {
     public void init() throws Exception {
         MockitoAnnotations.initMocks(this);
         this.schemaContext = TestRestconfUtils.loadSchemaContext("/modules");
-        this.schemaContextHandler = new SchemaContextHandler();
+
+        final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
+        final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);
+        Mockito.when(txHandler.get()).thenReturn(domTx);
+        final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
+        Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
+        final CheckedFuture checked = Mockito.mock(CheckedFuture.class);
+        Mockito.when(wTx.submit()).thenReturn(checked);
+        final Object value = null;
+        Mockito.when(checked.checkedGet()).thenReturn(value);
+        this.schemaContextHandler = new SchemaContextHandler(txHandler);
         this.schemaContextHandler.onGlobalContextUpdated(this.schemaContext);
         this.domMountPointServiceHandler = new DOMMountPointServiceHandler(this.domMountPointService);
         listOfRpcsNames.add("module2:dummy-rpc2-module2");
