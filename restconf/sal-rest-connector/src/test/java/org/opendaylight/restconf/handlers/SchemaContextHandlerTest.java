@@ -11,10 +11,13 @@ package org.opendaylight.restconf.handlers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import com.google.common.util.concurrent.CheckedFuture;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
+import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
-import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
@@ -30,7 +33,16 @@ public class SchemaContextHandlerTest {
 
     @Before
     public void setup() throws Exception {
-        this.schemaContextHandler = new SchemaContextHandler();
+        final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
+        final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);
+        Mockito.when(txHandler.get()).thenReturn(domTx);
+        final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
+        Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
+        final CheckedFuture checked = Mockito.mock(CheckedFuture.class);
+        Mockito.when(wTx.submit()).thenReturn(checked);
+        final Object value = null;
+        Mockito.when(checked.checkedGet()).thenReturn(value);
+        this.schemaContextHandler = new SchemaContextHandler(txHandler);
 
         this.schemaContext = TestRestconfUtils.loadSchemaContext(PATH_FOR_ACTUAL_SCHEMA_CONTEXT);
         this.schemaContextHandler.onGlobalContextUpdated(this.schemaContext);

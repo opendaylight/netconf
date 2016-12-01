@@ -12,7 +12,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.EMPTY;
 import com.google.common.collect.Iterables;
@@ -34,8 +33,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.restconf.Draft18;
 import org.opendaylight.restconf.base.services.api.RestconfStreamsService;
@@ -152,111 +149,6 @@ public class RestconfStreamsServiceTest {
 
         // make test
         this.thrown.expect(NullPointerException.class);
-        this.streamsService.getAvailableStreams(null);
-    }
-
-    /**
-     * Try to get all available streams supported by the server when Restconf module does not contain list stream
-     * catching <code>RestconfDocumentedException</code>. Error type, error tag and error status code are validated
-     * against expected values.
-     */
-    @Test
-    public void getAvailableStreamsMissingListStreamNegativeTest() {
-        // prepare conditions - get Restconf module with missing list stream
-        when(this.contextHandler.get()).thenReturn(this.mockSchemaContext);
-        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft18.RestconfModule.IETF_RESTCONF_QNAME
-                .getNamespace(), Draft18.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
-                .thenReturn(getTestingRestconfModule("restconf-module-with-missing-list-stream"));
-
-        // make test and verify
-        try {
-            this.streamsService.getAvailableStreams(null);
-            fail("Test is expected to fail due to missing list stream");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    RestconfError.ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     * Try to get all available streams supported by the server when Restconf module does not contain container streams
-     * catching <code>RestconfDocumentedException</code>. Error type, error tag and error status code are validated
-     * against expected values.
-     */
-    @Test
-    public void getAvailableStreamsMissingContainerStreamsNegativeTest() {
-        // prepare conditions - get Restconf module with missing container streams
-        when(this.contextHandler.get()).thenReturn(this.mockSchemaContext);
-        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft18.RestconfModule.IETF_RESTCONF_QNAME
-                .getNamespace(), Draft18.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
-                .thenReturn(getTestingRestconfModule("restconf-module-with-missing-container-streams"));
-
-        // make test and verify
-        try {
-            this.streamsService.getAvailableStreams(null);
-            fail("Test is expected to fail due to missing container streams");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    RestconfError.ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     * Try to get all available streams supported by the server when Restconf module contains node with name 'stream'
-     * but it is not of type list. Test is expected to fail with <code>IllegalStateException</code>.
-     */
-    @Test
-    public void getAvailableStreamsIllegalListStreamNegativeTest() {
-        // prepare conditions - get Restconf module with illegal list stream
-        when(this.contextHandler.get()).thenReturn(this.mockSchemaContext);
-        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft18.RestconfModule.IETF_RESTCONF_QNAME
-                .getNamespace(), Draft18.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
-                .thenReturn(getTestingRestconfModule("restconf-module-with-illegal-list-stream"));
-
-        // make test
-        this.thrown.expect(IllegalStateException.class);
-        this.streamsService.getAvailableStreams(null);
-    }
-
-    /**
-     * Try to get all available streams supported by the server when Restconf module contains node with name 'streams'
-     * but it is not of type container. Test is expected to fail with <code>IllegalStateException</code>.
-     */
-    @Test
-    public void getAvailableStreamsIllegalContainerStreamsNegativeTest() {
-        // prepare conditions - get Restconf module with illegal container streams
-        when(this.contextHandler.get()).thenReturn(this.mockSchemaContext);
-        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft18.RestconfModule.IETF_RESTCONF_QNAME
-                .getNamespace(), Draft18.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
-                .thenReturn(getTestingRestconfModule("restconf-module-with-illegal-container-streams"));
-
-        // make test
-        this.thrown.expect(IllegalStateException.class);
-        this.streamsService.getAvailableStreams(null);
-    }
-
-    /**
-     * Try to get all available streams supported by the server when node 'description' in list stream in Restconf
-     * module is not of type leaf. Test is expected to fail with <code>IllegalStateException</code>.
-     */
-    @Test
-    public void getAvailableStreamsIllegalLeafDescriptionNegativeTest() {
-        // prepare conditions - get Restconf module with illegal leaf description in list stream
-        when(this.contextHandler.get()).thenReturn(this.mockSchemaContext);
-        when(this.mockSchemaContext.findModuleByNamespaceAndRevision(Draft18.RestconfModule.IETF_RESTCONF_QNAME
-                .getNamespace(), Draft18.RestconfModule.IETF_RESTCONF_QNAME.getRevision()))
-                .thenReturn(getTestingRestconfModule("restconf-module-with-illegal-leaf-description"));
-
-        // make test
-        this.thrown.expect(IllegalStateException.class);
         this.streamsService.getAvailableStreams(null);
     }
 

@@ -15,11 +15,9 @@ import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.restconf.base.services.api.BaseServicesWrapper;
-import org.opendaylight.restconf.base.services.api.RestconfModulesService;
 import org.opendaylight.restconf.base.services.api.RestconfOperationsService;
 import org.opendaylight.restconf.base.services.api.RestconfSchemaService;
 import org.opendaylight.restconf.base.services.api.RestconfStreamsService;
-import org.opendaylight.restconf.base.services.impl.RestconfModulesServiceImpl;
 import org.opendaylight.restconf.base.services.impl.RestconfOperationsServiceImpl;
 import org.opendaylight.restconf.base.services.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.restconf.base.services.impl.RestconfStreamsServiceImpl;
@@ -51,7 +49,6 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
     private RestconfDataService delegRestconfDataService;
     private RestconfInvokeOperationsService delegRestconfInvokeOpsService;
     private RestconfStreamsSubscriptionService delegRestconfSubscrService;
-    private RestconfModulesService delegRestModService;
     private RestconfOperationsService delegRestOpsService;
     private RestconfStreamsService delegRestStrsService;
     private RestconfSchemaService delegRestSchService;
@@ -65,21 +62,6 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
 
     public static ServicesWrapperImpl getInstance() {
         return InstanceHolder.INSTANCE;
-    }
-
-    @Override
-    public NormalizedNodeContext getModules(final UriInfo uriInfo) {
-        return this.delegRestModService.getModules(uriInfo);
-    }
-
-    @Override
-    public NormalizedNodeContext getModules(final String identifier, final UriInfo uriInfo) {
-        return this.delegRestModService.getModules(identifier, uriInfo);
-    }
-
-    @Override
-    public NormalizedNodeContext getModule(final String identifier, final UriInfo uriInfo) {
-        return this.delegRestModService.getModule(identifier, uriInfo);
     }
 
     @Override
@@ -158,7 +140,6 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
                             final TransactionChainHandler transactionChainHandler,
                             final DOMDataBrokerHandler domDataBrokerHandler,
             final RpcServiceHandler rpcServiceHandler, final NotificationServiceHandler notificationServiceHandler) {
-        this.delegRestModService = new RestconfModulesServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
         this.delegRestOpsService = new RestconfOperationsServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
         this.delegRestSchService = new RestconfSchemaServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
         this.delegRestStrsService = new RestconfStreamsServiceImpl(schemaCtxHandler);
