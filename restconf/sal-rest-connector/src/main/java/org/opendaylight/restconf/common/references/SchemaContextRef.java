@@ -27,6 +27,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 public final class SchemaContextRef {
 
     private final SoftReference<SchemaContext> schemaContextRef;
+    private final String actualModuleSetId;
 
     /**
      * Create {@link SoftReference} of actual {@link SchemaContext}
@@ -35,6 +36,20 @@ public final class SchemaContextRef {
      *            - actual {@link SchemaContext}
      */
     public SchemaContextRef(final SchemaContext schemaContext) {
+        this.schemaContextRef = new SoftReference<SchemaContext>(schemaContext);
+        this.actualModuleSetId = "";
+    }
+
+    /**
+     * Create {@link SoftReference} of actual {@link SchemaContext}
+     *
+     * @param schemaContext
+     *            - actual {@link SchemaContext}
+     * @param actualModuleSetId
+     *            - identifier of acutal set of modules and submodules
+     */
+    public SchemaContextRef(final SchemaContext schemaContext, final String actualModuleSetId) {
+        this.actualModuleSetId = actualModuleSetId;
         this.schemaContextRef = new SoftReference<SchemaContext>(schemaContext);
     }
 
@@ -136,5 +151,15 @@ public final class SchemaContextRef {
      */
     public Module findModuleByNameAndRevision(final String localName, final Date revision) {
         return this.get().findModuleByName(localName, revision);
+    }
+
+    /**
+     * Return server-specific identifier representing the current set of modules
+     * and submodules
+     *
+     * @return identifier
+     */
+    public String getModuleSetId() {
+        return this.actualModuleSetId;
     }
 }

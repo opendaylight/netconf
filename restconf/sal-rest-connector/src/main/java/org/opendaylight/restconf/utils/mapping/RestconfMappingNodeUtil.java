@@ -8,25 +8,38 @@
 package org.opendaylight.restconf.utils.mapping;
 
 import com.google.common.base.Preconditions;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Set;
-import org.opendaylight.restconf.Draft18;
-import org.opendaylight.restconf.utils.RestconfConstants;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.restconf.Draft18.IetfYangLibrary;
 import org.opendaylight.restconf.utils.schema.context.RestconfSchemaUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.Module.ConformanceType;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuilder;
+import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.Deviation;
 import org.opendaylight.yangtools.yang.model.api.FeatureDefinition;
+import org.opendaylight.yangtools.yang.model.api.GroupingDefinition;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * Util class for mapping nodes
@@ -39,68 +52,315 @@ public final class RestconfMappingNodeUtil {
     }
 
     /**
-     * Mapping {@link Module} from {@link Set} of {@link Module} to
-     * {@link ListSchemaNode} of {@link Module} list.
+     * Map data from modules to {@link NormalizedNode}
      *
-     * @param restconfModule
-     *            - restconf module
      * @param modules
-     *            - all modules
-     * @return {@link MapNode}
+     *            - modules for mapping
+     * @param ietfYangLibraryModule
+     *            - ietf-yang-library module
+     * @param context
+     *            - schema context
+     * @param moduleSetId
+     *            - module-set-id of actual set
+     * @return mapped data as {@link NormalizedNode}
      */
-    public static MapNode restconfMappingNode(final Module restconfModule, final Set<Module> modules) {
-        final DataSchemaNode modulListSchemaNode = RestconfSchemaUtil.getRestconfSchemaNode(restconfModule,
-                Draft18.RestconfModule.MODULE_LIST_SCHEMA_NODE);
-        Preconditions.checkState(modulListSchemaNode instanceof ListSchemaNode);
+    public static NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>>
+            mapModulesByIetfYangLibraryYang(final Set<Module> modules, final Module ietfYangLibraryModule,
+                    final SchemaContext context, final String moduleSetId) {
+        final DataSchemaNode modulesStateSch =
+                ietfYangLibraryModule.getDataChildByName(IetfYangLibrary.MODUELS_STATE_CONT_QNAME);
+        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> modulesStateBuilder =
+                Builders.containerBuilder((ContainerSchemaNode) modulesStateSch);
 
-        final CollectionNodeBuilder<MapEntryNode, MapNode> listModuleBuilder = Builders
-                .mapBuilder((ListSchemaNode) modulListSchemaNode);
-        for (final Module module : modules) {
-            listModuleBuilder.withChild(toModuleEntryNode(module, modulListSchemaNode));
+        final DataSchemaNode moduleSetIdSch =
+                ((ContainerSchemaNode) modulesStateSch).getDataChildByName(IetfYangLibrary.MODULE_SET_ID_LEAF_QNAME);
+        modulesStateBuilder
+                .withChild(Builders.leafBuilder((LeafSchemaNode) moduleSetIdSch).withValue(moduleSetId).build());
+
+        final DataSchemaNode moduleSch = findNodeInGroupings(IetfYangLibrary.MODULE_QNAME_LIST, ietfYangLibraryModule);
+        final CollectionNodeBuilder<MapEntryNode, OrderedMapNode> mapBuilder =
+                Builders.orderedMapBuilder((ListSchemaNode) moduleSch);
+        for (final Module module : context.getModules()) {
+            fillMapByModules(mapBuilder, moduleSch, false, module, ietfYangLibraryModule, context);
         }
-        return listModuleBuilder.build();
+        return modulesStateBuilder.withChild(mapBuilder.build()).build();
     }
 
     /**
-     * Mapping {@link MapEntryNode} entries of {@link Module} to
-     * {@link ListSchemaNode}.
+     * Map data by the specific module or submodule
+     *
+     * @param mapBuilder
+     *            - ordered list builder for children
+     * @param moduleSch
+     *            - schema of list for entryMapBuilder
+     * @param isSubmodule
+     *            - true if module is specified as submodule, false otherwise
+     * @param module
+     *            - specific module or submodule
+     * @param ietfYangLibraryModule
+     *            - ietf-yang-library module
+     * @param context
+     *            - schema context
+     */
+    private static void fillMapByModules(final CollectionNodeBuilder<MapEntryNode, OrderedMapNode> mapBuilder,
+            final DataSchemaNode moduleSch, final boolean isSubmodule, final Module module,
+            final Module ietfYangLibraryModule, final SchemaContext context) {
+        final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder =
+                Builders.mapEntryBuilder((ListSchemaNode) moduleSch);
+        addCommonLeafs(module, mapEntryBuilder, ietfYangLibraryModule);
+        addChildOfModuleBySpecificModuleInternal(
+                IetfYangLibrary.SPECIFIC_MODULE_SCHEMA_LEAF_QNAME, mapEntryBuilder, IetfYangLibrary.BASE_URI_OF_SCHEMA
+                        + module.getName() + "/" + new SimpleDateFormat("yyyy-MM-dd").format(module.getRevision()),
+                ietfYangLibraryModule);
+        if (!isSubmodule) {
+            addChildOfModuleBySpecificModuleOfListChild(IetfYangLibrary.SPECIFIC_MODULE_NAMESPACE_LEAF_QNAME,
+                    mapEntryBuilder, module.getNamespace().toString(), ietfYangLibraryModule);
+
+            // features - not mandatory
+            if ((module.getFeatures() != null) && !module.getFeatures().isEmpty()) {
+                addFeatureLeafList(IetfYangLibrary.SPECIFIC_MODULE_FEATURE_LEAF_LIST_QNAME, mapEntryBuilder,
+                        module.getFeatures(), ietfYangLibraryModule);
+            }
+            // deviations - not mandatory
+            if ((module.getDeviations() != null) && !module.getDeviations().isEmpty()) {
+                addDeviationList(module, mapEntryBuilder, ietfYangLibraryModule, context);
+                addChildOfModuleBySpecificModuleOfListChild(IetfYangLibrary.SPECIFIC_MODULE_CONFORMANCE_LEAF_QNAME,
+                        mapEntryBuilder, ConformanceType.Implement.getName(), ietfYangLibraryModule);
+            } else {
+                addChildOfModuleBySpecificModuleOfListChild(IetfYangLibrary.SPECIFIC_MODULE_CONFORMANCE_LEAF_QNAME,
+                        mapEntryBuilder, ConformanceType.Import.getName(), ietfYangLibraryModule);
+            }
+            // submodules - not mandatory
+            if ((module.getSubmodules() != null) && !module.getSubmodules().isEmpty()) {
+                addSubmodules(module, mapEntryBuilder, ietfYangLibraryModule, context);
+            }
+        }
+        mapBuilder.withChild(mapEntryBuilder.build());
+    }
+
+    /**
+     * Mapping submodules of specific module
      *
      * @param module
-     *            - module for mapping
-     * @param modulListSchemaNode
-     *            - mapped {@link DataSchemaNode}
-     * @return {@link MapEntryNode}
+     *            - module with submodules
+     * @param mapEntryBuilder
+     *            - mapEntryBuilder of parent for mapping children
+     * @param ietfYangLibraryModule
+     *            - ietf-yang-library module
+     * @param context
+     *            - schema context
      */
-    private static MapEntryNode toModuleEntryNode(final Module module, final DataSchemaNode modulListSchemaNode) {
-        final ListSchemaNode listSchemaNode = (ListSchemaNode) modulListSchemaNode;
-        final Collection<DataSchemaNode> childListSchemaNode = listSchemaNode.getChildNodes();
-        final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> moduleNodeValues = Builders
-                .mapEntryBuilder(listSchemaNode);
+    private static void addSubmodules(final Module module,
+            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
+            final Module ietfYangLibraryModule, final SchemaContext context) {
+        final DataSchemaNode listSubm = findSchemaInListOfModulesSchema(
+                IetfYangLibrary.SPECIFIC_MODULE_SUBMODULE_LIST_QNAME, ietfYangLibraryModule);
+        final CollectionNodeBuilder<MapEntryNode, OrderedMapNode> mapBuilder =
+                Builders.orderedMapBuilder((ListSchemaNode) listSubm);
+        for (final Module submodule : module.getSubmodules()) {
+            fillMapByModules(mapBuilder, listSubm, true, submodule, ietfYangLibraryModule, context);
+        }
+        mapEntryBuilder.withChild(mapBuilder.build());
+    }
 
-        // MODULE NAME SCHEMA NODE
-        fillListWithLeaf(listSchemaNode, moduleNodeValues, RestconfMappingNodeConstants.NAME, module.getName());
+    /**
+     * Mapping deviations of specific module
+     *
+     * @param module
+     *            - module with deviations
+     * @param mapEntryBuilder
+     *            - mapEntryBuilder of parent for mapping children
+     * @param ietfYangLibraryModule
+     *            - ietf-yang-library module
+     * @param context
+     *            - schema context
+     */
+    private static void addDeviationList(final Module module,
+            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
+            final Module ietfYangLibraryModule, final SchemaContext context) {
+        final DataSchemaNode deviationsSchema = findSchemaInListOfModulesSchema(
+                IetfYangLibrary.SPECIFIC_MODULE_DEVIATION_LIST_QNAME, ietfYangLibraryModule);
+        final CollectionNodeBuilder<MapEntryNode, MapNode> deviations =
+                Builders.mapBuilder((ListSchemaNode) deviationsSchema);
+        for (final Deviation deviation : module.getDeviations()) {
+            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> deviationEntryNode =
+                    Builders.mapEntryBuilder((ListSchemaNode) deviationsSchema);
+            final QName lastComponent = deviation.getTargetPath().getLastComponent();
+            addChildOfModuleBySpecificModule(IetfYangLibrary.SPECIFIC_MODULE_NAME_LEAF_QNAME, deviationEntryNode,
+                    context.findModuleByNamespaceAndRevision(lastComponent.getNamespace(), lastComponent.getRevision())
+                            .getName(),
+                    ietfYangLibraryModule);
+            addChildOfModuleBySpecificModule(IetfYangLibrary.SPECIFIC_MODULE_REVISION_LEAF_QNAME, deviationEntryNode,
+                    lastComponent.getRevision(), ietfYangLibraryModule);
+            deviations.withChild(deviationEntryNode.build());
+        }
+        mapEntryBuilder.withChild(deviations.build());
+    }
 
-        // MODULE REVISION SCHEMA NODE
-        fillListWithLeaf(listSchemaNode, moduleNodeValues, RestconfMappingNodeConstants.REVISION,
-                RestconfConstants.REVISION_FORMAT.format(module.getRevision()));
-
-        // MODULE NAMESPACE SCHEMA NODE
-        fillListWithLeaf(listSchemaNode, moduleNodeValues, RestconfMappingNodeConstants.NAMESPACE,
-                module.getNamespace().toString());
-
-        // MODULE FEATURES SCHEMA NODES
-        final DataSchemaNode schemaNode = RestconfSchemaUtil.findSchemaNodeInCollection(childListSchemaNode,
-                RestconfMappingNodeConstants.FEATURE);
-        Preconditions.checkState(schemaNode instanceof LeafListSchemaNode);
-        final ListNodeBuilder<Object, LeafSetEntryNode<Object>> featureBuilder = Builders
-                .leafSetBuilder((LeafListSchemaNode) schemaNode);
-        for (final FeatureDefinition feature : module.getFeatures()) {
-            featureBuilder.withChild(Builders.leafSetEntryBuilder((LeafListSchemaNode) schemaNode)
+    /**
+     * Mapping features of specific module
+     *
+     * @param qnameOfFeaturesLeafList
+     *            - qname of feature leaf-list in ietf-yang-library module
+     * @param mapEntryBuilder
+     *            - mapEntryBuilder of parent for mapping children
+     * @param features
+     *            - features of specific module
+     * @param ietfYangLibraryModule
+     *            - ieat-yang-library module
+     */
+    private static void addFeatureLeafList(final QName qnameOfFeaturesLeafList,
+            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
+            final Set<FeatureDefinition> features, final Module ietfYangLibraryModule) {
+        final DataSchemaNode schemaNode =
+                findSchemaInListOfModulesSchema(qnameOfFeaturesLeafList, ietfYangLibraryModule);
+        final ListNodeBuilder<Object, LeafSetEntryNode<Object>> leafSetBuilder =
+                Builders.leafSetBuilder((LeafListSchemaNode) schemaNode);
+        for (final FeatureDefinition feature : features) {
+            leafSetBuilder.withChild(Builders.leafSetEntryBuilder((LeafListSchemaNode) schemaNode)
                     .withValue(feature.getQName().getLocalName()).build());
         }
-        moduleNodeValues.withChild(featureBuilder.build());
+        mapEntryBuilder.withChild(leafSetBuilder.build());
+    }
 
-        return moduleNodeValues.build();
+    /**
+     * Mapping common leafs (grouping common-leafs in ietf-yang-library) of
+     * specific module
+     *
+     * @param module
+     *            - specific module for getting name and revision
+     * @param mapEntryBuilder
+     *            - mapEntryBuilder of parent for mapping children
+     * @param ietfYangLibraryModule
+     *            - ietf-yang-library module
+     */
+    private static void addCommonLeafs(final Module module,
+            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
+            final Module ietfYangLibraryModule) {
+        addChildOfModuleBySpecificModuleInternal(IetfYangLibrary.SPECIFIC_MODULE_NAME_LEAF_QNAME, mapEntryBuilder,
+                module.getName(), ietfYangLibraryModule);
+        addChildOfModuleBySpecificModuleInternal(IetfYangLibrary.SPECIFIC_MODULE_REVISION_LEAF_QNAME, mapEntryBuilder,
+                new SimpleDateFormat("yyyy-MM-dd").format(module.getRevision()), ietfYangLibraryModule);
+    }
+
+    /**
+     * Mapping data child of grouping module-list by ietf-yang-library
+     *
+     * @param specificQName
+     *            - qname of leaf in module-list grouping
+     * @param mapEntryBuilder
+     *            - mapEntryBuilder of parent for mapping children
+     * @param value
+     *            - value of leaf
+     * @param ietfYangLibraryModule
+     *            - ietf-yang-library module
+     */
+    private static void addChildOfModuleBySpecificModuleOfListChild(final QName specificQName,
+            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
+            final Object value, final Module ietfYangLibraryModule) {
+        final DataSchemaNode leafSch = findSchemaInListOfModulesSchema(specificQName, ietfYangLibraryModule);
+        mapEntryBuilder.withChild(Builders.leafBuilder((LeafSchemaNode) leafSch).withValue(value).build());
+    }
+
+    /**
+     * Find specific schema in gourping module-lsit
+     *
+     * @param specificQName
+     *            - qname of schema
+     * @param ietfYangLibraryModule
+     *            - ietf-yang-library module
+     * @return schemaNode of specific child
+     */
+    private static DataSchemaNode findSchemaInListOfModulesSchema(final QName specificQName,
+            final Module ietfYangLibraryModule) {
+        for (final GroupingDefinition groupingDefinition : ietfYangLibraryModule.getGroupings()) {
+            if (groupingDefinition.getQName().equals(IetfYangLibrary.GROUPING_MODULE_LIST_QNAME)) {
+                final DataSchemaNode dataChildByName =
+                        groupingDefinition.getDataChildByName(IetfYangLibrary.MODULE_QNAME_LIST);
+                return ((ListSchemaNode) dataChildByName).getDataChildByName(specificQName);
+            }
+        }
+        throw new RestconfDocumentedException(specificQName.getLocalName() + " doesn't exist.");
+    }
+
+    /**
+     * Mapping data child of internal groupings in module-list grouping
+     *
+     * @param specifiLeafQName
+     *            - qnmae of leaf for mapping
+     * @param mapEntryBuilder
+     *            - mapEntryBuilder of parent for mapping children
+     * @param value
+     *            - value of leaf
+     * @param ietfYangLibraryModule
+     *            - ietf-yang-library module
+     */
+    private static void addChildOfModuleBySpecificModuleInternal(final QName specifiLeafQName,
+            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
+            final Object value, final Module ietfYangLibraryModule) {
+        final DataSchemaNode nameLeaf = findNodeInInternGroupings(specifiLeafQName, ietfYangLibraryModule);
+        mapEntryBuilder.withChild(Builders.leafBuilder((LeafSchemaNode) nameLeaf).withValue(value).build());
+    }
+
+    /**
+     * Find schema node of leaf by qname in internal groupings of module-list
+     * grouping
+     *
+     * @param qnameOfSchema
+     *            - qname of leaf
+     * @param ietfYangLibraryModule
+     *            - ietf-yang-library module
+     * @return schema node of specific leaf
+     */
+    private static DataSchemaNode findNodeInInternGroupings(final QName qnameOfSchema,
+            final Module ietfYangLibraryModule) {
+        for (final GroupingDefinition groupingDefinition : ietfYangLibraryModule.getGroupings()) {
+            if (groupingDefinition.getQName().equals(IetfYangLibrary.GROUPING_MODULE_LIST_QNAME)) {
+                for (final GroupingDefinition internalGrouping : groupingDefinition.getGroupings()) {
+                    if (internalGrouping.getDataChildByName(qnameOfSchema) != null) {
+                        return internalGrouping.getDataChildByName(qnameOfSchema);
+                    }
+                }
+            }
+        }
+        throw new RestconfDocumentedException(qnameOfSchema.getLocalName() + " doesn't exist.");
+    }
+
+    /**
+     * Mapping childrens of list-module
+     *
+     * @param specifiLeafQName
+     *            - qname of leaf
+     * @param mapEntryBuilder
+     *            - maptEntryBuilder of parent for mapping children
+     * @param value
+     *            - valeu of leaf
+     * @param ietfYangLibraryModule
+     *            - ietf-yang-library module
+     */
+    private static void addChildOfModuleBySpecificModule(final QName specifiLeafQName,
+            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
+            final Object value, final Module ietfYangLibraryModule) {
+        final DataSchemaNode nameLeaf = findNodeInGroupings(specifiLeafQName, ietfYangLibraryModule);
+        mapEntryBuilder.withChild(Builders.leafBuilder((LeafSchemaNode) nameLeaf).withValue(value).build());
+    }
+
+    /**
+     * Find schema of specific leaf in list-module grouping
+     *
+     * @param qnameOfSchema
+     *            - qname of leaf
+     * @param ietfYangLibraryModule
+     *            - ietf-yang-library module
+     * @return schemaNode of specific leaf
+     */
+    private static DataSchemaNode findNodeInGroupings(final QName qnameOfSchema, final Module ietfYangLibraryModule) {
+        for (final GroupingDefinition groupingDefinition : ietfYangLibraryModule.getGroupings()) {
+            if (groupingDefinition.getDataChildByName(qnameOfSchema) != null) {
+                return groupingDefinition.getDataChildByName(qnameOfSchema);
+            }
+        }
+        throw new RestconfDocumentedException(qnameOfSchema.getLocalName() + " doesn't exist.");
     }
 
     /**

@@ -12,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import com.google.common.util.concurrent.CheckedFuture;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +33,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
+import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
@@ -40,6 +43,7 @@ import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.restconf.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 
 public class RestconfStreamsSubscriptionServiceImplTest {
@@ -55,11 +59,23 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     @Mock
     private NotificationServiceHandler notificationServiceHandler;
 
-    private final SchemaContextHandler schemaHandler = new SchemaContextHandler();
+    private SchemaContextHandler schemaHandler;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+
+        final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
+        final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);
+        Mockito.when(txHandler.get()).thenReturn(domTx);
+        final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
+        Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
+        final CheckedFuture checked = Mockito.mock(CheckedFuture.class);
+        Mockito.when(wTx.submit()).thenReturn(checked);
+        final Object valueObj = null;
+        Mockito.when(checked.checkedGet()).thenReturn(valueObj);
+        this.schemaHandler = new SchemaContextHandler(txHandler);
+
         final DOMDataBroker dataBroker = mock(DOMDataBroker.class);
         final ListenerRegistration<DOMDataChangeListener> listener = mock(ListenerRegistration.class);
         doReturn(dataBroker).when(this.dataBrokerHandler).get();

@@ -11,11 +11,7 @@ package org.opendaylight.restconf.utils.schema.context;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import static org.opendaylight.restconf.Draft18.MonitoringModule;
-import static org.opendaylight.restconf.Draft18.RestconfModule;
-
 import com.google.common.collect.Sets;
-import java.util.NoSuchElementException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,6 +20,8 @@ import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.restconf.Draft18;
+import org.opendaylight.restconf.Draft18.MonitoringModule;
+import org.opendaylight.restconf.Draft18.RestconfModule;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -41,7 +39,7 @@ public class RestconfSchemaUtilTest {
 
     @Before
     public void setup() throws Exception {
-        schemaContext = TestRestconfUtils.loadSchemaContext("/modules/restconf-module-testing");
+        this.schemaContext = TestRestconfUtils.loadSchemaContext("/modules/restconf-module-testing");
     }
 
     /**
@@ -130,7 +128,7 @@ public class RestconfSchemaUtilTest {
      */
     @Test
     public void getRestconfSchemaNodeNullRestconfModuleNegativeTest() {
-        thrown.expect(NullPointerException.class);
+        this.thrown.expect(NullPointerException.class);
         RestconfSchemaUtil.getRestconfSchemaNode(null, RestconfModule.RESTCONF_CONTAINER_SCHEMA_NODE);
     }
 
@@ -140,7 +138,7 @@ public class RestconfSchemaUtilTest {
      */
     @Test
     public void getRestconfSchemaNodeNullSchemaNodeNameNegativeTest() {
-        thrown.expect(NullPointerException.class);
+        this.thrown.expect(NullPointerException.class);
         RestconfSchemaUtil.getRestconfSchemaNode(getTestingRestconfModule("ietf-restconf"), null);
     }
 
@@ -162,132 +160,6 @@ public class RestconfSchemaUtilTest {
             assertEquals("Error status code is not correct",
                     404, e.getErrors().get(0).getErrorTag().getStatusCode());
         }
-    }
-
-    /**
-     * Negative test for getting <code>DataSchemaNode</code> from Restconf module for schema node name equals to
-     * {@link RestconfModule#MODULES_CONTAINER_SCHEMA_NODE} when this node cannot be found.
-     * <code>RestconfDocumentedException</code> is expected and error type, error tag and error status code are
-     * compared to expected values.
-     */
-    @Test
-    public void getRestconfSchemaNodeContainerModulesNegativeTest() {
-        try {
-            RestconfSchemaUtil.getRestconfSchemaNode(getTestingRestconfModule(
-                    "restconf-module-with-missing-container-modules"), RestconfModule.MODULES_CONTAINER_SCHEMA_NODE);
-            fail("Test should fail due to missing " + RestconfModule.MODULES_CONTAINER_SCHEMA_NODE + " node");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    RestconfError.ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     * Negative test for getting <code>DataSchemaNode</code> from Restconf module for schema node name equals to
-     * {@link RestconfModule#MODULE_LIST_SCHEMA_NODE} when this node cannot be found.
-     * <code>RestconfDocumentedException</code> is expected and error type, error tag and error status code are
-     * compared to expected values.
-     */
-    @Test
-    public void getRestconfSchemaNodeListModuleNegativeTest() {
-        try {
-            RestconfSchemaUtil.getRestconfSchemaNode(
-                    getTestingRestconfModule("restconf-module-with-missing-list-module"),
-                    RestconfModule.MODULE_LIST_SCHEMA_NODE);
-            fail("Test should fail due to missing " + RestconfModule.MODULE_LIST_SCHEMA_NODE + " node");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    RestconfError.ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     * Negative test for getting <code>DataSchemaNode</code> from Restconf module for schema node name equals to
-     * {@link MonitoringModule#STREAMS_CONTAINER_SCHEMA_NODE} when this node cannot
-     * be found. <code>RestconfDocumentedException</code> is expected and error type, error tag and error status code
-     * are compared to expected values.
-     */
-    @Test
-    public void getRestconfSchemaNodeContainerStreamsNegativeTest() {
-        try {
-            RestconfSchemaUtil.getRestconfSchemaNode(
-                    getTestingRestconfModule("restconf-module-with-missing-container-streams"),
-                    MonitoringModule.STREAMS_CONTAINER_SCHEMA_NODE);
-            fail("Test should fail due to missing " + MonitoringModule.STREAMS_CONTAINER_SCHEMA_NODE + " node");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    RestconfError.ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     * Negative test for getting <code>DataSchemaNode</code> from Restconf module for schema node name equals to
-     * {@link MonitoringModule#STREAM_LIST_SCHEMA_NODE} when this node cannot be found.
-     * <code>RestconfDocumentedException</code> is expected and error type, error tag and error status code
-     * are compared to expected values.
-     */
-    @Test
-    public void getRestconfSchemaNodeListStreamNegativeTest() {
-        try {
-            RestconfSchemaUtil.getRestconfSchemaNode(
-                    getTestingRestconfModule("restconf-module-with-missing-list-stream"),
-                    MonitoringModule.STREAM_LIST_SCHEMA_NODE);
-            fail("Test should fail due to missing " + MonitoringModule.STREAM_LIST_SCHEMA_NODE + " node");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    RestconfError.ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     * Negative test for getting <code>DataSchemaNode</code> from Restconf module when Restconf module does not
-     * contains restconf grouping. Test is expected to fail with <code>RestconfDocumentedException</code> and error
-     * type, error tag and error status code are compared to expected values.
-     */
-    @Test
-    public void getRestconfSchemaNodeMissingRestconfGroupingNegativeTest() {
-        try {
-            RestconfSchemaUtil.getRestconfSchemaNode(
-                    getTestingRestconfModule("restconf-module-with-missing-grouping-restconf"),
-                    RestconfModule.MODULES_CONTAINER_SCHEMA_NODE);
-            fail("Test should fail due to missing restconf grouping in Restconf module");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    RestconfError.ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     * Negative test for getting <code>DataSchemaNode</code> from Restconf module when Restconf module contains
-     * restconf grouping which does not contain any child nodes. Test is expected to fail with
-     * <code>NoSuchElementException</code>.
-     */
-    @Test
-    public void getRestconfSchemaNodeEmptyRestconfGroupingNegativeTest() {
-        thrown.expect(NoSuchElementException.class);
-        RestconfSchemaUtil.getRestconfSchemaNode(
-                getTestingRestconfModule("restconf-module-with-empty-grouping-restconf"),
-                RestconfModule.MODULES_CONTAINER_SCHEMA_NODE);
     }
 
     /**
@@ -336,7 +208,7 @@ public class RestconfSchemaUtilTest {
      */
     @Test
     public void findSchemaNodeInCollectionNullCollectionNegativeTest() {
-        thrown.expect(NullPointerException.class);
+        this.thrown.expect(NullPointerException.class);
         RestconfSchemaUtil.findSchemaNodeInCollection(null, RestconfModule.MODULES_CONTAINER_SCHEMA_NODE);
     }
 
@@ -389,6 +261,6 @@ public class RestconfSchemaUtilTest {
      * @return Restconf module
      */
     private Module getTestingRestconfModule(final String s) {
-        return schemaContext.findModuleByName(s, Draft18.RestconfModule.IETF_RESTCONF_QNAME.getRevision());
+        return this.schemaContext.findModuleByName(s, Draft18.RestconfModule.IETF_RESTCONF_QNAME.getRevision());
     }
 }

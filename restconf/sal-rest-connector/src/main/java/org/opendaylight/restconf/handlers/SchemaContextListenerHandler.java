@@ -12,4 +12,11 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 
 interface SchemaContextListenerHandler extends Handler<SchemaContext>, SchemaContextListener {
 
+    /**
+     * Return server-specific identifier representing the current set of modules
+     * and submodules
+     *
+     * @return identifier
+     */
+    String getActualModuleSetId();
 }
