@@ -18,6 +18,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import com.google.common.base.Optional;
+import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -167,7 +168,16 @@ public class RestconfDataServiceImplTest {
         this.contextRef = new SchemaContextRef(TestRestconfUtils.loadSchemaContext(PATH_FOR_NEW_SCHEMA_CONTEXT));
         this.schemaNode = DataSchemaContextTree.from(this.contextRef.get()).getChild(this.iidBase).getDataSchemaNode();
 
-        final SchemaContextHandler schemaContextHandler = new SchemaContextHandler();
+        final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
+        final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);
+        Mockito.when(txHandler.get()).thenReturn(domTx);
+        final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
+        Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
+        final CheckedFuture checked = Mockito.mock(CheckedFuture.class);
+        Mockito.when(wTx.submit()).thenReturn(checked);
+        final Object valueObj = null;
+        Mockito.when(checked.checkedGet()).thenReturn(valueObj);
+        final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(txHandler);
 
         schemaContextHandler.onGlobalContextUpdated(this.contextRef.get());
         this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler, this.mountPointServiceHandler);

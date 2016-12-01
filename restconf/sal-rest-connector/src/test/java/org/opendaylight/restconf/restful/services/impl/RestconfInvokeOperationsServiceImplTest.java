@@ -17,15 +17,18 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -47,7 +50,16 @@ public class RestconfInvokeOperationsServiceImplTest {
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
         final SchemaContextRef contextRef = new SchemaContextRef(TestRestconfUtils.loadSchemaContext(PATH_FOR_NEW_SCHEMA_CONTEXT));
-        final SchemaContextHandler schemaContextHandler = new SchemaContextHandler();
+        final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
+        final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);
+        Mockito.when(txHandler.get()).thenReturn(domTx);
+        final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
+        Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
+        final CheckedFuture checked = Mockito.mock(CheckedFuture.class);
+        Mockito.when(wTx.submit()).thenReturn(checked);
+        final Object valueObj = null;
+        Mockito.when(checked.checkedGet()).thenReturn(valueObj);
+        final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(txHandler);
         schemaContextHandler.onGlobalContextUpdated(contextRef.get());
         this.invokeOperationsService =
                 new RestconfInvokeOperationsServiceImpl(this.rpcServiceHandler, schemaContextHandler);
