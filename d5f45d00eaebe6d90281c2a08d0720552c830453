@@ -22,6 +22,30 @@
       "revId": "d5f45d00eaebe6d90281c2a08d0720552c830453",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_082509c2",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-02T01:02:34Z",
+      "side": 1,
+      "message": "Ah sorry I didn\u0027t got that part right the first time. Now should be OK.",
+      "parentUuid": "1a622d24_08f8697b",
+      "range": {
+        "startLine": 104,
+        "startChar": 11,
+        "endLine": 104,
+        "endChar": 12
+      },
+      "revId": "d5f45d00eaebe6d90281c2a08d0720552c830453",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
