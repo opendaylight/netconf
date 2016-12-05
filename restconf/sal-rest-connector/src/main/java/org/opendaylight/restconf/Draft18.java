@@ -158,7 +158,7 @@ public final class Draft18 {
         public static final QName SPECIFIC_MODULE_REVISION_LEAF_QNAME =
                 QName.create(MODULE_QNAME, SPECIFIC_MODULE_REVISION_LEAF);
 
-        public static final String BASE_URI_OF_SCHEMA = "/data/ietf-yang-library:modules-state/module/";
+        public static final String BASE_URI_OF_SCHEMA = "/modules/";
         public static final String SPECIFIC_MODULE_SCHEMA_LEAF = "schema";
         public static final QName SPECIFIC_MODULE_SCHEMA_LEAF_QNAME =
                 QName.create(MODULE_QNAME, SPECIFIC_MODULE_SCHEMA_LEAF);

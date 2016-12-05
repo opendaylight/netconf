@@ -30,7 +30,7 @@ public interface RestconfSchemaService {
      * @return {@link SchemaExportContext}
      */
     @GET
-    @Produces({ Draft18.MediaTypes.YANG, Draft18.MediaTypes.YIN + RestconfConstants.XML })
-    @Path("data/ietf-yang-library:modules/module/{identifier:.+}/schema")
+    @Produces({ Draft18.MediaTypes.YIN + RestconfConstants.XML, Draft18.MediaTypes.YANG })
+    @Path("modules/{identifier:.+}")
     SchemaExportContext getSchema(@PathParam("identifier") String identifier);
 }
