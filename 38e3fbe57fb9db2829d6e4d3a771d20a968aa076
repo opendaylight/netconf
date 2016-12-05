@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a622d24_e7e8b37e",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/EditConfig.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2016-12-05T20:23:43Z",
+      "side": 1,
+      "message": "This can be final.",
+      "revId": "38e3fbe57fb9db2829d6e4d3a771d20a968aa076",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
