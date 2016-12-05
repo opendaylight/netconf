@@ -21,5 +21,6 @@
 
   <modules>
     <module>ietf-yang-library</module>
+    <module>ietf-restconf-monitoring</module>
   </modules>
 </project>
