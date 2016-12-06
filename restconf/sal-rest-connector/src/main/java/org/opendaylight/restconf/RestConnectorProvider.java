@@ -12,9 +12,12 @@ import com.google.common.base.Preconditions;
 import java.util.Collection;
 import java.util.Collections;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncTransaction;
+import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChain;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
@@ -23,6 +26,7 @@ import org.opendaylight.controller.sal.core.api.Provider;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.netconf.sal.rest.api.RestConnector;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.restconf.Draft18.MonitoringModule;
 import org.opendaylight.restconf.common.wrapper.services.ServicesWrapperImpl;
 import org.opendaylight.restconf.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
@@ -30,7 +34,15 @@ import org.opendaylight.restconf.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
+import org.opendaylight.restconf.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,6 +103,30 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         wrapperServices.setHandlers(schemaCtxHandler, RestConnectorProvider.mountPointServiceHandler,
                 RestConnectorProvider.transactionChainHandler, brokerHandler, rpcServiceHandler,
                 notificationServiceHandler);
+
+        putCapabilities(schemaCtxHandler.get());
+    }
+
+    /**
+     * Put capabilites supported by Restconf to DS
+     *
+     * @param schemaContext
+     *            - schema co context to get ietf*monitoring-module
+     *
+     */
+    private void putCapabilities(final SchemaContext schemaContext) {
+        final Module monitoringModule =
+                schemaContext.findModuleByNamespaceAndRevision(MonitoringModule.URI_MODULE, MonitoringModule.DATE);
+        final NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode =
+                RestconfMappingNodeUtil.mapCapabilites(monitoringModule);
+        final DOMDataWriteTransaction wTx = transactionChainHandler.get().newWriteOnlyTransaction();
+        wTx.put(LogicalDatastoreType.OPERATIONAL,
+                YangInstanceIdentifier.create(NodeIdentifier.create(normNode.getNodeType())), normNode);
+        try {
+            wTx.submit().checkedGet();
+        } catch (final TransactionCommitFailedException e) {
+            throw new RestconfDocumentedException("Problem occured while putting data to DS.", e);
+        }
     }
 
     /**

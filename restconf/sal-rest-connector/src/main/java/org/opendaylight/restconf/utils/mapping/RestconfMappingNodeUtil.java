@@ -13,6 +13,8 @@ import java.util.Collection;
 import java.util.Set;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.restconf.Draft18.IetfYangLibrary;
+import org.opendaylight.restconf.Draft18.MonitoringModule;
+import org.opendaylight.restconf.Draft18.MonitoringModule.QueryParams;
 import org.opendaylight.restconf.utils.schema.context.RestconfSchemaUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.Module.ConformanceType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -421,5 +423,81 @@ public final class RestconfMappingNodeUtil {
                 .findSchemaNodeInCollection(listStreamSchemaNode.getChildNodes(), nameSchemaNode);
         Preconditions.checkState(schemaNode instanceof LeafSchemaNode);
         streamNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) schemaNode).withValue(value).build());
+    }
+
+    /**
+     * Map capabilites by ietf-restconf-monitoring
+     *
+     * @param monitoringModule
+     *            - ietf-restconf-monitoring module
+     * @return mapped capabilites
+     */
+    public static NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>>
+            mapCapabilites(final Module monitoringModule) {
+        final DataSchemaNode restconfState =
+                monitoringModule.getDataChildByName(MonitoringModule.CONT_RESTCONF_STATE_QNAME);
+        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> restStateContBuilder =
+                Builders.containerBuilder((ContainerSchemaNode) restconfState);
+        final DataSchemaNode capabilitesContSchema =
+                getChildOFCOnt((ContainerSchemaNode) restconfState, MonitoringModule.CONT_CAPABILITES_QNAME);
+        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> capabilitesContBuilder =
+                Builders.containerBuilder((ContainerSchemaNode) capabilitesContSchema);
+        final DataSchemaNode leafListCapa = getChildOFCOnt((ContainerSchemaNode) capabilitesContSchema,
+                MonitoringModule.LEAF_LIST_CAPABILITY_QNAME);
+        final ListNodeBuilder<Object, LeafSetEntryNode<Object>> leafListCapaBuilder =
+                Builders.orderedLeafSetBuilder((LeafListSchemaNode) leafListCapa);
+        fillLeafListCapa(leafListCapaBuilder, (LeafListSchemaNode) leafListCapa);
+
+        return restStateContBuilder.withChild(capabilitesContBuilder.withChild(leafListCapaBuilder.build()).build())
+                .build();
+    }
+
+    /**
+     * Map data to leaf-list
+     *
+     * @param builder
+     *            - builder of parent for children
+     * @param leafListSchema
+     */
+    @SuppressWarnings("unchecked")
+    private static void fillLeafListCapa(final ListNodeBuilder builder, final LeafListSchemaNode leafListSchema) {
+        builder.withChild(leafListEntryBuild(leafListSchema, QueryParams.DEPTH));
+        builder.withChild(leafListEntryBuild(leafListSchema, QueryParams.FIELDS));
+        builder.withChild(leafListEntryBuild(leafListSchema, QueryParams.FILTER));
+        builder.withChild(leafListEntryBuild(leafListSchema, QueryParams.REPLAY));
+        builder.withChild(leafListEntryBuild(leafListSchema, QueryParams.WITH_DEFAULTS));
+    }
+
+    /**
+     * Map value to leaf list entry node
+     *
+     * @param leafListSchema
+     *            - leaf list schema of leaf list entry
+     * @param value
+     *            - value of leaf entry
+     * @return entry node
+     */
+    @SuppressWarnings("rawtypes")
+    private static LeafSetEntryNode leafListEntryBuild(final LeafListSchemaNode leafListSchema, final String value) {
+        return Builders.leafSetEntryBuilder(leafListSchema).withValue(value).build();
+    }
+
+    /**
+     * Find specific schema node by qname in parent {@link ContainerSchemaNode}
+     *
+     * @param parent
+     *            - schemaNode
+     * @param childQName
+     *            - specific qname of child
+     * @return schema node of child by qname
+     */
+    private static DataSchemaNode getChildOFCOnt(final ContainerSchemaNode parent, final QName childQName) {
+        for (final DataSchemaNode child : parent.getChildNodes()) {
+            if (child.getQName().equals(childQName)) {
+                return child;
+            }
+        }
+        throw new RestconfDocumentedException(
+                childQName.getLocalName() + "doesn't exist in container " + MonitoringModule.CONT_RESTCONF_STATE_NAME);
     }
 }
