@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.slf4j.Logger;
@@ -114,7 +113,7 @@ public final class Draft18 {
      */
     public static final class IetfYangLibrary {
 
-        private static final Logger LOG = LoggerFactory.getLogger(NotificationListenerAdapter.class);
+        private static final Logger LOG = LoggerFactory.getLogger(IetfYangLibrary.class);
 
         private IetfYangLibrary() {
             throw new UnsupportedOperationException("Util class");
@@ -185,17 +184,93 @@ public final class Draft18 {
     }
 
     /**
-     * Constants for restconf module
+     * Constants for ietf-restconf-monitoring module
      *
      */
     public static final class MonitoringModule {
+
+        private static final Logger LOG = LoggerFactory.getLogger(MonitoringModule.class);
 
         private MonitoringModule() {
             throw new UnsupportedOperationException("Util class");
         }
 
-        public static final String STREAMS_CONTAINER_SCHEMA_NODE = "streams";
+        public static final String NAME = "ietf-restconf-monitoring";
+        public static final String NAMESPACE = "urn:ietf:params:xml:ns:yang:ietf-restconf-monitoring";
+        public static final String REVISION = "2016-08-15";
 
+        public static Date DATE = null;
+        public static URI URI_MODULE = null;
+
+        static {
+            try {
+                DATE = new SimpleDateFormat("yyyy-MM-dd").parse(REVISION);
+                URI_MODULE = new URI(NAMESPACE);
+            } catch (final ParseException | URISyntaxException e) {
+                LOG.error(e.getMessage());
+            }
+        }
+
+        public static final QNameModule MODULE_QNAME = QNameModule.create(URI_MODULE, DATE);
+
+        public static final String CONT_RESTCONF_STATE_NAME = "restconf-state";
+        public static final QName CONT_RESTCONF_STATE_QNAME = QName.create(MODULE_QNAME, CONT_RESTCONF_STATE_NAME);
+
+        public static final String CONT_CAPABILITIES_NAME = "capabilities";
+        public static final QName CONT_CAPABILITES_QNAME = QName.create(MODULE_QNAME, CONT_CAPABILITIES_NAME);
+
+        public static final String LEAF_LIST_CAPABILITY_NAME = "capability";
+        public static final QName LEAF_LIST_CAPABILITY_QNAME = QName.create(MODULE_QNAME, LEAF_LIST_CAPABILITY_NAME);
+
+        public static final String CONT_STREAMS_NAME = "streams";
+        public static final QName CONT_STREAMS_QNAME = QName.create(MODULE_QNAME, CONT_STREAMS_NAME);
+
+        public static final String LIST_STREAM_NAME = "stream";
+        public static final QName LIST_STREAM_QNAME = QName.create(MODULE_QNAME, LIST_STREAM_NAME);
+
+        public static final String LEAF_NAME_STREAM_NAME = "name";
+        public static final QName LEAF_NAME_STREAM_QNAME = QName.create(MODULE_QNAME, LEAF_NAME_STREAM_NAME);
+
+        public static final String LEAF_DESCR_STREAM_NAME = "description";
+        public static final QName LEAF_DESCR_STREAM_QNAME = QName.create(MODULE_QNAME, LEAF_DESCR_STREAM_NAME);
+
+        public static final String LEAF_REPLAY_SUPP_STREAM_NAME = "replay-support";
+        public static final QName LEAF_REPLAY_SUPP_STREAM_QNAME =
+                QName.create(MODULE_QNAME, LEAF_REPLAY_SUPP_STREAM_NAME);
+
+        public static final String LEAF_START_TIME_STREAM_NAME = "replay-log-creation-time";
+        public static final QName LEAF_START_TIME_STREAM_QNAME =
+                QName.create(MODULE_QNAME, LEAF_START_TIME_STREAM_NAME);
+
+        public static final String LIST_ACCESS_STREAM_NAME = "access";
+        public static final QName LIST_ACCESS_STREAM_QNAME = QName.create(MODULE_QNAME, LIST_ACCESS_STREAM_NAME);
+
+        public static final String LEAF_ENCODING_ACCESS_NAME = "encoding";
+        public static final QName LEAF_ENCODING_ACCESS_QNAME = QName.create(MODULE_QNAME, LEAF_ENCODING_ACCESS_NAME);
+
+        public static final String LEAF_LOCATION_ACCESS_NAME = "location";
+        public static final QName LEAF_LOCATION_ACCESS_QNAME = QName.create(MODULE_QNAME, LEAF_LOCATION_ACCESS_NAME);
+
+        // TODO remove after implement ietf-restconf monitoring
+        public static final String STREAMS_CONTAINER_SCHEMA_NODE = "streams";
         public static final String STREAM_LIST_SCHEMA_NODE = "stream";
+
+        /**
+         * Constants for capabilities
+         */
+        public static final class QueryParams {
+
+            private QueryParams() {
+                throw new UnsupportedOperationException("Util class");
+            }
+
+            public static final String URI_BASE = "urn:ietf:params:restconf:capability:";
+
+            public static final String DEPTH = "depth:1.0";
+            public static final String FIELDS = "fields:1.0";
+            public static final String FILTER = "filter:1.0";
+            public static final String REPLAY = "replay:1.0";
+            public static final String WITH_DEFAULTS = "with-defaults:1.0";
+        }
     }
 }
