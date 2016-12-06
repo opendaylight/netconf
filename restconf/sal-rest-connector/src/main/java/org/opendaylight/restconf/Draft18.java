@@ -266,11 +266,11 @@ public final class Draft18 {
 
             public static final String URI_BASE = "urn:ietf:params:restconf:capability:";
 
-            public static final String DEPTH = "depth:1.0";
-            public static final String FIELDS = "fields:1.0";
-            public static final String FILTER = "filter:1.0";
-            public static final String REPLAY = "replay:1.0";
-            public static final String WITH_DEFAULTS = "with-defaults:1.0";
+            public static final String DEPTH = URI_BASE + "depth:1.0";
+            public static final String FIELDS = URI_BASE + "fields:1.0";
+            public static final String FILTER = URI_BASE + "filter:1.0";
+            public static final String REPLAY = URI_BASE + "replay:1.0";
+            public static final String WITH_DEFAULTS = URI_BASE + "with-defaults:1.0";
         }
     }
 }

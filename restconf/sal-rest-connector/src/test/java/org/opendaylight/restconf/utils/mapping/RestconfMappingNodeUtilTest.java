@@ -15,14 +15,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import com.google.common.collect.Sets;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -37,6 +40,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.restconf.Draft18;
 import org.opendaylight.restconf.Draft18.IetfYangLibrary;
 import org.opendaylight.restconf.Draft18.MonitoringModule;
+import org.opendaylight.restconf.Draft18.MonitoringModule.QueryParams;
 import org.opendaylight.restconf.Draft18.RestconfModule;
 import org.opendaylight.restconf.utils.schema.context.RestconfSchemaUtil;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -47,6 +51,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgum
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -74,15 +80,18 @@ public class RestconfMappingNodeUtilTest {
 
     private static Set<Module> modules;
     private static SchemaContext schemaContext;
+    private static SchemaContext schemaContextCapabilites;
 
     private static Set<Module> modulesRest;
+
     private Set<DataSchemaNode> allStreamChildNodes;
 
     @BeforeClass
     public static void loadTestSchemaContextAndModules() throws Exception {
         RestconfMappingNodeUtilTest.schemaContext = TestRestconfUtils.loadSchemaContext(
                 "/modules/restconf-module-testing");
-        RestconfMappingNodeUtilTest.modules = TestRestconfUtils.loadSchemaContext("/modules").getModules();
+        RestconfMappingNodeUtilTest.schemaContextCapabilites = TestRestconfUtils.loadSchemaContext("/modules");
+        RestconfMappingNodeUtilTest.modules = schemaContextCapabilites.getModules();
         RestconfMappingNodeUtilTest.modulesRest =
                 TestRestconfUtils.loadSchemaContext("/modules/restconf-module-testing").getModules();
     }
@@ -117,6 +126,32 @@ public class RestconfMappingNodeUtilTest {
 
         // verify loaded modules
         verifyLoadedModules((ContainerNode) modules);
+    }
+
+    @Test
+    public void restconfStateCapabilitesTest() {
+        final Module monitoringModule = schemaContextCapabilites
+                .findModuleByNamespaceAndRevision(MonitoringModule.URI_MODULE, MonitoringModule.DATE);
+        final NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode =
+                RestconfMappingNodeUtil.mapCapabilites(monitoringModule);
+        assertNotNull(normNode);
+        final List<Object> listOfValues = new ArrayList<>();
+
+        for (final DataContainerChild<? extends PathArgument, ?> child : ((ContainerNode) normNode).getValue()) {
+            if (child.getNodeType().equals(MonitoringModule.CONT_CAPABILITES_QNAME)) {
+                for (final DataContainerChild<? extends PathArgument, ?> dataContainerChild : ((ContainerNode) child)
+                        .getValue()) {
+                    for (final Object entry : ((LeafSetNode) dataContainerChild).getValue()) {
+                        listOfValues.add(((LeafSetEntryNode) entry).getValue());
+                    }
+                }
+            }
+        }
+        Assert.assertTrue(listOfValues.contains(QueryParams.DEPTH));
+        Assert.assertTrue(listOfValues.contains(QueryParams.FIELDS));
+        Assert.assertTrue(listOfValues.contains(QueryParams.FILTER));
+        Assert.assertTrue(listOfValues.contains(QueryParams.REPLAY));
+        Assert.assertTrue(listOfValues.contains(QueryParams.WITH_DEFAULTS));
     }
 
     /**
