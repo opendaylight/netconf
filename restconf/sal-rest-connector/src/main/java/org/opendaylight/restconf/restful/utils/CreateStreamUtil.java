@@ -162,7 +162,7 @@ public final class CreateStreamUtil {
             return null;
         }
 
-        return StreamUtil.resolveEnum(clazz, (String) value);
+        return ResolveEnumUtil.resolveEnum(clazz, (String) value);
     }
 
     private static YangInstanceIdentifier preparePath(final ContainerNode data, final QName qName) {

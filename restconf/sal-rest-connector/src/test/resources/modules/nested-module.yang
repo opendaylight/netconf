@@ -62,4 +62,8 @@ module nested-module {
             type string;
         }
     }
+
+    notification notifi{
+        description "Notifi";
+    }
 }
