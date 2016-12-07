@@ -58,6 +58,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     private UriInfo uriInfo;
     @Mock
     private NotificationServiceHandler notificationServiceHandler;
+    @Mock
+    private TransactionChainHandler transactionHandler;
 
     private SchemaContextHandler schemaHandler;
 
@@ -114,7 +116,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
-                        this.schemaHandler);
+                        this.schemaHandler, this.transactionHandler);
         final NormalizedNodeContext response = streamsSubscriptionService
                 .subscribeToStream(
                         "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
@@ -130,7 +132,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
-                        this.schemaHandler);
+                        this.schemaHandler, this.transactionHandler);
         streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/scope=ONE", this.uriInfo);
     }
 
@@ -140,7 +142,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
-                        this.schemaHandler);
+                        this.schemaHandler, this.transactionHandler);
         streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/datastore=OPERATIONAL",
                 this.uriInfo);
     }

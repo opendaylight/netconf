@@ -23,8 +23,11 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
@@ -34,18 +37,24 @@ import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
+import org.opendaylight.restconf.Draft18.MonitoringModule;
 import org.opendaylight.restconf.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.handlers.TransactionChainHandler;
+import org.opendaylight.restconf.parser.IdentifierCodec;
 import org.opendaylight.restconf.utils.RestconfConstants;
+import org.opendaylight.restconf.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
@@ -141,7 +150,8 @@ public final class SubscribeToStreamUtil {
     }
 
     /**
-     * Register listeners by streamName in identifier to listen to yang notifications
+     * Register listeners by streamName in identifier to listen to yang
+     * notifications
      *
      * @param identifier
      *            - identifier as stream name
@@ -155,10 +165,13 @@ public final class SubscribeToStreamUtil {
      *            - DOMNotificationService handler for register listeners
      * @param filter
      *            - indicate which subset of all possible events are of interest
+     * @param transactionChainHandler
+     * @param schemaHandler
      * @return location for listening
      */
-    public static URI notifStream(final String identifier, final UriInfo uriInfo, final Date start, final Date stop,
-            final NotificationServiceHandler notifiServiceHandler, final String filter) {
+    public static URI notifStream(final String identifier, final UriInfo uriInfo, Date start, final Date stop,
+            final NotificationServiceHandler notifiServiceHandler, final String filter,
+            final TransactionChainHandler transactionChainHandler, final SchemaContextHandler schemaHandler) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -167,11 +180,6 @@ public final class SubscribeToStreamUtil {
         if ((listeners == null) || listeners.isEmpty()) {
             throw new RestconfDocumentedException("Stream was not found.", ErrorType.PROTOCOL,
                     ErrorTag.UNKNOWN_ELEMENT);
-        }
-
-        for (final NotificationListenerAdapter listener : listeners) {
-            registerToListenNotification(listener, notifiServiceHandler);
-            listener.setQueryParams(start, stop, filter);
         }
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
@@ -184,6 +192,42 @@ public final class SubscribeToStreamUtil {
         }
         final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme("ws");
         final URI uriToWebsocketServer = uriToWebsocketServerBuilder.replacePath(streamName).build();
+
+        final DOMDataReadWriteTransaction wTx = transactionChainHandler.get().newReadWriteTransaction();
+        boolean exist;
+        try {
+            exist = wTx.exists(LogicalDatastoreType.OPERATIONAL, IdentifierCodec
+                    .deserialize("ietf-restconf-monitoring:restconf-state/streams", schemaHandler.get())).checkedGet();
+        } catch (final ReadFailedException e1) {
+            throw new RestconfDocumentedException("Problem while checking data if exists", e1);
+        }
+        final Module monitoringModule = schemaHandler.get()
+                .findModuleByNamespaceAndRevision(MonitoringModule.URI_MODULE, MonitoringModule.DATE);
+        if (start == null) {
+            start = new Date();
+        }
+        for (final NotificationListenerAdapter listener : listeners) {
+            registerToListenNotification(listener, notifiServiceHandler);
+                listener.setQueryParams(start, stop, filter);
+            final NormalizedNode mapToStreams =
+                    RestconfMappingNodeUtil.mapToStreams(listener.getSchemaPath().getLastComponent(),
+                    schemaHandler.get().getNotifications(), start, listener.getOutputType(),
+                            uriToWebsocketServer, monitoringModule, exist);
+            String pathId = "";
+            if(exist){
+                pathId = "ietf-restconf-monitoring:restconf-state/streams/stream="
+                        + listener.getSchemaPath().getLastComponent().getLocalName();
+            } else {
+                pathId = "ietf-restconf-monitoring:restconf-state/streams";
+            }
+            wTx.merge(LogicalDatastoreType.OPERATIONAL, IdentifierCodec.deserialize(pathId, schemaHandler.get()),
+                    mapToStreams);
+        }
+        try {
+            wTx.submit().checkedGet();
+        } catch (final TransactionCommitFailedException e) {
+            throw new RestconfDocumentedException("Problem while putting data to DS.", e);
+        }
 
         return uriToWebsocketServer;
     }

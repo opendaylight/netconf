@@ -149,6 +149,6 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
                 schemaCtxHandler);
         this.delegRestconfSubscrService =
                 new RestconfStreamsSubscriptionServiceImpl(domDataBrokerHandler, notificationServiceHandler,
-                        schemaCtxHandler);
+                        schemaCtxHandler, transactionChainHandler);
     }
 }

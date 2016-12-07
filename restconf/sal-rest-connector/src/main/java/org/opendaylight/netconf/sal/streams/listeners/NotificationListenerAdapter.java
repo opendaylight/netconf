@@ -512,4 +512,13 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
         this.stop = stop;
         this.filter = filter;
     }
+
+    /**
+     * Get outputType of listenere
+     *
+     * @return the outputType
+     */
+    public String getOutputType() {
+        return this.outputType;
+    }
 }

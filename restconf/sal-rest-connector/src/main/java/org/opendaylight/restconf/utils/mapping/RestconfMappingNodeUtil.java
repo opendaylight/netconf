@@ -8,8 +8,10 @@
 package org.opendaylight.restconf.utils.mapping;
 
 import com.google.common.base.Preconditions;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Set;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.restconf.Draft18.IetfYangLibrary;
@@ -41,6 +43,7 @@ import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
@@ -499,5 +502,83 @@ public final class RestconfMappingNodeUtil {
         }
         throw new RestconfDocumentedException(
                 childQName.getLocalName() + " doesn't exist in container " + MonitoringModule.CONT_RESTCONF_STATE_NAME);
+    }
+
+    /**
+     * @param lastComponent
+     * @param notifications
+     * @param start
+     * @param outputType
+     * @param uriToWebsocketServer
+     * @param monitoringModule
+     * @param exist
+     * @return
+     */
+    public static NormalizedNode mapToStreams(final QName lastComponent,
+            final Set<NotificationDefinition> notifications, final Date start, final String outputType,
+            final URI uriToWebsocketServer, final Module monitoringModule, final boolean exist) {
+        for (final NotificationDefinition notificationDefinition : notifications) {
+            if (notificationDefinition.getQName().equals(lastComponent)) {
+                final DataSchemaNode streamListSchema = ((ContainerSchemaNode) ((ContainerSchemaNode) monitoringModule
+                        .getDataChildByName(MonitoringModule.CONT_RESTCONF_STATE_QNAME))
+                                .getDataChildByName(MonitoringModule.CONT_STREAMS_QNAME))
+                                        .getDataChildByName(MonitoringModule.LIST_STREAM_QNAME);
+                final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
+                        Builders.mapEntryBuilder((ListSchemaNode) streamListSchema);
+
+                final ListSchemaNode listSchema = ((ListSchemaNode) streamListSchema);
+                prepareLeafAndFillEntryBuilder(streamEntry,
+                        listSchema.getDataChildByName(MonitoringModule.LEAF_NAME_STREAM_QNAME),
+                        notificationDefinition.getQName().getLocalName());
+                prepareLeafAndFillEntryBuilder(streamEntry,
+                        listSchema.getDataChildByName(MonitoringModule.LEAF_DESCR_STREAM_QNAME),
+                        notificationDefinition.getDescription());
+                prepareLeafAndFillEntryBuilder(streamEntry,
+                        listSchema.getDataChildByName(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME), true);
+                prepareLeafAndFillEntryBuilder(streamEntry,
+                        listSchema.getDataChildByName(MonitoringModule.LEAF_START_TIME_STREAM_QNAME),
+                        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'XXX").format(start));
+                prepareListAndFillEntryBuilder(streamEntry,
+                        (ListSchemaNode) listSchema.getDataChildByName(MonitoringModule.LIST_ACCESS_STREAM_QNAME),
+                        outputType, uriToWebsocketServer);
+
+                if (!exist) {
+                    final DataSchemaNode contStreamsSchema = ((ContainerSchemaNode) monitoringModule
+                            .getDataChildByName(MonitoringModule.CONT_RESTCONF_STATE_QNAME))
+                                    .getDataChildByName(MonitoringModule.CONT_STREAMS_QNAME);
+                    return Builders.containerBuilder((ContainerSchemaNode) contStreamsSchema).withChild(Builders
+                            .mapBuilder((ListSchemaNode) streamListSchema).withChild(streamEntry.build())
+                            .build()).build();
+                }
+                return streamEntry.build();
+            }
+        }
+
+        throw new RestconfDocumentedException(lastComponent + " doesn't exist in any modul");
+    }
+
+    private static void prepareListAndFillEntryBuilder(
+            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry,
+            final ListSchemaNode listSchemaNode, final String outputType, final URI uriToWebsocketServer) {
+        final CollectionNodeBuilder<MapEntryNode, MapNode> accessListBuilder = Builders.mapBuilder(listSchemaNode);
+        final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> entryAccessList =
+                Builders.mapEntryBuilder(listSchemaNode);
+        prepareLeafAndFillEntryBuilder(entryAccessList,
+                listSchemaNode.getDataChildByName(MonitoringModule.LEAF_ENCODING_ACCESS_QNAME), outputType);
+        prepareLeafAndFillEntryBuilder(entryAccessList,
+                listSchemaNode.getDataChildByName(MonitoringModule.LEAF_LOCATION_ACCESS_QNAME),
+                uriToWebsocketServer.toString());
+        streamEntry.withChild(accessListBuilder.withChild(entryAccessList.build()).build());
+    }
+
+    /**
+     * @param streamEntry
+     * @param dataChildByName
+     * @param localName
+     */
+    private static void prepareLeafAndFillEntryBuilder(
+            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry,
+            final DataSchemaNode leafSchema, final Object value) {
+        streamEntry.withChild(Builders.leafBuilder((LeafSchemaNode) leafSchema).withValue(value).build());
     }
 }

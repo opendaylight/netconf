@@ -20,6 +20,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.restconf.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.restful.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.restful.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.restful.utils.SubscribeToStreamUtil;
@@ -45,11 +46,15 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
     private final SchemaContextHandler schemaHandler;
 
+    private final TransactionChainHandler transactionChainHandler;
+
     public RestconfStreamsSubscriptionServiceImpl(final DOMDataBrokerHandler domDataBrokerHandler,
-            final NotificationServiceHandler notificationServiceHandler, final SchemaContextHandler schemaHandler) {
+            final NotificationServiceHandler notificationServiceHandler, final SchemaContextHandler schemaHandler,
+            final TransactionChainHandler transactionChainHandler) {
         this.domDataBrokerHandler = domDataBrokerHandler;
         this.notificationServiceHandler = notificationServiceHandler;
         this.schemaHandler = schemaHandler;
+        this.transactionChainHandler = transactionChainHandler;
     }
 
     @Override
@@ -98,7 +103,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                     SubscribeToStreamUtil.dataSubs(identifier, uriInfo, start, stop, this.domDataBrokerHandler, filter);
         } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
             response = SubscribeToStreamUtil.notifStream(identifier, uriInfo, start, stop,
-                    this.notificationServiceHandler, filter);
+                    this.notificationServiceHandler, filter, this.transactionChainHandler, this.schemaHandler);
         }
 
         if (response != null) {
