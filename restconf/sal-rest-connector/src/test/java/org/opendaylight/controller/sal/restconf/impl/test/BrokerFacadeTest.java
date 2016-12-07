@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -46,6 +47,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.sal.core.api.Broker.ConsumerSession;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
@@ -60,6 +62,8 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
+import org.opendaylight.restconf.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -326,7 +330,7 @@ public class BrokerFacadeTest {
      * Create, register, close and remove notification listener.
      */
     @Test
-    public void testRegisterToListenNotificationChanges() {
+    public void testRegisterToListenNotificationChanges() throws Exception {
         // create test notification listener
         final String identifier = "create-notification-stream/toaster:toastDone";
         final SchemaPath path = SchemaPath.create(true,
@@ -350,6 +354,16 @@ public class BrokerFacadeTest {
         // registrations should be invoked only once
         verify(this.domNotification, times(1)).registerNotificationListener(listener, listener.getSchemaPath());
 
+        final DOMTransactionChain transactionChain = mock(DOMTransactionChain.class);
+        final DOMDataWriteTransaction wTx = mock(DOMDataWriteTransaction.class);
+        final CheckedFuture checked = Futures.immediateCheckedFuture("");
+        when(wTx.submit()).thenReturn(checked);
+        when(transactionChain.newWriteOnlyTransaction()).thenReturn(wTx);
+        final TransactionChainHandler transactionChainHandler = new TransactionChainHandler(transactionChain);
+        final SchemaContextHandler schemaHandler = Mockito.mock(SchemaContextHandler.class);
+        final SchemaContext schCtx = TestUtils.loadSchemaContext("/modules");
+        when(schemaHandler.get()).thenReturn(schCtx);
+        listener.setCloseVars(transactionChainHandler, schemaHandler);
         // close and remove test notification listener
         listener.close();
         Notificator.removeNotificationListenerIfNoSubscriberExists(listener);
