@@ -27,7 +27,6 @@ import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.restconf.base.services.api.RestconfOperationsService;
-import org.opendaylight.restconf.base.services.api.RestconfStreamsService;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
 import org.opendaylight.restconf.restful.services.api.RestconfInvokeOperationsService;
 
@@ -218,7 +217,7 @@ public interface RestconfService {
 
     /**
      * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfStreamsService#getAvailableStreams(UriInfo)}
+     *             {@link RestconfDataService#readData(String, UriInfo)}
      */
     @Deprecated
     @GET
