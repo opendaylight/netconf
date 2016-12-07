@@ -11,10 +11,9 @@ package org.opendaylight.restconf.base.services.api;
  * Wrapper for all base services:
  * <ul>
  * <li>{@link RestconfOperationsService}
- * <li>{@link RestconfStreamsService}
  * <li>{@link RestconfSchemaService}
  * </ul>
  *
  */
-public interface BaseServicesWrapper extends RestconfOperationsService, RestconfStreamsService, RestconfSchemaService {
+public interface BaseServicesWrapper extends RestconfOperationsService, RestconfSchemaService {
 }
