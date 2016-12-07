@@ -21,11 +21,9 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
@@ -48,9 +46,15 @@ import javax.xml.xpath.XPathFactory;
 import org.json.JSONObject;
 import org.json.XML;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataChangeEvent;
+import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.restconf.Draft18.MonitoringModule;
+import org.opendaylight.restconf.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.handlers.TransactionChainHandler;
+import org.opendaylight.restconf.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -98,6 +102,8 @@ public class ListenerAdapter implements DOMDataChangeListener {
     private Date start = null;
     private Date stop = null;
     private String filter = null;
+    private TransactionChainHandler transactionChainHandler;
+    private SchemaContextHandler schemaHandler;
 
     /**
      * Creates new {@link ListenerAdapter} listener specified by path and stream
@@ -595,27 +601,6 @@ public class ListenerAdapter implements DOMDataChangeListener {
     }
 
     /**
-     * Generates new prefix which consists of four random characters <a-z>.
-     *
-     * @param prefixes
-     *            Collection of prefixes.
-     * @return New prefix which consists of four random characters <a-z>.
-     */
-    private static String generateNewPrefix(final Collection<String> prefixes) {
-        StringBuilder result = null;
-        final Random random = new Random();
-        do {
-            result = new StringBuilder();
-            for (int i = 0; i < 4; i++) {
-                final int randomNumber = 0x61 + (Math.abs(random.nextInt()) % 26);
-                result.append(Character.toChars(randomNumber));
-            }
-        } while (prefixes.contains(result.toString()));
-
-        return result.toString();
-    }
-
-    /**
      * Gets path pointed to data in data store.
      *
      * @return Path pointed to data in data store.
@@ -643,9 +628,15 @@ public class ListenerAdapter implements DOMDataChangeListener {
     }
 
     /**
-     * Removes all subscribers and unregisters event bus change recorder form event bus.
+     * Removes all subscribers and unregisters event bus change recorder form
+     * event bus and delete data in DS
      */
     public void close() throws Exception {
+        final DOMDataWriteTransaction wTx = this.transactionChainHandler.get().newWriteOnlyTransaction();
+        wTx.delete(LogicalDatastoreType.OPERATIONAL, IdentifierCodec.deserialize(MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY
+                        + this.path.getLastPathArgument().getNodeType().getLocalName(), this.schemaHandler.get()));
+        wTx.submit().checkedGet();
+
         this.subscribers = new ConcurrentSet<>();
         this.registration.close();
         this.registration = null;
@@ -742,6 +733,31 @@ public class ListenerAdapter implements DOMDataChangeListener {
         this.start = start;
         this.stop = stop;
         this.filter = filter;
+    }
+
+    /**
+     * Get output type
+     *
+     * @return outputType
+     */
+    public String getOutputType() {
+        return this.outputType.getName();
+    }
+
+    /**
+     * Transaction chain to delete data in DS on close()
+     *
+     * @param transactionChainHandler
+     *            - creating new write transaction to delete data on close
+     * @param schemaHandler
+     *            - for getting schema to deserialize
+     *            {@link MonitoringModule#PATH_TO_STREAM_WITHOUT_KEY} to
+     *            {@link YangInstanceIdentifier}
+     */
+    public void setCloseVars(final TransactionChainHandler transactionChainHandler,
+            final SchemaContextHandler schemaHandler) {
+        this.transactionChainHandler = transactionChainHandler;
+        this.schemaHandler = schemaHandler;
     }
 
 }

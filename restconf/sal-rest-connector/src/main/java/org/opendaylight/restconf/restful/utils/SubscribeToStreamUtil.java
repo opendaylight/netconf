@@ -23,8 +23,11 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
@@ -34,18 +37,24 @@ import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
+import org.opendaylight.restconf.Draft18.MonitoringModule;
 import org.opendaylight.restconf.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.handlers.TransactionChainHandler;
+import org.opendaylight.restconf.parser.IdentifierCodec;
 import org.opendaylight.restconf.utils.RestconfConstants;
+import org.opendaylight.restconf.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
@@ -72,11 +81,11 @@ public final class SubscribeToStreamUtil {
      *            - string of enum value
      * @return enum
      */
-    public static <T> T parseURIEnum(final Class<T> clazz, final String value) {
+    private static <T> T parseURIEnum(final Class<T> clazz, final String value) {
         if ((value == null) || value.equals("")) {
             return null;
         }
-        return StreamUtil.resolveEnum(clazz, value);
+        return ResolveEnumUtil.resolveEnum(clazz, value);
     }
 
     /**
@@ -141,7 +150,9 @@ public final class SubscribeToStreamUtil {
     }
 
     /**
-     * Register listeners by streamName in identifier to listen to yang notifications
+     * Register listeners by streamName in identifier to listen to yang
+     * notifications, put or delete info about listener to DS according to
+     * ietf-restconf-monitoring
      *
      * @param identifier
      *            - identifier as stream name
@@ -155,10 +166,16 @@ public final class SubscribeToStreamUtil {
      *            - DOMNotificationService handler for register listeners
      * @param filter
      *            - indicate which subset of all possible events are of interest
+     * @param transactionChainHandler
+     *            - to put new data about stream to DS and delete after close
+     *            listener
+     * @param schemaHandler
+     *            - for getting schema context
      * @return location for listening
      */
-    public static URI notifStream(final String identifier, final UriInfo uriInfo, final Date start, final Date stop,
-            final NotificationServiceHandler notifiServiceHandler, final String filter) {
+    public static URI notifYangStream(final String identifier, final UriInfo uriInfo, Date start, final Date stop,
+            final NotificationServiceHandler notifiServiceHandler, final String filter,
+            final TransactionChainHandler transactionChainHandler, final SchemaContextHandler schemaHandler) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -167,11 +184,6 @@ public final class SubscribeToStreamUtil {
         if ((listeners == null) || listeners.isEmpty()) {
             throw new RestconfDocumentedException("Stream was not found.", ErrorType.PROTOCOL,
                     ErrorTag.UNKNOWN_ELEMENT);
-        }
-
-        for (final NotificationListenerAdapter listener : listeners) {
-            registerToListenNotification(listener, notifiServiceHandler);
-            listener.setQueryParams(start, stop, filter);
         }
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
@@ -185,7 +197,39 @@ public final class SubscribeToStreamUtil {
         final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme("ws");
         final URI uriToWebsocketServer = uriToWebsocketServerBuilder.replacePath(streamName).build();
 
+        final DOMDataReadWriteTransaction wTx = transactionChainHandler.get().newReadWriteTransaction();
+        final boolean exist = checkExist(schemaHandler, wTx);
+        final Module monitoringModule = schemaHandler.get()
+                .findModuleByNamespaceAndRevision(MonitoringModule.URI_MODULE, MonitoringModule.DATE);
+        if (start == null) {
+            start = new Date();
+        }
+        for (final NotificationListenerAdapter listener : listeners) {
+            registerToListenNotification(listener, notifiServiceHandler);
+            listener.setQueryParams(start, stop, filter);
+            listener.setCloseVars(transactionChainHandler, schemaHandler);
+            final NormalizedNode mapToStreams =
+                    RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(listener.getSchemaPath().getLastComponent(),
+                    schemaHandler.get().getNotifications(), start, listener.getOutputType(),
+                            uriToWebsocketServer, monitoringModule, exist);
+            writeDataToDS(schemaHandler, listener.getSchemaPath().getLastComponent().getLocalName(), wTx, exist, mapToStreams);
+        }
+        submitData(wTx);
+
         return uriToWebsocketServer;
+    }
+
+    private static boolean checkExist(final SchemaContextHandler schemaHandler, final DOMDataReadWriteTransaction wTx) {
+        boolean exist;
+        try {
+            exist = wTx
+                    .exists(LogicalDatastoreType.OPERATIONAL, IdentifierCodec
+                            .deserialize(MonitoringModule.PATH_TO_STREAMS, schemaHandler.get()))
+                    .checkedGet();
+        } catch (final ReadFailedException e1) {
+            throw new RestconfDocumentedException("Problem while checking data if exists", e1);
+        }
+        return exist;
     }
 
     private static void registerToListenNotification(final NotificationListenerAdapter listener,
@@ -222,7 +266,9 @@ public final class SubscribeToStreamUtil {
     }
 
     /**
-     * Register listener by streamName in identifier to listen to yang notifications
+     * Register listener by streamName in identifier to listen to data change
+     * notifications, put or delete info about listener to DS according to
+     * ietf-restconf-monitoring
      *
      * @param identifier
      *            - identifier as stream name
@@ -236,10 +282,16 @@ public final class SubscribeToStreamUtil {
      *            - DOMDataBroker handler for register listener
      * @param filter
      *            - indicate which subset of all possible events are of interest
+     * @param schemaHandler
+     *            - for getting schema context
+     * @param transactionChainHandler
+     *            - to put new data about stream to DS and delete after close
+     *            listener
      * @return location for listening
      */
-    public static URI dataSubs(final String identifier, final UriInfo uriInfo, final Date start, final Date stop,
-            final DOMDataBrokerHandler domDataBrokerHandler, final String filter) {
+    public static URI notifiDataStream(final String identifier, final UriInfo uriInfo, Date start, final Date stop,
+            final DOMDataBrokerHandler domDataBrokerHandler, final String filter,
+            final TransactionChainHandler transactionChainHandler, final SchemaContextHandler schemaHandler) {
         final Map<String, String> mapOfValues = SubscribeToStreamUtil.mapValuesFromUri(identifier);
 
         final LogicalDatastoreType ds = SubscribeToStreamUtil.parseURIEnum(LogicalDatastoreType.class,
@@ -263,7 +315,12 @@ public final class SubscribeToStreamUtil {
         final ListenerAdapter listener = Notificator.getListenerFor(streamName);
         Preconditions.checkNotNull(listener, "Listener doesn't exist : " + streamName);
 
+        if (start == null) {
+            start = new Date();
+        }
+
         listener.setQueryParams(start, stop, filter);
+        listener.setCloseVars(transactionChainHandler, schemaHandler);
 
         SubscribeToStreamUtil.registration(ds, scope, listener, domDataBrokerHandler.get());
 
@@ -272,9 +329,50 @@ public final class SubscribeToStreamUtil {
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
         final UriBuilder uriToWebSocketServer =
                 uriBuilder.port(port).scheme(RestconfStreamsConstants.SCHEMA_SUBSCIBRE_URI);
-        return uriToWebSocketServer.replacePath(streamName).build();
+        final URI uri = uriToWebSocketServer.replacePath(streamName).build();
+
+        final Module monitoringModule = schemaHandler.get()
+                .findModuleByNamespaceAndRevision(MonitoringModule.URI_MODULE, MonitoringModule.DATE);
+        final DOMDataReadWriteTransaction wTx = transactionChainHandler.get().newReadWriteTransaction();
+        final boolean exist = checkExist(schemaHandler, wTx);
+
+        final NormalizedNode mapToStreams = RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.getPath(), start,
+                listener.getOutputType(), uri, monitoringModule, exist, schemaHandler.get());
+        writeDataToDS(schemaHandler, listener.getPath().getLastPathArgument().getNodeType().getLocalName(), wTx, exist,
+                mapToStreams);
+        submitData(wTx);
+        return uri;
     }
 
+    private static void writeDataToDS(final SchemaContextHandler schemaHandler, final String name,
+            final DOMDataReadWriteTransaction wTx, final boolean exist, final NormalizedNode mapToStreams) {
+        String pathId = "";
+        if (exist) {
+            pathId = MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name;
+        } else {
+            pathId = MonitoringModule.PATH_TO_STREAMS;
+        }
+        wTx.merge(LogicalDatastoreType.OPERATIONAL, IdentifierCodec.deserialize(pathId, schemaHandler.get()),
+                mapToStreams);
+    }
+
+    private static void submitData(final DOMDataReadWriteTransaction wTx) {
+        try {
+            wTx.submit().checkedGet();
+        } catch (final TransactionCommitFailedException e) {
+            throw new RestconfDocumentedException("Problem while putting data to DS.", e);
+        }
+    }
+
+    /**
+     * Parse input of query parameters - start-time or stop-time - from
+     * {@link DateAndTime} format to {@link Date} format
+     *
+     * @param entry
+     *            - start-time or stop-time as string in {@link DateAndTime}
+     *            format
+     * @return parsed {@link Date} by entry
+     */
     public static Date parseDateFromQueryParam(final Entry<String, List<String>> entry) {
         final DateAndTime event = new DateAndTime(entry.getValue().iterator().next());
         String numOf_ms = "";

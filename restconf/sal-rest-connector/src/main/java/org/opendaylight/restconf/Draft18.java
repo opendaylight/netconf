@@ -198,6 +198,9 @@ public final class Draft18 {
         public static final String NAME = "ietf-restconf-monitoring";
         public static final String NAMESPACE = "urn:ietf:params:xml:ns:yang:ietf-restconf-monitoring";
         public static final String REVISION = "2016-08-15";
+        public static final String PATH_TO_STREAM_WITHOUT_KEY =
+                "ietf-restconf-monitoring:restconf-state/streams/stream=";
+        public static final String PATH_TO_STREAMS = "ietf-restconf-monitoring:restconf-state/streams";
 
         public static Date DATE = null;
         public static URI URI_MODULE = null;
@@ -250,10 +253,6 @@ public final class Draft18 {
 
         public static final String LEAF_LOCATION_ACCESS_NAME = "location";
         public static final QName LEAF_LOCATION_ACCESS_QNAME = QName.create(MODULE_QNAME, LEAF_LOCATION_ACCESS_NAME);
-
-        // TODO remove after implement ietf-restconf monitoring
-        public static final String STREAMS_CONTAINER_SCHEMA_NODE = "streams";
-        public static final String STREAM_LIST_SCHEMA_NODE = "stream";
 
         /**
          * Constants for capabilities
