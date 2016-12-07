@@ -13,6 +13,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.Futures;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +34,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
@@ -44,6 +46,8 @@ import org.opendaylight.restconf.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
+import org.opendaylight.restconf.parser.IdentifierCodec;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 
 public class RestconfStreamsSubscriptionServiceImplTest {
@@ -58,6 +62,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     private UriInfo uriInfo;
     @Mock
     private NotificationServiceHandler notificationServiceHandler;
+    @Mock
+    private TransactionChainHandler transactionHandler;
 
     private SchemaContextHandler schemaHandler;
 
@@ -67,9 +73,16 @@ public class RestconfStreamsSubscriptionServiceImplTest {
 
         final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
         final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);
+        Mockito.when(this.transactionHandler.get()).thenReturn(domTx);
         Mockito.when(txHandler.get()).thenReturn(domTx);
         final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
         Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
+        final DOMDataReadWriteTransaction rwTx = Mockito.mock(DOMDataReadWriteTransaction.class);
+        final CheckedFuture checkedFuture = Futures.immediateCheckedFuture(true);
+        Mockito.when(rwTx.exists(Mockito.any(), Mockito.any())).thenReturn(checkedFuture);
+        final CheckedFuture checkedFutureEmpty = Futures.immediateCheckedFuture("");
+        Mockito.when(rwTx.submit()).thenReturn(checkedFutureEmpty);
+        Mockito.when(domTx.newReadWriteTransaction()).thenReturn(rwTx);
         final CheckedFuture checked = Mockito.mock(CheckedFuture.class);
         Mockito.when(wTx.submit()).thenReturn(checked);
         final Object valueObj = null;
@@ -109,12 +122,16 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     }
 
     @Test
-    public void testSubscribeToStream() {
+    public void testSubscribeToStream() throws Exception {
         final UriBuilder uriBuilder = UriBuilder.fromUri(uri);
+        final ListenerAdapter createListener = Notificator.createListener(
+                IdentifierCodec.deserialize("toaster:toaster/toasterStatus", this.schemaHandler.get()),
+                "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
+                NotificationOutputType.XML);
         doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
-                        this.schemaHandler);
+                        this.schemaHandler, this.transactionHandler);
         final NormalizedNodeContext response = streamsSubscriptionService
                 .subscribeToStream(
                         "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
@@ -130,7 +147,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
-                        this.schemaHandler);
+                        this.schemaHandler, this.transactionHandler);
         streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/scope=ONE", this.uriInfo);
     }
 
@@ -140,7 +157,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
-                        this.schemaHandler);
+                        this.schemaHandler, this.transactionHandler);
         streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/datastore=OPERATIONAL",
                 this.uriInfo);
     }

@@ -42,10 +42,17 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import org.json.JSONObject;
+import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.restconf.Draft18.MonitoringModule;
+import org.opendaylight.restconf.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.handlers.TransactionChainHandler;
+import org.opendaylight.restconf.parser.IdentifierCodec;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -92,6 +99,8 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
     private DOMNotification notification;
     private ListenerRegistration<DOMNotificationListener> registration;
     private Set<Channel> subscribers = new ConcurrentSet<>();
+    private TransactionChainHandler transactionChainHandler;
+    private SchemaContextHandler schemaHandler;
 
     /**
      * Set path of listener and stream name, register event bus.
@@ -229,9 +238,20 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
     }
 
     /**
-     * Reset lists, close registration and unregister bus event.
+     * Reset lists, close registration and unregister bus event and delete data in DS.
      */
     public void close() {
+        final DOMDataWriteTransaction wTx = this.transactionChainHandler.get().newWriteOnlyTransaction();
+        wTx.delete(LogicalDatastoreType.OPERATIONAL,
+                IdentifierCodec.deserialize(
+                        MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + this.path.getLastComponent().getLocalName(),
+                        this.schemaHandler.get()));
+        try {
+            wTx.submit().checkedGet();
+        } catch (final TransactionCommitFailedException e) {
+            throw new RestconfDocumentedException("Problem while deleting data from DS.", e);
+        }
+
         this.subscribers = new ConcurrentSet<>();
         this.registration.close();
         this.registration = null;
@@ -511,5 +531,31 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
         this.start = start;
         this.stop = stop;
         this.filter = filter;
+    }
+
+    /**
+     * Get outputType of listenere
+     *
+     * @return the outputType
+     */
+    public String getOutputType() {
+        return this.outputType;
+    }
+
+    /**
+     * Transaction chain for delete data in DS on close()
+     *
+     * @param transactionChainHandler
+     *            - creating new write transaction for delete data on close
+     * @param schemaHandler
+     *            - for getting schema to deserialize
+     *            {@link MonitoringModule#PATH_TO_STREAM_WITHOUT_KEY} to
+     *            {@link YangInstanceIdentifier}
+     */
+    public void setCloseVars(final TransactionChainHandler transactionChainHandler,
+            final SchemaContextHandler schemaHandler) {
+        this.transactionChainHandler = transactionChainHandler;
+        this.schemaHandler = schemaHandler;
+
     }
 }

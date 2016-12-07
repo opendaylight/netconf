@@ -8,16 +8,12 @@
 package org.opendaylight.restconf.restful.utils;
 
 /**
- * Common util class for stream
- * <ul>
- * <li>{@link SubscribeToStreamUtil}
- * <li>{@link CreateStreamUtil}
- * </ul>
+ * Common util class for resolve enum from String
  *
  */
-public final class StreamUtil {
+public final class ResolveEnumUtil {
 
-    private StreamUtil() {
+    private ResolveEnumUtil() {
         throw new UnsupportedOperationException("Util class");
     }
 
