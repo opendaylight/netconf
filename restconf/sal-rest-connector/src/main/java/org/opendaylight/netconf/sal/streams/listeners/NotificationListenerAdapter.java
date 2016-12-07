@@ -19,7 +19,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
@@ -40,11 +42,17 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import org.json.JSONObject;
-import org.json.XML;
+import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.restconf.Draft18.MonitoringModule;
+import org.opendaylight.restconf.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.handlers.TransactionChainHandler;
+import org.opendaylight.restconf.parser.IdentifierCodec;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -53,6 +61,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
+import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
+import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlDocumentUtils;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -75,8 +86,6 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
     private static final TransformerFactory FACTORY = TransformerFactory.newInstance();
 
     private final String streamName;
-    private ListenerRegistration<DOMNotificationListener> registration;
-    private Set<Channel> subscribers = new ConcurrentSet<>();
     private final EventBus eventBus;
     private final EventBusChangeRecorder eventBusChangeRecorder;
 
@@ -85,6 +94,13 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
     private Date start = null;
     private Date stop = null;
     private String filter;
+
+    private SchemaContext schemaContext;
+    private DOMNotification notification;
+    private ListenerRegistration<DOMNotificationListener> registration;
+    private Set<Channel> subscribers = new ConcurrentSet<>();
+    private TransactionChainHandler transactionChainHandler;
+    private SchemaContextHandler schemaHandler;
 
     /**
      * Set path of listener and stream name, register event bus.
@@ -109,10 +125,12 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
 
     @Override
     public void onNotification(final DOMNotification notification) {
+        this.schemaContext = ControllerContext.getInstance().getGlobalSchema();
+        this.notification = notification;
         final Date now = new Date();
         if (this.stop != null) {
             if ((this.start.compareTo(now) < 0) && (this.stop.compareTo(now) > 0)) {
-                checkFilter(notification);
+                checkFilter();
             }
             if (this.stop.compareTo(now) < 0) {
                 try {
@@ -124,21 +142,19 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
         } else if (this.start != null) {
             if (this.start.compareTo(now) < 0) {
                 this.start = null;
-                checkFilter(notification);
+                checkFilter();
             }
         } else {
-            checkFilter(notification);
+            checkFilter();
         }
     }
 
     /**
      * Check if is filter used and then prepare and post data do client
      *
-     * @param notification
-     *            - data of notification
      */
-    private void checkFilter(final DOMNotification notification) {
-        final String xml = prepareXmlFrom(notification);
+    private void checkFilter() {
+        final String xml = prepareXml();
         if (this.filter == null) {
             prepareAndPostData(xml);
         } else {
@@ -177,12 +193,38 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
     private void prepareAndPostData(final String xml) {
         final Event event = new Event(EventType.NOTIFY);
         if (this.outputType.equals("JSON")) {
-            final JSONObject jsonObject = XML.toJSONObject(xml);
-            event.setData(jsonObject.toString());
+            event.setData(prepareJson());
         } else {
             event.setData(xml);
         }
         this.eventBus.post(event);
+    }
+
+    /**
+     * Prepare json from notification data
+     *
+     * @return json as {@link String}
+     */
+    private String prepareJson() {
+        final JSONObject json = new JSONObject();
+        json.put("ietf-restconf:notification",
+                new JSONObject(writeBodyToString()).put("event-time", ListenerAdapter.toRFC3339(new Date())));
+        return json.toString();
+    }
+
+    private String writeBodyToString() {
+        final Writer writer = new StringWriter();
+        final NormalizedNodeStreamWriter jsonStream =
+                JSONNormalizedNodeStreamWriter.createExclusiveWriter(JSONCodecFactory.create(this.schemaContext),
+                        this.notification.getType(), null, JsonWriterFactory.createJsonWriter(writer));
+        final NormalizedNodeWriter nodeWriter = NormalizedNodeWriter.forStreamWriter(jsonStream);
+        try {
+            nodeWriter.write(this.notification.getBody());
+            nodeWriter.close();
+        } catch (final IOException e) {
+            throw new RestconfDocumentedException("Problem while writing body of notification to JSON. ", e);
+        }
+        return writer.toString();
     }
 
     /**
@@ -196,9 +238,20 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
     }
 
     /**
-     * Reset lists, close registration and unregister bus event.
+     * Reset lists, close registration and unregister bus event and delete data in DS.
      */
     public void close() {
+        final DOMDataWriteTransaction wTx = this.transactionChainHandler.get().newWriteOnlyTransaction();
+        wTx.delete(LogicalDatastoreType.OPERATIONAL,
+                IdentifierCodec.deserialize(
+                        MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + this.path.getLastComponent().getLocalName(),
+                        this.schemaHandler.get()));
+        try {
+            wTx.submit().checkedGet();
+        } catch (final TransactionCommitFailedException e) {
+            throw new RestconfDocumentedException("Problem while deleting data from DS.", e);
+        }
+
         this.subscribers = new ConcurrentSet<>();
         this.registration.close();
         this.registration = null;
@@ -273,8 +326,7 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
         this.eventBus.post(event);
     }
 
-    private String prepareXmlFrom(final DOMNotification notification) {
-        final SchemaContext schemaContext = ControllerContext.getInstance().getGlobalSchema();
+    private String prepareXml() {
         final Document doc = ListenerAdapter.createDocument();
         final Element notificationElement =
                 doc.createElementNS("urn:ietf:params:xml:ns:netconf:notification:1.0",
@@ -284,10 +336,10 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
         final Element eventTimeElement = doc.createElement("eventTime");
         eventTimeElement.setTextContent(ListenerAdapter.toRFC3339(new Date()));
         notificationElement.appendChild(eventTimeElement);
-        final String notificationNamespace = notification.getType().getLastComponent().getNamespace().toString();
+
         final Element notificationEventElement = doc.createElementNS(
-                notificationNamespace, "event");
-        addValuesToNotificationEventElement(doc, notificationEventElement, notification, schemaContext);
+                "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "create-notification-stream");
+        addValuesToNotificationEventElement(doc, notificationEventElement, this.notification, this.schemaContext);
         notificationElement.appendChild(notificationEventElement);
 
         try {
@@ -320,7 +372,9 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
             final DOMResult domResult = writeNormalizedNode(body,
                     YangInstanceIdentifier.create(body.getIdentifier()), schemaContext);
             final Node result = doc.importNode(domResult.getNode().getFirstChild(), true);
-            element.appendChild(result);
+            final Element dataElement = doc.createElement("notification");
+            dataElement.appendChild(result);
+            element.appendChild(dataElement);
         } catch (final IOException e) {
             LOG.error("Error in writer ", e);
         } catch (final XMLStreamException e) {
@@ -477,5 +531,31 @@ public class NotificationListenerAdapter implements DOMNotificationListener {
         this.start = start;
         this.stop = stop;
         this.filter = filter;
+    }
+
+    /**
+     * Get outputType of listenere
+     *
+     * @return the outputType
+     */
+    public String getOutputType() {
+        return this.outputType;
+    }
+
+    /**
+     * Transaction chain to delete data in DS on close()
+     *
+     * @param transactionChainHandler
+     *            - creating new write transaction to delete data on close
+     * @param schemaHandler
+     *            - for getting schema to deserialize
+     *            {@link MonitoringModule#PATH_TO_STREAM_WITHOUT_KEY} to
+     *            {@link YangInstanceIdentifier}
+     */
+    public void setCloseVars(final TransactionChainHandler transactionChainHandler,
+            final SchemaContextHandler schemaHandler) {
+        this.transactionChainHandler = transactionChainHandler;
+        this.schemaHandler = schemaHandler;
+
     }
 }
