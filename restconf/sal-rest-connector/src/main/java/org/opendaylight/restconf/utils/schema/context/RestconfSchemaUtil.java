@@ -7,17 +7,11 @@
  */
 package org.opendaylight.restconf.utils.schema.context;
 
-import com.google.common.base.Preconditions;
 import java.util.Collection;
-import java.util.Set;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
-import org.opendaylight.restconf.Draft18;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.GroupingDefinition;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 /**
@@ -28,73 +22,6 @@ public final class RestconfSchemaUtil {
 
     private RestconfSchemaUtil() {
         throw new UnsupportedOperationException("Util class");
-    }
-
-    /**
-     * Get {@link DataSchemaNode} from {@link Module} Restconf module by
-     * {@link String} schema node name.
-     *
-     * @param restconfModule
-     *            - restconf module
-     * @param schemaNodeName
-     *            - schema node name
-     * @return {@link DataSchemaNode}
-     */
-    public static DataSchemaNode getRestconfSchemaNode(final Module restconfModule, final String schemaNodeName) {
-
-        final Set<GroupingDefinition> groupings = restconfModule.getGroupings();
-        final GroupingDefinition restGroup = findSchemaNodeInCollection(groupings,
-                Draft18.RestconfModule.RESTCONF_GROUPING_SCHEMA_NODE);
-        final Collection<DataSchemaNode> childNodes = restGroup.getChildNodes();
-        final DataSchemaNode restCont = childNodes.iterator().next();
-
-        return findSchemaNode(restCont, schemaNodeName);
-    }
-
-    /**
-     * Find specific {@link DataSchemaNode} child in {@link DataNodeContainer}
-     * by {@link String} schema node name.
-     *
-     * @param restCont
-     *            - restconf container
-     * @param schemaNodeName
-     *            - schema node name
-     * @return {@link DataSchemaNode}
-     */
-    private static DataSchemaNode findSchemaNode(final DataSchemaNode restCont, final String schemaNodeName) {
-        switch (schemaNodeName) {
-            //MODULES
-            case Draft18.RestconfModule.MODULE_LIST_SCHEMA_NODE:
-                final DataSchemaNode moduleListSchNode = findSchemaNodeInCollection(
-                        ((DataNodeContainer) findSchemaNode(restCont,
-                                Draft18.RestconfModule.MODULES_CONTAINER_SCHEMA_NODE)).getChildNodes(),
-                        Draft18.RestconfModule.MODULE_LIST_SCHEMA_NODE);
-                Preconditions.checkNotNull(moduleListSchNode);
-                return moduleListSchNode;
-            case Draft18.RestconfModule.MODULES_CONTAINER_SCHEMA_NODE:
-                final DataSchemaNode modulesContSchNode = findSchemaNodeInCollection(((DataNodeContainer) restCont).getChildNodes(),
-                        Draft18.RestconfModule.MODULES_CONTAINER_SCHEMA_NODE);
-                Preconditions.checkNotNull(modulesContSchNode);
-                return modulesContSchNode;
-
-            //STREAMS
-            case Draft18.MonitoringModule.STREAM_LIST_SCHEMA_NODE:
-                final DataSchemaNode streamListSchNode = findSchemaNodeInCollection(
-                        ((DataNodeContainer) findSchemaNode(restCont,
-                                Draft18.MonitoringModule.STREAMS_CONTAINER_SCHEMA_NODE)).getChildNodes(),
-                        Draft18.MonitoringModule.STREAM_LIST_SCHEMA_NODE);
-                Preconditions.checkNotNull(streamListSchNode);
-                return streamListSchNode;
-            case Draft18.MonitoringModule.STREAMS_CONTAINER_SCHEMA_NODE:
-                final DataSchemaNode streamsContSchNode = findSchemaNodeInCollection(
-                        ((DataNodeContainer) restCont).getChildNodes(),
-                        Draft18.MonitoringModule.STREAMS_CONTAINER_SCHEMA_NODE);
-                Preconditions.checkNotNull(streamsContSchNode);
-                return streamsContSchNode;
-            default:
-                throw new RestconfDocumentedException("Schema node " + schemaNodeName + " does not exist in module.",
-                        ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
-        }
     }
 
     /**
