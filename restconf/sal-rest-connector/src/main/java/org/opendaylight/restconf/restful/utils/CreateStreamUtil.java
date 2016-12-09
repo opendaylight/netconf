@@ -102,20 +102,23 @@ public final class CreateStreamUtil {
         final ContainerNode data = (ContainerNode) payload.getData();
         final QName qname = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
         final YangInstanceIdentifier path = preparePath(data, qname);
-        final String streamName = prepareDataChangeNotifiStreamName(path, refSchemaCtx.get(), data);
+        String streamName = prepareDataChangeNotifiStreamName(path, refSchemaCtx.get(), data);
 
         final QName outputQname = QName.create(qname, "output");
         final QName streamNameQname = QName.create(qname, "stream-name");
 
-        final ContainerNode output = ImmutableContainerNodeBuilder.create()
-                .withNodeIdentifier(new NodeIdentifier(outputQname))
-                .withChild(ImmutableNodes.leafNode(streamNameQname, streamName)).build();
         final NotificationOutputType outputType = prepareOutputType(data);
+        if(outputType.equals(NotificationOutputType.JSON)){
+            streamName = streamName + "/JSON";
+        }
 
         if (!Notificator.existListenerFor(streamName)) {
             Notificator.createListener(path, streamName, outputType);
         }
 
+        final ContainerNode output =
+                ImmutableContainerNodeBuilder.create().withNodeIdentifier(new NodeIdentifier(outputQname))
+                        .withChild(ImmutableNodes.leafNode(streamNameQname, streamName)).build();
         return new DefaultDOMRpcResult(output);
     }
 
@@ -229,7 +232,9 @@ public final class CreateStreamUtil {
                 streamName = streamName + ",";
             }
         }
-
+        if (outputType.equals("JSON")) {
+            streamName = streamName + "/JSON";
+        }
         final QName rpcQName = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
         final QName outputQname = QName.create(rpcQName, "output");
         final QName streamNameQname = QName.create(rpcQName, "notification-stream-identifier");

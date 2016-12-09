@@ -132,24 +132,14 @@ public class Notificator {
     }
 
     /**
-     * Checks if listener has at least one subscriber. In case it doesn't have any, delete listener.
-     *
-     * @param listener
-     *            ListenerAdapter
-     */
-    public static void removeListenerIfNoSubscriberExists(final ListenerAdapter listener) {
-        if (!listener.hasSubscribers()) {
-            deleteListener(listener);
-        }
-    }
-
-    /**
      * Delete {@link ListenerAdapter} listener specified in parameter.
      *
+     * @param <T>
+     *
      * @param listener
      *            ListenerAdapter
      */
-    private static void deleteListener(final ListenerAdapter listener) {
+    private static <T extends BaseListenerInterface> void deleteListener(final T listener) {
         if (listener != null) {
             try {
                 listener.close();
@@ -203,13 +193,17 @@ public class Notificator {
         return listListeners;
     }
 
-    public static void removeNotificationListenerIfNoSubscriberExists(final NotificationListenerAdapter listener) {
+    public static <T extends BaseListenerInterface> void removeListenerIfNoSubscriberExists(final T listener) {
         if (!listener.hasSubscribers()) {
-            deleteNotificationListener(listener);
+            if (listener instanceof NotificationListenerAdapter) {
+                deleteNotificationListener(listener);
+            } else {
+                deleteListener(listener);
+            }
         }
     }
 
-    private static void deleteNotificationListener(final NotificationListenerAdapter listener) {
+    private static <T extends BaseListenerInterface> void deleteNotificationListener(final T listener) {
         if (listener != null) {
             try {
                 listener.close();
