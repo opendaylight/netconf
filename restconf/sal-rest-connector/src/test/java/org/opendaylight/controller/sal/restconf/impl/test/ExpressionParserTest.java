@@ -10,6 +10,7 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import org.junit.Assert;
@@ -20,7 +21,10 @@ import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 
 public class ExpressionParserTest {
 
@@ -126,12 +130,25 @@ public class ExpressionParserTest {
             }
         }
         final YangInstanceIdentifier path = Mockito.mock(YangInstanceIdentifier.class);
+        final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-14-12", "localName"));
+        Mockito.when(path.getLastPathArgument()).thenReturn(pathValue);
         final ListenerAdapter listener = Notificator.createListener(path, "streamName", NotificationOutputType.JSON);
         listener.setQueryParams(null, null, filter);
-        final Method m = listener.getClass().getDeclaredMethod("parseFilterParam", String.class);
+        final Class<?> superclass = listener.getClass().getSuperclass().getSuperclass();
+        Method m = null;
+        for (final Method method : superclass.getDeclaredMethods()) {
+            if (method.getName().equals("parseFilterParam")) {
+                m = method;
+            }
+        }
+        if (m == null) {
+            throw new Exception("Methode parseFilterParam doesn't exist in " + superclass.getName());
+        }
         m.setAccessible(true);
-
-        return (boolean) m.invoke(listener, readFile(xml));
+        final Field xmlField = superclass.getDeclaredField("xml");
+        xmlField.setAccessible(true);
+        xmlField.set(listener, readFile(xml));
+        return (boolean) m.invoke(listener, null);
     }
 
     private String readFile(final File xml) throws Exception {

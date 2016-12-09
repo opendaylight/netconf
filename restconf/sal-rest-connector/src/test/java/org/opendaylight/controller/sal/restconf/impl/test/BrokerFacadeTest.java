@@ -366,7 +366,7 @@ public class BrokerFacadeTest {
         listener.setCloseVars(transactionChainHandler, schemaHandler);
         // close and remove test notification listener
         listener.close();
-        Notificator.removeNotificationListenerIfNoSubscriberExists(listener);
+        Notificator.removeListenerIfNoSubscriberExists(listener);
     }
 
     /**
