@@ -104,6 +104,7 @@ public class ListenerAdapter implements DOMDataChangeListener {
     private String filter = null;
     private TransactionChainHandler transactionChainHandler;
     private SchemaContextHandler schemaHandler;
+    private final boolean supportBothTypes = false;
 
     /**
      * Creates new {@link ListenerAdapter} listener specified by path and stream
@@ -612,7 +613,8 @@ public class ListenerAdapter implements DOMDataChangeListener {
     /**
      * Sets {@link ListenerRegistration} registration.
      *
-     * @param registration DOMDataChangeListener registration
+     * @param registration
+     *            DOMDataChangeListener registration
      */
     public void setRegistration(final ListenerRegistration<DOMDataChangeListener> registration) {
         this.registration = registration;
@@ -691,20 +693,6 @@ public class ListenerAdapter implements DOMDataChangeListener {
     }
 
     /**
-     * Consists of two types {@link Store#CONFIG} and {@link Store#OPERATION}.
-     */
-    private static enum Store {
-        CONFIG("config"),
-        OPERATION("operation");
-
-        private final String value;
-
-        private Store(final String value) {
-            this.value = value;
-        }
-    }
-
-    /**
      * Consists of three types {@link Operation#CREATED}, {@link Operation#UPDATED} and {@link Operation#DELETED}.
      */
     private static enum Operation {
@@ -759,5 +747,4 @@ public class ListenerAdapter implements DOMDataChangeListener {
         this.transactionChainHandler = transactionChainHandler;
         this.schemaHandler = schemaHandler;
     }
-
 }
