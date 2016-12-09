@@ -36,7 +36,10 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 public class RestconfImplNotificationSubscribingTest {
@@ -61,6 +64,8 @@ public class RestconfImplNotificationSubscribingTest {
         ControllerContext.getInstance().setGlobalSchema(TestRestconfUtils.loadSchemaContext("/notifications"));
 
         final YangInstanceIdentifier path = Mockito.mock(YangInstanceIdentifier.class);
+        final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-14-12", "localName"));
+        Mockito.when(path.getLastPathArgument()).thenReturn(pathValue);
         Notificator.createListener(path, this.identifier, NotificationOutputType.XML);
     }
 
@@ -215,6 +220,8 @@ public class RestconfImplNotificationSubscribingTest {
     @Test
     public void onNotifiTest() throws Exception {
         final YangInstanceIdentifier path = Mockito.mock(YangInstanceIdentifier.class);
+        final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-14-12", "localName"));
+        Mockito.when(path.getLastPathArgument()).thenReturn(pathValue);
         final ListenerAdapter listener = Notificator.createListener(path, this.identifier, NotificationOutputType.XML);
 
         final List<Entry<String, List<String>>> list = new ArrayList<>();
@@ -229,13 +236,14 @@ public class RestconfImplNotificationSubscribingTest {
 
         final AsyncDataChangeEvent<YangInstanceIdentifier, NormalizedNode<?, ?>> change =
                 Mockito.mock(AsyncDataChangeEvent.class);
-        Field start = listener.getClass().getDeclaredField("start");
+        final Class<?> superclass = listener.getClass().getSuperclass().getSuperclass();
+        Field start = superclass.getDeclaredField("start");
         start.setAccessible(true);
         Date startOrig = (Date) start.get(listener);
         Assert.assertNotNull(startOrig);
         listener.onDataChanged(change);
 
-        start = listener.getClass().getDeclaredField("start");
+        start = superclass.getDeclaredField("start");
         start.setAccessible(true);
         startOrig = (Date) start.get(listener);
         Assert.assertNull(startOrig);
