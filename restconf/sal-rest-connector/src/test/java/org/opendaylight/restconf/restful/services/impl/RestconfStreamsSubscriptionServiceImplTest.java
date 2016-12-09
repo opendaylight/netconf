@@ -104,7 +104,6 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     public static void setUpBeforeTest() throws Exception {
         final Map<String, ListenerAdapter> listenersByStreamNameSetter = new HashMap<>();
         final ListenerAdapter adapter = mock(ListenerAdapter.class);
-        doReturn(false).when(adapter).isListening();
         listenersByStreamNameSetter.put(
                 "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
                 adapter);
