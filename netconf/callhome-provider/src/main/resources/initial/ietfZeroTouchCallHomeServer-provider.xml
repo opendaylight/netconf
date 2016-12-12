@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- vi: set et smarttab sw=4 tabstop=4: -->
+<snapshot>
+    <configuration>
+        <data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+            <modules xmlns="urn:opendaylight:params:xml:ns:yang:controller:config">
+                <module>
+                
+                    <!-- This xmlns:prefix should match the namespace in the *-provider-impl.yang file
+                         The prefix: inside type should match the prefix of the yang file. -->
+                    <type xmlns:prefix="urn:opendaylight:netconf:callhome:provider:impl:cfg">
+                        prefix:netconf-callhome-topology-impl
+                    </type>
+                    <name>call-home-topology</name>
+
+                   <event-executor xmlns="urn:opendaylight:netconf:callhome:provider:impl:cfg">
+                        <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netty">prefix:netty-event-executor</type>
+                        <name>global-event-executor</name>
+                    </event-executor>
+                    <binding-registry xmlns="urn:opendaylight:netconf:callhome:provider:impl:cfg">
+                        <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding">prefix:binding-broker-osgi-registry</type>
+                        <name>binding-osgi-broker</name>
+                    </binding-registry>
+                    <dom-registry xmlns="urn:opendaylight:netconf:callhome:provider:impl:cfg">
+                        <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:md:sal:dom">prefix:dom-broker-osgi-registry</type>
+                        <name>dom-broker</name>
+                    </dom-registry>
+                    <client-dispatcher xmlns="urn:opendaylight:netconf:callhome:provider:impl:cfg">
+                        <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:config:netconf">prefix:netconf-client-dispatcher</type>
+                        <name>global-netconf-dispatcher</name>
+                    </client-dispatcher>
+                    <processing-executor xmlns="urn:opendaylight:netconf:callhome:provider:impl:cfg">
+                        <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:threadpool">prefix:threadpool</type>
+                        <name>global-netconf-processing-executor</name>
+                    </processing-executor>
+                    <keepalive-executor xmlns="urn:opendaylight:netconf:callhome:provider:impl:cfg">
+                        <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:threadpool">prefix:scheduled-threadpool</type>
+                        <name>global-netconf-ssh-scheduled-executor</name>
+                    </keepalive-executor>
+                    <shared-schema-repository xmlns="urn:opendaylight:netconf:callhome:provider:impl:cfg">
+                        <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:topology:shared:schema:repository">prefix:shared-schema-repository</type>
+                        <name>default-shared-schema-repository</name>
+                    </shared-schema-repository>
+                </module>
+
+            </modules>
+        </data>
+
+    </configuration>
+
+    <!--  Required capabilities are basically a listing of all modules that need to be imported before
+          our service can be resolved. Capabilities for dependencies defined above are implied which is
+          why we do not have define a required capability for the data broker, for example. -->
+    <required-capabilities>
+        <capability>urn:opendaylight:netconf:callhome:provider:impl:cfg?module=odl-netconf-callhome-provider-cfg&amp;revision=2016-11-09</capability>
+    </required-capabilities>
+
+</snapshot>
