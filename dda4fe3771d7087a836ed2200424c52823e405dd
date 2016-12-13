@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a622d24_61e46f0d",
+        "filename": "netconf/callhome-model/src/main/yang/ietf-zerotouch-callhome-server.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-12-13T17:44:37Z",
+      "side": 1,
+      "message": "what is the license? Given this is incoming code, I think this should be EPL licensed...",
+      "range": {
+        "startLine": 27,
+        "startChar": 4,
+        "endLine": 27,
+        "endChar": 78
+      },
+      "revId": "dda4fe3771d7087a836ed2200424c52823e405dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
