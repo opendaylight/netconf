@@ -22,6 +22,29 @@
       "revId": "dda4fe3771d7087a836ed2200424c52823e405dd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_81e70b12",
+        "filename": "netconf/callhome-model/src/main/yang/ietf-zerotouch-callhome-server.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2016-12-13T17:45:24Z",
+      "side": 1,
+      "message": "This will all be stored in plain text?",
+      "range": {
+        "startLine": 41,
+        "startChar": 6,
+        "endLine": 54,
+        "endChar": 7
+      },
+      "revId": "dda4fe3771d7087a836ed2200424c52823e405dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
