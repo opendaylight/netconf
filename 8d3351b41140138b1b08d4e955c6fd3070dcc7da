@@ -1,0 +1,808 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a622d24_e4836302",
+        "filename": "features/netconf-connector/src/main/features/features.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "that would mean we can\u0027t use call home in a cluster? (yet I presume)",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 14
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_c4862713",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/AuthorizedKeysDecoder.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "could this be provided by AAA. Basically create an API in AAA and its implementation. And register it in the OSGi registery so we can inject it in netconf callhome bundle through blueprint?\n\nI feel this is work that AAA folks could provide/maintain in the long run, rather than NETCONF team.",
+      "range": {
+        "startLine": 29,
+        "startChar": 13,
+        "endLine": 29,
+        "endChar": 34
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_6477533b",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorization.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "How about creating our own Exception, something like CallHomeAuthorizationException, and provide session details.",
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_4472174a",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorization.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "Is it possible to define in which context this can occur?",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 34
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_c4b467d3",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorization.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "the methods provided by the builder starts with add*** I think it is more common to have builder\u0027s method starts with set***",
+      "range": {
+        "startLine": 84,
+        "startChar": 24,
+        "endLine": 84,
+        "endChar": 31
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_44a9777a",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorization.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "Please import this to avoid FQCN. Same apply elsewhere.",
+      "range": {
+        "startLine": 84,
+        "startChar": 43,
+        "endLine": 84,
+        "endChar": 79
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_e4e883b6",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorization.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "null check",
+      "range": {
+        "startLine": 132,
+        "startChar": 0,
+        "endLine": 133,
+        "endChar": 47
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_04c65f49",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorization.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "fix formatting: add brackets and spaces in the if statement",
+      "range": {
+        "startLine": 147,
+        "startChar": 0,
+        "endLine": 151,
+        "endChar": 54
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_64dc7313",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorizationProvider.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "kill space",
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_24d27b00",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorizationProvider.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "redundant modifier",
+      "range": {
+        "startLine": 33,
+        "startChar": 4,
+        "endLine": 33,
+        "endChar": 10
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_44ee97b5",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "Preconditions.checkNotNull",
+      "range": {
+        "startLine": 53,
+        "startChar": 23,
+        "endLine": 53,
+        "endChar": 31
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_e436c351",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "this.sshSession to avoid using the parameter",
+      "range": {
+        "startLine": 56,
+        "startChar": 8,
+        "endLine": 56,
+        "endChar": 18
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_a4132bb7",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "What does this mean? Should this be configurable",
+      "range": {
+        "startLine": 107,
+        "startChar": 84,
+        "endLine": 107,
+        "endChar": 87
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_47733915",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "It is preferable to use EventExecutor.newPromise() to create a new promise",
+      "range": {
+        "startLine": 120,
+        "startChar": 15,
+        "endLine": 120,
+        "endChar": 65
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_a7616d3b",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "Maybe this could be added to CallHomeProtocolSessionContext",
+      "range": {
+        "startLine": 128,
+        "startChar": 18,
+        "endLine": 128,
+        "endChar": 34
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_e75b6585",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "Why using this Factory pattern?\n\nHow about having the CallHomeSessionContext.create(ClientSession sshSession, CallHomeAuthorization authorization,SocketAddress remoteAddress) method as a public static method of CallHomeSessionContext, and have a private constructor in CallHomeSessionContext\n\nI believe this approach would remove some boilerplate that exist in this class, but also in some other class.",
+      "range": {
+        "startLine": 138,
+        "startChar": 17,
+        "endLine": 138,
+        "endChar": 24
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_8764314a",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "what is this for? please remove",
+      "range": {
+        "startLine": 146,
+        "startChar": 12,
+        "endLine": 146,
+        "endChar": 20
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_27039d43",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "Why not reuse the AsyncSshHandler class existing that is already acting as interface between mina and netty? Something in those lines: https://git.opendaylight.org/gerrit/#/c/48093/9/netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/CallHomeAsyncSshHandler.java\n\nIt adds less useless boilerplate this is there only to satisfy AbstractServerChannel",
+      "range": {
+        "startLine": 30,
+        "startChar": 13,
+        "endLine": 30,
+        "endChar": 32
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_c75e2976",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "space",
+      "range": {
+        "startLine": 38,
+        "startChar": 40,
+        "endLine": 38,
+        "endChar": 41
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_27555d50",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "kill those lines please",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 0
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_a7c84d23",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "isOpen",
+      "range": {
+        "startLine": 69,
+        "startChar": 20,
+        "endLine": 69,
+        "endChar": 30
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_e7e9a581",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "to know whether the channel is open, you need to keep the OpenFuture given when you open() the channel in CallHomeSessionContext#newSshFutureListener()",
+      "range": {
+        "startLine": 76,
+        "startChar": 15,
+        "endLine": 76,
+        "endChar": 35
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_c7ec6992",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "I guess you can say the channel is active after having started the reader and writer. And you can set it as inactive as soon as one of the two is firing issue",
+      "range": {
+        "startLine": 81,
+        "startChar": 15,
+        "endLine": 81,
+        "endChar": 35
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_87f2716d",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "I think those two methods are about the channel, not the session.",
+      "range": {
+        "startLine": 74,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 5
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_47e17999",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "I think you should call doClose() here",
+      "range": {
+        "startLine": 120,
+        "startChar": 0,
+        "endLine": 121,
+        "endChar": 29
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_07d781c0",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "why closing it twice?",
+      "range": {
+        "startLine": 128,
+        "startChar": 12,
+        "endLine": 128,
+        "endChar": 35
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_a7efad86",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "I think you should call doDisconnect() here to release the resources.",
+      "range": {
+        "startLine": 159,
+        "startChar": 12,
+        "endLine": 159,
+        "endChar": 19
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_47f85949",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "final",
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_07fe6138",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "newAuthFutureListener would make more sense.",
+      "range": {
+        "startLine": 118,
+        "startChar": 34,
+        "endLine": 118,
+        "endChar": 54
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_67fd953a",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "why we don\u0027t do anything here? Can you add comments? I believe #verifyServerKey will get call as callback, is that accurate?",
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_e7a08545",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "could be useful to provide session information in the log.",
+      "range": {
+        "startLine": 141,
+        "startChar": 20,
+        "endLine": 141,
+        "endChar": 25
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_a7968dee",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "unbind?\nAlso check not null before calling the method.",
+      "range": {
+        "startLine": 177,
+        "startChar": 8,
+        "endLine": 177,
+        "endChar": 16
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_c7a3c94d",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServerBuilder.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "please make those configurable through a config file, editable, through blueprint",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 59
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_278a7dbf",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServerBuilder.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "How about having this as a static public class and have the constructor private. Then this could be moved in NetconfCallHomeServer to avoid useless boilerplate",
+      "range": {
+        "startLine": 54,
+        "startChar": 4,
+        "endLine": 54,
+        "endChar": 40
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_0785c1ac",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/ReverseSshChannelInitializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "Please get rid of this Factory pattern in favor of static public method to instantiate the class, with a private constructor. This would be more elegant.",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 5
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_679475e2",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/SingleListenerChannelActivator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-15T21:26:05Z",
+      "side": 1,
+      "message": "What do you mean by Single? I think ChannelActivatorListener could be OK.",
+      "range": {
+        "startLine": 14,
+        "startChar": 6,
+        "endLine": 14,
+        "endChar": 36
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
