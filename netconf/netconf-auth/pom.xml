@@ -12,13 +12,13 @@
     <parent>
         <groupId>org.opendaylight.controller</groupId>
         <artifactId>config-parent</artifactId>
-        <version>0.5.2-SNAPSHOT</version>
+        <version>0.5.2-Boron-SR2</version>
         <relativePath/>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-auth</artifactId>
-    <version>1.1.2-SNAPSHOT</version>
+    <version>1.1.2-Boron-SR2</version>
     <name>${project.artifactId}</name>
     <packaging>bundle</packaging>
 </project>
