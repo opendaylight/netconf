@@ -1,0 +1,60 @@
+module odl-netconf-callhome-server {
+
+  namespace
+    "urn:opendaylight:params:xml:ns:yang:netconf-callhome-server";
+  prefix "ztcs";
+
+  organization
+   "OpenDaylight Project";
+
+  contact
+   "netconf-dev@lists.opendaylight.org";
+
+  description
+   "This module defines the northbound interface for OpenDaylight NETCONF Callhome.";
+
+  revision "2016-11-09" {
+    description
+     "Initial version";
+  }
+
+  container admin {
+    config true;
+    description "Settings for call home server administration";
+
+    container all-devices-credentials {
+      description "These are the shared credentials that are used in negotiating an SSH session to support NetConf call home";
+
+      leaf username {
+        description "The shared user name";
+        type string {
+          length "1..max";
+        }
+        mandatory true;
+      }
+      leaf password {
+        description "The shared password";
+        type string {
+          length "1..max";
+        }
+        mandatory true;
+      }
+    }
+  }
+
+  container devices {
+    config true;
+    description
+      "A list of device entries";
+        list device {
+          key unique-id;
+          leaf unique-id {
+            type string;
+          }
+          leaf ssh-host-key {
+            type string;
+          }
+        }
+  }
+}
+
