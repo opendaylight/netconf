@@ -3,6 +3,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "1a622d24_38973892",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/AuthorizedKeysDecoder.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-12-16T13:16:09Z",
+      "side": 1,
+      "message": "I think this should be provided in AAA, along with an exposed service that NETCONF could leverage.",
+      "range": {
+        "startLine": 25,
+        "startChar": 13,
+        "endLine": 25,
+        "endChar": 34
+      },
+      "revId": "d3c7ada613bb74ccec35d7770af45c8553c844bf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_6bdef012",
         "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/AuthorizedKeysDecoder.java",
         "patchSetId": 7
