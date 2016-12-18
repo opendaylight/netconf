@@ -101,9 +101,9 @@ public class CreateStreamUtilTest {
 
         assertTrue(lfSchemaNode instanceof LeafSchemaNode);
 
-        final QName rpcQname = QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", toasterValue);
         final Object o;
         if ("toaster".equals(toasterValue)) {
+            final QName rpcQname = QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", toasterValue);
             o = YangInstanceIdentifier.builder().node(rpcQname).build();
         } else {
             o = toasterValue;
