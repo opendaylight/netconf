@@ -357,7 +357,7 @@ public class NetconfDeviceTest {
                 Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
         Map<QName, AvailableCapability.CapabilityOrigin> moduleBasedCaps = new HashMap<>();
         moduleBasedCaps.putAll(sessionCaps.getModuleBasedCapsOrigin());
-        moduleBasedCaps.put(QName.create("test:qname:side:loading"), AvailableCapability.CapabilityOrigin.UserDefined);
+        moduleBasedCaps.put(QName.create("(test:qname:side:loading)test"), AvailableCapability.CapabilityOrigin.UserDefined);
 
         netconfSpy.onRemoteSessionUp(sessionCaps.replaceModuleCaps(moduleBasedCaps), listener);
 

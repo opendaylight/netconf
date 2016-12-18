@@ -8,9 +8,9 @@
 package org.opendaylight.restconf.rest.services.impl;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
@@ -26,10 +26,8 @@ import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.rest.services.api.RestconfOperationsService;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -106,32 +104,35 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
      * @return {@link NormalizedNodeContext}
      */
     private static NormalizedNodeContext getOperations(final Set<Module> modules, final DOMMountPoint mountPoint) {
-        final ContainerSchemaNodeImpl fakeCont = new ContainerSchemaNodeImpl();
-        final List<LeafNode<Object>> listRpcNodes = new ArrayList<>();
-        for (final Module m : modules) {
-            for (final RpcDefinition rpc : m.getRpcs()) {
+        final Collection<Module> neededModules = new ArrayList<>(modules.size());
+        final ArrayList<LeafSchemaNode> fakeRpcSchema = new ArrayList<>();
 
-                final LeafSchemaNode fakeLeaf = new LeafSchemaNodeImpl(fakeCont.getPath(),
-                        QName.create(ModuleImpl.moduleQName, m.getName() + ":" + rpc.getQName().getLocalName()));
-                fakeCont.addNodeChild(fakeLeaf);
-                listRpcNodes.add(Builders.leafBuilder(fakeLeaf).build());
+        for (final Module m : modules) {
+            final Set<RpcDefinition> rpcs = m.getRpcs();
+            if (!rpcs.isEmpty()) {
+                neededModules.add(m);
+
+                fakeRpcSchema.ensureCapacity(fakeRpcSchema.size() + rpcs.size());
+                rpcs.forEach(rpc -> fakeRpcSchema.add(new FakeLeafSchemaNode(rpc.getQName())));
             }
         }
-        final ContainerSchemaNode fakeContSchNode = fakeCont;
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder = Builders
-                .containerBuilder(fakeContSchNode);
 
-        for (final LeafNode<Object> rpcNode : listRpcNodes) {
-            containerBuilder.withChild(rpcNode);
+        final ContainerSchemaNode fakeCont = new FakeContainerSchemaNode(fakeRpcSchema);
+        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder = Builders
+                .containerBuilder(fakeCont);
+
+        for (final LeafSchemaNode leaf : fakeRpcSchema) {
+            containerBuilder.withChild(Builders.leafBuilder(leaf).build());
         }
 
-        final Module fakeModule = new ModuleImpl(fakeContSchNode);
+        final Collection<Module> fakeModules = new ArrayList<>(neededModules.size() + 1);
+        neededModules.forEach(imp -> fakeModules.add(new FakeImportedModule(imp)));
+        fakeModules.add(new FakeRestconfModule(neededModules, fakeCont));
 
-        final Set<Module> fakeModules = new HashSet<>();
-        fakeModules.add(fakeModule);
-        final SchemaContext fakeSchemaCtx = EffectiveSchemaContext.resolveSchemaContext(fakeModules);
+        final SchemaContext fakeSchemaCtx = EffectiveSchemaContext.resolveSchemaContext(
+            ImmutableSet.copyOf(fakeModules));
         final InstanceIdentifierContext<ContainerSchemaNode> instanceIdentifierContext = new InstanceIdentifierContext<>(
-                null, fakeContSchNode, mountPoint, fakeSchemaCtx);
+                null, fakeCont, mountPoint, fakeSchemaCtx);
         return new NormalizedNodeContext(instanceIdentifierContext, containerBuilder.build());
     }
 
