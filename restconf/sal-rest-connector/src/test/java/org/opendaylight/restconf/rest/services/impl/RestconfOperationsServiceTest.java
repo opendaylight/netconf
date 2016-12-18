@@ -7,10 +7,14 @@
  */
 package org.opendaylight.restconf.rest.services.impl;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import com.google.common.collect.ImmutableSet;
+import java.net.URI;
+import java.util.Set;
 import javax.ws.rs.core.UriInfo;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -20,6 +24,8 @@ import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -37,7 +43,7 @@ public class RestconfOperationsServiceTest {
     private SchemaContextHandler schemaContextHandler;
     private DOMMountPointServiceHandler domMountPointServiceHandler;
 
-    private static final List<String> listOfRpcsNames = new ArrayList<>();
+    private Set<QName> listOfRpcsNames;
 
     @Before
     public void init() throws Exception {
@@ -46,26 +52,31 @@ public class RestconfOperationsServiceTest {
         this.schemaContextHandler = new SchemaContextHandler();
         this.schemaContextHandler.onGlobalContextUpdated(this.schemaContext);
         this.domMountPointServiceHandler = new DOMMountPointServiceHandler(this.domMountPointService);
-        listOfRpcsNames.add("module2:dummy-rpc2-module2");
-        listOfRpcsNames.add("module2:dummy-rpc1-module2");
-        listOfRpcsNames.add("module1:dummy-rpc2-module1");
-        listOfRpcsNames.add("module1:dummy-rpc1-module1");
+
+        final QNameModule module1 = QNameModule.create(new URI("module:1"), null);
+        final QNameModule module2 = QNameModule.create(new URI("module:2"), null);
+
+        listOfRpcsNames = ImmutableSet.of(
+            QName.create(module1, "dummy-rpc1-module1"), QName.create(module1, "dummy-rpc2-module1"),
+            QName.create(module2, "dummy-rpc1-module2"), QName.create(module2, "dummy-rpc2-module2"));
     }
 
     @Test
     public void getOperationsTest() {
-        final RestconfOperationsServiceImpl oper = new RestconfOperationsServiceImpl(this.schemaContextHandler, this.domMountPointServiceHandler);
+        final RestconfOperationsServiceImpl oper = new RestconfOperationsServiceImpl(this.schemaContextHandler,
+            this.domMountPointServiceHandler);
         final NormalizedNodeContext operations = oper.getOperations(this.uriInfo);
         final ContainerNode data = (ContainerNode) operations.getData();
-        Assert.assertTrue(
-                data.getNodeType().getNamespace().toString().equals("urn:ietf:params:xml:ns:yang:ietf-restconf"));
-        Assert.assertTrue(data.getNodeType().getLocalName().equals("operations"));
-        for (final DataContainerChild<? extends PathArgument, ?> dataContainerChild : data.getValue()) {
-            Assert.assertTrue(dataContainerChild.getNodeType().getNamespace().toString()
-                    .equals("urn:ietf:params:xml:ns:yang:ietf-restconf"));
-            Assert.assertTrue(listOfRpcsNames.contains(dataContainerChild.getNodeType().getLocalName()));
-            Assert.assertTrue(dataContainerChild.getValue() == null);
-        }
+        assertEquals("urn:ietf:params:xml:ns:yang:ietf-restconf", data.getNodeType().getNamespace().toString());
+        assertEquals("operations", data.getNodeType().getLocalName());
 
+        assertEquals(4, data.getValue().size());
+
+        for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
+            assertNull(child.getValue());
+
+            final QName qname = child.getNodeType().withoutRevision();
+            assertTrue(listOfRpcsNames.contains(qname));
+        }
     }
 }
