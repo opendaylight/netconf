@@ -21,6 +21,11 @@
         <dependencies>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>ietf-restconf</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>ietf-yang-library</artifactId>
                 <version>${project.version}</version>
             </dependency>
