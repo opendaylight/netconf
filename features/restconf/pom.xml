@@ -175,6 +175,11 @@
       <artifactId>ietf-restconf-monitoring</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>ietf-restconf</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
   </dependencies>
   <scm>
