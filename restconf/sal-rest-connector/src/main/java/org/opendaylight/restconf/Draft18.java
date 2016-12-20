@@ -61,49 +61,57 @@ public final class Draft18 {
      */
     public static final class RestconfModule {
 
+        private static final Logger LOG = LoggerFactory.getLogger(RestconfModule.class);
+
         private RestconfModule() {
             throw new UnsupportedOperationException("Util class");
         }
 
-        public static final String REVISION = "2013-10-19";
-
+        public static final String REVISION = "2016-08-15";
         public static final String NAME = "ietf-restconf";
-
         public static final String NAMESPACE = "urn:ietf:params:xml:ns:yang:ietf-restconf";
 
+        public static final QName IETF_RESTCONF_QNAME = QName.create(Draft18.RestconfModule.NAMESPACE,
+                Draft18.RestconfModule.REVISION, Draft18.RestconfModule.NAME);
+
+        public static Date DATE = null;
+        public static URI URI_MODULE = null;
+
+        static {
+            try {
+                DATE = new SimpleDateFormat("yyyy-MM-dd").parse(REVISION);
+                URI_MODULE = new URI(NAMESPACE);
+            } catch (final ParseException | URISyntaxException e) {
+                LOG.error(e.getMessage());
+            }
+        }
+
+        // RESTCONF
         public static final String RESTCONF_GROUPING_SCHEMA_NODE = "restconf";
-
         public static final String RESTCONF_CONTAINER_SCHEMA_NODE = "restconf";
-
-        public static final String MODULES_CONTAINER_SCHEMA_NODE = "modules";
-
-        public static final String MODULE_LIST_SCHEMA_NODE = "module";
-
         public static final String OPERATIONS_CONTAINER_SCHEMA_NODE = "operations";
+        public static final String DATA_CONTAINER_SCHEMA_NODE = "data";
+        public static final String LIB_VER_LEAF_SCHEMA_NODE = "yang-library-version";
 
+        public static final QName RESTCONF_GROUPING_QNAME =
+                QName.create(IETF_RESTCONF_QNAME, RESTCONF_GROUPING_SCHEMA_NODE);
+        public static final QName RESTCONF_CONTAINER_QNAME =
+                QName.create(IETF_RESTCONF_QNAME, RESTCONF_CONTAINER_SCHEMA_NODE);
+        public static final QName LIB_VER_LEAF_QNAME = QName.create(IETF_RESTCONF_QNAME, LIB_VER_LEAF_SCHEMA_NODE);
+
+        // ERRORS
         public static final String ERRORS_GROUPING_SCHEMA_NODE = "errors";
-
         public static final String ERRORS_CONTAINER_SCHEMA_NODE = "errors";
-
         public static final String ERROR_LIST_SCHEMA_NODE = "error";
 
-        public static final QName IETF_RESTCONF_QNAME = QName.create(Draft18.RestconfModule.NAMESPACE, Draft18.RestconfModule.REVISION,
-                Draft18.RestconfModule.NAME);
-
-        public static final QName ERRORS_CONTAINER_QNAME = QName.create(IETF_RESTCONF_QNAME, ERRORS_CONTAINER_SCHEMA_NODE);
-
+        public static final QName ERRORS_CONTAINER_QNAME =
+                QName.create(IETF_RESTCONF_QNAME, ERRORS_CONTAINER_SCHEMA_NODE);
         public static final QName ERROR_LIST_QNAME = QName.create(IETF_RESTCONF_QNAME, ERROR_LIST_SCHEMA_NODE);
-
         public static final QName ERROR_TYPE_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-type");
-
         public static final QName ERROR_TAG_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-tag");
-
         public static final QName ERROR_APP_TAG_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-app-tag");
-
         public static final QName ERROR_MESSAGE_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-message");
-
         public static final QName ERROR_INFO_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-info");
-
         public static final QName ERROR_PATH_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-path");
     }
 
