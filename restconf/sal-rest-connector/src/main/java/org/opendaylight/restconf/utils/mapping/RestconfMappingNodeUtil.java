@@ -471,8 +471,8 @@ public final class RestconfMappingNodeUtil {
      */
     @SuppressWarnings("rawtypes")
     public static NormalizedNode mapYangNotificationStreamByIetfRestconfMonitoring(final QName notifiQName,
-            final Set<NotificationDefinition> notifications, final Date start, final String outputType,
-            final URI uri, final Module monitoringModule, final boolean existParent) {
+            final Set<NotificationDefinition> notifications, final Date start, final String outputType, final URI uri,
+            final Module monitoringModule, final boolean existParent) {
         for (final NotificationDefinition notificationDefinition : notifications) {
             if (notificationDefinition.getQName().equals(notifiQName)) {
                 final DataSchemaNode streamListSchema = ((ContainerSchemaNode) ((ContainerSchemaNode) monitoringModule
@@ -506,8 +506,8 @@ public final class RestconfMappingNodeUtil {
                             .getDataChildByName(MonitoringModule.CONT_RESTCONF_STATE_QNAME))
                                     .getDataChildByName(MonitoringModule.CONT_STREAMS_QNAME);
                     return Builders.containerBuilder((ContainerSchemaNode) contStreamsSchema).withChild(Builders
-                            .mapBuilder((ListSchemaNode) streamListSchema).withChild(streamEntry.build())
-                            .build()).build();
+                            .mapBuilder((ListSchemaNode) streamListSchema).withChild(streamEntry.build()).build())
+                            .build();
                 }
                 return streamEntry.build();
             }
@@ -567,9 +567,8 @@ public final class RestconfMappingNodeUtil {
      */
     @SuppressWarnings("rawtypes")
     public static NormalizedNode mapDataChangeNotificationStreamByIetfRestconfMonitoring(
-            final YangInstanceIdentifier path, final Date start,
-            final String outputType, final URI uri, final Module monitoringModule, final boolean existParent,
-            final SchemaContext schemaContext) {
+            final YangInstanceIdentifier path, final Date start, final String outputType, final URI uri,
+            final Module monitoringModule, final boolean existParent, final SchemaContext schemaContext) {
         final SchemaNode schemaNode = ParserIdentifier
                 .toInstanceIdentifier(ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContext),
                         schemaContext, null)

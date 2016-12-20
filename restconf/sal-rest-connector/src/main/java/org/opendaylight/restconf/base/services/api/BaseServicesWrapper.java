@@ -15,5 +15,5 @@ package org.opendaylight.restconf.base.services.api;
  * </ul>
  *
  */
-public interface BaseServicesWrapper extends RestconfOperationsService, RestconfSchemaService {
+public interface BaseServicesWrapper extends RestconfOperationsService, RestconfSchemaService, RestconfService {
 }
