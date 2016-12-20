@@ -22,24 +22,26 @@ and is available at http://www.eclipse.org/legal/epl-v10.html INTERNAL
   <packaging>bundle</packaging>
 
   <dependencies>
-    <!-- Apache Karaf console dependency -->
-    <dependency>
-     <groupId>org.apache.karaf.shell</groupId>
-     <artifactId>org.apache.karaf.shell.console</artifactId>
-     <version>${karaf.version}</version>
-    </dependency>
-    <dependency>
-     <groupId>org.apache.karaf.shell</groupId>
-     <artifactId>org.apache.karaf.shell.table</artifactId>
-     <version>${karaf.version}</version>
-    </dependency>
+      <!-- Apache Karaf console dependency -->
+      <dependency>
+          <groupId>org.apache.karaf.shell</groupId>
+          <artifactId>org.apache.karaf.shell.console</artifactId>
+          <version>${karaf.version}</version>
+          <scope>provided</scope>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.karaf.shell</groupId>
+          <artifactId>org.apache.karaf.shell.table</artifactId>
+          <version>${karaf.version}</version>
+          <scope>provided</scope>
+      </dependency>
 
-    <!-- Project Dependencies -->
-    <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>sal-netconf-connector</artifactId>
-      <version>${mdsal.version}</version>
-    </dependency>
+      <!-- Project Dependencies -->
+      <dependency>
+          <groupId>org.opendaylight.netconf</groupId>
+          <artifactId>sal-netconf-connector</artifactId>
+          <version>${mdsal.version}</version>
+      </dependency>
       <dependency>
           <groupId>org.mockito</groupId>
           <artifactId>mockito-all</artifactId>
