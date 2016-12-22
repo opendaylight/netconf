@@ -41,7 +41,7 @@
 
     <servlet-mapping>
         <servlet-name>JAXRSApiDoc</servlet-name>
-        <url-pattern>/17/apis/*</url-pattern>
+        <url-pattern>/18/apis/*</url-pattern>
     </servlet-mapping>
 
     <filter>
@@ -66,7 +66,7 @@
     </filter-mapping>
     <filter-mapping>
         <filter-name>cross-origin-api-doc</filter-name>
-        <url-pattern>/17/apis/*</url-pattern>
+        <url-pattern>/18/apis/*</url-pattern>
     </filter-mapping>
 
     <security-constraint>
