@@ -33,8 +33,7 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
-import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
  * The registry of available commands local + remote. Created from schema contexts.
@@ -139,7 +138,7 @@ public class CommandDispatcher {
                 // FIXME make local commands extensible
                 // e.g. by yang extension defining java class to be instantiated
                 // problem is with command specific resources
-                // e.g. Help would need command registry
+                // e.g. Help would need coimport java.io.IOException;mmand registry
                 final Command localCommand;
                 if (rpcDefinition.getQName().equals(CommandConstants.HELP_QNAME)) {
                     localCommand = Help.create(rpcDefinition, this);
@@ -165,11 +164,9 @@ public class CommandDispatcher {
 
     public static SchemaContext parseSchema(final Collection<String> yangPath) {
         final List<InputStream> streams = loadYangs(yangPath);
-        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
-                .newBuild();
         final SchemaContext schemaContext;
         try {
-            schemaContext = reactor.buildEffective(streams);
+            schemaContext = YangParserTestUtils.parseYangStreams(streams);
         } catch (ReactorException e) {
             throw new RuntimeException("Unable to build schema context from " + streams, e);
         }
