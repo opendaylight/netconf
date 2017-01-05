@@ -39,12 +39,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
-import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class SchemaServiceToMdsalWriterTest {
 
@@ -85,31 +82,19 @@ public class SchemaServiceToMdsalWriterTest {
     }
 
     @Test
-    public void testOnGlobalContextUpdated() {
+    public void testOnGlobalContextUpdated() throws Exception {
         schemaServiceToMdsalWriter.start();
 
         schemaServiceToMdsalWriter.onGlobalContextUpdated(getSchema());
         verify(writeTransaction).put(eq(LogicalDatastoreType.OPERATIONAL), eq(MODULES_STATE_INSTANCE_IDENTIFIER), eq(createTestModuleState()));
     }
 
-    private SchemaContext getSchema() {
+    private SchemaContext getSchema() throws Exception {
         final List<InputStream> modelsToParse = Lists.newArrayList(
                 SchemaServiceToMdsalWriterTest.class.getResourceAsStream("/test-module.yang"),
                 SchemaServiceToMdsalWriterTest.class.getResourceAsStream("/test-submodule.yang")
         );
-        return parseYangStreams(modelsToParse);
-    }
-
-    private SchemaContext parseYangStreams(final List<InputStream> streams) {
-        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
-                .newBuild();
-        final SchemaContext schemaContext;
-        try {
-            schemaContext = reactor.buildEffective(streams);
-        } catch (ReactorException e) {
-            throw new RuntimeException("Unable to build schema context from " + streams, e);
-        }
-        return schemaContext;
+        return YangParserTestUtils.parseYangStreams(modelsToParse);
     }
 
     private ModulesState createTestModuleState() {

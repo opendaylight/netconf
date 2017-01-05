@@ -10,7 +10,6 @@ package org.opendaylight.netconf.mdsal.connector.ops.get;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -30,11 +29,7 @@ import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
-import org.opendaylight.yangtools.yang.parser.spi.source.SourceException;
-import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangStatementSourceImpl;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -71,7 +66,7 @@ public class FilterContentValidatorTest {
         List<InputStream> sources = new ArrayList<>();
         sources.add(getClass().getResourceAsStream("/yang/filter-validator-test-mod-0.yang"));
         sources.add(getClass().getResourceAsStream("/yang/filter-validator-test-augment.yang"));
-        SchemaContext context = parseYangSources(sources);
+        SchemaContext context = YangParserTestUtils.parseYangStreams(sources);
         CurrentSchemaContext currentContext = mock(CurrentSchemaContext.class);
         doReturn(context).when(currentContext).getCurrentContext();
         validator = new FilterContentValidator(currentContext);
@@ -92,15 +87,5 @@ public class FilterContentValidatorTest {
             }
         }
 
-    }
-
-    public static SchemaContext parseYangSources(Collection<InputStream> testFiles)
-            throws SourceException, ReactorException, FileNotFoundException {
-        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
-                .newBuild();
-        for (InputStream testFile : testFiles) {
-            reactor.addSource(new YangStatementSourceImpl(testFile));
-        }
-        return reactor.buildEffective();
     }
 }

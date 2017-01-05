@@ -32,9 +32,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
-import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 
 public class NetconfToRpcRequestTest {
@@ -58,26 +56,14 @@ public class NetconfToRpcRequestTest {
     public static void setup() throws Exception {
         List<InputStream> modelsToParse = Collections
             .singletonList(NetconfToRpcRequestTest.class.getResourceAsStream("/schemas/rpc-notification-subscription.yang"));
-        final Set<Module> notifModules = parseYangStreams(modelsToParse).getModules();
+        final Set<Module> notifModules = YangParserTestUtils.parseYangStreams(modelsToParse).getModules();
         assertTrue(!notifModules.isEmpty());
 
         modelsToParse = Lists.newArrayList(
                 NetconfToRpcRequestTest.class.getResourceAsStream("/schemas/config-test-rpc.yang"),
                 NetconfToRpcRequestTest.class.getResourceAsStream("/schemas/rpc-notification-subscription.yang"));
-        cfgCtx = parseYangStreams(modelsToParse);
+        cfgCtx = YangParserTestUtils.parseYangStreams(modelsToParse);
         messageTransformer = new NetconfMessageTransformer(cfgCtx, true);
-    }
-
-    private static SchemaContext parseYangStreams(final List<InputStream> streams) {
-        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
-                .newBuild();
-        final SchemaContext schemaContext;
-        try {
-            schemaContext = reactor.buildEffective(streams);
-        } catch (ReactorException e) {
-            throw new RuntimeException("Unable to build schema context from " + streams, e);
-        }
-        return schemaContext;
     }
 
     private static LeafNode<Object> buildLeaf(final QName running, final Object value) {

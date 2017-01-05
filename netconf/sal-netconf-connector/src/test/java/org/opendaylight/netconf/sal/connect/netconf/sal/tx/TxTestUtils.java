@@ -8,17 +8,11 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
-import com.google.common.collect.ImmutableList;
-import java.io.InputStream;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
-import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
 
 class TxTestUtils {
 
@@ -49,18 +43,6 @@ class TxTestUtils {
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(Q_NAME_2))
                 .withValue("data")
                 .build();
-    }
-
-    static SchemaContext parseYangStreams(final InputStream... streams) {
-        final CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
-                .newBuild();
-        final SchemaContext schemaContext;
-        try {
-            schemaContext = reactor.buildEffective(ImmutableList.copyOf(streams));
-        } catch (final ReactorException e) {
-            throw new RuntimeException("Unable to build schema context from " + streams, e);
-        }
-        return schemaContext;
     }
 
 }

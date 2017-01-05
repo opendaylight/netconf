@@ -13,7 +13,6 @@ import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
 
 import com.google.common.collect.ImmutableList;
 import java.io.InputStream;
@@ -32,7 +31,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.controller.cluster.databroker.ConcurrentDOMDataBroker;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.MountPointService;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.binding.impl.BindingDOMDataBrokerAdapter;
 import org.opendaylight.controller.md.sal.binding.impl.BindingToNormalizedNodeCodec;
@@ -75,9 +73,7 @@ import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
-import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class NetconfCommandsImplTest {
 
@@ -93,8 +89,8 @@ public class NetconfCommandsImplTest {
     private NetconfCommandsImpl netconfCommands;
 
     @Before
-    public void setUp() throws TransactionCommitFailedException, TimeoutException, InterruptedException {
-        schemaContext = parseYangStreams(getYangSchemas());
+    public void setUp() throws Exception {
+        schemaContext = YangParserTestUtils.parseYangStreams(getYangSchemas());
         schemaContext.getModules();
         final SchemaService schemaService = createSchemaService();
 
@@ -303,18 +299,6 @@ public class NetconfCommandsImplTest {
             schemas.add(resourceAsStream);
         }
         return schemas;
-    }
-
-    private static SchemaContext parseYangStreams(final List<InputStream> streams) {
-        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
-                .newBuild();
-        final SchemaContext schemaContext;
-        try {
-            schemaContext = reactor.buildEffective(streams);
-        } catch (ReactorException e) {
-            throw new RuntimeException("Unable to build schema context from " + streams, e);
-        }
-        return schemaContext;
     }
 
     private SchemaService createSchemaService() {

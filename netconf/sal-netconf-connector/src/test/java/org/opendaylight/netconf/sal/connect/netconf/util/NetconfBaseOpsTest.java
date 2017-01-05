@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -47,9 +46,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
-import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -95,7 +92,7 @@ public class NetconfBaseOpsTest {
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME)))
                 .thenReturn(RpcResultBuilder.success(ok).buildFuture());
         final SchemaContext schemaContext =
-                parseYangStreams(getClass().getResourceAsStream("/schemas/test-module.yang"));
+                YangParserTestUtils.parseYangStreams(getClass().getResourceAsStream("/schemas/test-module.yang"));
         final MessageTransformer<NetconfMessage> transformer = new NetconfMessageTransformer(schemaContext, true);
         final DOMRpcService rpc = new NetconfDeviceRpc(schemaContext, listener, transformer);
         final RemoteDeviceId id =
@@ -255,18 +252,6 @@ public class NetconfBaseOpsTest {
                 Optional.of(ModifyAction.REPLACE), leafId);
         baseOps.editConfigRunning(callback, structure, ModifyAction.MERGE, true);
         verifyMessageSent("edit-config-test-module-running", NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME);
-    }
-
-    private static SchemaContext parseYangStreams(final InputStream... streams) {
-        final CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
-                .newBuild();
-        final SchemaContext schemaContext;
-        try {
-            schemaContext = reactor.buildEffective(Arrays.asList(streams));
-        } catch (final ReactorException e) {
-            throw new RuntimeException("Unable to build schema context from " + streams, e);
-        }
-        return schemaContext;
     }
 
     private void verifyMessageSent(final String fileName, final QName name) {

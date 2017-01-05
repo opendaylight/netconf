@@ -64,5 +64,9 @@ and is available at http://www.eclipse.org/legal/epl-v10.html INTERNAL
           <groupId>org.powermock</groupId>
           <artifactId>powermock-core</artifactId>
       </dependency>
+      <dependency>
+          <groupId>org.opendaylight.yangtools</groupId>
+          <artifactId>yang-test-util</artifactId>
+      </dependency>
   </dependencies>
 </project>

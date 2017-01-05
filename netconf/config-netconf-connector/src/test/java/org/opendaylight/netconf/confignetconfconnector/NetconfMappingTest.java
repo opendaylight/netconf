@@ -119,9 +119,7 @@ import org.opendaylight.yangtools.sal.binding.generator.util.BindingRuntimeConte
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextProvider;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
-import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
@@ -255,7 +253,7 @@ public class NetconfMappingTest extends AbstractConfigTest {
         final BindingRuntimeContext ret = super.getBindingRuntimeContext();
         doReturn(TestIdentity1.class).when(ret).getIdentityClass(TestIdentity1.QNAME);
         doReturn(TestIdentity2.class).when(ret).getIdentityClass(TestIdentity2.QNAME);
-        doReturn(parseYangStreams(getYangs())).when(ret).getSchemaContext();
+        doReturn(YangParserTestUtils.parseYangStreams(getYangs())).when(ret).getSchemaContext();
         return ret;
     }
 
@@ -726,7 +724,7 @@ public class NetconfMappingTest extends AbstractConfigTest {
 
         final Map<String, Map<String, ModuleMXBeanEntry>> mBeanEntries = Maps.newHashMap();
 
-        final SchemaContext schemaContext = parseYangStreams(yangDependencies);
+        final SchemaContext schemaContext = YangParserTestUtils.parseYangStreams(yangDependencies);
         final YangStoreService yangStoreService = new YangStoreService(new SchemaContextProvider() {
             @Override public SchemaContext getSchemaContext() {
                 return schemaContext;
@@ -752,21 +750,8 @@ public class NetconfMappingTest extends AbstractConfigTest {
     }
 
     private Set<org.opendaylight.yangtools.yang.model.api.Module> getModules() throws Exception {
-        final SchemaContext resolveSchemaContext = parseYangStreams(getYangs());
+        final SchemaContext resolveSchemaContext = YangParserTestUtils.parseYangStreams(getYangs());
         return resolveSchemaContext.getModules();
-    }
-
-    private static SchemaContext parseYangStreams(final List<InputStream> streams) {
-
-        final CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
-                .newBuild();
-        final SchemaContext schemaContext;
-        try {
-            schemaContext = reactor.buildEffective(streams);
-        } catch (final ReactorException e) {
-            throw new RuntimeException("Unable to build schema context from " + streams, e);
-        }
-        return schemaContext;
     }
 
     @Test

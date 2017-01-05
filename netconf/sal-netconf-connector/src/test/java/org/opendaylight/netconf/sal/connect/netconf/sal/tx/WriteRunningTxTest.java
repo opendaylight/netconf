@@ -29,6 +29,7 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransform
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class WriteRunningTxTest {
 
@@ -40,7 +41,8 @@ public class WriteRunningTxTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        final SchemaContext schemaContext = TxTestUtils.parseYangStreams(getClass().getResourceAsStream("/schemas/test-module.yang"));
+        final SchemaContext schemaContext =
+                YangParserTestUtils.parseYangStreams(getClass().getResourceAsStream("/schemas/test-module.yang"));
         doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult())).when(rpc).invokeRpc(any(), any());
         netconfOps = new NetconfBaseOps(rpc, schemaContext);
         id = new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("0.0.0.0", 17830));
