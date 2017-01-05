@@ -71,9 +71,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
-import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -189,7 +187,7 @@ public class RuntimeRpcTest {
             }
         }).when(sourceProvider).getSource(any(SourceIdentifier.class));
 
-        this.schemaContext = parseYangStreams(getYangSchemas());
+        this.schemaContext = YangParserTestUtils.parseYangStreams(getYangSchemas());
         this.currentSchemaContext = new CurrentSchemaContext(schemaService, sourceProvider);
     }
 
@@ -305,17 +303,5 @@ public class RuntimeRpcTest {
         }
 
         return schemas;
-    }
-
-    private static SchemaContext parseYangStreams(final List<InputStream> streams) {
-        final CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
-                .newBuild();
-        final SchemaContext schemaContext;
-        try {
-            schemaContext = reactor.buildEffective(streams);
-        } catch (final ReactorException e) {
-            throw new RuntimeException("Unable to build schema context from " + streams, e);
-        }
-        return schemaContext;
     }
 }

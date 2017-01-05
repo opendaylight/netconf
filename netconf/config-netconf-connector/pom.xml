@@ -107,14 +107,16 @@
       <artifactId>config-manager</artifactId>
       <scope>test</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-test-util</artifactId>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-util</artifactId>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>org.opendaylight.controller</groupId>
       <artifactId>yang-test</artifactId>

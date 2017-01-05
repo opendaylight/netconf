@@ -30,9 +30,7 @@ import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessag
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
-import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 
 public class NetconfToNotificationTest {
@@ -54,7 +52,7 @@ public class NetconfToNotificationTest {
         userNotification = new NetconfMessage(doc);
     }
 
-    static SchemaContext getNotificationSchemaContext(Class<?> loadClass, boolean getExceptionTest) {
+    static SchemaContext getNotificationSchemaContext(Class<?> loadClass, boolean getExceptionTest) throws Exception {
         final List<InputStream> modelsToParse = new ArrayList<>();
 
         if (getExceptionTest) {
@@ -65,23 +63,11 @@ public class NetconfToNotificationTest {
             modelsToParse.add(loadClass.getResourceAsStream("/schemas/user-notification2.yang"));
         }
 
-        final SchemaContext context = parseYangStreams(modelsToParse);
+        final SchemaContext context = YangParserTestUtils.parseYangStreams(modelsToParse);
         final Set<Module> modules = context.getModules();
         assertTrue(!modules.isEmpty());
         assertNotNull(context);
         return context;
-    }
-
-    private static SchemaContext parseYangStreams(final List<InputStream> streams) {
-        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
-                .newBuild();
-        final SchemaContext schemaContext;
-        try {
-            schemaContext = reactor.buildEffective(streams);
-        } catch (ReactorException e) {
-            throw new RuntimeException("Unable to build schema context from " + streams, e);
-        }
-        return schemaContext;
     }
 
     @Test(expected =  IllegalStateException.class)

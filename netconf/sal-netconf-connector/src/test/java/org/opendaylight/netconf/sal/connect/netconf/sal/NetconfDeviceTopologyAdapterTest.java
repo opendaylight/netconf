@@ -68,9 +68,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLe
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
-import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class NetconfDeviceTopologyAdapterTest {
 
@@ -106,7 +104,7 @@ public class NetconfDeviceTopologyAdapterTest {
 
         doReturn(txIdent).when(writeTx).getIdentifier();
 
-        this.schemaContext = parseYangStreams(getYangSchemas());
+        this.schemaContext = YangParserTestUtils.parseYangStreams(getYangSchemas());
         schemaContext.getModules();
         final SchemaService schemaService = createSchemaService();
 
@@ -225,18 +223,6 @@ public class NetconfDeviceTopologyAdapterTest {
         }
 
         return schemas;
-    }
-
-    private static SchemaContext parseYangStreams(final List<InputStream> streams) {
-        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
-                .newBuild();
-        final SchemaContext schemaContext;
-        try {
-            schemaContext = reactor.buildEffective(streams);
-        } catch (ReactorException e) {
-            throw new RuntimeException("Unable to build schema context from " + streams, e);
-        }
-        return schemaContext;
     }
 
     private SchemaService createSchemaService() {

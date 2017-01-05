@@ -85,29 +85,33 @@
       <groupId>org.opendaylight.controller</groupId>
       <artifactId>config-util</artifactId>
     </dependency>
-      <dependency>
-          <groupId>org.opendaylight.controller</groupId>
-          <artifactId>config-api</artifactId>
-      </dependency>
-      <dependency>
-          <groupId>org.opendaylight.netconf</groupId>
-          <artifactId>ietf-netconf</artifactId>
-      </dependency>
-      <dependency>
-          <groupId>org.opendaylight.controller</groupId>
-          <artifactId>sal-distributed-datastore</artifactId>
-          <scope>test</scope>
-      </dependency>
-      <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>netconf-util</artifactId>
-          <type>test-jar</type>
-          <scope>test</scope>
-      </dependency>
-      <dependency>
-          <groupId>xmlunit</groupId>
-          <artifactId>xmlunit</artifactId>
-          <scope>test</scope>
-      </dependency>
+    <dependency>
+      <groupId>org.opendaylight.controller</groupId>
+      <artifactId>config-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>ietf-netconf</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.controller</groupId>
+      <artifactId>sal-distributed-datastore</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>netconf-util</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>xmlunit</groupId>
+      <artifactId>xmlunit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-test-util</artifactId>
+    </dependency>
   </dependencies>
 </project>

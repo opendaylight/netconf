@@ -76,10 +76,8 @@ import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
-import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
 import org.opendaylight.yangtools.yang.parser.util.ASTSchemaSource;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class NetconfDeviceTest {
 
@@ -369,29 +367,17 @@ public class NetconfDeviceTest {
                 moduleBasedCaps.get(QName.create(entry.getCapability())).getName(), entry.getCapabilityOrigin().getName()));
     }
 
-    private SchemaContextFactory getSchemaFactory() {
+    private SchemaContextFactory getSchemaFactory() throws Exception {
         final SchemaContextFactory schemaFactory = mockClass(SchemaContextFactory.class);
         doReturn(Futures.immediateCheckedFuture(getSchema())).when(schemaFactory).createSchemaContext(any(Collection.class));
         return schemaFactory;
     }
 
-    private static SchemaContext parseYangStreams(final List<InputStream> streams) {
-        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
-                .newBuild();
-        final SchemaContext schemaContext;
-        try {
-            schemaContext = reactor.buildEffective(streams);
-        } catch (ReactorException e) {
-            throw new RuntimeException("Unable to build schema context from " + streams, e);
-        }
-        return schemaContext;
-    }
-
-    public static SchemaContext getSchema() {
+    public static SchemaContext getSchema() throws Exception {
         final List<InputStream> modelsToParse = Lists.newArrayList(
                 NetconfDeviceTest.class.getResourceAsStream("/schemas/test-module.yang")
         );
-        return parseYangStreams(modelsToParse);
+        return YangParserTestUtils.parseYangStreams(modelsToParse);
     }
 
     private RemoteDeviceHandler<NetconfSessionPreferences> getFacade() throws Exception {
