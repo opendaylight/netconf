@@ -12,10 +12,8 @@ import static org.opendaylight.netconf.cli.io.IOUtil.PROMPT_SUFIX;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,20 +23,15 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.opendaylight.netconf.cli.reader.ReadingException;
-import org.opendaylight.netconf.cli.writer.WriteException;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
-import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @Ignore
 public class NetconfCliTest {
 
-    private static SchemaContext loadSchemaContext(final String resourceDirectory) throws IOException,
-            URISyntaxException {
+    private static SchemaContext loadSchemaContext(final String resourceDirectory) throws Exception {
         final URI uri = NetconfCliTest.class.getResource(resourceDirectory).toURI();
         final File testDir = new File(uri);
         final String[] fileList = testDir.list();
@@ -49,23 +42,11 @@ public class NetconfCliTest {
         for (final String fileName : fileList) {
             NetconfCliTest.class.getResourceAsStream(fileName);
         }
-        return parseYangStreams(streams);
-    }
-
-    private static SchemaContext parseYangStreams(final List<InputStream> streams) {
-        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
-                .newBuild();
-        final SchemaContext schemaContext;
-        try {
-            schemaContext = reactor.buildEffective(streams);
-        } catch (ReactorException e) {
-            throw new RuntimeException("Unable to build schema context from " + streams, e);
-        }
-        return schemaContext;
+        return YangParserTestUtils.parseYangStreams(streams);
     }
 
     @Test
-    public void cliTest() throws ReadingException, IOException, WriteException, URISyntaxException {
+    public void cliTest() throws Exception {
 
         final SchemaContext schemaContext = loadSchemaContext("/schema-context");
         assertNotNull(schemaContext);
