@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1a622d24_f67cacb7",
+        "filename": "features/netconf-connector/src/main/features/features.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-01-06T17:22:04Z",
+      "side": 1,
+      "message": "For now we have not tested this with NETCONF clustering. Probably this will require some changes in cluster aware netconf topology code. There may be some assumptions in netconf topology about connections, but here the connection at the TCP layer is reversed.",
+      "parentUuid": "1a622d24_e4836302",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 14
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a622d24_c4862713",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/AuthorizedKeysDecoder.java",
         "patchSetId": 2
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "1a622d24_364e2497",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/AuthorizedKeysDecoder.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-01-06T17:22:04Z",
+      "side": 1,
+      "message": "In future this makes sense, but now we opted for having it embedded here,in order to have self-contained patch",
+      "parentUuid": "1a622d24_c4862713",
+      "range": {
+        "startLine": 29,
+        "startChar": 13,
+        "endLine": 29,
+        "endChar": 34
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a622d24_6477533b",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorization.java",
         "patchSetId": 2
@@ -59,6 +107,24 @@
       "writtenOn": "2016-12-15T21:26:05Z",
       "side": 1,
       "message": "How about creating our own Exception, something like CallHomeAuthorizationException, and provide session details.",
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_d62530c3",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorization.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-01-06T17:22:04Z",
+      "side": 1,
+      "message": "We don\u0027t need custom exception here we believe. Here this should not happen, this is guarded by its server allowed check in the NetconfCallHomeServer.",
+      "parentUuid": "1a622d24_6477533b",
       "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -197,6 +263,24 @@
     },
     {
       "key": {
+        "uuid": "1a622d24_b62074b1",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorizationProvider.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-01-06T17:22:04Z",
+      "side": 1,
+      "message": "Will do.",
+      "parentUuid": "1a622d24_64dc7313",
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a622d24_24d27b00",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorizationProvider.java",
         "patchSetId": 2
@@ -208,6 +292,30 @@
       "writtenOn": "2016-12-15T21:26:05Z",
       "side": 1,
       "message": "redundant modifier",
+      "range": {
+        "startLine": 33,
+        "startChar": 4,
+        "endLine": 33,
+        "endChar": 10
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_16304800",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorizationProvider.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-01-06T17:22:04Z",
+      "side": 1,
+      "message": "Will do.",
+      "parentUuid": "1a622d24_24d27b00",
       "range": {
         "startLine": 33,
         "startChar": 4,
@@ -358,6 +466,30 @@
     },
     {
       "key": {
+        "uuid": "1a622d24_f62aec8e",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-01-06T17:22:04Z",
+      "side": 1,
+      "message": "This Factory pattern prevents us from having 3 pointers in each CallHomeSessionContext just to access dependencies which are used only once. This way we have one pointer",
+      "parentUuid": "1a622d24_e75b6585",
+      "range": {
+        "startLine": 138,
+        "startChar": 17,
+        "endLine": 138,
+        "endChar": 24
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a622d24_8764314a",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
         "patchSetId": 2
@@ -392,6 +524,30 @@
       "writtenOn": "2016-12-15T21:26:05Z",
       "side": 1,
       "message": "Why not reuse the AsyncSshHandler class existing that is already acting as interface between mina and netty? Something in those lines: https://git.opendaylight.org/gerrit/#/c/48093/9/netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/CallHomeAsyncSshHandler.java\n\nIt adds less useless boilerplate this is there only to satisfy AbstractServerChannel",
+      "range": {
+        "startLine": 30,
+        "startChar": 13,
+        "endLine": 30,
+        "endChar": 32
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_9613b865",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-01-06T17:22:04Z",
+      "side": 1,
+      "message": "Actually if you look into the NETCONF code https://github.com/opendaylight/netconf/blob/03cd91edfcb91ebad953158eca8418806314b335/netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java#L286\n\nThere is TODO that AsyncSshHandler should be implemented as Netty channel, so we tried this approach\nAnd just kept it localized to call home for now.",
+      "parentUuid": "1a622d24_27039d43",
       "range": {
         "startLine": 30,
         "startChar": 13,
@@ -496,6 +652,30 @@
     },
     {
       "key": {
+        "uuid": "1a622d24_d60c1045",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-01-06T17:22:04Z",
+      "side": 1,
+      "message": "Open Future does not reflect changes only innitial open channel status, \nThis class is already with opened channel, so no need to keep that, we need\nonly to observe closing of this channel (probably using channel.getAsyncIn())\nsince channel does not implements sshd.Closeable",
+      "parentUuid": "1a622d24_e7e9a581",
+      "range": {
+        "startLine": 76,
+        "startChar": 15,
+        "endLine": 76,
+        "endChar": 35
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a622d24_c7ec6992",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
         "patchSetId": 2
@@ -507,6 +687,30 @@
       "writtenOn": "2016-12-15T21:26:05Z",
       "side": 1,
       "message": "I guess you can say the channel is active after having started the reader and writer. And you can set it as inactive as soon as one of the two is firing issue",
+      "range": {
+        "startLine": 81,
+        "startChar": 15,
+        "endLine": 81,
+        "endChar": 35
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_41003c01",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-01-06T17:22:04Z",
+      "side": 1,
+      "message": "See previous comment.",
+      "parentUuid": "1a622d24_c7ec6992",
       "range": {
         "startLine": 81,
         "startChar": 15,
@@ -542,6 +746,30 @@
     },
     {
       "key": {
+        "uuid": "1a622d24_b607d41c",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-01-06T17:22:04Z",
+      "side": 1,
+      "message": "Yes, they are channel related, but channel existence is also dependent\non session",
+      "parentUuid": "1a622d24_87f2716d",
+      "range": {
+        "startLine": 74,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 5
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a622d24_47e17999",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
         "patchSetId": 2
@@ -565,6 +793,30 @@
     },
     {
       "key": {
+        "uuid": "1a622d24_810a541f",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-01-06T17:22:04Z",
+      "side": 1,
+      "message": "Disconnect is non-blocking",
+      "parentUuid": "1a622d24_47e17999",
+      "range": {
+        "startLine": 120,
+        "startChar": 0,
+        "endLine": 121,
+        "endChar": 29
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a622d24_07d781c0",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
         "patchSetId": 2
@@ -576,6 +828,30 @@
       "writtenOn": "2016-12-15T21:26:05Z",
       "side": 1,
       "message": "why closing it twice?",
+      "range": {
+        "startLine": 128,
+        "startChar": 12,
+        "endLine": 128,
+        "endChar": 35
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_610d7837",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-01-06T17:22:04Z",
+      "side": 1,
+      "message": "Close is blocking and waiting for channel to be closed. Second close shuold be on sshSession. We will fix it.",
+      "parentUuid": "1a622d24_07d781c0",
       "range": {
         "startLine": 128,
         "startChar": 12,
@@ -668,6 +944,24 @@
     },
     {
       "key": {
+        "uuid": "1a622d24_81589433",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-01-06T17:22:04Z",
+      "side": 1,
+      "message": "Actually this happens after verifyServerKey, actual callback is handled via #sessionEvent on line 85 when we get Authenticated case",
+      "parentUuid": "1a622d24_67fd953a",
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a622d24_e7a08545",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServer.java",
         "patchSetId": 2
@@ -725,6 +1019,30 @@
       "writtenOn": "2016-12-15T21:26:05Z",
       "side": 1,
       "message": "please make those configurable through a config file, editable, through blueprint",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 59
+      },
+      "revId": "8d3351b41140138b1b08d4e955c6fd3070dcc7da",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_c141ec3a",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServerBuilder.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-01-06T17:22:04Z",
+      "side": 1,
+      "message": "These are configurable via Builder itself and in class IetfZeroTouchCallHomeServerProvider\nyou could see they are customized using  #Configuration object.",
+      "parentUuid": "1a622d24_c7a3c94d",
       "range": {
         "startLine": 29,
         "startChar": 0,
