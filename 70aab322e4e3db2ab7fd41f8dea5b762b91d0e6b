@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a622d24_3d6fef2c",
+        "filename": "netconf/callhome-model/src/main/yang/odl-netconf-callhome-server.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-01-06T19:07:28Z",
+      "side": 1,
+      "message": "This is still in plain text.  This is unacceptable.",
+      "range": {
+        "startLine": 19,
+        "startChar": 2,
+        "endLine": 34,
+        "endChar": 3
+      },
+      "revId": "70aab322e4e3db2ab7fd41f8dea5b762b91d0e6b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
