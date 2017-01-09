@@ -13,7 +13,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.Maps;
@@ -40,6 +39,7 @@ import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
  * Unit tests for {@link ParserIdentifier}
@@ -101,25 +101,26 @@ public class ParserIdentifierTest {
     @Before
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
-        schemaContext = TestRestconfUtils.loadSchemaContext("/parser-identifier");
-        schemaContextOnMountPoint = TestRestconfUtils.loadSchemaContext("/parser-identifier");
+        this.schemaContext = YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/parser-identifier"));
+        this.schemaContextOnMountPoint =
+                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/parser-identifier"));
 
         // create and register mount point
-        mountPoint = SimpleDOMMountPoint.create(
+        this.mountPoint = SimpleDOMMountPoint.create(
                 YangInstanceIdentifier.builder()
                         .node(QName.create("mount:point", "2016-06-02", "mount-container"))
                         .node(QName.create("mount:point", "2016-06-02", "point-number"))
                         .build(),
                 ImmutableClassToInstanceMap.copyOf(Maps.newHashMap()),
-                schemaContextOnMountPoint
+                this.schemaContextOnMountPoint
         );
 
-        mountPointService = new DOMMountPointServiceImpl();
-        ((DOMMountPointServiceImpl) mountPointService).registerMountPoint(mountPoint);
+        this.mountPointService = new DOMMountPointServiceImpl();
+        ((DOMMountPointServiceImpl) this.mountPointService).registerMountPoint(this.mountPoint);
 
         // register mount point with null schema context
-        when(mockMountPoint.getSchemaContext()).thenReturn(null);
-        when(mockMountPointService.getMountPoint(YangInstanceIdentifier.EMPTY)).thenReturn(Optional.of(mockMountPoint));
+        when(this.mockMountPoint.getSchemaContext()).thenReturn(null);
+        when(this.mockMountPointService.getMountPoint(YangInstanceIdentifier.EMPTY)).thenReturn(Optional.of(this.mockMountPoint));
     }
 
     /**
@@ -133,7 +134,7 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierTest() {
         final InstanceIdentifierContext<?> context = ParserIdentifier.toInstanceIdentifier(
-                TEST_IDENT, schemaContext, Optional.absent());
+                TEST_IDENT, this.schemaContext, Optional.absent());
 
         assertEquals("Returned not expected identifier",
                 TEST_IDENT_RESULT, context .getInstanceIdentifier().toString());
@@ -146,7 +147,7 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierOtherModulesTest() {
         final InstanceIdentifierContext<?> context = ParserIdentifier.toInstanceIdentifier(
-                TEST_IDENT_OTHERS, schemaContext, Optional.absent());
+                TEST_IDENT_OTHERS, this.schemaContext, Optional.absent());
 
         assertEquals("Returned not expected identifier",
                 TEST_IDENT_OTHERS_RESULT, context.getInstanceIdentifier().toString());
@@ -159,16 +160,16 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierMountPointTest() {
         final InstanceIdentifierContext<?> context = ParserIdentifier.toInstanceIdentifier(
-                MOUNT_POINT_IDENT + "/" + TEST_IDENT, schemaContext, Optional.of(mountPointService));
+                MOUNT_POINT_IDENT + "/" + TEST_IDENT, this.schemaContext, Optional.of(this.mountPointService));
 
         assertEquals("Returned not expected identifier",
                 TEST_IDENT_RESULT.toString(), context.getInstanceIdentifier().toString());
 
         assertEquals("Mount point not found",
-                mountPoint, context.getMountPoint());
+                this.mountPoint, context.getMountPoint());
 
         assertEquals("Schema context from mount point expected",
-                schemaContextOnMountPoint, context.getSchemaContext());
+                this.schemaContextOnMountPoint, context.getSchemaContext());
     }
 
     /**
@@ -178,7 +179,7 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierNullIdentifierTest() {
         final InstanceIdentifierContext<?> context = ParserIdentifier.toInstanceIdentifier(
-                null, schemaContext, Optional.absent());
+                null, this.schemaContext, Optional.absent());
         assertEquals("Returned not expected identifier",
                 YangInstanceIdentifier.EMPTY, context.getInstanceIdentifier());
     }
@@ -189,7 +190,7 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toInstanceIdentifierNullSchemaContextNegativeTest() {
-        thrown.expect(NullPointerException.class);
+        this.thrown.expect(NullPointerException.class);
         ParserIdentifier.toInstanceIdentifier(TEST_IDENT, null, Optional.absent());
     }
 
@@ -199,7 +200,7 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierEmptyIdentifierTest() {
         final InstanceIdentifierContext<?> context = ParserIdentifier.toInstanceIdentifier(
-                "", schemaContext, Optional.absent());
+                "", this.schemaContext, Optional.absent());
         assertEquals("Returned not expected identifier",
                 YangInstanceIdentifier.EMPTY, context.getInstanceIdentifier());
     }
@@ -209,8 +210,8 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toInstanceIdentifierInvalidIdentifierNegativeTest() {
-        thrown.expect(IllegalArgumentException.class);
-        ParserIdentifier.toInstanceIdentifier(INVALID_TEST_IDENT, schemaContext, Optional.absent());
+        this.thrown.expect(IllegalArgumentException.class);
+        ParserIdentifier.toInstanceIdentifier(INVALID_TEST_IDENT, this.schemaContext, Optional.absent());
     }
 
     /**
@@ -219,8 +220,8 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toInstanceIdentifierMountPointInvalidIdentifierNegativeTest() {
-        thrown.expect(IllegalArgumentException.class);
-        ParserIdentifier.toInstanceIdentifier(INVALID_MOUNT_POINT_IDENT, schemaContext, Optional.of(mountPointService));
+        this.thrown.expect(IllegalArgumentException.class);
+        ParserIdentifier.toInstanceIdentifier(INVALID_MOUNT_POINT_IDENT, this.schemaContext, Optional.of(this.mountPointService));
     }
 
     /**
@@ -232,7 +233,7 @@ public class ParserIdentifierTest {
     public void toInstanceIdentifierMissingMountPointNegativeTest() {
         try {
             ParserIdentifier.toInstanceIdentifier(
-                    "" + "/" + RestconfConstants.MOUNT, schemaContext, Optional.of(mountPointService));
+                    "" + "/" + RestconfConstants.MOUNT, this.schemaContext, Optional.of(this.mountPointService));
             fail("Test should fail due to missing mount point");
         } catch (final RestconfDocumentedException e) {
             assertEquals("Not expected error type",
@@ -252,7 +253,7 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierMissingMountPointServiceNegativeTest() {
         try {
-            ParserIdentifier.toInstanceIdentifier(RestconfConstants.MOUNT, schemaContext, Optional.absent());
+            ParserIdentifier.toInstanceIdentifier(RestconfConstants.MOUNT, this.schemaContext, Optional.absent());
             fail("Test should fail due to absent mount point service");
         } catch (final RestconfDocumentedException e) {
             assertEquals("Not expected error type",
@@ -399,7 +400,7 @@ public class ParserIdentifierTest {
      */
     @Test
     public void makeQNameFromIdentifierNullIdentifierNegativeTest() {
-        thrown.expect(NullPointerException.class);
+        this.thrown.expect(NullPointerException.class);
         ParserIdentifier.makeQNameFromIdentifier(null);
     }
 
@@ -455,7 +456,7 @@ public class ParserIdentifierTest {
     @Test
     public void toSchemaExportContextFromIdentifierTest() {
         final SchemaExportContext exportContext = ParserIdentifier.
-                toSchemaExportContextFromIdentifier(schemaContext, TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null);
+                toSchemaExportContextFromIdentifier(this.schemaContext, TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null);
 
         assertNotNull("Export context should be parsed", exportContext);
 
@@ -477,7 +478,7 @@ public class ParserIdentifierTest {
     @Test
     public void toSchemaExportContextFromIdentifierNotFoundTest() {
         final SchemaExportContext exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
-                schemaContext,
+                this.schemaContext,
                 "not-existing-module" + "/" + "2016-01-01",
                 null);
 
@@ -494,7 +495,7 @@ public class ParserIdentifierTest {
     public void toSchemaExportContextFromIdentifierInvalidIdentifierNegativeTest() {
         try {
             ParserIdentifier.toSchemaExportContextFromIdentifier(
-                    schemaContext, TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME, null);
+                    this.schemaContext, TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME, null);
             fail("Test should fail due to invalid identifier supplied");
         } catch (final RestconfDocumentedException e) {
             assertEquals("Not expected error type",
@@ -513,9 +514,9 @@ public class ParserIdentifierTest {
     @Test
     public void toSchemaExportContextFromIdentifierMountPointTest() {
         final SchemaExportContext exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
-                schemaContext,
+                this.schemaContext,
                 MOUNT_POINT_IDENT + "/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION,
-                mountPointService);
+                this.mountPointService);
 
         final Module module = exportContext.getModule();
         assertNotNull("Export context should contains test module", module);
@@ -535,9 +536,9 @@ public class ParserIdentifierTest {
     @Test
     public void toSchemaExportContextFromIdentifierMountPointNotFoundTest() {
         final SchemaExportContext exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
-                schemaContext,
+                this.schemaContext,
                 MOUNT_POINT_IDENT + "/" + "not-existing-module" + "/" + "2016-01-01",
-                mountPointService);
+                this.mountPointService);
 
         assertNotNull("Export context should be parsed", exportContext);
         assertNull("Not-existing module should be null", exportContext.getModule());
@@ -552,9 +553,9 @@ public class ParserIdentifierTest {
     public void toSchemaExportContextFromIdentifierMountPointInvalidIdentifierNegativeTest() {
         try {
             ParserIdentifier.toSchemaExportContextFromIdentifier(
-                    schemaContext,
+                    this.schemaContext,
                     MOUNT_POINT_IDENT + "/" + TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME,
-                    mountPointService);
+                    this.mountPointService);
 
             fail("Test should fail due to invalid identifier supplied");
         } catch (final RestconfDocumentedException e) {
@@ -573,8 +574,8 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toSchemaExportContextFromIdentifierNullIdentifierNegativeTest() {
-        thrown.expect(NullPointerException.class);
-        ParserIdentifier.toSchemaExportContextFromIdentifier(schemaContext, null, null);
+        this.thrown.expect(NullPointerException.class);
+        ParserIdentifier.toSchemaExportContextFromIdentifier(this.schemaContext, null, null);
     }
 
     /**
@@ -583,7 +584,7 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toSchemaExportContextFromIdentifierNullSchemaContextNegativeTest() {
-        thrown.expect(NullPointerException.class);
+        this.thrown.expect(NullPointerException.class);
         ParserIdentifier.toSchemaExportContextFromIdentifier(null, TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null);
     }
 
@@ -594,7 +595,7 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toSchemaExportContextFromIdentifierMountPointNullSchemaContextNegativeTest() {
-        thrown.expect(NullPointerException.class);
+        this.thrown.expect(NullPointerException.class);
         ParserIdentifier.toSchemaExportContextFromIdentifier(
                 null,
                 MOUNT_POINT_IDENT
@@ -602,7 +603,7 @@ public class ParserIdentifierTest {
                 + TEST_MODULE_NAME
                 + "/"
                 + TEST_MODULE_REVISION,
-                mountPointService);
+                this.mountPointService);
     }
 
     /**
@@ -612,9 +613,9 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toSchemaExportContextFromIdentifierNullMountPointServiceNegativeTest() {
-        thrown.expect(NullPointerException.class);
+        this.thrown.expect(NullPointerException.class);
         ParserIdentifier.toSchemaExportContextFromIdentifier(
-                schemaContext,
+                this.schemaContext,
                 MOUNT_POINT_IDENT
                 + "/"
                 + TEST_MODULE_NAME
@@ -629,15 +630,15 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toSchemaExportContextFromIdentifierNullSchemaContextBehindMountPointNegativeTest() {
-        thrown.expect(NullPointerException.class);
+        this.thrown.expect(NullPointerException.class);
         ParserIdentifier.toSchemaExportContextFromIdentifier(
-                schemaContext,
+                this.schemaContext,
                 "/"
                 + RestconfConstants.MOUNT
                 + "/"
                 + TEST_MODULE_NAME
                 + "/"
                 + TEST_MODULE_REVISION,
-                mockMountPointService);
+                this.mockMountPointService);
     }
 }

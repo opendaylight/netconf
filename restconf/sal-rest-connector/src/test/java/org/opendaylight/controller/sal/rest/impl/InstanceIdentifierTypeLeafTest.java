@@ -17,12 +17,14 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class InstanceIdentifierTypeLeafTest {
 
     @Test
     public void stringToInstanceIdentifierTest() throws Exception {
-        final SchemaContext schemaContext = TestRestconfUtils.loadSchemaContext("/instanceidentifier");
+        final SchemaContext schemaContext =
+                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/instanceidentifier"));
         ControllerContext.getInstance().setGlobalSchema(schemaContext);
         final InstanceIdentifierContext<?> instanceIdentifier =
                 ControllerContext.getInstance().toInstanceIdentifier(

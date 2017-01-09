@@ -41,6 +41,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class RestconfImplNotificationSubscribingTest {
 
@@ -61,7 +62,8 @@ public class RestconfImplNotificationSubscribingTest {
 
         this.broker.setDomDataBroker(this.domDataBroker);
         RestconfImpl.getInstance().setBroker(this.broker);
-        ControllerContext.getInstance().setGlobalSchema(TestRestconfUtils.loadSchemaContext("/notifications"));
+        ControllerContext.getInstance()
+                .setGlobalSchema(YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/notifications")));
 
         final YangInstanceIdentifier path = Mockito.mock(YangInstanceIdentifier.class);
         final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-14-12", "localName"));

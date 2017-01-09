@@ -20,12 +20,14 @@ import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class RestconfImplTest {
 
     @Test
     public void RestImplTest() throws Exception {
-        final SchemaContext schemaContext = TestRestconfUtils.loadSchemaContext("/restconf/impl");
+        final SchemaContext schemaContext =
+                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/restconf/impl"));
 
         final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
         final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);

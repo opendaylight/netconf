@@ -12,7 +12,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -33,6 +32,7 @@ import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
  * Unit test for {@link ParserFieldsParameter}
@@ -75,40 +75,41 @@ public class ParserFieldsParameterTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        final SchemaContext schemaContext = TestRestconfUtils.loadSchemaContext("/jukebox");
+        final SchemaContext schemaContext =
+                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/jukebox"));
 
         final QNameModule qNameModule = QNameModule.create(URI.create("http://example.com/ns/example-jukebox"),
                 new SimpleDateFormat("yyyy-MM-dd").parse("2015-04-04"));
 
-        jukeboxQName = QName.create(qNameModule, "jukebox");
-        playerQName = QName.create(qNameModule, "player");
-        libraryQName = QName.create(qNameModule, "library");
-        augmentedLibraryQName = QName.create(
+        this.jukeboxQName = QName.create(qNameModule, "jukebox");
+        this.playerQName = QName.create(qNameModule, "player");
+        this.libraryQName = QName.create(qNameModule, "library");
+        this.augmentedLibraryQName = QName.create(
                 QNameModule.create(
                         URI.create("http://example.com/ns/augmented-jukebox"),
                         new SimpleDateFormat("yyyy-MM-dd").parse("2016-05-05")),
                 "augmented-library");
-        albumQName = QName.create(qNameModule, "album");
-        nameQName = QName.create(qNameModule, "name");
+        this.albumQName = QName.create(qNameModule, "album");
+        this.nameQName = QName.create(qNameModule, "name");
 
-        Mockito.when(identifierContext.getSchemaContext()).thenReturn(schemaContext);
-        Mockito.when(containerJukebox.getQName()).thenReturn(jukeboxQName);
-        Mockito.when(identifierContext.getSchemaNode()).thenReturn(containerJukebox);
+        Mockito.when(this.identifierContext.getSchemaContext()).thenReturn(schemaContext);
+        Mockito.when(this.containerJukebox.getQName()).thenReturn(this.jukeboxQName);
+        Mockito.when(this.identifierContext.getSchemaNode()).thenReturn(this.containerJukebox);
 
-        Mockito.when(containerLibrary.getQName()).thenReturn(libraryQName);
-        Mockito.when(containerJukebox.getDataChildByName(libraryQName)).thenReturn(containerLibrary);
+        Mockito.when(this.containerLibrary.getQName()).thenReturn(this.libraryQName);
+        Mockito.when(this.containerJukebox.getDataChildByName(this.libraryQName)).thenReturn(this.containerLibrary);
 
-        Mockito.when(augmentedContainerLibrary.getQName()).thenReturn(augmentedLibraryQName);
-        Mockito.when(containerJukebox.getDataChildByName(augmentedLibraryQName)).thenReturn(augmentedContainerLibrary);
+        Mockito.when(this.augmentedContainerLibrary.getQName()).thenReturn(this.augmentedLibraryQName);
+        Mockito.when(this.containerJukebox.getDataChildByName(this.augmentedLibraryQName)).thenReturn(this.augmentedContainerLibrary);
 
-        Mockito.when(containerPlayer.getQName()).thenReturn(playerQName);
-        Mockito.when(containerJukebox.getDataChildByName(playerQName)).thenReturn(containerPlayer);
+        Mockito.when(this.containerPlayer.getQName()).thenReturn(this.playerQName);
+        Mockito.when(this.containerJukebox.getDataChildByName(this.playerQName)).thenReturn(this.containerPlayer);
 
-        Mockito.when(listAlbum.getQName()).thenReturn(albumQName);
-        Mockito.when(containerLibrary.getDataChildByName(albumQName)).thenReturn(listAlbum);
+        Mockito.when(this.listAlbum.getQName()).thenReturn(this.albumQName);
+        Mockito.when(this.containerLibrary.getDataChildByName(this.albumQName)).thenReturn(this.listAlbum);
 
-        Mockito.when(leafName.getQName()).thenReturn(nameQName);
-        Mockito.when(listAlbum.getDataChildByName(nameQName)).thenReturn(leafName);
+        Mockito.when(this.leafName.getQName()).thenReturn(this.nameQName);
+        Mockito.when(this.listAlbum.getDataChildByName(this.nameQName)).thenReturn(this.leafName);
     }
 
     /**
@@ -117,12 +118,12 @@ public class ParserFieldsParameterTest {
     @Test
     public void parseFieldsParameterSimplePathTest() {
         final String input = "library";
-        final List<Set<QName>> parsedFields = ParserFieldsParameter.parseFieldsParameter(identifierContext, input);
+        final List<Set<QName>> parsedFields = ParserFieldsParameter.parseFieldsParameter(this.identifierContext, input);
 
         assertNotNull(parsedFields);
         assertEquals(1, parsedFields.size());
         assertEquals(1, parsedFields.get(0).size());
-        assertTrue(parsedFields.get(0).contains(libraryQName));
+        assertTrue(parsedFields.get(0).contains(this.libraryQName));
     }
 
     /**
@@ -131,13 +132,13 @@ public class ParserFieldsParameterTest {
     @Test
     public void parseFieldsParameterDoublePathTest() {
         final String input = "library;player";
-        final List<Set<QName>> parsedFields = ParserFieldsParameter.parseFieldsParameter(identifierContext, input);
+        final List<Set<QName>> parsedFields = ParserFieldsParameter.parseFieldsParameter(this.identifierContext, input);
 
         assertNotNull(parsedFields);
         assertEquals(1, parsedFields.size());
         assertEquals(2, parsedFields.get(0).size());
-        assertTrue(parsedFields.get(0).contains(libraryQName));
-        assertTrue(parsedFields.get(0).contains(playerQName));
+        assertTrue(parsedFields.get(0).contains(this.libraryQName));
+        assertTrue(parsedFields.get(0).contains(this.playerQName));
     }
 
     /**
@@ -146,19 +147,19 @@ public class ParserFieldsParameterTest {
     @Test
     public void parseFieldsParameterSubPathTest() {
         final String input = "library/album/name";
-        final List<Set<QName>> parsedFields = ParserFieldsParameter.parseFieldsParameter(identifierContext, input);
+        final List<Set<QName>> parsedFields = ParserFieldsParameter.parseFieldsParameter(this.identifierContext, input);
 
         assertNotNull(parsedFields);
         assertEquals(3, parsedFields.size());
 
         assertEquals(1, parsedFields.get(0).size());
-        assertTrue(parsedFields.get(0).contains(libraryQName));
+        assertTrue(parsedFields.get(0).contains(this.libraryQName));
 
         assertEquals(1, parsedFields.get(1).size());
-        assertTrue(parsedFields.get(1).contains(albumQName));
+        assertTrue(parsedFields.get(1).contains(this.albumQName));
 
         assertEquals(1, parsedFields.get(2).size());
-        assertTrue(parsedFields.get(2).contains(nameQName));
+        assertTrue(parsedFields.get(2).contains(this.nameQName));
     }
 
     /**
@@ -167,19 +168,19 @@ public class ParserFieldsParameterTest {
     @Test
     public void parseFieldsParameterChildrenPathTest() {
         final String input = "library(album(name))";
-        final List<Set<QName>> parsedFields = ParserFieldsParameter.parseFieldsParameter(identifierContext, input);
+        final List<Set<QName>> parsedFields = ParserFieldsParameter.parseFieldsParameter(this.identifierContext, input);
 
         assertNotNull(parsedFields);
         assertEquals(3, parsedFields.size());
 
         assertEquals(1, parsedFields.get(0).size());
-        assertTrue(parsedFields.get(0).contains(libraryQName));
+        assertTrue(parsedFields.get(0).contains(this.libraryQName));
 
         assertEquals(1, parsedFields.get(1).size());
-        assertTrue(parsedFields.get(1).contains(albumQName));
+        assertTrue(parsedFields.get(1).contains(this.albumQName));
 
         assertEquals(1, parsedFields.get(2).size());
-        assertTrue(parsedFields.get(2).contains(nameQName));
+        assertTrue(parsedFields.get(2).contains(this.nameQName));
     }
 
     /**
@@ -188,13 +189,13 @@ public class ParserFieldsParameterTest {
     @Test
     public void parseFieldsParameterNamespaceTest() {
         final String input = "augmented-jukebox:augmented-library";
-        final List<Set<QName>> parsedFields = ParserFieldsParameter.parseFieldsParameter(identifierContext, input);
+        final List<Set<QName>> parsedFields = ParserFieldsParameter.parseFieldsParameter(this.identifierContext, input);
 
         assertNotNull(parsedFields);
         assertEquals(1, parsedFields.size());
 
         assertEquals(1, parsedFields.get(0).size());
-        assertTrue(parsedFields.get(0).contains(augmentedLibraryQName));
+        assertTrue(parsedFields.get(0).contains(this.augmentedLibraryQName));
     }
 
     /**
@@ -205,7 +206,7 @@ public class ParserFieldsParameterTest {
         final String input = "*";
 
         try {
-            ParserFieldsParameter.parseFieldsParameter(identifierContext, input);
+            ParserFieldsParameter.parseFieldsParameter(this.identifierContext, input);
             fail("Test should fail due to not expected character used in parameter input value");
         } catch (final RestconfDocumentedException e) {
             // Bad request
@@ -223,7 +224,7 @@ public class ParserFieldsParameterTest {
         final String input = "library(";
 
         try {
-            ParserFieldsParameter.parseFieldsParameter(identifierContext, input);
+            ParserFieldsParameter.parseFieldsParameter(this.identifierContext, input);
             fail("Test should fail due to missing closing parenthesis");
         } catch (final RestconfDocumentedException e) {
             // Bad request
@@ -241,7 +242,7 @@ public class ParserFieldsParameterTest {
         final String input = "library(not-existing)";
 
         try {
-            ParserFieldsParameter.parseFieldsParameter(identifierContext, input);
+            ParserFieldsParameter.parseFieldsParameter(this.identifierContext, input);
             fail("Test should fail due to missing child node in parent node");
         } catch (final RestconfDocumentedException e) {
             // Bad request
@@ -259,7 +260,7 @@ public class ParserFieldsParameterTest {
         final String input = "library(album);";
 
         try {
-            ParserFieldsParameter.parseFieldsParameter(identifierContext, input);
+            ParserFieldsParameter.parseFieldsParameter(this.identifierContext, input);
             fail("Test should fail due to unexpected character after parenthesis");
         } catch (final RestconfDocumentedException e) {
             // Bad request
@@ -277,7 +278,7 @@ public class ParserFieldsParameterTest {
         final String input = "library(album)player";
 
         try {
-            ParserFieldsParameter.parseFieldsParameter(identifierContext, input);
+            ParserFieldsParameter.parseFieldsParameter(this.identifierContext, input);
             fail("Test should fail due to missing semicolon after parenthesis");
         } catch (final RestconfDocumentedException e) {
             // Bad request

@@ -91,7 +91,7 @@
 
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-parser-impl</artifactId>
+      <artifactId>yang-test-util</artifactId>
     </dependency>
 
     <dependency>

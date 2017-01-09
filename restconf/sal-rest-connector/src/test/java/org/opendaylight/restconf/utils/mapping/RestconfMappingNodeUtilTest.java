@@ -50,6 +50,7 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
  * Unit tests for {@link RestconfMappingNodeUtil}
@@ -73,11 +74,12 @@ public class RestconfMappingNodeUtilTest {
 
     @BeforeClass
     public static void loadTestSchemaContextAndModules() throws Exception {
-        schemaContext = TestRestconfUtils.loadSchemaContext(
-                "/modules/restconf-module-testing");
-        schemaContextMonitoring = TestRestconfUtils.loadSchemaContext("/modules");
+        schemaContext =
+                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/modules/restconf-module-testing"));
+        schemaContextMonitoring = YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/modules"));
         modules = schemaContextMonitoring.getModules();
-        modulesRest = TestRestconfUtils.loadSchemaContext("/modules/restconf-module-testing").getModules();
+        modulesRest = YangParserTestUtils
+                .parseYangSources(TestRestconfUtils.loadFiles("/modules/restconf-module-testing")).getModules();
     }
 
     @Before

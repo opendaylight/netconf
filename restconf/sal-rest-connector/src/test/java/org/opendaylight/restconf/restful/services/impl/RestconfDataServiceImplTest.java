@@ -67,6 +67,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class RestconfDataServiceImplTest {
 
@@ -165,7 +166,8 @@ public class RestconfDataServiceImplTest {
                 .node(this.baseQName)
                 .build();
 
-        this.contextRef = new SchemaContextRef(TestRestconfUtils.loadSchemaContext(PATH_FOR_NEW_SCHEMA_CONTEXT));
+        this.contextRef = new SchemaContextRef(
+                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
         this.schemaNode = DataSchemaContextTree.from(this.contextRef.get()).getChild(this.iidBase).getDataSchemaNode();
 
         final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
