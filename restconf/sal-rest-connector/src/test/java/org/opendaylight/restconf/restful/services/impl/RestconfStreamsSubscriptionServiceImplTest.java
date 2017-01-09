@@ -12,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import java.lang.reflect.Field;
@@ -49,6 +50,7 @@ import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class RestconfStreamsSubscriptionServiceImplTest {
 
@@ -97,7 +99,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         final Set<Entry<String, List<String>>> set = new HashSet<>();
         Mockito.when(map.entrySet()).thenReturn(set);
         Mockito.when(this.uriInfo.getQueryParameters()).thenReturn(map);
-        this.schemaHandler.onGlobalContextUpdated(TestRestconfUtils.loadSchemaContext("/notifications"));
+        this.schemaHandler.onGlobalContextUpdated(
+                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/notifications")));
     }
 
     @BeforeClass

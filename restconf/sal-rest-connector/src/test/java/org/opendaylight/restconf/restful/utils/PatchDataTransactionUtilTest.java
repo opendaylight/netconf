@@ -45,6 +45,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class PatchDataTransactionUtilTest {
 
@@ -81,7 +82,8 @@ public class PatchDataTransactionUtilTest {
         PatchDataTransactionUtilTest.broker.setAccessible(true);
         PatchDataTransactionUtilTest.broker.set(RestConnectorProvider.class, mock(DOMDataBroker.class));
 
-        refSchemaCtx = new SchemaContextRef(TestRestconfUtils.loadSchemaContext(PATH_FOR_NEW_SCHEMA_CONTEXT));
+        this.refSchemaCtx = new SchemaContextRef(
+                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
         final QName baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
         final QName containerPlayerQName = QName.create(baseQName, "player");
         final QName leafGapQName = QName.create(baseQName, "gap");
@@ -92,7 +94,7 @@ public class PatchDataTransactionUtilTest {
                 new YangInstanceIdentifier.NodeIdentifierWithPredicates(listArtistQName, leafNameQName, "name of artist");
 
         /** instance identifier for accessing leaf node "gap" */
-        iIDCreateAndDelete = YangInstanceIdentifier.builder()
+        this.iIDCreateAndDelete = YangInstanceIdentifier.builder()
                 .node(baseQName)
                 .node(containerPlayerQName)
                 .node(leafGapQName)
@@ -109,18 +111,18 @@ public class PatchDataTransactionUtilTest {
                 .withChild(buildGapLeaf)
                 .build();
 
-        buildBaseContainerForTests = Builders.containerBuilder()
+        this.buildBaseContainerForTests = Builders.containerBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(baseQName))
                 .withChild(buildPlayerContainer)
                 .build();
 
-        targetNodeForCreateAndDelete = YangInstanceIdentifier.builder(iIDCreateAndDelete)
+        this.targetNodeForCreateAndDelete = YangInstanceIdentifier.builder(this.iIDCreateAndDelete)
                 .node(containerPlayerQName)
                 .node(leafGapQName)
                 .build();
 
         /** instance identifier for accessing leaf node "name" in list "artist" */
-        iIDMerge = YangInstanceIdentifier.builder()
+        this.iIDMerge = YangInstanceIdentifier.builder()
                 .node(baseQName)
                 .node(containerLibraryQName)
                 .node(listArtistQName)
@@ -145,12 +147,12 @@ public class PatchDataTransactionUtilTest {
                 .withChild(contentDescription)
                 .build();
 
-        buildArtistList = Builders.mapBuilder()
+        this.buildArtistList = Builders.mapBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(listArtistQName))
                 .withChild(mapEntryNode)
                 .build();
 
-        targetNodeMerge = YangInstanceIdentifier.builder()
+        this.targetNodeMerge = YangInstanceIdentifier.builder()
                 .node(baseQName)
                 .node(containerLibraryQName)
                 .node(listArtistQName)
@@ -158,18 +160,18 @@ public class PatchDataTransactionUtilTest {
                 .build();
 
         /** Mocks */
-        doReturn(rWTransaction).when(transactionChain).newReadWriteTransaction();
-        doReturn(Futures.immediateCheckedFuture(null)).when(rWTransaction).submit();
+        doReturn(this.rWTransaction).when(this.transactionChain).newReadWriteTransaction();
+        doReturn(Futures.immediateCheckedFuture(null)).when(this.rWTransaction).submit();
     }
 
     @Test
     public void testPatchDataReplaceMergeAndRemove() {
         doReturn(Futures.immediateCheckedFuture(false)).doReturn(Futures.immediateCheckedFuture(true))
-                .when(rWTransaction).exists(LogicalDatastoreType.CONFIGURATION, targetNodeMerge);
+                .when(this.rWTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeMerge);
 
-        final PATCHEntity entityReplace = new PATCHEntity("edit1", "REPLACE", targetNodeMerge, buildArtistList);
-        final PATCHEntity entityMerge = new PATCHEntity("edit2", "MERGE", targetNodeMerge, buildArtistList);
-        final PATCHEntity entityRemove = new PATCHEntity("edit3", "REMOVE", targetNodeMerge);
+        final PATCHEntity entityReplace = new PATCHEntity("edit1", "REPLACE", this.targetNodeMerge, this.buildArtistList);
+        final PATCHEntity entityMerge = new PATCHEntity("edit2", "MERGE", this.targetNodeMerge, this.buildArtistList);
+        final PATCHEntity entityRemove = new PATCHEntity("edit3", "REMOVE", this.targetNodeMerge);
         final List<PATCHEntity> entities = new ArrayList<>();
 
         entities.add(entityReplace);
@@ -177,13 +179,13 @@ public class PatchDataTransactionUtilTest {
         entities.add(entityRemove);
 
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iIDMerge, null, null, refSchemaCtx.get());
+                new InstanceIdentifierContext<>(this.iIDMerge, null, null, this.refSchemaCtx.get());
         final PATCHContext patchContext = new PATCHContext(iidContext, entities, "patchRMRm");
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, transactionChain);
+        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, this.transactionChain);
         final PATCHStatusContext patchStatusContext =
-                PatchDataTransactionUtil.patchData(patchContext, wrapper, refSchemaCtx);
+                PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
 
-        for (PATCHStatusEntity entity : patchStatusContext.getEditCollection()) {
+        for (final PATCHStatusEntity entity : patchStatusContext.getEditCollection()) {
             assertTrue(entity.isOk());
         }
         assertTrue(patchStatusContext.isOk());
@@ -192,24 +194,24 @@ public class PatchDataTransactionUtilTest {
     @Test
     public void testPatchDataCreateAndDelete() throws Exception {
         doReturn(Futures.immediateCheckedFuture(false)).doReturn(Futures.immediateCheckedFuture(true))
-                .when(rWTransaction).exists(LogicalDatastoreType.CONFIGURATION, targetNodeForCreateAndDelete);
+                .when(this.rWTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
 
         final PATCHEntity entityCreate =
-                new PATCHEntity("edit1", "CREATE", targetNodeForCreateAndDelete, buildBaseContainerForTests);
+                new PATCHEntity("edit1", "CREATE", this.targetNodeForCreateAndDelete, this.buildBaseContainerForTests);
         final PATCHEntity entityDelete =
-                new PATCHEntity("edit2", "DELETE", targetNodeForCreateAndDelete);
+                new PATCHEntity("edit2", "DELETE", this.targetNodeForCreateAndDelete);
         final List<PATCHEntity> entities = new ArrayList<>();
 
         entities.add(entityCreate);
         entities.add(entityDelete);
 
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iIDCreateAndDelete, null, null, refSchemaCtx.get());
+                new InstanceIdentifierContext<>(this.iIDCreateAndDelete, null, null, this.refSchemaCtx.get());
         final PATCHContext patchContext = new PATCHContext(iidContext, entities, "patchCD");
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, transactionChain);
-        final PATCHStatusContext patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, wrapper, refSchemaCtx);
+        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, this.transactionChain);
+        final PATCHStatusContext patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
 
-        for (PATCHStatusEntity entity : patchStatusContext.getEditCollection()) {
+        for (final PATCHStatusEntity entity : patchStatusContext.getEditCollection()) {
             assertTrue(entity.isOk());
         }
         assertTrue(patchStatusContext.isOk());
@@ -218,19 +220,19 @@ public class PatchDataTransactionUtilTest {
     @Test
     public void deleteNonexistentDataTest() {
         doReturn(Futures.immediateCheckedFuture(false))
-                .when(rWTransaction).exists(LogicalDatastoreType.CONFIGURATION, targetNodeForCreateAndDelete);
+                .when(this.rWTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
 
         final PATCHEntity entityDelete =
-                new PATCHEntity("edit", "DELETE", targetNodeForCreateAndDelete);
+                new PATCHEntity("edit", "DELETE", this.targetNodeForCreateAndDelete);
         final List<PATCHEntity> entities = new ArrayList<>();
 
         entities.add(entityDelete);
 
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iIDCreateAndDelete, null, null, refSchemaCtx.get());
+                new InstanceIdentifierContext<>(this.iIDCreateAndDelete, null, null, this.refSchemaCtx.get());
         final PATCHContext patchContext = new PATCHContext(iidContext, entities, "patchD");
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, transactionChain);
-        final PATCHStatusContext patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, wrapper, refSchemaCtx);
+        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, this.transactionChain);
+        final PATCHStatusContext patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
 
         assertFalse(patchStatusContext.isOk());
         assertEquals(RestconfError.ErrorType.PROTOCOL,
@@ -242,21 +244,21 @@ public class PatchDataTransactionUtilTest {
     @Test
     public void testPatchMergePutContainer() throws Exception {
         doReturn(Futures.immediateCheckedFuture(false)).doReturn(Futures.immediateCheckedFuture(true))
-                .when(rWTransaction).exists(LogicalDatastoreType.CONFIGURATION, targetNodeForCreateAndDelete);
+                .when(this.rWTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
 
         final PATCHEntity entityMerge =
-                new PATCHEntity("edit1", "MERGE", targetNodeForCreateAndDelete, buildBaseContainerForTests);
+                new PATCHEntity("edit1", "MERGE", this.targetNodeForCreateAndDelete, this.buildBaseContainerForTests);
         final List<PATCHEntity> entities = new ArrayList<>();
 
         entities.add(entityMerge);
 
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(iIDCreateAndDelete, null, null, refSchemaCtx.get());
+                new InstanceIdentifierContext<>(this.iIDCreateAndDelete, null, null, this.refSchemaCtx.get());
         final PATCHContext patchContext = new PATCHContext(iidContext, entities, "patchM");
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, transactionChain);
-        final PATCHStatusContext patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, wrapper, refSchemaCtx);
+        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, this.transactionChain);
+        final PATCHStatusContext patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
 
-        for (PATCHStatusEntity entity : patchStatusContext.getEditCollection()) {
+        for (final PATCHStatusEntity entity : patchStatusContext.getEditCollection()) {
             assertTrue(entity.isOk());
         }
         assertTrue(patchStatusContext.isOk());

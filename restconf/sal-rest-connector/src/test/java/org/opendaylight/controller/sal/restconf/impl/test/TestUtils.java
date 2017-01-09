@@ -8,6 +8,7 @@
 package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertNotNull;
+
 import com.google.common.base.Preconditions;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -22,7 +23,9 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -47,10 +50,8 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
-import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangStatementSourceImpl;
 import org.opendaylight.yangtools.yang.parser.util.NamedFileInputStream;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -62,8 +63,7 @@ public final class TestUtils {
 
     public static SchemaContext loadSchemaContext(final String... yangPath)
             throws FileNotFoundException, ReactorException {
-        final CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR.newBuild();
-
+        final List<InputStream> files = new ArrayList<>();
         for (int i = 0; i < yangPath.length; i++) {
             final String path = yangPath[i];
             final String pathToFile = TestUtils.class.getResource(path).getPath();
@@ -72,15 +72,16 @@ public final class TestUtils {
             if (fileList == null) {
                 throw new FileNotFoundException(pathToFile);
             }
+
             for (int j = 0; j < fileList.length; j++) {
                 final String fileName = fileList[j];
                 final File file = new File(testDir, fileName);
                 if (file.isDirectory() == false) {
-                    reactor.addSource(new YangStatementSourceImpl(new NamedFileInputStream(file, file.getPath())));
+                    files.add(new NamedFileInputStream(file, file.getPath()));
                 }
             }
         }
-        return reactor.buildEffective();
+        return YangParserTestUtils.parseYangStreams(files);
     }
 
     public static Module findModule(final Set<Module> modules, final String moduleName) {
@@ -119,7 +120,7 @@ public final class TestUtils {
                 StandardCharsets.UTF_8)));
             final byte[] charData = out.toByteArray();
             return new String(charData, StandardCharsets.UTF_8);
-        } catch (TransformerException e) {
+        } catch (final TransformerException e) {
             final String msg = "Error during transformation of Document into String";
             LOG.error(msg, e);
             return msg;

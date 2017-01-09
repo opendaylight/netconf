@@ -38,6 +38,7 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 import org.opendaylight.yangtools.yang.parser.spi.source.SourceException;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class JsonBodyReaderTest extends AbstractBodyReaderTest {
 
@@ -71,7 +72,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
-        schemaContext = TestRestconfUtils.parseYangSources(testFiles);
+        schemaContext = YangParserTestUtils.parseYangSources(testFiles);
         controllerContext.setSchemas(schemaContext);
         when(mountPointServiceHandler.get()).thenReturn(mock(DOMMountPointService.class));
     }

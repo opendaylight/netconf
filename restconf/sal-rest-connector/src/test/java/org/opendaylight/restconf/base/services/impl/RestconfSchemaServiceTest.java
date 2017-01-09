@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
+
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import java.util.HashMap;
 import org.junit.Before;
@@ -30,7 +31,6 @@ import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.restconf.base.services.api.RestconfSchemaService;
-import org.opendaylight.restconf.base.services.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.utils.RestconfConstants;
@@ -39,6 +39,7 @@ import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
  * Unit tests for {@code RestconfSchemaService}
@@ -81,9 +82,11 @@ public class RestconfSchemaServiceTest {
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        this.schemaContext = TestRestconfUtils.loadSchemaContext("/modules");
-        this.schemaContextBehindMountPoint = TestRestconfUtils.loadSchemaContext("/modules/modules-behind-mount-point");
-        this.schemaContextWithMountPoints = TestRestconfUtils.loadSchemaContext("/modules/mount-points");
+        this.schemaContext = YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/modules"));
+        this.schemaContextBehindMountPoint = YangParserTestUtils
+                .parseYangSources(TestRestconfUtils.loadFiles("/modules/modules-behind-mount-point"));
+        this.schemaContextWithMountPoints =
+                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/modules/mount-points"));
 
         // create and register mount points
         this.mountPoint = SimpleDOMMountPoint.create(

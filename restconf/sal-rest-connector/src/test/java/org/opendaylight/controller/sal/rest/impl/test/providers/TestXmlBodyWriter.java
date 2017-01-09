@@ -14,15 +14,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
 import java.util.Collection;
-
 import javax.ws.rs.core.MediaType;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
  * sal-rest-connector org.opendaylight.controller.sal.rest.impl.test.providers
@@ -40,7 +39,7 @@ public class TestXmlBodyWriter extends AbstractBodyReaderTest {
 
     public TestXmlBodyWriter() throws NoSuchFieldException, SecurityException {
         super();
-        xmlBodyWriter = new NormalizedNodeXmlBodyWriter();
+        this.xmlBodyWriter = new NormalizedNodeXmlBodyWriter();
     }
 
     @Override
@@ -50,10 +49,10 @@ public class TestXmlBodyWriter extends AbstractBodyReaderTest {
 
     @BeforeClass
     public static void initialization() throws Exception {
-        Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
+        final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
-        schemaContext = TestRestconfUtils.parseYangSources(testFiles);
+        schemaContext = YangParserTestUtils.parseYangSources(testFiles);
         controllerContext.setSchemas(schemaContext);
     }
 
@@ -64,7 +63,7 @@ public class TestXmlBodyWriter extends AbstractBodyReaderTest {
         final NormalizedNodeContext nnContext = TestRestconfUtils
                 .loadNormalizedContextFromXmlFile(pathToInputFile, uri);
         final OutputStream output = new ByteArrayOutputStream();
-        xmlBodyWriter.writeTo(nnContext, null, null, null, mediaType, null,
+        this.xmlBodyWriter.writeTo(nnContext, null, null, null, this.mediaType, null,
                 output);
         assertTrue(output.toString().contains("lf-test"));
     }

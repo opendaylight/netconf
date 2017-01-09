@@ -11,6 +11,7 @@ package org.opendaylight.restconf.parser.builder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import java.util.Iterator;
@@ -27,6 +28,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
  * Unit tests for {@link YangInstanceIdentifierDeserializer}
@@ -41,7 +43,8 @@ public class YangInstanceIdentifierDeserializerTest {
 
     @Before
     public void init() throws Exception {
-        this.schemaContext = TestRestconfUtils.loadSchemaContext("/restconf/parser/deserializer");
+        this.schemaContext =
+                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/restconf/parser/deserializer"));
     }
 
     /**
