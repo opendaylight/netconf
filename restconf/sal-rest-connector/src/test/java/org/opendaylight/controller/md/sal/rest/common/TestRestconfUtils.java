@@ -8,19 +8,17 @@
 
 package org.opendaylight.controller.md.sal.rest.common;
 
+import com.google.common.base.Preconditions;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.opendaylight.controller.sal.rest.impl.test.providers.TestJsonBodyWriter;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
@@ -36,27 +34,20 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
-import org.opendaylight.yangtools.yang.parser.spi.source.SourceException;
-import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangStatementSourceImpl;
-import org.opendaylight.yangtools.yang.parser.util.NamedFileInputStream;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.google.common.base.Preconditions;
-
 /**
- * sal-rest-connector
- * org.opendaylight.controller.md.sal.rest.common
+ * sal-rest-connector org.opendaylight.controller.md.sal.rest.common
  *
  *
  *
  * @author <a href="mailto:vdemcak@cisco.com">Vaclav Demcak</a>
  *
- * Created: Mar 7, 2015
+ *         Created: Mar 7, 2015
  */
 public class TestRestconfUtils {
 
@@ -82,21 +73,20 @@ public class TestRestconfUtils {
         BUILDERFACTORY = factory;
     }
 
-    private TestRestconfUtils () {
+    private TestRestconfUtils() {
         throw new UnsupportedOperationException("Test utility class");
     }
 
     public static SchemaContext loadSchemaContext(final String yangPath, final SchemaContext schemaContext) {
         try {
             Preconditions.checkArgument(yangPath != null, "Path can not be null.");
-            Preconditions.checkArgument(( ! yangPath.isEmpty()), "Path can not be empty.");
+            Preconditions.checkArgument((!yangPath.isEmpty()), "Path can not be empty.");
             if (schemaContext == null) {
                 return loadSchemaContext(yangPath);
             } else {
                 throw new UnsupportedOperationException("Unable to add new yang sources to existing schema context.");
             }
-        }
-        catch (final Exception e) {
+        } catch (final Exception e) {
             LOG.error("Yang files at path: " + yangPath + " weren't loaded.");
         }
         return schemaContext;
@@ -106,7 +96,8 @@ public class TestRestconfUtils {
         throw new AbstractMethodError("Not implemented yet");
     }
 
-    public static NormalizedNodeContext loadNormalizedContextFromXmlFile(final String pathToInputFile, final String uri) {
+    public static NormalizedNodeContext loadNormalizedContextFromXmlFile(final String pathToInputFile,
+            final String uri) {
         final InstanceIdentifierContext<?> iiContext = ControllerContext.getInstance().toInstanceIdentifier(uri);
         final InputStream inputStream = TestJsonBodyWriter.class.getResourceAsStream(pathToInputFile);
         try {
@@ -114,8 +105,7 @@ public class TestRestconfUtils {
             final Document doc = dBuilder.parse(inputStream);
             final NormalizedNode<?, ?> nn = parse(iiContext, doc);
             return new NormalizedNodeContext(iiContext, nn);
-        }
-        catch (final Exception e) {
+        } catch (final Exception e) {
             LOG.error("Load xml file " + pathToInputFile + " fail.", e);
         }
         return null;
@@ -152,12 +142,13 @@ public class TestRestconfUtils {
                 }
             }
         }
-        final DomToNormalizedNodeParserFactory parserFactory =
-                DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, iiContext.getSchemaContext());
+        final DomToNormalizedNodeParserFactory parserFactory = DomToNormalizedNodeParserFactory
+                .getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, iiContext.getSchemaContext());
 
-        if(schemaNode instanceof ContainerSchemaNode) {
-            return parserFactory.getContainerNodeParser().parse(Collections.singletonList(doc.getDocumentElement()), (ContainerSchemaNode) schemaNode);
-        } else if(schemaNode instanceof ListSchemaNode) {
+        if (schemaNode instanceof ContainerSchemaNode) {
+            return parserFactory.getContainerNodeParser().parse(Collections.singletonList(doc.getDocumentElement()),
+                    (ContainerSchemaNode) schemaNode);
+        } else if (schemaNode instanceof ListSchemaNode) {
             final ListSchemaNode casted = (ListSchemaNode) schemaNode;
             return parserFactory.getMapEntryNodeParser().parse(elements, casted);
         } // FIXME : add another DataSchemaNode extensions e.g. LeafSchemaNode
@@ -181,21 +172,13 @@ public class TestRestconfUtils {
         return testFiles;
     }
 
-    public static SchemaContext loadSchemaContext(String resourceDirectory)
-            throws SourceException, ReactorException, FileNotFoundException,
-            URISyntaxException {
+    public static SchemaContext loadSchemaContext(final String resourceDirectory)
+            throws FileNotFoundException, ReactorException {
         return parseYangSources(loadFiles(resourceDirectory));
     }
 
-    public static SchemaContext parseYangSources(Collection<File> testFiles)
-            throws SourceException, ReactorException, FileNotFoundException {
-        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
-                .newBuild();
-        for (File testFile : testFiles) {
-            reactor.addSource(new YangStatementSourceImpl(
-                    new NamedFileInputStream(testFile, testFile.getPath())));
-        }
-
-        return reactor.buildEffective();
+    public static SchemaContext parseYangSources(final Collection<File> testFiles)
+            throws FileNotFoundException, ReactorException {
+        return YangParserTestUtils.parseYangSources(testFiles);
     }
 }

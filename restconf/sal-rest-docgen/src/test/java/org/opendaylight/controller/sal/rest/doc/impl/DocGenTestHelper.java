@@ -9,7 +9,6 @@ package org.opendaylight.controller.sal.rest.doc.impl;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsonorg.JsonOrgModule;
@@ -17,9 +16,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -30,10 +31,7 @@ import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
-import org.opendaylight.yangtools.yang.parser.stmt.reactor.CrossSourceStatementReactor;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangInferencePipeline;
-import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.YangStatementSourceImpl;
-import org.opendaylight.yangtools.yang.parser.util.NamedFileInputStream;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class DocGenTestHelper {
 
@@ -42,8 +40,7 @@ public class DocGenTestHelper {
     private SchemaContext schemaContext;
 
     public Set<Module> loadModules(final String resourceDirectory)
-            throws FileNotFoundException,
-            URISyntaxException, ReactorException {
+            throws URISyntaxException, FileNotFoundException, ReactorException {
 
         final URI resourceDirUri = getClass().getResource(resourceDirectory).toURI();
         final File testDir = new File(resourceDirUri);
@@ -51,13 +48,12 @@ public class DocGenTestHelper {
         if (fileList == null) {
             throw new FileNotFoundException(resourceDirectory.toString());
         }
-        final CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR.newBuild();
+        final List<File> files = new ArrayList<>();
         for (final String fileName : fileList) {
-            final File file = new File(testDir, fileName);
-            reactor.addSource(new YangStatementSourceImpl(new NamedFileInputStream(file, file.getPath())));
+            files.add(new File(testDir, fileName));
         }
 
-        this.schemaContext = reactor.buildEffective();
+        this.schemaContext = YangParserTestUtils.parseYangSources(files);
         return this.schemaContext.getModules();
     }
 
