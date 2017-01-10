@@ -20,12 +20,13 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
 
 /**
- * This service generates swagger (See <a
- * href="https://helloreverb.com/developers/swagger"
+ * This service generates swagger (See
+ * <a href="https://helloreverb.com/developers/swagger"
  * >https://helloreverb.com/developers/swagger</a>) compliant documentation for
  * RESTCONF APIs. The output of this is used by embedded Swagger UI.
  *
- * <p>NOTE: These API's need to be synchronized due to bug 1198. Thread access to
+ * <p>
+ * NOTE: These API's need to be synchronized due to bug 1198. Thread access to
  * the SchemaContext is not synchronized properly and thus you can end up with
  * missing definitions without this synchronization. There are likely otherways
  * to work around this limitation, but given that this API is a dev only tool
@@ -77,9 +78,7 @@ public class ApiDocServiceImpl implements ApiDocService {
      */
     @Override
     public synchronized Response getApiExplorer(final UriInfo uriInfo) {
-        return Response
-                .seeOther(uriInfo.getBaseUriBuilder().path("../explorer/index.html").build())
-                .build();
+        return Response.seeOther(uriInfo.getBaseUriBuilder().path("../explorer/index.html").build()).build();
     }
 
     @Override
@@ -88,8 +87,8 @@ public class ApiDocServiceImpl implements ApiDocService {
         try (OutputStreamWriter streamWriter = new OutputStreamWriter(baos, StandardCharsets.UTF_8)) {
             final JSONWriter writer = new JSONWriter(streamWriter);
             writer.array();
-            for (final Entry<String, Long> entry : MountPointSwagger.getInstance()
-                    .getInstanceIdentifiers().entrySet()) {
+            for (final Entry<String, Long> entry : MountPointSwagger.getInstance().getInstanceIdentifiers()
+                    .entrySet()) {
                 writer.object();
                 writer.key("instance").value(entry.getKey());
                 writer.key("id").value(entry.getValue());
@@ -106,30 +105,28 @@ public class ApiDocServiceImpl implements ApiDocService {
     public synchronized Response getMountRootDoc(final String instanceNum, final UriInfo uriInfo) {
         final ResourceList resourceList;
         if (isNew(uriInfo)) {
-            resourceList = MountPointSwagger.getInstanceDraft17().getResourceList(uriInfo,
-                    Long.parseLong(instanceNum));
+            resourceList = MountPointSwagger.getInstanceDraft18().getResourceList(uriInfo, Long.parseLong(instanceNum));
         } else {
-            resourceList = MountPointSwagger.getInstance().getResourceList(uriInfo,
-                    Long.parseLong(instanceNum));
+            resourceList = MountPointSwagger.getInstance().getResourceList(uriInfo, Long.parseLong(instanceNum));
         }
         return Response.ok(resourceList).build();
     }
 
     @Override
     public synchronized Response getMountDocByModule(final String instanceNum, final String module,
-                                                     final String revision, final UriInfo uriInfo) {
+            final String revision, final UriInfo uriInfo) {
         final ApiDeclaration api;
         if (isNew(uriInfo)) {
-            api = MountPointSwagger.getInstanceDraft17().getMountPointApi(uriInfo,
-                    Long.parseLong(instanceNum), module, revision);
+            api = MountPointSwagger.getInstanceDraft18().getMountPointApi(uriInfo, Long.parseLong(instanceNum), module,
+                    revision);
         } else {
-            api = MountPointSwagger.getInstance().getMountPointApi(uriInfo,
-                    Long.parseLong(instanceNum), module, revision);
+            api = MountPointSwagger.getInstance().getMountPointApi(uriInfo, Long.parseLong(instanceNum), module,
+                    revision);
         }
         return Response.ok(api).build();
     }
 
     private static boolean isNew(final UriInfo uriInfo) {
-        return uriInfo.getBaseUri().toString().contains("/17/");
+        return uriInfo.getBaseUri().toString().contains("/18/");
     }
 }
