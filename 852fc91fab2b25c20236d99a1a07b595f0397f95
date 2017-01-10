@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a622d24_f891fb47",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/EditConfig.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-01-10T12:22:14Z",
+      "side": 1,
+      "message": "null initializer is redundant. Moreover you elementsByTagName variable can be final",
+      "revId": "852fc91fab2b25c20236d99a1a07b595f0397f95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_38aa5385",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/EditConfig.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-01-10T12:22:14Z",
+      "side": 1,
+      "message": "According to https://docs.oracle.com/javase/8/docs/api/java/util/Objects.html#isNull-java.lang.Object-\n\nObjects isNull static method exists to be used as a predicate. Anyway, why do we have to check elementsByTagName object for null reference?",
+      "revId": "852fc91fab2b25c20236d99a1a07b595f0397f95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_be1beb71",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/EditConfigTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-01-10T12:22:14Z",
+      "side": 1,
+      "message": "I don\u0027t think names of the methods in this class conforms to style guide https://google.github.io/styleguide/javaguide.html#s5.2.3-method-names\n\nMoreover, what do you think about adding this tests to NetconfMDSalMappingTest?\n\nOr about testing EditConfig\u0027s getElementsByTagName method directly?",
+      "revId": "852fc91fab2b25c20236d99a1a07b595f0397f95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_dbc19955",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/EditConfigTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-01-10T12:22:14Z",
+      "side": 1,
+      "message": "we can fail already at the end of try block",
+      "revId": "852fc91fab2b25c20236d99a1a07b595f0397f95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_1b72f1ac",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/EditConfigTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-01-10T12:22:14Z",
+      "side": 1,
+      "message": "final modifier is redundant for private method",
+      "revId": "852fc91fab2b25c20236d99a1a07b595f0397f95",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
