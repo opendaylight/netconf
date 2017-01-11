@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2016 Brocade Communication Systems and others.  All rights reserved.
+
+ This program and the accompanying materials are made available under the
+ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ and is available at http://www.eclipse.org/legal/epl-v10.html
+-->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           odl:use-default-for-reference-types="true">
+
+    <reference id="bindingAwareBroker"
+               interface="org.opendaylight.controller.sal.binding.api.BindingAwareBroker"/>
+    <reference id="keepAliveExecutor"
+               interface="org.opendaylight.controller.config.threadpool.ScheduledThreadPool"
+               odl:type="global-netconf-ssh-scheduled-executor"/>
+    <reference id="processingExecutor"
+               interface="org.opendaylight.controller.config.threadpool.ThreadPool"
+               odl:type="global-netconf-processing-executor"/>
+    <reference id="domBroker"
+               interface="org.opendaylight.controller.sal.core.api.Broker"/>
+    <reference id="eventExecutor"
+               interface="io.netty.util.concurrent.EventExecutor"
+               odl:type="global-event-executor"/>
+    <reference id="dataBroker"
+               interface="org.opendaylight.controller.md.sal.binding.api.DataBroker"/>
+    <reference id="domMountPointService"
+               interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"/>
+
+    <bean id="schemaRepository" class="org.opendaylight.netconf.callhome.mount.SchemaRepositoryProviderImpl">
+        <argument value="shared-schema-repository-impl"/>
+    </bean>
+
+    <bean id="callhomeProvider" class="org.opendaylight.netconf.callhome.mount.IetfZeroTouchCallHomeServerProvider"
+          init-method="init"
+          destroy-method="close" >
+        <argument ref="dataBroker" />
+        <argument ref="callhomeDispatcher" />
+    </bean>
+
+    <bean id="callhomeDispatcher" class="org.opendaylight.netconf.callhome.mount.CallHomeMountDispatcher">
+        <argument value="topology-netconf"/>
+        <argument ref="bindingAwareBroker"/>
+        <argument ref="eventExecutor"/>
+        <argument ref="keepAliveExecutor"/>
+        <argument ref="processingExecutor"/>
+        <argument ref="schemaRepository"/>
+        <argument ref="domBroker"/>
+        <argument ref="dataBroker"/>
+        <argument ref="domMountPointService"/>
+    </bean>
+
+
+</blueprint>
