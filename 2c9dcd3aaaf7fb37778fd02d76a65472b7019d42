@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "1a622d24_47d2c25c",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-01-11T16:53:34Z",
+      "side": 1,
+      "message": "Does LocalDateTime information about time zone?\n\nIf not, let\u0027s say we want to parse string \"2001-07-04T12:08:56.235-07:00\"\n\nI believe the result of the parsing wouldn\u0027t be Date object representing date and time 2001-07-04T12:08:56.235-07:00, but Date object representing date and time 2001-07-04-T12:08:56.235+01:00 if you are in central Europe and respectively if you are in other time zones.",
+      "parentUuid": "1a622d24_a3a58b48",
+      "revId": "2c9dcd3aaaf7fb37778fd02d76a65472b7019d42",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a622d24_4b5af750",
         "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
         "patchSetId": 10
@@ -223,6 +241,24 @@
       "side": 1,
       "message": "No, this is actually the trick here, #get(field) return the value if it is in the range authorized for the given field. If the value is out of the authorized range, the #get(field) throw a DateTimeException.\nFor the leap second case, the value is out of the range, as second belongs to [0,59], not [0,60].",
       "parentUuid": "1a622d24_66cf2a80",
+      "revId": "2c9dcd3aaaf7fb37778fd02d76a65472b7019d42",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_c7c5328f",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-01-11T16:53:34Z",
+      "side": 1,
+      "message": "Yeah, you are right.",
+      "parentUuid": "1a622d24_031b9f81",
       "revId": "2c9dcd3aaaf7fb37778fd02d76a65472b7019d42",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
