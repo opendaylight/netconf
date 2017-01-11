@@ -46,6 +46,13 @@
         <bundle>mvn:org.opendaylight.netconf/netconf-connector-config/{{VERSION}}</bundle>
     </feature>
 
+    <feature name='odl-netconf-callhome-ssh' version='${project.version}' description="OpenDaylight :: Netconf Connector :: Netconf Call Home Connector + Netconf SSH Server + loopback connection configuration">
+        <feature version='${project.version}'>odl-netconf-topology</feature>
+        <bundle>mvn:org.opendaylight.netconf/callhome-protocol/{{VERSION}}</bundle>
+        <bundle>mvn:org.opendaylight.netconf/callhome-provider/{{VERSION}}</bundle>
+        <bundle>mvn:org.opendaylight.netconf/callhome-model/{{VERSION}}</bundle>
+    </feature>
+
     <feature name='odl-netconf-topology' version='${project.version}' description="OpenDaylight :: Netconf Topology :: Netconf Connector + Netconf SSH Server + Netconf configuration via config topology datastore">
         <feature version='${project.version}'>odl-netconf-ssh</feature>
         <feature version='${project.version}'>odl-netconf-connector</feature>
