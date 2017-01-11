@@ -57,6 +57,10 @@
     <module>tools</module>
     <module>netconf-console</module>
 
+    <module>callhome-model</module>
+    <module>callhome-protocol</module>
+    <module>callhome-provider</module>
+
     <module>netconf-artifacts</module>
   </modules>
 
