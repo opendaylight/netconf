@@ -16,6 +16,24 @@
       "revId": "d6687f4d665ecd8aa68b0b522272076a687990e7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_a3a8eb77",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 512,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2017-01-11T15:44:40Z",
+      "side": 1,
+      "message": "No reason, removing.",
+      "parentUuid": "1a622d24_adbf3aa9",
+      "revId": "d6687f4d665ecd8aa68b0b522272076a687990e7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
