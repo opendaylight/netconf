@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright © 2017 Red Hat, Inc. and others.
+
+ This program and the accompanying materials are made available under the
+ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ and is available at http://www.eclipse.org/legal/epl-v10.html
+ -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.opendaylight.odlparent</groupId>
+        <artifactId>single-feature-parent</artifactId>
+        <version>1.8.0-SNAPSHOT</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>org.opendaylight.netconf</groupId>
+    <artifactId>odl-restconf-noauth</artifactId>
+    <version>1.5.0-SNAPSHOT</version>
+    <packaging>feature</packaging>
+
+    <name>OpenDaylight :: Restconf</name>
+
+    <properties>
+        <config.configfile.directory>etc/opendaylight/karaf</config.configfile.directory>
+        <config.restconf.configfile>10-rest-connector.xml</config.restconf.configfile>
+        <config.restconf.service.configfile>10-restconf-service.xml</config.restconf.service.configfile>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.opendaylight.odlparent</groupId>
+                <artifactId>odlparent-artifacts</artifactId>
+                <version>1.8.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.yangtools</groupId>
+                <artifactId>yangtools-artifacts</artifactId>
+                <version>1.1.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.aaa</groupId>
+                <artifactId>aaa-artifacts</artifactId>
+                <version>0.5.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>netconf-artifacts</artifactId>
+                <version>1.2.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>restconf-artifacts</artifactId>
+                <version>1.5.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.opendaylight.aaa</groupId>
+            <artifactId>odl-aaa-shiro</artifactId>
+            <version>0.5.0-SNAPSHOT</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.controller</groupId>
+            <artifactId>odl-mdsal-broker</artifactId>
+            <version>1.5.0-SNAPSHOT</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.odlparent</groupId>
+            <artifactId>odl4-netty-4</artifactId>
+            <version>1.8.0-SNAPSHOT</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <!-- TODO
+            <feature>war</feature>
+        -->
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>ietf-restconf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>ietf-yang-library</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>ietf-restconf-monitoring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>sal-rest-connector</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>yang-data-codec-gson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>yang-model-export</artifactId>
+        </dependency>
+        <dependency>
+            <!-- finalname="${config.configfile.directory}/${config.restconf.configfile}" -->
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>sal-rest-connector-config</artifactId>
+            <version>${project.version}</version>
+            <type>xml</type>
+            <classifier>config</classifier>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <!-- finalname="${config.configfile.directory}/${config.restconf.service.configfile}" -->
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>sal-rest-connector-config</artifactId>
+            <version>${project.version}</version>
+            <type>xml</type>
+            <classifier>configrestconfservice</classifier>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+</project>
