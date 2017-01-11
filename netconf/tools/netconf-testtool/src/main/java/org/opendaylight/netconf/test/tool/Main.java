@@ -212,7 +212,7 @@ public final class Main {
         public void updateFeatureFile(final List<File> generated) {
             for (final File fileFeatures : ncFeatureFiles) {
                 try {
-                    final Features f =  JaxbUtil.unmarshal(new FileInputStream(fileFeatures), false);
+                    final Features f =  JaxbUtil.unmarshal(fileFeatures.toURI().toString(), false);
 
                     for (final Feature feature : f.getFeature()) {
                         if (NETCONF_CONNECTOR_ALL_FEATURE.equals(feature.getName())) {
