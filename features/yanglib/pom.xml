@@ -1,124 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- vi: set et smarttab sw=4 tabstop=4: -->
 <!--
- Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
+ Copyright © 2017 Red Hat, Inc. and others.
 
  This program and the accompanying materials are made available under the
  terms of the Eclipse Public License v1.0 which accompanies this distribution,
  and is available at http://www.eclipse.org/legal/epl-v10.html
--->
+ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
-        <artifactId>features-parent</artifactId>
+        <artifactId>odlparent-lite</artifactId>
         <version>1.8.0-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
-    <artifactId>features-yanglib</artifactId>
+    <artifactId>features-yanglib-aggregator</artifactId>
     <version>1.2.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
-    <properties>
-        <controller.mdsal.version>1.5.0-SNAPSHOT</controller.mdsal.version>
-        <netconf.version>1.2.0-SNAPSHOT</netconf.version>
-        <mdsal.version>2.2.0-SNAPSHOT</mdsal.version>
-        <mdsal.model.version>0.10.0-SNAPSHOT</mdsal.model.version>
-        <restconf.version>1.5.0-SNAPSHOT</restconf.version>
-        <yangtools.version>1.1.0-SNAPSHOT</yangtools.version>
-    </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.opendaylight.odlparent</groupId>
-                <artifactId>odlparent-artifacts</artifactId>
-                <version>1.8.0-SNAPSHOT</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.controller</groupId>
-                <artifactId>mdsal-artifacts</artifactId>
-                <version>${controller.mdsal.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.mdsal.model</groupId>
-                <artifactId>mdsal-model-artifacts</artifactId>
-                <version>${mdsal.model.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>netconf-artifacts</artifactId>
-                <version>${netconf.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>restconf-artifacts</artifactId>
-                <version>${restconf.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.yangtools</groupId>
-                <artifactId>yangtools-artifacts</artifactId>
-                <version>${yangtools.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.opendaylight.odlparent</groupId>
-            <artifactId>features-odlparent</artifactId>
-            <classifier>features</classifier>
-            <type>xml</type>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal.model</groupId>
-            <artifactId>features-mdsal-model</artifactId>
-            <version>${mdsal.model.version}</version>
-            <classifier>features</classifier>
-            <type>xml</type>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal</groupId>
-            <artifactId>features-mdsal</artifactId>
-            <version>${mdsal.version}</version>
-            <classifier>features</classifier>
-            <type>xml</type>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>features-restconf</artifactId>
-            <classifier>features</classifier>
-            <type>xml</type>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>features-yangtools</artifactId>
-            <classifier>features</classifier>
-            <type>xml</type>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ietf-netconf-yang-library</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>yanglib</artifactId>
-        </dependency>
-    </dependencies>
+    <modules>
+        <module>features-yanglib</module>
+        <module>features4-yanglib</module>
+        <module>odl-yanglib</module>
+    </modules>
 
     <scm>
         <connection>scm:git:http://git.opendaylight.org/gerrit/controller.git</connection>
