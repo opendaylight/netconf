@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1a622d24_0398bf1a",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2017-01-11T16:35:11Z",
+      "side": 1,
+      "message": "\u003e Why can\u0027t we just use directly DateTimeFormatter.ISO_DATE_TIME?\n\nIt is used at multiple location within this class, so instead of being redundant, I\u0027m holding this value in a variable, so I only have one place to modify if we ever want to use a different formatter.\n\n\u003e Also why not just ISO_OFFSET_DATE_TIME?\nAs we\u0027re using ZoneOffset.UTC, I\u0027m not sure it worth having the OFFSET bits in the formatter.\n\nBut one or the other would work.",
+      "parentUuid": "1a622d24_ababcb1b",
+      "revId": "2c9dcd3aaaf7fb37778fd02d76a65472b7019d42",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a622d24_e6fcd074",
         "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
         "patchSetId": 10
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "1a622d24_a3a58b48",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2017-01-11T16:35:11Z",
+      "side": 1,
+      "message": "First, we convert the string to a LocalDateTime to get a java8 time pojo holding the string value, and then, we create a ZonedDateTime instance based on the LocalDateTime, to which we specified the UTC offset and system time-zone.\nSo this operation actually adds information to the input string value, rather than loosing some.",
+      "parentUuid": "1a622d24_e6fcd074",
+      "revId": "2c9dcd3aaaf7fb37778fd02d76a65472b7019d42",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a622d24_4b5af750",
         "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
         "patchSetId": 10
@@ -47,6 +83,24 @@
       "writtenOn": "2017-01-05T15:41:53Z",
       "side": 1,
       "message": "According to documentation:\nhttps://docs.oracle.com/javase/8/docs/api/java/util/Objects.html#isNull-java.lang.Object-\nObjects static isNull method exists to be used as a Predicate, so maybe this is not appropriate usage.",
+      "revId": "2c9dcd3aaaf7fb37778fd02d76a65472b7019d42",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_436c7708",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2017-01-11T16:35:11Z",
+      "side": 1,
+      "message": "Ok, sorry for the mis-usage. Using a simple !\u003d operator instead.",
+      "parentUuid": "1a622d24_4b5af750",
       "revId": "2c9dcd3aaaf7fb37778fd02d76a65472b7019d42",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -87,6 +141,24 @@
     },
     {
       "key": {
+        "uuid": "1a622d24_23485b86",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2017-01-11T16:35:11Z",
+      "side": 1,
+      "message": "Oversight, it is indeed an integer value.",
+      "parentUuid": "1a622d24_0b40ff54",
+      "revId": "2c9dcd3aaaf7fb37778fd02d76a65472b7019d42",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a622d24_86ba4608",
         "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
         "patchSetId": 10
@@ -98,6 +170,24 @@
       "writtenOn": "2017-01-05T15:41:53Z",
       "side": 1,
       "message": "Why do we need to compareUnsigned?\n\nAlso do we need to use Integer\u0027s or Long\u0027s static compare method? Isn\u0027t minuteOfHour !\u003d 59, etc. enough?",
+      "revId": "2c9dcd3aaaf7fb37778fd02d76a65472b7019d42",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_c356c729",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2017-01-11T16:35:11Z",
+      "side": 1,
+      "message": "It is enough. Reverting to classic !\u003d operator.",
+      "parentUuid": "1a622d24_86ba4608",
       "revId": "2c9dcd3aaaf7fb37778fd02d76a65472b7019d42",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -121,6 +211,24 @@
     },
     {
       "key": {
+        "uuid": "1a622d24_031b9f81",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2017-01-11T16:35:11Z",
+      "side": 1,
+      "message": "No, this is actually the trick here, #get(field) return the value if it is in the range authorized for the given field. If the value is out of the authorized range, the #get(field) throw a DateTimeException.\nFor the leap second case, the value is out of the range, as second belongs to [0,59], not [0,60].",
+      "parentUuid": "1a622d24_66cf2a80",
+      "revId": "2c9dcd3aaaf7fb37778fd02d76a65472b7019d42",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a622d24_ab30eb01",
         "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
         "patchSetId": 10
@@ -132,6 +240,24 @@
       "writtenOn": "2017-01-05T15:41:53Z",
       "side": 1,
       "message": "Is this necessary?",
+      "revId": "2c9dcd3aaaf7fb37778fd02d76a65472b7019d42",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_23169b55",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2017-01-11T16:35:11Z",
+      "side": 1,
+      "message": "No, it\u0027s not. Reverting.",
+      "parentUuid": "1a622d24_ab30eb01",
       "revId": "2c9dcd3aaaf7fb37778fd02d76a65472b7019d42",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
