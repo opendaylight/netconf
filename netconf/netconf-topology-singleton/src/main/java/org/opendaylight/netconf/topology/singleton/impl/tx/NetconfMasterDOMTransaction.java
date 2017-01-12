@@ -40,7 +40,7 @@ public class NetconfMasterDOMTransaction implements NetconfDOMTransaction {
     private final RemoteDeviceId id;
     private final DOMDataBroker delegateBroker;
 
-    private DOMDataReadOnlyTransaction readTx;
+    private final DOMDataReadOnlyTransaction readTx;
     private DOMDataWriteTransaction writeTx;
 
     public NetconfMasterDOMTransaction(final RemoteDeviceId id,
@@ -149,6 +149,11 @@ public class NetconfMasterDOMTransaction implements NetconfDOMTransaction {
 
     @Override
     public Future<Void> submit() {
+        if (writeTx == null) {
+            LOG.trace("{}: Submit empty via NETCONF", id);
+            return akka.dispatch.Futures.successful(null);
+        }
+
         LOG.trace("{}: Submit[{}} via NETCONF", id, writeTx.getIdentifier());
 
         final CheckedFuture<Void, TransactionCommitFailedException> submitFuture = writeTx.submit();
