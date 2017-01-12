@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a622d24_9cb26504",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/NetconfMasterDOMTransaction.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-01-12T17:44:11Z",
+      "side": 1,
+      "message": "Can you please apply this also to cancel method?",
+      "revId": "7bd8f42da911f4cb70bf3236d9792c785b85a80c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
