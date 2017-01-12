@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a622d24_9ce6e5ae",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/NetconfMasterDOMTransaction.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 866
+      },
+      "writtenOn": "2017-01-12T19:50:08Z",
+      "side": 1,
+      "message": "Since there are two possible cases when writeTx is null, not sure if true or false is more suitable to be return.\n1. no modification was done - transaction is \"new\" state - should return true.\n2. transaction was been already finished (set null in the submit\u0027s future listener) - should return false.",
+      "range": {
+        "startLine": 147,
+        "startChar": 19,
+        "endLine": 147,
+        "endChar": 24
+      },
+      "revId": "0ac8c2a62c3cd9e66ab02605e084188cf353ea58",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
