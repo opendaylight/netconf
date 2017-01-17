@@ -18,8 +18,12 @@ import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NetconfDeviceNotificationService implements DOMNotificationService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceNotificationService.class);
 
     private final Multimap<SchemaPath, DOMNotificationListener> listeners = HashMultimap.create();
 
@@ -27,7 +31,12 @@ public class NetconfDeviceNotificationService implements DOMNotificationService 
     // TODO shouldnt we reuse the implementation for notification router from sal-broker-impl ?
     public synchronized void publishNotification(final DOMNotification notification) {
         for (final DOMNotificationListener domNotificationListener : listeners.get(notification.getType())) {
-            domNotificationListener.onNotification(notification);
+            try {
+                domNotificationListener.onNotification(notification);
+            } catch (final Exception e) {
+                LOG.warn("Listener {} threw an uncaught exception during processing notification {}",
+                        domNotificationListener, notification, e);
+            }
         }
     }
 
