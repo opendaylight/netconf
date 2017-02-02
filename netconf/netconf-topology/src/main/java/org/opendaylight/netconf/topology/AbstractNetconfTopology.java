@@ -26,7 +26,6 @@ import java.util.Map;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -161,7 +160,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     protected final ThreadPool processingExecutor;
     protected final SharedSchemaRepository sharedSchemaRepository;
     protected final DataBroker dataBroker;
-    protected final DOMMountPointService mountPointService;
 
     protected SchemaSourceRegistry schemaRegistry = DEFAULT_SCHEMA_REPOSITORY;
     protected SchemaRepository schemaRepository = DEFAULT_SCHEMA_REPOSITORY;
@@ -173,7 +171,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                                       final BindingAwareBroker bindingAwareBroker, final Broker domBroker,
                                       final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
                                       final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
-                                      final DataBroker dataBroker, final DOMMountPointService mountPointService) {
+                                      final DataBroker dataBroker) {
         this.topologyId = topologyId;
         this.clientDispatcher = clientDispatcher;
         this.bindingAwareBroker = bindingAwareBroker;
@@ -183,7 +181,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         this.processingExecutor = processingExecutor;
         this.sharedSchemaRepository = schemaRepositoryProvider.getSharedSchemaRepository();
         this.dataBroker = dataBroker;
-        this.mountPointService = mountPointService;
     }
 
     public void setSchemaRegistry(final SchemaSourceRegistry schemaRegistry) {

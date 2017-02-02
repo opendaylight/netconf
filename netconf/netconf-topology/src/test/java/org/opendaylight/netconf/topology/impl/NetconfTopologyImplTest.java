@@ -37,7 +37,6 @@ import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
@@ -94,9 +93,6 @@ public class NetconfTopologyImplTest {
     @Mock
     private DataBroker dataBroker;
 
-    @Mock
-    private DOMMountPointService domMountPointService;
-
     private TestingNetconfTopologyImpl topology;
     private TestingNetconfTopologyImpl spyTopology;
 
@@ -111,7 +107,7 @@ public class NetconfTopologyImplTest {
 
         topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedBindingAwareBroker,
                 mockedDataBroker, mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, mockedSchemaRepositoryProvider,
-                dataBroker, domMountPointService);
+                dataBroker);
 
         spyTopology = spy(topology);
     }
@@ -193,9 +189,9 @@ public class NetconfTopologyImplTest {
                                           BindingAwareBroker bindingAwareBroker, Broker domBroker,
                                           EventExecutor eventExecutor, ScheduledThreadPool keepaliveExecutor,
                                           ThreadPool processingExecutor, SchemaRepositoryProvider schemaRepositoryProvider,
-                                          DataBroker dataBroker, DOMMountPointService domMountPointService) {
+                                          DataBroker dataBroker) {
             super(topologyId, clientDispatcher, bindingAwareBroker, domBroker, eventExecutor, keepaliveExecutor,
-                    processingExecutor, schemaRepositoryProvider, dataBroker, domMountPointService);
+                    processingExecutor, schemaRepositoryProvider, dataBroker);
         }
 
         @Override

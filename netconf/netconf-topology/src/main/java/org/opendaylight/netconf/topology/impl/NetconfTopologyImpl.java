@@ -22,7 +22,6 @@ import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
@@ -54,10 +53,10 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
                                final BindingAwareBroker bindingAwareBroker, final Broker domBroker,
                                final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
                                final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
-                               final DataBroker dataBroker, final DOMMountPointService mountPointService) {
+                               final DataBroker dataBroker) {
         super(topologyId, clientDispatcher,
                 bindingAwareBroker, domBroker, eventExecutor,
-                keepaliveExecutor, processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService);
+                keepaliveExecutor, processingExecutor, schemaRepositoryProvider, dataBroker);
     }
 
     @Override

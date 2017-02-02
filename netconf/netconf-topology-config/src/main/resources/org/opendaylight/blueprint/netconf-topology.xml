@@ -28,8 +28,6 @@
                odl:type="global-event-executor"/>
     <reference id="dataBroker"
                interface="org.opendaylight.controller.md.sal.binding.api.DataBroker"/>
-    <reference id="domMountPointService"
-               interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"/>
 
     <bean id="schemaRepository" class="org.opendaylight.netconf.topology.impl.SchemaRepositoryProviderImpl">
         <argument value="shared-schema-repository-impl"/>
@@ -47,7 +45,6 @@
         <argument ref="processingExecutor"/>
         <argument ref="schemaRepository"/>
         <argument ref="dataBroker"/>
-        <argument ref="domMountPointService"/>
     </bean>
 
     <bean id="netconfConnectorFactory" class="org.opendaylight.netconf.topology.impl.NetconfConnectorFactoryImpl"/>
