@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.slf4j.Logger;
@@ -28,13 +29,13 @@ import org.slf4j.LoggerFactory;
  * </ul>
  * </ul>
  *
- * We used old revision {@link Draft18.RestconfModule#REVISION} of restconf yang
+ * We used old revision {@link Rfc8040.RestconfModule#REVISION} of restconf yang
  * because the latest restconf draft has to be supported by Yang 1.1 and we are
  * not. Then, this is only partial implementation of the latest restconf draft.
  */
-public final class Draft18 {
+public final class Rfc8040 {
 
-    private Draft18() {
+    private Rfc8040() {
         throw new UnsupportedOperationException("Util class");
     }
 
@@ -67,12 +68,12 @@ public final class Draft18 {
             throw new UnsupportedOperationException("Util class");
         }
 
-        public static final String REVISION = "2016-08-15";
+        public static final String REVISION = "2017-01-26";
         public static final String NAME = "ietf-restconf";
         public static final String NAMESPACE = "urn:ietf:params:xml:ns:yang:ietf-restconf";
 
-        public static final QName IETF_RESTCONF_QNAME = QName.create(Draft18.RestconfModule.NAMESPACE,
-                Draft18.RestconfModule.REVISION, Draft18.RestconfModule.NAME);
+        public static final QName IETF_RESTCONF_QNAME = QName.create(Rfc8040.RestconfModule.NAMESPACE,
+                Rfc8040.RestconfModule.REVISION, Rfc8040.RestconfModule.NAME);
 
         public static Date DATE = null;
         public static URI URI_MODULE = null;
@@ -205,7 +206,7 @@ public final class Draft18 {
 
         public static final String NAME = "ietf-restconf-monitoring";
         public static final String NAMESPACE = "urn:ietf:params:xml:ns:yang:ietf-restconf-monitoring";
-        public static final String REVISION = "2016-08-15";
+        public static final String REVISION = "2017-01-26";
         public static final String PATH_TO_STREAM_WITHOUT_KEY =
                 "ietf-restconf-monitoring:restconf-state/streams/stream=";
         public static final String PATH_TO_STREAMS = "ietf-restconf-monitoring:restconf-state/streams";
