@@ -12,7 +12,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
-import org.opendaylight.restconf.Draft18;
+import org.opendaylight.restconf.Rfc8040;
 import org.opendaylight.restconf.utils.RestconfConstants;
 
 /**
@@ -30,7 +30,7 @@ public interface RestconfSchemaService {
      * @return {@link SchemaExportContext}
      */
     @GET
-    @Produces({ Draft18.MediaTypes.YIN + RestconfConstants.XML, Draft18.MediaTypes.YANG })
+    @Produces({ Rfc8040.MediaTypes.YIN + RestconfConstants.XML, Rfc8040.MediaTypes.YANG })
     @Path("modules/{identifier:.+}")
     SchemaExportContext getSchema(@PathParam("identifier") String identifier);
 }

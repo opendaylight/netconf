@@ -37,7 +37,7 @@ import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
-import org.opendaylight.restconf.Draft18.MonitoringModule;
+import org.opendaylight.restconf.Rfc8040.MonitoringModule;
 import org.opendaylight.restconf.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.parser.IdentifierCodec;
