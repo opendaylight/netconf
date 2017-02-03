@@ -12,7 +12,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
-import org.opendaylight.restconf.Draft18;
+import org.opendaylight.restconf.Rfc8040;
 import org.opendaylight.restconf.utils.RestconfConstants;
 
 /**
@@ -28,7 +28,7 @@ public interface RestconfService {
      */
     @GET
     @Path("/yang-library-version")
-    @Produces({ Draft18.MediaTypes.DATA + RestconfConstants.JSON, Draft18.MediaTypes.DATA, MediaType.APPLICATION_JSON,
+    @Produces({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public NormalizedNodeContext getLibraryVersion();
 }

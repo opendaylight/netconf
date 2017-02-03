@@ -17,7 +17,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
-import org.opendaylight.restconf.Draft18;
+import org.opendaylight.restconf.Rfc8040;
 import org.opendaylight.restconf.utils.RestconfConstants;
 
 /**
@@ -41,9 +41,9 @@ public interface RestconfInvokeOperationsService {
      */
     @POST
     @Path("/operations/{identifier:.+}")
-    @Produces({ Draft18.MediaTypes.DATA + RestconfConstants.JSON, Draft18.MediaTypes.DATA, MediaType.APPLICATION_JSON,
+    @Produces({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    @Consumes({ Draft18.MediaTypes.DATA + RestconfConstants.JSON, Draft18.MediaTypes.DATA, MediaType.APPLICATION_JSON,
+    @Consumes({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     NormalizedNodeContext invokeRpc(@Encoded @PathParam("identifier") String identifier,
             NormalizedNodeContext payload, @Context UriInfo uriInfo);
