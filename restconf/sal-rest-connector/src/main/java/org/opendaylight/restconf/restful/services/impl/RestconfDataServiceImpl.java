@@ -33,6 +33,7 @@ import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
+import org.opendaylight.restconf.restful.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.restconf.restful.utils.DeleteDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.PatchDataTransactionUtil;
@@ -57,12 +58,16 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private final TransactionChainHandler transactionChainHandler;
     private final DOMMountPointServiceHandler mountPointServiceHandler;
 
+    private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
+
     public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
                                    final TransactionChainHandler transactionChainHandler,
-                                   final DOMMountPointServiceHandler mountPointServiceHandler) {
+            final DOMMountPointServiceHandler mountPointServiceHandler,
+            final RestconfStreamsSubscriptionService delegRestconfSubscrService) {
         this.schemaContextHandler = schemaContextHandler;
         this.transactionChainHandler = transactionChainHandler;
         this.mountPointServiceHandler = mountPointServiceHandler;
+        this.delegRestconfSubscrService = delegRestconfSubscrService;
     }
 
     @Override
@@ -116,7 +121,14 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
                 instanceIdentifier, mountPoint, transactionChain);
         final NormalizedNode<?, ?> node =
-                ReadDataTransactionUtil.readData(parameters.getContent(), transactionNode, withDefa);
+                ReadDataTransactionUtil.readData(identifier, parameters.getContent(), transactionNode, withDefa,
+                        schemaContextRef, uriInfo);
+        if (identifier.contains("ietf-restconf-monitoring:restconf-state/streams/stream=")
+                && identifier.contains("/access=") && identifier.contains("/location")) {
+            final String value = (String) node.getValue();
+            final String streamName = value.substring(value.indexOf("create-notification-stream/"), value.length());
+            this.delegRestconfSubscrService.subscribeToStream(streamName, uriInfo);
+        }
         if (node == null) {
             throw new RestconfDocumentedException(
                     "Request could not be completed because the relevant data model content does not exist",
