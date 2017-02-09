@@ -494,9 +494,11 @@ public final class RestconfMappingNodeUtil {
                 }
                 prepareLeafAndFillEntryBuilder(streamEntry,
                         listSchema.getDataChildByName(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME), true);
-                prepareLeafAndFillEntryBuilder(streamEntry,
+                if (start != null) {
+                    prepareLeafAndFillEntryBuilder(streamEntry,
                         listSchema.getDataChildByName(MonitoringModule.LEAF_START_TIME_STREAM_QNAME),
                         new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'XXX").format(start));
+                }
                 prepareListAndFillEntryBuilder(streamEntry,
                         (ListSchemaNode) listSchema.getDataChildByName(MonitoringModule.LIST_ACCESS_STREAM_QNAME),
                         outputType, uri);
