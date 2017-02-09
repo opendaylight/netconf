@@ -21,16 +21,19 @@ import static org.mockito.Mockito.mock;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -57,6 +60,7 @@ import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
+import org.opendaylight.restconf.restful.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -110,6 +114,8 @@ public class RestconfDataServiceImplTest {
     private DOMDataBroker mountDataBroker;
     @Mock
     private DOMTransactionChain transactionChain;
+    @Mock
+    private RestconfStreamsSubscriptionService delegRestconfSubscrService;
 
     @Before
     public void setUp() throws Exception {
@@ -183,7 +189,8 @@ public class RestconfDataServiceImplTest {
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(txHandler);
 
         schemaContextHandler.onGlobalContextUpdated(this.contextRef.get());
-        this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler, this.mountPointServiceHandler);
+        this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler,
+                this.mountPointServiceHandler, this.delegRestconfSubscrService);
         doReturn(this.domTransactionChain).when(this.transactionChainHandler).get();
         doReturn(this.read).when(this.domTransactionChain).newReadOnlyTransaction();
         doReturn(this.readWrite).when(this.domTransactionChain).newReadWriteTransaction();
