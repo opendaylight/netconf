@@ -10,6 +10,7 @@ package org.opendaylight.netconf.mdsal.connector.ops.get;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
+import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -17,8 +18,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +34,8 @@ import org.junit.runners.model.InitializationError;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
@@ -36,14 +44,18 @@ import org.xml.sax.SAXException;
 @RunWith(value = Parameterized.class)
 public class FilterContentValidatorTest {
 
-    private static final int TEST_CASE_COUNT = 8;
+    private static final int TEST_CASE_COUNT = 13;
+    private static final Pattern LIST_ENTRY_PATTERN =
+            Pattern.compile("(?<listName>.*)\\[\\{(?<keys>(.*)(, .*)*)\\}\\]");
+    private static final Pattern KEY_VALUE_PATTERN =
+            Pattern.compile("(?<key>\\(.*\\).*)=(?<value>.*)");
     private final XmlElement filterContent;
     private final String expected;
     private FilterContentValidator validator;
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() throws IOException, SAXException, URISyntaxException, InitializationError {
-        List<Object[]> result = new ArrayList<>();
+        final List<Object[]> result = new ArrayList<>();
         final Path path = Paths.get(FilterContentValidatorTest.class.getResource("/filter/expected.txt").toURI());
         final List<String> expected = Files.readAllLines(path);
         if (expected.size() != TEST_CASE_COUNT) {
@@ -56,18 +68,18 @@ public class FilterContentValidatorTest {
         return result;
     }
 
-    public FilterContentValidatorTest(Document filterContent, String expected) {
+    public FilterContentValidatorTest(final Document filterContent, final String expected) {
         this.filterContent = XmlElement.fromDomDocument(filterContent);
         this.expected = expected;
     }
 
     @Before
     public void setUp() throws Exception {
-        List<InputStream> sources = new ArrayList<>();
+        final List<InputStream> sources = new ArrayList<>();
         sources.add(getClass().getResourceAsStream("/yang/filter-validator-test-mod-0.yang"));
         sources.add(getClass().getResourceAsStream("/yang/filter-validator-test-augment.yang"));
-        SchemaContext context = YangParserTestUtils.parseYangStreams(sources);
-        CurrentSchemaContext currentContext = mock(CurrentSchemaContext.class);
+        final SchemaContext context = YangParserTestUtils.parseYangStreams(sources);
+        final CurrentSchemaContext currentContext = mock(CurrentSchemaContext.class);
         doReturn(context).when(currentContext).getCurrentContext();
         validator = new FilterContentValidator(currentContext);
     }
@@ -76,16 +88,65 @@ public class FilterContentValidatorTest {
     public void testValidate() throws Exception {
         if (expected.startsWith("success")) {
             final String expId = expected.replace("success=", "");
-            Assert.assertEquals(expId, validator.validate(filterContent).toString());
+            final YangInstanceIdentifier actual = validator.validate(filterContent);
+            final YangInstanceIdentifier expected = fromString(expId);
+            Assert.assertEquals(expected, actual);
         } else if (expected.startsWith("error")) {
             try {
                 validator.validate(filterContent);
                 Assert.fail(XmlUtil.toString(filterContent) + " is not valid and should throw exception.");
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 final String expectedExceptionClass = expected.replace("error=", "");
                 Assert.assertEquals(expectedExceptionClass, e.getClass().getName());
             }
         }
+    }
 
+    private static YangInstanceIdentifier fromString(final String input) {
+        //remove first /
+        final String yid = input.substring(1);
+        final List<String> pathElements = Arrays.asList(yid.split("/"));
+        final YangInstanceIdentifier.InstanceIdentifierBuilder builder = YangInstanceIdentifier.builder();
+        //if not specified, PathArguments inherit namespace and revision from previous PathArgument
+        QName prev = null;
+        for (final String pathElement : pathElements) {
+            final Matcher matcher = LIST_ENTRY_PATTERN.matcher(pathElement);
+            if (matcher.matches()) {
+                prev = parseListEntry(builder, prev, matcher);
+            } else {
+                final QName qName = createNodeQName(prev, pathElement);
+                builder.node(qName);
+                prev = qName;
+            }
+        }
+        return builder.build();
+    }
+
+    private static QName parseListEntry(final YangInstanceIdentifier.InstanceIdentifierBuilder builder,
+                                        final QName prev, final Matcher matcher) {
+        final Map<QName, Object> keys = new HashMap<>();
+        final String listName = matcher.group("listName");
+        final QName listQName = createNodeQName(prev, listName);
+        final String keysString = matcher.group("keys");
+        final String[] split = keysString.split(",");
+        for (final String s : split) {
+            final Matcher keyMatcher = KEY_VALUE_PATTERN.matcher(s.trim());
+            if (keyMatcher.matches()) {
+                final QName keyName = QName.create(keyMatcher.group("key"));
+                final String keyValue = keyMatcher.group("value");
+                keys.put(keyName, keyValue);
+            }
+        }
+        builder.nodeWithKey(listQName, keys);
+        return prev;
+    }
+
+    private static QName createNodeQName(final QName prev, final String qNameString) {
+        final QName qName = QName.create(qNameString);
+        if (qName.getModule().getNamespace() != null) {
+            return qName;
+        } else {
+            return QName.create(Preconditions.checkNotNull(prev), qNameString);
+        }
     }
 }
