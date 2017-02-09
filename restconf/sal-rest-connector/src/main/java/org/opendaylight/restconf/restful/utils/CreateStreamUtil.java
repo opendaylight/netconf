@@ -11,8 +11,6 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -22,6 +20,7 @@ import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
@@ -33,8 +32,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgum
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -186,67 +183,46 @@ public final class CreateStreamUtil {
     /**
      * Create stream with POST operation via RPC
      *
-     * @param payload
+     * @param notificatinoDefinition
      *            - input of RPC
      * @param refSchemaCtx
      *            - schemaContext
+     * @param outputType
      * @return {@link DOMRpcResult}
      */
-    public static DOMRpcResult createYangNotifiStream(final NormalizedNodeContext payload,
-            final SchemaContextRef refSchemaCtx) {
-        final ContainerNode data = (ContainerNode) payload.getData();
-        LeafSetNode leafSet = null;
-        String outputType = "XML";
-        for (final DataContainerChild<? extends PathArgument, ?> dataChild : data.getValue()) {
-            if (dataChild instanceof LeafSetNode) {
-                leafSet = (LeafSetNode) dataChild;
-            } else if (dataChild instanceof AugmentationNode) {
-                outputType = (String) (((AugmentationNode) dataChild).getValue()).iterator().next().getValue();
-            }
-        }
-
-        final Collection<LeafSetEntryNode> entryNodes = leafSet.getValue();
+    public static List<NotificationListenerAdapter> createYangNotifiStream(
+            final NotificationDefinition notificatinoDefinition, final SchemaContextRef refSchemaCtx,
+            final String outputType) {
         final List<SchemaPath> paths = new ArrayList<>();
         String streamName = RestconfStreamsConstants.CREATE_NOTIFICATION_STREAM + "/";
-
-        final Iterator<LeafSetEntryNode> iterator = entryNodes.iterator();
-        while (iterator.hasNext()) {
-            final QName valueQName = QName.create((String) iterator.next().getValue());
-            final Module module = refSchemaCtx.findModuleByNamespaceAndRevision(valueQName.getModule().getNamespace(),
-                    valueQName.getModule().getRevision());
-            Preconditions.checkNotNull(module,
-                    "Module for namespace " + valueQName.getModule().getNamespace() + " does not exist");
-            NotificationDefinition notifiDef = null;
-            for (final NotificationDefinition notification : module.getNotifications()) {
-                if (notification.getQName().equals(valueQName)) {
-                    notifiDef = notification;
-                    break;
-                }
-            }
-            final String moduleName = module.getName();
-            Preconditions.checkNotNull(notifiDef,
-                    "Notification " + valueQName + "doesn't exist in module " + moduleName);
-            paths.add(notifiDef.getPath());
-            streamName = streamName + moduleName + ":" + valueQName.getLocalName();
-            if (iterator.hasNext()) {
-                streamName = streamName + ",";
+        final QName notificatinoDefinitionQName = notificatinoDefinition.getQName();
+        final Module module =
+                refSchemaCtx.findModuleByNamespaceAndRevision(notificatinoDefinitionQName.getModule().getNamespace(),
+                        notificatinoDefinitionQName.getModule().getRevision());
+        Preconditions.checkNotNull(module,
+                "Module for namespace " + notificatinoDefinitionQName.getModule().getNamespace() + " does not exist");
+        NotificationDefinition notifiDef = null;
+        for (final NotificationDefinition notification : module.getNotifications()) {
+            if (notification.getQName().equals(notificatinoDefinitionQName)) {
+                notifiDef = notification;
+                break;
             }
         }
+        final String moduleName = module.getName();
+        Preconditions.checkNotNull(notifiDef,
+                "Notification " + notificatinoDefinitionQName + "doesn't exist in module " + moduleName);
+        paths.add(notifiDef.getPath());
+        streamName = streamName + moduleName + ":" + notificatinoDefinitionQName.getLocalName();
         if (outputType.equals("JSON")) {
             streamName = streamName + "/JSON";
         }
-        final QName rpcQName = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
-        final QName outputQname = QName.create(rpcQName, "output");
-        final QName streamNameQname = QName.create(rpcQName, "notification-stream-identifier");
-
-        final ContainerNode output =
-                ImmutableContainerNodeBuilder.create().withNodeIdentifier(new NodeIdentifier(outputQname))
-                        .withChild(ImmutableNodes.leafNode(streamNameQname, streamName)).build();
 
         if (!Notificator.existNotificationListenerFor(streamName)) {
-            Notificator.createNotificationListener(paths, streamName, outputType);
+            return Notificator.createNotificationListener(paths, streamName, outputType);
+        } else {
+            final List<NotificationListenerAdapter> notificationListenerFor =
+                    Notificator.getNotificationListenerFor(streamName);
+            return SubscribeToStreamUtil.pickSpecificListenerByOutput(notificationListenerFor, outputType);
         }
-
-        return new DefaultDOMRpcResult(output);
     }
 }

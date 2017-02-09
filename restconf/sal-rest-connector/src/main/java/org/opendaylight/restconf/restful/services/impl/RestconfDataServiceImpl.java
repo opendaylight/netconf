@@ -7,6 +7,11 @@
  */
 package org.opendaylight.restconf.restful.services.impl;
 
+import static org.opendaylight.restconf.restful.utils.RestconfStreamsConstants.CREATE_NOTIFICATION_STREAM;
+import static org.opendaylight.restconf.restful.utils.RestconfStreamsConstants.STREAM_ACCESS_PATH_PART;
+import static org.opendaylight.restconf.restful.utils.RestconfStreamsConstants.STREAM_LOCATION_PATH_PART;
+import static org.opendaylight.restconf.restful.utils.RestconfStreamsConstants.STREAM_PATH;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.text.SimpleDateFormat;
@@ -33,6 +38,7 @@ import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
+import org.opendaylight.restconf.restful.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.restconf.restful.utils.DeleteDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.PatchDataTransactionUtil;
@@ -40,6 +46,7 @@ import org.opendaylight.restconf.restful.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.restful.utils.RestconfDataServiceConstant;
+import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -57,12 +64,16 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private final TransactionChainHandler transactionChainHandler;
     private final DOMMountPointServiceHandler mountPointServiceHandler;
 
+    private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
+
     public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
                                    final TransactionChainHandler transactionChainHandler,
-                                   final DOMMountPointServiceHandler mountPointServiceHandler) {
+            final DOMMountPointServiceHandler mountPointServiceHandler,
+            final RestconfStreamsSubscriptionService delegRestconfSubscrService) {
         this.schemaContextHandler = schemaContextHandler;
         this.transactionChainHandler = transactionChainHandler;
         this.mountPointServiceHandler = mountPointServiceHandler;
+        this.delegRestconfSubscrService = delegRestconfSubscrService;
     }
 
     @Override
@@ -116,7 +127,16 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
                 instanceIdentifier, mountPoint, transactionChain);
         final NormalizedNode<?, ?> node =
-                ReadDataTransactionUtil.readData(parameters.getContent(), transactionNode, withDefa);
+                ReadDataTransactionUtil.readData(identifier, parameters.getContent(), transactionNode, withDefa,
+                        schemaContextRef, uriInfo);
+        if (identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
+                && identifier.contains(STREAM_LOCATION_PATH_PART)) {
+            final String value = (String) node.getValue();
+            final String streamName = value.substring(
+                    value.indexOf(CREATE_NOTIFICATION_STREAM.toString() + RestconfConstants.SLASH),
+                    value.length());
+            this.delegRestconfSubscrService.subscribeToStream(streamName, uriInfo);
+        }
         if (node == null) {
             throw new RestconfDocumentedException(
                     "Request could not be completed because the relevant data model content does not exist",
