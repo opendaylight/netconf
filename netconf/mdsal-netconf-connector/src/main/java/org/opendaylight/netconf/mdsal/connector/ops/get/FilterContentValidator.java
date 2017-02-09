@@ -7,11 +7,15 @@
  */
 package org.opendaylight.netconf.mdsal.connector.ops.get;
 
+import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder;
+
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -22,18 +26,20 @@ import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.util.ParserStreamUtils;
 import org.opendaylight.yangtools.yang.model.api.ChoiceCaseNode;
-import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class validates filter content against schema context.
  */
 public class FilterContentValidator {
 
+    private static final Logger LOG = LoggerFactory.getLogger(FilterContentValidator.class);
     private final CurrentSchemaContext schemaContext;
 
     /**
@@ -44,8 +50,8 @@ public class FilterContentValidator {
     }
 
     /**
-     * Validates filter content against this validator schema context. If the filter is valid, method returns {@link YangInstanceIdentifier}
-     * of node which can be used as root for data selection.
+     * Validates filter content against this validator schema context. If the filter is valid,
+     * method returns {@link YangInstanceIdentifier} of node which can be used as root for data selection.
      * @param filterContent filter content
      * @return YangInstanceIdentifier
      * @throws DocumentedException if filter content is not valid
@@ -55,11 +61,13 @@ public class FilterContentValidator {
             final URI namespace = new URI(filterContent.getNamespace());
             final Module module = schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(namespace, null);
             final DataSchemaNode schema = getRootDataSchemaNode(module, namespace, filterContent.getName());
-            final FilterTree filterTree = validateNode(filterContent, schema, new FilterTree(schema.getQName(), Type.OTHER));
-            return getFilterDataRoot(filterTree, YangInstanceIdentifier.builder());
+            final FilterTree filterTree = validateNode(filterContent, schema, new FilterTree(schema.getQName(),
+                    Type.OTHER, schema));
+            return getFilterDataRoot(filterTree, filterContent, YangInstanceIdentifier.builder());
         } catch (DocumentedException e) {
             throw e;
         } catch (Exception e) {
+            LOG.debug("Filter content isn't valid", e);
             throw new DocumentedException("Validation failed. Cause: " + e.getMessage(),
                     DocumentedException.ErrorType.application,
                     DocumentedException.ErrorTag.unknown_namespace,
@@ -75,7 +83,8 @@ public class FilterContentValidator {
      * @return child data node schema
      * @throws DocumentedException if child with given name is not present
      */
-    private DataSchemaNode getRootDataSchemaNode(Module module, URI nameSpace, String name) throws DocumentedException {
+    private DataSchemaNode getRootDataSchemaNode(final Module module, final URI nameSpace, final String name)
+            throws DocumentedException {
         final Collection<DataSchemaNode> childNodes = module.getChildNodes();
         for (DataSchemaNode childNode : childNodes) {
             final QName qName = childNode.getQName();
@@ -83,7 +92,8 @@ public class FilterContentValidator {
                 return childNode;
             }
         }
-        throw new DocumentedException("Unable to find node with namespace: " + nameSpace + "in schema context: " + schemaContext.getCurrentContext().toString(),
+        throw new DocumentedException("Unable to find node with namespace: " + nameSpace + "in schema context: " +
+                schemaContext.getCurrentContext().toString(),
                 DocumentedException.ErrorType.application,
                 DocumentedException.ErrorTag.unknown_namespace,
                 DocumentedException.ErrorSeverity.error);
@@ -97,17 +107,19 @@ public class FilterContentValidator {
      * @return tree
      * @throws ValidationException if filter content is not valid
      */
-    private FilterTree validateNode(XmlElement element, DataSchemaNode parentNodeSchema, FilterTree tree) throws ValidationException {
+    private FilterTree validateNode(final XmlElement element, final DataSchemaNode parentNodeSchema,
+                                    final FilterTree tree) throws ValidationException {
         final List<XmlElement> childElements = element.getChildElements();
         for (XmlElement childElement : childElements) {
             try {
-                final Deque<DataSchemaNode> path = findSchemaNodeByNameAndNamespace(parentNodeSchema, childElement.getName(), new URI(childElement.getNamespace()));
+                final Deque<DataSchemaNode> path = ParserStreamUtils.findSchemaNodeByNameAndNamespace(parentNodeSchema,
+                        childElement.getName(), new URI(childElement.getNamespace()));
                 if (path.isEmpty()) {
                     throw new ValidationException(element, childElement);
                 }
                 FilterTree subtree = tree;
                 for (DataSchemaNode dataSchemaNode : path) {
-                        subtree = subtree.addChild(dataSchemaNode);
+                    subtree = subtree.addChild(dataSchemaNode);
                 }
                 final DataSchemaNode childSchema = path.getLast();
                 validateNode(childElement, childSchema, subtree);
@@ -120,14 +132,16 @@ public class FilterContentValidator {
 
     /**
      * Searches for YangInstanceIdentifier of node, which can be used as root for data selection.
-     * It goes as deep in tree as possible. Method stops traversing, when there are multiple child elements
-     * or when it encounters list node.
+     * It goes as deep in tree as possible. Method stops traversing, when there are multiple child elements. If element
+     * represents list and child elements are key values, then it builds YangInstanceIdentifier of list entry.
      * @param tree QName tree
-     * @param builder builder
-     * @return YangInstanceIdentifier
+     * @param filterContent filter element
+     * @param builder builder  @return YangInstanceIdentifier
      */
-    private YangInstanceIdentifier getFilterDataRoot(FilterTree tree, YangInstanceIdentifier.InstanceIdentifierBuilder builder) {
+    private YangInstanceIdentifier getFilterDataRoot(FilterTree tree, final XmlElement filterContent,
+                                                     final InstanceIdentifierBuilder builder) {
         builder.node(tree.getName());
+        final List<String> path = new ArrayList<>();
         while (tree.getChildren().size() == 1) {
             final FilterTree child = tree.getChildren().iterator().next();
             if (child.getType() == Type.CHOICE_CASE) {
@@ -135,7 +149,9 @@ public class FilterContentValidator {
                 continue;
             }
             builder.node(child.getName());
+            path.add(child.getName().getLocalName());
             if (child.getType() == Type.LIST) {
+                appendKeyIfPresent(child, filterContent, path, builder);
                 return builder.build();
             }
             tree = child;
@@ -143,57 +159,42 @@ public class FilterContentValidator {
         return builder.build();
     }
 
-    //FIXME this method will also be in yangtools ParserUtils, use that when https://git.opendaylight.org/gerrit/#/c/37031/ will be merged
-    /**
-     * Returns stack of schema nodes via which it was necessary to pass to get schema node with specified
-     * {@code childName} and {@code namespace}
-     *
-     * @param dataSchemaNode
-     * @param childName
-     * @param namespace
-     * @return stack of schema nodes via which it was passed through. If found schema node is direct child then stack
-     *         contains only one node. If it is found under choice and case then stack should contains 2*n+1 element
-     *         (where n is number of choices through it was passed)
-     */
-    private Deque<DataSchemaNode> findSchemaNodeByNameAndNamespace(final DataSchemaNode dataSchemaNode,
-                                                                   final String childName, final URI namespace) {
-        final Deque<DataSchemaNode> result = new ArrayDeque<>();
-        final List<ChoiceSchemaNode> childChoices = new ArrayList<>();
-        DataSchemaNode potentialChildNode = null;
-        if (dataSchemaNode instanceof DataNodeContainer) {
-            for (final DataSchemaNode childNode : ((DataNodeContainer) dataSchemaNode).getChildNodes()) {
-                if (childNode instanceof ChoiceSchemaNode) {
-                    childChoices.add((ChoiceSchemaNode) childNode);
-                } else {
-                    final QName childQName = childNode.getQName();
+    private void appendKeyIfPresent(final FilterTree tree, final XmlElement filterContent,
+                                    final List<String> pathToList,
+                                    final InstanceIdentifierBuilder builder) {
+        Preconditions.checkArgument(tree.getSchemaNode() instanceof ListSchemaNode);
+        final ListSchemaNode listSchemaNode = (ListSchemaNode) tree.getSchemaNode();
+        final List<QName> keyDefinition = listSchemaNode.getKeyDefinition();
+        final Map<QName, Object> map = getKeyValues(pathToList, filterContent, keyDefinition);
+        if (!map.isEmpty()) {
+            builder.nodeWithKey(tree.getName(), map);
+        }
+    }
 
-                    if (childQName.getLocalName().equals(childName) && childQName.getNamespace().equals(namespace)) {
-                        if (potentialChildNode == null ||
-                                childQName.getRevision().after(potentialChildNode.getQName().getRevision())) {
-                            potentialChildNode = childNode;
-                        }
-                    }
-                }
+    private Map<QName, Object> getKeyValues(final List<String> path, final XmlElement filterContent,
+                                            final List<QName> keyDefinition) {
+        XmlElement current = filterContent;
+        //find list element
+        for (final String pathElement : path) {
+            final List<XmlElement> childElements = current.getChildElements(pathElement);
+            // if there are multiple list entries present in the filter, we can't use any keys and must read whole list
+            if (childElements.size() != 1) {
+                return Collections.emptyMap();
+            }
+            current = childElements.get(0);
+        }
+        final Map<QName, Object> keys = new HashMap<>();
+        for (final QName qName : keyDefinition) {
+            final Optional<XmlElement> childElements = current.getOnlyChildElementOptionally(qName.getLocalName());
+            if (!childElements.isPresent()) {
+                return Collections.emptyMap();
+            }
+            final Optional<String> keyValue = childElements.get().getOnlyTextContentOptionally();
+            if (keyValue.isPresent()) {
+                keys.put(qName, keyValue.get());
             }
         }
-        if (potentialChildNode != null) {
-            result.push(potentialChildNode);
-            return result;
-        }
-
-        // try to find data schema node in choice (looking for first match)
-        for (final ChoiceSchemaNode choiceNode : childChoices) {
-            for (final ChoiceCaseNode concreteCase : choiceNode.getCases()) {
-                final Deque<DataSchemaNode> resultFromRecursion = findSchemaNodeByNameAndNamespace(concreteCase, childName,
-                        namespace);
-                if (!resultFromRecursion.isEmpty()) {
-                    resultFromRecursion.push(concreteCase);
-                    resultFromRecursion.push(choiceNode);
-                    return resultFromRecursion;
-                }
-            }
-        }
-        return result;
+        return keys;
     }
 
     /**
@@ -203,11 +204,13 @@ public class FilterContentValidator {
 
         private final QName name;
         private final Type type;
+        private final DataSchemaNode schemaNode;
         private final Map<QName, FilterTree> children;
 
-        FilterTree(QName name, Type type) {
+        FilterTree(final QName name, final Type type, final DataSchemaNode schemaNode) {
             this.name = name;
             this.type = type;
+            this.schemaNode = schemaNode;
             this.children = new HashMap<>();
         }
 
@@ -223,7 +226,7 @@ public class FilterContentValidator {
             final QName name = data.getQName();
             FilterTree childTree = children.get(name);
             if (childTree == null) {
-                childTree = new FilterTree(name, type);
+                childTree = new FilterTree(name, type, data);
             }
             children.put(name, childTree);
             return childTree;
@@ -239,6 +242,10 @@ public class FilterContentValidator {
 
         Type getType() {
             return type;
+        }
+
+        DataSchemaNode getSchemaNode() {
+            return schemaNode;
         }
     }
 
