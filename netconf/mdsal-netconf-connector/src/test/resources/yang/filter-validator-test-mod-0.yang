@@ -7,6 +7,17 @@ module filter-validator-test-mod-0 {
             mandatory true;
             type string;
         }
+        container inner {
+            list inner-multi-key-list {
+                key "id1 id2";
+                leaf id1 {
+                    type string;
+                }
+                leaf id2 {
+                    type string;
+                }
+            }
+        }
         list choiceList {
             key name;
             leaf name {
@@ -25,6 +36,16 @@ module filter-validator-test-mod-0 {
                         }
                     }
                 }
+            }
+        }
+
+        list multi-key-list {
+            key "id1 id2";
+            leaf id1 {
+                type string;
+            }
+            leaf id2 {
+                type string;
             }
         }
     }
