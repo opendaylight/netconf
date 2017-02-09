@@ -9,6 +9,7 @@ package org.opendaylight.restconf.restful.utils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+
 import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -19,8 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
@@ -95,7 +98,12 @@ public final class SubscribeToStreamUtil {
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
-        final List<NotificationListenerAdapter> listeners = Notificator.getNotificationListenerFor(streamName);
+        List<NotificationListenerAdapter> listeners = Notificator.getNotificationListenerFor(streamName);
+        if (identifier.contains("/JSON")) {
+            listeners = pickSpecificListenerByOutput(listeners, "JSON");
+        } else {
+            listeners = pickSpecificListenerByOutput(listeners, "XML");
+        }
         if ((listeners == null) || listeners.isEmpty()) {
             throw new RestconfDocumentedException("Stream was not found.", ErrorType.PROTOCOL,
                     ErrorTag.UNKNOWN_ELEMENT);
@@ -122,6 +130,19 @@ public final class SubscribeToStreamUtil {
         submitData(wTx);
 
         return uri;
+    }
+
+    private static List<NotificationListenerAdapter> pickSpecificListenerByOutput(
+            final List<NotificationListenerAdapter> listeners,
+            final String outputType) {
+        for (final NotificationListenerAdapter notificationListenerAdapter : listeners) {
+            if (notificationListenerAdapter.getOutputType().equals(outputType)) {
+                final List<NotificationListenerAdapter> list = new ArrayList<>();
+                list.add(notificationListenerAdapter);
+                return list;
+            }
+        }
+        return listeners;
     }
 
     /**
@@ -250,7 +271,7 @@ public final class SubscribeToStreamUtil {
     }
 
     @SuppressWarnings("rawtypes")
-    private static void writeDataToDS(final SchemaContext schemaContext, final String name,
+    static void writeDataToDS(final SchemaContext schemaContext, final String name,
             final DOMDataReadWriteTransaction wTx, final boolean exist, final NormalizedNode mapToStreams) {
         String pathId = "";
         if (exist) {
@@ -262,7 +283,7 @@ public final class SubscribeToStreamUtil {
                 mapToStreams);
     }
 
-    private static void submitData(final DOMDataReadWriteTransaction wTx) {
+    static void submitData(final DOMDataReadWriteTransaction wTx) {
         try {
             wTx.submit().checkedGet();
         } catch (final TransactionCommitFailedException e) {
@@ -289,7 +310,7 @@ public final class SubscribeToStreamUtil {
         return result;
     }
 
-    private static URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
+    static URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
         final int port = SubscribeToStreamUtil.prepareNotificationPort();
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
@@ -342,7 +363,7 @@ public final class SubscribeToStreamUtil {
         return port;
     }
 
-    private static boolean checkExist(final SchemaContext schemaContext, final DOMDataReadWriteTransaction wTx) {
+    static boolean checkExist(final SchemaContext schemaContext, final DOMDataReadWriteTransaction wTx) {
         boolean exist;
         try {
             exist = wTx.exists(LogicalDatastoreType.OPERATIONAL,
