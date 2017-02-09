@@ -56,8 +56,6 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
             if (namespace.toString().equals(RestconfStreamsConstants.SAL_REMOTE_NAMESPACE)) {
                 if (identifier.contains(RestconfStreamsConstants.CREATE_DATA_SUBSCR)) {
                     response = CreateStreamUtil.createDataChangeNotifiStream(payload, refSchemaCtx);
-                } else if (identifier.contains(RestconfStreamsConstants.CREATE_NOTIFICATION_STREAM)) {
-                    response = CreateStreamUtil.createYangNotifiStream(payload, refSchemaCtx);
                 } else {
                     throw new RestconfDocumentedException("Not supported operation", ErrorType.RPC,
                             ErrorTag.OPERATION_NOT_SUPPORTED);

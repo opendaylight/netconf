@@ -65,6 +65,12 @@ public final class RestconfStreamsConstants {
     public static final CharSequence NOTIFICATION_STREAM = "notification-stream";
     public static final CharSequence CREATE_NOTIFICATION_STREAM = "create-" + NOTIFICATION_STREAM;
 
+    public static final String STREAMS_PATH = "ietf-restconf-monitoring:restconf-state/streams";
+    public static final String STREAM_PATH_PART = "/stream=";
+    public static final String STREAM_PATH = STREAMS_PATH + STREAM_PATH_PART;
+    public static final String STREAM_ACCESS_PATH_PART = "/access=";
+    public static final String STREAM_LOCATION_PATH_PART = "/location";
+
     static {
         Date eventSubscriptionAugRevision;
         try {
