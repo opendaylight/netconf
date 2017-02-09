@@ -45,6 +45,30 @@
       "revId": "d37f9011e8545c3a3b4dec65b948081f54fbad62",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_f372f10f",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterContentValidator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-02-09T18:03:06Z",
+      "side": 1,
+      "message": "This check is for case, that multiple list entries are specified in the filter, e.g.\n\u003cmainroot xmlns\u003d\"urn:dummy:mod-0\"\u003e\n    \u003cmulti-key-list\u003e\n        \u003cid1\u003eaaa\u003c/id1\u003e\n        \u003cid2\u003ebbb\u003c/id2\u003e\n    \u003c/multi-key-list\u003e\n    \u003cmulti-key-list\u003e\n        \u003cid1\u003eccc\u003c/id1\u003e\n        \u003cid2\u003eddd\u003c/id2\u003e\n    \u003c/multi-key-list\u003e\n\u003c/mainroot\u003e\nThen we need to read whole list instead of specific entry and no key should be present in YangInstanceIdentifier. If there is only one key, we can use it to make the input for filtering smaller.\n\nI will add a comment.",
+      "parentUuid": "fafc7978_b33a2932",
+      "range": {
+        "startLine": 175,
+        "startChar": 16,
+        "endLine": 175,
+        "endChar": 41
+      },
+      "revId": "d37f9011e8545c3a3b4dec65b948081f54fbad62",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
