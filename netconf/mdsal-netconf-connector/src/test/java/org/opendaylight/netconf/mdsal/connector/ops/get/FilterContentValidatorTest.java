@@ -36,14 +36,14 @@ import org.xml.sax.SAXException;
 @RunWith(value = Parameterized.class)
 public class FilterContentValidatorTest {
 
-    private static final int TEST_CASE_COUNT = 8;
+    private static final int TEST_CASE_COUNT = 11;
     private final XmlElement filterContent;
     private final String expected;
     private FilterContentValidator validator;
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() throws IOException, SAXException, URISyntaxException, InitializationError {
-        List<Object[]> result = new ArrayList<>();
+        final List<Object[]> result = new ArrayList<>();
         final Path path = Paths.get(FilterContentValidatorTest.class.getResource("/filter/expected.txt").toURI());
         final List<String> expected = Files.readAllLines(path);
         if (expected.size() != TEST_CASE_COUNT) {
@@ -56,18 +56,18 @@ public class FilterContentValidatorTest {
         return result;
     }
 
-    public FilterContentValidatorTest(Document filterContent, String expected) {
+    public FilterContentValidatorTest(final Document filterContent, final String expected) {
         this.filterContent = XmlElement.fromDomDocument(filterContent);
         this.expected = expected;
     }
 
     @Before
     public void setUp() throws Exception {
-        List<InputStream> sources = new ArrayList<>();
+        final List<InputStream> sources = new ArrayList<>();
         sources.add(getClass().getResourceAsStream("/yang/filter-validator-test-mod-0.yang"));
         sources.add(getClass().getResourceAsStream("/yang/filter-validator-test-augment.yang"));
-        SchemaContext context = YangParserTestUtils.parseYangStreams(sources);
-        CurrentSchemaContext currentContext = mock(CurrentSchemaContext.class);
+        final SchemaContext context = YangParserTestUtils.parseYangStreams(sources);
+        final CurrentSchemaContext currentContext = mock(CurrentSchemaContext.class);
         doReturn(context).when(currentContext).getCurrentContext();
         validator = new FilterContentValidator(currentContext);
     }
@@ -81,7 +81,7 @@ public class FilterContentValidatorTest {
             try {
                 validator.validate(filterContent);
                 Assert.fail(XmlUtil.toString(filterContent) + " is not valid and should throw exception.");
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 final String expectedExceptionClass = expected.replace("error=", "");
                 Assert.assertEquals(expectedExceptionClass, e.getClass().getName());
             }
