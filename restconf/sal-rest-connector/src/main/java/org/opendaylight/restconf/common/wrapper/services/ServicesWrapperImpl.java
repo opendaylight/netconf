@@ -141,12 +141,13 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
             final RpcServiceHandler rpcServiceHandler, final NotificationServiceHandler notificationServiceHandler) {
         this.delegRestOpsService = new RestconfOperationsServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
         this.delegRestSchService = new RestconfSchemaServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
-        this.delegRestconfDataService =
-                new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler, domMountPointServiceHandler);
-        this.delegRestconfInvokeOpsService =
-                new RestconfInvokeOperationsServiceImpl(rpcServiceHandler, schemaCtxHandler);
         this.delegRestconfSubscrService = new RestconfStreamsSubscriptionServiceImpl(domDataBrokerHandler,
                 notificationServiceHandler, schemaCtxHandler, transactionChainHandler);
+        this.delegRestconfDataService =
+                new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler, domMountPointServiceHandler,
+                        this.delegRestconfSubscrService);
+        this.delegRestconfInvokeOpsService =
+                new RestconfInvokeOperationsServiceImpl(rpcServiceHandler, schemaCtxHandler);
         this.delegRestService = new RestconfImpl(schemaCtxHandler);
     }
 }
