@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.restful.services.impl;
 
 import static org.junit.Assert.assertEquals;
@@ -57,6 +56,7 @@ import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
+import org.opendaylight.restconf.restful.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -110,6 +110,8 @@ public class RestconfDataServiceImplTest {
     private DOMDataBroker mountDataBroker;
     @Mock
     private DOMTransactionChain transactionChain;
+    @Mock
+    private RestconfStreamsSubscriptionService delegRestconfSubscrService;
 
     @Before
     public void setUp() throws Exception {
@@ -183,7 +185,8 @@ public class RestconfDataServiceImplTest {
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(txHandler);
 
         schemaContextHandler.onGlobalContextUpdated(this.contextRef.get());
-        this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler, this.mountPointServiceHandler);
+        this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler,
+                this.mountPointServiceHandler, this.delegRestconfSubscrService);
         doReturn(this.domTransactionChain).when(this.transactionChainHandler).get();
         doReturn(this.read).when(this.domTransactionChain).newReadOnlyTransaction();
         doReturn(this.readWrite).when(this.domTransactionChain).newReadWriteTransaction();
