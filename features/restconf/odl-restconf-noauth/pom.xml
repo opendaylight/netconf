@@ -93,9 +93,12 @@
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
-        <!-- TODO
-            <feature>war</feature>
-        -->
+        <dependency>
+            <groupId>org.opendaylight.odlparent</groupId>
+            <artifactId>odl-karaf-feat-war</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>ietf-restconf</artifactId>

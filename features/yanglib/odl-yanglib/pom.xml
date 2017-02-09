@@ -57,8 +57,12 @@
             <artifactId>ietf-netconf-yang-library</artifactId>
             <version>1.2.0-SNAPSHOT</version>
         </dependency>
-        <!-- TODO
-            <feature>war</feature>
-        -->
+
+        <dependency>
+            <groupId>org.opendaylight.odlparent</groupId>
+            <artifactId>odl-karaf-feat-war</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
     </dependencies>
 </project>
