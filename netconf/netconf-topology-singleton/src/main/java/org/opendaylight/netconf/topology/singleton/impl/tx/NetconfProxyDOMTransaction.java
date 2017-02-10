@@ -15,6 +15,7 @@ import akka.pattern.Patterns;
 import com.google.common.base.Optional;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
@@ -67,9 +68,12 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) { // ask timeout
-                    Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
-                            DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
-                            DocumentedException.ErrorSeverity.WARNING);
+                    final Exception exception = new NetconfDocumentedException(
+                            "Request could not be completed because of insufficient resources.",
+                            DocumentedException.ErrorType.APPLICATION,
+                            DocumentedException.ErrorTag.RESOURCE_DENIED,
+                            DocumentedException.ErrorSeverity.ERROR
+                    );
                     promise.failure(exception);
                     return;
                 }
@@ -100,9 +104,12 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) { // ask timeout
-                    Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
-                            DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
-                            DocumentedException.ErrorSeverity.WARNING);
+                    final Exception exception = new NetconfDocumentedException(
+                            "Request could not be completed because of insufficient resources.",
+                            DocumentedException.ErrorType.APPLICATION,
+                            DocumentedException.ErrorTag.RESOURCE_DENIED,
+                            DocumentedException.ErrorSeverity.ERROR
+                    );
                     promise.failure(exception);
                     return;
                 }
@@ -166,9 +173,12 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) { // ask timeout
-                    Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
-                            DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
-                            DocumentedException.ErrorSeverity.WARNING);
+                    final Exception exception = new NetconfDocumentedException(
+                            "Request could not be completed because of insufficient resources.",
+                            DocumentedException.ErrorType.APPLICATION,
+                            DocumentedException.ErrorTag.RESOURCE_DENIED,
+                            DocumentedException.ErrorSeverity.ERROR
+                    );
                     promise.failure(exception);
                     return;
                 }
