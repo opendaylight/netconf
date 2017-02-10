@@ -96,6 +96,7 @@ public class RestconfErrorTest {
         lookUpMap.put("operation-failed", 500);
         lookUpMap.put("partial-operation", 500);
         lookUpMap.put("malformed-message", 400);
+        lookUpMap.put("resource-denied-transport", 503);
 
         for (ErrorTag tag : ErrorTag.values()) {
             Integer expectedStatusCode = lookUpMap.get(tag.getTagValue());
