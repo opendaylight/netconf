@@ -68,7 +68,8 @@ public class RestconfError {
         OPERATION_NOT_SUPPORTED("operation-not-supported", 501 /* Not Implemented */),
         OPERATION_FAILED("operation-failed", 500 /* INTERNAL_SERVER_ERROR */),
         PARTIAL_OPERATION("partial-operation", 500 /* INTERNAL_SERVER_ERROR */),
-        MALFORMED_MESSAGE("malformed-message", 400 /* Bad Request */);
+        MALFORMED_MESSAGE("malformed-message", 400 /* Bad Request */),
+        RESOURCE_DENIED_TRANSPORT("resource-denied-transport", 503 /* Service Unavailable */);
 
         private final String tagValue;
         private final int statusCode;
