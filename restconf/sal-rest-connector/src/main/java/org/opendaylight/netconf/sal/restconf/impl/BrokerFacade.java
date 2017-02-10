@@ -1011,8 +1011,6 @@ public class BrokerFacade {
     /**
      * PUT data and do NOT submit {@link DOMDataReadWriteTransaction}
      *
-     * @param insert
-     * @param point
      */
     private void putDataWithinTransaction(
             final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
