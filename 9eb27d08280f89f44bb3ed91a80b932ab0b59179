@@ -48,6 +48,29 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_4646967d",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/NetconfProxyDOMTransaction.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-02-10T16:14:01Z",
+      "side": 1,
+      "message": "In my opinion it could stay as DocumentedException",
+      "range": {
+        "startLine": 71,
+        "startChar": 52,
+        "endLine": 71,
+        "endChar": 59
+      },
+      "revId": "9eb27d08280f89f44bb3ed91a80b932ab0b59179",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_064c8e9d",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/NetconfProxyDOMTransaction.java",
         "patchSetId": 1
