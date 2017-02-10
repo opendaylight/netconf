@@ -19,6 +19,7 @@ import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
+import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.CancelRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.DeleteRequest;
@@ -78,7 +79,6 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
     @Override
     public Future<Optional<NormalizedNodeMessage>> read(final LogicalDatastoreType store,
                                                         final YangInstanceIdentifier path) {
-
         final Future<Object> readScalaFuture =
                 Patterns.ask(masterContextRef, new ReadRequest(store, path), actorResponseWaitTime);
 
@@ -90,9 +90,11 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) { // ask timeout
-                    Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
-                            DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
-                            DocumentedException.ErrorSeverity.WARNING);
+                    final Exception exception = new DocumentedException(
+                            id + ":Master is down. Please try again.",
+                            DocumentedException.ErrorType.TRANSPORT,
+                            DocumentedException.ErrorTag.RESOURCE_DENIED,
+                            DocumentedException.ErrorSeverity.ERROR);
                     promise.failure(exception);
                     return;
                 }
@@ -123,9 +125,11 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) { // ask timeout
-                    Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
-                            DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
-                            DocumentedException.ErrorSeverity.WARNING);
+                    final Exception exception = new DocumentedException(
+                            id + ":Master is down. Please try again.",
+                            DocumentedException.ErrorType.TRANSPORT,
+                            DocumentedException.ErrorTag.RESOURCE_DENIED,
+                            DocumentedException.ErrorSeverity.ERROR);
                     promise.failure(exception);
                     return;
                 }
@@ -189,9 +193,11 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) { // ask timeout
-                    Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
-                            DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
-                            DocumentedException.ErrorSeverity.WARNING);
+                    final Exception exception = new DocumentedException(
+                            id + ":Master is down. Please try again.",
+                            DocumentedException.ErrorType.TRANSPORT,
+                            DocumentedException.ErrorTag.RESOURCE_DENIED,
+                            DocumentedException.ErrorSeverity.ERROR);
                     promise.failure(exception);
                     return;
                 }
