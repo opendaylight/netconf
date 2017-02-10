@@ -960,7 +960,9 @@ public class BrokerFacade {
                                         final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         final CountDownLatch responseWaiter = new CountDownLatch(1);
         final ReadDataResult<Boolean> readData = new ReadDataResult<>();
+        final MaybeFailure maybeFailure = new MaybeFailure();
         final CheckedFuture<Boolean, ReadFailedException> future = rWTransaction.exists(store, path);
+
 
         Futures.addCallback(future, new FutureCallback<Boolean>() {
             @Override
@@ -971,6 +973,7 @@ public class BrokerFacade {
 
             @Override
             public void onFailure(final Throwable t) {
+                maybeFailure.setFailure(t);
                 responseWaiter.countDown();
                 handlingCallback(t, store, path, null, null);
             }
@@ -978,10 +981,16 @@ public class BrokerFacade {
 
         try {
             responseWaiter.await();
-        } catch (final Exception e) {
+        } catch (final InterruptedException e) {
             final String msg = "Problem while waiting for response";
             LOG.warn(msg);
             throw new RestconfDocumentedException(msg, e);
+        }
+
+        if (maybeFailure.getFailure() != null) {
+            rWTransaction.cancel();
+            throw new RestconfDocumentedException("There was a problem while checking for existence of data.",
+                    ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, maybeFailure.getFailure());
         }
 
         if (readData.getResult()) {
@@ -1253,8 +1262,7 @@ public class BrokerFacade {
                                                      final YangInstanceIdentifier path, final Optional<X> result,
                                                      final ReadDataResult<X> readData) {
         if (t != null) {
-            LOG.warn("Exception by reading {} via Restconf: {}", datastore.name(), path, t);
-            throw new RestconfDocumentedException("Problem to get data from transaction.", t);
+            LOG.error("Exception by reading {} via Restconf: {}", datastore.name(), path, t);
         } else {
             LOG.debug("Reading result data from transaction.");
             if (result != null) {
@@ -1318,5 +1326,18 @@ public class BrokerFacade {
         final NormalizedNode<?, ?> parentStructure = ImmutableNodes.fromInstanceId(schemaContext,
                 YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));
         rwTx.merge(store, rootNormalizedPath, parentStructure);
+    }
+
+    private static final class MaybeFailure {
+
+        private Throwable failure = null;
+
+        private void setFailure(final Throwable failure) {
+            this.failure = failure;
+        }
+
+        private Throwable getFailure() {
+            return failure;
+        }
     }
 }
