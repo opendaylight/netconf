@@ -90,9 +90,11 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) { // ask timeout
-                    Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
-                            DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
-                            DocumentedException.ErrorSeverity.WARNING);
+                    final Exception exception = new DocumentedException(
+                            id + ":Master is down. Please try again.",
+                            DocumentedException.ErrorType.TRANSPORT,
+                            DocumentedException.ErrorTag.RESOURCE_DENIED,
+                            DocumentedException.ErrorSeverity.ERROR);
                     promise.failure(exception);
                     return;
                 }
@@ -123,9 +125,11 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) { // ask timeout
-                    Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
-                            DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
-                            DocumentedException.ErrorSeverity.WARNING);
+                    final Exception exception = new DocumentedException(
+                            id + ":Master is down. Please try again.",
+                            DocumentedException.ErrorType.TRANSPORT,
+                            DocumentedException.ErrorTag.RESOURCE_DENIED,
+                            DocumentedException.ErrorSeverity.ERROR);
                     promise.failure(exception);
                     return;
                 }
@@ -144,7 +148,6 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
         LOG.trace("{}: Write {} via NETCONF: {} with payload {}", id, store, data.getIdentifier(), data.getNode());
 
         masterContextRef.tell(new PutRequest(store, data), ActorRef.noSender());
-
     }
 
     @Override
@@ -189,9 +192,11 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) { // ask timeout
-                    Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
-                            DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
-                            DocumentedException.ErrorSeverity.WARNING);
+                    final Exception exception = new DocumentedException(
+                            id + ":Master is down. Please try again.",
+                            DocumentedException.ErrorType.TRANSPORT,
+                            DocumentedException.ErrorTag.RESOURCE_DENIED,
+                            DocumentedException.ErrorSeverity.ERROR);
                     promise.failure(exception);
                     return;
                 }
