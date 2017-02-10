@@ -44,6 +44,7 @@ import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -76,6 +77,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BrokerFacade {
+
     private final static Logger LOG = LoggerFactory.getLogger(BrokerFacade.class);
 
     private final static BrokerFacade INSTANCE = new BrokerFacade();
@@ -526,7 +528,17 @@ public class BrokerFacade {
                 prepareDataByParamWithDef(optional.get(), path, withDefa);
         } catch (ReadFailedException e) {
             LOG.warn("Error reading {} from datastore {}", path, datastore.name(), e);
-            throw new RestconfDocumentedException("Error reading data.", e, e.getErrorList());
+            final RpcError error = e.getErrorList().get(0);
+            if (error.getErrorType().equals(RpcError.ErrorType.TRANSPORT) &&
+                    error.getTag().equals(ErrorTag.RESOURCE_DENIED.getTagValue())
+                    ) {
+                throw new RestconfDocumentedException(
+                        error.getMessage(),
+                        ErrorType.TRANSPORT,
+                        ErrorTag.RESOURCE_DENIED_TRANSPORT);
+            } else {
+                throw new RestconfDocumentedException("Error reading data.", e, e.getErrorList());
+            }
         }
     }
 

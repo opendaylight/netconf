@@ -16,12 +16,15 @@ import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
 import javax.annotation.Nullable;
+import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
+import org.opendaylight.yangtools.yang.common.RpcError;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
@@ -62,6 +65,18 @@ public class NetconfReadOnlyTransaction implements DOMDataReadOnlyTransaction {
             @Nullable
             @Override
             public ReadFailedException apply(Exception cause) {
+                if (cause.getCause() instanceof DocumentedException) {
+                    final DocumentedException exception = (DocumentedException) cause.getCause();
+                    if (exception.getErrorSeverity().equals(DocumentedException.ErrorSeverity.ERROR) &&
+                            exception.getErrorType().equals(DocumentedException.ErrorType.TRANSPORT) &&
+                            exception.getErrorTag().equals(DocumentedException.ErrorTag.RESOURCE_DENIED)) {
+                        final RpcError error = RpcResultBuilder.newError(
+                                RpcError.ErrorType.TRANSPORT,
+                                exception.getErrorTag().getTagValue(),
+                                "Master is down. Please try again.");
+                        return new ReadFailedException("Read from transaction failed", error);
+                    }
+                }
                 return new ReadFailedException("Read from transaction failed", cause);
             }
         });
