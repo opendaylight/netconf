@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_c6828693",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-02-10T16:10:43Z",
+      "side": 1,
+      "message": "Correct format is: BUG-7741: title",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 14
+      },
+      "revId": "9eb27d08280f89f44bb3ed91a80b932ab0b59179",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_a67dc2b3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-02-10T16:10:43Z",
+      "side": 1,
+      "message": "You have changed it to NetconfDocumentedException",
+      "range": {
+        "startLine": 9,
+        "startChar": 30,
+        "endLine": 9,
+        "endChar": 57
+      },
+      "revId": "9eb27d08280f89f44bb3ed91a80b932ab0b59179",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_064c8e9d",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/NetconfProxyDOMTransaction.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-02-10T16:10:43Z",
+      "side": 1,
+      "message": "This message was ok before, you should only change ErrorTag and adapt restconf exception handling to it.",
+      "range": {
+        "startLine": 72,
+        "startChar": 27,
+        "endLine": 72,
+        "endChar": 96
+      },
+      "revId": "9eb27d08280f89f44bb3ed91a80b932ab0b59179",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
