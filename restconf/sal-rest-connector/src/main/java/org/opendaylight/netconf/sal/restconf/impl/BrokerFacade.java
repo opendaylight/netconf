@@ -44,6 +44,7 @@ import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -526,6 +527,15 @@ public class BrokerFacade {
                 prepareDataByParamWithDef(optional.get(), path, withDefa);
         } catch (ReadFailedException e) {
             LOG.warn("Error reading {} from datastore {}", path, datastore.name(), e);
+            for (final RpcError error : e.getErrorList()) {
+                if (error.getErrorType() == RpcError.ErrorType.TRANSPORT
+                        && error.getTag().equals(ErrorTag.RESOURCE_DENIED.getTagValue())) {
+                    throw new RestconfDocumentedException(
+                            error.getMessage(),
+                            ErrorType.TRANSPORT,
+                            ErrorTag.RESOURCE_DENIED_TRANSPORT);
+                }
+            }
             throw new RestconfDocumentedException("Error reading data.", e, e.getErrorList());
         }
     }

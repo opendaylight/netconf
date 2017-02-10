@@ -19,6 +19,7 @@ import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
+import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.CancelRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.DeleteRequest;
@@ -90,9 +91,11 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) { // ask timeout
-                    Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
-                            DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
-                            DocumentedException.ErrorSeverity.WARNING);
+                    final Exception exception = new DocumentedException(
+                            id + ":Master is down. Please try again.",
+                            DocumentedException.ErrorType.TRANSPORT,
+                            DocumentedException.ErrorTag.RESOURCE_DENIED,
+                            DocumentedException.ErrorSeverity.ERROR);
                     promise.failure(exception);
                     return;
                 }
@@ -123,9 +126,11 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) { // ask timeout
-                    Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
-                            DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
-                            DocumentedException.ErrorSeverity.WARNING);
+                    final Exception exception = new DocumentedException(
+                            id + ":Master is down. Please try again.",
+                            DocumentedException.ErrorType.TRANSPORT,
+                            DocumentedException.ErrorTag.RESOURCE_DENIED,
+                            DocumentedException.ErrorSeverity.ERROR);
                     promise.failure(exception);
                     return;
                 }
@@ -172,6 +177,7 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
             // here must be Await because AsyncWriteTransaction do not return future
             return (boolean) Await.result(cancelScalaFuture, actorResponseWaitTime.duration());
         } catch (Exception e) {
+
             return false;
         }
     }
@@ -189,9 +195,11 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) { // ask timeout
-                    Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
-                            DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
-                            DocumentedException.ErrorSeverity.WARNING);
+                    final Exception exception = new DocumentedException(
+                            id + ":Master is down. Please try again.",
+                            DocumentedException.ErrorType.TRANSPORT,
+                            DocumentedException.ErrorTag.RESOURCE_DENIED,
+                            DocumentedException.ErrorSeverity.ERROR);
                     promise.failure(exception);
                     return;
                 }

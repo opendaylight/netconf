@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -27,6 +28,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,6 +70,8 @@ import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.RpcError;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -163,6 +167,25 @@ public class BrokerFacadeTest {
         this.brokerFacade.setDomDataBroker(null);
 
         this.brokerFacade.readOperationalData(this.instanceID);
+    }
+
+    @Test(expected = RestconfDocumentedException.class)
+    public void test503() throws ExecutionException, InterruptedException {
+        final RpcError error = RpcResultBuilder.newError(
+                RpcError.ErrorType.TRANSPORT,
+                ErrorTag.RESOURCE_DENIED.getTagValue(),
+                "Master is down. Please try again.");
+        final ReadFailedException exception503 = new ReadFailedException("Read from transaction failed", error);
+        doReturn(Futures.immediateFailedCheckedFuture(exception503))
+                .when(rTransaction).read(any(LogicalDatastoreType.class), any(YangInstanceIdentifier.class));
+        try {
+            brokerFacade.readConfigurationData(this.instanceID, "explicit");
+        } catch (final RestconfDocumentedException e) {
+            assertEquals("getErrorTag", ErrorTag.RESOURCE_DENIED_TRANSPORT, e.getErrors().get(0).getErrorTag());
+            assertEquals("getErrorType", ErrorType.TRANSPORT, e.getErrors().get(0).getErrorType());
+            assertEquals("getErrorMessage", "Master is down. Please try again.", e.getErrors().get(0).getErrorMessage());
+            throw e;
+        }
     }
 
     @Test
