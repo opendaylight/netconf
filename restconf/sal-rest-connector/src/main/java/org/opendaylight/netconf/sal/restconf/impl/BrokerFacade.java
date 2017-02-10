@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.OPERATIONAL;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -521,6 +522,7 @@ public class BrokerFacade {
         LOG.trace("Read {} via Restconf: {}", datastore.name(), path);
         final ListenableFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = transaction.read(datastore, path);
         final ReadDataResult<NormalizedNode<?, ?>> readData = new ReadDataResult<>();
+
         final CountDownLatch responseWaiter = new CountDownLatch(1);
 
         Futures.addCallback(listenableFuture, new FutureCallback<Optional<NormalizedNode<?, ?>>>() {
@@ -534,7 +536,7 @@ public class BrokerFacade {
             @Override
             public void onFailure(final Throwable t) {
                 responseWaiter.countDown();
-                handlingCallback(t, datastore, path, null, null);
+                handlingCallback(t, datastore, path, null, readData);
             }
         });
 
@@ -544,6 +546,9 @@ public class BrokerFacade {
             final String msg = "Problem while waiting for response";
             LOG.warn(msg);
             throw new RestconfDocumentedException(msg, e);
+        }
+        if (readData.getThrowable() != null) {
+            throw new RestconfDocumentedException("Problem to get data from transaction.", readData.getThrowable());
         }
         if (withDefa == null) {
             return readData.getResult();
@@ -555,7 +560,7 @@ public class BrokerFacade {
 
     private NormalizedNode<?, ?> prepareDataByParamWithDef(final NormalizedNode<?, ?> result,
             final YangInstanceIdentifier path, final String withDefa) {
-        boolean trim;
+        final boolean trim;
         switch (withDefa) {
             case "trim":
                 trim = true;
@@ -1232,13 +1237,22 @@ public class BrokerFacade {
      */
     private final class ReadDataResult<T> {
         T result = null;
+        Throwable t = null;
 
         T getResult() {
             return this.result;
         }
 
+        Throwable getThrowable() {
+            return this.t;
+        }
+
         void setResult(final T result) {
             this.result = result;
+        }
+
+        void setThrowable(final Throwable t) {
+            this.t = t;
         }
     }
 
@@ -1256,6 +1270,7 @@ public class BrokerFacade {
                                                      final ReadDataResult<X> readData) {
         if (t != null) {
             LOG.warn("Exception by reading {} via Restconf: {}", datastore.name(), path, t);
+            readData.setThrowable(t);
             throw new RestconfDocumentedException("Problem to get data from transaction.", t);
         } else {
             LOG.debug("Reading result data from transaction.");
