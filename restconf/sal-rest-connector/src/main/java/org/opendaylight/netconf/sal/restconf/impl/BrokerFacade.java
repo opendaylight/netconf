@@ -76,7 +76,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BrokerFacade {
+public class
+BrokerFacade {
     private final static Logger LOG = LoggerFactory.getLogger(BrokerFacade.class);
 
     private final static BrokerFacade INSTANCE = new BrokerFacade();
