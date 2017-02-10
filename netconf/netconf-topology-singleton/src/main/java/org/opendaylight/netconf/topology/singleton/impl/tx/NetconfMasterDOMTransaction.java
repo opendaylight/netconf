@@ -40,7 +40,7 @@ public class NetconfMasterDOMTransaction implements NetconfDOMTransaction {
     private final RemoteDeviceId id;
     private final DOMDataBroker delegateBroker;
 
-    private DOMDataReadOnlyTransaction readTx;
+    private final DOMDataReadOnlyTransaction readTx;
     private DOMDataWriteTransaction writeTx;
 
     public NetconfMasterDOMTransaction(final RemoteDeviceId id,
