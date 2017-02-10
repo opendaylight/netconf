@@ -87,7 +87,7 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) { // ask timeout
-                    Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
+                    final Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
                             DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
                             DocumentedException.ErrorSeverity.WARNING);
                     promise.failure(exception);
@@ -120,7 +120,7 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) { // ask timeout
-                    Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
+                    final Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
                             DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
                             DocumentedException.ErrorSeverity.WARNING);
                     promise.failure(exception);
@@ -168,7 +168,7 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
         try {
             // here must be Await because AsyncWriteTransaction do not return future
             return (boolean) Await.result(cancelScalaFuture, NetconfTopologyUtils.TIMEOUT.duration());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return false;
         }
     }
@@ -186,7 +186,7 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) { // ask timeout
-                    Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
+                    final Exception exception = new DocumentedException(id + ":Master is down. Please try again.",
                             DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
                             DocumentedException.ErrorSeverity.WARNING);
                     promise.failure(exception);
