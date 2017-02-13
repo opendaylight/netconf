@@ -8,11 +8,12 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.concurrent.ExecutionException;
+import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
@@ -77,12 +78,15 @@ public final class ReadOnlyTx implements DOMDataReadOnlyTransaction {
     @Override
     public CheckedFuture<Boolean, ReadFailedException> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> data = read(store, path);
-
-        try {
-            return Futures.immediateCheckedFuture(data.get().isPresent());
-        } catch (InterruptedException | ExecutionException e) {
-            return Futures.immediateFailedCheckedFuture(new ReadFailedException("Exists failed",e));
-        }
+        final ListenableFuture<Boolean> result = Futures.transform(data,
+                new Function<Optional<NormalizedNode<?, ?>>, Boolean>() {
+                    @Nullable
+                    @Override
+                    public Boolean apply(@Nullable final Optional<NormalizedNode<?, ?>> input) {
+                        return input != null && input.isPresent();
+                    }
+                });
+        return MappingCheckedFuture.create(result, ReadFailedException.MAPPER);
     }
 
     @Override
