@@ -9,13 +9,13 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.OPERATIONAL;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -103,7 +103,7 @@ public class BrokerFacade {
     }
 
     private void checkPreconditions() {
-        if ((this.context == null) || (this.domDataBroker == null)) {
+        if (this.context == null || this.domDataBroker == null) {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
     }
@@ -519,38 +519,15 @@ public class BrokerFacade {
     private NormalizedNode<?, ?> readDataViaTransaction(final DOMDataReadTransaction transaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final String withDefa) {
         LOG.trace("Read {} via Restconf: {}", datastore.name(), path);
-        final ListenableFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = transaction.read(datastore, path);
-        final ReadDataResult<NormalizedNode<?, ?>> readData = new ReadDataResult<>();
-        final CountDownLatch responseWaiter = new CountDownLatch(1);
-
-        Futures.addCallback(listenableFuture, new FutureCallback<Optional<NormalizedNode<?, ?>>>() {
-
-            @Override
-            public void onSuccess(final Optional<NormalizedNode<?, ?>> result) {
-                handlingCallback(null, datastore, path, result, readData);
-                responseWaiter.countDown();
-            }
-
-            @Override
-            public void onFailure(final Throwable t) {
-                responseWaiter.countDown();
-                handlingCallback(t, datastore, path, null, null);
-            }
-        });
 
         try {
-            responseWaiter.await();
-        } catch (final Exception e) {
-            final String msg = "Problem while waiting for response";
-            LOG.warn(msg);
-            throw new RestconfDocumentedException(msg, e);
+            final Optional<NormalizedNode<?, ?>> optional = transaction.read(datastore, path).checkedGet();
+            return !optional.isPresent() ? null : withDefa == null ? optional.get() :
+                prepareDataByParamWithDef(optional.get(), path, withDefa);
+        } catch (ReadFailedException e) {
+            LOG.warn("Error reading {} from datastore {}", path, datastore.name(), e);
+            throw new RestconfDocumentedException("Error reading data.", e, e.getErrorList());
         }
-        if (withDefa == null) {
-            return readData.getResult();
-        } else {
-            return prepareDataByParamWithDef(readData.getResult(), path, withDefa);
-        }
-
     }
 
     private NormalizedNode<?, ?> prepareDataByParamWithDef(final NormalizedNode<?, ?> result,
@@ -611,12 +588,12 @@ public class BrokerFacade {
                     builder.withChild(leafBuilder.build());
                 } else {
                     if (trim) {
-                        if ((defaultVal == null) || !defaultVal.equals(nodeVal)) {
+                        if (defaultVal == null || !defaultVal.equals(nodeVal)) {
                             leafBuilder.withValue(((LeafNode) child).getValue());
                             builder.withChild(leafBuilder.build());
                         }
                     } else {
-                        if ((defaultVal != null) && defaultVal.equals(nodeVal)) {
+                        if (defaultVal != null && defaultVal.equals(nodeVal)) {
                             leafBuilder.withValue(((LeafNode) child).getValue());
                             builder.withChild(leafBuilder.build());
                         }
@@ -662,12 +639,12 @@ public class BrokerFacade {
                 final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
                         Builders.leafBuilder((LeafSchemaNode) childSchema);
                 if (trim) {
-                    if ((defaultVal == null) || !defaultVal.equals(nodeVal)) {
+                    if (defaultVal == null || !defaultVal.equals(nodeVal)) {
                         leafBuilder.withValue(((LeafNode) child).getValue());
                         builder.withChild(leafBuilder.build());
                     }
                 } else {
-                    if ((defaultVal != null) && defaultVal.equals(nodeVal)) {
+                    if (defaultVal != null && defaultVal.equals(nodeVal)) {
                         leafBuilder.withValue(((LeafNode) child).getValue());
                         builder.withChild(leafBuilder.build());
                     }
@@ -711,7 +688,7 @@ public class BrokerFacade {
                     if(schemaNode instanceof ListSchemaNode){
                         final OrderedMapNode readList =
                                 (OrderedMapNode) this.readConfigurationData(path.getParent().getParent());
-                        if ((readList == null) || readList.getValue().isEmpty()) {
+                        if (readList == null || readList.getValue().isEmpty()) {
                             simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
                         } else {
                             rWTransaction.delete(datastore, path.getParent().getParent());
@@ -722,7 +699,7 @@ public class BrokerFacade {
                     } else {
                         final OrderedLeafSetNode readLeafList =
                                 (OrderedLeafSetNode) readConfigurationData(path.getParent());
-                        if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
+                        if (readLeafList == null || readLeafList.getValue().isEmpty()) {
                             simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
                         } else {
                             rWTransaction.delete(datastore, path.getParent());
@@ -739,7 +716,7 @@ public class BrokerFacade {
                     if(schemaNode instanceof ListSchemaNode){
                         final OrderedMapNode readList =
                                 (OrderedMapNode) this.readConfigurationData(path.getParent().getParent());
-                        if ((readList == null) || readList.getValue().isEmpty()) {
+                        if (readList == null || readList.getValue().isEmpty()) {
                             simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
                         } else {
                             insertWithPointListPost(rWTransaction, datastore, path, payload, schemaContext, point,
@@ -749,7 +726,7 @@ public class BrokerFacade {
                     } else {
                         final OrderedLeafSetNode<?> readLeafList =
                                 (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
-                        if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
+                        if (readLeafList == null || readLeafList.getValue().isEmpty()) {
                             simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
                         } else {
                             insertWithPointLeafListPost(rWTransaction, datastore, path, payload, schemaContext, point,
@@ -761,7 +738,7 @@ public class BrokerFacade {
                     if (schemaNode instanceof ListSchemaNode) {
                         final OrderedMapNode readList =
                                 (OrderedMapNode) this.readConfigurationData(path.getParent().getParent());
-                        if ((readList == null) || readList.getValue().isEmpty()) {
+                        if (readList == null || readList.getValue().isEmpty()) {
                             simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
                         } else {
                             insertWithPointListPost(rWTransaction, datastore, path, payload, schemaContext, point,
@@ -771,7 +748,7 @@ public class BrokerFacade {
                     } else {
                         final OrderedLeafSetNode<?> readLeafList =
                                 (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
-                        if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
+                        if (readLeafList == null || readLeafList.getValue().isEmpty()) {
                             simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
                         } else {
                             insertWithPointLeafListPost(rWTransaction, datastore, path, payload, schemaContext, point,
@@ -907,6 +884,17 @@ public class BrokerFacade {
         rWTransaction.put(datastore, path, payload);
     }
 
+    private boolean doesItemExist(final DOMDataReadWriteTransaction rWTransaction,
+            final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        try {
+            return rWTransaction.exists(store, path).checkedGet();
+        } catch (ReadFailedException e) {
+            rWTransaction.cancel();
+            throw new RestconfDocumentedException("Could not read the data in order to determine existence.",
+                    e, e.getErrorList());
+        }
+    }
+
     /**
      * Check if item already exists. Throws error if it does NOT already exist.
      * @param rWTransaction Current transaction
@@ -915,33 +903,7 @@ public class BrokerFacade {
      */
     private void checkItemExists(final DOMDataReadWriteTransaction rWTransaction,
                                  final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        final CountDownLatch responseWaiter = new CountDownLatch(1);
-        final ReadDataResult<Boolean> readData = new ReadDataResult<>();
-        final CheckedFuture<Boolean, ReadFailedException> future = rWTransaction.exists(store, path);
-
-        Futures.addCallback(future, new FutureCallback<Boolean>() {
-            @Override
-            public void onSuccess(@Nullable final Boolean result) {
-                handlingCallback(null, store, path, Optional.of(result), readData);
-                responseWaiter.countDown();
-            }
-
-            @Override
-            public void onFailure(final Throwable t) {
-                responseWaiter.countDown();
-                handlingCallback(t, store, path, null, null);
-            }
-        });
-
-        try {
-            responseWaiter.await();
-        } catch (final Exception e) {
-            final String msg = "Problem while waiting for response";
-            LOG.warn(msg);
-            throw new RestconfDocumentedException(msg, e);
-        }
-
-        if ((readData.getResult() == null) || !readData.getResult()) {
+        if (!doesItemExist(rWTransaction, store, path)) {
             final String errMsg = "Operation via Restconf was not executed because data does not exist";
             LOG.trace("{}:{}", errMsg, path);
             rWTransaction.cancel();
@@ -958,33 +920,7 @@ public class BrokerFacade {
      */
     private void checkItemDoesNotExists(final DOMDataReadWriteTransaction rWTransaction,
                                         final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        final CountDownLatch responseWaiter = new CountDownLatch(1);
-        final ReadDataResult<Boolean> readData = new ReadDataResult<>();
-        final CheckedFuture<Boolean, ReadFailedException> future = rWTransaction.exists(store, path);
-
-        Futures.addCallback(future, new FutureCallback<Boolean>() {
-            @Override
-            public void onSuccess(@Nullable final Boolean result) {
-                handlingCallback(null, store, path, Optional.of(result), readData);
-                responseWaiter.countDown();
-            }
-
-            @Override
-            public void onFailure(final Throwable t) {
-                responseWaiter.countDown();
-                handlingCallback(t, store, path, null, null);
-            }
-        });
-
-        try {
-            responseWaiter.await();
-        } catch (final Exception e) {
-            final String msg = "Problem while waiting for response";
-            LOG.warn(msg);
-            throw new RestconfDocumentedException(msg, e);
-        }
-
-        if (readData.getResult()) {
+        if (doesItemExist(rWTransaction, store, path)) {
             final String errMsg = "Operation via Restconf was not executed because data already exists";
             LOG.trace("{}:{}", errMsg, path);
             rWTransaction.cancel();
@@ -1035,7 +971,7 @@ public class BrokerFacade {
                     if (schemaNode instanceof ListSchemaNode) {
                         final OrderedMapNode readList =
                                 (OrderedMapNode) this.readConfigurationData(path.getParent());
-                        if ((readList == null) || readList.getValue().isEmpty()) {
+                        if (readList == null || readList.getValue().isEmpty()) {
                             simplePut(datastore, path, rWTransaction, schemaContext, payload);
                         } else {
                             rWTransaction.delete(datastore, path.getParent());
@@ -1045,7 +981,7 @@ public class BrokerFacade {
                     } else {
                         final OrderedLeafSetNode<?> readLeafList =
                                 (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
-                        if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
+                        if (readLeafList == null || readLeafList.getValue().isEmpty()) {
                             simplePut(datastore, path, rWTransaction, schemaContext, payload);
                         } else {
                             rWTransaction.delete(datastore, path.getParent());
@@ -1062,7 +998,7 @@ public class BrokerFacade {
                     if (schemaNode instanceof ListSchemaNode) {
                         final OrderedMapNode readList =
                                 (OrderedMapNode) this.readConfigurationData(path.getParent());
-                        if ((readList == null) || readList.getValue().isEmpty()) {
+                        if (readList == null || readList.getValue().isEmpty()) {
                             simplePut(datastore, path, rWTransaction, schemaContext, payload);
                         } else {
                             insertWithPointListPut(rWTransaction, datastore, path, payload, schemaContext, point,
@@ -1071,7 +1007,7 @@ public class BrokerFacade {
                     } else {
                         final OrderedLeafSetNode<?> readLeafList =
                                 (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
-                        if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
+                        if (readLeafList == null || readLeafList.getValue().isEmpty()) {
                             simplePut(datastore, path, rWTransaction, schemaContext, payload);
                         } else {
                             insertWithPointLeafListPut(rWTransaction, datastore, path, payload, schemaContext, point,
@@ -1083,7 +1019,7 @@ public class BrokerFacade {
                     if (schemaNode instanceof ListSchemaNode) {
                         final OrderedMapNode readList =
                                 (OrderedMapNode) this.readConfigurationData(path.getParent());
-                        if ((readList == null) || readList.getValue().isEmpty()) {
+                        if (readList == null || readList.getValue().isEmpty()) {
                             simplePut(datastore, path, rWTransaction, schemaContext, payload);
                         } else {
                             insertWithPointListPut(rWTransaction, datastore, path, payload, schemaContext, point,
@@ -1092,7 +1028,7 @@ public class BrokerFacade {
                     } else {
                         final OrderedLeafSetNode<?> readLeafList =
                                 (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
-                        if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
+                        if (readLeafList == null || readLeafList.getValue().isEmpty()) {
                             simplePut(datastore, path, rWTransaction, schemaContext, payload);
                         } else {
                             insertWithPointLeafListPut(rWTransaction, datastore, path, payload, schemaContext, point,
@@ -1224,47 +1160,6 @@ public class BrokerFacade {
 
     public void setDomDataBroker(final DOMDataBroker domDataBroker) {
         this.domDataBroker = domDataBroker;
-    }
-
-    /**
-     * Helper class for result of transaction commit callback.
-     * @param <T> Type of result
-     */
-    private final class ReadDataResult<T> {
-        T result = null;
-
-        T getResult() {
-            return this.result;
-        }
-
-        void setResult(final T result) {
-            this.result = result;
-        }
-    }
-
-    /**
-     * Set result from transaction commit callback.
-     * @param t Throwable if transaction commit failed
-     * @param datastore Datastore from which data are read
-     * @param path Path from which data are read
-     * @param result Result of read from {@code datastore}
-     * @param readData Result value which will be set
-     * @param <X> Result type
-     */
-    protected final static <X> void handlingCallback(final Throwable t, final LogicalDatastoreType datastore,
-                                                     final YangInstanceIdentifier path, final Optional<X> result,
-                                                     final ReadDataResult<X> readData) {
-        if (t != null) {
-            LOG.warn("Exception by reading {} via Restconf: {}", datastore.name(), path, t);
-            throw new RestconfDocumentedException("Problem to get data from transaction.", t);
-        } else {
-            LOG.debug("Reading result data from transaction.");
-            if (result != null) {
-                if (result.isPresent()) {
-                    readData.setResult(result.get());
-                }
-            }
-        }
     }
 
     public void registerToListenNotification(final NotificationListenerAdapter listener) {

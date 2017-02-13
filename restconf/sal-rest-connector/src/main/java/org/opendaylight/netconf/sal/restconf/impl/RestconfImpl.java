@@ -11,15 +11,16 @@ package org.opendaylight.netconf.sal.restconf.impl;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,7 +38,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -81,6 +81,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.tree.ModifiedNodeDoesNotExistException;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
@@ -469,12 +470,12 @@ public class RestconfImpl implements RestconfService {
 
         RpcDefinition resultNodeSchema = null;
         final NormalizedNode<?, ?> resultData = result.getResult();
-        if ((result != null) && (result.getResult() != null)) {
+        if (result != null && result.getResult() != null) {
             resultNodeSchema = (RpcDefinition) payload.getInstanceIdentifierContext().getSchemaNode();
         }
 
         return new NormalizedNodeContext(
-                new InstanceIdentifierContext<RpcDefinition>(null, resultNodeSchema, mountPoint, schemaContext),
+                new InstanceIdentifierContext<>(null, resultNodeSchema, mountPoint, schemaContext),
                 resultData, QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
@@ -484,7 +485,7 @@ public class RestconfImpl implements RestconfService {
         }
         try {
             final DOMRpcResult retValue = response.get();
-            if ((retValue.getErrors() == null) || retValue.getErrors().isEmpty()) {
+            if (retValue.getErrors() == null || retValue.getErrors().isEmpty()) {
                 return retValue;
             }
             LOG.debug("RpcError message", retValue.getErrors());
@@ -522,10 +523,10 @@ public class RestconfImpl implements RestconfService {
     }
 
     private static void validateInput(final SchemaNode inputSchema, final NormalizedNodeContext payload) {
-        if ((inputSchema != null) && (payload.getData() == null)) {
+        if (inputSchema != null && payload.getData() == null) {
             // expected a non null payload
             throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
-        } else if ((inputSchema == null) && (payload.getData() != null)) {
+        } else if (inputSchema == null && payload.getData() != null) {
             // did not expect any input
             throw new RestconfDocumentedException("No input expected.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
@@ -545,7 +546,7 @@ public class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException(errMsg, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
         }
 
-        final YangInstanceIdentifier pathIdentifier = ((YangInstanceIdentifier) pathValue);
+        final YangInstanceIdentifier pathIdentifier = (YangInstanceIdentifier) pathValue;
         String streamName = (String) CREATE_DATA_SUBSCR;
         NotificationOutputType outputType = null;
         if (!pathIdentifier.isEmpty()) {
@@ -590,7 +591,7 @@ public class RestconfImpl implements RestconfService {
 
     @Override
     public NormalizedNodeContext invokeRpc(final String identifier, final String noPayload, final UriInfo uriInfo) {
-        if ((noPayload != null) && !CharMatcher.WHITESPACE.matchesAllOf(noPayload)) {
+        if (noPayload != null && !CharMatcher.WHITESPACE.matchesAllOf(noPayload)) {
             throw new RestconfDocumentedException("Content must be empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
@@ -745,24 +746,24 @@ public class RestconfImpl implements RestconfService {
     @Override
     public Response updateConfigurationData(final String identifier, final NormalizedNodeContext payload,
             final UriInfo uriInfo) {
-        boolean insert_used = false;
-        boolean point_used = false;
+        boolean insertUsed = false;
+        boolean pointUsed = false;
         String insert = null;
         String point = null;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             switch (entry.getKey()) {
                 case "insert":
-                    if (!insert_used) {
-                        insert_used = true;
+                    if (!insertUsed) {
+                        insertUsed = true;
                         insert = entry.getValue().iterator().next();
                     } else {
                         throw new RestconfDocumentedException("Insert parameter can be used only once.");
                     }
                     break;
                 case "point":
-                    if (!point_used) {
-                        point_used = true;
+                    if (!pointUsed) {
+                        pointUsed = true;
                         point = entry.getValue().iterator().next();
                     } else {
                         throw new RestconfDocumentedException("Point parameter can be used only once.");
@@ -773,10 +774,10 @@ public class RestconfImpl implements RestconfService {
             }
         }
 
-        if (point_used && !insert_used) {
+        if (pointUsed && !insertUsed) {
             throw new RestconfDocumentedException("Point parameter can't be used without Insert parameter.");
         }
-        if (point_used && (insert.equals("first") || insert.equals("last"))) {
+        if (pointUsed && (insert.equals("first") || insert.equals("last"))) {
             throw new RestconfDocumentedException(
                     "Point parameter can be used only with 'after' or 'before' values of Insert parameter.");
         }
@@ -809,7 +810,7 @@ public class RestconfImpl implements RestconfService {
          * (and having to document the behavior).
          */
         PutResult result = null;
-        final TryOfPutData tryPutData = new TryOfPutData();
+        int tries = 2;
         while (true) {
             if (mountPoint != null) {
 
@@ -819,56 +820,23 @@ public class RestconfImpl implements RestconfService {
                 result = this.broker.commitConfigurationDataPut(this.controllerContext.getGlobalSchema(), normalizedII,
                         payload.getData(), insert, point);
             }
-            final CountDownLatch waiter = new CountDownLatch(1);
-            Futures.addCallback(result.getFutureOfPutData(), new FutureCallback<Void>() {
-
-                @Override
-                public void onSuccess(final Void result) {
-                    handlingLoggerPut(null, tryPutData, identifier);
-                    waiter.countDown();
-                }
-
-                @Override
-                public void onFailure(final Throwable t) {
-                    waiter.countDown();
-                    handlingLoggerPut(t, tryPutData, identifier);
-                }
-            });
 
             try {
-                waiter.await();
-            } catch (final Exception e) {
-                final String msg = "Problem while waiting for response";
-                LOG.warn(msg);
-                throw new RestconfDocumentedException(msg, e);
-            }
+                result.getFutureOfPutData().checkedGet();
+                return Response.status(result.getStatus()).build();
+            } catch (TransactionCommitFailedException e) {
+                if (e instanceof OptimisticLockFailedException) {
+                    if (--tries <= 0) {
+                        LOG.debug("Got OptimisticLockFailedException on last try - failing " + identifier);
+                        throw new RestconfDocumentedException(e.getMessage(), e, e.getErrorList());
+                    }
 
-            if (tryPutData.isDone()) {
-                break;
-            } else {
-                throw new RestconfDocumentedException("Problem while PUT operations");
-            }
-        }
-
-        return Response.status(result.getStatus()).build();
-    }
-
-    protected void handlingLoggerPut(final Throwable t, final TryOfPutData tryPutData, final String identifier) {
-        if (t != null) {
-            if (t instanceof OptimisticLockFailedException) {
-                if (tryPutData.countGet() <= 0) {
-                    LOG.debug("Got OptimisticLockFailedException on last try - failing " + identifier);
-                    throw new RestconfDocumentedException(t.getMessage(), t);
+                    LOG.debug("Got OptimisticLockFailedException - trying again " + identifier);
+                } else {
+                    LOG.debug("Update failed for " + identifier, e);
+                    throw new RestconfDocumentedException(e.getMessage(), e, e.getErrorList());
                 }
-                LOG.debug("Got OptimisticLockFailedException - trying again " + identifier);
-                tryPutData.countDown();
-            } else {
-                LOG.debug("Update ConfigDataStore fail " + identifier, t);
-                throw new RestconfDocumentedException(t.getMessage(), t);
             }
-        } else {
-            LOG.trace("PUT Successful " + identifier);
-            tryPutData.done();
         }
     }
 
@@ -911,7 +879,7 @@ public class RestconfImpl implements RestconfService {
         final NormalizedNode<?, ?> data = payload.getData();
         if (schemaNode instanceof ListSchemaNode) {
             final List<QName> keyDefinitions = ((ListSchemaNode) schemaNode).getKeyDefinition();
-            if ((lastPathArgument instanceof NodeIdentifierWithPredicates) && (data instanceof MapEntryNode)) {
+            if (lastPathArgument instanceof NodeIdentifierWithPredicates && data instanceof MapEntryNode) {
                 final Map<QName, Object> uriKeyValues =
                         ((NodeIdentifierWithPredicates) lastPathArgument).getKeyValues();
                 isEqualUriAndPayloadKeyValues(uriKeyValues, (MapEntryNode) data, keyDefinitions);
@@ -986,24 +954,24 @@ public class RestconfImpl implements RestconfService {
         final InstanceIdentifierContext<?> iiWithData = payload.getInstanceIdentifierContext();
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
 
-        boolean insert_used = false;
-        boolean point_used = false;
+        boolean insertUsed = false;
+        boolean pointUsed = false;
         String insert = null;
         String point = null;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             switch (entry.getKey()) {
                 case "insert":
-                    if (!insert_used) {
-                        insert_used = true;
+                    if (!insertUsed) {
+                        insertUsed = true;
                         insert = entry.getValue().iterator().next();
                     } else {
                         throw new RestconfDocumentedException("Insert parameter can be used only once.");
                     }
                     break;
                 case "point":
-                    if (!point_used) {
-                        point_used = true;
+                    if (!pointUsed) {
+                        pointUsed = true;
                         point = entry.getValue().iterator().next();
                     } else {
                         throw new RestconfDocumentedException("Point parameter can be used only once.");
@@ -1014,10 +982,10 @@ public class RestconfImpl implements RestconfService {
             }
         }
 
-        if (point_used && !insert_used) {
+        if (pointUsed && !insertUsed) {
             throw new RestconfDocumentedException("Point parameter can't be used without Insert parameter.");
         }
-        if (point_used && (insert.equals("first") || insert.equals("last"))) {
+        if (pointUsed && (insert.equals("first") || insert.equals("last"))) {
             throw new RestconfDocumentedException(
                     "Point parameter can be used only with 'after' or 'before' values of Insert parameter.");
         }
@@ -1031,29 +999,16 @@ public class RestconfImpl implements RestconfService {
                     payload.getData(), insert, point);
         }
 
-        final CountDownLatch waiter = new CountDownLatch(1);
-        Futures.addCallback(future, new FutureCallback<Void>() {
-
-            @Override
-            public void onSuccess(final Void result) {
-                handlerLoggerPost(null, uriInfo);
-                waiter.countDown();
-            }
-
-            @Override
-            public void onFailure(final Throwable t) {
-                waiter.countDown();
-                handlerLoggerPost(t, uriInfo);
-            }
-        });
-
         try {
-            waiter.await();
-        } catch (final Exception e) {
-            final String msg = "Problem while waiting for response";
-            LOG.warn(msg);
-            throw new RestconfDocumentedException(msg, e);
+            future.checkedGet();
+        } catch (final RestconfDocumentedException e) {
+            throw e;
+        } catch (TransactionCommitFailedException e) {
+            LOG.info("Error creating data " + (uriInfo != null ? uriInfo.getPath() : ""), e);
+            throw new RestconfDocumentedException(e.getMessage(), e, e.getErrorList());
         }
+
+        LOG.trace("Successfuly created data.");
 
         final ResponseBuilder responseBuilder = Response.status(Status.NO_CONTENT);
         // FIXME: Provide path to result.
@@ -1062,16 +1017,6 @@ public class RestconfImpl implements RestconfService {
             responseBuilder.location(location);
         }
         return responseBuilder.build();
-    }
-
-    protected void handlerLoggerPost(final Throwable t, final UriInfo uriInfo) {
-        if (t != null) {
-            final String errMsg = "Error creating data ";
-            LOG.warn(errMsg + (uriInfo != null ? uriInfo.getPath() : ""), t);
-            throw new RestconfDocumentedException(errMsg, t);
-        } else {
-            LOG.trace("Successfuly create data.");
-        }
     }
 
     private URI resolveLocation(final UriInfo uriInfo, final String uriBehindBase, final DOMMountPoint mountPoint,
@@ -1105,51 +1050,22 @@ public class RestconfImpl implements RestconfService {
             future = this.broker.commitConfigurationDataDelete(normalizedII);
         }
 
-        final CountDownLatch waiter = new CountDownLatch(1);
-        final ResultOperation result = new ResultOperation();
-        Futures.addCallback(future, new FutureCallback<Void>() {
-
-            @Override
-            public void onSuccess(final Void result) {
-                LOG.trace("Successfuly delete data.");
-                waiter.countDown();
-            }
-
-            @Override
-            public void onFailure(final Throwable t) {
-                waiter.countDown();
-                result.setFailed(t);
-            }
-
-        });
-
         try {
-            waiter.await();
-        } catch (final Exception e) {
-            final String msg = "Problem while waiting for response";
-            LOG.warn(msg);
-            throw new RestconfDocumentedException(msg, e);
-        }
-        if (result.failed() != null) {
-            final Throwable t = result.failed();
+            future.checkedGet();
+        } catch (TransactionCommitFailedException e) {
+            final Optional<Throwable> searchedException = Iterables.tryFind(Throwables.getCausalChain(e),
+                    Predicates.instanceOf(ModifiedNodeDoesNotExistException.class));
+            if (searchedException.isPresent()) {
+                throw new RestconfDocumentedException("Data specified for delete doesn't exist.", ErrorType.APPLICATION,
+                        ErrorTag.DATA_MISSING);
+            }
+
             final String errMsg = "Error while deleting data";
-            LOG.info(errMsg, t);
-            throw new RestconfDocumentedException(errMsg, RestconfError.ErrorType.APPLICATION,
-                    RestconfError.ErrorTag.OPERATION_FAILED, t);
+            LOG.info(errMsg, e);
+            throw new RestconfDocumentedException(e.getMessage(), e, e.getErrorList());
         }
+
         return Response.status(Status.OK).build();
-    }
-
-    private class ResultOperation {
-        private Throwable t = null;
-
-        public void setFailed(final Throwable t) {
-            this.t = t;
-        }
-
-        public Throwable failed() {
-            return this.t;
-        }
     }
 
     /**
@@ -1239,9 +1155,9 @@ public class RestconfImpl implements RestconfService {
         final String value = event.getValue();
         if (value.contains(".")) {
             numOf_ms = numOf_ms + ".";
-            final int lastChar = value.contains("Z") ? value.indexOf("Z") : (value.contains("+") ? value.indexOf("+")
-                    : (value.contains("-") ? value.indexOf("-") : value.length()));
-            for (int i = 0; i < (lastChar - value.indexOf(".") - 1); i++) {
+            final int lastChar = value.contains("Z") ? value.indexOf("Z") : value.contains("+") ? value.indexOf("+")
+                    : value.contains("-") ? value.indexOf("-") : value.length();
+            for (int i = 0; i < lastChar - value.indexOf(".") - 1; i++) {
                 numOf_ms = numOf_ms + "S";
             }
         }
@@ -1299,7 +1215,7 @@ public class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
         final List<NotificationListenerAdapter> listeners = Notificator.getNotificationListenerFor(streamName);
-        if ((listeners == null) || listeners.isEmpty()) {
+        if (listeners == null || listeners.isEmpty()) {
             throw new RestconfDocumentedException("Stream was not found.", ErrorType.PROTOCOL,
                     ErrorTag.UNKNOWN_ELEMENT);
         }
@@ -1501,14 +1417,14 @@ public class RestconfImpl implements RestconfService {
                 Builders.mapEntryBuilder(listModuleSchemaNode);
 
         List<DataSchemaNode> instanceDataChildrenByName =
-                ControllerContext.findInstanceDataChildrenByName((listModuleSchemaNode), "name");
+                ControllerContext.findInstanceDataChildrenByName(listModuleSchemaNode, "name");
         final DataSchemaNode nameSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(nameSchemaNode instanceof LeafSchemaNode);
         moduleNodeValues
                 .withChild(Builders.leafBuilder((LeafSchemaNode) nameSchemaNode).withValue(module.getName()).build());
 
         instanceDataChildrenByName =
-                ControllerContext.findInstanceDataChildrenByName((listModuleSchemaNode), "revision");
+                ControllerContext.findInstanceDataChildrenByName(listModuleSchemaNode, "revision");
         final DataSchemaNode revisionSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(revisionSchemaNode instanceof LeafSchemaNode);
         final String revision = REVISION_FORMAT.format(module.getRevision());
@@ -1516,20 +1432,20 @@ public class RestconfImpl implements RestconfService {
                 .withChild(Builders.leafBuilder((LeafSchemaNode) revisionSchemaNode).withValue(revision).build());
 
         instanceDataChildrenByName =
-                ControllerContext.findInstanceDataChildrenByName((listModuleSchemaNode), "namespace");
+                ControllerContext.findInstanceDataChildrenByName(listModuleSchemaNode, "namespace");
         final DataSchemaNode namespaceSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(namespaceSchemaNode instanceof LeafSchemaNode);
         moduleNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) namespaceSchemaNode)
                 .withValue(module.getNamespace().toString()).build());
 
         instanceDataChildrenByName =
-                ControllerContext.findInstanceDataChildrenByName((listModuleSchemaNode), "feature");
+                ControllerContext.findInstanceDataChildrenByName(listModuleSchemaNode, "feature");
         final DataSchemaNode featureSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(featureSchemaNode instanceof LeafListSchemaNode);
         final ListNodeBuilder<Object, LeafSetEntryNode<Object>> featuresBuilder =
                 Builders.leafSetBuilder((LeafListSchemaNode) featureSchemaNode);
         for (final FeatureDefinition feature : module.getFeatures()) {
-            featuresBuilder.withChild(Builders.leafSetEntryBuilder(((LeafListSchemaNode) featureSchemaNode))
+            featuresBuilder.withChild(Builders.leafSetEntryBuilder((LeafListSchemaNode) featureSchemaNode)
                     .withValue(feature.getQName().getLocalName()).build());
         }
         moduleNodeValues.withChild(featuresBuilder.build());
@@ -1545,33 +1461,33 @@ public class RestconfImpl implements RestconfService {
                 Builders.mapEntryBuilder(listStreamSchemaNode);
 
         List<DataSchemaNode> instanceDataChildrenByName =
-                ControllerContext.findInstanceDataChildrenByName((listStreamSchemaNode), "name");
+                ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "name");
         final DataSchemaNode nameSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(nameSchemaNode instanceof LeafSchemaNode);
         streamNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) nameSchemaNode).withValue(streamName).build());
 
         instanceDataChildrenByName =
-                ControllerContext.findInstanceDataChildrenByName((listStreamSchemaNode), "description");
+                ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "description");
         final DataSchemaNode descriptionSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(descriptionSchemaNode instanceof LeafSchemaNode);
         streamNodeValues.withChild(
                 Builders.leafBuilder((LeafSchemaNode) nameSchemaNode).withValue("DESCRIPTION_PLACEHOLDER").build());
 
         instanceDataChildrenByName =
-                ControllerContext.findInstanceDataChildrenByName((listStreamSchemaNode), "replay-support");
+                ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "replay-support");
         final DataSchemaNode replaySupportSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(replaySupportSchemaNode instanceof LeafSchemaNode);
         streamNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) replaySupportSchemaNode)
                 .withValue(Boolean.valueOf(true)).build());
 
         instanceDataChildrenByName =
-                ControllerContext.findInstanceDataChildrenByName((listStreamSchemaNode), "replay-log-creation-time");
+                ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "replay-log-creation-time");
         final DataSchemaNode replayLogCreationTimeSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(replayLogCreationTimeSchemaNode instanceof LeafSchemaNode);
         streamNodeValues.withChild(
                 Builders.leafBuilder((LeafSchemaNode) replayLogCreationTimeSchemaNode).withValue("").build());
 
-        instanceDataChildrenByName = ControllerContext.findInstanceDataChildrenByName((listStreamSchemaNode), "events");
+        instanceDataChildrenByName = ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "events");
         final DataSchemaNode eventsSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(eventsSchemaNode instanceof LeafSchemaNode);
         streamNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) eventsSchemaNode).withValue("").build());
@@ -1595,7 +1511,7 @@ public class RestconfImpl implements RestconfService {
             if (dataChild instanceof LeafSetNode) {
                 leafSet = (LeafSetNode) dataChild;
             } else if (dataChild instanceof AugmentationNode) {
-                outputType = (String) (((AugmentationNode) dataChild).getValue()).iterator().next().getValue();
+                outputType = (String) ((AugmentationNode) dataChild).getValue().iterator().next().getValue();
             }
         }
 
@@ -1642,26 +1558,5 @@ public class RestconfImpl implements RestconfService {
         final DOMRpcResult defaultDOMRpcResult = new DefaultDOMRpcResult(output);
 
         return Futures.immediateCheckedFuture(defaultDOMRpcResult);
-    }
-
-    private class TryOfPutData {
-        int tries = 2;
-        boolean done = false;
-
-        void countDown() {
-            this.tries--;
-        }
-
-        void done() {
-            this.done = true;
-        }
-
-        boolean isDone() {
-            return this.done;
-        }
-
-        int countGet() {
-            return this.tries;
-        }
     }
 }
