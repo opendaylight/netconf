@@ -20,6 +20,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
+import org.opendaylight.yangtools.yang.common.YangVersion;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchema;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -130,27 +131,27 @@ final class FakeRestconfModule implements Module {
 
     @Override
     public String getYangVersion() {
-        throw new UnsupportedOperationException("Not supported operations.");
+        return YangVersion.VERSION_1.toString();
     }
 
     @Override
     public String getDescription() {
-        throw new UnsupportedOperationException("Not supported operations.");
+        throw new UnsupportedOperationException("Operation not implemented.");
     }
 
     @Override
     public String getReference() {
-        throw new UnsupportedOperationException("Not supported operations.");
+        throw new UnsupportedOperationException("Operation not implemented.");
     }
 
     @Override
     public String getOrganization() {
-        throw new UnsupportedOperationException("Not supported operations.");
+        throw new UnsupportedOperationException("Operation not implemented.");
     }
 
     @Override
     public String getContact() {
-        throw new UnsupportedOperationException("Not supported operations.");
+        throw new UnsupportedOperationException("Operation not implemented.");
     }
 
     @Override
@@ -165,47 +166,46 @@ final class FakeRestconfModule implements Module {
 
     @Override
     public Set<FeatureDefinition> getFeatures() {
-        throw new UnsupportedOperationException("Not supported operations.");
+        throw new UnsupportedOperationException("Operation not implemented.");
     }
 
     @Override
     public Set<NotificationDefinition> getNotifications() {
-        throw new UnsupportedOperationException("Not supported operations.");
+        throw new UnsupportedOperationException("Operation not implemented.");
     }
 
     @Override
     public Set<AugmentationSchema> getAugmentations() {
-        throw new UnsupportedOperationException("Not supported operations.");
+        throw new UnsupportedOperationException("Operation not implemented.");
     }
 
     @Override
     public Set<RpcDefinition> getRpcs() {
-        throw new UnsupportedOperationException("Not supported operations.");
+        throw new UnsupportedOperationException("Operation not implemented.");
     }
 
     @Override
     public Set<Deviation> getDeviations() {
-        throw new UnsupportedOperationException("Not supported operations.");
+        throw new UnsupportedOperationException("Operation not implemented.");
     }
 
     @Override
     public Set<IdentitySchemaNode> getIdentities() {
-        throw new UnsupportedOperationException("Not supported operations.");
+        throw new UnsupportedOperationException("Operation not implemented.");
     }
 
     @Override
     public List<ExtensionDefinition> getExtensionSchemaNodes() {
-        throw new UnsupportedOperationException("Not supported operations.");
+        throw new UnsupportedOperationException("Operation not implemented.");
     }
 
     @Override
     public List<UnknownSchemaNode> getUnknownSchemaNodes() {
-        throw new UnsupportedOperationException("Not supported operations.");
+        throw new UnsupportedOperationException("Operation not implemented.");
     }
 
     @Override
     public String getSource() {
-        throw new UnsupportedOperationException("Not supported operations.");
+        throw new UnsupportedOperationException("Operation not implemented.");
     }
-
 }
