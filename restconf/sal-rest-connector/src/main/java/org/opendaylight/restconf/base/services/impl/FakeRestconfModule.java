@@ -130,12 +130,12 @@ final class FakeRestconfModule implements Module {
 
     @Override
     public String getYangVersion() {
-        throw new UnsupportedOperationException("Not supported operations.");
+        return "";
     }
 
     @Override
     public String getDescription() {
-        throw new UnsupportedOperationException("Not supported operations.");
+        return "";
     }
 
     @Override
