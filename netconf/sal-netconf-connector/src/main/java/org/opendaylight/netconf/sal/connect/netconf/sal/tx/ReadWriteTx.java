@@ -10,9 +10,7 @@ package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.concurrent.ExecutionException;
 import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
@@ -73,14 +71,7 @@ public class ReadWriteTx implements DOMDataReadWriteTransaction {
     @Override public CheckedFuture<Boolean, ReadFailedException> exists(
         final LogicalDatastoreType store,
         final YangInstanceIdentifier path) {
-        final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException>
-            data = read(store, path);
-
-        try {
-            return Futures.immediateCheckedFuture(data.get().isPresent());
-        } catch (InterruptedException | ExecutionException e) {
-            return Futures.immediateFailedCheckedFuture(new ReadFailedException("Exists failed",e));
-        }
+        return delegateReadTx.exists(store, path);
     }
 
     @Override
