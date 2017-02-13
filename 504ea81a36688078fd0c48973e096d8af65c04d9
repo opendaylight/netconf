@@ -22,6 +22,30 @@
       "revId": "504ea81a36688078fd0c48973e096d8af65c04d9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_f0d13958",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/base/services/impl/FakeRestconfModule.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2017-02-13T17:56:12Z",
+      "side": 1,
+      "message": "It did fix the tests  but I didn\u0027t know you had a patch - I\u0027ll remove this.",
+      "parentUuid": "fafc7978_7069c9bd",
+      "range": {
+        "startLine": 133,
+        "startChar": 6,
+        "endLine": 133,
+        "endChar": 18
+      },
+      "revId": "504ea81a36688078fd0c48973e096d8af65c04d9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
