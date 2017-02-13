@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_7069c9bd",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/base/services/impl/FakeRestconfModule.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-02-13T17:37:40Z",
+      "side": 1,
+      "message": "This is not valid, please see https://git.opendaylight.org/gerrit/#/c/51806/",
+      "range": {
+        "startLine": 133,
+        "startChar": 6,
+        "endLine": 133,
+        "endChar": 18
+      },
+      "revId": "504ea81a36688078fd0c48973e096d8af65c04d9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
