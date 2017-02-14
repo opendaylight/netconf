@@ -19,6 +19,9 @@ import scala.concurrent.Future;
  */
 public interface NetconfDOMTransaction {
 
+
+    Future<Void> openTransaction();
+
     /**
      * Read data from particular data-store
      * @param store data-store type

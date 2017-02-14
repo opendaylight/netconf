@@ -53,6 +53,11 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
     }
 
     @Override
+    public Future<Void> openTransaction() {
+        final Future<Void> ;
+    }
+
+    @Override
     public Future<Optional<NormalizedNodeMessage>> read(final LogicalDatastoreType store,
                                                         final YangInstanceIdentifier path) {
 

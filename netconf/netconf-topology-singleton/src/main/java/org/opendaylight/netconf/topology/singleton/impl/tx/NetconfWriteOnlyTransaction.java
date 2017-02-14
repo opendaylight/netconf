@@ -45,6 +45,8 @@ public class NetconfWriteOnlyTransaction implements DOMDataWriteTransaction {
         this.id = id;
         this.delegate = delegate;
         this.actorSystem = actorSystem;
+
+        delegate.openTransaction();
     }
 
     @Override

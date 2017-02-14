@@ -59,6 +59,11 @@ public class NetconfMasterDOMTransaction implements NetconfDOMTransaction {
     }
 
     @Override
+    public Future<Void> openTransaction() {
+        return null;
+    }
+
+    @Override
     public Future<Optional<NormalizedNodeMessage>> read(final LogicalDatastoreType store,
                                                         final YangInstanceIdentifier path) {
         LOG.trace("{}: Read[{}] {} via NETCONF: {}", id, readTx.getIdentifier(), store, path);
