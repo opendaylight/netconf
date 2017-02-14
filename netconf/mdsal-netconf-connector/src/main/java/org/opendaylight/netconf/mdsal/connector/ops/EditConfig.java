@@ -113,7 +113,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         case NONE:
             return;
         case MERGE:
-            createMapNodeIfNonExistent(rwtx, path, changeData);
+            mergeParentMap(rwtx, path, changeData);
             rwtx.merge(LogicalDatastoreType.CONFIGURATION, path, changeData);
             break;
         case CREATE:
@@ -122,14 +122,14 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
                 if (readResult.isPresent()) {
                     throw new DocumentedException("Data already exists, cannot execute CREATE operation", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, ErrorSeverity.ERROR);
                 }
-                createMapNodeIfNonExistent(rwtx, path, changeData);
+                mergeParentMap(rwtx, path, changeData);
                 rwtx.put(LogicalDatastoreType.CONFIGURATION, path, changeData);
             } catch (final ReadFailedException e) {
                 LOG.warn("Read from datastore failed when trying to read data for create operation", change, e);
             }
             break;
         case REPLACE:
-            createMapNodeIfNonExistent(rwtx, path, changeData);
+            mergeParentMap(rwtx, path, changeData);
             rwtx.put(LogicalDatastoreType.CONFIGURATION, path, changeData);
             break;
         case DELETE:
@@ -151,23 +151,15 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         }
     }
 
-    private void createMapNodeIfNonExistent(final DOMDataReadWriteTransaction rwtx, final YangInstanceIdentifier path,
-                                            final NormalizedNode change) throws DocumentedException {
-        if (!(change instanceof MapEntryNode)) {
-            return;
-        }
-        final YangInstanceIdentifier mapNodeYid = path.getParent();
-        try {
-            final Boolean mapNodeExists = rwtx.exists(LogicalDatastoreType.CONFIGURATION, mapNodeYid).checkedGet();
-            if (!mapNodeExists) {
-                final MapNode mixinNode = Builders.mapBuilder()
-                        .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(mapNodeYid.getLastPathArgument().getNodeType()))
-                        .build();
-                rwtx.put(LogicalDatastoreType.CONFIGURATION, mapNodeYid, mixinNode);
-            }
-        } catch (final ReadFailedException e) {
-            throw new DocumentedException("List node existence check failed", e, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
-
+    private void mergeParentMap(final DOMDataReadWriteTransaction rwtx, final YangInstanceIdentifier path,
+                                final NormalizedNode change) throws DocumentedException {
+        if (change instanceof MapEntryNode) {
+            final YangInstanceIdentifier mapNodeYid = path.getParent();
+            //merge empty map
+            final MapNode mixinNode = Builders.mapBuilder()
+                    .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(mapNodeYid.getLastPathArgument().getNodeType()))
+                    .build();
+            rwtx.merge(LogicalDatastoreType.CONFIGURATION, mapNodeYid, mixinNode);
         }
     }
 
@@ -223,7 +215,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         final NodeList elementsByTagName = operationElement.getDomElement().getElementsByTagName(TARGET_KEY);
         // Direct lookup instead of using XmlElement class due to performance
         if (elementsByTagName.getLength() == 0) {
-            Map<String, String> errorInfo = ImmutableMap.of("bad-attribute", TARGET_KEY, "bad-element", OPERATION_NAME);
+            final Map<String, String> errorInfo = ImmutableMap.of("bad-attribute", TARGET_KEY, "bad-element", OPERATION_NAME);
             throw new DocumentedException("Missing target element",
                     ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE, ErrorSeverity.ERROR, errorInfo);
         } else if (elementsByTagName.getLength() > 1) {
