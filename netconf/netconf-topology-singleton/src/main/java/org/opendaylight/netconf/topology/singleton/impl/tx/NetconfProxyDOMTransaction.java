@@ -13,6 +13,7 @@ import akka.actor.ActorSystem;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import com.google.common.base.Optional;
+import com.google.common.base.Throwables;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeverity;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
@@ -27,6 +28,7 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.DeleteR
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ExistsRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.MergeRequest;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.OpenTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.PutRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ReadRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitFailedReply;
@@ -53,6 +55,24 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
         this.id = id;
         this.actorSystem = actorSystem;
         this.masterContextRef = masterContextRef;
+    }
+
+    @Override
+    public void openTransaction() {
+        // TODO we can do some checking for already opened transaction also
+        // here in this class. We can track open transaction at least for this
+        // node.
+        LOG.debug("{}: Requesting leader {} to open new transaction", id, masterContextRef);
+        final Future<Object> openTxFuture =
+                Patterns.ask(masterContextRef, new OpenTransaction(), NetconfTopologyUtils.TIMEOUT);
+        try {
+            // we have to wait here so we can see if tx can be opened
+            Await.result(openTxFuture, NetconfTopologyUtils.TIMEOUT.duration());
+            LOG.debug("{}: New transaction opened successfully", id);
+        } catch (final Exception e) {
+            LOG.error("{}: Failed to open new transaction", id, e);
+            Throwables.propagate(e);
+        }
     }
 
     @Override

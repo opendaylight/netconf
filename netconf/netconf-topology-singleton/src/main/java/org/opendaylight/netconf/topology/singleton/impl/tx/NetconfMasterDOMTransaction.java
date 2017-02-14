@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.topology.singleton.impl.tx;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -56,6 +57,14 @@ public class NetconfMasterDOMTransaction implements NetconfDOMTransaction {
 
         // only ever need 1 readTx since it doesnt need to be closed
         readTx = delegateBroker.newReadOnlyTransaction();
+    }
+
+    @Override
+    public void openTransaction() {
+        // TODO We don't have to do anything here since
+        // NetconfProxyDOMTransactions and RemoteOperationTxProcessor do all
+        // the work regarding opening transactions. But maybe we should check
+        // for open transaction here instead in RemoteOperationTxProcessor
     }
 
     @Override

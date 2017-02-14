@@ -20,6 +20,11 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 public interface RemoteOperationTxProcessor {
 
     /**
+     * Opens a new transaction.
+     */
+    void doOpenTransaction(ActorRef recipient, ActorRef sender);
+
+    /**
      * Delete node in particular data-store in path
      * @param store data-store type
      * @param path unique identifier of a particular node instance in the data tree
