@@ -21,22 +21,22 @@ public final class NetconfConfigUtil {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfConfigUtil.class);
 
     private NetconfConfigUtil() {
+        throw new AssertionError("Utility class should not be instantiated");
     }
 
-    public static Optional<NetconfConfiguration> getNetconfConfigurationService(BundleContext bundleContext) {
-        final Collection<ServiceReference<ManagedService>> serviceReferences;
-        try {
-            serviceReferences = bundleContext.getServiceReferences(ManagedService.class, null);
-            for (final ServiceReference<ManagedService> serviceReference : serviceReferences) {
+    public static NetconfConfiguration getNetconfConfigurationService(BundleContext bundleContext)
+            throws InvalidSyntaxException {
+        LOG.debug("Trying to retrieve netconf configuration service");
+        final Collection<ServiceReference<ManagedService>> serviceReferences
+                = bundleContext.getServiceReferences(ManagedService.class, null);
+        for (final ServiceReference<ManagedService> serviceReference : serviceReferences) {
                 ManagedService service = bundleContext.getService(serviceReference);
                 if (service instanceof NetconfConfiguration){
-                    return Optional.of((NetconfConfiguration) service);
+                    LOG.debug("Netconf configuration service found");
+                    return (NetconfConfiguration) service;
                 }
-            }
-        } catch (InvalidSyntaxException e) {
-            LOG.error("Unable to retrieve references for ManagedService: {}", e);
         }
-        LOG.error("Unable to retrieve NetconfConfiguration service. Not found. Bundle netconf-util probably failed to load.");
-        return Optional.empty();
+
+        throw new IllegalStateException("Netconf configuration service not found");
     }
 }
