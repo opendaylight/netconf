@@ -42,18 +42,9 @@ public class NetconfConfiguration implements ManagedService {
     private static final InetSocketAddress DEFAULT_TCP_SERVER_ADRESS = new InetSocketAddress(LOCAL_HOST, 8383);
     private static final InetSocketAddress DEFAULT_SSH_SERVER_ADRESS = new InetSocketAddress(INADDR_ANY, 1830);
 
-    /**
-     * Singleton instance of this class, registered as a service in the OSGi registry.
-     */
-    private static final NetconfConfiguration INSTANCE = new NetconfConfiguration();
-
     private NetconfConfigurationHolder netconfConfiguration;
 
-    public static NetconfConfiguration getInstance() {
-        return INSTANCE;
-    }
-
-    private NetconfConfiguration() {
+    NetconfConfiguration() {
         netconfConfiguration = new NetconfConfigurationHolder(DEFAULT_TCP_SERVER_ADRESS,
                 DEFAULT_SSH_SERVER_ADRESS, DEFAULT_PRIVATE_KEY_PATH);
     }
@@ -61,7 +52,7 @@ public class NetconfConfiguration implements ManagedService {
     @Override
     public void updated(final Dictionary<String, ?> dictionaryConfig) {
         if (dictionaryConfig == null) {
-            LOG.trace("CSS netconf server configuration cannot be updated as passed dictionary is null");
+            LOG.debug("CSS netconf server configuration cannot be updated as passed dictionary is null");
             return;
         }
         final InetSocketAddress sshServerAddress = new InetSocketAddress((String) dictionaryConfig.get(SSH_ADDRESS_PROP),
