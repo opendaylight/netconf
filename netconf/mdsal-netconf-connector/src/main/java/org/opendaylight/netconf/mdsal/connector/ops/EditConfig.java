@@ -34,7 +34,10 @@ import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.DomUtils;
 import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -78,7 +81,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
 
         final XmlElement configElement = getElement(operationElement, CONFIG_KEY);
 
-        for (XmlElement element : configElement.getChildElements()) {
+        for (final XmlElement element : configElement.getChildElements()) {
             final String ns = element.getNamespace();
             final DataSchemaNode schemaNode = getSchemaNodeFromNamespace(ns, element).get();
 
@@ -104,42 +107,59 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
     }
 
     private void executeChange(final DOMDataReadWriteTransaction rwtx, final DataTreeChange change) throws DocumentedException {
+        final YangInstanceIdentifier path = YangInstanceIdentifier.create(change.getPath());
+        final NormalizedNode<?, ?> changeData = change.getChangeRoot();
         switch (change.getAction()) {
         case NONE:
             return;
         case MERGE:
             rwtx.merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(change.getPath()), change.getChangeRoot());
+            mergeParentMap(rwtx, path, changeData);
             break;
         case CREATE:
             try {
-                final Optional<NormalizedNode<?, ?>> readResult = rwtx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(change.getPath())).checkedGet();
+                final Optional<NormalizedNode<?, ?>> readResult = rwtx.read(LogicalDatastoreType.CONFIGURATION, path).checkedGet();
                 if (readResult.isPresent()) {
                     throw new DocumentedException("Data already exists, cannot execute CREATE operation", ErrorType.protocol, ErrorTag.data_exists, ErrorSeverity.error);
                 }
-                rwtx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(change.getPath()), change.getChangeRoot());
-            } catch (ReadFailedException e) {
+                mergeParentMap(rwtx, path, changeData);
+                rwtx.put(LogicalDatastoreType.CONFIGURATION, path, changeData);
+            } catch (final ReadFailedException e) {
                 LOG.warn("Read from datastore failed when trying to read data for create operation", change, e);
             }
             break;
         case REPLACE:
-            rwtx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(change.getPath()), change.getChangeRoot());
+            mergeParentMap(rwtx, path, changeData);
+            rwtx.put(LogicalDatastoreType.CONFIGURATION, path, changeData);
             break;
         case DELETE:
             try {
-                final Optional<NormalizedNode<?, ?>> readResult = rwtx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(change.getPath())).checkedGet();
+                final Optional<NormalizedNode<?, ?>> readResult = rwtx.read(LogicalDatastoreType.CONFIGURATION, path).checkedGet();
                 if (!readResult.isPresent()) {
                     throw new DocumentedException("Data is missing, cannot execute DELETE operation", ErrorType.protocol, ErrorTag.data_missing, ErrorSeverity.error);
                 }
-                rwtx.delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(change.getPath()));
-            } catch (ReadFailedException e) {
+                rwtx.delete(LogicalDatastoreType.CONFIGURATION, path);
+            } catch (final ReadFailedException e) {
                 LOG.warn("Read from datastore failed when trying to read data for delete operation", change, e);
             }
             break;
         case REMOVE:
-            rwtx.delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(change.getPath()));
+            rwtx.delete(LogicalDatastoreType.CONFIGURATION, path);
             break;
         default:
             LOG.warn("Unknown/not implemented operation, not executing");
+        }
+    }
+
+    private void mergeParentMap(final DOMDataReadWriteTransaction rwtx, final YangInstanceIdentifier path,
+                                final NormalizedNode change) {
+        if (change instanceof MapEntryNode) {
+            final YangInstanceIdentifier mapNodeYid = path.getParent();
+            //merge empty map
+            final MapNode mixinNode = Builders.mapBuilder()
+                    .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(mapNodeYid.getLastPathArgument().getNodeType()))
+                    .build();
+            rwtx.merge(LogicalDatastoreType.CONFIGURATION, mapNodeYid, mixinNode);
         }
     }
 
@@ -174,7 +194,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
                 throw new NetconfDocumentedException("Unable to find module by namespace: " + namespace,
                         ErrorType.application, ErrorTag.unknown_namespace, ErrorSeverity.error);
             }
-            DataSchemaNode schemaNode =
+            final DataSchemaNode schemaNode =
                     module.getDataChildByName(QName.create(module.getQNameModule(), element.getName()));
             if (schemaNode != null) {
                 dataSchemaNode = Optional.of(schemaNode);
@@ -184,7 +204,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
                         ErrorTag.unknown_namespace,
                         ErrorSeverity.error);
             }
-        } catch (URISyntaxException e) {
+        } catch (final URISyntaxException e) {
             LOG.debug("Unable to create URI for namespace : {}", namespace);
         }
 
@@ -195,7 +215,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         final NodeList elementsByTagName = operationElement.getDomElement().getElementsByTagName(TARGET_KEY);
         // Direct lookup instead of using XmlElement class due to performance
         if (elementsByTagName.getLength() == 0) {
-            Map<String, String> errorInfo = ImmutableMap.of("bad-attribute", TARGET_KEY, "bad-element", OPERATION_NAME);
+            final Map<String, String> errorInfo = ImmutableMap.of("bad-attribute", TARGET_KEY, "bad-element", OPERATION_NAME);
             throw new DocumentedException("Missing target element",
                     ErrorType.protocol, ErrorTag.missing_attribute, ErrorSeverity.error, errorInfo);
         } else if (elementsByTagName.getLength() > 1) {
@@ -219,7 +239,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
 
     }
 
-    private XmlElement getElement(final XmlElement operationElement, String elementName) throws DocumentedException {
+    private XmlElement getElement(final XmlElement operationElement, final String elementName) throws DocumentedException {
         final Optional<XmlElement> childNode = operationElement.getOnlyChildElementOptionally(elementName);
         if (!childNode.isPresent()) {
             throw new DocumentedException(elementName + " element is missing",
