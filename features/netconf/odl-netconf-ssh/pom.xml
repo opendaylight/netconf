@@ -26,6 +26,7 @@
     <name>OpenDaylight :: Netconf Connector :: SSH</name>
 
     <dependencies>
+        <!-- These are pulled in via feature.xml directly for now (until we can configure prerequisites here
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>odl-netconf-util</artifactId>
@@ -40,6 +41,7 @@
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
+        -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>odl-aaa-netconf-plugin</artifactId>
