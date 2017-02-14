@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.util.osgi;
 
-import io.netty.channel.local.LocalAddress;
 import java.net.InetSocketAddress;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -19,7 +18,7 @@ public class NetconfConfigurationTest {
 
     @Test
     public void testUpdated() throws Exception {
-        final NetconfConfiguration config = NetconfConfiguration.getInstance();
+        final NetconfConfiguration config = new NetconfConfiguration();
         Assert.assertEquals(new InetSocketAddress("0.0.0.0", 1830), config.getSshServerAddress());
         Assert.assertEquals(new InetSocketAddress("127.0.0.1", 8383), config.getTcpServerAddress());
         Assert.assertEquals("./configuration/RSA.pk", config.getPrivateKeyPath());
@@ -42,7 +41,7 @@ public class NetconfConfigurationTest {
 
     @Test
     public void testUpdatedNull() throws Exception {
-        final NetconfConfiguration config = NetconfConfiguration.getInstance();
+        final NetconfConfiguration config = new NetconfConfiguration();
         Assert.assertEquals(new InetSocketAddress("0.0.0.0", 1830), config.getSshServerAddress());
         Assert.assertEquals(new InetSocketAddress("127.0.0.1", 8383), config.getTcpServerAddress());
         Assert.assertEquals("./configuration/RSA.pk", config.getPrivateKeyPath());

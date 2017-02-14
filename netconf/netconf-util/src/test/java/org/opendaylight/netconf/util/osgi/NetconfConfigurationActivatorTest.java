@@ -46,7 +46,7 @@ public class NetconfConfigurationActivatorTest {
         activator.start(context);
         final Dictionary<String, String> props = new Hashtable<>();
         props.put(Constants.SERVICE_PID, "netconf");
-        verify(context).registerService(eq(ManagedService.class), eq(NetconfConfiguration.getInstance()), eq(props));
+        verify(context).registerService(eq(ManagedService.class), any(NetconfConfiguration.class), eq(props));
         activator.stop(context);
         verify(registration).unregister();
     }
