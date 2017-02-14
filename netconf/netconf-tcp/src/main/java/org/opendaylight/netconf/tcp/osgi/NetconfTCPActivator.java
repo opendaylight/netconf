@@ -14,6 +14,7 @@ import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
 import org.opendaylight.netconf.util.osgi.NetconfConfiguration;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,9 +26,8 @@ public class NetconfTCPActivator implements BundleActivator {
     private ProxyServer proxyServer;
 
     @Override
-    public void start(BundleContext context) {
-        final NetconfConfiguration netconfConfiguration = NetconfConfigUtil.getNetconfConfigurationService(context).
-                        orElseThrow(() -> new IllegalStateException("Configuration for TCP not found."));
+    public void start(BundleContext context) throws InvalidSyntaxException {
+        final NetconfConfiguration netconfConfiguration = NetconfConfigUtil.getNetconfConfigurationService(context);
 
         final InetSocketAddress address = netconfConfiguration.getTcpServerAddress();
 

@@ -23,6 +23,7 @@ import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
 import org.opendaylight.netconf.util.osgi.NetconfConfiguration;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,7 @@ public class NetconfSSHActivator implements BundleActivator {
     private SshProxyServer server;
 
     @Override
-    public void start(final BundleContext bundleContext) throws IOException {
+    public void start(final BundleContext bundleContext) throws IOException, InvalidSyntaxException {
         minaTimerExecutor = Executors.newScheduledThreadPool(POOL_SIZE, new ThreadFactory() {
             @Override
             public Thread newThread(final Runnable r) {
@@ -77,9 +78,10 @@ public class NetconfSSHActivator implements BundleActivator {
         }
     }
 
-    private SshProxyServer startSSHServer(final BundleContext bundleContext) throws IOException {
-        final NetconfConfiguration netconfConfiguration = NetconfConfigUtil.getNetconfConfigurationService(bundleContext).
-                        orElseThrow(() -> new IllegalStateException("Configuration for SSH not found."));
+    private SshProxyServer startSSHServer(final BundleContext bundleContext)
+            throws IOException, InvalidSyntaxException {
+        final NetconfConfiguration netconfConfiguration =
+                NetconfConfigUtil.getNetconfConfigurationService(bundleContext);
 
         final InetSocketAddress sshSocketAddress = netconfConfiguration.getSshServerAddress();
         LOG.info("Starting netconf SSH server at {}", sshSocketAddress);
