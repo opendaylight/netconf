@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.api.util.NetconfConstants;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -47,6 +48,7 @@ public class NetconfMonitoringServiceTrackerTest {
         doNothing().when(serviceRegistration).unregister();
         doReturn(filter).when(context).createFilter(anyString());
         doReturn("").when(reference).toString();
+        doReturn(NetconfConstants.NETCONF_MONITORING).when(reference).getProperty(NetconfConstants.SERVICE_NAME);
         doReturn(monitoringService).when(context).getService(any(ServiceReference.class));
     }
 

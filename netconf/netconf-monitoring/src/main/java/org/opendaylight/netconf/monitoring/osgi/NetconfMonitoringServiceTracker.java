@@ -33,8 +33,11 @@ public class NetconfMonitoringServiceTracker extends ServiceTracker<NetconfMonit
 
     @Override
     public NetconfMonitoringService addingService(final ServiceReference<NetconfMonitoringService> reference) {
-        Preconditions.checkState(reg == null, "Monitoring service was already added");
+        if (!NetconfConstants.isConfigSubsystemReference(reference)) {
+            return null;
+        }
 
+        Preconditions.checkState(reg == null, "Monitoring service was already added");
         final NetconfMonitoringService netconfMonitoringService = super.addingService(reference);
 
         final NetconfMonitoringOperationService operationService = new NetconfMonitoringOperationService(
@@ -52,6 +55,10 @@ public class NetconfMonitoringServiceTracker extends ServiceTracker<NetconfMonit
     @Override
     public void removedService(final ServiceReference<NetconfMonitoringService> reference,
             final NetconfMonitoringService netconfMonitoringService) {
+        if (!NetconfConstants.isConfigSubsystemReference(reference)) {
+            return;
+        }
+
         if(reg!=null) {
             try {
                 reg.unregister();
