@@ -148,21 +148,28 @@ public class WriteOnlyTransactionTest {
         // Test of invoking put on master through slave proxy
 
         doNothing().when(writeTx).put(storeType, instanceIdentifier, testNode);
-        slaveDataBroker.newWriteOnlyTransaction().put(storeType, instanceIdentifier, testNode);
+
+        DOMDataWriteTransaction wTx = slaveDataBroker.newWriteOnlyTransaction();
+        wTx.put(storeType, instanceIdentifier, testNode);
 
         verify(writeTx, times(1)).put(storeType, instanceIdentifier, testNode);
 
+        wTx.cancel();
         // Test of invoking merge on master through slave proxy
 
         doNothing().when(writeTx).merge(storeType, instanceIdentifier, testNode);
-        slaveDataBroker.newWriteOnlyTransaction().merge(storeType, instanceIdentifier, testNode);
+        wTx = slaveDataBroker.newWriteOnlyTransaction();
+        wTx.merge(storeType, instanceIdentifier, testNode);
 
         verify(writeTx, times(1)).merge(storeType, instanceIdentifier, testNode);
 
+        wTx.cancel();
         // Test of invoking delete on master through slave proxy
 
         doNothing().when(writeTx).delete(storeType, instanceIdentifier);
-        slaveDataBroker.newWriteOnlyTransaction().delete(storeType, instanceIdentifier);
+        wTx = slaveDataBroker.newWriteOnlyTransaction();
+        wTx.delete(storeType, instanceIdentifier);
+        wTx.cancel();
 
         verify(writeTx, times(1)).delete(storeType, instanceIdentifier);
 
@@ -177,33 +184,33 @@ public class WriteOnlyTransactionTest {
 
         // Without Tx
 
+        DOMDataWriteTransaction wTx = slaveDataBroker.newWriteOnlyTransaction();
         final CheckedFuture<Void,TransactionCommitFailedException> resultSubmit = Futures.immediateCheckedFuture(null);
         doReturn(resultSubmit).when(writeTx).submit();
 
-        final CheckedFuture<Void, TransactionCommitFailedException> resultSubmitResponse =
-                slaveDataBroker.newWriteOnlyTransaction().submit();
+        final CheckedFuture<Void, TransactionCommitFailedException> resultSubmitResponse = wTx.submit();
 
-        final Object result= resultSubmitResponse.checkedGet(TIMEOUT_SEC, TimeUnit.SECONDS);
+        final Object result = resultSubmitResponse.checkedGet(TIMEOUT_SEC, TimeUnit.SECONDS);
 
         assertNull(result);
 
         // With Tx
-
+        wTx = slaveDataBroker.newWriteOnlyTransaction();
         doNothing().when(writeTx).delete(any(), any());
-        slaveDataBroker.newWriteOnlyTransaction().delete(LogicalDatastoreType.CONFIGURATION,
+        wTx.delete(LogicalDatastoreType.CONFIGURATION,
                 YangInstanceIdentifier.EMPTY);
 
         final CheckedFuture<Void,TransactionCommitFailedException> resultSubmitTx = Futures.immediateCheckedFuture(null);
         doReturn(resultSubmitTx).when(writeTx).submit();
 
-        final CheckedFuture<Void, TransactionCommitFailedException> resultSubmitTxResponse =
-                slaveDataBroker.newWriteOnlyTransaction().submit();
+        final CheckedFuture<Void, TransactionCommitFailedException> resultSubmitTxResponse = wTx.submit();
 
         final Object resultTx = resultSubmitTxResponse.checkedGet(TIMEOUT_SEC, TimeUnit.SECONDS);
 
         assertNull(resultTx);
 
-        slaveDataBroker.newWriteOnlyTransaction().delete(LogicalDatastoreType.CONFIGURATION,
+        wTx = slaveDataBroker.newWriteOnlyTransaction();
+        wTx.delete(LogicalDatastoreType.CONFIGURATION,
                 YangInstanceIdentifier.EMPTY);
 
         final TransactionCommitFailedException throwable = new TransactionCommitFailedException("Fail", null);
@@ -213,7 +220,7 @@ public class WriteOnlyTransactionTest {
         doReturn(resultThrowable).when(writeTx).submit();
 
         final CheckedFuture<Void, TransactionCommitFailedException> resultThrowableResponse =
-                slaveDataBroker.newWriteOnlyTransaction().submit();
+                wTx.submit();
 
         exception.expect(TransactionCommitFailedException.class);
         resultThrowableResponse.checkedGet(TIMEOUT_SEC, TimeUnit.SECONDS);
@@ -228,23 +235,24 @@ public class WriteOnlyTransactionTest {
 
         // Without Tx
 
-        final Boolean resultFalseNoTx = slaveDataBroker.newWriteOnlyTransaction().cancel();
+        DOMDataWriteTransaction wTx = slaveDataBroker.newWriteOnlyTransaction();
+        final Boolean resultFalseNoTx = wTx.cancel();
         assertEquals(false, resultFalseNoTx);
 
         // With Tx, readWriteTx test
 
+        wTx = slaveDataBroker.newWriteOnlyTransaction();
         doNothing().when(writeTx).delete(any(), any());
-        slaveDataBroker.newReadWriteTransaction().delete(LogicalDatastoreType.CONFIGURATION,
+        wTx.delete(LogicalDatastoreType.CONFIGURATION,
                 YangInstanceIdentifier.EMPTY);
 
         doReturn(true).when(writeTx).cancel();
-
-        final Boolean resultTrue = slaveDataBroker.newWriteOnlyTransaction().cancel();
+        final Boolean resultTrue = wTx.cancel();
         assertEquals(true, resultTrue);
 
         doReturn(false).when(writeTx).cancel();
 
-        final Boolean resultFalse = slaveDataBroker.newWriteOnlyTransaction().cancel();
+        final Boolean resultFalse = wTx.cancel();
         assertEquals(false, resultFalse);
 
     }

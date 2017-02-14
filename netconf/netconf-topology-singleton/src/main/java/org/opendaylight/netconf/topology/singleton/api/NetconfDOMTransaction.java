@@ -17,7 +17,20 @@ import scala.concurrent.Future;
 /**
  * Provides API for all operations of read and write transactions
  */
+// TODO we should separate between read tx and write tx
 public interface NetconfDOMTransaction {
+
+
+    /**
+     * Opens a new transaction. Transactions have to be opened before applying
+     * any operations on them. Previous transaction has to be either submitted
+     * ({@link #submit submit} was invoked) or canceled ({@link #cancel} was
+     * invoked.
+     *
+     * @throws IllegalStateException
+     *             if the previous transaction was not SUBMITTED or CANCELLED.
+     */
+    void openTransaction();
 
     /**
      * Read data from particular data-store
