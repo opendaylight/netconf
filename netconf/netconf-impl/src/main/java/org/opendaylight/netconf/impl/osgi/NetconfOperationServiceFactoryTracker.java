@@ -26,8 +26,7 @@ class NetconfOperationServiceFactoryTracker extends
 
     @Override
     public NetconfOperationServiceFactory addingService(ServiceReference<NetconfOperationServiceFactory> reference) {
-        Object property = reference.getProperty(NetconfConstants.SERVICE_NAME);
-        if (property != null && isMarkedForConfig(property)) {
+        if (NetconfConstants.isConfigSubsystemReference(reference)) {
             NetconfOperationServiceFactory netconfOperationServiceFactory = super.addingService(reference);
             factoriesListener.onAddNetconfOperationServiceFactory(netconfOperationServiceFactory);
             return netconfOperationServiceFactory;
@@ -39,13 +38,8 @@ class NetconfOperationServiceFactoryTracker extends
     @Override
     public void removedService(ServiceReference<NetconfOperationServiceFactory> reference,
             NetconfOperationServiceFactory netconfOperationServiceFactory) {
-        if (netconfOperationServiceFactory != null) {
+        if (NetconfConstants.isConfigSubsystemReference(reference) && netconfOperationServiceFactory != null) {
             factoriesListener.onRemoveNetconfOperationServiceFactory(netconfOperationServiceFactory);
         }
     }
-
-    private boolean isMarkedForConfig(Object property) {
-        return NetconfConstants.CONFIG_SERVICE_MARKERS.contains(property);
-    }
-
 }

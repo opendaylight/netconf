@@ -57,7 +57,7 @@ public class NetconfOperationServiceFactoryTrackerTest {
 
     @Test
     public void testNetconfOperationServiceFactoryTracker() throws Exception {
-        tracker.removedService(null, factory);
+        tracker.removedService(reference, factory);
         verify(listener, times(1)).onRemoveNetconfOperationServiceFactory(any(NetconfOperationServiceFactory.class));
     }
 

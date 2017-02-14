@@ -57,14 +57,16 @@ public class ActivatorTest {
 
         activator.start(context);
 
+        final Dictionary<String, String> props = new Hashtable<>();
+        props.put(NetconfConstants.SERVICE_NAME, NetconfConstants.NETCONF_NOTIFICATION);
         verify(context, times(1)).registerService(eq(NetconfNotificationCollector.class),
-                any(NetconfNotificationManager.class), eq(new Hashtable<>()));
+                any(NetconfNotificationManager.class), eq(props));
 
         final ArgumentCaptor<NetconfOperationServiceFactory> serviceFactoryArgumentCaptor =
                 ArgumentCaptor.forClass(NetconfOperationServiceFactory.class);
 
         final Dictionary<String, String> properties = new Hashtable<>();
-        properties.put(NetconfConstants.SERVICE_NAME, NetconfConstants.NETCONF_MONITORING);
+        properties.put(NetconfConstants.SERVICE_NAME, NetconfConstants.NETCONF_NOTIFICATION);
 
         verify(context, times(1)).registerService(eq(NetconfOperationServiceFactory.class),
                 serviceFactoryArgumentCaptor.capture(), eq(properties));

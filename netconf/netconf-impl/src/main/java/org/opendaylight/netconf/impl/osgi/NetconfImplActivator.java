@@ -15,6 +15,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.concurrent.TimeUnit;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.api.util.NetconfConstants;
 import org.opendaylight.netconf.impl.NetconfServerDispatcherImpl;
 import org.opendaylight.netconf.impl.NetconfServerDispatcherImpl.ServerChannelInitializer;
 import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory;
@@ -23,7 +24,6 @@ import org.opendaylight.netconf.impl.SessionIdProvider;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
-import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
 import org.opendaylight.netconf.util.osgi.NetconfConfiguration;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -80,9 +80,12 @@ public class NetconfImplActivator implements BundleActivator {
                     new ServiceTracker<>(context, NetconfNotificationCollector.class, new ServiceTrackerCustomizer<NetconfNotificationCollector, NetconfNotificationCollector>() {
                         @Override
                         public NetconfNotificationCollector addingService(ServiceReference<NetconfNotificationCollector> reference) {
-                            Preconditions.checkState(listenerReg == null, "Notification collector service was already added");
-                            listenerReg = context.getService(reference).registerBaseNotificationPublisher();
-                            monitoringService.setNotificationPublisher(listenerReg);
+                            if (NetconfConstants.isConfigSubsystemReference(reference)) {
+                                Preconditions.checkState(listenerReg == null, "Notification collector service was already added");
+                                listenerReg = context.getService(reference).registerBaseNotificationPublisher();
+                                monitoringService.setNotificationPublisher(listenerReg);
+                            }
+
                             return null;
                         }
 
@@ -93,9 +96,11 @@ public class NetconfImplActivator implements BundleActivator {
 
                         @Override
                         public void removedService(ServiceReference<NetconfNotificationCollector> reference, NetconfNotificationCollector service) {
-                            listenerReg.close();
-                            listenerReg = null;
-                            monitoringService.setNotificationPublisher(listenerReg);
+                            if (NetconfConstants.isConfigSubsystemReference(reference)) {
+                                listenerReg.close();
+                                listenerReg = null;
+                                monitoringService.setNotificationPublisher(listenerReg);
+                            }
                         }
                     });
             notificationServiceTracker.open();
@@ -111,8 +116,9 @@ public class NetconfImplActivator implements BundleActivator {
 
     private NetconfMonitoringServiceImpl startMonitoringService(BundleContext context, AggregatedNetconfOperationServiceFactory factoriesListener) {
         NetconfMonitoringServiceImpl netconfMonitoringServiceImpl = new NetconfMonitoringServiceImpl(factoriesListener);
-        Dictionary<String, ?> dic = new Hashtable<>();
-        regMonitoring = context.registerService(NetconfMonitoringService.class, netconfMonitoringServiceImpl, dic);
+        Dictionary<String, String> properties = new Hashtable<>();
+        properties.put(NetconfConstants.SERVICE_NAME, NetconfConstants.NETCONF_MONITORING);
+        regMonitoring = context.registerService(NetconfMonitoringService.class, netconfMonitoringServiceImpl, properties);
 
         return netconfMonitoringServiceImpl;
     }

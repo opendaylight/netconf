@@ -46,7 +46,8 @@ public class Activator implements BundleActivator {
         // Add properties to autowire with netconf-impl instance for cfg subsystem
         final Dictionary<String, String> props = new Hashtable<>();
         props.put(NetconfConstants.SERVICE_NAME, NetconfConstants.NETCONF_NOTIFICATION);
-        netconfNotificationCollectorServiceRegistration = context.registerService(NetconfNotificationCollector.class, netconfNotificationManager, new Hashtable<String, Object>());
+        netconfNotificationCollectorServiceRegistration =
+                context.registerService(NetconfNotificationCollector.class, netconfNotificationManager, props);
 
         final NetconfOperationServiceFactory netconfOperationServiceFactory = new NetconfOperationServiceFactory() {
 
@@ -90,7 +91,7 @@ public class Activator implements BundleActivator {
         };
 
         final Dictionary<String, String> properties = new Hashtable<>();
-        properties.put(NetconfConstants.SERVICE_NAME, NetconfConstants.NETCONF_MONITORING);
+        properties.put(NetconfConstants.SERVICE_NAME, NetconfConstants.NETCONF_NOTIFICATION);
         operationaServiceRegistration = context.registerService(NetconfOperationServiceFactory.class, netconfOperationServiceFactory, properties);
     }
 
