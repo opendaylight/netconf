@@ -22,6 +22,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
+import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.openexi.proc.common.EXIOptionsException;
 import org.openexi.sax.EXIReader;
@@ -81,7 +82,7 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
         final TransformerHandler handler = FACTORY.newTransformerHandler();
         reader.setContentHandler(handler);
 
-        final DOMResult domResult = new DOMResult();
+        final DOMResult domResult = new DOMResult(XmlUtil.newDocument());
         handler.setResult(domResult);
 
         try (final InputStream is = new ByteBufInputStream(in)) {
