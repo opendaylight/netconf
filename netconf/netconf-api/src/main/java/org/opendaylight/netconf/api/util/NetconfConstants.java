@@ -10,9 +10,10 @@ package org.opendaylight.netconf.api.util;
 
 import com.google.common.collect.Sets;
 import java.util.Set;
+import org.osgi.framework.ServiceReference;
 
 /**
- * These constants mark operation service factories that are auto wired with netconf endpoint
+ * These constants mark netconf services that are auto wired with netconf endpoint
  * for config subsystem
  */
 public final class NetconfConstants {
@@ -20,10 +21,18 @@ public final class NetconfConstants {
      * TODO define marker interface in mapping-api that the serviceFactories in cofing subsystem
      * will implement so we can check for services with instanceof instead of constants
      */
+    // TODO Do we need separate marks for each kind of service?
     public static final String SERVICE_NAME = "name";
     public static final String CONFIG_NETCONF_CONNECTOR = "config-netconf-connector";
     public static final String NETCONF_MONITORING = "ietf-netconf-monitoring";
     public static final String NETCONF_NOTIFICATION = "ietf-netconf-notifications";
 
-    public static final Set<String> CONFIG_SERVICE_MARKERS = Sets.newHashSet(SERVICE_NAME, CONFIG_NETCONF_CONNECTOR, NETCONF_MONITORING, NETCONF_NOTIFICATION);
+    public static final Set<String> CONFIG_SERVICE_MARKERS =
+            Sets.newHashSet(CONFIG_NETCONF_CONNECTOR, NETCONF_MONITORING, NETCONF_NOTIFICATION);
+
+    public static boolean isConfigSubsystemReference(final ServiceReference<?> reference) {
+        final Object property = reference.getProperty(SERVICE_NAME);
+        return property != null && CONFIG_SERVICE_MARKERS.contains(property);
+    }
+
 }
