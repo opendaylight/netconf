@@ -16,6 +16,7 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -23,6 +24,7 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.openexi.proc.common.EXIOptionsException;
 import org.openexi.sax.EXIReader;
 import org.slf4j.Logger;
@@ -50,9 +52,11 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
      * cannot be invoked concurrently. Hence we can reuse the reader.
      */
     private final EXIReader reader;
+    private final DocumentBuilder documentBuilder;
 
     private NetconfEXIToMessageDecoder(final EXIReader reader) {
         this.reader = Preconditions.checkNotNull(reader);
+        this.documentBuilder = UntrustedXML.newDocumentBuilder();
     }
 
     public static NetconfEXIToMessageDecoder create(final NetconfEXICodec codec) throws EXIOptionsException {
@@ -81,7 +85,7 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
         final TransformerHandler handler = FACTORY.newTransformerHandler();
         reader.setContentHandler(handler);
 
-        final DOMResult domResult = new DOMResult();
+        final DOMResult domResult = new DOMResult(documentBuilder.newDocument());
         handler.setResult(domResult);
 
         try (final InputStream is = new ByteBufInputStream(in)) {
