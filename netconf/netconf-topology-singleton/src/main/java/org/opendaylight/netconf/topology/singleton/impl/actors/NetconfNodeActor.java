@@ -46,6 +46,7 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.DeleteR
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyResultResponse;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ExistsRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.MergeRequest;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.OpenTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.PutRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ReadRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitRequest;
@@ -148,7 +149,9 @@ public class NetconfNodeActor extends UntypedActor {
     }
 
     private void resolveProxyCalls(final Object message, final ActorRef recipient, final ActorRef futureSender) {
-        if (message instanceof ReadRequest) {
+        if (message instanceof OpenTransaction) {
+            operationsProcessor.doOpenTransaction(recipient, futureSender);
+        } else if (message instanceof ReadRequest) {
 
             final ReadRequest readRequest = (ReadRequest) message;
             operationsProcessor.doRead(readRequest.getStore(), readRequest.getPath(), recipient, futureSender);
