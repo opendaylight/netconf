@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_5aa49ba5",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterContentValidator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-02-15T12:08:04Z",
+      "side": 1,
+      "message": "Why do you make this static?",
+      "revId": "31f6dd4368f423806928f66ed732e09463fb79a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_ba8ca736",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterContentValidator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-02-15T12:08:04Z",
+      "side": 1,
+      "message": "Why static?",
+      "revId": "31f6dd4368f423806928f66ed732e09463fb79a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_da96cbef",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterContentValidator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-02-15T12:08:04Z",
+      "side": 1,
+      "message": "Can you please add test case where list element is wrapped in two containers? Something like:\n\u003cmainroot xmlns\u003d\"urn:dummy:mod-0\"\u003e\n  \u003ccont\u003e  \n    \u003cmulti-key-list\u003e\n      \u003cid1\u003eaaa\u003c/id1\u003e\n      \u003cid2\u003ebbb\u003c/id2\u003e\n    \u003c/multi-key-list\u003e\n  \u003c/cont\u003e\n\u003c/mainroot\u003e\n\nWill this approach find list element?",
+      "revId": "31f6dd4368f423806928f66ed732e09463fb79a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_bacb071d",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterContentValidatorTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-02-15T12:08:04Z",
+      "side": 1,
+      "message": "do not comment this out but remove it instead",
+      "revId": "31f6dd4368f423806928f66ed732e09463fb79a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_3ad717c1",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterContentValidatorTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-02-15T12:08:04Z",
+      "side": 1,
+      "message": "yIdStringEquals\n\nMaybe the better approach here is to construct YangInstanceIdentifier from expected string and compare it directly to actual YangInstanceIdentifier",
+      "revId": "31f6dd4368f423806928f66ed732e09463fb79a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
