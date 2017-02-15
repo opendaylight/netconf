@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_1dcccdbb",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/EditConfig.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-02-15T12:32:42Z",
+      "side": 1,
+      "message": "I\u0027ve tried it and it didn\u0027t work. Please see https://bugs.opendaylight.org/show_bug.cgi?id\u003d6681 and https://git.opendaylight.org/gerrit/#/c/45967/\nMerging empty map instead of exist check should be better approach in clustered environment, where read op is expensive.",
+      "parentUuid": "fafc7978_ba0947df",
+      "revId": "dc3a063f35a42ed39c1413b69f993bd9c96b5b5a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_1a5a13f3",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/EditConfig.java",
         "patchSetId": 2
