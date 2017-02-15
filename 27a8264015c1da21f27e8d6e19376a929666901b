@@ -22,6 +22,30 @@
       "revId": "27a8264015c1da21f27e8d6e19376a929666901b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_77a6d854",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4540
+      },
+      "writtenOn": "2017-02-15T09:47:59Z",
+      "side": 1,
+      "message": "We have the following bugs so far:\n* https://bugs.opendaylight.org/show_bug.cgi?id\u003d7752\n* https://bugs.opendaylight.org/show_bug.cgi?id\u003d7753\n* https://bugs.opendaylight.org/show_bug.cgi?id\u003d7754\n\nAnd https://git.opendaylight.org/gerrit/51871 forks the plugin in odlparent.",
+      "parentUuid": "fafc7978_77d7f8ed",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 18
+      },
+      "revId": "27a8264015c1da21f27e8d6e19376a929666901b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
