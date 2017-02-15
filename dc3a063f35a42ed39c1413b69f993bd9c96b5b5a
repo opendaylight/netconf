@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_ba0947df",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/EditConfig.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-02-15T10:58:21Z",
+      "side": 1,
+      "message": "Do we even need to merge empty parent map node?\n\nCan you please try this without prior merging parent map node? You will see if write modifications are capable of handling it on their own or they are not.",
+      "revId": "dc3a063f35a42ed39c1413b69f993bd9c96b5b5a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_1a5a13f3",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/EditConfig.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-02-15T10:58:21Z",
+      "side": 1,
+      "message": "Unnecessary throws clause",
+      "revId": "dc3a063f35a42ed39c1413b69f993bd9c96b5b5a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
