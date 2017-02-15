@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_77d7f8ed",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2017-02-15T09:21:04Z",
+      "side": 1,
+      "message": "Do we have a Bug to track this? Or perhaps multiple Bugs with multiple improvements?\nAlso, does this mean we will build a fork of karaf-maven-plugin on Odlparent?",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 18
+      },
+      "revId": "27a8264015c1da21f27e8d6e19376a929666901b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
