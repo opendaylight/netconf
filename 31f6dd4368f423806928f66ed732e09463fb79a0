@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_fdaf4992",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterContentValidator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-02-15T13:30:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_5aa49ba5",
+      "revId": "31f6dd4368f423806928f66ed732e09463fb79a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_ba8ca736",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterContentValidator.java",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2017-02-15T12:08:04Z",
       "side": 1,
       "message": "Why static?",
+      "revId": "31f6dd4368f423806928f66ed732e09463fb79a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_5d96554d",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterContentValidator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-02-15T13:30:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_ba8ca736",
       "revId": "31f6dd4368f423806928f66ed732e09463fb79a0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_3d91d152",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterContentValidator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-02-15T13:30:41Z",
+      "side": 1,
+      "message": "You\u0027re right, there was a bug.\nfilterContent.getChildElements(pathElement);\nshould be \ncurrent.getChildElements(pathElement);\n\nFixed and added unit test.",
+      "parentUuid": "fafc7978_da96cbef",
+      "revId": "31f6dd4368f423806928f66ed732e09463fb79a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_bacb071d",
         "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterContentValidatorTest.java",
         "patchSetId": 4
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_dd89a527",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterContentValidatorTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-02-15T13:30:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_bacb071d",
+      "revId": "31f6dd4368f423806928f66ed732e09463fb79a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_3ad717c1",
         "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterContentValidatorTest.java",
         "patchSetId": 4
@@ -81,6 +153,24 @@
       "writtenOn": "2017-02-15T12:08:04Z",
       "side": 1,
       "message": "yIdStringEquals\n\nMaybe the better approach here is to construct YangInstanceIdentifier from expected string and compare it directly to actual YangInstanceIdentifier",
+      "revId": "31f6dd4368f423806928f66ed732e09463fb79a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_bde141d2",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterContentValidatorTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-02-15T13:30:41Z",
+      "side": 1,
+      "message": "will do",
+      "parentUuid": "fafc7978_3ad717c1",
       "revId": "31f6dd4368f423806928f66ed732e09463fb79a0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
