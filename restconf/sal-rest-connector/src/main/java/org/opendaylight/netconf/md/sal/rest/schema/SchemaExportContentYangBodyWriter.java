@@ -18,10 +18,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import org.opendaylight.restconf.Draft17;
+import org.opendaylight.restconf.Rfc8040;
 
 @Provider
-@Produces({ SchemaRetrievalService.YANG_MEDIA_TYPE, Draft17.MediaTypes.YANG })
+@Produces({ SchemaRetrievalService.YANG_MEDIA_TYPE, Rfc8040.MediaTypes.YANG })
 public class SchemaExportContentYangBodyWriter implements MessageBodyWriter<SchemaExportContext> {
 
     @Override

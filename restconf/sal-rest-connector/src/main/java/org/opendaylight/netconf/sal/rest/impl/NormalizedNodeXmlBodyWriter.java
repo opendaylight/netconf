@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+import java.util.Map.Entry;
+import javanet.staxutils.IndentingXMLStreamWriter;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -29,8 +32,6 @@ import org.opendaylight.netconf.sal.rest.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
-import org.opendaylight.restconf.Draft17;
-import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -41,12 +42,15 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import javanet.staxutils.IndentingXMLStreamWriter;
 
+/**
+ * @deprecated This class will be replaced by
+ * {@link org.opendaylight.restconf.jersey.providers.NormalizedNodeXmlBodyWriter}
+ */
+@Deprecated
 @Provider
 @Produces({ Draft02.MediaTypes.API + RestconfService.XML, Draft02.MediaTypes.DATA + RestconfService.XML,
-        Draft02.MediaTypes.OPERATION + RestconfService.XML, Draft17.MediaTypes.DATA + RestconfConstants.XML,
-        MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+        Draft02.MediaTypes.OPERATION + RestconfService.XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<NormalizedNodeContext> {
 
     private static final XMLOutputFactory XML_FACTORY;
@@ -73,6 +77,9 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             final Annotation[] annotations, final MediaType mediaType,
             final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws IOException,
             WebApplicationException {
+        for (final Entry<String, Object> entry : t.getNewHeaders().entrySet()) {
+            httpHeaders.add(entry.getKey(), entry.getValue());
+        }
         final InstanceIdentifierContext<?> pathContext = t.getInstanceIdentifierContext();
         if (t.getData() == null) {
             return;
@@ -80,7 +87,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
 
         XMLStreamWriter xmlWriter;
         try {
-            xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream);
+            xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
             if (t.getWriterParameters().isPrettyPrint()) {
                 xmlWriter = new IndentingXMLStreamWriter(xmlWriter);
             }
@@ -92,14 +99,12 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
         final NormalizedNode<?, ?> data = t.getData();
         final SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
 
-
-
-        writeNormalizedNode(xmlWriter, schemaPath, pathContext, data, t.getWriterParameters().getDepth());
-
+        writeNormalizedNode(xmlWriter, schemaPath, pathContext, data, Optional.fromNullable(t.getWriterParameters().getDepth()));
     }
 
-    private void writeNormalizedNode(final XMLStreamWriter xmlWriter, final SchemaPath schemaPath, final InstanceIdentifierContext<?>
-            pathContext, NormalizedNode<?, ?> data, final Optional<Integer> depth) throws IOException {
+    private void writeNormalizedNode(final XMLStreamWriter xmlWriter, final SchemaPath schemaPath,
+            final InstanceIdentifierContext<?> pathContext, NormalizedNode<?, ?> data, final Optional<Integer> depth)
+            throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
         final SchemaContext schemaCtx = pathContext.getSchemaContext();
         if (SchemaPath.ROOT.equals(schemaPath)) {
@@ -122,8 +127,9 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
     }
 
     private RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
-                                                                        final SchemaContext schemaContext, final SchemaPath schemaPath, final Optional<Integer> depth) {
-        final NormalizedNodeStreamWriter xmlStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, schemaContext, schemaPath);
+            final SchemaContext schemaContext, final SchemaPath schemaPath, final Optional<Integer> depth) {
+        final NormalizedNodeStreamWriter xmlStreamWriter =
+                XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, schemaContext, schemaPath);
         if (depth.isPresent()) {
             return DepthAwareNormalizedNodeWriter.forStreamWriter(xmlStreamWriter, depth.get());
         } else {
@@ -136,7 +142,8 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             throws IOException {
         try {
             final QName name = data.getNodeType();
-            xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, name.getLocalName(), name.getNamespace().toString());
+            xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, name.getLocalName(),
+                    name.getNamespace().toString());
             xmlWriter.writeDefaultNamespace(name.getNamespace().toString());
             for(final NormalizedNode<?,?> child : data.getValue()) {
                 nnWriter.write(child);

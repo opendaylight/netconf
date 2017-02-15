@@ -14,24 +14,23 @@ import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
+import org.opendaylight.restconf.base.services.api.BaseServicesWrapper;
+import org.opendaylight.restconf.base.services.api.RestconfOperationsService;
+import org.opendaylight.restconf.base.services.api.RestconfSchemaService;
+import org.opendaylight.restconf.base.services.api.RestconfService;
+import org.opendaylight.restconf.base.services.impl.RestconfImpl;
+import org.opendaylight.restconf.base.services.impl.RestconfOperationsServiceImpl;
+import org.opendaylight.restconf.base.services.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.restconf.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.rest.services.api.BaseServicesWrapper;
-import org.opendaylight.restconf.rest.services.api.RestconfModulesService;
-import org.opendaylight.restconf.rest.services.api.RestconfOperationsService;
-import org.opendaylight.restconf.rest.services.api.RestconfSchemaService;
-import org.opendaylight.restconf.rest.services.api.RestconfStreamsService;
-import org.opendaylight.restconf.rest.services.impl.RestconfModulesServiceImpl;
-import org.opendaylight.restconf.rest.services.impl.RestconfOperationsServiceImpl;
-import org.opendaylight.restconf.rest.services.impl.RestconfSchemaServiceImpl;
-import org.opendaylight.restconf.rest.services.impl.RestconfStreamsServiceImpl;
-import org.opendaylight.restconf.restful.services.api.TransactionServicesWrapper;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
 import org.opendaylight.restconf.restful.services.api.RestconfInvokeOperationsService;
 import org.opendaylight.restconf.restful.services.api.RestconfStreamsSubscriptionService;
+import org.opendaylight.restconf.restful.services.api.TransactionServicesWrapper;
 import org.opendaylight.restconf.restful.services.impl.RestconfDataServiceImpl;
 import org.opendaylight.restconf.restful.services.impl.RestconfInvokeOperationsServiceImpl;
 import org.opendaylight.restconf.restful.services.impl.RestconfStreamsSubscriptionServiceImpl;
@@ -50,10 +49,9 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
     private RestconfDataService delegRestconfDataService;
     private RestconfInvokeOperationsService delegRestconfInvokeOpsService;
     private RestconfStreamsSubscriptionService delegRestconfSubscrService;
-    private RestconfModulesService delegRestModService;
     private RestconfOperationsService delegRestOpsService;
-    private RestconfStreamsService delegRestStrsService;
     private RestconfSchemaService delegRestSchService;
+    private RestconfService delegRestService;
 
     private ServicesWrapperImpl() {
     }
@@ -67,21 +65,6 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
     }
 
     @Override
-    public NormalizedNodeContext getModules(final UriInfo uriInfo) {
-        return this.delegRestModService.getModules(uriInfo);
-    }
-
-    @Override
-    public NormalizedNodeContext getModules(final String identifier, final UriInfo uriInfo) {
-        return this.delegRestModService.getModules(identifier, uriInfo);
-    }
-
-    @Override
-    public NormalizedNodeContext getModule(final String identifier, final UriInfo uriInfo) {
-        return this.delegRestModService.getModule(identifier, uriInfo);
-    }
-
-    @Override
     public NormalizedNodeContext getOperations(final UriInfo uriInfo) {
         return this.delegRestOpsService.getOperations(uriInfo);
     }
@@ -92,13 +75,13 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
     }
 
     @Override
-    public NormalizedNodeContext getAvailableStreams(final UriInfo uriInfo) {
-        return this.delegRestStrsService.getAvailableStreams(uriInfo);
+    public SchemaExportContext getSchema(final String mountAndModuleId) {
+        return this.delegRestSchService.getSchema(mountAndModuleId);
     }
 
     @Override
-    public SchemaExportContext getSchema(final String mountAndModuleId) {
-        return this.delegRestSchService.getSchema(mountAndModuleId);
+    public Response readData(final UriInfo uriInfo) {
+        return this.delegRestconfDataService.readData(uriInfo);
     }
 
     @Override
@@ -107,8 +90,8 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
     }
 
     @Override
-    public Response putData(final String identifier, final NormalizedNodeContext payload) {
-        return this.delegRestconfDataService.putData(identifier, payload);
+    public Response putData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+        return this.delegRestconfDataService.putData(identifier, payload, uriInfo);
     }
 
     @Override
@@ -143,21 +126,27 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
     }
 
     @Override
-    public Response subscribeToStream(final String identifier, final UriInfo uriInfo) {
+    public NormalizedNodeContext subscribeToStream(final String identifier, final UriInfo uriInfo) {
         return this.delegRestconfSubscrService.subscribeToStream(identifier, uriInfo);
+    }
+
+    @Override
+    public NormalizedNodeContext getLibraryVersion() {
+        return this.delegRestService.getLibraryVersion();
     }
 
     public void setHandlers(final SchemaContextHandler schemaCtxHandler,
             final DOMMountPointServiceHandler domMountPointServiceHandler,
             final TransactionChainHandler transactionChainHandler, final DOMDataBrokerHandler domDataBrokerHandler,
-            final RpcServiceHandler rpcServiceHandler) {
-        this.delegRestModService = new RestconfModulesServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
+            final RpcServiceHandler rpcServiceHandler, final NotificationServiceHandler notificationServiceHandler) {
         this.delegRestOpsService = new RestconfOperationsServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
         this.delegRestSchService = new RestconfSchemaServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
-        this.delegRestStrsService = new RestconfStreamsServiceImpl(schemaCtxHandler);
-        this.delegRestconfDataService = new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler);
-        this.delegRestconfInvokeOpsService = new RestconfInvokeOperationsServiceImpl(rpcServiceHandler,
-                schemaCtxHandler);
-        this.delegRestconfSubscrService = new RestconfStreamsSubscriptionServiceImpl(domDataBrokerHandler);
+        this.delegRestconfDataService =
+                new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler, domMountPointServiceHandler);
+        this.delegRestconfInvokeOpsService =
+                new RestconfInvokeOperationsServiceImpl(rpcServiceHandler, schemaCtxHandler);
+        this.delegRestconfSubscrService = new RestconfStreamsSubscriptionServiceImpl(domDataBrokerHandler,
+                notificationServiceHandler, schemaCtxHandler, transactionChainHandler);
+        this.delegRestService = new RestconfImpl(schemaCtxHandler);
     }
 }

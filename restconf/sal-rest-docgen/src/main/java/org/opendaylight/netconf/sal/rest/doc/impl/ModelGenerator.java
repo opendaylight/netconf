@@ -9,20 +9,22 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolveNodesName;
 
-import com.google.common.base.Preconditions;
+import com.google.common.base.Optional;
+import com.mifmif.common.regex.Generex;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Post;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.AnyXmlSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ChoiceCaseNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ConstraintDefinition;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -33,23 +35,30 @@ import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.RevisionAwareXPath;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.TypedSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.type.BinaryTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition.Bit;
 import org.opendaylight.yangtools.yang.model.api.type.BooleanTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.DecimalTypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.EmptyTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.EnumTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.EnumTypeDefinition.EnumPair;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.IntegerTypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LengthConstraint;
+import org.opendaylight.yangtools.yang.model.api.type.PatternConstraint;
 import org.opendaylight.yangtools.yang.model.api.type.StringTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.UnionTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.UnsignedIntegerTypeDefinition;
+import org.opendaylight.yangtools.yang.model.util.RevisionAwareXPathImpl;
+import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,10 +70,10 @@ public class ModelGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(ModelGenerator.class);
 
+    private static final Pattern STRIP_PATTERN = Pattern.compile("\\[[^\\[\\]]*\\]");
     private static final String BASE_64 = "base64";
     private static final String BINARY_ENCODING_KEY = "binaryEncoding";
     private static final String MEDIA_KEY = "media";
-    private static final String ONE_OF_KEY = "oneOf";
     private static final String UNIQUE_ITEMS_KEY = "uniqueItems";
     private static final String MAX_ITEMS = "maxItems";
     private static final String MIN_ITEMS = "minItems";
@@ -81,64 +90,51 @@ public class ModelGenerator {
     private static final String OBJECT_TYPE = "object";
     private static final String ARRAY_TYPE = "array";
     private static final String ENUM = "enum";
-    private static final String INTEGER = "integer";
-    private static final String NUMBER = "number";
-    private static final String BOOLEAN = "boolean";
-    private static final String STRING = "string";
     private static final String ID_KEY = "id";
     private static final String SUB_TYPES_KEY = "subTypes";
+    private static final String UNIQUE_EMPTY_IDENTIFIER = "unique_empty_identifier";
 
     private Module topLevelModule;
 
     public ModelGenerator() {
     }
 
-    private static String jsonTypeFor(final TypeDefinition<?> type) {
-        if (type instanceof BooleanTypeDefinition) {
-            return BOOLEAN;
-        } else if (type instanceof DecimalTypeDefinition) {
-            return NUMBER;
-        } else if (type instanceof EnumTypeDefinition) {
-            return ENUM;
-        } else if (type instanceof IntegerTypeDefinition) {
-            return INTEGER;
-        } else if (type instanceof UnsignedIntegerTypeDefinition) {
-            return INTEGER;
-        } else if (type instanceof StringTypeDefinition) {
-            return STRING;
-        }
-
-        // TODO: Binary type
-        return null;
-    }
-
+    /**
+     * Creates Json models from provided module according to swagger spec
+     *
+     * @param module        - Yang module to be converted
+     * @param schemaContext - SchemaContext of all Yang files used by Api Doc
+     * @return JSONObject containing data used for creating examples and models in Api Doc
+     * @throws IOException
+     * @throws JSONException
+     */
     public JSONObject convertToJsonSchema(final Module module, final SchemaContext schemaContext) throws IOException, JSONException {
-        JSONObject models = new JSONObject();
+        final JSONObject models = new JSONObject();
+        models.put(UNIQUE_EMPTY_IDENTIFIER, new JSONObject());
         topLevelModule = module;
-        processModules(module, models);
+        processModules(module, models, schemaContext);
         processContainersAndLists(module, models, schemaContext);
         processRPCs(module, models, schemaContext);
         processIdentities(module, models);
         return models;
     }
 
-    private void processModules(final Module module, final JSONObject models) throws JSONException {
-        createConcreteModelForPost(models, module.getName() + BaseYangSwaggerGenerator.MODULE_NAME_SUFFIX, createPropertiesForPost(module));
+    private void processModules(final Module module, final JSONObject models, final SchemaContext schemaContext) throws JSONException {
+        createConcreteModelForPost(models, module.getName() + BaseYangSwaggerGenerator.MODULE_NAME_SUFFIX,
+                createPropertiesForPost(module, schemaContext, module.getName()));
     }
 
     private void processContainersAndLists(final Module module, final JSONObject models, final SchemaContext schemaContext)
             throws IOException, JSONException {
+        final String moduleName = module.getName();
 
-        String moduleName = module.getName();
-
-        for (DataSchemaNode childNode : module.getChildNodes()) {
+        for (final DataSchemaNode childNode : module.getChildNodes()) {
             // For every container and list in the module
             if (childNode instanceof ContainerSchemaNode || childNode instanceof ListSchemaNode) {
                 processDataNodeContainer((DataNodeContainer) childNode, moduleName, models, true, schemaContext);
                 processDataNodeContainer((DataNodeContainer) childNode, moduleName, models, false, schemaContext);
             }
         }
-
     }
 
     /**
@@ -151,68 +147,95 @@ public class ModelGenerator {
      */
     private void processRPCs(final Module module, final JSONObject models, final SchemaContext schemaContext) throws JSONException,
             IOException {
-
-        Set<RpcDefinition> rpcs = module.getRpcs();
-        String moduleName = module.getName();
-        for (RpcDefinition rpc : rpcs) {
-
-            ContainerSchemaNode input = rpc.getInput();
+        final Set<RpcDefinition> rpcs = module.getRpcs();
+        final String moduleName = module.getName();
+        for (final RpcDefinition rpc : rpcs) {
+            final ContainerSchemaNode input = rpc.getInput();
             if (input != null) {
-                JSONObject inputJSON = processDataNodeContainer(input, moduleName, models, schemaContext);
-                String filename = "(" + rpc.getQName().getLocalName() + ")input";
-                inputJSON.put("id", filename);
-                // writeToFile(filename, inputJSON.toString(2), moduleName);
-                models.put(filename, inputJSON);
+                final JSONObject properties = processChildren(input.getChildNodes(), moduleName, models, true, schemaContext);
+
+                final String filename = "(" + rpc.getQName().getLocalName() + ")input";
+                final JSONObject childSchema = getSchemaTemplate();
+                childSchema.put(TYPE_KEY, OBJECT_TYPE);
+                childSchema.put(PROPERTIES_KEY, properties);
+                childSchema.put(ID_KEY, filename);
+                models.put(filename, childSchema);
+
+                processTopData(filename, models, input);
             }
 
-            ContainerSchemaNode output = rpc.getOutput();
+            final ContainerSchemaNode output = rpc.getOutput();
             if (output != null) {
-                JSONObject outputJSON = processDataNodeContainer(output, moduleName, models, schemaContext);
-                String filename = "(" + rpc.getQName().getLocalName() + ")output";
-                outputJSON.put("id", filename);
-                models.put(filename, outputJSON);
+                final JSONObject properties = processChildren(output.getChildNodes(), moduleName, models, true, schemaContext);
+                final String filename = "(" + rpc.getQName().getLocalName() + ")output";
+                final JSONObject childSchema = getSchemaTemplate();
+                childSchema.put(TYPE_KEY, OBJECT_TYPE);
+                childSchema.put(PROPERTIES_KEY, properties);
+                childSchema.put(ID_KEY, filename);
+                models.put(filename, childSchema);
+
+                processTopData(filename, models, output);
             }
         }
+    }
+
+    private JSONObject processTopData(final String filename, final JSONObject models, final SchemaNode schemaNode) {
+        final JSONObject items = new JSONObject();
+
+        items.put(REF_KEY, filename);
+        final JSONObject dataNodeProperties = new JSONObject();
+        dataNodeProperties.put(TYPE_KEY, schemaNode instanceof ListSchemaNode ? ARRAY_TYPE : OBJECT_TYPE);
+        dataNodeProperties.put(ITEMS_KEY, items);
+
+        dataNodeProperties.putOpt(DESCRIPTION_KEY, schemaNode.getDescription());
+        final JSONObject properties = new JSONObject();
+        properties.put(topLevelModule.getName() + ":" + schemaNode.getQName().getLocalName(), dataNodeProperties);
+        final JSONObject finalChildSchema = getSchemaTemplate();
+        finalChildSchema.put(TYPE_KEY, OBJECT_TYPE);
+        finalChildSchema.put(PROPERTIES_KEY, properties);
+        finalChildSchema.put(ID_KEY, filename + OperationBuilder.TOP);
+        models.put(filename + OperationBuilder.TOP, finalChildSchema);
+
+        return dataNodeProperties;
     }
 
     /**
      * Processes the 'identity' statement in a yang model and maps it to a 'model' in the Swagger JSON spec.
      *
-     * @param module
-     *            The module from which the identity stmt will be processed
-     * @param models
-     *            The JSONObject in which the parsed identity will be put as a 'model' obj
+     * @param module The module from which the identity stmt will be processed
+     * @param models The JSONObject in which the parsed identity will be put as a 'model' obj
      */
     private static void processIdentities(final Module module, final JSONObject models) throws JSONException {
 
-        String moduleName = module.getName();
-        Set<IdentitySchemaNode> idNodes = module.getIdentities();
+        final String moduleName = module.getName();
+        final Set<IdentitySchemaNode> idNodes = module.getIdentities();
         LOG.debug("Processing Identities for module {} . Found {} identity statements", moduleName, idNodes.size());
 
-        for (IdentitySchemaNode idNode : idNodes) {
-            JSONObject identityObj = new JSONObject();
-            String identityName = idNode.getQName().getLocalName();
+        for (final IdentitySchemaNode idNode : idNodes) {
+            final JSONObject identityObj = new JSONObject();
+            final String identityName = idNode.getQName().getLocalName();
             LOG.debug("Processing Identity: {}", identityName);
 
             identityObj.put(ID_KEY, identityName);
             identityObj.put(DESCRIPTION_KEY, idNode.getDescription());
 
-            JSONObject props = new JSONObject();
-            IdentitySchemaNode baseId = idNode.getBaseIdentity();
+            final JSONObject props = new JSONObject();
+            final IdentitySchemaNode baseId = idNode.getBaseIdentity();
 
             if (baseId == null) {
                 /**
                  * This is a base identity. So lets see if it has sub types. If it does, then add them to the model
                  * definition.
                  */
-                Set<IdentitySchemaNode> derivedIds = idNode.getDerivedIdentities();
+                final Set<IdentitySchemaNode> derivedIds = idNode.getDerivedIdentities();
 
                 if (derivedIds != null) {
-                    JSONArray subTypes = new JSONArray();
-                    for (IdentitySchemaNode derivedId : derivedIds) {
+                    final JSONArray subTypes = new JSONArray();
+                    for (final IdentitySchemaNode derivedId : derivedIds) {
                         subTypes.put(derivedId.getQName().getLocalName());
                     }
                     identityObj.put(SUB_TYPES_KEY, subTypes);
+
                 }
             } else {
                 /**
@@ -227,167 +250,172 @@ public class ModelGenerator {
         }
     }
 
-    /**
-     * Processes the container and list nodes and populates the moduleJSON.
-     */
-    private JSONObject processDataNodeContainer(final DataNodeContainer dataNode, final String moduleName, final JSONObject models,
-            final SchemaContext schemaContext) throws JSONException, IOException {
-        return processDataNodeContainer(dataNode, moduleName, models, true, schemaContext);
-    }
-
-    private JSONObject processDataNodeContainer(final DataNodeContainer dataNode, final String moduleName, final JSONObject models,
-            final boolean isConfig, final SchemaContext schemaContext) throws JSONException, IOException {
+    private JSONObject processDataNodeContainer(final DataNodeContainer dataNode, final String parentName, final JSONObject models,
+                                                final boolean isConfig, final SchemaContext schemaContext) throws JSONException, IOException {
         if (dataNode instanceof ListSchemaNode || dataNode instanceof ContainerSchemaNode) {
-            Preconditions.checkArgument(dataNode instanceof SchemaNode, "Data node should be also schema node");
-            Iterable<DataSchemaNode> containerChildren = dataNode.getChildNodes();
-            JSONObject properties = processChildren(containerChildren, ((SchemaNode) dataNode).getQName(), moduleName,
-                    models, isConfig, schemaContext);
+            final Iterable<DataSchemaNode> containerChildren = dataNode.getChildNodes();
+            final String localName = ((SchemaNode) dataNode).getQName().getLocalName();
+            final JSONObject properties = processChildren(containerChildren, parentName + "/" + localName, models, isConfig, schemaContext);
+            final String nodeName = parentName + (isConfig ? OperationBuilder.CONFIG : OperationBuilder.OPERATIONAL)
+                    + localName;
 
-            String nodeName = (isConfig ? OperationBuilder.CONFIG : OperationBuilder.OPERATIONAL)
-                    + ((SchemaNode) dataNode).getQName().getLocalName();
-
-            JSONObject childSchema = getSchemaTemplate();
+            final JSONObject childSchema = getSchemaTemplate();
             childSchema.put(TYPE_KEY, OBJECT_TYPE);
             childSchema.put(PROPERTIES_KEY, properties);
-            childSchema.put("id", nodeName);
+
+            childSchema.put(ID_KEY, nodeName);
             models.put(nodeName, childSchema);
 
             if (isConfig) {
-                createConcreteModelForPost(models, ((SchemaNode) dataNode).getQName().getLocalName(),
-                        createPropertiesForPost(dataNode));
+                createConcreteModelForPost(models, localName,
+                        createPropertiesForPost(dataNode, schemaContext, parentName + "/" + localName));
             }
 
-            JSONObject items = new JSONObject();
-            items.put(REF_KEY, nodeName);
-            JSONObject dataNodeProperties = new JSONObject();
-            dataNodeProperties.put(TYPE_KEY, dataNode instanceof ListSchemaNode ? ARRAY_TYPE : OBJECT_TYPE);
-            dataNodeProperties.put(ITEMS_KEY, items);
-
-            return dataNodeProperties;
+            return processTopData(nodeName, models, (SchemaNode) dataNode);
         }
         return null;
     }
 
     private static void createConcreteModelForPost(final JSONObject models, final String localName,
-            final JSONObject properties) throws JSONException {
-        String nodePostName = OperationBuilder.CONFIG + localName + Post.METHOD_NAME;
-        JSONObject postSchema = getSchemaTemplate();
+                                                   final JSONObject properties) throws JSONException {
+        final String nodePostName = OperationBuilder.CONFIG + localName + Post.METHOD_NAME;
+        final JSONObject postSchema = getSchemaTemplate();
         postSchema.put(TYPE_KEY, OBJECT_TYPE);
-        postSchema.put("id", nodePostName);
+        postSchema.put(ID_KEY, nodePostName);
         postSchema.put(PROPERTIES_KEY, properties);
         models.put(nodePostName, postSchema);
     }
 
-    private JSONObject createPropertiesForPost(final DataNodeContainer dataNodeContainer) throws JSONException {
-        JSONObject properties = new JSONObject();
-        for (DataSchemaNode childNode : dataNodeContainer.getChildNodes()) {
+    private JSONObject createPropertiesForPost(final DataNodeContainer dataNodeContainer, final SchemaContext schemaContext, final String parentName)
+            throws JSONException {
+        final JSONObject properties = new JSONObject();
+        for (final DataSchemaNode childNode : dataNodeContainer.getChildNodes()) {
             if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
-                JSONObject items = new JSONObject();
-                items.put(REF_KEY, "(config)" + childNode.getQName().getLocalName());
-                JSONObject property = new JSONObject();
+                final JSONObject items = new JSONObject();
+                items.put(REF_KEY, parentName + "(config)" + childNode.getQName().getLocalName());
+                final JSONObject property = new JSONObject();
                 property.put(TYPE_KEY, childNode instanceof ListSchemaNode ? ARRAY_TYPE : OBJECT_TYPE);
                 property.put(ITEMS_KEY, items);
                 properties.put(childNode.getQName().getLocalName(), property);
             } else if (childNode instanceof LeafSchemaNode) {
-                JSONObject property = processLeafNode((LeafSchemaNode)childNode);
+                final JSONObject property = processLeafNode((LeafSchemaNode) childNode, schemaContext);
                 properties.put(childNode.getQName().getLocalName(), property);
             }
         }
         return properties;
-    }
-
-    private JSONObject processChildren(final Iterable<DataSchemaNode> nodes, final QName parentQName, final String moduleName,
-            final JSONObject models, final SchemaContext schemaContext) throws JSONException, IOException {
-        return processChildren(nodes, parentQName, moduleName, models, true, schemaContext);
     }
 
     /**
      * Processes the nodes.
      */
-    private JSONObject processChildren(final Iterable<DataSchemaNode> nodes, final QName parentQName,
-            final String moduleName, final JSONObject models, final boolean isConfig, final SchemaContext schemaContext)
+    private JSONObject processChildren(final Iterable<DataSchemaNode> nodes, final String parentName, final JSONObject models,
+                                       final boolean isConfig, final SchemaContext schemaContext)
             throws JSONException, IOException {
-
-        JSONObject properties = new JSONObject();
-
-        for (DataSchemaNode node : nodes) {
+        final JSONObject properties = new JSONObject();
+        for (final DataSchemaNode node : nodes) {
             if (node.isConfiguration() == isConfig) {
-
-                String name = resolveNodesName(node, topLevelModule, schemaContext);
-                JSONObject property = null;
+                final String name = resolveNodesName(node, topLevelModule, schemaContext);
+                final JSONObject property;
                 if (node instanceof LeafSchemaNode) {
-                    property = processLeafNode((LeafSchemaNode) node);
+                    property = processLeafNode((LeafSchemaNode) node, schemaContext);
+
                 } else if (node instanceof ListSchemaNode) {
-                    property = processDataNodeContainer((ListSchemaNode) node, moduleName, models, isConfig,
+                    property = processDataNodeContainer((ListSchemaNode) node, parentName, models, isConfig,
                             schemaContext);
 
                 } else if (node instanceof LeafListSchemaNode) {
-                    property = processLeafListNode((LeafListSchemaNode) node);
+                    property = processLeafListNode((LeafListSchemaNode) node, schemaContext);
 
                 } else if (node instanceof ChoiceSchemaNode) {
-                    property = processChoiceNode((ChoiceSchemaNode) node, moduleName, models, schemaContext);
+                    if (((ChoiceSchemaNode) node).getCases().iterator().hasNext()) {
+                        processChoiceNode(((ChoiceSchemaNode) node).getCases().iterator().next().getChildNodes(),
+                                parentName, models, schemaContext, isConfig, properties);
+                    }
+                    continue;
 
                 } else if (node instanceof AnyXmlSchemaNode) {
                     property = processAnyXMLNode((AnyXmlSchemaNode) node);
 
                 } else if (node instanceof ContainerSchemaNode) {
-                    property = processDataNodeContainer((ContainerSchemaNode) node, moduleName, models, isConfig,
+                    property = processDataNodeContainer((ContainerSchemaNode) node, parentName, models, isConfig,
                             schemaContext);
 
                 } else {
                     throw new IllegalArgumentException("Unknown DataSchemaNode type: " + node.getClass());
                 }
-
                 property.putOpt(DESCRIPTION_KEY, node.getDescription());
-                properties.put(name, property);
+                properties.put(topLevelModule.getName() + ":" + name, property);
             }
         }
         return properties;
     }
 
-    private JSONObject processLeafListNode(final LeafListSchemaNode listNode) throws JSONException {
-        JSONObject props = new JSONObject();
+    private JSONObject processLeafListNode(final LeafListSchemaNode listNode, final SchemaContext schemaContext) throws JSONException {
+        final JSONObject props = new JSONObject();
         props.put(TYPE_KEY, ARRAY_TYPE);
 
-        JSONObject itemsVal = new JSONObject();
-        processTypeDef(listNode.getType(), itemsVal);
+        final JSONObject itemsVal = new JSONObject();
+        final ConstraintDefinition constraints = listNode.getConstraints();
+        final Optional<Integer> maxOptional = Optional.fromNullable(constraints.getMaxElements());
+        if (maxOptional.or(2) >= 2) {
+            processTypeDef(listNode.getType(), listNode, itemsVal, schemaContext);
+            processTypeDef(listNode.getType(), listNode, itemsVal, schemaContext);
+        } else {
+            processTypeDef(listNode.getType(), listNode, itemsVal, schemaContext);
+        }
         props.put(ITEMS_KEY, itemsVal);
 
-        ConstraintDefinition constraints = listNode.getConstraints();
+
         processConstraints(constraints, props);
 
         return props;
     }
 
-    private JSONObject processChoiceNode(final ChoiceSchemaNode choiceNode, final String moduleName, final JSONObject models,
-            final SchemaContext schemaContext) throws JSONException, IOException {
+    private void processChoiceNode(final Iterable<DataSchemaNode> nodes, final String moduleName, final JSONObject models,
+                                   final SchemaContext schemaContext, final boolean isConfig, final JSONObject properties)
+            throws JSONException, IOException {
+        for (final DataSchemaNode node : nodes) {
+            final String name = resolveNodesName(node, topLevelModule, schemaContext);
+            final JSONObject property;
 
-        Set<ChoiceCaseNode> cases = choiceNode.getCases();
+            if (node instanceof LeafSchemaNode) {
+                property = processLeafNode((LeafSchemaNode) node, schemaContext);
 
-        JSONArray choiceProps = new JSONArray();
-        for (ChoiceCaseNode choiceCase : cases) {
-            String choiceName = choiceCase.getQName().getLocalName();
-            JSONObject choiceProp = processChildren(choiceCase.getChildNodes(), choiceCase.getQName(), moduleName,
-                    models, schemaContext);
-            JSONObject choiceObj = new JSONObject();
-            choiceObj.put(choiceName, choiceProp);
-            choiceObj.put(TYPE_KEY, OBJECT_TYPE);
-            choiceProps.put(choiceObj);
+            } else if (node instanceof ListSchemaNode) {
+                property = processDataNodeContainer((ListSchemaNode) node, moduleName, models, isConfig,
+                        schemaContext);
+
+            } else if (node instanceof LeafListSchemaNode) {
+                property = processLeafListNode((LeafListSchemaNode) node, schemaContext);
+
+            } else if (node instanceof ChoiceSchemaNode) {
+                if (((ChoiceSchemaNode) node).getCases().iterator().hasNext())
+                    processChoiceNode(((ChoiceSchemaNode) node).getCases().iterator().next().getChildNodes(),
+                            moduleName, models, schemaContext, isConfig, properties);
+                continue;
+
+            } else if (node instanceof AnyXmlSchemaNode) {
+                property = processAnyXMLNode((AnyXmlSchemaNode) node);
+
+            } else if (node instanceof ContainerSchemaNode) {
+                property = processDataNodeContainer((ContainerSchemaNode) node, moduleName, models, isConfig,
+                        schemaContext);
+
+            } else {
+                throw new IllegalArgumentException("Unknown DataSchemaNode type: " + node.getClass());
+            }
+
+            property.putOpt(DESCRIPTION_KEY, node.getDescription());
+            properties.put(name, property);
         }
-
-        JSONObject oneOfProps = new JSONObject();
-        oneOfProps.put(ONE_OF_KEY, choiceProps);
-        oneOfProps.put(TYPE_KEY, OBJECT_TYPE);
-
-        return oneOfProps;
     }
 
     private static void processConstraints(final ConstraintDefinition constraints, final JSONObject props) throws JSONException {
-        boolean isMandatory = constraints.isMandatory();
+        final boolean isMandatory = constraints.isMandatory();
         props.put(REQUIRED_KEY, isMandatory);
 
-        Integer minElements = constraints.getMinElements();
-        Integer maxElements = constraints.getMaxElements();
+        final Integer minElements = constraints.getMinElements();
+        final Integer maxElements = constraints.getMaxElements();
         if (minElements != null) {
             props.put(MIN_ITEMS, minElements);
         }
@@ -396,86 +424,140 @@ public class ModelGenerator {
         }
     }
 
-    private JSONObject processLeafNode(final LeafSchemaNode leafNode) throws JSONException {
-        JSONObject property = new JSONObject();
+    private JSONObject processLeafNode(final LeafSchemaNode leafNode, final SchemaContext schemaContext) throws JSONException {
+        final JSONObject property = new JSONObject();
 
-        String leafDescription = leafNode.getDescription();
+        final String leafDescription = leafNode.getDescription();
         property.put(DESCRIPTION_KEY, leafDescription);
-
         processConstraints(leafNode.getConstraints(), property);
-        processTypeDef(leafNode.getType(), property);
+        processTypeDef(leafNode.getType(), leafNode, property, schemaContext);
 
         return property;
     }
 
     private static JSONObject processAnyXMLNode(final AnyXmlSchemaNode leafNode) throws JSONException {
-        JSONObject property = new JSONObject();
+        final JSONObject property = new JSONObject();
 
-        String leafDescription = leafNode.getDescription();
+        final String leafDescription = leafNode.getDescription();
         property.put(DESCRIPTION_KEY, leafDescription);
 
         processConstraints(leafNode.getConstraints(), property);
+        final String localName = leafNode.getQName().getLocalName();
+        property.put(TYPE_KEY, "example of anyxml " + localName);
 
         return property;
     }
 
-    private void processTypeDef(final TypeDefinition<?> leafTypeDef, final JSONObject property) throws JSONException {
-        if (leafTypeDef instanceof BinaryTypeDefinition) {
-            processBinaryType((BinaryTypeDefinition) leafTypeDef, property);
-        } else if (leafTypeDef instanceof BitsTypeDefinition) {
-            processBitsType((BitsTypeDefinition) leafTypeDef, property);
-        } else if (leafTypeDef instanceof EnumTypeDefinition) {
-            processEnumType((EnumTypeDefinition) leafTypeDef, property);
-        } else if (leafTypeDef instanceof IdentityrefTypeDefinition) {
-            property.putOpt(TYPE_KEY,
-                    ((IdentityrefTypeDefinition) leafTypeDef).getIdentity().getQName().getLocalName());
-        } else if (leafTypeDef instanceof StringTypeDefinition) {
-            processStringType((StringTypeDefinition) leafTypeDef, property);
-        } else if (leafTypeDef instanceof UnionTypeDefinition) {
-            processUnionType((UnionTypeDefinition) leafTypeDef, property);
-        } else {
-            String jsonType = jsonTypeFor(leafTypeDef);
-            if (jsonType == null) {
-                jsonType = "object";
+    private String processTypeDef(final TypeDefinition<?> leafTypeDef, final DataSchemaNode node,
+                                  final JSONObject property, final SchemaContext schemaContext) throws JSONException {
+        final String jsonType;
+        if (leafTypeDef.getDefaultValue() == null) {
+            if (leafTypeDef instanceof BinaryTypeDefinition) {
+                jsonType = processBinaryType(property);
+
+            } else if (leafTypeDef instanceof BitsTypeDefinition) {
+                jsonType = processBitsType((BitsTypeDefinition) leafTypeDef, property);
+
+            } else if (leafTypeDef instanceof EnumTypeDefinition) {
+                jsonType = processEnumType((EnumTypeDefinition) leafTypeDef, property);
+
+            } else if (leafTypeDef instanceof IdentityrefTypeDefinition) {
+                final String name = topLevelModule.getName();
+                jsonType = name + ":" + ((IdentityrefTypeDefinition) leafTypeDef).getIdentity().getQName().getLocalName();
+
+            } else if (leafTypeDef instanceof StringTypeDefinition) {
+                jsonType = processStringType(leafTypeDef, property, node.getQName().getLocalName());
+
+            } else if (leafTypeDef instanceof UnionTypeDefinition) {
+                jsonType = processUnionType((UnionTypeDefinition) leafTypeDef, property, schemaContext, node);
+
+            } else if (leafTypeDef instanceof EmptyTypeDefinition) {
+                jsonType = UNIQUE_EMPTY_IDENTIFIER;
+
+            } else if (leafTypeDef instanceof LeafrefTypeDefinition) {
+                return processLeafRef(node, property, schemaContext, leafTypeDef);
+
+            } else if (leafTypeDef instanceof BooleanTypeDefinition) {
+                jsonType = "true";
+
+            } else if (leafTypeDef instanceof DecimalTypeDefinition) {
+                jsonType = String.valueOf(((DecimalTypeDefinition) leafTypeDef).getRangeConstraints()
+                        .iterator().next().getMin());
+
+            } else if (leafTypeDef instanceof IntegerTypeDefinition) {
+                jsonType = String.valueOf(((IntegerTypeDefinition) leafTypeDef).getRangeConstraints()
+                        .iterator().next().getMin());
+
+            } else if (leafTypeDef instanceof UnsignedIntegerTypeDefinition) {
+                jsonType = String.valueOf(((UnsignedIntegerTypeDefinition) leafTypeDef).getRangeConstraints()
+                        .iterator().next().getMin());
+
+            } else {
+                jsonType = OBJECT_TYPE;
+
             }
-            property.putOpt(TYPE_KEY, jsonType);
+        } else {
+            jsonType = String.valueOf(leafTypeDef.getDefaultValue());
         }
+        property.putOpt(TYPE_KEY, jsonType);
+        return jsonType;
     }
 
-    private static void processBinaryType(final BinaryTypeDefinition binaryType, final JSONObject property) throws JSONException {
-        property.put(TYPE_KEY, STRING);
-        JSONObject media = new JSONObject();
+    private String processLeafRef(final DataSchemaNode node, final JSONObject property, final SchemaContext schemaContext,
+                                  final TypeDefinition<?> leafTypeDef) {
+        RevisionAwareXPath xPath = ((LeafrefTypeDefinition) leafTypeDef).getPathStatement();
+        final URI namespace = leafTypeDef.getQName().getNamespace();
+        final Date revision = leafTypeDef.getQName().getRevision();
+        final Module module = schemaContext.findModuleByNamespaceAndRevision(namespace, revision);
+        final SchemaNode schemaNode;
+
+        final String xPathString = STRIP_PATTERN.matcher(xPath.toString()).replaceAll("");
+        xPath = new RevisionAwareXPathImpl(xPathString, xPath.isAbsolute());
+
+        if (xPath.isAbsolute()) {
+            schemaNode = SchemaContextUtil.findDataSchemaNode(schemaContext, module, xPath);
+        } else {
+            schemaNode = SchemaContextUtil.findDataSchemaNodeForRelativeXPath(schemaContext, module, node, xPath);
+        }
+
+        return processTypeDef(((TypedSchemaNode) schemaNode).getType(), (DataSchemaNode) schemaNode, property, schemaContext);
+    }
+
+    private static String processBinaryType(final JSONObject property) throws JSONException {
+        final JSONObject media = new JSONObject();
         media.put(BINARY_ENCODING_KEY, BASE_64);
         property.put(MEDIA_KEY, media);
+        return "bin1 bin2";
     }
 
-    private static void processEnumType(final EnumTypeDefinition enumLeafType, final JSONObject property) throws JSONException {
-        List<EnumPair> enumPairs = enumLeafType.getValues();
-        List<String> enumNames = new ArrayList<>();
-        for (EnumPair enumPair : enumPairs) {
+    private static String processEnumType(final EnumTypeDefinition enumLeafType, final JSONObject property) throws JSONException {
+        final List<EnumPair> enumPairs = enumLeafType.getValues();
+        final List<String> enumNames = new ArrayList<>();
+        for (final EnumPair enumPair : enumPairs) {
             enumNames.add(enumPair.getName());
         }
+
         property.putOpt(ENUM, new JSONArray(enumNames));
+        return enumLeafType.getValues().iterator().next().getName();
     }
 
-    private static void processBitsType(final BitsTypeDefinition bitsType, final JSONObject property) throws JSONException {
-        property.put(TYPE_KEY, ARRAY_TYPE);
+    private static String processBitsType(final BitsTypeDefinition bitsType, final JSONObject property) throws JSONException {
         property.put(MIN_ITEMS, 0);
         property.put(UNIQUE_ITEMS_KEY, true);
-        JSONArray enumValues = new JSONArray();
-
-        List<Bit> bits = bitsType.getBits();
-        for (Bit bit : bits) {
-            enumValues.put(bit.getName());
+        final List<String> enumNames = new ArrayList<>();
+        final List<Bit> bits = bitsType.getBits();
+        for (final Bit bit : bits) {
+            enumNames.add(bit.getName());
         }
-        JSONObject itemsValue = new JSONObject();
-        itemsValue.put(ENUM, enumValues);
-        property.put(ITEMS_KEY, itemsValue);
+        property.put(ENUM, new JSONArray(enumNames));
+
+        return enumNames.iterator().next() + " " + enumNames.get(enumNames.size() - 1);
     }
 
-    private static void processStringType(final StringTypeDefinition stringType, final JSONObject property) throws JSONException {
-        StringTypeDefinition type = stringType;
-        List<LengthConstraint> lengthConstraints = stringType.getLengthConstraints();
+    private static String processStringType(final TypeDefinition<?> stringType, final JSONObject property, final String nodeName)
+            throws JSONException {
+        StringTypeDefinition type = (StringTypeDefinition) stringType;
+        List<LengthConstraint> lengthConstraints = ((StringTypeDefinition) stringType).getLengthConstraints();
         while (lengthConstraints.isEmpty() && type.getBaseType() != null) {
             type = type.getBaseType();
             lengthConstraints = type.getLengthConstraints();
@@ -483,33 +565,39 @@ public class ModelGenerator {
 
         // FIXME: json-schema is not expressive enough to capture min/max laternatives. We should find the true minimum
         //        and true maximum implied by the constraints and use that.
-        for (LengthConstraint lengthConstraint : lengthConstraints) {
-            Number min = lengthConstraint.getMin();
-            Number max = lengthConstraint.getMax();
+        for (final LengthConstraint lengthConstraint : lengthConstraints) {
+            final Number min = lengthConstraint.getMin();
+            final Number max = lengthConstraint.getMax();
             property.putOpt(MIN_LENGTH_KEY, min);
             property.putOpt(MAX_LENGTH_KEY, max);
         }
-
-        property.put(TYPE_KEY, STRING);
+        if (type.getPatternConstraints().iterator().hasNext()) {
+            final PatternConstraint pattern = type.getPatternConstraints().iterator().next();
+            String regex = pattern.getRegularExpression();
+            regex = regex.substring(1, regex.length() - 1);
+            final Generex generex = new Generex(regex);
+            return generex.random();
+        } else {
+            return "Some " + nodeName;
+        }
     }
 
-    private static void processUnionType(final UnionTypeDefinition unionType, final JSONObject property) throws JSONException {
-        StringBuilder type = new StringBuilder();
-        for (TypeDefinition<?> typeDef : unionType.getTypes()) {
-            if (type.length() > 0) {
-                type.append(" or ");
-            }
-            type.append(jsonTypeFor(typeDef));
+    private String processUnionType(final UnionTypeDefinition unionType, final JSONObject property,
+                                    final SchemaContext schemaContext, final DataSchemaNode node)
+            throws JSONException {
+        final List<String> unionNames = new ArrayList<>();
+        for (final TypeDefinition<?> typeDef : unionType.getTypes()) {
+            unionNames.add(processTypeDef(typeDef, node, property, schemaContext));
         }
-
-        property.put(TYPE_KEY, type);
+        property.put(ENUM, new JSONArray(unionNames));
+        return unionNames.iterator().next();
     }
 
     /**
      * Helper method to generate a pre-filled JSON schema object.
      */
     private static JSONObject getSchemaTemplate() throws JSONException {
-        JSONObject schemaJSON = new JSONObject();
+        final JSONObject schemaJSON = new JSONObject();
         schemaJSON.put(SCHEMA_KEY, SCHEMA_URL);
 
         return schemaJSON;

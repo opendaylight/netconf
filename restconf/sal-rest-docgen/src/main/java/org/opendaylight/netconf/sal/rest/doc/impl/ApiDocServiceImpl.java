@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Map.Entry;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -19,12 +20,13 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
 
 /**
- * This service generates swagger (See <a
- * href="https://helloreverb.com/developers/swagger"
+ * This service generates swagger (See
+ * <a href="https://helloreverb.com/developers/swagger"
  * >https://helloreverb.com/developers/swagger</a>) compliant documentation for
  * RESTCONF APIs. The output of this is used by embedded Swagger UI.
  *
- * <p>NOTE: These API's need to be synchronized due to bug 1198. Thread access to
+ * <p>
+ * NOTE: These API's need to be synchronized due to bug 1198. Thread access to
  * the SchemaContext is not synchronized properly and thus you can end up with
  * missing definitions without this synchronization. There are likely otherways
  * to work around this limitation, but given that this API is a dev only tool
@@ -44,9 +46,14 @@ public class ApiDocServiceImpl implements ApiDocService {
      * served by <code> getDocByModule()</code> method.
      */
     @Override
-    public synchronized Response getRootDoc(UriInfo uriInfo) {
-        ApiDocGenerator generator = ApiDocGenerator.getInstance();
-        ResourceList rootDoc = generator.getResourceListing(uriInfo);
+    public synchronized Response getRootDoc(final UriInfo uriInfo) {
+        final ApiDocGenerator generator = ApiDocGenerator.getInstance();
+        if (isNew(uriInfo)) {
+            generator.setDraft(true);
+        } else {
+            generator.setDraft(false);
+        }
+        final ResourceList rootDoc = generator.getResourceListing(uriInfo);
 
         return Response.ok(rootDoc).build();
     }
@@ -55,10 +62,14 @@ public class ApiDocServiceImpl implements ApiDocService {
      * Generates Swagger compliant document listing APIs for module.
      */
     @Override
-    public synchronized Response getDocByModule(String module, String revision, UriInfo uriInfo) {
-        ApiDocGenerator generator = ApiDocGenerator.getInstance();
-
-        ApiDeclaration doc = generator.getApiDeclaration(module, revision, uriInfo);
+    public synchronized Response getDocByModule(final String module, final String revision, final UriInfo uriInfo) {
+        final ApiDocGenerator generator = ApiDocGenerator.getInstance();
+        if (isNew(uriInfo)) {
+            generator.setDraft(true);
+        } else {
+            generator.setDraft(false);
+        }
+        final ApiDeclaration doc = generator.getApiDeclaration(module, revision, uriInfo);
         return Response.ok(doc).build();
     }
 
@@ -66,45 +77,56 @@ public class ApiDocServiceImpl implements ApiDocService {
      * Redirects to embedded swagger ui.
      */
     @Override
-    public synchronized Response getApiExplorer(UriInfo uriInfo) {
-        return Response
-                .seeOther(uriInfo.getBaseUriBuilder().path("../explorer/index.html").build())
-                .build();
+    public synchronized Response getApiExplorer(final UriInfo uriInfo) {
+        return Response.seeOther(uriInfo.getBaseUriBuilder().path("../explorer/index.html").build()).build();
     }
 
     @Override
-    public synchronized Response getListOfMounts(UriInfo uriInfo) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (OutputStreamWriter streamWriter = new OutputStreamWriter(baos)) {
-            JSONWriter writer = new JSONWriter(streamWriter);
+    public synchronized Response getListOfMounts(final UriInfo uriInfo) {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (OutputStreamWriter streamWriter = new OutputStreamWriter(baos, StandardCharsets.UTF_8)) {
+            final JSONWriter writer = new JSONWriter(streamWriter);
             writer.array();
-            for (Entry<String, Long> entry : MountPointSwagger.getInstance()
-                    .getInstanceIdentifiers().entrySet()) {
+            for (final Entry<String, Long> entry : MountPointSwagger.getInstance().getInstanceIdentifiers()
+                    .entrySet()) {
                 writer.object();
                 writer.key("instance").value(entry.getKey());
                 writer.key("id").value(entry.getValue());
                 writer.endObject();
             }
             writer.endArray();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return Response.status(500).entity(e.getMessage()).build();
         }
         return Response.status(200).entity(baos.toString()).build();
     }
 
     @Override
-    public synchronized Response getMountRootDoc(String instanceNum, UriInfo uriInfo) {
-        ResourceList resourceList = MountPointSwagger.getInstance().getResourceList(uriInfo,
-                Long.parseLong(instanceNum));
+    public synchronized Response getMountRootDoc(final String instanceNum, final UriInfo uriInfo) {
+        final ResourceList resourceList;
+        if (isNew(uriInfo)) {
+            resourceList = MountPointSwagger.getInstanceDraft18().getResourceList(uriInfo, Long.parseLong(instanceNum));
+        } else {
+            resourceList = MountPointSwagger.getInstance().getResourceList(uriInfo, Long.parseLong(instanceNum));
+        }
         return Response.ok(resourceList).build();
     }
 
     @Override
-    public synchronized Response getMountDocByModule(String instanceNum, String module,
-            String revision, UriInfo uriInfo) {
-        ApiDeclaration api = MountPointSwagger.getInstance().getMountPointApi(uriInfo,
-                Long.parseLong(instanceNum), module, revision);
+    public synchronized Response getMountDocByModule(final String instanceNum, final String module,
+            final String revision, final UriInfo uriInfo) {
+        final ApiDeclaration api;
+        if (isNew(uriInfo)) {
+            api = MountPointSwagger.getInstanceDraft18().getMountPointApi(uriInfo, Long.parseLong(instanceNum), module,
+                    revision);
+        } else {
+            api = MountPointSwagger.getInstance().getMountPointApi(uriInfo, Long.parseLong(instanceNum), module,
+                    revision);
+        }
         return Response.ok(api).build();
     }
 
+    private static boolean isNew(final UriInfo uriInfo) {
+        return uriInfo.getBaseUri().toString().contains("/18/");
+    }
 }

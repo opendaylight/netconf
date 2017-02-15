@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.sal.restconf.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
@@ -15,12 +17,22 @@ public class NormalizedNodeContext {
     private final InstanceIdentifierContext<? extends SchemaNode> context;
     private final NormalizedNode<?,?> data;
     private final WriterParameters writerParameters;
+    private Map<String, Object> headers = new HashMap<>();
 
     public NormalizedNodeContext(final InstanceIdentifierContext<? extends SchemaNode> context,
-                                 final NormalizedNode<?, ?> data, WriterParameters writerParameters) {
+                                 final NormalizedNode<?, ?> data, final WriterParameters writerParameters) {
         this.context = context;
         this.data = data;
         this.writerParameters = writerParameters;
+    }
+
+    public NormalizedNodeContext(final InstanceIdentifierContext<? extends SchemaNode> context,
+            final NormalizedNode<?, ?> data, final WriterParameters writerParameters,
+            final Map<String, Object> headers) {
+        this.context = context;
+        this.data = data;
+        this.writerParameters = writerParameters;
+        this.headers = headers;
     }
 
     public NormalizedNodeContext(final InstanceIdentifierContext<? extends SchemaNode> context,
@@ -31,15 +43,32 @@ public class NormalizedNodeContext {
         this.writerParameters = new WriterParameters.WriterParametersBuilder().build();
     }
 
+    public NormalizedNodeContext(final InstanceIdentifierContext<? extends SchemaNode> context,
+            final NormalizedNode<?, ?> data, final Map<String, Object> headers) {
+        this.context = context;
+        this.data = data;
+        // default writer parameters
+        this.writerParameters = new WriterParameters.WriterParametersBuilder().build();
+        this.headers = headers;
+    }
+
+
     public InstanceIdentifierContext<? extends SchemaNode> getInstanceIdentifierContext() {
-        return context;
+        return this.context;
     }
 
     public NormalizedNode<?, ?> getData() {
-        return data;
+        return this.data;
     }
 
     public WriterParameters getWriterParameters() {
-        return writerParameters;
+        return this.writerParameters;
+    }
+
+    /**
+     * @return
+     */
+    public Map<String, Object> getNewHeaders() {
+        return this.headers;
     }
 }

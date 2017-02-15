@@ -16,6 +16,7 @@ import org.opendaylight.controller.md.sal.common.api.data.TransactionChain;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.sal.core.api.Broker.ProviderSession;
 import org.opendaylight.controller.sal.core.api.Provider;
@@ -25,6 +26,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.restconf.common.wrapper.services.ServicesWrapperImpl;
 import org.opendaylight.restconf.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
@@ -34,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Provider for restconf draft17.
+ * Provider for restconf draft18.
  *
  */
 public class RestConnectorProvider implements Provider, RestConnector, AutoCloseable {
@@ -57,8 +59,11 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
     };
 
     private ListenerRegistration<SchemaContextListener> listenerRegistration;
+
+    private SchemaContextHandler schemaCtxHandler;
     private static TransactionChainHandler transactionChainHandler;
     private static DOMDataBroker dataBroker;
+    private static DOMMountPointServiceHandler mountPointServiceHandler;
 
     @Override
     public void onSessionInitiated(final ProviderSession session) {
@@ -66,10 +71,7 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
 
         final ServicesWrapperImpl wrapperServices = ServicesWrapperImpl.getInstance();
 
-        final SchemaContextHandler schemaCtxHandler = new SchemaContextHandler();
-        this.listenerRegistration = schemaService.registerSchemaContextListener(schemaCtxHandler);
-
-        final DOMMountPointServiceHandler domMountPointServiceHandler = new DOMMountPointServiceHandler(
+        RestConnectorProvider.mountPointServiceHandler = new DOMMountPointServiceHandler(
                 session.getService(DOMMountPointService.class));
 
         RestConnectorProvider.dataBroker = session.getService(DOMDataBroker.class);
@@ -78,11 +80,19 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         RestConnectorProvider.transactionChainHandler = new TransactionChainHandler(RestConnectorProvider.dataBroker
                 .createTransactionChain(RestConnectorProvider.transactionListener));
 
+        this.schemaCtxHandler = new SchemaContextHandler(transactionChainHandler);
+        this.listenerRegistration = schemaService.registerSchemaContextListener(this.schemaCtxHandler);
+
         final DOMRpcService rpcService = session.getService(DOMRpcService.class);
         final RpcServiceHandler rpcServiceHandler = new RpcServiceHandler(rpcService);
 
-        wrapperServices.setHandlers(schemaCtxHandler, domMountPointServiceHandler,
-                RestConnectorProvider.transactionChainHandler, brokerHandler, rpcServiceHandler);
+        final DOMNotificationService notificationService = session.getService(DOMNotificationService.class);
+        final NotificationServiceHandler notificationServiceHandler =
+                new NotificationServiceHandler(notificationService);
+
+        wrapperServices.setHandlers(this.schemaCtxHandler, RestConnectorProvider.mountPointServiceHandler,
+                RestConnectorProvider.transactionChainHandler, brokerHandler, rpcServiceHandler,
+                notificationServiceHandler);
     }
 
     /**
@@ -100,6 +110,14 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         );
     }
 
+    /**
+     * Get current {@link DOMMountPointService} from {@link DOMMountPointServiceHandler}.
+     * @return {@link DOMMountPointService}
+     */
+    public static DOMMountPointService getMountPointService() {
+        return RestConnectorProvider.mountPointServiceHandler.get();
+    }
+
     @Override
     public Collection<ProviderFunctionality> getProviderFunctionality() {
         return Collections.emptySet();
@@ -113,8 +131,8 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         }
 
         // close transaction chain
-        if (RestConnectorProvider.transactionChainHandler != null) {
-            RestConnectorProvider.transactionChainHandler.get().close();
+        if ((transactionChainHandler != null) && (transactionChainHandler.get() != null)) {
+            transactionChainHandler.get().close();
         }
     }
 }

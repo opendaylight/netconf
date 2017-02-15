@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
+    <eventTime>2016-11-10T04:45:31+01:00</eventTime>
+    <data-changed-notification xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote">
+        <data-change-event>
+            <path>/toaster:toaster/toaster:toasterStatus</path>
+            <operation>updated</operation>
+            <data>
+                <toasterStatus xmlns="http://netconfcentral.org/ns/toaster">1</toasterStatus>
+            </data>
+        </data-change-event>
+    </data-changed-notification>
+</notification>

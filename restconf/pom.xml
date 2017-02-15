@@ -25,6 +25,7 @@
         <module>sal-restconf-broker</module>
         -->
         <module>restconf-artifacts</module>
+        <module>models</module>
     </modules>
 
     <dependencyManagement>

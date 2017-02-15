@@ -8,22 +8,18 @@
 package org.opendaylight.restconf.utils.mapping;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import com.google.common.collect.Sets;
-import java.util.AbstractMap;
-import java.util.Collections;
+import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.NoSuchElementException;
 import java.util.Set;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -32,23 +28,24 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
-import org.opendaylight.restconf.Draft17;
-import org.opendaylight.restconf.Draft17.MonitoringModule;
-import org.opendaylight.restconf.Draft17.RestconfModule;
-import org.opendaylight.restconf.utils.schema.context.RestconfSchemaUtil;
+import org.opendaylight.restconf.Rfc8040.IetfYangLibrary;
+import org.opendaylight.restconf.Rfc8040.MonitoringModule;
+import org.opendaylight.restconf.Rfc8040.MonitoringModule.QueryParams;
+import org.opendaylight.restconf.Rfc8040.RestconfModule;
+import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.nodes.AbstractImmutableDataContainerAttrNode;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.GroupingDefinition;
-import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -70,13 +67,17 @@ public class RestconfMappingNodeUtilTest {
 
     private static Set<Module> modules;
     private static SchemaContext schemaContext;
-    private Set<DataSchemaNode> allStreamChildNodes;
+    private static SchemaContext schemaContextMonitoring;
+
+    private static Set<Module> modulesRest;
 
     @BeforeClass
     public static void loadTestSchemaContextAndModules() throws Exception {
-        RestconfMappingNodeUtilTest.schemaContext = TestRestconfUtils.loadSchemaContext(
+        schemaContext = TestRestconfUtils.loadSchemaContext(
                 "/modules/restconf-module-testing");
-        RestconfMappingNodeUtilTest.modules = TestRestconfUtils.loadSchemaContext("/modules").getModules();
+        schemaContextMonitoring = TestRestconfUtils.loadSchemaContext("/modules");
+        modules = schemaContextMonitoring.getModules();
+        modulesRest = TestRestconfUtils.loadSchemaContext("/modules/restconf-module-testing").getModules();
     }
 
     @Before
@@ -89,9 +90,6 @@ public class RestconfMappingNodeUtilTest {
                 QName.create("", RestconfMappingNodeConstants.REPLAY_SUPPORT));
         when(this.leafReplayLog.getQName()).thenReturn(QName.create(RestconfMappingNodeConstants.REPLAY_LOG));
         when(this.leafEvents.getQName()).thenReturn(QName.create("", RestconfMappingNodeConstants.EVENTS));
-
-        this.allStreamChildNodes = Sets.newHashSet(
-                this.leafName, this.leafDescription, this.leafReplaySupport, this.leafReplayLog, this.leafEvents);
     }
 
     /**
@@ -101,584 +99,139 @@ public class RestconfMappingNodeUtilTest {
     @Test
     public void restconfMappingNodeTest() {
         // write modules into list module in Restconf
-        final MapNode modules = RestconfMappingNodeUtil.restconfMappingNode(
-                getTestingRestconfModule("ietf-restconf"), RestconfMappingNodeUtilTest.modules);
+        final Module ietfYangLibMod =
+                schemaContext.findModuleByNamespaceAndRevision(IetfYangLibrary.URI_MODULE, IetfYangLibrary.DATE);
+        final NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> modules =
+                RestconfMappingNodeUtil.mapModulesByIetfYangLibraryYang(RestconfMappingNodeUtilTest.modules,
+                        ietfYangLibMod, schemaContext, "1");
 
         // verify loaded modules
-        verifyLoadedModules(modules);
+        verifyLoadedModules((ContainerNode) modules);
     }
 
-    /**
-     * Positive test of writing one stream to {@link MonitoringModule#STREAM_LIST_SCHEMA_NODE} and checking if stream
-     * was correctly written.
-     */
     @Test
-    public void toStreamEntryNodeTest() {
-        // test stream name
-        final String stream1 = "stream-1";
+    public void restconfStateCapabilitesTest() {
+        final Module monitoringModule = schemaContextMonitoring
+                .findModuleByNamespaceAndRevision(MonitoringModule.URI_MODULE, MonitoringModule.DATE);
+        final NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode =
+                RestconfMappingNodeUtil.mapCapabilites(monitoringModule);
+        assertNotNull(normNode);
+        final List<Object> listOfValues = new ArrayList<>();
 
-        // get list stream node from Restconf module
-        final ListSchemaNode listStream = (ListSchemaNode) RestconfSchemaUtil.getRestconfSchemaNode(
-                getTestingRestconfModule("ietf-restconf"), MonitoringModule.STREAM_LIST_SCHEMA_NODE);
-
-        // write stream to list stream node
-        final MapEntryNode mapEntryNode = RestconfMappingNodeUtil.toStreamEntryNode(stream1, listStream);
-
-        // verify
-        verifyStream(stream1, mapEntryNode);
-    }
-
-    /**
-     * Test mapping modules to list with <code>null</code> Restconf module. Test fails with
-     * <code>NullPointerException</code>.
-     */
-    @Test
-    public void restconfMappingNodeMissingRestconfModuleNegativeTest() {
-        thrown.expect(NullPointerException.class);
-        RestconfMappingNodeUtil.restconfMappingNode(null, RestconfMappingNodeUtilTest.modules);
-    }
-
-    /**
-     * Try to map modules into module list when Restconf module is available but does not contain node
-     * {@link RestconfModule#MODULE_LIST_SCHEMA_NODE}. <code>RestconfDocumentedException</code> is expected and error
-     * type, error tag and error status code are compared to expected values.
-     */
-    @Test
-    public void restconfMappingNodeMissingModuleListNegativeTest() {
-        try {
-            RestconfMappingNodeUtil.restconfMappingNode(
-                    getTestingRestconfModule("restconf-module-with-missing-list-module"),
-                    RestconfMappingNodeUtilTest.modules);
-            fail("Test should fail due to missing "
-                    + RestconfModule.MODULE_LIST_SCHEMA_NODE
-                    + " node in Restconf module");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     * Try to map modules into module list when Restconf module is available and contains node
-     * {@link RestconfModule#MODULE_LIST_SCHEMA_NODE} but it is not of type list. <code>IllegalStateException</code>
-     * should be returned.
-     */
-    @Test
-    public void restconfMappingNodeIllegalModuleListNegativeTest() {
-        thrown.expect(IllegalStateException.class);
-        RestconfMappingNodeUtil.restconfMappingNode(
-                getTestingRestconfModule("restconf-module-with-illegal-list-module"),
-                RestconfMappingNodeUtilTest.modules);
-    }
-
-    /**
-     * Map <code>null</code> set of modules to module list. <code>NullPointerException</code> is expected.
-     */
-    @Test
-    public void restconfMappingNodeNullModulesNegativeTest() {
-        thrown.expect(NullPointerException.class);
-        RestconfMappingNodeUtil.restconfMappingNode(getTestingRestconfModule("ietf-restconf"), null);
-    }
-
-    /**
-     * Try to map modules into list module of Restconf module when Restconf module does not contain grouping
-     * {@link RestconfModule#RESTCONF_GROUPING_SCHEMA_NODE}. <code>RestconfDocumentedException</code> is expected and
-     * error type, error tag and error status code are compared to expected values.
-     */
-    @Test
-    public void restconfMappingNodeNoRestconfGroupingNegativeTest() {
-        try {
-            RestconfMappingNodeUtil.restconfMappingNode(
-                    getTestingRestconfModule("restconf-module-with-missing-grouping-restconf"),
-                    RestconfMappingNodeUtilTest.modules);
-            fail("Test should fail due to missing "
-                    + RestconfModule.RESTCONF_GROUPING_SCHEMA_NODE
-                    + " grouping in Restconf module groupings");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     * Try to map modules into list module of Restconf module when Restconf module does not contain any grouping.
-     * Test is catching <code>RestconfDocumentedException</code> and checking error type, error and error status code.
-     */
-    @Test
-    public void restconfMappingNodeNoGroupingsNegativeTest() {
-        // prepare conditions
-        final Module mockRestconfModule = mock(Module.class);
-        when(mockRestconfModule.getGroupings()).thenReturn(Sets.newHashSet());
-
-        // test
-        try {
-            RestconfMappingNodeUtil.restconfMappingNode(mockRestconfModule, RestconfMappingNodeUtilTest.modules);
-            fail("Test should fail due to no child nodes in Restconf grouping");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     * Test when there is a grouping with name {@link RestconfModule#RESTCONF_GROUPING_SCHEMA_NODE} in Restconf
-     * module but contains no child nodes. <code>NoSuchElementException</code> is expected.
-     */
-    @Test
-    public void restconfMappingNodeRestconfGroupingNoChildNegativeTest() {
-        // prepare conditions
-        final Module mockRestconfModule = mock(Module.class);
-        final GroupingDefinition mockRestconfGrouping = mock(GroupingDefinition.class);
-        when(mockRestconfGrouping.getQName()).thenReturn(QName.create(
-                "", RestconfModule.RESTCONF_GROUPING_SCHEMA_NODE));
-        when(mockRestconfModule.getGroupings()).thenReturn(Sets.newHashSet(mockRestconfGrouping));
-        when(mockRestconfGrouping.getChildNodes()).thenReturn(Sets.newHashSet());
-
-        // test
-        thrown.expect(NoSuchElementException.class);
-        RestconfMappingNodeUtil.restconfMappingNode(mockRestconfModule, RestconfMappingNodeUtilTest.modules);
-    }
-
-    /**
-     * {@link RestconfModule#MODULE_LIST_SCHEMA_NODE} in Restconf module does not contain any child with name
-     * {@link RestconfMappingNodeConstants#NAME}. Test fails with <code>RestconfDocumentedException</code> checking
-     * error type, error tag and error status code.
-     */
-    @Test
-    public void restconfMappingNodeMissingNameNegativeTest() {
-        try {
-            RestconfMappingNodeUtil.restconfMappingNode(
-                    getTestingRestconfModule("restconf-module-with-missing-leaf-name-in-list-module"),
-                    RestconfMappingNodeUtilTest.modules);
-            fail("Test should fail due to missing leaf "
-                    + RestconfMappingNodeConstants.NAME
-                    + " in "
-                    + RestconfModule.MODULE_LIST_SCHEMA_NODE
-                    + " node");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     * {@link RestconfModule#MODULE_LIST_SCHEMA_NODE} in Restconf module does not contain any child with name
-     * {@link RestconfMappingNodeConstants#REVISION}. Test fails with <code>RestconfDocumentedException</code> checking
-     * error type, error tag and error status code.
-     */
-    @Test
-    public void restconfMappingNodeMissingRevisionNegativeTest() {
-        try {
-            RestconfMappingNodeUtil.restconfMappingNode(
-                    getTestingRestconfModule("restconf-module-with-missing-leaf-revision-in-list-module"),
-                    RestconfMappingNodeUtilTest.modules);
-            fail("Test should fail due to missing leaf "
-                    + RestconfMappingNodeConstants.REVISION
-                    + " in "
-                    + RestconfModule.MODULE_LIST_SCHEMA_NODE
-                    + " node");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     * {@link RestconfModule#MODULE_LIST_SCHEMA_NODE} in Restconf module does not contain any child with name
-     * {@link RestconfMappingNodeConstants#NAMESPACE}. Test fails with <code>RestconfDocumentedException</code>
-     * checking error type, error tag and error status code.
-     */
-    @Test
-    public void restconfMappingNodeMissingNamespaceNegativeTest() {
-        try {
-            RestconfMappingNodeUtil.restconfMappingNode(
-                    getTestingRestconfModule("restconf-module-with-missing-leaf-namespace-in-list-module"),
-                    RestconfMappingNodeUtilTest.modules);
-            fail("Test should fail due to missing leaf "
-                    + RestconfMappingNodeConstants.NAMESPACE
-                    + " in "
-                    + RestconfModule.MODULE_LIST_SCHEMA_NODE
-                    + " node");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     * {@link RestconfModule#MODULE_LIST_SCHEMA_NODE} in Restconf module does not contain any child with name
-     * {@link RestconfMappingNodeConstants#FEATURE}. Test fails with <code>RestconfDocumentedException</code> checking
-     * error type, error tag and error status code.
-     */
-    @Test
-    public void restconfMappingNodeMissingFeaturesNegativeTest() {
-        try {
-            RestconfMappingNodeUtil.restconfMappingNode(
-                    getTestingRestconfModule("restconf-module-with-missing-leaf-list-feature-in-list-module"),
-                    RestconfMappingNodeUtilTest.modules);
-            fail("Test should fail due to missing leaf "
-                    + RestconfMappingNodeConstants.FEATURE
-                    + " in "
-                    + RestconfModule.MODULE_LIST_SCHEMA_NODE
-                    + " node");
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     *
-     * {@link RestconfModule#MODULE_LIST_SCHEMA_NODE} in Restconf module contains child with name
-     * {@link RestconfMappingNodeConstants#NAME} but it is not of type leaf. Test fails with
-     * <code>IllegalStateException</code>.
-     */
-    @Test
-    public void restconfMappingNodeIllegalNameNegativeTest() {
-        thrown.expect(IllegalStateException.class);
-        RestconfMappingNodeUtil.restconfMappingNode(
-                getTestingRestconfModule("restconf-module-with-illegal-leaf-name-in-list-module"),
-                RestconfMappingNodeUtilTest.modules);
-    }
-
-    /**
-     *
-     * {@link RestconfModule#MODULE_LIST_SCHEMA_NODE} in Restconf module contains child with name
-     * {@link RestconfMappingNodeConstants#REVISION} but it is not of type leaf. Test fails with
-     * <code>IllegalStateException</code>.
-     */
-    @Test
-    public void restconfMappingNodeIllegalRevisionNegativeTest() {
-        thrown.expect(IllegalStateException.class);
-        RestconfMappingNodeUtil.restconfMappingNode(
-                getTestingRestconfModule("restconf-module-with-illegal-leaf-revision-in-list-module"),
-                RestconfMappingNodeUtilTest.modules);
-    }
-
-    /**
-     * {@link RestconfModule#MODULE_LIST_SCHEMA_NODE} in Restconf module contains child with name
-     * {@link RestconfMappingNodeConstants#NAMESPACE} but it is not of type leaf. Test fails with
-     * <code>IllegalStateException</code>.
-     */
-    @Test
-    public void restconfMappingNodeIllegalNamespaceNegativeTest() {
-        thrown.expect(IllegalStateException.class);
-        RestconfMappingNodeUtil.restconfMappingNode(
-                getTestingRestconfModule("restconf-module-with-illegal-leaf-namespace-in-list-module"),
-                RestconfMappingNodeUtilTest.modules);
-    }
-
-    /**
-     * Module list in Restconf module contains child with name {@link RestconfMappingNodeConstants#FEATURE} but it is
-     * not of type leaf-list. Test fails with <code>IllegalStateException</code>.
-     */
-    @Test
-    public void restconfMappingNodeIllegalFeatureNegativeTest() {
-        thrown.expect(IllegalStateException.class);
-        RestconfMappingNodeUtil.restconfMappingNode(
-                getTestingRestconfModule("restconf-module-with-illegal-leaf-list-feature-in-list-module"),
-                RestconfMappingNodeUtilTest.modules);
-    }
-
-    /**
-     * Try to map streams when {@link MonitoringModule#STREAM_LIST_SCHEMA_NODE} is <code>null</code>.
-     * Test is expected to fail catching <code>IllegalStateException</code>.
-     */
-    @Test
-    public void toStreamEntryNodeNullListStreamNegativeTest() {
-        thrown.expect(IllegalStateException.class);
-        RestconfMappingNodeUtil.toStreamEntryNode("stream-1", null);
-    }
-
-    /**
-     * Test trying to map streams to {@link MonitoringModule#STREAM_LIST_SCHEMA_NODE} which is not of type list.
-     * Test is expected to fail with <code>IllegalStateException</code>.
-     */
-    @Test
-    public void toStreamEntryNodeIllegalListStreamNegativeTest() {
-        thrown.expect(IllegalStateException.class);
-        RestconfMappingNodeUtil.toStreamEntryNode("stream-1", mock(LeafSchemaNode.class));
-    }
-
-    /**
-     * Test case with target {@link MonitoringModule#STREAM_LIST_SCHEMA_NODE} which does not contain any child nodes.
-     * Test is catching <code>RestconfDocumentedException</code> and error type, error tag and error status code are
-     * compared to expected values.
-     */
-    @Test
-    public void toStreamEntryNodeSchemaNodeWithoutChildsNegativeTest() {
-        final ListSchemaNode mockListNode = mock(ListSchemaNode.class);
-        when(mockListNode.getChildNodes()).thenReturn(Collections.EMPTY_SET);
-
-       try {
-           RestconfMappingNodeUtil.toStreamEntryNode("stream-1", mockListNode);
-           fail("Test should fail due to no child nodes in"
-                   + MonitoringModule.STREAM_LIST_SCHEMA_NODE
-                   + " node");
-       } catch (final RestconfDocumentedException e) {
-           assertEquals("Error type is not correct",
-                   ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-           assertEquals("Error tag is not correct",
-                   ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-           assertEquals("Error status code is not correct",
-                   404, e.getErrors().get(0).getErrorTag().getStatusCode());
-       }
-    }
-
-    /**
-     * Test case when target list stream does not contain child with name {@link RestconfMappingNodeConstants#NAME}.
-     * Test is catching <code>RestconfDocumentedException</code> and error type, error tag and error status code are
-     * compared to expected values.
-     */
-    @Test
-    public void toStreamEntryNodeMissingStreamNameNegativeTest() {
-        prepareMockListWithMissingLeaf(this.leafName);
-
-        try {
-            RestconfMappingNodeUtil.toStreamEntryNode("stream-1", this.mockStreamList);
-            fail("Test should fail due to missing "
-                    + RestconfMappingNodeConstants.NAME
-                    + " node in " + MonitoringModule.STREAM_LIST_SCHEMA_NODE);
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     * Test case when target list stream does not contain child with name
-     * {@link RestconfMappingNodeConstants#DESCRIPTION}. Test is catching <code>RestconfDocumentedException</code> and
-     * checking error type and error tag.
-     */
-    @Test
-    public void toStreamEntryNodeMissingStreamDescriptionNegativeTest() {
-        prepareMockListWithMissingLeaf(this.leafDescription);
-
-        try {
-            RestconfMappingNodeUtil.toStreamEntryNode("stream-1", this.mockStreamList);
-            fail("Test should fail due to missing "
-                    + RestconfMappingNodeConstants.DESCRIPTION
-                    + " node in " + MonitoringModule.STREAM_LIST_SCHEMA_NODE);
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     * Test case when target list stream does not contain child with name
-     * {@link RestconfMappingNodeConstants#REPLAY_SUPPORT}. Test is catching <code>RestconfDocumentedException</code>
-     * and checking error type and error tag.
-     */
-    @Test
-    public void toStreamEntryNodeMissingStreamReplaySupportNegativeTest() {
-        prepareMockListWithMissingLeaf(this.leafReplaySupport);
-
-        try {
-            RestconfMappingNodeUtil.toStreamEntryNode("stream-1", this.mockStreamList);
-            fail("Test should fail due to missing "
-                    + RestconfMappingNodeConstants.REPLAY_SUPPORT
-                    + " node in " + MonitoringModule.STREAM_LIST_SCHEMA_NODE);
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     * Test case when target list stream does not contain child with name
-     * {@link RestconfMappingNodeConstants#REPLAY_LOG}. Test is catching <code>RestconfDocumentedException</code> and
-     * checking error type and error tag.
-     */
-    @Test
-    public void toStreamEntryNodeMissingStreamReplayLogNegativeTest() {
-        prepareMockListWithMissingLeaf(this.leafReplayLog);
-
-        try {
-            RestconfMappingNodeUtil.toStreamEntryNode("stream-1", this.mockStreamList);
-            fail("Test should fail due to missing "
-                    + RestconfMappingNodeConstants.REPLAY_LOG
-                    + " node in " + MonitoringModule.STREAM_LIST_SCHEMA_NODE);
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     * Test case when target list stream does not contain child with name {@link RestconfMappingNodeConstants#EVENTS}.
-     * Test is catching <code>RestconfDocumentedException</code> and checking error type, error tag and error status
-     * code.
-     */
-    @Test
-    public void toStreamEntryNodeMissingStreamEventsNegativeTest() {
-        prepareMockListWithMissingLeaf(this.leafEvents);
-
-        try {
-            RestconfMappingNodeUtil.toStreamEntryNode("stream-1", this.mockStreamList);
-            fail("Test should fail due to missing "
-                    + RestconfMappingNodeConstants.EVENTS
-                    + " node in " + MonitoringModule.STREAM_LIST_SCHEMA_NODE);
-        } catch (final RestconfDocumentedException e) {
-            assertEquals("Error type is not correct",
-                    ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-            assertEquals("Error tag is not correct",
-                    ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Error status code is not correct",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
-        }
-    }
-
-    /**
-     * Test case when target list stream contains child with name {@link RestconfMappingNodeConstants#NAME}. Test is
-     * expecting <code>IllegalStateException</code>.
-     */
-    @Test
-    public void toStreamEntryNodeStreamNameNegativeTest() {
-        prepareMockListWithIllegalLeaf(this.leafName);
-
-        thrown.expect(IllegalStateException.class);
-        RestconfMappingNodeUtil.toStreamEntryNode("stream-1", this.mockStreamList);
-    }
-
-    /**
-     * Test case when target list stream contains child with name {@link RestconfMappingNodeConstants#DESCRIPTION}.
-     * Test is expecting <code>IllegalStateException</code>.
-     */
-    @Test
-    public void toStreamEntryNodeStreamDescriptionNegativeTest() {
-        prepareMockListWithIllegalLeaf(this.leafDescription);
-
-        thrown.expect(IllegalStateException.class);
-        RestconfMappingNodeUtil.toStreamEntryNode("stream-1", this.mockStreamList);
-    }
-
-    /**
-     * Test case when target list stream contains child with name {@link RestconfMappingNodeConstants#REPLAY_SUPPORT}.
-     * Test is expecting <code>IllegalStateException</code>.
-     */
-    @Test
-    public void toStreamEntryNodeStreamReplaySupportNegativeTest() {
-        prepareMockListWithIllegalLeaf(this.leafReplaySupport);
-
-        thrown.expect(IllegalStateException.class);
-        RestconfMappingNodeUtil.toStreamEntryNode("stream-1", this.mockStreamList);
-    }
-
-    /**
-     * Test case when target list stream contains child with name {@link RestconfMappingNodeConstants#REPLAY_LOG}.
-     * Test is expecting <code>IllegalStateException</code>.
-     */
-    @Test
-    public void toStreamEntryNodeStreamReplayLogNegativeTest() {
-        prepareMockListWithIllegalLeaf(this.leafReplayLog);
-
-        thrown.expect(IllegalStateException.class);
-        RestconfMappingNodeUtil.toStreamEntryNode("stream-1", this.mockStreamList);
-    }
-
-    /**
-     * Test case when target list stream contains child with name {@link RestconfMappingNodeConstants#EVENTS}. Test is
-     * expecting <code>IllegalStateException</code>.
-     */
-    @Test
-    public void toStreamEntryNodeStreamEventsNegativeTest() {
-        prepareMockListWithIllegalLeaf(this.leafEvents);
-
-        thrown.expect(IllegalStateException.class);
-        RestconfMappingNodeUtil.toStreamEntryNode("stream-1", this.mockStreamList);
-    }
-
-    /**
-     * Utils
-     */
-
-    /**
-     * Verify loaded modules from Restconf module
-     * @param modules Returned modules node
-     */
-    private void verifyLoadedModules(final MapNode modules) {
-        final Iterator<MapEntryNode> iterator = modules.getValue().iterator();
-        final Map<String, String> loadedModules = new HashMap<>();
-
-        while (iterator.hasNext()) {
-            final Iterator entries = ((AbstractImmutableDataContainerAttrNode) iterator.next())
-                    .getChildren().entrySet().iterator();
-
-            String name = null;
-            String revision = null;
-
-            boolean notAllowedKey = false;
-            while (entries.hasNext()) {
-                final Entry e = ((AbstractMap.SimpleImmutableEntry) entries.next());
-                final String key = ((YangInstanceIdentifier.NodeIdentifier) e.getKey()).getNodeType().getLocalName();
-
-                switch (key) {
-                    case RestconfMappingNodeConstants.NAME:
-                        name = (String) ((LeafNode) e.getValue()).getValue();
-                        break;
-                    case RestconfMappingNodeConstants.REVISION:
-                        revision = (String) ((LeafNode) e.getValue()).getValue();
-                        break;
-                    case RestconfMappingNodeConstants.NAMESPACE:
-                        // fall through
-                    case RestconfMappingNodeConstants.FEATURE:
-                        break;
-                    default:
-                        notAllowedKey = true;
-                        break;
+        for (final DataContainerChild<? extends PathArgument, ?> child : ((ContainerNode) normNode).getValue()) {
+            if (child.getNodeType().equals(MonitoringModule.CONT_CAPABILITES_QNAME)) {
+                for (final DataContainerChild<? extends PathArgument, ?> dataContainerChild : ((ContainerNode) child)
+                        .getValue()) {
+                    for (final Object entry : ((LeafSetNode) dataContainerChild).getValue()) {
+                        listOfValues.add(((LeafSetEntryNode) entry).getValue());
+                    }
                 }
             }
+        }
+        Assert.assertTrue(listOfValues.contains(QueryParams.DEPTH));
+        Assert.assertTrue(listOfValues.contains(QueryParams.FIELDS));
+        Assert.assertTrue(listOfValues.contains(QueryParams.FILTER));
+        Assert.assertTrue(listOfValues.contains(QueryParams.REPLAY));
+        Assert.assertTrue(listOfValues.contains(QueryParams.WITH_DEFAULTS));
+    }
 
-            assertFalse("Not allowed key in list module found", notAllowedKey);
-            loadedModules.put(name, revision);
+    @Test
+    public void toStreamEntryNodeTest() throws Exception {
+        final YangInstanceIdentifier path =
+                ParserIdentifier.toInstanceIdentifier("nested-module:depth1-cont/depth2-leaf1", schemaContextMonitoring, null).getInstanceIdentifier();
+        final Date start = new Date();
+        final String outputType = "XML";
+        final URI uri = new URI("uri");
+        final Module monitoringModule = schemaContextMonitoring
+                .findModuleByNamespaceAndRevision(MonitoringModule.URI_MODULE, MonitoringModule.DATE);
+        final boolean exist = true;
+
+        final Map<QName, Object> map =
+                prepareMap(path.getLastPathArgument().getNodeType().getLocalName(), uri, start, outputType);
+
+        final NormalizedNode mappedData = RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(path, start, outputType, uri,
+                monitoringModule, exist, schemaContextMonitoring);
+        assertNotNull(mappedData);
+        testData(map, mappedData);
+    }
+
+    @Test
+    public void toStreamEntryNodeNotifiTest() throws Exception {
+        final Date start = new Date();
+        final String outputType = "JSON";
+        final URI uri = new URI("uri");
+        final Module monitoringModule = schemaContextMonitoring
+                .findModuleByNamespaceAndRevision(MonitoringModule.URI_MODULE, MonitoringModule.DATE);
+        final boolean exist = true;
+
+        final Map<QName, Object> map = prepareMap("notifi", uri, start, outputType);
+        map.put(MonitoringModule.LEAF_DESCR_STREAM_QNAME, "Notifi");
+
+        final QName notifiQName = QName.create("urn:nested:module", "2014-06-3", "notifi");
+        final NormalizedNode mappedData =
+                RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(notifiQName, schemaContextMonitoring.getNotifications(), start,
+                        outputType, uri, monitoringModule, exist);
+        assertNotNull(mappedData);
+        testData(map, mappedData);
+    }
+
+    private Map<QName, Object> prepareMap(final String name, final URI uri, final Date start, final String outputType) {
+        final Map<QName, Object> map = new HashMap<>();
+        map.put(MonitoringModule.LEAF_NAME_STREAM_QNAME, name);
+        map.put(MonitoringModule.LEAF_LOCATION_ACCESS_QNAME, uri.toString());
+        map.put(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME, true);
+        map.put(MonitoringModule.LEAF_START_TIME_STREAM_QNAME,
+                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'XXX").format(start));
+        map.put(MonitoringModule.LEAF_ENCODING_ACCESS_QNAME, outputType);
+        return map;
+    }
+
+    private void testData(final Map<QName, Object> map, final NormalizedNode mappedData) {
+        for (final DataContainerChild<? extends PathArgument, ?> child : ((MapEntryNode) mappedData).getValue()) {
+            if (child instanceof LeafNode) {
+                final LeafNode leaf = ((LeafNode) child);
+                Assert.assertTrue(map.containsKey(leaf.getNodeType()));
+                Assert.assertEquals(map.get(leaf.getNodeType()), leaf.getValue());
+            }
+        }
+    }
+
+    /**
+     * Verify loaded modules
+     *
+     * @param containerNode
+     *            - modules
+     */
+    private void verifyLoadedModules(final ContainerNode containerNode) {
+
+        final Map<String, String> loadedModules = new HashMap<>();
+
+        for (final DataContainerChild<? extends PathArgument, ?> child : containerNode.getValue()) {
+            if (child instanceof LeafNode) {
+                assertEquals(IetfYangLibrary.MODULE_SET_ID_LEAF_QNAME, ((LeafNode) child).getNodeType());
+            }
+            if (child instanceof MapNode) {
+                assertEquals(IetfYangLibrary.MODULE_QNAME_LIST, ((MapNode) child).getNodeType());
+                for (final MapEntryNode mapEntryNode : ((MapNode) child).getValue()) {
+                    String name = "";
+                    String revision = "";
+                    for (final DataContainerChild<? extends PathArgument, ?> dataContainerChild : mapEntryNode
+                            .getValue()) {
+                        switch (dataContainerChild.getNodeType().getLocalName()) {
+                            case IetfYangLibrary.SPECIFIC_MODULE_NAME_LEAF:
+                                name = String.valueOf(((LeafNode) dataContainerChild).getValue());
+                                break;
+                            case IetfYangLibrary.SPECIFIC_MODULE_REVISION_LEAF:
+                                revision = String.valueOf(((LeafNode) dataContainerChild).getValue());
+                                break;
+                        }
+                    }
+                    loadedModules.put(name, revision);
+                }
+            }
         }
 
-        verifyLoadedModules(RestconfMappingNodeUtilTest.modules, loadedModules);
+        verifyLoadedModules(RestconfMappingNodeUtilTest.modulesRest, loadedModules);
     }
 
     /**
@@ -700,94 +253,5 @@ public class RestconfMappingNodeUtilTest {
 
             loadedModules.remove(name);
         }
-    }
-
-    /**
-     * Verify if a stream was correctly written into {@link MonitoringModule#STREAM_LIST_SCHEMA_NODE} node in Restconf
-     * module.
-     * @param streamName Expected stream name
-     * @param streamNode Writetn strem node from Restconf module
-     */
-    private final void verifyStream(final String streamName, final MapEntryNode streamNode) {
-        assertNotNull("Stream node can not be null", streamNode);
-        final Iterator entries = ((AbstractImmutableDataContainerAttrNode) streamNode)
-                .getChildren().entrySet().iterator();
-        boolean notAllowedKey = false;
-
-        while (entries.hasNext()) {
-            final Entry e = ((AbstractMap.SimpleImmutableEntry) entries.next());
-            final String key = ((YangInstanceIdentifier.NodeIdentifier) e.getKey()).getNodeType().getLocalName();
-
-            switch (key) {
-                case RestconfMappingNodeConstants.NAME :
-                    assertEquals("Stream name value is not as expected",
-                            streamName, ((LeafNode) e.getValue()).getValue());
-                    break;
-                case RestconfMappingNodeConstants.DESCRIPTION :
-                    assertEquals("Stream description value is not as expected",
-                            RestconfMappingStreamConstants.DESCRIPTION, ((LeafNode) e.getValue()).getValue());
-                    break;
-                case RestconfMappingNodeConstants.REPLAY_SUPPORT :
-                    assertEquals("Stream replay support value is not as expected",
-                            RestconfMappingStreamConstants.REPLAY_SUPPORT, ((LeafNode) e.getValue()).getValue());
-                    break;
-                case RestconfMappingNodeConstants.REPLAY_LOG :
-                    assertEquals("Stream replay log value is not as expected",
-                            RestconfMappingStreamConstants.REPLAY_LOG, ((LeafNode) e.getValue()).getValue());
-                    break;
-                case RestconfMappingNodeConstants.EVENTS :
-                    assertEquals("Stream events value is not as expected",
-                            RestconfMappingStreamConstants.EVENTS, ((LeafNode) e.getValue()).getValue());
-                    break;
-                default:
-                    notAllowedKey = true;
-                    break;
-            }
-        }
-
-        assertFalse("Not allowed key in list stream found", notAllowedKey);
-    }
-
-    /**
-     * There are multiple testing Restconf modules for different test cases. It is possible to distinguish them by
-     * name or by namespace. This method is looking for Restconf test module by its name.
-     * @param s Testing Restconf module name
-     * @return Restconf module
-     */
-    private Module getTestingRestconfModule(final String s) {
-        return RestconfMappingNodeUtilTest.schemaContext.findModuleByName(
-                s, Draft17.RestconfModule.IETF_RESTCONF_QNAME.getRevision());
-    }
-
-    /**
-     * Updates {@link this#mockStreamList} to NOT contains specified leaf.
-     * @param leaf Leaf to be missing
-     */
-    private void prepareMockListWithMissingLeaf(final LeafSchemaNode leaf) {
-        // prepare set of leaf without selected leaf
-        final Set childLeafs = new HashSet<>(this.allStreamChildNodes);
-        childLeafs.remove(leaf);
-
-        // mock list leaf nodes
-        when(this.mockStreamList.getChildNodes()).thenReturn(childLeafs);
-    }
-
-    /**
-     * Updates {@link this#mockStreamList} to contains specified leaf which is not of type {@link LeafSchemaNode}.
-     * @param leaf Leaf to be changes
-     */
-    private void prepareMockListWithIllegalLeaf(final LeafSchemaNode leaf) {
-        // prepare set of leaf without selected leaf
-        final Set childLeafs = new HashSet<>(this.allStreamChildNodes);
-        childLeafs.remove(leaf);
-
-        // add leaf-list with the same local name as removed leaf
-        final String localName = leaf.getQName().getLocalName();
-        final LeafListSchemaNode mockLeafList = mock(LeafListSchemaNode.class);
-        when(mockLeafList.getQName()).thenReturn(QName.create("", localName));
-        childLeafs.add(mockLeafList);
-
-        // mock list leaf nodes
-        when(this.mockStreamList.getChildNodes()).thenReturn(childLeafs);
     }
 }

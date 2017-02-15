@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.sal.rest.impl;
 
 import static org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter.UNKNOWN_SIZE;
-import com.google.common.annotations.Beta;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
@@ -44,8 +44,11 @@ import org.slf4j.LoggerFactory;
  * the opposite of a {@link javax.xml.stream.XMLStreamReader} -- unlike instantiating an iterator over
  * the backing data, this encapsulates a {@link NormalizedNodeStreamWriter} and allows
  * us to write multiple nodes.
+ *
+ * @deprecated This class will be replaced by
+ * {@link org.opendaylight.restconf.jersey.providers.ParameterAwareNormalizedNodeWriter}
  */
-@Beta
+@Deprecated
 public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWriter {
     private final NormalizedNodeStreamWriter writer;
     protected int currentDepth = 0;

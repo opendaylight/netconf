@@ -3,6 +3,7 @@ This component offers Swagger documentation of the RestConf APIs.
 This Swagger documentation can be accessed in two ways:
 I. Running server
 Open a browser and go to http://<host>:8181/apidoc/explorer/index.html
+For new restconf draft go to http://<host>:8181/apidoc/17/explorer/index.html
 
 II. Static documentation generation
 By adding a reference to the StaticDocGenerator class in any pom.xml,

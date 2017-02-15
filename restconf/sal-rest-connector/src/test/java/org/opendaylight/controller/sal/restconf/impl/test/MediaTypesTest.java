@@ -27,6 +27,7 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
@@ -142,19 +143,27 @@ public class MediaTypesTest extends JerseyTest {
         final String uriPrefix = "/config/";
         final String uriPath = "ietf-interfaces:interfaces";
         final String uri = uriPrefix + uriPath;
-        when(restconfService.updateConfigurationData(eq(uriPath), any(NormalizedNodeContext.class))).thenReturn(null);
+        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        when(restconfService.updateConfigurationData(eq(uriPath), any(NormalizedNodeContext.class), uriInfo))
+                .thenReturn(null);
         put(uri, null, Draft02.MediaTypes.DATA + JSON, jsonData);
-        verify(restconfService, times(1)).updateConfigurationData(eq(uriPath), any(NormalizedNodeContext.class));
+        verify(restconfService, times(1)).updateConfigurationData(eq(uriPath), any(NormalizedNodeContext.class),
+                uriInfo);
         put(uri, null, Draft02.MediaTypes.DATA + XML, xmlData);
-        verify(restconfService, times(2)).updateConfigurationData(eq(uriPath), any(NormalizedNodeContext.class));
+        verify(restconfService, times(2)).updateConfigurationData(eq(uriPath), any(NormalizedNodeContext.class),
+                uriInfo);
         put(uri, null, MediaType.APPLICATION_JSON, jsonData);
-        verify(restconfService, times(3)).updateConfigurationData(eq(uriPath), any(NormalizedNodeContext.class));
+        verify(restconfService, times(3)).updateConfigurationData(eq(uriPath), any(NormalizedNodeContext.class),
+                uriInfo);
         put(uri, null, MediaType.APPLICATION_XML, xmlData);
-        verify(restconfService, times(4)).updateConfigurationData(eq(uriPath), any(NormalizedNodeContext.class));
+        verify(restconfService, times(4)).updateConfigurationData(eq(uriPath), any(NormalizedNodeContext.class),
+                uriInfo);
         put(uri, null, MediaType.TEXT_XML, xmlData);
-        verify(restconfService, times(5)).updateConfigurationData(eq(uriPath), any(NormalizedNodeContext.class));
+        verify(restconfService, times(5)).updateConfigurationData(eq(uriPath), any(NormalizedNodeContext.class),
+                uriInfo);
         put(uri, "fooMediaType", MediaType.TEXT_XML, xmlData);
-        verify(restconfService, times(6)).updateConfigurationData(eq(uriPath), any(NormalizedNodeContext.class));
+        verify(restconfService, times(6)).updateConfigurationData(eq(uriPath), any(NormalizedNodeContext.class),
+                uriInfo);
     }
 
     @Test
@@ -235,12 +244,12 @@ public class MediaTypesTest extends JerseyTest {
 
     private int post(final String uri, final String acceptMediaType, final String contentTypeMediaType, final String data) {
         if (acceptMediaType == null) {
-            if (contentTypeMediaType == null || data == null) {
+            if ((contentTypeMediaType == null) || (data == null)) {
                 return target(uri).request().post(null).getStatus();
             }
             return target(uri).request().post(Entity.entity(data, contentTypeMediaType)).getStatus();
         }
-        if (contentTypeMediaType == null || data == null) {
+        if ((contentTypeMediaType == null) || (data == null)) {
             return target(uri).request(acceptMediaType).post(null).getStatus();
         }
         return target(uri).request(acceptMediaType).post(Entity.entity(data, contentTypeMediaType)).getStatus();

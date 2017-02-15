@@ -25,6 +25,4 @@ public class RpcServiceHandler implements Handler<DOMRpcService> {
     public DOMRpcService get() {
         return this.rpcService;
     }
-
-
 }

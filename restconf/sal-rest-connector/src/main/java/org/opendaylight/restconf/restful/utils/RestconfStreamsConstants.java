@@ -59,6 +59,12 @@ public final class RestconfStreamsConstants {
 
     public static final String SCHEMA_SUBSCIBRE_URI = "ws";
 
+    public static final CharSequence DATA_SUBSCR = "data-change-event-subscription";
+    public static final CharSequence CREATE_DATA_SUBSCR = "create-" + DATA_SUBSCR;
+
+    public static final CharSequence NOTIFICATION_STREAM = "notification-stream";
+    public static final CharSequence CREATE_NOTIFICATION_STREAM = "create-" + NOTIFICATION_STREAM;
+
     static {
         Date eventSubscriptionAugRevision;
         try {
@@ -70,7 +76,8 @@ public final class RestconfStreamsConstants {
         }
         SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT, eventSubscriptionAugRevision);
         SAL_REMOTE_AUG_IDENTIFIER = new YangInstanceIdentifier.AugmentationIdentifier(Sets
-                .newHashSet(QName.create(SAL_REMOTE_AUGMENT, "scope"), QName.create(SAL_REMOTE_AUGMENT, "datastore")));
+                .newHashSet(QName.create(SAL_REMOTE_AUGMENT, "scope"), QName.create(SAL_REMOTE_AUGMENT, "datastore"),
+                        QName.create(SAL_REMOTE_AUGMENT, "notification-output-type")));
     }
 
     private RestconfStreamsConstants() {

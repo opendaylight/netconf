@@ -16,21 +16,21 @@ import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 
 /**
- * Wrapping providers from restconf draft02 and draft17.
+ * Wrapping providers from restconf draft02 and draft18.
  *
  */
 public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
 
     // DRAFT02
     private final RestconfProviderImpl providerDraft02;
-    // DRAFT17
-    private final RestConnectorProvider providerDraft17;
+    // DRAFT18
+    private final RestConnectorProvider providerDraft18;
 
     /**
      * Init both providers:
      * <ul>
      * <li>draft02 - {@link RestconfProviderImpl}
-     * <li>draft17 - {@link RestConnectorProvider}
+     * <li>draft18 - {@link RestConnectorProvider}
      * </ul>
      *
      * @param port
@@ -41,14 +41,14 @@ public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
         this.providerDraft02 = new RestconfProviderImpl();
         this.providerDraft02.setWebsocketPort(port);
 
-        this.providerDraft17 = new RestConnectorProvider();
+        this.providerDraft18 = new RestConnectorProvider();
     }
 
     /**
      * Register both providers, which will use the SAL layer:
      * <ul>
      * <li>draft02 - {@link RestconfProviderImpl}
-     * <li>draft17 - {@link RestConnectorProvider}
+     * <li>draft18 - {@link RestConnectorProvider}
      * </ul>
      *
      * @param broker
@@ -58,8 +58,8 @@ public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
         // Register draft02 provider
         broker.registerProvider(this.providerDraft02);
 
-        // Register draft17 provider
-        broker.registerProvider(this.providerDraft17);
+        // Register draft18 provider
+        broker.registerProvider(this.providerDraft18);
     }
 
     /**
@@ -77,7 +77,7 @@ public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
     @Override
     public void close() throws Exception {
         this.providerDraft02.close();
-        this.providerDraft17.close();
+        this.providerDraft18.close();
     }
 
 }

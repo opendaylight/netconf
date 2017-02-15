@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -28,12 +29,12 @@ import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
-import org.opendaylight.restconf.Draft17;
+import org.opendaylight.restconf.Rfc8040;
 import org.opendaylight.restconf.utils.RestconfConstants;
 
 @Provider
 @Produces({Draft02.MediaTypes.PATCH_STATUS + RestconfService.XML,
-        Draft17.MediaTypes.PATCH_STATUS + RestconfConstants.XML})
+        Rfc8040.MediaTypes.PATCH_STATUS + RestconfConstants.XML})
 public class PATCHXmlBodyWriter implements MessageBodyWriter<PATCHStatusContext> {
 
     private static final XMLOutputFactory XML_FACTORY;
@@ -62,7 +63,7 @@ public class PATCHXmlBodyWriter implements MessageBodyWriter<PATCHStatusContext>
             throws IOException, WebApplicationException {
 
         try {
-            final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream);
+            final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
             writeDocument(xmlWriter, patchStatusContext);
         } catch (final XMLStreamException e) {
             throw new IllegalStateException(e);

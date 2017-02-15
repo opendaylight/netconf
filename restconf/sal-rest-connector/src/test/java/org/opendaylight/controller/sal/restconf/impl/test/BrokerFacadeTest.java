@@ -22,7 +22,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.CheckedFuture;
@@ -32,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -47,6 +47,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.sal.core.api.Broker.ConsumerSession;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
@@ -61,6 +62,9 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
+import org.opendaylight.restconf.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.handlers.TransactionChainHandler;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -97,10 +101,10 @@ public class BrokerFacadeTest {
     private final BrokerFacade brokerFacade = BrokerFacade.getInstance();
     private final NormalizedNode<?, ?> dummyNode = createDummyNode("test:module", "2014-01-09", "interfaces");
     private final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> dummyNodeInFuture =
-            wrapDummyNode(dummyNode);
+            wrapDummyNode(this.dummyNode);
     private final QName qname = TestUtils.buildQName("interfaces","test:module", "2014-01-09");
-    private final SchemaPath type = SchemaPath.create(true, qname);
-    private final YangInstanceIdentifier instanceID = YangInstanceIdentifier.builder().node(qname).build();
+    private final SchemaPath type = SchemaPath.create(true, this.qname);
+    private final YangInstanceIdentifier instanceID = YangInstanceIdentifier.builder().node(this.qname).build();
 
     @Before
     public void setUp() throws Exception {
@@ -193,7 +197,7 @@ public class BrokerFacadeTest {
         when(this.rwTransaction.read(LogicalDatastoreType.CONFIGURATION, this.instanceID)).thenReturn(readFuture);
 
         final PutResult result = this.brokerFacade.commitConfigurationDataPut(mock(SchemaContext.class),
-                this.instanceID, this.dummyNode);
+                this.instanceID, this.dummyNode, null, null);
 
         final Future<Void> actualFuture = result.getFutureOfPutData();
 
@@ -216,7 +220,7 @@ public class BrokerFacadeTest {
         when(this.rwTransaction.submit()).thenReturn(expFuture);
 
         final CheckedFuture<Void, TransactionCommitFailedException> actualFuture = this.brokerFacade
-                .commitConfigurationDataPost(mock(SchemaContext.class), this.instanceID, this.dummyNode);
+                .commitConfigurationDataPost(mock(SchemaContext.class), this.instanceID, this.dummyNode, null, null);
 
         assertSame("commitConfigurationDataPost", expFuture, actualFuture);
 
@@ -234,7 +238,8 @@ public class BrokerFacadeTest {
                 .thenReturn(successFuture);
         try {
             // Schema context is only necessary for ensuring parent structure
-            this.brokerFacade.commitConfigurationDataPost((SchemaContext) null, this.instanceID, this.dummyNode);
+            this.brokerFacade.commitConfigurationDataPost((SchemaContext) null, this.instanceID, this.dummyNode, null,
+                    null);
         } catch (final RestconfDocumentedException e) {
             assertEquals("getErrorTag", RestconfError.ErrorTag.DATA_EXISTS, e.getErrors().get(0).getErrorTag());
             throw e;
@@ -299,7 +304,8 @@ public class BrokerFacadeTest {
 
     @Test
     public void testRegisterToListenDataChanges() {
-        final ListenerAdapter listener = Notificator.createListener(this.instanceID, "stream");
+        final ListenerAdapter listener = Notificator.createListener(this.instanceID, "stream",
+                NotificationOutputType.XML);
 
         @SuppressWarnings("unchecked")
         final ListenerRegistration<DOMDataChangeListener> mockRegistration = mock(ListenerRegistration.class);
@@ -324,7 +330,7 @@ public class BrokerFacadeTest {
      * Create, register, close and remove notification listener.
      */
     @Test
-    public void testRegisterToListenNotificationChanges() {
+    public void testRegisterToListenNotificationChanges() throws Exception {
         // create test notification listener
         final String identifier = "create-notification-stream/toaster:toastDone";
         final SchemaPath path = SchemaPath.create(true,
@@ -348,9 +354,19 @@ public class BrokerFacadeTest {
         // registrations should be invoked only once
         verify(this.domNotification, times(1)).registerNotificationListener(listener, listener.getSchemaPath());
 
+        final DOMTransactionChain transactionChain = mock(DOMTransactionChain.class);
+        final DOMDataWriteTransaction wTx = mock(DOMDataWriteTransaction.class);
+        final CheckedFuture checked = Futures.immediateCheckedFuture("");
+        when(wTx.submit()).thenReturn(checked);
+        when(transactionChain.newWriteOnlyTransaction()).thenReturn(wTx);
+        final TransactionChainHandler transactionChainHandler = new TransactionChainHandler(transactionChain);
+        final SchemaContextHandler schemaHandler = Mockito.mock(SchemaContextHandler.class);
+        final SchemaContext schCtx = TestUtils.loadSchemaContext("/modules");
+        when(schemaHandler.get()).thenReturn(schCtx);
+        listener.setCloseVars(transactionChainHandler, schemaHandler);
         // close and remove test notification listener
         listener.close();
-        Notificator.removeNotificationListenerIfNoSubscriberExists(listener);
+        Notificator.removeListenerIfNoSubscriberExists(listener);
     }
 
     /**

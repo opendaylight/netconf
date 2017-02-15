@@ -13,6 +13,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil.getRevisionFormat;
+import com.google.common.base.Preconditions;
 import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.util.Date;
@@ -21,8 +22,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
@@ -32,20 +33,26 @@ import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.model.api.AugmentationSchema;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.util.SchemaNodeUtils;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
@@ -66,13 +73,11 @@ public class URIParametersParsing {
     }
 
     @Test
-    @Ignore // URI parsing test - not able to catch a motivation + bad mocking response now - it needs to change Controller RPC table holder approach
     public void resolveURIParametersConcreteValues() {
         resolveURIParameters("OPERATIONAL", "SUBTREE", LogicalDatastoreType.OPERATIONAL, DataChangeScope.SUBTREE);
     }
 
     @Test
-    @Ignore // URI parsing test - not able to catch a motivation + bad mocking response now - it needs to change Controller RPC table holder approach
     public void resolveURIParametersDefaultValues() {
         resolveURIParameters(null, null, LogicalDatastoreType.CONFIGURATION, DataChangeScope.BASE);
     }
@@ -86,7 +91,7 @@ public class URIParametersParsing {
         final String datastoreValue = datastore == null ? "CONFIGURATION" : datastore;
         final String scopeValue = scope == null ? "BASE" : scope + "";
         Notificator.createListener(iiBuilder.build(), "dummyStreamName/datastore=" + datastoreValue + "/scope="
-                + scopeValue);
+                + scopeValue, NotificationOutputType.XML);
 
         final UriInfo mockedUriInfo = mock(UriInfo.class);
         @SuppressWarnings("unchecked")
@@ -99,16 +104,13 @@ public class URIParametersParsing {
          final UriBuilder uriBuilder = UriBuilder.fromUri("www.whatever.com");
          when(mockedUriInfo.getAbsolutePathBuilder()).thenReturn(uriBuilder);
 
-//       when(mockedBrokerFacade.invokeRpc(any(SchemaPath.class), any(NormalizedNode.class)))
-//       .thenReturn(Futures.<DOMRpcResult, DOMRpcException> immediateCheckedFuture(new DefaultDOMRpcResult(Builders.containerBuilder().build())));
-
         this.restconf.invokeRpc("sal-remote:create-data-change-event-subscription", prepareDomRpcNode(datastore, scope),
                 mockedUriInfo);
 
-        final ListenerAdapter listener = Notificator.getListenerFor("opendaylight-inventory:nodes/datastore="
+        final ListenerAdapter listener =
+                Notificator.getListenerFor("data-change-event-subscription/opendaylight-inventory:nodes/datastore="
                 + datastoreValue + "/scope=" + scopeValue);
         assertNotNull(listener);
-
     }
 
     private NormalizedNodeContext prepareDomRpcNode(final String datastore, final String scope) {
@@ -123,7 +125,9 @@ public class URIParametersParsing {
         final Module rpcSalRemoteModule = schema.findModuleByName("sal-remote", revDate);
         final Set<RpcDefinition> setRpcs = rpcSalRemoteModule.getRpcs();
         final QName rpcQName = QName.create(rpcSalRemoteModule.getQNameModule(), "create-data-change-event-subscription");
-        final QName rpcInputQName = QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote","2014-01-14","input");
+        final QName rpcInputQName =
+                QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "2014-01-14", "input");
+        final RpcDefinition rpcDef = Mockito.mock(RpcDefinition.class);
         ContainerSchemaNode rpcInputSchemaNode = null;
         for (final RpcDefinition rpc : setRpcs) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
@@ -133,29 +137,52 @@ public class URIParametersParsing {
         }
         assertNotNull("RPC ContainerSchemaNode was not found!", rpcInputSchemaNode);
 
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> container = Builders.containerBuilder(rpcInputSchemaNode);
+        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> container =
+                Builders.containerBuilder(rpcInputSchemaNode);
 
-        final QName pathQName = QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "2014-01-14", "path");
+        final QName pathQName =
+                QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "2014-01-14", "path");
         final DataSchemaNode pathSchemaNode = rpcInputSchemaNode.getDataChildByName(pathQName);
         assertTrue(pathSchemaNode instanceof LeafSchemaNode);
         final LeafNode<Object> pathNode = (Builders.leafBuilder((LeafSchemaNode) pathSchemaNode)
-                .withValue(YangInstanceIdentifier.builder().node(QName.create("urn:opendaylight:inventory", "2013-08-19", "nodes")).build())).build();
+                .withValue(YangInstanceIdentifier.builder()
+                        .node(QName.create("urn:opendaylight:inventory", "2013-08-19", "nodes")).build())).build();
         container.withChild(pathNode);
 
+        final AugmentationSchema augmentationSchema = rpcInputSchemaNode.getAvailableAugmentations().iterator().next();
+        Preconditions.checkNotNull(augmentationSchema);
+        final DataContainerNodeBuilder<AugmentationIdentifier, AugmentationNode> augmentationBuilder =
+                Builders.augmentationBuilder(augmentationSchema);
+
         final QName dataStoreQName = QName.create("urn:sal:restconf:event:subscription", "2014-7-8", "datastore");
-        final DataSchemaNode dsSchemaNode = rpcInputSchemaNode.getDataChildByName(dataStoreQName);
+        final DataSchemaNode dsSchemaNode = augmentationSchema.getDataChildByName(dataStoreQName);
         assertTrue(dsSchemaNode instanceof LeafSchemaNode);
         final LeafNode<Object> dsNode = (Builders.leafBuilder((LeafSchemaNode) dsSchemaNode)
                 .withValue(datastore)).build();
-        container.withChild(dsNode);
+        augmentationBuilder.withChild(dsNode);
 
         final QName scopeQName = QName.create("urn:sal:restconf:event:subscription", "2014-7-8", "scope");
-        final DataSchemaNode scopeSchemaNode = rpcInputSchemaNode.getDataChildByName(scopeQName);
+        final DataSchemaNode scopeSchemaNode = augmentationSchema.getDataChildByName(scopeQName);
         assertTrue(scopeSchemaNode instanceof LeafSchemaNode);
         final LeafNode<Object> scopeNode = (Builders.leafBuilder((LeafSchemaNode) scopeSchemaNode)
                 .withValue(scope)).build();
-        container.withChild(scopeNode);
+        augmentationBuilder.withChild(scopeNode);
 
-        return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpcInputSchemaNode, null, schema), container.build());
+        final QName outputQName =
+                QName.create("urn:sal:restconf:event:subscription", "2014-7-8", "notification-output-type");
+        final DataSchemaNode outputSchemaNode = augmentationSchema.getDataChildByName(outputQName);
+        assertTrue(outputSchemaNode instanceof LeafSchemaNode);
+        final LeafNode<Object> outputNode =
+                (Builders.leafBuilder((LeafSchemaNode) outputSchemaNode).withValue("XML")).build();
+        augmentationBuilder.withChild(outputNode);
+
+        container.withChild(augmentationBuilder.build());
+
+        when(rpcDef.getInput()).thenReturn(rpcInputSchemaNode);
+        when(rpcDef.getPath()).thenReturn(SchemaPath.create(true, rpcQName));
+        when(rpcDef.getQName()).thenReturn(rpcQName);
+
+        return new NormalizedNodeContext(new InstanceIdentifierContext<RpcDefinition>(null, rpcDef, null, schema),
+                container.build());
     }
 }
