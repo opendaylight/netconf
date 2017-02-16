@@ -21,6 +21,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.tree.ConflictingModificationAppliedException;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
@@ -77,6 +78,14 @@ public class SchemaContextHandler implements SchemaContextListenerHandler {
         try {
             wTx.submit().checkedGet();
         } catch (final TransactionCommitFailedException e) {
+            if (e.getCause() instanceof ConflictingModificationAppliedException) {
+                /*
+                  Ignore error when another node already putting the same data.
+                  This is workaround for bug:
+                  https://bugs.opendaylight.org/show_bug.cgi?id=7728
+                 */
+            }
+
             throw new RestconfDocumentedException("Problem occured while putting data to DS.", e);
         }
     }
