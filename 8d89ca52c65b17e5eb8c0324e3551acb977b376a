@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_7bf23ed3",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterContentValidator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-02-16T09:21:18Z",
+      "side": 1,
+      "message": "If you want to see this information, you can log the exception.",
+      "revId": "8d89ca52c65b17e5eb8c0324e3551acb977b376a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
