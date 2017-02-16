@@ -14,6 +14,7 @@ import akka.actor.ActorRef;
 import akka.cluster.Cluster;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
+import akka.util.Timeout;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -36,6 +37,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyContext.class);
 
     private final ServiceGroupIdentifier serviceGroupIdent;
+    private final Timeout actorResponseWaitTime;
     private NetconfTopologySetup netconfTopologyDeviceSetup;
     private RemoteDeviceId remoteDeviceId;
     private RemoteDeviceConnector remoteDeviceConnector;
@@ -46,14 +48,15 @@ class NetconfTopologyContext implements ClusterSingletonService {
     private ActorRef masterActorRef;
 
     NetconfTopologyContext(final NetconfTopologySetup netconfTopologyDeviceSetup,
-                           final ServiceGroupIdentifier serviceGroupIdent) {
+                           final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime) {
         this.netconfTopologyDeviceSetup = Preconditions.checkNotNull(netconfTopologyDeviceSetup);
         this.serviceGroupIdent = serviceGroupIdent;
+        this.actorResponseWaitTime = actorResponseWaitTime;
 
         remoteDeviceId = NetconfTopologyUtils.createRemoteDeviceId(netconfTopologyDeviceSetup.getNode().getNodeId(),
                 netconfTopologyDeviceSetup.getNode().getAugmentation(NetconfNode.class));
 
-        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId);
+        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime);
 
         netconfNodeManager = createNodeDeviceManager();
 
@@ -74,7 +77,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
         if (!finalClose) {
             final String masterAddress = Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
             masterActorRef = netconfTopologyDeviceSetup.getActorSystem().actorOf(NetconfNodeActor.props(
-                    netconfTopologyDeviceSetup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY),
+                    netconfTopologyDeviceSetup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY, actorResponseWaitTime),
                     NetconfTopologyUtils.createMasterActorName(remoteDeviceId.getName(), masterAddress));
 
             remoteDeviceConnector.startRemoteDeviceConnection(masterActorRef);
@@ -109,7 +112,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
     private NetconfNodeManager createNodeDeviceManager() {
         final NetconfNodeManager ndm =
                 new NetconfNodeManager(netconfTopologyDeviceSetup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY,
-                        DEFAULT_SCHEMA_REPOSITORY);
+                        DEFAULT_SCHEMA_REPOSITORY, actorResponseWaitTime);
         ndm.registerDataTreeChangeListener(netconfTopologyDeviceSetup.getTopologyId(),
                 netconfTopologyDeviceSetup.getNode().getKey());
 
@@ -148,11 +151,11 @@ class NetconfTopologyContext implements ClusterSingletonService {
         if (!isMaster) {
             netconfNodeManager.refreshDevice(netconfTopologyDeviceSetup, remoteDeviceId);
         }
-        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId);
+        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime);
 
         if (isMaster) {
             final Future<Object> future = Patterns.ask(masterActorRef, new RefreshSetupMasterActorData(
-                    netconfTopologyDeviceSetup, remoteDeviceId), NetconfTopologyUtils.TIMEOUT);
+                    netconfTopologyDeviceSetup, remoteDeviceId), actorResponseWaitTime);
 
             future.onComplete(new OnComplete<Object>() {
                 @Override

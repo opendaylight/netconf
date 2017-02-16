@@ -12,12 +12,12 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
+import akka.util.Timeout;
 import com.google.common.base.Optional;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
-import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.CancelRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.DeleteRequest;
@@ -43,13 +43,16 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
     private final RemoteDeviceId id;
     private final ActorSystem actorSystem;
     private final ActorRef masterContextRef;
+    private final Timeout actorResponseWaitTime;
 
     public NetconfProxyDOMTransaction(final RemoteDeviceId id,
                                       final ActorSystem actorSystem,
-                                      final ActorRef masterContextRef) {
+                                      final ActorRef masterContextRef,
+                                      final Timeout actorResponseWaitTime) {
         this.id = id;
         this.actorSystem = actorSystem;
         this.masterContextRef = masterContextRef;
+        this.actorResponseWaitTime = actorResponseWaitTime;
     }
 
     @Override
@@ -57,7 +60,7 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
                                                         final YangInstanceIdentifier path) {
 
         final Future<Object> readScalaFuture =
-                Patterns.ask(masterContextRef, new ReadRequest(store, path), NetconfTopologyUtils.TIMEOUT);
+                Patterns.ask(masterContextRef, new ReadRequest(store, path), actorResponseWaitTime);
 
         LOG.trace("{}: Read {} via NETCONF: {}", id, store, path);
 
@@ -91,7 +94,7 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
     @Override
     public Future<Boolean> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         final Future<Object> existsScalaFuture =
-                Patterns.ask(masterContextRef, new ExistsRequest(store, path), NetconfTopologyUtils.TIMEOUT);
+                Patterns.ask(masterContextRef, new ExistsRequest(store, path), actorResponseWaitTime);
 
         LOG.trace("{}: Exists {} via NETCONF: {}", id, store, path);
 
@@ -141,13 +144,13 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
     @Override
     public boolean cancel() {
         final Future<Object> cancelScalaFuture =
-                Patterns.ask(masterContextRef, new CancelRequest(), NetconfTopologyUtils.TIMEOUT);
+                Patterns.ask(masterContextRef, new CancelRequest(), actorResponseWaitTime);
 
         LOG.trace("{}: Cancel {} via NETCONF", id);
 
         try {
             // here must be Await because AsyncWriteTransaction do not return future
-            return (boolean) Await.result(cancelScalaFuture, NetconfTopologyUtils.TIMEOUT.duration());
+            return (boolean) Await.result(cancelScalaFuture, actorResponseWaitTime.duration());
         } catch (final Exception e) {
             return false;
         }
@@ -156,7 +159,7 @@ public class NetconfProxyDOMTransaction implements NetconfDOMTransaction {
     @Override
     public Future<Void> submit() {
         final Future<Object> submitScalaFuture =
-                Patterns.ask(masterContextRef, new SubmitRequest(), NetconfTopologyUtils.TIMEOUT);
+                Patterns.ask(masterContextRef, new SubmitRequest(), actorResponseWaitTime);
 
         LOG.trace("{}: Submit {} via NETCONF", id);
 
