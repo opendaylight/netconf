@@ -11,7 +11,6 @@ package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import org.junit.Assert;
@@ -26,7 +25,6 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 public class ReadWriteTxTest {
     @Mock
@@ -78,9 +76,9 @@ public class ReadWriteTxTest {
     @Test
     public void exists() throws Exception {
         final YangInstanceIdentifier id = TxTestUtils.getContainerId();
-        final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> resultFuture =
-                Futures.immediateCheckedFuture(Optional.of(TxTestUtils.getContainerNode()));
-        when(delegateReadTx.read(LogicalDatastoreType.CONFIGURATION, id)).thenReturn(resultFuture);
+        final CheckedFuture<Boolean, ReadFailedException> resultFuture =
+                Futures.immediateCheckedFuture(true);
+        when(delegateReadTx.exists(LogicalDatastoreType.CONFIGURATION, id)).thenReturn(resultFuture);
         final CheckedFuture<Boolean, ReadFailedException> exists = tx.exists(LogicalDatastoreType.CONFIGURATION, id);
         Assert.assertTrue(exists.get());
     }
