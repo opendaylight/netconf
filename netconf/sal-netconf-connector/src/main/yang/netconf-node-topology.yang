@@ -126,6 +126,15 @@ module netconf-node-topology {
             description "Limit of concurrent messages that can be send before reply messages are received.
                          If value <1 is provided, no limit will be enforced";
         }
+
+        leaf actor-response-wait-time {
+                    config true;
+                    type uint16 {
+                      range "1..max";
+                    }
+                    default 5;
+                    description "Time that slave actor will wait for response from master.";
+        }
     }
 
     grouping netconf-node-connection-status {

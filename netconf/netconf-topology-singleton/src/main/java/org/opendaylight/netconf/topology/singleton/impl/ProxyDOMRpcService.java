@@ -12,6 +12,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
+import akka.util.Timeout;
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
@@ -26,7 +27,6 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
-import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.SchemaPathMessage;
 import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessage;
@@ -48,12 +48,14 @@ public class ProxyDOMRpcService implements DOMRpcService {
     private final ActorRef masterActorRef;
     private final ActorSystem actorSystem;
     private final RemoteDeviceId id;
+    private final Timeout actorResponseWaitTime;
 
     public ProxyDOMRpcService(final ActorSystem actorSystem, final ActorRef masterActorRef,
-                              final RemoteDeviceId remoteDeviceId) {
+                              final RemoteDeviceId remoteDeviceId, final Timeout actorResponseWaitTime) {
         this.actorSystem = actorSystem;
         this.masterActorRef = masterActorRef;
         id = remoteDeviceId;
+        this.actorResponseWaitTime = actorResponseWaitTime;
     }
 
     @Nonnull
@@ -67,7 +69,7 @@ public class ProxyDOMRpcService implements DOMRpcService {
         final Future<Object> scalaFuture =
                 Patterns.ask(masterActorRef,
                         new InvokeRpcMessage(new SchemaPathMessage(type), normalizedNodeMessage),
-                        NetconfTopologyUtils.TIMEOUT);
+                        actorResponseWaitTime);
 
         final SettableFuture<DOMRpcResult> settableFuture = SettableFuture.create();
 
