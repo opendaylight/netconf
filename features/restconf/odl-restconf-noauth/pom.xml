@@ -95,7 +95,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.odlparent</groupId>
-            <artifactId>odl-karaf-feat-war</artifactId>
+            <artifactId>odl-karaf-feat-jetty</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
