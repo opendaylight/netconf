@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import akka.actor.ActorRef;
+import akka.util.Timeout;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -88,6 +89,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
      * synchronization locks.
      */
     private static final Map<String, NetconfDevice.SchemaResourcesDTO> schemaResourcesDTOs = new HashMap<>();
+    private final Timeout actorResponseWaitTime;
 
     // Initializes default constant instances for the case when the default schema repository
     // directory cache/schema is used.
@@ -111,10 +113,11 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     private NetconfConnectorDTO deviceCommunicatorDTO;
 
     public RemoteDeviceConnectorImpl(final NetconfTopologySetup netconfTopologyDeviceSetup,
-                                     final RemoteDeviceId remoteDeviceId) {
+                                     final RemoteDeviceId remoteDeviceId, final Timeout actorResponseWaitTime) {
 
         this.netconfTopologyDeviceSetup = Preconditions.checkNotNull(netconfTopologyDeviceSetup);
         this.remoteDeviceId = remoteDeviceId;
+        this.actorResponseWaitTime = actorResponseWaitTime;
     }
 
     @Override
@@ -170,7 +173,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade = new MasterSalFacade(remoteDeviceId,
                 netconfTopologyDeviceSetup.getDomBroker(), netconfTopologyDeviceSetup.getBindingAwareBroker(),
-                netconfTopologyDeviceSetup.getActorSystem(), deviceContextActorRef);
+                netconfTopologyDeviceSetup.getActorSystem(), deviceContextActorRef, actorResponseWaitTime);
         if (keepaliveDelay > 0) {
             LOG.info("{}: Adding keepalive facade.", remoteDeviceId);
             salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade,

@@ -131,6 +131,7 @@ public class NetconfTopologyManagerTest {
                 .setBetweenAttemptsTimeoutMillis(100)
                 .setSchemaless(false)
                 .setTcpOnly(false)
+                .setActorResponseWaitTime(10)
                 .build();
         final Node node = new NodeBuilder().setNodeId(new NodeId("node-id"))
                 .addAugmentation(NetconfNode.class, netconfNode).build();
@@ -251,7 +252,7 @@ public class NetconfTopologyManagerTest {
         private final DataTreeIdentifier<Node> rootPath;
         private final DataObjectModification<Node> rootNode;
 
-        CustomTreeModification(DataTreeIdentifier<Node> rootPath, DataObjectModification<Node> rootNode) {
+        CustomTreeModification(final DataTreeIdentifier<Node> rootPath, final DataObjectModification<Node> rootNode) {
             this.rootPath = rootPath;
             this.rootNode = rootNode;
         }
