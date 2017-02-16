@@ -12,6 +12,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 
 import akka.actor.ActorRef;
+import akka.util.Timeout;
 import com.google.common.util.concurrent.Futures;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
@@ -27,10 +28,11 @@ class TestingRemoteDeviceConnectorImpl extends RemoteDeviceConnectorImpl {
     private final RemoteDeviceHandler salFacade;
 
     TestingRemoteDeviceConnectorImpl(final NetconfTopologySetup netconfTopologyDeviceSetup,
-                                            final RemoteDeviceId remoteDeviceId,
-                                            final NetconfDeviceCommunicator communicator,
-                                            final RemoteDeviceHandler salFacade) {
-        super(netconfTopologyDeviceSetup, remoteDeviceId);
+                                     final RemoteDeviceId remoteDeviceId,
+                                     final NetconfDeviceCommunicator communicator,
+                                     final RemoteDeviceHandler salFacade,
+                                     final Timeout actorResponseWaitTime) {
+        super(netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime);
         this.communicator = communicator;
         this.salFacade = salFacade;
     }
@@ -38,7 +40,6 @@ class TestingRemoteDeviceConnectorImpl extends RemoteDeviceConnectorImpl {
     @Override
     public NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
                                                         final ActorRef deviceContextActorRef) {
-
         final NetconfConnectorDTO connectorDTO = new NetconfConnectorDTO(communicator, salFacade);
         doReturn(Futures.immediateCheckedFuture(null)).when(communicator).initializeRemoteConnection(any(), any());
         return connectorDTO;
