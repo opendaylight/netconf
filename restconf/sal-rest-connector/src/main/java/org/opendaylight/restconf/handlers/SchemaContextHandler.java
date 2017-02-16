@@ -21,8 +21,11 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.tree.ConflictingModificationAppliedException;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link SchemaContextHandler}
@@ -30,10 +33,12 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  */
 public class SchemaContextHandler implements SchemaContextListenerHandler {
 
+    private static final Logger LOG = LoggerFactory.getLogger(SchemaContextHandler.class);
+
+    private final TransactionChainHandler transactionChainHandler;
     private SchemaContext context;
 
     private int moduleSetId;
-    private final TransactionChainHandler transactionChainHandler;
 
     /**
      * Set module-set-id on initial value - 0
@@ -77,7 +82,16 @@ public class SchemaContextHandler implements SchemaContextListenerHandler {
         try {
             wTx.submit().checkedGet();
         } catch (final TransactionCommitFailedException e) {
-            throw new RestconfDocumentedException("Problem occured while putting data to DS.", e);
+            if (e.getCause() instanceof ConflictingModificationAppliedException) {
+                /*
+                  Ignore error when another cluster node is already putting the same data to DS.
+                  This is workaround for bug:
+                  https://bugs.opendaylight.org/show_bug.cgi?id=7728
+                */
+                LOG.warn("Ignoring that another cluster node is already putting the same data to DS.", e);
+            } else {
+                throw new RestconfDocumentedException("Problem occurred while putting data to DS.", e);
+            }
         }
     }
 }
