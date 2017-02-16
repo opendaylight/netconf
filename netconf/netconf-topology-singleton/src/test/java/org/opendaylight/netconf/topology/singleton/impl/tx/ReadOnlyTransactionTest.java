@@ -89,7 +89,7 @@ public class ReadOnlyTransactionTest {
 
         final NetconfTopologySetup setup = mock(NetconfTopologySetup.class);
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY,
-                DEFAULT_SCHEMA_REPOSITORY);
+                DEFAULT_SCHEMA_REPOSITORY, TIMEOUT);
 
         masterRef = TestActorRef.create(system, props, "master_read");
 
@@ -111,7 +111,7 @@ public class ReadOnlyTransactionTest {
         // Create slave data broker for testing proxy
 
         final NetconfDOMTransaction proxyDOMTransactions =
-                new NetconfProxyDOMTransaction(remoteDeviceId, system, masterRef);
+                new NetconfProxyDOMTransaction(remoteDeviceId, system, masterRef, TIMEOUT);
 
         slaveDataBroker = new NetconfDOMDataBroker(system, remoteDeviceId, proxyDOMTransactions);
 

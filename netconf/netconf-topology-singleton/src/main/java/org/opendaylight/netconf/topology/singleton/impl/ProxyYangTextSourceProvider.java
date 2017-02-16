@@ -13,12 +13,12 @@ import akka.actor.ActorRef;
 import akka.dispatch.Futures;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
+import akka.util.Timeout;
 import com.google.common.collect.Sets;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
-import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.YangTextSchemaSourceRequest;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import scala.concurrent.Future;
@@ -28,10 +28,13 @@ public class ProxyYangTextSourceProvider implements RemoteYangTextSourceProvider
 
     private final ActorRef masterRef;
     private final ActorContext actorContext;
+    private final Timeout actorResponseWaitTime;
 
-    public ProxyYangTextSourceProvider(final ActorRef masterRef, final ActorContext actorContext) {
+    public ProxyYangTextSourceProvider(final ActorRef masterRef, final ActorContext actorContext,
+                                       final Timeout actorResponseWaitTime) {
         this.masterRef = masterRef;
         this.actorContext = actorContext;
+        this.actorResponseWaitTime = actorResponseWaitTime;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class ProxyYangTextSourceProvider implements RemoteYangTextSourceProvider
             @Nonnull final SourceIdentifier sourceIdentifier) {
 
         final Future<Object> scalaFuture = Patterns.ask(masterRef,
-                new YangTextSchemaSourceRequest(sourceIdentifier), NetconfTopologyUtils.TIMEOUT);
+                new YangTextSchemaSourceRequest(sourceIdentifier), actorResponseWaitTime);
 
         final Promise.DefaultPromise<YangTextSchemaSourceSerializationProxy> promise = new Promise.DefaultPromise<>();
 

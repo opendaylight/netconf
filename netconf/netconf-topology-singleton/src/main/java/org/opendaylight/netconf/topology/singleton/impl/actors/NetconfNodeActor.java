@@ -11,6 +11,7 @@ package org.opendaylight.netconf.topology.singleton.impl.actors;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
+import akka.util.Timeout;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -68,6 +69,7 @@ import org.slf4j.LoggerFactory;
 public class NetconfNodeActor extends UntypedActor {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeActor.class);
+    private final Timeout actorResponseWaitTime;
 
     private NetconfTopologySetup setup;
     private RemoteDeviceId id;
@@ -81,18 +83,19 @@ public class NetconfNodeActor extends UntypedActor {
 
     public static Props props(final NetconfTopologySetup setup,
                               final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
-                              final SchemaRepository schemaRepository) {
+                              final SchemaRepository schemaRepository, final Timeout actorResponseWaitTime) {
         return Props.create(NetconfNodeActor.class, () ->
-                new NetconfNodeActor(setup, id, schemaRegistry, schemaRepository));
+                new NetconfNodeActor(setup, id, schemaRegistry, schemaRepository, actorResponseWaitTime));
     }
 
     private NetconfNodeActor(final NetconfTopologySetup setup,
-                             final RemoteDeviceId id, SchemaSourceRegistry schemaRegistry,
-                             final SchemaRepository schemaRepository) {
+                             final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
+                             final SchemaRepository schemaRepository, final Timeout actorResponseWaitTime) {
         this.setup = setup;
         this.id = id;
         this.schemaRegistry = schemaRegistry;
         this.schemaRepository = schemaRepository;
+        this.actorResponseWaitTime = actorResponseWaitTime;
     }
 
     @Override
@@ -192,7 +195,7 @@ public class NetconfNodeActor extends UntypedActor {
             public void onSuccess(final YangTextSchemaSource yangTextSchemaSource) {
                 try {
                     sender.tell(new YangTextSchemaSourceSerializationProxy(yangTextSchemaSource), getSelf());
-                } catch (IOException exception) {
+                } catch (final IOException exception) {
                     sender.tell(exception.getCause(), getSelf());
                 }
             }
@@ -232,11 +235,11 @@ public class NetconfNodeActor extends UntypedActor {
         });
     }
 
-    private void registerSlaveMountPoint(ActorRef masterReference) {
+    private void registerSlaveMountPoint(final ActorRef masterReference) {
         if (this.slaveSalManager != null) {
             slaveSalManager.close();
         }
-        slaveSalManager = new SlaveSalFacade(id, setup.getDomBroker(), setup.getActorSystem());
+        slaveSalManager = new SlaveSalFacade(id, setup.getDomBroker(), setup.getActorSystem(), actorResponseWaitTime);
 
         final CheckedFuture<SchemaContext, SchemaResolutionException> remoteSchemaContext =
                 getSchemaContext(masterReference);
@@ -256,14 +259,14 @@ public class NetconfNodeActor extends UntypedActor {
         });
     }
 
-    private DOMRpcService getDOMRpcService(ActorRef masterReference) {
-        return new ProxyDOMRpcService(setup.getActorSystem(), masterReference, id);
+    private DOMRpcService getDOMRpcService(final ActorRef masterReference) {
+        return new ProxyDOMRpcService(setup.getActorSystem(), masterReference, id, actorResponseWaitTime);
     }
 
-    private CheckedFuture<SchemaContext, SchemaResolutionException> getSchemaContext(ActorRef masterReference) {
+    private CheckedFuture<SchemaContext, SchemaResolutionException> getSchemaContext(final ActorRef masterReference) {
 
         final RemoteYangTextSourceProvider remoteYangTextSourceProvider =
-                new ProxyYangTextSourceProvider(masterReference, getContext());
+                new ProxyYangTextSourceProvider(masterReference, getContext(), actorResponseWaitTime);
         final RemoteSchemaProvider remoteProvider = new RemoteSchemaProvider(remoteYangTextSourceProvider,
                 getContext().dispatcher());
 

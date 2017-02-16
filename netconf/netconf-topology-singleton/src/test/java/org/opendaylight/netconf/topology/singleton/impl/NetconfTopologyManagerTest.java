@@ -86,7 +86,7 @@ public class NetconfTopologyManagerTest {
 
         netconfTopologyManager = new NetconfTopologyManager(dataBroker, rpcProviderRegistry,
                 clusterSingletonServiceProvider, bindingAwareBroker, keepaliveExecutor, processingExecutor, domBroker,
-                actorSystemProvider, eventExecutor, clientDispatcher, topologyId);
+                actorSystemProvider, eventExecutor, clientDispatcher, topologyId, 5);
     }
     @Test
     public void testWriteConfiguration() throws Exception {
@@ -251,7 +251,7 @@ public class NetconfTopologyManagerTest {
         private final DataTreeIdentifier<Node> rootPath;
         private final DataObjectModification<Node> rootNode;
 
-        CustomTreeModification(DataTreeIdentifier<Node> rootPath, DataObjectModification<Node> rootNode) {
+        CustomTreeModification(final DataTreeIdentifier<Node> rootPath, final DataObjectModification<Node> rootNode) {
             this.rootPath = rootPath;
             this.rootNode = rootNode;
         }
