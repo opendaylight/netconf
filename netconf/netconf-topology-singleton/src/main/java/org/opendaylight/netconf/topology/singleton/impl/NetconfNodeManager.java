@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.singleton.impl;
 
 import akka.actor.ActorRef;
 import akka.actor.PoisonPill;
+import akka.util.Timeout;
 import java.util.Collection;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.binding.api.ClusteredDataTreeChangeListener;
@@ -50,14 +51,16 @@ class NetconfNodeManager
     private final SchemaSourceRegistry schemaRegistry;
     private final SchemaRepository schemaRepository;
     private ActorRef slaveActorRef;
+    private final Timeout actorResponseWaitTime;
 
     NetconfNodeManager(final NetconfTopologySetup setup,
                        final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
-                       final SchemaRepository schemaRepository) {
+                       final SchemaRepository schemaRepository, final Timeout actorResponseWaitTime) {
         this.setup = setup;
         this.id = id;
         this.schemaRegistry = schemaRegistry;
         this.schemaRepository = schemaRepository;
+        this.actorResponseWaitTime = actorResponseWaitTime;
     }
 
     @Override
@@ -124,7 +127,7 @@ class NetconfNodeManager
                     NetconfTopologyUtils.createMasterActorName(id.getName(),
                             netconfNodeAfter.getClusteredConnectionStatus().getNetconfMasterNode()));
             setup.getActorSystem().actorSelection(path).tell(new AskForMasterMountPoint(), slaveActorRef);
-        } else {            ;
+        } else {
             closeActor();
         }
     }
@@ -132,7 +135,7 @@ class NetconfNodeManager
     private void createActorRef() {
         if (slaveActorRef == null) {
             slaveActorRef = setup.getActorSystem().actorOf(NetconfNodeActor.props(setup, id, schemaRegistry,
-                    schemaRepository), id.getName());
+                    schemaRepository, actorResponseWaitTime), id.getName());
         }
     }
 
