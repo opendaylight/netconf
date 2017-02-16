@@ -13,6 +13,7 @@ import akka.actor.ActorSystem;
 import akka.cluster.Cluster;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
+import akka.util.Timeout;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.util.List;
@@ -31,7 +32,6 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.tx.NetconfMasterDOMTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.tx.NetconfProxyDOMTransaction;
-import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -46,6 +46,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     private static final Logger LOG = LoggerFactory.getLogger(MasterSalFacade.class);
 
     private final RemoteDeviceId id;
+    private final Timeout actorResponseWaitTime;
 
     private SchemaContext remoteSchemaContext = null;
     private NetconfSessionPreferences netconfSessionPreferences = null;
@@ -57,14 +58,16 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     private DOMDataBroker deviceDataBroker = null;
 
     MasterSalFacade(final RemoteDeviceId id,
-                           final Broker domBroker,
-                           final BindingAwareBroker bindingBroker,
-                           final ActorSystem actorSystem,
-                           final ActorRef masterActorRef) {
+                    final Broker domBroker,
+                    final BindingAwareBroker bindingBroker,
+                    final ActorSystem actorSystem,
+                    final ActorRef masterActorRef,
+                    final Timeout actorResponseWaitTime) {
         this.id = id;
         this.salProvider = new NetconfDeviceSalProvider(id);
         this.actorSystem = actorSystem;
         this.masterActorRef = masterActorRef;
+        this.actorResponseWaitTime = actorResponseWaitTime;
 
         registerToSal(domBroker, bindingBroker);
     }
@@ -141,7 +144,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
         // We need to create NetconfProxyDOMTransaction so accessing mountpoint
         // on leader node would be same as on follower node
         final NetconfDOMTransaction proxyDOMTransation =
-                new NetconfProxyDOMTransaction(id, actorSystem, masterActorRef);
+                new NetconfProxyDOMTransaction(id, actorSystem, masterActorRef, actorResponseWaitTime);
         final NetconfDOMDataBroker proxyDataBroker = new NetconfDOMDataBroker(actorSystem, id, proxyDOMTransation);
         salProvider.getMountInstance()
                 .onTopologyDeviceConnected(remoteSchemaContext, proxyDataBroker, deviceRpc, notificationService);
@@ -157,11 +160,11 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
         // send initial data to master actor and create actor for providing it
         return Patterns.ask(masterActorRef, new CreateInitialMasterActorData(deviceDataBroker, sourceIdentifiers,
-                        deviceRpc), NetconfTopologyUtils.TIMEOUT);
+                deviceRpc), actorResponseWaitTime);
     }
 
     private void updateDeviceData() {
-        Cluster cluster = Cluster.get(actorSystem);
+        final Cluster cluster = Cluster.get(actorSystem);
         salProvider.getTopologyDatastoreAdapter().updateClusteredDeviceData(true, cluster.selfAddress().toString(),
                 netconfSessionPreferences.getNetconfDeviceCapabilities());
     }

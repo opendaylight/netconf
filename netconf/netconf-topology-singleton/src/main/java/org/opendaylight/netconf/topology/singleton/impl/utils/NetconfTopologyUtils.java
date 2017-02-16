@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.topology.singleton.impl.utils;
 
-import akka.util.Timeout;
 import java.io.File;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
@@ -30,13 +29,10 @@ import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
-import scala.concurrent.duration.Duration;
 
 public class NetconfTopologyUtils {
 
     private static final String DEFAULT_SCHEMA_REPOSITORY_NAME = "sal-netconf-connector";
-
-    public static final Timeout TIMEOUT = new Timeout(Duration.create(10, "seconds"));
 
     public static final long DEFAULT_REQUEST_TIMEOUT_MILLIS = 60000L;
     public static final int DEFAULT_KEEPALIVE_DELAY = 0;
@@ -74,18 +70,18 @@ public class NetconfTopologyUtils {
             DEFAULT_SCHEMA_REPOSITORY.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
 
     public static RemoteDeviceId createRemoteDeviceId(final NodeId nodeId, final NetconfNode node) {
-        IpAddress ipAddress = node.getHost().getIpAddress();
-        InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null
+        final IpAddress ipAddress = node.getHost().getIpAddress();
+        final InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null
                 ? ipAddress.getIpv4Address().getValue() : ipAddress.getIpv6Address().getValue(),
                 node.getPort().getValue());
         return new RemoteDeviceId(nodeId.getValue(), address);
     }
 
-    public static String createActorPath(String masterMember, String name) {
+    public static String createActorPath(final String masterMember, final String name) {
         return  masterMember + "/user/" + name;
     }
 
-    public static String createMasterActorName(String name, String masterAddress) {
+    public static String createMasterActorName(final String name, final String masterAddress) {
         return masterAddress.replaceAll("//", "") + "_" + name;
     }
 

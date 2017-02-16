@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import akka.actor.ActorRef;
+import akka.util.Timeout;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -86,9 +87,10 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
      * synchronization locks.
      */
     private static final Map<String, NetconfDevice.SchemaResourcesDTO> schemaResourcesDTOs = new HashMap<>();
+    private final Timeout actorResponseWaitTime;
 
     private SchemaSourceRegistry schemaRegistry = NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
-    private SchemaRepository schemaRepository = NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
+    private final SchemaRepository schemaRepository = NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
 
     private final NetconfTopologySetup netconfTopologyDeviceSetup;
     private final RemoteDeviceId remoteDeviceId;
@@ -111,10 +113,11 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     }
 
     public RemoteDeviceConnectorImpl(final NetconfTopologySetup netconfTopologyDeviceSetup,
-                                     final RemoteDeviceId remoteDeviceId) {
+                                     final RemoteDeviceId remoteDeviceId, final Timeout actorResponseWaitTime) {
 
         this.netconfTopologyDeviceSetup = Preconditions.checkNotNull(netconfTopologyDeviceSetup);
         this.remoteDeviceId = remoteDeviceId;
+        this.actorResponseWaitTime = actorResponseWaitTime;
     }
 
     @Override
@@ -136,12 +139,12 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         Futures.addCallback(future, new FutureCallback<NetconfDeviceCapabilities>() {
             @Override
-            public void onSuccess(NetconfDeviceCapabilities result) {
+            public void onSuccess(final NetconfDeviceCapabilities result) {
                 LOG.debug("{}: Connector started successfully", remoteDeviceId);
             }
 
             @Override
-            public void onFailure(@Nullable Throwable throwable) {
+            public void onFailure(@Nullable final Throwable throwable) {
                 LOG.error("{}: Connector failed, {}", remoteDeviceId, throwable);
             }
         });
@@ -152,7 +155,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         Preconditions.checkNotNull(deviceCommunicatorDTO, remoteDeviceId + ": Device communicator was not created.");
         try {
             deviceCommunicatorDTO.close();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOG.error("{}: Error at closing device communicator.", remoteDeviceId, e);
         }
     }
@@ -170,7 +173,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade =  new MasterSalFacade(remoteDeviceId,
                 netconfTopologyDeviceSetup.getDomBroker(), netconfTopologyDeviceSetup.getBindingAwareBroker(),
-                netconfTopologyDeviceSetup.getActorSystem(), deviceContextActorRef);
+                netconfTopologyDeviceSetup.getActorSystem(), deviceContextActorRef, actorResponseWaitTime);
         if (keepaliveDelay > 0) {
             LOG.info("{}: Adding keepalive facade.", remoteDeviceId);
             salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade,
@@ -179,13 +182,13 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         }
 
         // pre register yang library sources as fallback schemas to schema registry
-        List<SchemaSourceRegistration<YangTextSchemaSource>> registeredYangLibSources = Lists.newArrayList();
+        final List<SchemaSourceRegistration<YangTextSchemaSource>> registeredYangLibSources = Lists.newArrayList();
         if (node.getYangLibrary() != null) {
             final String yangLibURL = node.getYangLibrary().getYangLibraryUrl().getValue();
             final String yangLibUsername = node.getYangLibrary().getUsername();
             final String yangLigPassword = node.getYangLibrary().getPassword();
 
-            LibraryModulesSchemas libraryModulesSchemas;
+            final LibraryModulesSchemas libraryModulesSchemas;
             if (yangLibURL != null) {
                 if (yangLibUsername != null && yangLigPassword != null) {
                     libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL, yangLibUsername, yangLigPassword);
@@ -193,7 +196,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                     libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL);
                 }
 
-                for (Map.Entry<SourceIdentifier, URL> sourceIdentifierURLEntry :
+                for (final Map.Entry<SourceIdentifier, URL> sourceIdentifierURLEntry :
                         libraryModulesSchemas.getAvailableModels().entrySet()) {
                     registeredYangLibSources
                             .add(schemaRegistry.registerSchemaSource(
@@ -334,7 +337,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     }
 
     //TODO: duplicate code
-    private InetSocketAddress getSocketAddress(final Host host, int port) {
+    private InetSocketAddress getSocketAddress(final Host host, final int port) {
         if (host.getDomainName() != null) {
             return new InetSocketAddress(host.getDomainName().getValue(), port);
         } else {

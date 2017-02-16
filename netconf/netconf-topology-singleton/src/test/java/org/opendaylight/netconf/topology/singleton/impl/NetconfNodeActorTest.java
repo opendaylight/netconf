@@ -100,7 +100,7 @@ public class NetconfNodeActorTest {
         final NetconfTopologySetup setup = mock(NetconfTopologySetup.class);
 
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY,
-                DEFAULT_SCHEMA_REPOSITORY);
+                DEFAULT_SCHEMA_REPOSITORY, TIMEOUT);
 
         system = ActorSystem.create();
 
@@ -180,19 +180,19 @@ public class NetconfNodeActorTest {
         final SchemaRepository schemaRepository = mock(SchemaRepository.class);
         final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create("testID", Optional.absent());
         final Props props = NetconfNodeActor.props(mock(NetconfTopologySetup.class), remoteDeviceId,
-                DEFAULT_SCHEMA_REPOSITORY, schemaRepository);
+                DEFAULT_SCHEMA_REPOSITORY, schemaRepository, TIMEOUT);
 
         final ActorRef actorRefSchemaRepo = TestActorRef.create(system, props, "master_mocked_schema_repository");
         final ActorContext actorContext = mock(ActorContext.class);
         doReturn(system.dispatcher()).when(actorContext).dispatcher();
 
         final ProxyYangTextSourceProvider proxyYang =
-                new ProxyYangTextSourceProvider(actorRefSchemaRepo, actorContext);
+                new ProxyYangTextSourceProvider(actorRefSchemaRepo, actorContext, TIMEOUT);
         // test if asking for source is resolved and sended back
 
         final YangTextSchemaSource yangTextSchemaSource = new YangTextSchemaSource(sourceIdentifier) {
             @Override
-            protected MoreObjects.ToStringHelper addToStringAttributes(MoreObjects.ToStringHelper toStringHelper) {
+            protected MoreObjects.ToStringHelper addToStringAttributes(final MoreObjects.ToStringHelper toStringHelper) {
                 return null;
             }
 
@@ -254,7 +254,7 @@ public class NetconfNodeActorTest {
 
         // test if slave get right identifiers from master
 
-        final ProxyDOMRpcService slaveDomRPCService = new ProxyDOMRpcService(system, masterRef, remoteDeviceId);
+        final ProxyDOMRpcService slaveDomRPCService = new ProxyDOMRpcService(system, masterRef, remoteDeviceId, TIMEOUT);
 
         final SchemaPath schemaPath = SchemaPath.create(true, QName.create("TestQname"));
         final NormalizedNode<?, ?> outputNode = ImmutableContainerNodeBuilder.create()
@@ -325,8 +325,8 @@ public class NetconfNodeActorTest {
 
     }
 
-    private String convertStreamToString(java.io.InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+    private String convertStreamToString(final java.io.InputStream is) {
+        final java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
     }
 

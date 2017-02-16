@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.singleton.impl;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import akka.util.Timeout;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
@@ -29,13 +30,16 @@ public class SlaveSalFacade {
     private final NetconfDeviceSalProvider salProvider;
 
     private final ActorSystem actorSystem;
+    private final Timeout actorResponseWaitTime;
 
     public SlaveSalFacade(final RemoteDeviceId id,
                           final Broker domBroker,
-                          final ActorSystem actorSystem) {
+                          final ActorSystem actorSystem,
+                          final Timeout actorResponseWaitTime) {
         this.id = id;
         this.salProvider = new NetconfDeviceSalProvider(id);
         this.actorSystem = actorSystem;
+        this.actorResponseWaitTime = actorResponseWaitTime;
 
         registerToSal(domBroker);
     }
@@ -50,7 +54,7 @@ public class SlaveSalFacade {
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
 
         final NetconfDOMTransaction proxyDOMTransactions =
-                new NetconfProxyDOMTransaction(id, actorSystem, masterActorRef);
+                new NetconfProxyDOMTransaction(id, actorSystem, masterActorRef, actorResponseWaitTime);
 
         final NetconfDOMDataBroker netconfDeviceDataBroker =
                 new NetconfDOMDataBroker(actorSystem, id, proxyDOMTransactions);
@@ -69,7 +73,7 @@ public class SlaveSalFacade {
         unregisterSlaveMountPoint();
         try {
             salProvider.getMountInstance().close();
-        } catch (Exception exception) {
+        } catch (final Exception exception) {
             LOG.warn("{}: Exception in closing slave sal facade: {}", id, exception);
         }
 

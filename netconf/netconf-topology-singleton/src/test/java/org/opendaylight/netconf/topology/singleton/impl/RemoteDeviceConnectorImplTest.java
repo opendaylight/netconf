@@ -19,6 +19,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import akka.util.Timeout;
 import io.netty.util.concurrent.EventExecutor;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -55,11 +56,13 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
+import scala.concurrent.duration.Duration;
 
 public class RemoteDeviceConnectorImplTest {
 
     private static final NodeId NODE_ID = new NodeId("testing-node");
     private static final String TOPOLOGY_ID = "testing-topology";
+    private static final Timeout TIMEOUT = new Timeout(Duration.create(5, "seconds"));
 
     @Mock
     private DataBroker dataBroker;
@@ -138,7 +141,7 @@ public class RemoteDeviceConnectorImplTest {
         final RemoteDeviceHandler salFacade = mock(RemoteDeviceHandler.class);
 
         final TestingRemoteDeviceConnectorImpl remoteDeviceConnection =
-                new TestingRemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, communicator, salFacade);
+                new TestingRemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, communicator, salFacade, TIMEOUT);
 
         final ActorRef masterRef = mock(ActorRef.class);
 
@@ -169,7 +172,7 @@ public class RemoteDeviceConnectorImplTest {
                 .build();
 
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
-                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId);
+                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, TIMEOUT);
 
         final ActorRef masterRef = mock(ActorRef.class);
 
@@ -201,7 +204,7 @@ public class RemoteDeviceConnectorImplTest {
                 new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 9999));
 
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
-                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId);
+                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, TIMEOUT);
 
         final ActorRef masterRef = mock(ActorRef.class);
 
@@ -228,7 +231,7 @@ public class RemoteDeviceConnectorImplTest {
                 .build();
 
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
-                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId);
+                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, TIMEOUT);
 
         final NetconfReconnectingClientConfiguration defaultClientConfig =
                 remoteDeviceConnection.getClientConfig(listener, testingNode);
@@ -259,7 +262,7 @@ public class RemoteDeviceConnectorImplTest {
                 .build();
 
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
-                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId);
+                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, TIMEOUT);
 
         final ActorRef masterRef = mock(ActorRef.class);
 
