@@ -17,11 +17,11 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.AbstractMap;
 import java.util.Map;
-import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfServerSessionPreferences;
+import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
+import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

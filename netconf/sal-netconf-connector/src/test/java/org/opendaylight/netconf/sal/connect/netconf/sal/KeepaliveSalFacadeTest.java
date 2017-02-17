@@ -16,12 +16,12 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,8 +45,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-
-import com.google.common.util.concurrent.Futures;
 
 public class KeepaliveSalFacadeTest {
 

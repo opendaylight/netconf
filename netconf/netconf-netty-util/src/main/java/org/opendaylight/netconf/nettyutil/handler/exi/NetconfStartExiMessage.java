@@ -14,10 +14,10 @@ import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.openexi.proc.common.EXIOptions;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Start-exi netconf message.

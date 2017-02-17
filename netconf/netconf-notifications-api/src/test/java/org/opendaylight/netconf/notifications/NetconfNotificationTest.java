@@ -11,13 +11,10 @@ package org.opendaylight.netconf.notifications;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

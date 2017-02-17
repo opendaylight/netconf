@@ -15,9 +15,9 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.sshd.common.io.IoInputStream;
 import org.apache.sshd.common.io.IoOutputStream;
 import org.apache.sshd.server.ExitCallback;
+import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandlerReader;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandlerWriter;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

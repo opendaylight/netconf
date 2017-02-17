@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.sal.restconf.broker.impl;
 
+import com.google.common.base.Optional;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-
 import org.opendaylight.controller.sal.binding.api.data.DataBrokerService;
 import org.opendaylight.controller.sal.binding.api.data.DataChangeListener;
 import org.opendaylight.controller.sal.binding.api.data.DataModificationTransaction;
@@ -31,8 +31,6 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Optional;
 
 public class DataBrokerServiceImpl implements DataBrokerService  {
 

@@ -10,6 +10,7 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
+
 import org.junit.Test;
 import org.opendaylight.netconf.sal.restconf.impl.RestCodec;
 import org.opendaylight.yangtools.concepts.Codec;

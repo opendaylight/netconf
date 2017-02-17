@@ -10,7 +10,6 @@ package org.opendaylight.netconf.sal.restconf.broker.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import org.opendaylight.controller.sal.binding.api.NotificationListener;
 import org.opendaylight.controller.sal.binding.api.NotificationService;
 import org.opendaylight.netconf.sal.restconf.broker.listeners.RemoteNotificationListener;

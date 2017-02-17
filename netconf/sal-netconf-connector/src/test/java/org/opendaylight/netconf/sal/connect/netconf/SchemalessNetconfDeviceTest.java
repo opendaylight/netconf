@@ -14,7 +14,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.collect.Lists;
-import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;

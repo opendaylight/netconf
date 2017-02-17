@@ -33,7 +33,6 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
-import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
 import org.opendaylight.netconf.util.osgi.NetconfConfiguration;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceListener;

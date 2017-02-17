@@ -18,6 +18,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
+
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 import com.google.gson.JsonArray;

@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.util.osgi;
 
-import io.netty.channel.local.LocalAddress;
 import java.net.InetSocketAddress;
 import java.util.Dictionary;
 import java.util.Hashtable;

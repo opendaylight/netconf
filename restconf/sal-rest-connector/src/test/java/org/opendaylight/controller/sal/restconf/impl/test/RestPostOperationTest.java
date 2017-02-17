@@ -14,6 +14,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.controller.sal.restconf.impl.test.RestOperationUtils.XML;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.CheckedFuture;

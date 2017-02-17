@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.topology.singleton.impl.utils;
 
-import akka.cluster.Member;
 import akka.util.Timeout;
 import java.io.File;
 import java.math.BigDecimal;

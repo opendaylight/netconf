@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.controller.sal.restconf.impl.test.RestOperationUtils.JSON;
 import static org.opendaylight.controller.sal.restconf.impl.test.RestOperationUtils.XML;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;

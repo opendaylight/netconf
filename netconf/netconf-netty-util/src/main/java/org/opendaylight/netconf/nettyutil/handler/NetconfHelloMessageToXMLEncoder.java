@@ -15,9 +15,9 @@ import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import javax.xml.transform.TransformerException;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
-import org.opendaylight.netconf.api.NetconfMessage;
 
 /**
  * Customized NetconfMessageToXMLEncoder that serializes additional header with

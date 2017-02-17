@@ -8,6 +8,7 @@
 package org.opendaylight.controller.sal.restconf.impl.nn.to.xml.test;
 
 import static org.junit.Assert.assertTrue;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import java.io.ByteArrayOutputStream;
@@ -19,8 +20,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
 import org.opendaylight.controller.sal.rest.impl.test.providers.AbstractBodyReaderTest;
+import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;

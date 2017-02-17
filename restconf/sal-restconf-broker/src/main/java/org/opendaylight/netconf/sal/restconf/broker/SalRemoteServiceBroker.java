@@ -8,6 +8,8 @@
 package org.opendaylight.netconf.sal.restconf.broker;
 
 
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import org.opendaylight.controller.md.sal.binding.util.BindingContextUtils;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
@@ -22,7 +24,6 @@ import org.opendaylight.yangtools.restconf.client.api.RestconfClientContext;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static com.google.common.base.Preconditions.checkState;
 
 public class SalRemoteServiceBroker implements BindingAwareBroker,AutoCloseable {
 

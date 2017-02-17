@@ -9,6 +9,7 @@
 package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertTrue;
+
 import java.io.FileNotFoundException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;

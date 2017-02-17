@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.Set;
 import javax.ws.rs.core.Application;
 import org.opendaylight.yanglib.api.YangLibRestAppService;
-import org.opendaylight.yanglib.api.YangLibService;
 import org.osgi.framework.FrameworkUtil;
 
 public class YangLibRestApp extends Application implements YangLibRestAppService {

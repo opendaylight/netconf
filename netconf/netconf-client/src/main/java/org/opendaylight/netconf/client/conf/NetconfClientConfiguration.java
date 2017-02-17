@@ -12,9 +12,9 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.net.InetSocketAddress;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
+import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.protocol.framework.ReconnectStrategy;
 
 public class NetconfClientConfiguration {

@@ -9,12 +9,10 @@
 package org.opendaylight.netconf.test.tool.rpc;
 
 import com.google.common.base.Optional;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;

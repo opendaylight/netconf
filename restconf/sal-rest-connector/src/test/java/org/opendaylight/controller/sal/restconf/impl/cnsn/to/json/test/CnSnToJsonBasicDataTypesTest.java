@@ -12,6 +12,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
+
 import com.google.common.collect.Maps;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;

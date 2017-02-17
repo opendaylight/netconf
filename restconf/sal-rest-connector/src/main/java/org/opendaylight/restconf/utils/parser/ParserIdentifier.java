@@ -7,6 +7,10 @@
  */
 package org.opendaylight.restconf.utils.parser;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
@@ -31,10 +35,6 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.google.common.base.Optional;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 /**
  * Util class for parsing identifier

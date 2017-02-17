@@ -23,7 +23,6 @@ import org.opendaylight.netconf.impl.SessionIdProvider;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
-import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
 import org.opendaylight.netconf.util.osgi.NetconfConfiguration;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;

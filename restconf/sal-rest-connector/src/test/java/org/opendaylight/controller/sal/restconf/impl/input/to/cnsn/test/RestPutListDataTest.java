@@ -13,6 +13,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.io.FileNotFoundException;
