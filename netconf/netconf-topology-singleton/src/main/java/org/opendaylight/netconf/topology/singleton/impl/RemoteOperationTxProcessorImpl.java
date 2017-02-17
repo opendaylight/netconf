@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import akka.actor.ActorRef;
+import akka.actor.Status;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
@@ -40,10 +41,26 @@ public class RemoteOperationTxProcessorImpl implements RemoteOperationTxProcesso
     private DOMDataWriteTransaction writeTx;
     private DOMDataReadOnlyTransaction readTx;
 
+    private ActorRef currentUser = null;
+
     public RemoteOperationTxProcessorImpl(final DOMDataBroker dataBroker, final RemoteDeviceId id) {
         this.dataBroker = dataBroker;
         this.id = id;
         this.readTx = dataBroker.newReadOnlyTransaction();
+    }
+
+    @Override
+    public void doOpenTransaction(ActorRef recipient, ActorRef sender) {
+        if (currentUser != null) {
+            LOG.error("{}: Opening a new transaction for {} failed.", id, recipient);
+            recipient.tell(new Status.Failure(
+                    new IllegalStateException("Transaction is already opened for another user")), recipient);
+            return;
+        }
+
+        LOG.debug("{}: Opening a new transaction for {}", id, recipient);
+        currentUser = recipient;
+        recipient.tell(new Status.Success(null), sender);
     }
 
     @Override
@@ -56,6 +73,7 @@ public class RemoteOperationTxProcessorImpl implements RemoteOperationTxProcesso
 
     @Override
     public void doSubmit(final ActorRef recipient, final ActorRef sender) {
+        currentUser = null;
         if (writeTx != null) {
             CheckedFuture<Void, TransactionCommitFailedException> submitFuture = writeTx.submit();
             Futures.addCallback(submitFuture, new FutureCallback<Void>() {
@@ -77,11 +95,13 @@ public class RemoteOperationTxProcessorImpl implements RemoteOperationTxProcesso
 
     @Override
     public void doCancel(final ActorRef recipient, final ActorRef sender) {
+        currentUser = null;
         boolean cancel = false;
         if (writeTx != null) {
             cancel = writeTx.cancel();
         }
         recipient.tell(cancel, sender);
+
     }
 
     @Override
@@ -148,6 +168,7 @@ public class RemoteOperationTxProcessorImpl implements RemoteOperationTxProcesso
 
     @Override
     public void close() throws Exception {
+        currentUser = null;
         if (readTx != null) {
             readTx.close();
         }

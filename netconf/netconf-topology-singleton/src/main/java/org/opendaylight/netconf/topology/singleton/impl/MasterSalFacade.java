@@ -30,6 +30,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.tx.NetconfMasterDOMTransaction;
+import org.opendaylight.netconf.topology.singleton.impl.tx.NetconfProxyDOMTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
@@ -137,8 +138,13 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
                 new NetconfMasterDOMTransaction(id, remoteSchemaContext, deviceRpc, netconfSessionPreferences);
         deviceDataBroker =
                 new NetconfDOMDataBroker(actorSystem, id, masterDOMTransactions);
+        // We need to create NetconfProxyDOMTransaction so accessing mountpoint
+        // on leader node would be same as on follower node
+        final NetconfDOMTransaction proxyDOMTransation =
+                new NetconfProxyDOMTransaction(id, actorSystem, masterActorRef);
+        final NetconfDOMDataBroker proxyDataBroker = new NetconfDOMDataBroker(actorSystem, id, proxyDOMTransation);
         salProvider.getMountInstance()
-                .onTopologyDeviceConnected(remoteSchemaContext, deviceDataBroker, deviceRpc, notificationService);
+                .onTopologyDeviceConnected(remoteSchemaContext, proxyDataBroker, deviceRpc, notificationService);
     }
 
     private Future<Object> sendInitialDataToActor() {
