@@ -9,11 +9,7 @@
 package org.opendaylight.netconf.sal.connect.api;
 
 import java.util.Set;
-import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemas;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 
 public interface NetconfDeviceSchemas {
 

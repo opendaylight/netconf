@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import com.google.common.base.Optional;
 import com.google.common.io.Resources;
 import com.google.common.util.concurrent.Futures;

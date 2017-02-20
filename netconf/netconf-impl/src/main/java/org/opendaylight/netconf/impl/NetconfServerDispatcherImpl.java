@@ -17,9 +17,9 @@ import io.netty.channel.local.LocalServerChannel;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.util.concurrent.Promise;
 import java.net.InetSocketAddress;
-import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.netconf.api.NetconfServerDispatcher;
 import org.opendaylight.netconf.impl.util.DeserializerExceptionHandler;
+import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.protocol.framework.AbstractDispatcher;
 
 public class NetconfServerDispatcherImpl extends AbstractDispatcher<NetconfServerSession, NetconfServerSessionListener> implements NetconfServerDispatcher {

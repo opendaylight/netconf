@@ -9,6 +9,7 @@ package org.opendaylight.netconf.cli.reader.impl;
 
 import static org.opendaylight.netconf.cli.io.IOUtil.isSkipInput;
 import static org.opendaylight.netconf.cli.io.IOUtil.listType;
+
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;

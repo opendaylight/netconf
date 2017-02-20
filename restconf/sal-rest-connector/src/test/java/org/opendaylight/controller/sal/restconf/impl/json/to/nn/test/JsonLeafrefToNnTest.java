@@ -9,6 +9,7 @@ package org.opendaylight.controller.sal.restconf.impl.json.to.nn.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;

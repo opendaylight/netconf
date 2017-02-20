@@ -9,7 +9,6 @@ package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_URI;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.stripNotification;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
 import com.google.common.base.Function;

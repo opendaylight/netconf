@@ -9,15 +9,21 @@
 
 package org.opendaylight.netconf.test.tool;
 
-import com.ning.http.client.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.ning.http.client.AsyncCompletionHandler;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.HttpResponseStatus;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.Realm;
+import com.ning.http.client.Request;
+import com.ning.http.client.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Execution implements Callable<Void> {
 

@@ -21,12 +21,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opendaylight.controller.config.util.capability.Capability;
+import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
 import org.opendaylight.netconf.util.CloseableUtil;
-import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

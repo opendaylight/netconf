@@ -11,6 +11,7 @@ package org.opendaylight.controller.sal.rest.impl.test.providers;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.Collections;

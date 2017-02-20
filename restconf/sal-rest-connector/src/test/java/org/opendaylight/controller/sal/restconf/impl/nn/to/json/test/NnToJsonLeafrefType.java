@@ -9,6 +9,7 @@ package org.opendaylight.controller.sal.restconf.impl.nn.to.json.test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;

@@ -9,10 +9,6 @@
 package org.opendaylight.netconf.test.tool;
 
 import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.util.ContextInitializer;
-import ch.qos.logback.core.joran.spi.JoranException;
-import ch.qos.logback.core.util.StatusPrinter;
 import com.google.common.base.Stopwatch;
 import com.google.common.io.CharStreams;
 import com.ning.http.client.AsyncHttpClient;

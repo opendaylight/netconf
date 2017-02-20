@@ -21,7 +21,6 @@ import java.util.List;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
-import org.opendaylight.restconf.utils.validation.RestconfValidation;
 
 /**
  * Unit test for {@link RestconfValidation}

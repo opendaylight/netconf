@@ -9,7 +9,6 @@
 package org.opendaylight.netconf.util.messages;
 
 import com.google.common.base.Optional;
-import java.io.IOException;
 import java.util.Map;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
@@ -22,7 +21,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 /**
  * See <a href="http://tools.ietf.org/html/rfc6241#section-6">rfc6241</a> for details.
