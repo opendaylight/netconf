@@ -294,7 +294,7 @@ public class JSONRestconfServiceImplTest {
         verifyLeafNode(actualNode, TEST_LF12_QNAME, "lf12 data");
     }
 
-    @Test
+    @Test(expected = TransactionCommitFailedException.class)
     public void testPostFailure() throws Throwable {
         doReturn(Futures.immediateFailedCheckedFuture(new TransactionCommitFailedException("mock"))).when(brokerFacade)
                 .commitConfigurationDataPost(any(SchemaContext.class), any(YangInstanceIdentifier.class),
@@ -309,7 +309,13 @@ public class JSONRestconfServiceImplTest {
         Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
         final UriBuilder uriBuilder = UriBuilder.fromPath("");
         Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(uriBuilder);
-        this.service.post(uriPath, payload, uriInfo);
+
+        try {
+            this.service.post(uriPath, payload, uriInfo);
+        } catch (final OperationFailedException e) {
+            assertNotNull(e.getCause());
+            throw e.getCause();
+        }
     }
 
     @Test
