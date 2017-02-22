@@ -1085,9 +1085,11 @@ public class RestconfImpl implements RestconfService {
         boolean startTime_used = false;
         boolean stopTime_used = false;
         boolean filter_used = false;
+        boolean leafNodesOnly_used = false;
         Date start = null;
         Date stop = null;
         String filter = null;
+        boolean leafNodesOnly = false;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             switch (entry.getKey()) {
@@ -1115,6 +1117,14 @@ public class RestconfImpl implements RestconfService {
                         throw new RestconfDocumentedException("Filter parameter can be used only once.");
                     }
                     break;
+                case "odlLeafNodesOnly":
+                    if (!leafNodesOnly_used) {
+                        leafNodesOnly_used = true;
+                        leafNodesOnly = Boolean.parseBoolean(entry.getValue().iterator().next());
+                    } else {
+                        throw new RestconfDocumentedException("OdlLeafNodesOnly parameter can be used only once.");
+                    }
+                    break;
                 default:
                     throw new RestconfDocumentedException("Bad parameter used with notifications: " + entry.getKey());
             }
@@ -1124,7 +1134,7 @@ public class RestconfImpl implements RestconfService {
         }
         URI response = null;
         if (identifier.contains(DATA_SUBSCR)) {
-            response = dataSubs(identifier, uriInfo, start, stop, filter);
+            response = dataSubs(identifier, uriInfo, start, stop, filter, leafNodesOnly);
         } else if (identifier.contains(NOTIFICATION_STREAM)) {
             response = notifStream(identifier, uriInfo, start, stop, filter);
         }
@@ -1222,7 +1232,7 @@ public class RestconfImpl implements RestconfService {
 
         for (final NotificationListenerAdapter listener : listeners) {
             this.broker.registerToListenNotification(listener);
-            listener.setQueryParams(start, stop, filter);
+            listener.setQueryParams(start, stop, filter, false);
         }
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
@@ -1255,7 +1265,7 @@ public class RestconfImpl implements RestconfService {
      * @return {@link URI} of location
      */
     private URI dataSubs(final String identifier, final UriInfo uriInfo, final Date start, final Date stop,
-            final String filter) {
+            final String filter, boolean leafNodesOnly) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -1266,7 +1276,7 @@ public class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException("Stream was not found.", ErrorType.PROTOCOL,
                     ErrorTag.UNKNOWN_ELEMENT);
         }
-        listener.setQueryParams(start, stop, filter);
+        listener.setQueryParams(start, stop, filter, leafNodesOnly);
 
         final Map<String, String> paramToValues = resolveValuesFromUri(identifier);
         final LogicalDatastoreType datastore =
