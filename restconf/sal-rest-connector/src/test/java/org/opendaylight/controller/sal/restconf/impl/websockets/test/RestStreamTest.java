@@ -15,12 +15,15 @@ import static org.mockito.Mockito.mock;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.util.logging.Level;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
+import org.glassfish.jersey.test.TestProperties;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -39,7 +42,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-public class RestStream extends JerseyTest {
+public class RestStreamTest extends JerseyTest {
 
     private static BrokerFacade brokerFacade;
     private static RestconfImpl restconfImpl;
@@ -71,10 +74,22 @@ public class RestStream extends JerseyTest {
     }
 
     @Test
-    @Ignore // FIXME : find problem with codec
+    @Ignore // Sporadic failures where jersey does not correctly pass post data to XmlNormalizedNodeBodyReader.readFrom
     public void testCallRpcCallGet() throws UnsupportedEncodingException, InterruptedException {
+        createAndSubscribe(null);
+    }
+
+    @Test
+    @Ignore // Sporadic failures where jersey does not correctly pass post data to XmlNormalizedNodeBodyReader.readFrom
+    public void testCallRpcCallGetLeaves() throws UnsupportedEncodingException, InterruptedException {
+        createAndSubscribe("odl-leaf-nodes-only", "true");
+    }
+
+    private void createAndSubscribe(String queryParamName, Object... values)
+                                                throws UnsupportedEncodingException, InterruptedException {
         String uri = "/operations/sal-remote:create-data-change-event-subscription";
-        final Response responseWithStreamName = post(uri, MediaType.APPLICATION_XML, getRpcInput());
+        String rpcInput = getRpcInput();
+        final Response responseWithStreamName = post(uri, MediaType.APPLICATION_XML, rpcInput);
         final Document xmlResponse = responseWithStreamName.readEntity(Document.class);
         assertNotNull(xmlResponse);
         final Element outputElement = xmlResponse.getDocumentElement();
@@ -82,21 +97,25 @@ public class RestStream extends JerseyTest {
 
         final Node streamNameElement = outputElement.getFirstChild();
         assertEquals("stream-name",streamNameElement.getLocalName());
-        assertEquals("ietf-interfaces:interfaces/ietf-interfaces:interface/eth0/datastore=CONFIGURATION/scope=BASE",streamNameElement.getTextContent());
+        assertEquals("data-change-event-subscription/ietf-interfaces:interfaces/ietf-interfaces:interface/eth0/datastore=CONFIGURATION/scope=BASE",streamNameElement.getTextContent());
 
-        uri = "/streams/stream/ietf-interfaces:interfaces/ietf-interfaces:interface/eth0/datastore=CONFIGURATION/scope=BASE";
-        final Response responseWithRedirectionUri = get(uri, MediaType.APPLICATION_XML);
+        uri = "/streams/stream/data-change-event-subscription/ietf-interfaces:interfaces/ietf-interfaces:interface/eth0/datastore=CONFIGURATION/scope=BASE";
+        final Response responseWithRedirectionUri = get(uri, MediaType.APPLICATION_XML, null);
         final URI websocketServerUri = responseWithRedirectionUri.getLocation();
         assertNotNull(websocketServerUri);
-        assertTrue(websocketServerUri.toString().matches(".*http://localhost:[\\d]+/ietf-interfaces:interfaces/ietf-interfaces:interface/eth0.*"));
+        assertTrue(websocketServerUri.toString().matches(".*ws://localhost:[\\d]+/data-change-event-subscription/ietf-interfaces:interfaces/ietf-interfaces:interface/eth0.*"));
     }
 
     private Response post(final String uri, final String mediaType, final String data) {
         return target(uri).request(mediaType).post(Entity.entity(data, mediaType));
     }
 
-    private Response get(final String uri, final String mediaType) {
-        return target(uri).request(mediaType).get();
+    private Response get(final String uri, final String mediaType, String queryParam, Object... values) {
+        if (queryParam != null) {
+            return target(uri).queryParam(queryParam, values).request(mediaType).get();
+        } else {
+            return target(uri).request(mediaType).get();
+        }
     }
 
     private static String getRpcInput() {
