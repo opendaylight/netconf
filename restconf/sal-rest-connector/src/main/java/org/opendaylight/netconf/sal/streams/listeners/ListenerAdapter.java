@@ -19,12 +19,14 @@ import org.json.XML;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataChangeEvent;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
+import org.opendaylight.restconf.parser.builder.YangInstanceIdentifierDeserializer;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
@@ -208,7 +210,8 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
             return;
         }
         for (final Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> entry : data) {
-            if (!ControllerContext.getInstance().isNodeMixin(entry.getKey())) {
+            if (!ControllerContext.getInstance().isNodeMixin(entry.getKey()) &&
+                                                            (!leafNodesOnly || entry.getValue() instanceof LeafNode)) {
                 final Node node = createCreatedChangedDataChangeEventElement(doc, entry, operation, schemaContext,
                         dataSchemaContextTree);
                 element.appendChild(node);

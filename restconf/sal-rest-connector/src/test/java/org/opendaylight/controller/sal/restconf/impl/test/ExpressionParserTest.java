@@ -133,7 +133,7 @@ public class ExpressionParserTest {
         final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-14-12", "localName"));
         Mockito.when(path.getLastPathArgument()).thenReturn(pathValue);
         final ListenerAdapter listener = Notificator.createListener(path, "streamName", NotificationOutputType.JSON);
-        listener.setQueryParams(null, null, filter);
+        listener.setQueryParams(null, null, filter, false);
         final Class<?> superclass = listener.getClass().getSuperclass().getSuperclass();
         Method m = null;
         for (final Method method : superclass.getDeclaredMethods()) {

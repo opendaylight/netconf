@@ -80,6 +80,7 @@ public class Notificator {
      */
     public static ListenerAdapter createListener(final YangInstanceIdentifier path, final String streamName,
             final NotificationOutputType outputType) {
+        LOG.warn("JOSH createListener", new Exception());
         final ListenerAdapter listener = new ListenerAdapter(path, streamName, outputType);
         try {
             lock.lock();
