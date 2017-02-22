@@ -23,7 +23,8 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.ReadWriteTx;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
+import org.opendaylight.netconf.topology.singleton.api.NetconfDOMReadTransaction;
+import org.opendaylight.netconf.topology.singleton.api.NetconfDOMWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.tx.NetconfReadOnlyTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.tx.NetconfWriteOnlyTransaction;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
@@ -32,41 +33,44 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 public class NetconfDOMDataBroker implements DOMDataBroker {
 
     private final RemoteDeviceId id;
-    private final NetconfDOMTransaction masterDataBroker;
+    private final NetconfDOMReadTransaction masterReadTx;
+    private final NetconfDOMWriteTransaction masterWriteTx;
     private final ActorSystem actorSystem;
 
     public NetconfDOMDataBroker(final ActorSystem actorSystem, final RemoteDeviceId id,
-                         final NetconfDOMTransaction masterDataBroker) {
+                                final NetconfDOMReadTransaction masterReadTx,
+                                final NetconfDOMWriteTransaction masterWriteTx) {
         this.id = id;
-        this.masterDataBroker = masterDataBroker;
+        this.masterReadTx = masterReadTx;
+        this.masterWriteTx = masterWriteTx;
         this.actorSystem = actorSystem;
     }
 
     @Override
     public DOMDataReadOnlyTransaction newReadOnlyTransaction() {
-        return new NetconfReadOnlyTransaction(id, actorSystem, masterDataBroker);
+        return new NetconfReadOnlyTransaction(id, actorSystem, masterReadTx);
     }
 
     @Override
     public DOMDataReadWriteTransaction newReadWriteTransaction() {
-        return new ReadWriteTx(new NetconfReadOnlyTransaction(id, actorSystem, masterDataBroker),
-                new NetconfWriteOnlyTransaction(id, actorSystem, masterDataBroker));
+        return new ReadWriteTx(new NetconfReadOnlyTransaction(id, actorSystem, masterReadTx),
+                new NetconfWriteOnlyTransaction(id, actorSystem, masterWriteTx));
     }
 
     @Override
     public DOMDataWriteTransaction newWriteOnlyTransaction() {
-        return new NetconfWriteOnlyTransaction(id, actorSystem, masterDataBroker);
+        return new NetconfWriteOnlyTransaction(id, actorSystem, masterWriteTx);
     }
 
     @Override
     public ListenerRegistration<DOMDataChangeListener> registerDataChangeListener(
-            LogicalDatastoreType store, YangInstanceIdentifier path, DOMDataChangeListener listener,
-            DataChangeScope triggeringScope) {
+            final LogicalDatastoreType store, final YangInstanceIdentifier path, final DOMDataChangeListener listener,
+            final DataChangeScope triggeringScope) {
         throw new UnsupportedOperationException(id + ": Data change listeners not supported for netconf mount point");
     }
 
     @Override
-    public DOMTransactionChain createTransactionChain(TransactionChainListener listener) {
+    public DOMTransactionChain createTransactionChain(final TransactionChainListener listener) {
         throw new UnsupportedOperationException(id + ": Transaction chains not supported for netconf mount point");
     }
 

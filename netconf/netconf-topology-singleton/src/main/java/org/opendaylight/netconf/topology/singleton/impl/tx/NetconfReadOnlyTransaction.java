@@ -20,7 +20,7 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
+import org.opendaylight.netconf.topology.singleton.api.NetconfDOMReadTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -33,12 +33,12 @@ public class NetconfReadOnlyTransaction implements DOMDataReadOnlyTransaction {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfReadOnlyTransaction.class);
 
     private final RemoteDeviceId id;
-    private final NetconfDOMTransaction delegate;
+    private final NetconfDOMReadTransaction delegate;
     private final ActorSystem actorSystem;
 
     public NetconfReadOnlyTransaction(final RemoteDeviceId id,
                                       final ActorSystem actorSystem,
-                                      final NetconfDOMTransaction delegate) {
+                                      final NetconfDOMReadTransaction delegate) {
         this.id = id;
         this.delegate = delegate;
         this.actorSystem = actorSystem;
@@ -61,7 +61,7 @@ public class NetconfReadOnlyTransaction implements DOMDataReadOnlyTransaction {
         checkedFuture = Futures.makeChecked(settableFuture, new Function<Exception, ReadFailedException>() {
             @Nullable
             @Override
-            public ReadFailedException apply(Exception cause) {
+            public ReadFailedException apply(final Exception cause) {
                 return new ReadFailedException("Read from transaction failed", cause);
             }
         });
@@ -103,7 +103,7 @@ public class NetconfReadOnlyTransaction implements DOMDataReadOnlyTransaction {
         checkedFuture = Futures.makeChecked(settableFuture, new Function<Exception, ReadFailedException>() {
             @Nullable
             @Override
-            public ReadFailedException apply(Exception cause) {
+            public ReadFailedException apply(final Exception cause) {
                 return new ReadFailedException("Read from transaction failed", cause);
             }
         });
