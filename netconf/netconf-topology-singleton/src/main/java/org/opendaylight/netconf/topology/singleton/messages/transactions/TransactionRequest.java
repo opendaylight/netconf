@@ -13,7 +13,9 @@ import java.io.Serializable;
 /**
  * API for transaction request messages, slave sends these message types to master for performing required operation.
  * This interface helps better handle request messages in actor. All messages are send with operations defined in
- * NetconfProxyDOMTransaction. Messages requiring response are send by ask otherwise with tell.
+ * {@link org.opendaylight.netconf.topology.singleton.impl.tx.proxy.ProxyDOMReadTransaction} and
+ * {@link org.opendaylight.netconf.topology.singleton.impl.tx.proxy.ProxyDOMReadTransaction}.
+ * Messages requiring response are send by ask otherwise with tell.
  */
 public interface TransactionRequest extends Serializable {
 }

@@ -48,9 +48,14 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
+import org.opendaylight.netconf.topology.singleton.api.NetconfDOMReadTransaction;
+import org.opendaylight.netconf.topology.singleton.api.NetconfDOMWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.NetconfDOMDataBroker;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
+import org.opendaylight.netconf.topology.singleton.impl.tx.master.MasterDOMReadTransaction;
+import org.opendaylight.netconf.topology.singleton.impl.tx.master.MasterDOMWriteTransaction;
+import org.opendaylight.netconf.topology.singleton.impl.tx.proxy.ProxyDOMReadTransaction;
+import org.opendaylight.netconf.topology.singleton.impl.tx.proxy.ProxyDOMWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.MasterActorDataInitialized;
@@ -109,18 +114,23 @@ public class WriteOnlyTransactionTest {
         doReturn(writeTx).when(delegateDataBroker).newWriteOnlyTransaction();
         doReturn(readTx).when(delegateDataBroker).newReadOnlyTransaction();
 
-        final NetconfDOMTransaction masterDOMTransactions =
-                new NetconfMasterDOMTransaction(remoteDeviceId, delegateDataBroker);
+        final NetconfDOMReadTransaction masterDOMReadTransaction =
+                new MasterDOMReadTransaction(remoteDeviceId, delegateDataBroker);
+        final NetconfDOMWriteTransaction masterDOMWriteTransaction =
+                new MasterDOMWriteTransaction(remoteDeviceId, delegateDataBroker);
 
         masterDataBroker =
-                new NetconfDOMDataBroker(system, remoteDeviceId, masterDOMTransactions);
+                new NetconfDOMDataBroker(system, remoteDeviceId, masterDOMReadTransaction, masterDOMWriteTransaction);
 
         // Create slave data broker for testing proxy
 
-        final NetconfDOMTransaction proxyDOMTransactions =
-                new NetconfProxyDOMTransaction(remoteDeviceId, system, masterRef);
+        final NetconfDOMReadTransaction proxyDOMReadTransaction =
+                new ProxyDOMReadTransaction(remoteDeviceId, system, masterRef);
+        final NetconfDOMWriteTransaction proxyDOMWriteTransaction =
+                new ProxyDOMWriteTransaction(remoteDeviceId, system, masterRef);
 
-        slaveDataBroker = new NetconfDOMDataBroker(system, remoteDeviceId, proxyDOMTransactions);
+        slaveDataBroker =
+                new NetconfDOMDataBroker(system, remoteDeviceId, proxyDOMReadTransaction, proxyDOMWriteTransaction);
 
 
     }

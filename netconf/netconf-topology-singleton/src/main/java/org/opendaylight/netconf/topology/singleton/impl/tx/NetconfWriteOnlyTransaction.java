@@ -21,7 +21,7 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
+import org.opendaylight.netconf.topology.singleton.api.NetconfDOMWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -36,12 +36,12 @@ public class NetconfWriteOnlyTransaction implements DOMDataWriteTransaction {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfWriteOnlyTransaction.class);
 
     private final RemoteDeviceId id;
-    private final NetconfDOMTransaction delegate;
+    private final NetconfDOMWriteTransaction delegate;
     private final ActorSystem actorSystem;
 
     public NetconfWriteOnlyTransaction(final RemoteDeviceId id,
                                        final ActorSystem actorSystem,
-                                       final NetconfDOMTransaction delegate) {
+                                       final NetconfDOMWriteTransaction delegate) {
         this.id = id;
         this.delegate = delegate;
         this.actorSystem = actorSystem;
@@ -89,13 +89,13 @@ public class NetconfWriteOnlyTransaction implements DOMDataWriteTransaction {
         checkedFuture = Futures.makeChecked(settFuture, new Function<Exception, TransactionCommitFailedException>() {
             @Nullable
             @Override
-            public TransactionCommitFailedException apply(Exception input) {
+            public TransactionCommitFailedException apply(final Exception input) {
                 return new TransactionCommitFailedException("Transaction commit failed", input);
             }
         });
         submit.onComplete(new OnComplete<Void>() {
             @Override
-            public void onComplete(Throwable throwable, Void object) throws Throwable {
+            public void onComplete(final Throwable throwable, final Void object) throws Throwable {
                 if (throwable == null) {
                     settFuture.set(object);
                 } else {
@@ -116,8 +116,8 @@ public class NetconfWriteOnlyTransaction implements DOMDataWriteTransaction {
             @Override
             public void onComplete(final Throwable throwable, final Void result) throws Throwable {
                 if (throwable == null) {
-                    TransactionStatus status = TransactionStatus.SUBMITED;
-                    RpcResult<TransactionStatus> rpcResult = RpcResultBuilder.success(status).build();
+                    final TransactionStatus status = TransactionStatus.SUBMITED;
+                    final RpcResult<TransactionStatus> rpcResult = RpcResultBuilder.success(status).build();
                     settFuture.set(rpcResult);
                 } else {
                     settFuture.setException(throwable);
