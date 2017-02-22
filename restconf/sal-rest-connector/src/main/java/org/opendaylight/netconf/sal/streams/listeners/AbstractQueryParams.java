@@ -27,6 +27,7 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
     protected Date start = null;
     protected Date stop = null;
     protected String filter = null;
+    protected boolean leafNodesOnly = false;
 
     private String xml;
 
@@ -39,11 +40,23 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      *            - stop-time of getting notification
      * @param filter
      *            - indicate which subset of all possible events are of interest
+     * @param leafNodesOnly
+     *            - if true, notifications will contain changes to leaf nodes only
      */
-    public void setQueryParams(final Date start, final Date stop, final String filter) {
+    public void setQueryParams(final Date start, final Date stop, final String filter, final boolean leafNodesOnly) {
         this.start = start;
         this.stop = stop;
         this.filter = filter;
+        this.leafNodesOnly = leafNodesOnly;
+    }
+
+    /**
+     * Check whether this query should only notify about leaf node changes
+     *
+     * @return true if this query should only notify about leaf node changes
+     */
+    public boolean getLeafNodesOnly() {
+        return leafNodesOnly;
     }
 
     /**
