@@ -51,6 +51,8 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
     private Instant start = null;
     private Instant stop = null;
     private String filter = null;
+    private boolean leafNodesOnly = false;
+    private String xml = null;
 
     @VisibleForTesting
     public final Instant getStart() {
@@ -66,11 +68,23 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      *            - stop-time of getting notification
      * @param filter
      *            - indicate which subset of all possible events are of interest
+     * @param leafNodesOnly
+     *            - if true, notifications will contain changes to leaf nodes only
      */
-    public void setQueryParams(final Instant start, final Optional<Instant> stop, final Optional<String> filter) {
+    public void setQueryParams(final Instant start, final Optional<Instant> stop, final Optional<String> filter, final boolean leafNodesOnly) {
         this.start = Preconditions.checkNotNull(start);
         this.stop = stop.orElse(null);
         this.filter = filter.orElse(null);
+        this.leafNodesOnly = leafNodesOnly;
+    }
+
+    /**
+     * Check whether this query should only notify about leaf node changes
+     *
+     * @return true if this query should only notify about leaf node changes
+     */
+    public boolean getLeafNodesOnly() {
+        return leafNodesOnly;
     }
 
     /**
