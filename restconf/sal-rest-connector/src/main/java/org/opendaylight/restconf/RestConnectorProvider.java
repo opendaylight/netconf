@@ -60,7 +60,6 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
 
     private ListenerRegistration<SchemaContextListener> listenerRegistration;
 
-    private SchemaContextHandler schemaCtxHandler;
     private static TransactionChainHandler transactionChainHandler;
     private static DOMDataBroker dataBroker;
     private static DOMMountPointServiceHandler mountPointServiceHandler;
@@ -80,8 +79,8 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         RestConnectorProvider.transactionChainHandler = new TransactionChainHandler(RestConnectorProvider.dataBroker
                 .createTransactionChain(RestConnectorProvider.transactionListener));
 
-        this.schemaCtxHandler = new SchemaContextHandler(transactionChainHandler);
-        this.listenerRegistration = schemaService.registerSchemaContextListener(this.schemaCtxHandler);
+        final SchemaContextHandler schemaCtxHandler = new SchemaContextHandler(RestConnectorProvider.transactionChainHandler);
+        this.listenerRegistration = schemaService.registerSchemaContextListener(schemaCtxHandler);
 
         final DOMRpcService rpcService = session.getService(DOMRpcService.class);
         final RpcServiceHandler rpcServiceHandler = new RpcServiceHandler(rpcService);
@@ -90,7 +89,7 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         final NotificationServiceHandler notificationServiceHandler =
                 new NotificationServiceHandler(notificationService);
 
-        wrapperServices.setHandlers(this.schemaCtxHandler, RestConnectorProvider.mountPointServiceHandler,
+        wrapperServices.setHandlers(schemaCtxHandler, RestConnectorProvider.mountPointServiceHandler,
                 RestConnectorProvider.transactionChainHandler, brokerHandler, rpcServiceHandler,
                 notificationServiceHandler);
     }
