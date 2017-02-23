@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_97f875c4",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/AbstractQueryParams.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 3316
+      },
+      "writtenOn": "2017-02-23T14:27:08Z",
+      "side": 1,
+      "message": "Instead of adding new prameter, how about setQueryParams(NotificationQueryParams)?\n\nSince it\u0027d would be unlikely to add more parameters, either way is okay.",
+      "range": {
+        "startLine": 46,
+        "startChar": 16,
+        "endLine": 46,
+        "endChar": 115
+      },
+      "revId": "531fb59a8cd5fa11a03d4cf1f3aafc7cec08ba32",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_374d499b",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 3316
+      },
+      "writtenOn": "2017-02-23T14:27:08Z",
+      "side": 1,
+      "message": "In deletion case, will non-leaf be reported?",
+      "range": {
+        "startLine": 176,
+        "startChar": 8,
+        "endLine": 177,
+        "endChar": 34
+      },
+      "revId": "531fb59a8cd5fa11a03d4cf1f3aafc7cec08ba32",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
