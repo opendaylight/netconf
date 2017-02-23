@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_455776ca",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/NetconfMasterDOMTransaction.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-02-23T11:40:37Z",
+      "side": 1,
+      "message": "Why is writeTx.cancel() in try block?",
+      "revId": "b6b5065a17ec5d5488a1a316bf3b2f906d7382a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
