@@ -13,6 +13,7 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.Rfc8040.MonitoringModule;
 import org.opendaylight.restconf.utils.mapping.RestconfMappingNodeUtil;
@@ -82,16 +83,20 @@ public class SchemaContextHandler implements SchemaContextListenerHandler {
         try {
             wTx.submit().checkedGet();
         } catch (final TransactionCommitFailedException e) {
-            if (e.getCause() instanceof ConflictingModificationAppliedException) {
-                /*
-                  Ignore error when another cluster node is already putting the same data to DS.
-                  This is workaround for bug:
-                  https://bugs.opendaylight.org/show_bug.cgi?id=7728
-                */
-                LOG.warn("Ignoring that another cluster node is already putting the same data to DS.", e);
-            } else {
+            if (!(e.getCause() instanceof ConflictingModificationAppliedException)) {
                 throw new RestconfDocumentedException("Problem occurred while putting data to DS.", e);
             }
+
+            /*
+              Ignore error when another cluster node is already putting the same data to DS.
+              We expect that cluster is homogeneous and that node was going to write the same data
+              (that means retry is not needed). To be able to continue after failed transaction transaction
+              chain reset must be invoked.
+              This is workaround for bug:
+              https://bugs.opendaylight.org/show_bug.cgi?id=7728
+            */
+            LOG.warn("Ignoring that another cluster node is already putting the same data to DS.", e);
+            RestConnectorProvider.resetTransactionChainForAdapaters(this.transactionChainHandler.get());
         }
     }
 }
