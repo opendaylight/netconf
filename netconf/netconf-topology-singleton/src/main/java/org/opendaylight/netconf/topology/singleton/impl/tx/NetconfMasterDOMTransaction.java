@@ -152,8 +152,11 @@ public class NetconfMasterDOMTransaction implements NetconfDOMTransaction {
     @Override
     public boolean cancel() {
         LOG.trace("{}: Cancel[{}} via NETCONF", id, writeTx.getIdentifier());
-
-        return writeTx.cancel();
+        try {
+            return writeTx.cancel();
+        } finally {
+            writeTx = null;
+        }
     }
 
     @Override
