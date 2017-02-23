@@ -8,6 +8,8 @@
 
 package org.opendaylight.netconf.topology.singleton.impl.tx.master;
 
+import akka.actor.ActorRef;
+import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -21,6 +23,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPrefe
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceDataBroker;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMWriteTransaction;
+import org.opendaylight.netconf.topology.singleton.api.TransactionInUseException;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -35,6 +38,7 @@ public class MasterDOMWriteTransaction implements NetconfDOMWriteTransaction {
     private final RemoteDeviceId id;
     private final DOMDataBroker delegateBroker;
 
+    private ActorRef user = null;
     private DOMDataWriteTransaction writeTx;
 
     public MasterDOMWriteTransaction(final RemoteDeviceId id,
@@ -50,19 +54,17 @@ public class MasterDOMWriteTransaction implements NetconfDOMWriteTransaction {
     }
 
     @Override
-    public void openTransaction() {
-        // TODO We don't have to do anything here since
-        // NetconfProxyDOMTransactions and RemoteOperationTxProcessor do all
-        // the work regarding opening transactions. But maybe we should check
-        // for open transaction here instead in RemoteOperationTxProcessor
+    public void openTransaction(@Nonnull final ActorRef requester) throws TransactionInUseException {
+        Preconditions.checkNotNull(requester);
+        if (user != null) {
+            throw new TransactionInUseException(user);
+        }
+        user = requester;
+        writeTx = delegateBroker.newWriteOnlyTransaction();
     }
 
     @Override
     public void put(final LogicalDatastoreType store, final NormalizedNodeMessage data) {
-        if (writeTx == null) {
-            writeTx = delegateBroker.newWriteOnlyTransaction();
-        }
-
         LOG.trace("{}: Write[{}] {} via NETCONF: {} with payload {}", id, writeTx.getIdentifier(), store,
                 data.getIdentifier(), data.getNode());
 
@@ -71,10 +73,6 @@ public class MasterDOMWriteTransaction implements NetconfDOMWriteTransaction {
 
     @Override
     public void merge(final LogicalDatastoreType store, final NormalizedNodeMessage data) {
-        if (writeTx == null) {
-            writeTx = delegateBroker.newWriteOnlyTransaction();
-        }
-
         LOG.trace("{}: Merge[{}] {} via NETCONF: {} with payload {}", id, writeTx.getIdentifier(), store,
                 data.getIdentifier(), data.getNode());
 
@@ -83,41 +81,53 @@ public class MasterDOMWriteTransaction implements NetconfDOMWriteTransaction {
 
     @Override
     public void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        if (writeTx == null) {
-            writeTx = delegateBroker.newWriteOnlyTransaction();
-        }
-
         LOG.trace("{}: Delete[{}} {} via NETCONF: {}", id, writeTx.getIdentifier(), store, path);
 
         writeTx.delete(store, path);
     }
 
     @Override
-    public boolean cancel() {
-        LOG.trace("{}: Cancel[{}} via NETCONF", id, writeTx.getIdentifier());
-
-        return writeTx.cancel();
+    public boolean cancel(@Nonnull final ActorRef requester) {
+        Preconditions.checkNotNull(requester);
+        if (requester.equals(user)) {
+            LOG.trace("{}: Cancel[{}} via NETCONF", id, writeTx.getIdentifier());
+            final boolean canceled = writeTx.cancel();
+            writeTx = null;
+            user = null;
+            return canceled;
+        } else {
+            throw new IllegalStateException("Transaction used by " + user + ", cancel request issued by " + requester);
+        }
     }
 
     @Override
-    public Future<Void> submit() {
-        LOG.trace("{}: Submit[{}} via NETCONF", id, writeTx.getIdentifier());
-
-        final CheckedFuture<Void, TransactionCommitFailedException> submitFuture = writeTx.submit();
-        writeTx = null;
-
+    public Future<Void> submit(@Nonnull final ActorRef requester) {
+        Preconditions.checkNotNull(requester);
         final Promise.DefaultPromise<Void> promise = new Promise.DefaultPromise<>();
-        Futures.addCallback(submitFuture, new FutureCallback<Void>() {
-            @Override
-            public void onSuccess(final Void result) {
-                promise.success(result);
-            }
+        if (!requester.equals(user)) {
+            final IllegalStateException cause =
+                    new IllegalStateException("Transaction is used by " + user + ", submit request issued by "
+                            + requester);
+            promise.failure(cause);
+        } else {
+            LOG.trace("{}: Submit[{}} via NETCONF", id, writeTx.getIdentifier());
 
-            @Override
-            public void onFailure(@Nonnull final Throwable throwable) {
-                promise.failure(throwable);
-            }
-        });
+            final CheckedFuture<Void, TransactionCommitFailedException> submitFuture = writeTx.submit();
+            writeTx = null;
+            user = null;
+
+            Futures.addCallback(submitFuture, new FutureCallback<Void>() {
+                @Override
+                public void onSuccess(final Void result) {
+                    promise.success(result);
+                }
+
+                @Override
+                public void onFailure(@Nonnull final Throwable throwable) {
+                    promise.failure(throwable);
+                }
+            });
+        }
         return promise.future();
     }
 }

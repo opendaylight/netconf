@@ -31,13 +31,15 @@ public class SlaveSalFacade {
     private final NetconfDeviceSalProvider salProvider;
 
     private final ActorSystem actorSystem;
+    private final ActorRef self;
 
     public SlaveSalFacade(final RemoteDeviceId id,
                           final Broker domBroker,
-                          final ActorSystem actorSystem) {
+                          final ActorSystem actorSystem, final ActorRef self) {
         this.id = id;
         this.salProvider = new NetconfDeviceSalProvider(id);
         this.actorSystem = actorSystem;
+        this.self = self;
 
         registerToSal(domBroker);
     }
@@ -57,7 +59,7 @@ public class SlaveSalFacade {
                 new ProxyDOMWriteTransaction(id, actorSystem, masterActorRef);
 
         final NetconfDOMDataBroker netconfDeviceDataBroker =
-                new NetconfDOMDataBroker(actorSystem, id, proxyDOMReadTransaction, proxyDOMWriteTransaction);
+                new NetconfDOMDataBroker(actorSystem, id, proxyDOMReadTransaction, proxyDOMWriteTransaction, self);
 
         salProvider.getMountInstance().onTopologyDeviceConnected(remoteSchemaContext, netconfDeviceDataBroker,
                 deviceRpc, notificationService);

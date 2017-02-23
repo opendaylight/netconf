@@ -10,8 +10,8 @@ package org.opendaylight.netconf.topology.singleton.messages;
 
 import java.io.Serializable;
 import java.util.List;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.topology.singleton.impl.NetconfDOMDataBroker;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 
 /**
@@ -20,11 +20,11 @@ import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 public class CreateInitialMasterActorData implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final DOMDataBroker deviceDataBroker;
+    private final NetconfDOMDataBroker deviceDataBroker;
     private final List<SourceIdentifier> allSourceIdentifiers;
     private final DOMRpcService deviceRpc;
 
-    public CreateInitialMasterActorData(final DOMDataBroker deviceDataBroker,
+    public CreateInitialMasterActorData(final NetconfDOMDataBroker deviceDataBroker,
                                         final List<SourceIdentifier> allSourceIdentifiers,
                                         final DOMRpcService deviceRpc) {
         this.deviceDataBroker = deviceDataBroker;
@@ -32,7 +32,7 @@ public class CreateInitialMasterActorData implements Serializable {
         this.deviceRpc = deviceRpc;
     }
 
-    public DOMDataBroker getDeviceDataBroker() {
+    public NetconfDOMDataBroker getDeviceDataBroker() {
         return deviceDataBroker;
     }
 

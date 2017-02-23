@@ -12,11 +12,15 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import java.util.concurrent.atomic.AtomicBoolean;
+import javax.annotation.Nonnull;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMWriteTransaction;
+import org.opendaylight.netconf.topology.singleton.api.TransactionInUseException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.CancelRequest;
@@ -40,6 +44,7 @@ public class ProxyDOMWriteTransaction implements NetconfDOMWriteTransaction {
     private final RemoteDeviceId id;
     private final ActorSystem actorSystem;
     private final ActorRef masterContextRef;
+    private final AtomicBoolean opened = new AtomicBoolean(false);
 
     public ProxyDOMWriteTransaction(final RemoteDeviceId id,
                                     final ActorSystem actorSystem,
@@ -50,10 +55,10 @@ public class ProxyDOMWriteTransaction implements NetconfDOMWriteTransaction {
     }
 
     @Override
-    public void openTransaction() {
-        // TODO we can do some checking for already opened transaction also
-        // here in this class. We can track open transaction at least for this
-        // node.
+    public void openTransaction(@Nonnull final ActorRef requester) throws TransactionInUseException {
+        if (!opened.compareAndSet(false, true)) {
+            throw new TransactionInUseException();
+        }
         LOG.debug("{}: Requesting leader {} to open new transaction", id, masterContextRef);
         final Future<Object> openTxFuture =
                 Patterns.ask(masterContextRef, new OpenTransaction(), NetconfTopologyUtils.TIMEOUT);
@@ -90,7 +95,11 @@ public class ProxyDOMWriteTransaction implements NetconfDOMWriteTransaction {
     }
 
     @Override
-    public boolean cancel() {
+    public boolean cancel(@Nonnull final ActorRef requester) {
+        //if this proxy isn't opened just return false
+        if (!opened.compareAndSet(true, false)) {
+            return false;
+        }
         final Future<Object> cancelScalaFuture =
                 Patterns.ask(masterContextRef, new CancelRequest(), NetconfTopologyUtils.TIMEOUT);
 
@@ -105,7 +114,8 @@ public class ProxyDOMWriteTransaction implements NetconfDOMWriteTransaction {
     }
 
     @Override
-    public Future<Void> submit() {
+    public Future<Void> submit(@Nonnull final ActorRef requester) {
+        Preconditions.checkState(opened.compareAndSet(true, false), "Transaction isn't opened");
         final Future<Object> submitScalaFuture =
                 Patterns.ask(masterContextRef, new SubmitRequest(), NetconfTopologyUtils.TIMEOUT);
 

@@ -88,7 +88,7 @@ public class NetconfNodeActor extends UntypedActor {
     }
 
     private NetconfNodeActor(final NetconfTopologySetup setup,
-                             final RemoteDeviceId id, SchemaSourceRegistry schemaRegistry,
+                             final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
                              final SchemaRepository schemaRepository) {
         this.setup = setup;
         this.id = id;
@@ -195,7 +195,7 @@ public class NetconfNodeActor extends UntypedActor {
             public void onSuccess(final YangTextSchemaSource yangTextSchemaSource) {
                 try {
                     sender.tell(new YangTextSchemaSourceSerializationProxy(yangTextSchemaSource), getSelf());
-                } catch (IOException exception) {
+                } catch (final IOException exception) {
                     sender.tell(exception.getCause(), getSelf());
                 }
             }
@@ -235,11 +235,11 @@ public class NetconfNodeActor extends UntypedActor {
         });
     }
 
-    private void registerSlaveMountPoint(ActorRef masterReference) {
+    private void registerSlaveMountPoint(final ActorRef masterReference) {
         if (this.slaveSalManager != null) {
             slaveSalManager.close();
         }
-        slaveSalManager = new SlaveSalFacade(id, setup.getDomBroker(), setup.getActorSystem());
+        slaveSalManager = new SlaveSalFacade(id, setup.getDomBroker(), setup.getActorSystem(), self());
 
         final CheckedFuture<SchemaContext, SchemaResolutionException> remoteSchemaContext =
                 getSchemaContext(masterReference);
@@ -259,11 +259,11 @@ public class NetconfNodeActor extends UntypedActor {
         });
     }
 
-    private DOMRpcService getDOMRpcService(ActorRef masterReference) {
+    private DOMRpcService getDOMRpcService(final ActorRef masterReference) {
         return new ProxyDOMRpcService(setup.getActorSystem(), masterReference, id);
     }
 
-    private CheckedFuture<SchemaContext, SchemaResolutionException> getSchemaContext(ActorRef masterReference) {
+    private CheckedFuture<SchemaContext, SchemaResolutionException> getSchemaContext(final ActorRef masterReference) {
 
         final RemoteYangTextSourceProvider remoteYangTextSourceProvider =
                 new ProxyYangTextSourceProvider(masterReference, getContext());

@@ -11,6 +11,7 @@ package org.opendaylight.netconf.topology.singleton.impl;
 import akka.actor.ActorRef;
 import akka.actor.Status;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -18,11 +19,11 @@ import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.RemoteOperationTxProcessor;
+import org.opendaylight.netconf.topology.singleton.api.TransactionInUseException;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitFailedReply;
@@ -36,54 +37,42 @@ public class RemoteOperationTxProcessorImpl implements RemoteOperationTxProcesso
 
     private static final Logger LOG = LoggerFactory.getLogger(RemoteOperationTxProcessorImpl.class);
 
-    private final DOMDataBroker dataBroker;
+    private final NetconfDOMDataBroker dataBroker;
     private final RemoteDeviceId id;
     private DOMDataWriteTransaction writeTx;
-    private DOMDataReadOnlyTransaction readTx;
+    private final DOMDataReadOnlyTransaction readTx;
 
-    private ActorRef currentUser = null;
-
-    public RemoteOperationTxProcessorImpl(final DOMDataBroker dataBroker, final RemoteDeviceId id) {
+    public RemoteOperationTxProcessorImpl(final NetconfDOMDataBroker dataBroker, final RemoteDeviceId id) {
         this.dataBroker = dataBroker;
         this.id = id;
         this.readTx = dataBroker.newReadOnlyTransaction();
     }
 
     @Override
-    public void doOpenTransaction(ActorRef recipient, ActorRef sender) {
-        if (currentUser != null) {
+    public void doOpenTransaction(final ActorRef recipient, final ActorRef sender) {
+        try {
+            LOG.debug("{}: Opening a new transaction for {}", id, recipient);
+            writeTx = dataBroker.newWriteOnlyTransaction(recipient);
+            recipient.tell(new Status.Success(null), sender);
+        } catch (final TransactionInUseException e) {
             LOG.error("{}: Opening a new transaction for {} failed.", id, recipient);
             recipient.tell(new Status.Failure(
-                    new IllegalStateException("Transaction is already opened for another user")), recipient);
-            return;
+                    new IllegalStateException("Transaction is already opened for another user", e)), recipient);
         }
-
-        LOG.debug("{}: Opening a new transaction for {}", id, recipient);
-        currentUser = recipient;
-        recipient.tell(new Status.Success(null), sender);
-    }
-
-    @Override
-    public void doDelete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        if (writeTx == null) {
-            writeTx = dataBroker.newWriteOnlyTransaction();
-        }
-        writeTx.delete(store, path);
     }
 
     @Override
     public void doSubmit(final ActorRef recipient, final ActorRef sender) {
-        currentUser = null;
         if (writeTx != null) {
-            CheckedFuture<Void, TransactionCommitFailedException> submitFuture = writeTx.submit();
+            final CheckedFuture<Void, TransactionCommitFailedException> submitFuture = writeTx.submit();
             Futures.addCallback(submitFuture, new FutureCallback<Void>() {
                 @Override
-                public void onSuccess(Void result) {
+                public void onSuccess(final Void result) {
                     recipient.tell(new SubmitReply(), sender);
                 }
 
                 @Override
-                public void onFailure(@Nonnull Throwable throwable) {
+                public void onFailure(@Nonnull final Throwable throwable) {
                     recipient.tell(throwable, sender);
                 }
             });
@@ -95,28 +84,30 @@ public class RemoteOperationTxProcessorImpl implements RemoteOperationTxProcesso
 
     @Override
     public void doCancel(final ActorRef recipient, final ActorRef sender) {
-        currentUser = null;
         boolean cancel = false;
         if (writeTx != null) {
             cancel = writeTx.cancel();
+            writeTx = null;
         }
         recipient.tell(cancel, sender);
 
     }
 
     @Override
+    public void doDelete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        Preconditions.checkNotNull(writeTx, "Transaction wasn't opened");
+        writeTx.delete(store, path);
+    }
+
+    @Override
     public void doPut(final LogicalDatastoreType store, final NormalizedNodeMessage data) {
-        if (writeTx == null) {
-            writeTx = dataBroker.newWriteOnlyTransaction();
-        }
+        Preconditions.checkNotNull(writeTx, "Transaction wasn't opened");
         writeTx.put(store, data.getIdentifier(), data.getNode());
     }
 
     @Override
     public void doMerge(final LogicalDatastoreType store, final NormalizedNodeMessage data) {
-        if (writeTx == null) {
-            writeTx = dataBroker.newWriteOnlyTransaction();
-        }
+        Preconditions.checkNotNull(writeTx, "Transaction wasn't opened");
         writeTx.merge(store, data.getIdentifier(), data.getNode());
     }
 
@@ -168,7 +159,10 @@ public class RemoteOperationTxProcessorImpl implements RemoteOperationTxProcesso
 
     @Override
     public void close() throws Exception {
-        currentUser = null;
+        if (writeTx != null) {
+            writeTx.cancel();
+            writeTx = null;
+        }
         if (readTx != null) {
             readTx.close();
         }

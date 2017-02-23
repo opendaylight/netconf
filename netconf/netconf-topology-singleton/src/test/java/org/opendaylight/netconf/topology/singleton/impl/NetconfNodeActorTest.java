@@ -45,7 +45,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
@@ -116,7 +115,7 @@ public class NetconfNodeActorTest {
     @Test
     public void testInitDataMessages() throws Exception {
 
-        final DOMDataBroker domDataBroker = mock(DOMDataBroker.class);
+        final NetconfDOMDataBroker domDataBroker = mock(NetconfDOMDataBroker.class);
         final List<SourceIdentifier> sourceIdentifiers = Lists.newArrayList();
 
         /* Test init master data */
@@ -148,7 +147,7 @@ public class NetconfNodeActorTest {
     @Test
     public void testRegisterMountPointMessage() throws Exception {
 
-        final DOMDataBroker domDataBroker = mock(DOMDataBroker.class);
+        final NetconfDOMDataBroker domDataBroker = mock(NetconfDOMDataBroker.class);
         final List<SourceIdentifier> sourceIdentifiers =
                 Lists.newArrayList(RevisionSourceIdentifier.create("testID", Optional.absent()));
 
@@ -192,7 +191,7 @@ public class NetconfNodeActorTest {
 
         final YangTextSchemaSource yangTextSchemaSource = new YangTextSchemaSource(sourceIdentifier) {
             @Override
-            protected MoreObjects.ToStringHelper addToStringAttributes(MoreObjects.ToStringHelper toStringHelper) {
+            protected MoreObjects.ToStringHelper addToStringAttributes(final MoreObjects.ToStringHelper toStringHelper) {
                 return null;
             }
 
@@ -238,7 +237,7 @@ public class NetconfNodeActorTest {
     @Test
     public void testProxyDOMRpcService() throws Exception {
 
-        final DOMDataBroker domDataBroker = mock(DOMDataBroker.class);
+        final NetconfDOMDataBroker domDataBroker = mock(NetconfDOMDataBroker.class);
         final List<SourceIdentifier> sourceIdentifiers =
                 Lists.newArrayList(RevisionSourceIdentifier.create("testID", Optional.absent()));
 
@@ -325,8 +324,8 @@ public class NetconfNodeActorTest {
 
     }
 
-    private String convertStreamToString(java.io.InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+    private String convertStreamToString(final java.io.InputStream is) {
+        final java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
     }
 

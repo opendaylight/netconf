@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.topology.singleton.impl.tx;
 
+import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.dispatch.OnComplete;
 import com.google.common.base.Function;
@@ -22,6 +23,7 @@ import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFaile
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMWriteTransaction;
+import org.opendaylight.netconf.topology.singleton.api.TransactionInUseException;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -38,15 +40,17 @@ public class NetconfWriteOnlyTransaction implements DOMDataWriteTransaction {
     private final RemoteDeviceId id;
     private final NetconfDOMWriteTransaction delegate;
     private final ActorSystem actorSystem;
+    private final ActorRef user;
 
     public NetconfWriteOnlyTransaction(final RemoteDeviceId id,
                                        final ActorSystem actorSystem,
-                                       final NetconfDOMWriteTransaction delegate) {
+                                       final NetconfDOMWriteTransaction delegate,
+                                       final ActorRef user) throws TransactionInUseException {
         this.id = id;
         this.delegate = delegate;
         this.actorSystem = actorSystem;
-
-        this.delegate.openTransaction();
+        this.user = user;
+        this.delegate.openTransaction(user);
     }
 
     @Override
@@ -69,7 +73,7 @@ public class NetconfWriteOnlyTransaction implements DOMDataWriteTransaction {
     public boolean cancel() {
         LOG.trace("{}: Cancel", id);
 
-        return delegate.cancel();
+        return delegate.cancel(user);
     }
 
     @Override
@@ -83,7 +87,7 @@ public class NetconfWriteOnlyTransaction implements DOMDataWriteTransaction {
     public CheckedFuture<Void, TransactionCommitFailedException> submit() {
         LOG.trace("{}: Submit", id);
 
-        final Future<Void> submit = delegate.submit();
+        final Future<Void> submit = delegate.submit(user);
         final SettableFuture<Void> settFuture = SettableFuture.create();
         final CheckedFuture<Void, TransactionCommitFailedException> checkedFuture;
         checkedFuture = Futures.makeChecked(settFuture, new Function<Exception, TransactionCommitFailedException>() {
@@ -110,7 +114,7 @@ public class NetconfWriteOnlyTransaction implements DOMDataWriteTransaction {
     public ListenableFuture<RpcResult<TransactionStatus>> commit() {
         LOG.trace("{}: Commit", id);
 
-        final Future<Void> commit = delegate.submit();
+        final Future<Void> commit = delegate.submit(user);
         final SettableFuture<RpcResult<TransactionStatus>> settFuture = SettableFuture.create();
         commit.onComplete(new OnComplete<Void>() {
             @Override

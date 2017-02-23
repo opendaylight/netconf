@@ -17,7 +17,6 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
@@ -57,7 +56,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
     private final ActorRef masterActorRef;
     private final ActorSystem actorSystem;
-    private DOMDataBroker deviceDataBroker = null;
+    private NetconfDOMDataBroker deviceDataBroker = null;
 
     MasterSalFacade(final RemoteDeviceId id,
                            final Broker domBroker,
@@ -137,20 +136,20 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
         LOG.info("{}: Creating master data broker for device", id);
 
-        final NetconfDOMReadTransaction masterDOMReadTransaction =
+        final NetconfDOMReadTransaction masterReadTransaction =
                 new MasterDOMReadTransaction(id, remoteSchemaContext, deviceRpc, netconfSessionPreferences);
-        final NetconfDOMWriteTransaction masterDOMWriteTransaction =
+        final NetconfDOMWriteTransaction masterWriteTransaction =
                 new MasterDOMWriteTransaction(id, remoteSchemaContext, deviceRpc, netconfSessionPreferences);
         deviceDataBroker =
-                new NetconfDOMDataBroker(actorSystem, id, masterDOMReadTransaction, masterDOMWriteTransaction);
+                new NetconfDOMDataBroker(actorSystem, id, masterReadTransaction, masterWriteTransaction, masterActorRef);
         // We need to create ProxyDOMReadTransaction and ProxyDOMWriteTransaction so accessing mountpoint
         // on leader node would be same as on follower node
-        final NetconfDOMReadTransaction proxyDOMReadTransaction =
+        final NetconfDOMReadTransaction proxyReadTransaction =
                 new ProxyDOMReadTransaction(id, actorSystem, masterActorRef);
-        final NetconfDOMWriteTransaction proxyDOMWriteTransaction =
+        final NetconfDOMWriteTransaction proxyWriteTransaction =
                 new ProxyDOMWriteTransaction(id, actorSystem, masterActorRef);
         final NetconfDOMDataBroker proxyDataBroker =
-                new NetconfDOMDataBroker(actorSystem, id, proxyDOMReadTransaction, proxyDOMWriteTransaction);
+                new NetconfDOMDataBroker(actorSystem, id, proxyReadTransaction, proxyWriteTransaction, masterActorRef);
         salProvider.getMountInstance()
                 .onTopologyDeviceConnected(remoteSchemaContext, proxyDataBroker, deviceRpc, notificationService);
     }

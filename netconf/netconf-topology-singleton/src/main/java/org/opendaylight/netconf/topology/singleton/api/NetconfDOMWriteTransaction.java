@@ -8,6 +8,8 @@
 
 package org.opendaylight.netconf.topology.singleton.api;
 
+import akka.actor.ActorRef;
+import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -20,12 +22,13 @@ public interface NetconfDOMWriteTransaction {
     /**
      * Opens a new transaction. Transactions have to be opened before applying
      * any operations on them. Previous transaction has to be either submitted
-     * ({@link #submit()} was invoked) or canceled ({@link #cancel()} was
-     * invoked.
+     * ({@link #submit(ActorRef)} was invoked) or canceled ({@link #cancel(ActorRef)} was
+     * invoked. Only actor passed as parameter to this method can close transaction.
      *
      * @throws IllegalStateException if the previous transaction was not SUBMITTED or CANCELLED.
+     * @param requester actor, which wants to open transaction
      */
-    void openTransaction();
+    void openTransaction(@Nonnull ActorRef requester) throws TransactionInUseException;
 
     /**
      * Put data to particular data-store
@@ -52,17 +55,19 @@ public interface NetconfDOMWriteTransaction {
     void delete(LogicalDatastoreType store, YangInstanceIdentifier path);
 
     /**
-     * Cancel operation
+     * Cancel operation. Only actor, which opened this transaction can cancel it.
      *
      * @return success or not
+     * @param requester actor, which wants to cancel transaction
      */
-    boolean cancel();
+    boolean cancel(@Nonnull ActorRef requester);
 
     /**
-     * Commit opened transaction.
+     * Commit opened transaction. Only actor, which opened this transaction can submit it.
      *
      * @return void or raised exception
+     * @param requester actor, which wants to submit transaction
      */
-    Future<Void> submit();
+    Future<Void> submit(@Nonnull ActorRef requester);
 }
 

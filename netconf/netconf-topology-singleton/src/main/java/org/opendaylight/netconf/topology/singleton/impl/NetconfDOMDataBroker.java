@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.topology.singleton.impl;
 
+import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import java.util.Collections;
 import java.util.Map;
@@ -25,6 +26,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.tx.ReadWriteTx;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMReadTransaction;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMWriteTransaction;
+import org.opendaylight.netconf.topology.singleton.api.TransactionInUseException;
 import org.opendaylight.netconf.topology.singleton.impl.tx.NetconfReadOnlyTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.tx.NetconfWriteOnlyTransaction;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
@@ -36,14 +38,16 @@ public class NetconfDOMDataBroker implements DOMDataBroker {
     private final NetconfDOMReadTransaction masterReadTx;
     private final NetconfDOMWriteTransaction masterWriteTx;
     private final ActorSystem actorSystem;
+    private final ActorRef self;
 
     public NetconfDOMDataBroker(final ActorSystem actorSystem, final RemoteDeviceId id,
                                 final NetconfDOMReadTransaction masterReadTx,
-                                final NetconfDOMWriteTransaction masterWriteTx) {
+                                final NetconfDOMWriteTransaction masterWriteTx, final ActorRef self) {
         this.id = id;
         this.masterReadTx = masterReadTx;
         this.masterWriteTx = masterWriteTx;
         this.actorSystem = actorSystem;
+        this.self = self;
     }
 
     @Override
@@ -53,13 +57,29 @@ public class NetconfDOMDataBroker implements DOMDataBroker {
 
     @Override
     public DOMDataReadWriteTransaction newReadWriteTransaction() {
-        return new ReadWriteTx(new NetconfReadOnlyTransaction(id, actorSystem, masterReadTx),
-                new NetconfWriteOnlyTransaction(id, actorSystem, masterWriteTx));
+        try {
+            return newReadWriteTransaction(self);
+        } catch (final TransactionInUseException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
     public DOMDataWriteTransaction newWriteOnlyTransaction() {
-        return new NetconfWriteOnlyTransaction(id, actorSystem, masterWriteTx);
+        try {
+            return newWriteOnlyTransaction(self);
+        } catch (final TransactionInUseException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public DOMDataReadWriteTransaction newReadWriteTransaction(final ActorRef user) throws TransactionInUseException {
+        return new ReadWriteTx(new NetconfReadOnlyTransaction(id, actorSystem, masterReadTx),
+                new NetconfWriteOnlyTransaction(id, actorSystem, masterWriteTx, user));
+    }
+
+    public DOMDataWriteTransaction newWriteOnlyTransaction(final ActorRef user) throws TransactionInUseException {
+        return new NetconfWriteOnlyTransaction(id, actorSystem, masterWriteTx, user);
     }
 
     @Override

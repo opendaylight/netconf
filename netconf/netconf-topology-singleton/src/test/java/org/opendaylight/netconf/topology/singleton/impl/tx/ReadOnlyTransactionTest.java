@@ -74,7 +74,7 @@ public class ReadOnlyTransactionTest {
 
     private ActorRef masterRef;
     private NetconfDOMDataBroker slaveDataBroker;
-    private DOMDataBroker masterDataBroker;
+    private NetconfDOMDataBroker masterDataBroker;
     private List<SourceIdentifier> sourceIdentifiers;
 
     @Mock
@@ -113,7 +113,7 @@ public class ReadOnlyTransactionTest {
                 new MasterDOMWriteTransaction(remoteDeviceId, delegateDataBroker);
 
         masterDataBroker =
-                new NetconfDOMDataBroker(system, remoteDeviceId, masterDOMReadTransaction, masterDOMWriteTransaction);
+                new NetconfDOMDataBroker(system, remoteDeviceId, masterDOMReadTransaction, masterDOMWriteTransaction, masterRef);
 
         // Create slave data broker for testing proxy
 
@@ -123,7 +123,7 @@ public class ReadOnlyTransactionTest {
                 new ProxyDOMWriteTransaction(remoteDeviceId, system, masterRef);
 
         slaveDataBroker =
-                new NetconfDOMDataBroker(system, remoteDeviceId, proxyDOMReadTransaction, proxyDOMWriteTransaction);
+                new NetconfDOMDataBroker(system, remoteDeviceId, proxyDOMReadTransaction, proxyDOMWriteTransaction, null);
 
     }
 
