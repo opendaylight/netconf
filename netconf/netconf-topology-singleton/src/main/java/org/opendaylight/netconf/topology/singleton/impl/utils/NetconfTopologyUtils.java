@@ -8,11 +8,11 @@
 
 package org.opendaylight.netconf.topology.singleton.impl.utils;
 
-import akka.cluster.Member;
 import akka.util.Timeout;
 import java.io.File;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
+import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
@@ -75,18 +75,18 @@ public class NetconfTopologyUtils {
             DEFAULT_SCHEMA_REPOSITORY.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
 
     public static RemoteDeviceId createRemoteDeviceId(final NodeId nodeId, final NetconfNode node) {
-        IpAddress ipAddress = node.getHost().getIpAddress();
-        InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null
+        final IpAddress ipAddress = node.getHost().getIpAddress();
+        final InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null
                 ? ipAddress.getIpv4Address().getValue() : ipAddress.getIpv6Address().getValue(),
                 node.getPort().getValue());
         return new RemoteDeviceId(nodeId.getValue(), address);
     }
 
-    public static String createActorPath(String masterMember, String name) {
+    public static String createActorPath(final String masterMember, final String name) {
         return  masterMember + "/user/" + name;
     }
 
-    public static String createMasterActorName(String name, String masterAddress) {
+    public static String createMasterActorName(final String name, final String masterAddress) {
         return masterAddress.replaceAll("//", "") + "_" + name;
     }
 
@@ -113,5 +113,11 @@ public class NetconfTopologyUtils {
 
     public static InstanceIdentifier<Node> createTopologyNodePath(final String topologyId) {
         return createTopologyListPath(topologyId).child(Node.class);
+    }
+
+    public static DocumentedException createMasterIsDownException(final RemoteDeviceId id) {
+        return new DocumentedException(id + ":Master is down. Please try again.",
+                DocumentedException.ErrorType.application, DocumentedException.ErrorTag.operation_failed,
+                DocumentedException.ErrorSeverity.warning);
     }
 }
