@@ -15,7 +15,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
@@ -48,8 +48,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
-import org.opendaylight.netconf.topology.singleton.impl.NetconfDOMDataBroker;
+import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMDataBroker;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
@@ -73,13 +72,12 @@ public class WriteOnlyTransactionTest {
     public final ExpectedException exception = ExpectedException.none();
 
     private ActorRef masterRef;
-    private NetconfDOMDataBroker slaveDataBroker;
-    private DOMDataBroker masterDataBroker;
+    private ProxyDOMDataBroker slaveDataBroker;
     private List<SourceIdentifier> sourceIdentifiers;
-
+    @Mock
+    private DOMDataBroker deviceDataBroker;
     @Mock
     private DOMDataWriteTransaction writeTx;
-
     @Mock
     private DOMRpcService domRpcService;
 
@@ -100,29 +98,14 @@ public class WriteOnlyTransactionTest {
 
         sourceIdentifiers = Lists.newArrayList();
 
-        // Create master data broker
-
-        final DOMDataBroker delegateDataBroker = mock(DOMDataBroker.class);
         writeTx = mock(DOMDataWriteTransaction.class);
         final DOMDataReadOnlyTransaction readTx = mock(DOMDataReadOnlyTransaction.class);
 
-        doReturn(writeTx).when(delegateDataBroker).newWriteOnlyTransaction();
-        doReturn(readTx).when(delegateDataBroker).newReadOnlyTransaction();
-
-        final NetconfDOMTransaction masterDOMTransactions =
-                new NetconfMasterDOMTransaction(remoteDeviceId, delegateDataBroker);
-
-        masterDataBroker =
-                new NetconfDOMDataBroker(system, remoteDeviceId, masterDOMTransactions);
+        doReturn(writeTx).when(deviceDataBroker).newWriteOnlyTransaction();
+        doReturn(readTx).when(deviceDataBroker).newReadOnlyTransaction();
 
         // Create slave data broker for testing proxy
-
-        final NetconfDOMTransaction proxyDOMTransactions =
-                new NetconfProxyDOMTransaction(remoteDeviceId, system, masterRef);
-
-        slaveDataBroker = new NetconfDOMDataBroker(system, remoteDeviceId, proxyDOMTransactions);
-
-
+        slaveDataBroker = new ProxyDOMDataBroker(system, remoteDeviceId, masterRef);
     }
 
     @After
@@ -132,8 +115,7 @@ public class WriteOnlyTransactionTest {
     }
 
     @Test
-    public void testPutMergeDeleteCalls() throws Exception {
-
+    public void testPut() throws Exception {
         /* Initialize data on master */
 
         initializeDataTest();
@@ -148,29 +130,56 @@ public class WriteOnlyTransactionTest {
 
         doNothing().when(writeTx).put(storeType, instanceIdentifier, testNode);
 
-        DOMDataWriteTransaction wTx = slaveDataBroker.newWriteOnlyTransaction();
+        final DOMDataWriteTransaction wTx = slaveDataBroker.newWriteOnlyTransaction();
         wTx.put(storeType, instanceIdentifier, testNode);
 
-        verify(writeTx, times(1)).put(storeType, instanceIdentifier, testNode);
+        verify(writeTx, timeout(2000)).put(storeType, instanceIdentifier, testNode);
 
         wTx.cancel();
+
+    }
+
+    @Test
+    public void testMerge() throws Exception {
+
+        /* Initialize data on master */
+
+        initializeDataTest();
+
+        final YangInstanceIdentifier instanceIdentifier = YangInstanceIdentifier.EMPTY;
+        final LogicalDatastoreType storeType = LogicalDatastoreType.CONFIGURATION;
+        final NormalizedNode<?, ?> testNode = ImmutableContainerNodeBuilder.create()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("TestQname")))
+                .withChild(ImmutableNodes.leafNode(QName.create("NodeQname"), "foo")).build();
         // Test of invoking merge on master through slave proxy
 
         doNothing().when(writeTx).merge(storeType, instanceIdentifier, testNode);
-        wTx = slaveDataBroker.newWriteOnlyTransaction();
+        final DOMDataWriteTransaction wTx = slaveDataBroker.newWriteOnlyTransaction();
         wTx.merge(storeType, instanceIdentifier, testNode);
 
-        verify(writeTx, times(1)).merge(storeType, instanceIdentifier, testNode);
+        verify(writeTx, timeout(2000)).merge(storeType, instanceIdentifier, testNode);
 
         wTx.cancel();
+
+    }
+
+    @Test
+    public void testDelete() throws Exception {
+
+        /* Initialize data on master */
+
+        initializeDataTest();
+
+        final YangInstanceIdentifier instanceIdentifier = YangInstanceIdentifier.EMPTY;
+        final LogicalDatastoreType storeType = LogicalDatastoreType.CONFIGURATION;
         // Test of invoking delete on master through slave proxy
 
         doNothing().when(writeTx).delete(storeType, instanceIdentifier);
-        wTx = slaveDataBroker.newWriteOnlyTransaction();
+        final DOMDataWriteTransaction wTx = slaveDataBroker.newWriteOnlyTransaction();
         wTx.delete(storeType, instanceIdentifier);
         wTx.cancel();
 
-        verify(writeTx, times(1)).delete(storeType, instanceIdentifier);
+        verify(writeTx, timeout(2000)).delete(storeType, instanceIdentifier);
 
     }
 
@@ -183,8 +192,8 @@ public class WriteOnlyTransactionTest {
 
         // Without Tx
 
-        DOMDataWriteTransaction wTx = slaveDataBroker.newWriteOnlyTransaction();
-        final CheckedFuture<Void,TransactionCommitFailedException> resultSubmit = Futures.immediateCheckedFuture(null);
+        final DOMDataWriteTransaction wTx = slaveDataBroker.newWriteOnlyTransaction();
+        final CheckedFuture<Void, TransactionCommitFailedException> resultSubmit = Futures.immediateCheckedFuture(null);
         doReturn(resultSubmit).when(writeTx).submit();
 
         final CheckedFuture<Void, TransactionCommitFailedException> resultSubmitResponse = wTx.submit();
@@ -192,14 +201,21 @@ public class WriteOnlyTransactionTest {
         final Object result = resultSubmitResponse.checkedGet(TIMEOUT_SEC, TimeUnit.SECONDS);
 
         assertNull(result);
+    }
 
+    @Test
+    public void testSubmitWithOperation() throws Exception {
+
+        /* Initialize data on master */
+
+        initializeDataTest();
         // With Tx
-        wTx = slaveDataBroker.newWriteOnlyTransaction();
+        final DOMDataWriteTransaction wTx = slaveDataBroker.newWriteOnlyTransaction();
         doNothing().when(writeTx).delete(any(), any());
         wTx.delete(LogicalDatastoreType.CONFIGURATION,
                 YangInstanceIdentifier.EMPTY);
 
-        final CheckedFuture<Void,TransactionCommitFailedException> resultSubmitTx = Futures.immediateCheckedFuture(null);
+        final CheckedFuture<Void, TransactionCommitFailedException> resultSubmitTx = Futures.immediateCheckedFuture(null);
         doReturn(resultSubmitTx).when(writeTx).submit();
 
         final CheckedFuture<Void, TransactionCommitFailedException> resultSubmitTxResponse = wTx.submit();
@@ -207,8 +223,15 @@ public class WriteOnlyTransactionTest {
         final Object resultTx = resultSubmitTxResponse.checkedGet(TIMEOUT_SEC, TimeUnit.SECONDS);
 
         assertNull(resultTx);
+    }
 
-        wTx = slaveDataBroker.newWriteOnlyTransaction();
+    @Test
+    public void testSubmitFail() throws Exception {
+
+        /* Initialize data on master */
+
+        initializeDataTest();
+        final DOMDataWriteTransaction wTx = slaveDataBroker.newWriteOnlyTransaction();
         wTx.delete(LogicalDatastoreType.CONFIGURATION,
                 YangInstanceIdentifier.EMPTY);
 
@@ -233,14 +256,22 @@ public class WriteOnlyTransactionTest {
         initializeDataTest();
 
         // Without Tx
-
-        DOMDataWriteTransaction wTx = slaveDataBroker.newWriteOnlyTransaction();
+        doReturn(true).when(writeTx).cancel();
+        final DOMDataWriteTransaction wTx = slaveDataBroker.newWriteOnlyTransaction();
         final Boolean resultFalseNoTx = wTx.cancel();
-        assertEquals(false, resultFalseNoTx);
+        assertEquals(true, resultFalseNoTx);
+    }
+
+    @Test
+    public void testCancelWithOperation() throws Exception {
+
+        /* Initialize data on master */
+
+        initializeDataTest();
 
         // With Tx, readWriteTx test
 
-        wTx = slaveDataBroker.newWriteOnlyTransaction();
+        final DOMDataWriteTransaction wTx = slaveDataBroker.newWriteOnlyTransaction();
         doNothing().when(writeTx).delete(any(), any());
         wTx.delete(LogicalDatastoreType.CONFIGURATION,
                 YangInstanceIdentifier.EMPTY);
@@ -249,8 +280,6 @@ public class WriteOnlyTransactionTest {
         final Boolean resultTrue = wTx.cancel();
         assertEquals(true, resultTrue);
 
-        doReturn(false).when(writeTx).cancel();
-
         final Boolean resultFalse = wTx.cancel();
         assertEquals(false, resultFalse);
 
@@ -258,7 +287,7 @@ public class WriteOnlyTransactionTest {
 
     private void initializeDataTest() throws Exception {
         final Future<Object> initialDataToActor =
-                Patterns.ask(masterRef, new CreateInitialMasterActorData(masterDataBroker, sourceIdentifiers,
+                Patterns.ask(masterRef, new CreateInitialMasterActorData(deviceDataBroker, sourceIdentifiers,
                                 domRpcService), TIMEOUT);
 
         final Object success = Await.result(initialDataToActor, TIMEOUT.duration());
