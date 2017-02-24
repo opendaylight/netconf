@@ -43,8 +43,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
-import org.opendaylight.netconf.topology.singleton.impl.NetconfDOMDataBroker;
+import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMDataBroker;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
@@ -68,13 +67,12 @@ public class ReadOnlyTransactionTest {
     public final ExpectedException exception = ExpectedException.none();
 
     private ActorRef masterRef;
-    private NetconfDOMDataBroker slaveDataBroker;
-    private DOMDataBroker masterDataBroker;
+    private ProxyDOMDataBroker slaveDataBroker;
     private List<SourceIdentifier> sourceIdentifiers;
-
+    @Mock
+    private DOMDataBroker deviceDataBroker;
     @Mock
     private DOMDataReadOnlyTransaction readTx;
-
     @Mock
     private DOMRpcService domRpcService;
 
@@ -95,32 +93,18 @@ public class ReadOnlyTransactionTest {
 
         sourceIdentifiers = Lists.newArrayList();
 
-        // Create master data broker
-
-        final DOMDataBroker delegateDataBroker = mock(DOMDataBroker.class);
+        //device read tx
         readTx = mock(DOMDataReadOnlyTransaction.class);
-
-        doReturn(readTx).when(delegateDataBroker).newReadOnlyTransaction();
-
-        final NetconfDOMTransaction masterDOMTransactions =
-                new NetconfMasterDOMTransaction(remoteDeviceId, delegateDataBroker);
-
-        masterDataBroker =
-                new NetconfDOMDataBroker(system, remoteDeviceId, masterDOMTransactions);
+        doReturn(readTx).when(deviceDataBroker).newReadOnlyTransaction();
 
         // Create slave data broker for testing proxy
-
-        final NetconfDOMTransaction proxyDOMTransactions =
-                new NetconfProxyDOMTransaction(remoteDeviceId, system, masterRef, TIMEOUT);
-
-        slaveDataBroker = new NetconfDOMDataBroker(system, remoteDeviceId, proxyDOMTransactions);
-
-
+        slaveDataBroker =
+                new ProxyDOMDataBroker(system, remoteDeviceId, masterRef, Timeout.apply(5, TimeUnit.SECONDS));
     }
 
     @After
     public void teardown() {
-        JavaTestKit.shutdownActorSystem(system);
+        JavaTestKit.shutdownActorSystem(system, null, true);
         system = null;
     }
 
@@ -256,7 +240,7 @@ public class ReadOnlyTransactionTest {
 
     private void initializeDataTest() throws Exception {
         final Future<Object> initialDataToActor =
-                Patterns.ask(masterRef, new CreateInitialMasterActorData(masterDataBroker, sourceIdentifiers,
+                Patterns.ask(masterRef, new CreateInitialMasterActorData(deviceDataBroker, sourceIdentifiers,
                                 domRpcService), TIMEOUT);
 
         final Object success = Await.result(initialDataToActor, TIMEOUT.duration());
