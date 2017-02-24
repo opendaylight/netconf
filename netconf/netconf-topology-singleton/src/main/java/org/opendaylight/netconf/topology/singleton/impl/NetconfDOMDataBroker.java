@@ -8,7 +8,11 @@
 
 package org.opendaylight.netconf.topology.singleton.impl;
 
+import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import akka.pattern.Patterns;
+import akka.util.Timeout;
+import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.Map;
 import javax.annotation.Nonnull;
@@ -23,50 +27,73 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.ReadWriteTx;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
-import org.opendaylight.netconf.topology.singleton.impl.tx.NetconfReadOnlyTransaction;
-import org.opendaylight.netconf.topology.singleton.impl.tx.NetconfWriteOnlyTransaction;
+import org.opendaylight.netconf.topology.singleton.impl.tx.ProxyReadTransaction;
+import org.opendaylight.netconf.topology.singleton.impl.tx.ProxyWriteTransaction;
+import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadTransactionReply;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadTransactionRequest;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.NewWriteTransactionReply;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.NewWriteTransactionRequest;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import scala.concurrent.Await;
+import scala.concurrent.Future;
 
 public class NetconfDOMDataBroker implements DOMDataBroker {
 
+    private static final Timeout TIMEOUT = NetconfTopologyUtils.TIMEOUT;
+
     private final RemoteDeviceId id;
-    private final NetconfDOMTransaction masterDataBroker;
+    private final ActorRef masterNode;
     private final ActorSystem actorSystem;
 
     public NetconfDOMDataBroker(final ActorSystem actorSystem, final RemoteDeviceId id,
-                         final NetconfDOMTransaction masterDataBroker) {
+                                final ActorRef masterNode) {
         this.id = id;
-        this.masterDataBroker = masterDataBroker;
+        this.masterNode = masterNode;
         this.actorSystem = actorSystem;
     }
 
     @Override
     public DOMDataReadOnlyTransaction newReadOnlyTransaction() {
-        return new NetconfReadOnlyTransaction(id, actorSystem, masterDataBroker);
+        final Future<Object> txActorFuture = Patterns.ask(masterNode, new NewReadTransactionRequest(), TIMEOUT);
+        try {
+            final Object msg = Await.result(txActorFuture, TIMEOUT.duration());
+            Preconditions.checkState(msg instanceof NewReadTransactionReply);
+            final NewReadTransactionReply reply = (NewReadTransactionReply) msg;
+            return new ProxyReadTransaction(reply.getTxActor(), id, actorSystem);
+        } catch (final Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
     public DOMDataReadWriteTransaction newReadWriteTransaction() {
-        return new ReadWriteTx(new NetconfReadOnlyTransaction(id, actorSystem, masterDataBroker),
-                new NetconfWriteOnlyTransaction(id, actorSystem, masterDataBroker));
+        return new ReadWriteTx(newReadOnlyTransaction(), newWriteOnlyTransaction());
     }
 
     @Override
     public DOMDataWriteTransaction newWriteOnlyTransaction() {
-        return new NetconfWriteOnlyTransaction(id, actorSystem, masterDataBroker);
+        final Future<Object> txActorFuture = Patterns.ask(masterNode, new NewWriteTransactionRequest(), TIMEOUT);
+        try {
+            final Object msg = Await.result(txActorFuture, TIMEOUT.duration());
+            Preconditions.checkState(msg instanceof NewWriteTransactionReply);
+            final NewWriteTransactionReply reply = (NewWriteTransactionReply) msg;
+            return new ProxyWriteTransaction(reply.getTxActor(), id, actorSystem);
+        } catch (final Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
     public ListenerRegistration<DOMDataChangeListener> registerDataChangeListener(
-            LogicalDatastoreType store, YangInstanceIdentifier path, DOMDataChangeListener listener,
-            DataChangeScope triggeringScope) {
+            final LogicalDatastoreType store, final YangInstanceIdentifier path, final DOMDataChangeListener listener,
+            final DataChangeScope triggeringScope) {
         throw new UnsupportedOperationException(id + ": Data change listeners not supported for netconf mount point");
     }
 
     @Override
-    public DOMTransactionChain createTransactionChain(TransactionChainListener listener) {
+    public DOMTransactionChain createTransactionChain(final TransactionChainListener listener) {
         throw new UnsupportedOperationException(id + ": Transaction chains not supported for netconf mount point");
     }
 
