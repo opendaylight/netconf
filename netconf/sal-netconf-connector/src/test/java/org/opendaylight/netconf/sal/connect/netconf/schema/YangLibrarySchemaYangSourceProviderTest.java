@@ -61,6 +61,6 @@ public class YangLibrarySchemaYangSourceProviderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetSourceNotAvailable() throws Exception {
-        yangLibrarySchemaYangSourceProvider.getSource(RevisionSourceIdentifier.create("aaaaa", "0000-00-00"));
+        yangLibrarySchemaYangSourceProvider.getSource(RevisionSourceIdentifier.create("aaaaa"));
     }
 }

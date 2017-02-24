@@ -79,13 +79,9 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDevice.class);
 
-    public static final Function<QName, SourceIdentifier> QNAME_TO_SOURCE_ID_FUNCTION = new Function<QName, SourceIdentifier>() {
-        @Override
-        public SourceIdentifier apply(final QName input) {
-            return RevisionSourceIdentifier
-                    .create(input.getLocalName(), Optional.fromNullable(input.getFormattedRevision()));
-        }
-    };
+    public static final Function<QName, SourceIdentifier> QNAME_TO_SOURCE_ID_FUNCTION =
+            input -> RevisionSourceIdentifier.create(input.getLocalName(),
+                Optional.fromNullable(input.getFormattedRevision()));
 
     protected final RemoteDeviceId id;
     private final boolean reconnectOnSchemasChange;
@@ -168,8 +164,9 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     private void registerToBaseNetconfStream(final NetconfDeviceRpc deviceRpc, final NetconfDeviceCommunicator listener) {
        // TODO check whether the model describing create subscription is present in schema
         // Perhaps add a default schema context to support create-subscription if the model was not provided (same as what we do for base netconf operations in transformer)
-        final CheckedFuture<DOMRpcResult, DOMRpcException> rpcResultListenableFuture =
-                deviceRpc.invokeRpc(NetconfMessageTransformUtil.toPath(NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME), NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_CONTENT);
+        final CheckedFuture<DOMRpcResult, DOMRpcException> rpcResultListenableFuture = deviceRpc.invokeRpc(
+            NetconfMessageTransformUtil.toPath(NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME),
+            NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_CONTENT);
 
         final NotificationHandler.NotificationFilter filter = new NotificationHandler.NotificationFilter() {
             @Override
@@ -534,12 +531,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
         }
 
         private Collection<QName> getQNameFromSourceIdentifiers(final Collection<SourceIdentifier> identifiers) {
-            final Collection<QName> qNames = Collections2.transform(identifiers, new Function<SourceIdentifier, QName>() {
-                @Override
-                public QName apply(final SourceIdentifier sourceIdentifier) {
-                    return getQNameFromSourceIdentifier(sourceIdentifier);
-                }
-            });
+            final Collection<QName> qNames = Collections2.transform(identifiers, this::getQNameFromSourceIdentifier);
 
             if (qNames.isEmpty()) {
                 LOG.debug("{}: Unable to map any source identifiers to a capability reported by device : {}", id, identifiers);
@@ -550,22 +542,27 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
         private QName getQNameFromSourceIdentifier(final SourceIdentifier identifier) {
             // Required sources are all required and provided merged in DeviceSourcesResolver
             for (final QName qname : deviceSources.getRequiredSourcesQName()) {
-                if(qname.getLocalName().equals(identifier.getName()) == false) {
+                if (!qname.getLocalName().equals(identifier.getName())) {
                     continue;
                 }
 
-                if(identifier.getRevision().equals(SourceIdentifier.NOT_PRESENT_FORMATTED_REVISION) &&
-                        qname.getRevision() == null) {
-                    return qname;
-                }
-
-                if (qname.getFormattedRevision().equals(identifier.getRevision())) {
+                final String rev = getNullableRev(identifier);
+                if (rev == null) {
+                    if (qname.getRevision() == null) {
+                        return qname;
+                    }
+                } else if (qname.getFormattedRevision().equals(rev)) {
                     return qname;
                 }
             }
             LOG.warn("Unable to map identifier to a devices reported capability: {} Available: {}",identifier, deviceSources.getRequiredSourcesQName());
             // return null since we cannot find the QName, this capability will be removed from required sources and not reported as unresolved-capability
             return null;
+        }
+
+        private String getNullableRev(final SourceIdentifier identifier) {
+            final String rev = identifier.getRevision();
+            return rev == null || SourceIdentifier.NOT_PRESENT_FORMATTED_REVISION.equals(rev) ? null : rev;
         }
     }
 }

@@ -113,7 +113,8 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
         final String moduleName = sourceIdentifier.getName();
 
         // If formatted revision is SourceIdentifier.NOT_PRESENT_FORMATTED_REVISION, we have to omit it from request
-        final String formattedRevision = sourceIdentifier.getRevision().equals(SourceIdentifier.NOT_PRESENT_FORMATTED_REVISION) ? null : sourceIdentifier.getRevision();
+        final String badRev = sourceIdentifier.getRevision();
+        final String formattedRevision = SourceIdentifier.NOT_PRESENT_FORMATTED_REVISION.equals(badRev) ? null : badRev;
         final Optional<String> revision = Optional.fromNullable(formattedRevision);
         final NormalizedNode<?, ?> getSchemaRequest = createGetSchemaRequest(moduleName, revision);
 
