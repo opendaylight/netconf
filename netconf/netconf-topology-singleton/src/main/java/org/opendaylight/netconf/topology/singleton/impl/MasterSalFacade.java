@@ -26,12 +26,10 @@ import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
+import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceDataBroker;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
-import org.opendaylight.netconf.topology.singleton.impl.tx.NetconfMasterDOMTransaction;
-import org.opendaylight.netconf.topology.singleton.impl.tx.NetconfProxyDOMTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -137,15 +135,11 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
         LOG.info("{}: Creating master data broker for device", id);
 
-        final NetconfDOMTransaction masterDOMTransactions =
-                new NetconfMasterDOMTransaction(id, remoteSchemaContext, deviceRpc, netconfSessionPreferences);
-        deviceDataBroker =
-                new NetconfDOMDataBroker(actorSystem, id, masterDOMTransactions);
-        // We need to create NetconfProxyDOMTransaction so accessing mountpoint
+        deviceDataBroker = new NetconfDeviceDataBroker(id, remoteSchemaContext, deviceRpc, netconfSessionPreferences);
+        // We need to create ProxyDOMDataBroker so accessing mountpoint
         // on leader node would be same as on follower node
-        final NetconfDOMTransaction proxyDOMTransation =
-                new NetconfProxyDOMTransaction(id, actorSystem, masterActorRef, actorResponseWaitTime);
-        final NetconfDOMDataBroker proxyDataBroker = new NetconfDOMDataBroker(actorSystem, id, proxyDOMTransation);
+        final ProxyDOMDataBroker proxyDataBroker =
+                new ProxyDOMDataBroker(actorSystem, id, masterActorRef, actorResponseWaitTime);
         salProvider.getMountInstance()
                 .onTopologyDeviceConnected(remoteSchemaContext, proxyDataBroker, deviceRpc, notificationService);
     }
@@ -154,7 +148,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
         final List<SourceIdentifier> sourceIdentifiers =
                 remoteSchemaContext.getAllModuleIdentifiers().stream().map(mi ->
                         RevisionSourceIdentifier.create(mi.getName(),
-                            (SimpleDateFormatUtil.DEFAULT_DATE_REV == mi.getRevision() ? Optional.<String>absent() :
+                                (SimpleDateFormatUtil.DEFAULT_DATE_REV == mi.getRevision() ? Optional.<String>absent() :
                                     Optional.of(mi.getQNameModule().getFormattedRevision()))))
                         .collect(Collectors.toList());
 
