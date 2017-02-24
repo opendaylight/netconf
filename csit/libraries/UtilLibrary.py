@@ -4,6 +4,7 @@ from SSHLibrary import SSHLibrary
 import robot
 import time
 import re
+import json
 import warnings
 
 
@@ -302,6 +303,41 @@ def flush_iptables(controllers, username, password):
         print "."
         print "."
     return flush_result
+
+
+def build_elastic_search_JSON_request(query_String):
+    data = {'from': '0',
+            'size': '1',
+            'sort': [{'TimeStamp': {'order': 'desc'}}],
+            'query': {'query_string': {'query': query_String}}}
+    return json.dumps(data)
+
+
+def create_query_string_search(data_category, metric_name, node_id, rk_node_id):
+    query = 'TSDRDataCategory:'
+    query += data_category
+    query += ' AND MetricName:'
+    query += metric_name
+    query += ' AND NodeID:\"'
+    query += node_id
+    query += '\" AND RecordKeys.KeyValue:\"'
+    query += rk_node_id
+    query += '\" AND RecordKeys.KeyName:Node AND RecordKeys.KeyValue:0 AND RecordKeys.KeyName:Table'
+    return query
+
+
+def create_query_string_count(data_category):
+    query = 'TSDRDataCategory:'
+    query += data_category
+    return query
+
+
+def extract_metric_value_search(response):
+    return str(response['hits']['hits'][0]['_source']['MetricValue'])
+
+
+def extract_metric_value_count(response):
+    return int(response['hits']['total'])
 
 
 #
