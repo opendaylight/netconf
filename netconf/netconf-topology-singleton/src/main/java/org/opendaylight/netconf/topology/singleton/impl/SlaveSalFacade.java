@@ -15,8 +15,6 @@ import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
-import org.opendaylight.netconf.topology.singleton.impl.tx.NetconfProxyDOMTransaction;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,11 +47,8 @@ public class SlaveSalFacade {
                                         final ActorRef masterActorRef) {
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
 
-        final NetconfDOMTransaction proxyDOMTransactions =
-                new NetconfProxyDOMTransaction(id, actorSystem, masterActorRef);
-
-        final NetconfDOMDataBroker netconfDeviceDataBroker =
-                new NetconfDOMDataBroker(actorSystem, id, proxyDOMTransactions);
+        final ProxyDOMDataBroker netconfDeviceDataBroker =
+                new ProxyDOMDataBroker(actorSystem, id, masterActorRef);
 
         salProvider.getMountInstance().onTopologyDeviceConnected(remoteSchemaContext, netconfDeviceDataBroker,
                 deviceRpc, notificationService);
@@ -69,7 +64,7 @@ public class SlaveSalFacade {
         unregisterSlaveMountPoint();
         try {
             salProvider.getMountInstance().close();
-        } catch (Exception exception) {
+        } catch (final Exception exception) {
             LOG.warn("{}: Exception in closing slave sal facade: {}", id, exception);
         }
 
