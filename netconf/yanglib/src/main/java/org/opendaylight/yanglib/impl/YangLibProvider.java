@@ -54,13 +54,9 @@ import org.slf4j.LoggerFactory;
 public class YangLibProvider implements BindingAwareProvider, AutoCloseable, SchemaSourceListener{
     private static final Logger LOG = LoggerFactory.getLogger(YangLibProvider.class);
 
-    private static final Predicate<PotentialSchemaSource<?>> YANG_SCHEMA_SOURCE = new Predicate<PotentialSchemaSource<?>>() {
-        @Override
-        public boolean apply(final PotentialSchemaSource<?> input) {
-            // filter out non yang sources
-            return YangTextSchemaSource.class.isAssignableFrom(input.getRepresentation());
-        }
-    };
+    private static final OptionalRevision NO_REVISION = new OptionalRevision("");
+    private static final Predicate<PotentialSchemaSource<?>> YANG_SCHEMA_SOURCE =
+            input -> YangTextSchemaSource.class.isAssignableFrom(input.getRepresentation());
 
     protected DataBroker dataBroker;
     protected SchemaListenerRegistration schemaListenerRegistration;
@@ -123,12 +119,12 @@ public class YangLibProvider implements BindingAwareProvider, AutoCloseable, Sch
 
         Futures.addCallback(tx.submit(), new FutureCallback<Void>() {
             @Override
-            public void onSuccess(@Nullable Void result) {
+            public void onSuccess(@Nullable final Void result) {
                 LOG.debug("Modules state successfully populated with new modules");
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFailure(final Throwable t) {
                 LOG.warn("Unable to update modules state", t);
             }
         });
@@ -152,28 +148,33 @@ public class YangLibProvider implements BindingAwareProvider, AutoCloseable, Sch
 
         Futures.addCallback(tx.submit(), new FutureCallback<Void>() {
             @Override
-            public void onSuccess(@Nullable Void result) {
+            public void onSuccess(@Nullable final Void result) {
                 LOG.debug("Modules state successfully updated.");
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFailure(final Throwable t) {
                 LOG.warn("Unable to update modules state", t);
             }
         });
     }
 
+
+
     private Uri getUrlForModule(final SourceIdentifier sourceIdentifier) {
-        final String revision = sourceIdentifier.getRevision().equals(SourceIdentifier.NOT_PRESENT_FORMATTED_REVISION)
-                ? "" : sourceIdentifier.getRevision();
-        return new Uri("http://" + bindingAddress + ":" + bindingPort
-                + "/yanglib/schemas/" + sourceIdentifier.getName() + "/" + revision);
+        return new Uri("http://" + bindingAddress + ':' + bindingPort + "/yanglib/schemas/"
+                + sourceIdentifier.getName() + '/' + revString(sourceIdentifier));
     }
 
-    private OptionalRevision getRevisionForModule(final SourceIdentifier sourceIdentifier) {
-        return sourceIdentifier.getRevision().equals(SourceIdentifier.NOT_PRESENT_FORMATTED_REVISION)
-                ? new OptionalRevision("")
-                : new OptionalRevision(new RevisionIdentifier(sourceIdentifier.getRevision()));
+    private static String revString(final SourceIdentifier id) {
+        final String rev = id.getRevision();
+        return rev == null || SourceIdentifier.NOT_PRESENT_FORMATTED_REVISION.equals(rev) ? "" : rev;
+    }
+
+    private static OptionalRevision getRevisionForModule(final SourceIdentifier sourceIdentifier) {
+        final String rev = sourceIdentifier.getRevision();
+        return rev == null || SourceIdentifier.NOT_PRESENT_FORMATTED_REVISION.equals(rev) ? NO_REVISION
+                : new OptionalRevision(new RevisionIdentifier(rev));
     }
 
     private <T> T getObjectFromBundleContext(final Class<T> type, final String serviceRefName) {
