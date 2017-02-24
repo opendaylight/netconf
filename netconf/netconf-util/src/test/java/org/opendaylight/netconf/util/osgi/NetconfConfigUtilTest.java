@@ -46,11 +46,11 @@ public class NetconfConfigUtilTest {
         doReturn(services).when(context).getServiceReferences(ManagedService.class, null);
         final ManagedService service = mock(ManagedService.class);
         doReturn(service).when(context).getService(serviceRef);
-        doReturn(NetconfConfiguration.getInstance()).when(context).getService(netconfConfigurationRef);
-        final java.util.Optional<NetconfConfiguration> netconfConfigurationOptional =
+        NetconfConfiguration netconfConfiguration = new NetconfConfiguration();
+        doReturn(netconfConfiguration).when(context).getService(netconfConfigurationRef);
+        final NetconfConfiguration actualNetconfConfiguration =
                 NetconfConfigUtil.getNetconfConfigurationService(context);
-        Assert.assertTrue(netconfConfigurationOptional.isPresent());
-        Assert.assertEquals(NetconfConfiguration.getInstance(), netconfConfigurationOptional.get());
+        Assert.assertEquals(netconfConfiguration, actualNetconfConfiguration);
 
     }
 
@@ -62,9 +62,12 @@ public class NetconfConfigUtilTest {
         doReturn(services).when(context).getServiceReferences(ManagedService.class, null);
         final ManagedService service = mock(ManagedService.class);
         doReturn(service).when(context).getService(serviceRef);
-        final java.util.Optional<NetconfConfiguration> netconfConfigurationOptional =
-                NetconfConfigUtil.getNetconfConfigurationService(context);
-        Assert.assertFalse(netconfConfigurationOptional.isPresent());
+        try {
+            NetconfConfigUtil.getNetconfConfigurationService(context);
+            Assert.fail(IllegalStateException.class + "exception expected");
+        } catch (IllegalStateException e) {
+
+        }
     }
 
     @Test
@@ -72,8 +75,11 @@ public class NetconfConfigUtilTest {
         final BundleContext context = mock(BundleContext.class);
         final InvalidSyntaxException exception = new InvalidSyntaxException("Invalid syntax", "filter");
         doThrow(exception).when(context).getServiceReferences(ManagedService.class, null);
-        final java.util.Optional<NetconfConfiguration> netconfConfigurationOptional =
-                NetconfConfigUtil.getNetconfConfigurationService(context);
-        Assert.assertFalse(netconfConfigurationOptional.isPresent());
+        try {
+            NetconfConfigUtil.getNetconfConfigurationService(context);
+            Assert.fail(InvalidSyntaxException.class + "exception expected");
+        } catch (InvalidSyntaxException e) {
+            return;
+        }
     }
 }
