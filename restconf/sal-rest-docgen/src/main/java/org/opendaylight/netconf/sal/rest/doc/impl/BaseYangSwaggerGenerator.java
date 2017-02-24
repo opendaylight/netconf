@@ -15,9 +15,7 @@ import com.fasterxml.jackson.datatype.jsonorg.JsonOrgModule;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.net.URI;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -44,6 +42,7 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.Parameter;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Resource;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -52,6 +51,7 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +65,6 @@ public class BaseYangSwaggerGenerator {
     private static final String RESTCONF_DRAFT = "18";
 
     static final String MODULE_NAME_SUFFIX = "_module";
-    protected static final DateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private final ModelGenerator jsonConverter = new ModelGenerator();
 
     // private Map<String, ApiDeclaration> MODULE_DOC_CACHE = new HashMap<>()
@@ -92,7 +91,7 @@ public class BaseYangSwaggerGenerator {
         LOG.info("Modules found [{}]", modules.size());
 
         for (final Module module : modules) {
-            final String revisionString = SIMPLE_DATE_FORMAT.format(module.getRevision());
+            final String revisionString = SimpleDateFormatUtil.getRevisionFormat().format(module.getRevision());
             final Resource resource = new Resource();
             LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
             final ApiDeclaration doc =
@@ -128,8 +127,8 @@ public class BaseYangSwaggerGenerator {
         Date rev = null;
 
         try {
-            if ((revision != null) && !revision.equals("0000-00-00")) {
-                rev = SIMPLE_DATE_FORMAT.parse(revision);
+            if (revision != null && !SourceIdentifier.NOT_PRESENT_FORMATTED_REVISION.equals(revision)) {
+                rev = SimpleDateFormatUtil.getRevisionFormat().parse(revision);
             }
         } catch (final ParseException e) {
             throw new IllegalArgumentException(e);
@@ -249,8 +248,8 @@ public class BaseYangSwaggerGenerator {
         return null;
     }
 
-    private void addRootPostLink(final Module module, final DataNodeContainer node, final List<Parameter> pathParams,
-            final String resourcePath, final String dataStore, final List<Api> apis) {
+    private static void addRootPostLink(final Module module, final DataNodeContainer node,
+            final List<Parameter> pathParams, final String resourcePath, final String dataStore, final List<Api> apis) {
         if (containsListOrContainer(module.getChildNodes())) {
             final Api apiForRootPostUri = new Api();
             apiForRootPostUri.setPath(resourcePath.concat(getContent(dataStore)));
@@ -273,15 +272,14 @@ public class BaseYangSwaggerGenerator {
         if (newDraft) {
             if ("config".contains(dataStore) || "operational".contains(dataStore)) {
                 return "/" + RESTCONF_DRAFT + "/data" + context;
-            } else {
-                return "/" + RESTCONF_DRAFT + "/operations" + context;
             }
-        } else {
-            return "/" + dataStore + context;
+            return "/" + RESTCONF_DRAFT + "/operations" + context;
         }
+
+        return "/" + dataStore + context;
     }
 
-    private String generateCacheKey(final String module, final String revision) {
+    private static String generateCacheKey(final String module, final String revision) {
         return module + "(" + revision + ")";
     }
 
@@ -329,16 +327,16 @@ public class BaseYangSwaggerGenerator {
         }
     }
 
-    private boolean containsListOrContainer(final Iterable<DataSchemaNode> nodes) {
+    private static boolean containsListOrContainer(final Iterable<DataSchemaNode> nodes) {
         for (final DataSchemaNode child : nodes) {
-            if ((child instanceof ListSchemaNode) || (child instanceof ContainerSchemaNode)) {
+            if (child instanceof ListSchemaNode || child instanceof ContainerSchemaNode) {
                 return true;
             }
         }
         return false;
     }
 
-    private List<Operation> operation(final DataSchemaNode node, final List<Parameter> pathParams,
+    private static List<Operation> operation(final DataSchemaNode node, final List<Parameter> pathParams,
             final boolean isConfig, final Iterable<DataSchemaNode> childSchemaNodes, final String parentName) {
         final List<Operation> operations = new ArrayList<>();
 
@@ -360,7 +358,7 @@ public class BaseYangSwaggerGenerator {
         return operations;
     }
 
-    private List<Operation> operationPost(final String name, final String description,
+    private static List<Operation> operationPost(final String name, final String description,
             final DataNodeContainer dataNodeContainer, final List<Parameter> pathParams, final boolean isConfig,
             final String parentName) {
         final List<Operation> operations = new ArrayList<>();
@@ -371,7 +369,7 @@ public class BaseYangSwaggerGenerator {
         return operations;
     }
 
-    private String createPath(final DataSchemaNode schemaNode, final List<Parameter> pathParams,
+    private static String createPath(final DataSchemaNode schemaNode, final List<Parameter> pathParams,
             final SchemaContext schemaContext) {
         final ArrayList<LeafSchemaNode> pathListParams = new ArrayList<>();
         final StringBuilder path = new StringBuilder();
@@ -465,6 +463,6 @@ public class BaseYangSwaggerGenerator {
     }
 
     public void setDraft(final boolean draft) {
-        this.newDraft = draft;
+        BaseYangSwaggerGenerator.newDraft = draft;
     }
 }
