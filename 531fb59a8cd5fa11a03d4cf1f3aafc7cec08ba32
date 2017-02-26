@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_5e062187",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/AbstractQueryParams.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5357
+      },
+      "writtenOn": "2017-02-26T06:45:14Z",
+      "side": 1,
+      "message": "I see what you mean. For now, let\u0027s leave it and if there are ever any additional query params we can create a class for them.",
+      "parentUuid": "fafc7978_97f875c4",
+      "range": {
+        "startLine": 46,
+        "startChar": 16,
+        "endLine": 46,
+        "endChar": 115
+      },
+      "revId": "531fb59a8cd5fa11a03d4cf1f3aafc7cec08ba32",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_374d499b",
         "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2017-02-23T14:27:08Z",
       "side": 1,
       "message": "In deletion case, will non-leaf be reported?",
+      "range": {
+        "startLine": 176,
+        "startChar": 8,
+        "endLine": 177,
+        "endChar": 34
+      },
+      "revId": "531fb59a8cd5fa11a03d4cf1f3aafc7cec08ba32",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_fed555e5",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 5357
+      },
+      "writtenOn": "2017-02-26T06:45:14Z",
+      "side": 1,
+      "message": "Not really. I did not change the logic for how how deletes are notified because even without this change it still notifies about only the leaf nodes along with the single, enclsoing container. This last bit (the immediate container) is a very slight inconsistency but it does not break anything and is probably a good idea to keep.\n\n\nHere is a capture of a notification for the delete of a single Port status:\n\n{\n    \"notification\": {\n        \"data-changed-notification\": {\n            \"data-change-event\": [\n                {\n                    \"operation\": \"deleted\",\n                    \"path\": \"/neutron:neutron/neutron:ports/neutron:port[neutron:uuid\u003d\u00272e7bce0c-341e-4d1c-b49c-6526909d49bf\u0027]/neutron:uuid\"\n                },\n                {\n                    \"operation\": \"deleted\",\n                    \"path\": \"/neutron:neutron/neutron:ports/neutron:port[neutron:uuid\u003d\u00272e7bce0c-341e-4d1c-b49c-6526909d49bf\u0027]/neutron:status\"\n                },\n                {\n                    \"operation\": \"deleted\",\n                    \"path\": \"/neutron:neutron/neutron:ports/neutron:port[neutron:uuid\u003d\u00272e7bce0c-341e-4d1c-b49c-6526909d49bf\u0027]\"\n                }\n            ],\n            \"xmlns\": \"urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote\"\n        },\n        \"eventTime\": \"2017-02-26T08:33:30+02:00\",\n        \"xmlns\": \"urn:ietf:params:xml:ns:netconf:notification:1.0\"\n    }\n}",
+      "parentUuid": "fafc7978_374d499b",
       "range": {
         "startLine": 176,
         "startChar": 8,
