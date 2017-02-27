@@ -99,6 +99,8 @@ public class NetconfMessageTransformUtil {
 
     public static final QName IETF_NETCONF_NOTIFICATIONS =
             QName.create(NetconfCapabilityChange.QNAME, "ietf-netconf-notifications").intern();
+    public static final QName NETCONF_NOTIFICATIONS = QName
+            .create("urn:ietf:params:xml:ns:netconf:notification:1.0", "2013-07-15", "notifications").intern();
 
     public static final QName NETCONF_QNAME =
             QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "netconf").intern();
