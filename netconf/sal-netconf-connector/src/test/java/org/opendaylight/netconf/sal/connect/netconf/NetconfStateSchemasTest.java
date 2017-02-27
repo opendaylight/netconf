@@ -72,7 +72,7 @@ public class NetconfStateSchemasTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        final SchemaContext schemaContext = BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext();
+        final SchemaContext schemaContext = BaseSchema.BASE_NETCONF_CTX.getSchemaContext();
         final DataSchemaNode schemasNode =
                 ((ContainerSchemaNode) schemaContext
                         .getDataChildByName(NetconfState.QNAME)).getDataChildByName(Schemas.QNAME);

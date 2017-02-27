@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_URI;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
@@ -113,14 +112,14 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         try {
             content = parserFactory.getContainerNodeParser().parse(Collections.singleton(element),
                 notificationAsContainerSchemaNode);
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
             throw new IllegalArgumentException(String.format("Failed to parse notification %s", element), e);
         }
         return new NetconfDeviceNotification(content, stripped.getKey());
     }
 
     private static NotificationDefinition getMostRecentNotification(final Collection<NotificationDefinition> notificationDefinitions) {
-        Comparator<NotificationDefinition> cmp = (o1, o2) -> o1.getQName().getRevision().compareTo(o2.getQName().getRevision());
+        final Comparator<NotificationDefinition> cmp = (o1, o2) -> o1.getQName().getRevision().compareTo(o2.getQName().getRevision());
 
         return Collections.max(notificationDefinitions, cmp);
     }
@@ -133,7 +132,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
         // Determine whether a base netconf operation is being invoked and also check if the device exposed model for base netconf
         // If no, use pre built base netconf operations model
-        final boolean needToUseBaseCtx = mappedRpcs.get(rpcQName) == null && isBaseOrNotificationRpc(rpcQName);
+        final boolean needToUseBaseCtx = mappedRpcs.get(rpcQName) == null && rpcQName.getNamespace().equals(NETCONF_URI);
         if(needToUseBaseCtx) {
             currentMappedRpcs = baseSchema.getMappedRpcs();
         }
@@ -154,7 +153,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         try {
             // If the schema context for netconf device does not contain model for base netconf operations, use default pre build context with just the base model
             // This way operations like lock/unlock are supported even if the source for base model was not provided
-            SchemaContext ctx = needToUseBaseCtx ? baseSchema.getSchemaContext() : schemaContext;
+            final SchemaContext ctx = needToUseBaseCtx ? baseSchema.getSchemaContext() : schemaContext;
             NetconfMessageTransformUtil.writeNormalizedRpc(((ContainerNode) payload), result, rpc, ctx);
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize " + rpc, e);
@@ -164,13 +163,6 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
         return new NetconfMessage(node);
     }
-
-    private boolean isBaseOrNotificationRpc(final QName rpc) {
-        return rpc.getNamespace().equals(NETCONF_URI) ||
-                rpc.getNamespace().equals(IETF_NETCONF_NOTIFICATIONS.getNamespace()) ||
-                rpc.getNamespace().equals(NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME.getNamespace());
-    }
-
 
     @Override
     public synchronized DOMRpcResult toRpcResult(final NetconfMessage message, final SchemaPath rpc) {
@@ -183,7 +175,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
             try {
                 dataNode = parserFactory.getContainerNodeParser().parse(Collections.singleton(xmlData), schemaForDataRead);
-            } catch (IllegalArgumentException e) {
+            } catch (final IllegalArgumentException e) {
                 throw new IllegalArgumentException(String.format("Failed to parse data response %s", xmlData), e);
             }
 
@@ -195,7 +187,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
             // Determine whether a base netconf operation is being invoked and also check if the device exposed model for base netconf
             // If no, use pre built base netconf operations model
-            final boolean needToUseBaseCtx = mappedRpcs.get(rpcQName) == null && isBaseOrNotificationRpc(rpcQName);
+            final boolean needToUseBaseCtx = mappedRpcs.get(rpcQName) == null && rpcQName.getNamespace().equals(NETCONF_URI);
             if(needToUseBaseCtx) {
                 currentMappedRpcs = baseSchema.getMappedRpcs();
             }
@@ -214,7 +206,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                 try {
                     normalizedNode = parserFactory.getContainerNodeParser().parse(Collections.singleton(element),
                         rpcDefinition.getOutput());
-                } catch (IllegalArgumentException e) {
+                } catch (final IllegalArgumentException e) {
                     throw new IllegalArgumentException(String.format("Failed to parse RPC response %s", element), e);
                 }
             }

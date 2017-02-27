@@ -131,7 +131,7 @@ public class NetconfDeviceWriteOnlyTxTest {
                 .doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("Failed tx")))
                 .when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
-        final WriteRunningTx tx = new WriteRunningTx(id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext()),
+        final WriteRunningTx tx = new WriteRunningTx(id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX.getSchemaContext()),
                 false);
 
         tx.delete(LogicalDatastoreType.CONFIGURATION, yangIId);
