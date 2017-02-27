@@ -20,6 +20,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -32,6 +33,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
@@ -52,6 +54,7 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability;
+import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
@@ -216,10 +219,7 @@ public class NetconfDevice
     void handleSalInitializationSuccess(final SchemaContext result,
                                         final NetconfSessionPreferences remoteSessionCapabilities,
                                         final DOMRpcService deviceRpc) {
-        final BaseSchema baseSchema =
-                remoteSessionCapabilities.isNotificationsSupported()
-                        ? BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS : BaseSchema.BASE_NETCONF_CTX;
-        messageTransformer = new NetconfMessageTransformer(result, true, baseSchema);
+        messageTransformer = new NetconfMessageTransformer(result, true);
 
         updateTransformer(messageTransformer);
         // salFacade.onDeviceConnected has to be called before the notification handler is initialized
@@ -466,14 +466,11 @@ public class NetconfDevice
          * Build schema context, in case of success or final failure notify device.
          */
         @SuppressWarnings("checkstyle:IllegalCatch")
-        private void setUpSchema(Collection<SourceIdentifier> requiredSources) {
-            while (!requiredSources.isEmpty()) {
-                LOG.trace("{}: Trying to build schema context from {}", id, requiredSources);
+        private void setUpSchema(final Collection<SourceIdentifier> requiredSources) {
+            Collection<SourceIdentifier> sourceIdentifiers = Sets.newHashSet(requiredSources);
+            while (!sourceIdentifiers.isEmpty()) {
+                LOG.trace("{}: Trying to build schema context from {}", id, sourceIdentifiers);
                 try {
-                    final CheckedFuture<SchemaContext, SchemaResolutionException> schemaBuilderFuture =
-                            schemaContextFactory.createSchemaContext(requiredSources);
-                    final SchemaContext result = schemaBuilderFuture.checkedGet();
-                    LOG.debug("{}: Schema context built successfully from {}", id, requiredSources);
                     final Collection<QName> filteredQNames = Sets.difference(deviceSources.getRequiredSourcesQName(),
                             capabilities.getUnresolvedCapabilites().keySet());
                     capabilities.addCapabilities(filteredQNames.stream().map(entry -> new AvailableCapabilityBuilder()
@@ -487,22 +484,47 @@ public class NetconfDevice
                                             remoteSessionCapabilities.getNonModuleBasedCapsOrigin().get(entry)).build())
                             .collect(Collectors.toList()));
 
+                    // If device supports notifications and does not contain necessary modules, add them automatically
+                    if (remoteSessionCapabilities.containsNonModuleCapability(NetconfMessageTransformUtil
+                            .NETCONF_NOTIFICATONS_URI.toString())) {
+                        final List<YangModuleInfo> moduleInfos = new ArrayList<>();
+
+                        if (!remoteSessionCapabilities
+                                .containsModuleCapability(NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS)) {
+                            moduleInfos.add(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf
+                                    .notifications.rev120206.$YangModuleInfoImpl.getInstance());
+                        }
+
+                        if (!remoteSessionCapabilities
+                                .containsModuleCapability(NetconfMessageTransformUtil.NETCONF_NOTIFICATIONS)) {
+                            moduleInfos.add(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf
+                                    .notification._1._0.rev080714.$YangModuleInfoImpl.getInstance());
+                        }
+
+                        addSchemaSourceToSchemaRegistry(moduleInfos, sourceIdentifiers);
+                    }
+
+                    final CheckedFuture<SchemaContext, SchemaResolutionException> schemaBuilderFuture =
+                            schemaContextFactory.createSchemaContext(sourceIdentifiers);
+                    final SchemaContext result = schemaBuilderFuture.checkedGet();
+                    LOG.debug("{}: Schema context built successfully from {}", id, sourceIdentifiers);
+
                     handleSalInitializationSuccess(result, remoteSessionCapabilities, getDeviceSpecificRpc(result));
                     return;
                 } catch (final Throwable t) {
                     if (t instanceof MissingSchemaSourceException) {
-                        requiredSources =
+                        sourceIdentifiers =
                                 handleMissingSchemaSourceException(requiredSources, (MissingSchemaSourceException) t);
                     } else if (t instanceof SchemaResolutionException) {
                         // schemaBuilderFuture.checkedGet() throws only SchemaResolutionException
                         // that might be wrapping a MissingSchemaSourceException so we need to look
                         // at the cause of the exception to make sure we don't misinterpret it.
                         if (t.getCause() instanceof MissingSchemaSourceException) {
-                            requiredSources = handleMissingSchemaSourceException(
+                            sourceIdentifiers = handleMissingSchemaSourceException(
                                     requiredSources, (MissingSchemaSourceException) t.getCause());
                             continue;
                         }
-                        requiredSources =
+                        sourceIdentifiers =
                                 handleSchemaResolutionException(requiredSources, (SchemaResolutionException) t);
                     } else {
                         // unknown error, fail
@@ -515,6 +537,20 @@ public class NetconfDevice
             final IllegalStateException cause = new IllegalStateException(id + ": No more sources for schema context");
             handleSalInitializationFailure(cause, listener);
             salFacade.onDeviceFailed(cause);
+        }
+
+        private void addSchemaSourceToSchemaRegistry(final List<YangModuleInfo> moduleInfos,
+                                                     final Collection<SourceIdentifier> sourceIdentifiers) {
+            final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
+            moduleInfoBackedContext.addModuleInfos(moduleInfos);
+            for (final YangModuleInfo moduleInfo : moduleInfos) {
+                final RevisionSourceIdentifier revisionSourceIdentifier =
+                        RevisionSourceIdentifier.create(moduleInfo.getName(), moduleInfo.getRevision());
+                sourceRegistrations.add(schemaRegistry.registerSchemaSource(moduleInfoBackedContext,
+                        PotentialSchemaSource.create(revisionSourceIdentifier, YangTextSchemaSource.class,
+                                PotentialSchemaSource.Costs.COMPUTATION.getValue())));
+                sourceIdentifiers.add(revisionSourceIdentifier);
+            }
         }
 
         private Collection<SourceIdentifier> handleMissingSchemaSourceException(
