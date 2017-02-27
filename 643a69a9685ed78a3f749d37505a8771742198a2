@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_c4d99ef4",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 536,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-02-27T06:45:59Z",
+      "side": 1,
+      "message": "In my opinion, Restconf shouldn\u0027t be aware of Netconf clustering. I would set here some more generic message and use constructor RestconfDocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag, final Throwable cause) to preserve error cause.",
+      "range": {
+        "startLine": 536,
+        "startChar": 54,
+        "endLine": 536,
+        "endChar": 89
+      },
+      "revId": "643a69a9685ed78a3f749d37505a8771742198a2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
