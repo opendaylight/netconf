@@ -8,15 +8,19 @@
 
 package org.opendaylight.netconf.topology;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.util.concurrent.EventExecutor;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.URL;
@@ -63,12 +67,16 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
@@ -104,7 +112,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     /**
      * The qualified schema cache directory <code>cache/schema</code>
      */
-    private static final String QUALIFIED_DEFAULT_CACHE_DIRECTORY = CACHE_DIRECTORY + File.separator+ DEFAULT_CACHE_DIRECTORY;
+    private static final String QUALIFIED_DEFAULT_CACHE_DIRECTORY = CACHE_DIRECTORY + File.separator + DEFAULT_CACHE_DIRECTORY;
 
     /**
      * The name for the default schema repository
@@ -150,7 +158,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(DEFAULT_CACHE);
         DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(
                 TextToASTTransformer.create(DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY));
-    }
+           }
 
     protected final String topologyId;
     private final NetconfClientDispatcher clientDispatcher;
@@ -213,7 +221,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     }
 
     protected ListenableFuture<NetconfDeviceCapabilities> setupConnection(final NodeId nodeId,
-                                                                        final Node configNode) {
+                                                                          final Node configNode) {
         final NetconfNode netconfNode = configNode.getAugmentation(NetconfNode.class);
 
         Preconditions.checkNotNull(netconfNode.getHost());
@@ -245,7 +253,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     }
 
     protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId,
-                                                         final NetconfNode node) {
+                                                           final NetconfNode node) {
         //setup default values since default value is not supported in mdsal
         final Long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null ? DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
         final Long keepaliveDelay = node.getKeepaliveDelay() == null ? DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay();
@@ -273,8 +281,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             final String yangLigPassword = node.getYangLibrary().getPassword();
 
             final LibraryModulesSchemas libraryModulesSchemas;
-            if(yangLibURL != null) {
-                if(yangLibUsername != null && yangLigPassword != null) {
+            if (yangLibURL != null) {
+                if (yangLibUsername != null && yangLigPassword != null) {
                     libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL, yangLibUsername, yangLigPassword);
                 } else {
                     libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL);
@@ -286,7 +294,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                                     new YangLibrarySchemaYangSourceProvider(remoteDeviceId, libraryModulesSchemas.getAvailableModels()),
                                     PotentialSchemaSource
                                             .create(sourceIdentifierURLEntry.getKey(), YangTextSchemaSource.class,
-                                            PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
+                                                    PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
                 }
             }
         }
@@ -329,7 +337,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             // SchemaContextFactory remain the default values.
             if (!moduleSchemaCacheDirectory.equals(DEFAULT_CACHE_DIRECTORY)) {
                 // Multiple modules may be created at once;  synchronize to avoid issues with data consistency among threads.
-                synchronized(schemaResourcesDTOs) {
+                synchronized (schemaResourcesDTOs) {
                     // Look for the cached DTO to reuse SchemaRegistry and SchemaContextFactory variables if they already exist
                     schemaResourcesDTO = schemaResourcesDTOs.get(moduleSchemaCacheDirectory);
                     if (schemaResourcesDTO == null) {
@@ -426,7 +434,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     protected abstract RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id, final Broker domBroker, final BindingAwareBroker bindingBroker);
 
     private InetSocketAddress getSocketAddress(final Host host, final int port) {
-        if(host.getDomainName() != null) {
+        if (host.getDomainName() != null) {
             return new InetSocketAddress(host.getDomainName().getValue(), port);
         } else {
             final IpAddress ipAddress = host.getIpAddress();
