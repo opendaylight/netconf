@@ -123,6 +123,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
         // Determine whether a base netconf operation is being invoked and also check if the device exposed model for base netconf
         // If no, use pre built base netconf operations model
+        //TODO this might be redundant but needs deeper investigation.
         final boolean needToUseBaseCtx = mappedRpcs.get(rpcQName) == null && isBaseOrNotificationRpc(rpcQName);
         if(needToUseBaseCtx) {
             currentMappedRpcs = baseSchema.getMappedRpcs();
@@ -185,6 +186,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
             // Determine whether a base netconf operation is being invoked and also check if the device exposed model for base netconf
             // If no, use pre built base netconf operations model
+            //TODO this might be redundant but needs deeper investigation.
             final boolean needToUseBaseCtx = mappedRpcs.get(rpcQName) == null && isBaseOrNotificationRpc(rpcQName);
             if(needToUseBaseCtx) {
                 currentMappedRpcs = baseSchema.getMappedRpcs();
