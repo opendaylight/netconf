@@ -22,6 +22,7 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -203,10 +204,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     }
 
     void handleSalInitializationSuccess(final SchemaContext result, final NetconfSessionPreferences remoteSessionCapabilities, final DOMRpcService deviceRpc) {
-        final BaseSchema baseSchema =
-                remoteSessionCapabilities.isNotificationsSupported() ?
-                BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS :
-                BaseSchema.BASE_NETCONF_CTX;
+        final BaseSchema baseSchema = BaseSchema.BASE_NETCONF_CTX;
         messageTransformer = new NetconfMessageTransformer(result, true, baseSchema);
 
         updateTransformer(messageTransformer);
@@ -447,9 +445,6 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
             while (!requiredSources.isEmpty()) {
                 LOG.trace("{}: Trying to build schema context from {}", id, requiredSources);
                 try {
-                    final CheckedFuture<SchemaContext, SchemaResolutionException> schemaBuilderFuture = schemaContextFactory.createSchemaContext(requiredSources);
-                    final SchemaContext result = schemaBuilderFuture.checkedGet();
-                    LOG.debug("{}: Schema context built successfully from {}", id, requiredSources);
                     final Collection<QName> filteredQNames = Sets.difference(deviceSources.getRequiredSourcesQName(), capabilities.getUnresolvedCapabilites().keySet());
                     capabilities.addCapabilities(filteredQNames.stream().map(entry -> new AvailableCapabilityBuilder()
                             .setCapability(entry.toString()).setCapabilityOrigin(remoteSessionCapabilities.getModuleBasedCapsOrigin().get(entry)).build())
@@ -459,10 +454,20 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
                             .setCapability(entry).setCapabilityOrigin(AvailableCapability.CapabilityOrigin.DeviceAdvertised).build())
                             .collect(Collectors.toList()));
 
+                    final HashSet<SourceIdentifier> sourceIdentifiers = Sets.newHashSet(requiredSources);
+                    if (remoteSessionCapabilities.isNotificationsSupported()) {
+                        final RevisionSourceIdentifier notifications = RevisionSourceIdentifier.create("notifications", "2008-07-14");
+                        sourceIdentifiers.add(notifications);
+                    }
+
+                    LOG.debug("{}: Schema context built successfully from {}", id, sourceIdentifiers);
+                    final CheckedFuture<SchemaContext, SchemaResolutionException> schemaBuilderFuture = schemaContextFactory.createSchemaContext(sourceIdentifiers);
+                    final SchemaContext result = schemaBuilderFuture.checkedGet();
+
                     handleSalInitializationSuccess(result, remoteSessionCapabilities, getDeviceSpecificRpc(result));
                     return;
                 } catch (final Throwable t) {
-                    if (t instanceof MissingSchemaSourceException){
+                    if (t instanceof MissingSchemaSourceException) {
                         requiredSources = handleMissingSchemaSourceException(requiredSources, (MissingSchemaSourceException) t);
                     } else if (t instanceof SchemaResolutionException) {
                         // schemaBuilderFuture.checkedGet() throws only SchemaResolutionException

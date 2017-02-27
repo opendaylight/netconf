@@ -64,7 +64,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
     private static final ContainerNode GET_SCHEMAS_RPC;
     static {
         final DataContainerChild<?, ?> filter = NetconfMessageTransformUtil.toFilterStructure(STATE_SCHEMAS_IDENTIFIER,
-                BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext());
+                BaseSchema.BASE_NETCONF_CTX.getSchemaContext());
         GET_SCHEMAS_RPC
                 = Builders.containerBuilder().withNodeIdentifier(toId(NETCONF_GET_QNAME)).withChild(filter).build();
     }

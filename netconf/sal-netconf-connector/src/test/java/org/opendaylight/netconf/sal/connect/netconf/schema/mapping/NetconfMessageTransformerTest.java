@@ -104,13 +104,13 @@ public class NetconfMessageTransformerTest {
         final NetconfMessageTransformer transformer = new NetconfMessageTransformer(
                 partialSchema,
                 true,
-                BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS
+                BaseSchema.BASE_NETCONF_CTX
         );
-        NetconfMessage netconfMessage = transformer.toRpcRequest(
+        final NetconfMessage netconfMessage = transformer.toRpcRequest(
                 toPath(CREATE_SUBSCRIPTION_RPC_QNAME),
                 CREATE_SUBSCRIPTION_RPC_CONTENT
         );
-        String documentString = XmlUtil.toString(netconfMessage.getDocument());
+        final String documentString = XmlUtil.toString(netconfMessage.getDocument());
         assertThat(documentString, CoreMatchers.containsString("<create-subscription"));
         assertThat(documentString, CoreMatchers.containsString("<rpc"));
     }
@@ -246,7 +246,7 @@ public class NetconfMessageTransformerTest {
         final MapEntryNode schemaNode = Builders.mapEntryBuilder().withNodeIdentifier(identifierWithPredicates).withValue(values).build();
 
         final YangInstanceIdentifier id = YangInstanceIdentifier.builder().node(NetconfState.QNAME).node(Schemas.QNAME).node(Schema.QNAME).nodeWithKey(Schema.QNAME, keys).build();
-        final DataContainerChild<?, ?> editConfigStructure = createEditConfigStructure(BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext(), id, Optional.<ModifyAction>absent(), Optional.<NormalizedNode<?, ?>>fromNullable(schemaNode));
+        final DataContainerChild<?, ?> editConfigStructure = createEditConfigStructure(BaseSchema.BASE_NETCONF_CTX.getSchemaContext(), id, Optional.<ModifyAction>absent(), Optional.<NormalizedNode<?, ?>>fromNullable(schemaNode));
 
         final DataContainerChild<?, ?> target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_QNAME);
 
@@ -316,12 +316,13 @@ public class NetconfMessageTransformerTest {
         assertNull(compositeNodeRpcResult.getResult());
     }
 
-    public SchemaContext getSchema(boolean addBase) {
+    public SchemaContext getSchema(final boolean addBase) {
         final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
         if(addBase) {
             moduleInfoBackedContext.addModuleInfos(Collections.singleton($YangModuleInfoImpl.getInstance()));
         }
         moduleInfoBackedContext.addModuleInfos(Collections.singleton(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.$YangModuleInfoImpl.getInstance()));
+        moduleInfoBackedContext.addModuleInfos(Collections.singleton(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.$YangModuleInfoImpl.getInstance()));
         return moduleInfoBackedContext.tryToCreateSchemaContext().get();
     }
 }
