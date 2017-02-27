@@ -8,15 +8,19 @@
 
 package org.opendaylight.netconf.topology;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.util.concurrent.EventExecutor;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.URL;
@@ -62,12 +66,16 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
@@ -103,7 +111,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     /**
      * The qualified schema cache directory <code>cache/schema</code>
      */
-    private static final String QUALIFIED_DEFAULT_CACHE_DIRECTORY = CACHE_DIRECTORY + File.separator+ DEFAULT_CACHE_DIRECTORY;
+    private static final String QUALIFIED_DEFAULT_CACHE_DIRECTORY = CACHE_DIRECTORY + File.separator + DEFAULT_CACHE_DIRECTORY;
 
     /**
      * The name for the default schema repository
@@ -149,6 +157,29 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(DEFAULT_CACHE);
         DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(
                 TextToASTTransformer.create(DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY));
+        SourceIdentifier sId = RevisionSourceIdentifier.create("notifications", "2008-07-14");
+        registerSource(DEFAULT_SCHEMA_REPOSITORY, "/META-INF/yang/notifications@2008-07-14.yang", sId);
+        sId = RevisionSourceIdentifier.create("ietf-netconf", "2011-06-02");
+        registerSource(DEFAULT_SCHEMA_REPOSITORY, "/META-INF/yang/ietf-netconf-notifications@2012-02-06.yang", sId);
+           }
+
+    private static void registerSource(final SharedSchemaRepository consumer, final String resource, final SourceIdentifier sourceId) {
+        consumer.registerSchemaSource(new SchemaSourceProvider<SchemaSourceRepresentation>() {
+            @Override
+            public CheckedFuture<? extends SchemaSourceRepresentation, SchemaSourceException> getSource(final SourceIdentifier sourceIdentifier) {
+                return Futures.immediateCheckedFuture(new YangTextSchemaSource(sourceId) {
+                    @Override
+                    protected MoreObjects.ToStringHelper addToStringAttributes(final MoreObjects.ToStringHelper toStringHelper) {
+                        return toStringHelper;
+                    }
+
+                    @Override
+                    public InputStream openStream() throws IOException {
+                        return getClass().getResourceAsStream(resource);
+                    }
+                });
+            }
+        }, PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
     }
 
     protected final String topologyId;
@@ -192,13 +223,13 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     }
 
     @Override
-    public ListenableFuture<NetconfDeviceCapabilities> connectNode(NodeId nodeId, Node configNode) {
+    public ListenableFuture<NetconfDeviceCapabilities> connectNode(final NodeId nodeId, final Node configNode) {
         LOG.info("Connecting RemoteDevice{{}} , with config {}", nodeId, configNode);
         return setupConnection(nodeId, configNode);
     }
 
     @Override
-    public ListenableFuture<Void> disconnectNode(NodeId nodeId) {
+    public ListenableFuture<Void> disconnectNode(final NodeId nodeId) {
         LOG.debug("Disconnecting RemoteDevice{{}}", nodeId.getValue());
         if (!activeConnectors.containsKey(nodeId)) {
             return Futures.immediateFailedFuture(new IllegalStateException("Unable to disconnect device that is not connected"));
@@ -212,7 +243,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     }
 
     protected ListenableFuture<NetconfDeviceCapabilities> setupConnection(final NodeId nodeId,
-                                                                        final Node configNode) {
+                                                                          final Node configNode) {
         final NetconfNode netconfNode = configNode.getAugmentation(NetconfNode.class);
 
         Preconditions.checkNotNull(netconfNode.getHost());
@@ -229,12 +260,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         Futures.addCallback(future, new FutureCallback<NetconfDeviceCapabilities>() {
             @Override
-            public void onSuccess(NetconfDeviceCapabilities result) {
+            public void onSuccess(final NetconfDeviceCapabilities result) {
                 LOG.debug("Connector for : " + nodeId.getValue() + " started succesfully");
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFailure(final Throwable t) {
                 LOG.error("Connector for : " + nodeId.getValue() + " failed");
                 // remove this node from active connectors?
             }
@@ -244,17 +275,17 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     }
 
     protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId,
-                                                         final NetconfNode node) {
+                                                           final NetconfNode node) {
         //setup default values since default value is not supported in mdsal
         final Long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null ? DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
         final Long keepaliveDelay = node.getKeepaliveDelay() == null ? DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay();
         final Boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null ? DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
 
-        IpAddress ipAddress = node.getHost().getIpAddress();
-        InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null ?
+        final IpAddress ipAddress = node.getHost().getIpAddress();
+        final InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null ?
                 ipAddress.getIpv4Address().getValue() : ipAddress.getIpv6Address().getValue(),
                 node.getPort().getValue());
-        RemoteDeviceId remoteDeviceId = new RemoteDeviceId(nodeId.getValue(), address);
+        final RemoteDeviceId remoteDeviceId = new RemoteDeviceId(nodeId.getValue(), address);
 
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade =
                 createSalFacade(remoteDeviceId, domBroker, bindingAwareBroker);
@@ -265,27 +296,27 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
 
         // pre register yang library sources as fallback schemas to schema registry
-        List<SchemaSourceRegistration<YangTextSchemaSource>> registeredYangLibSources = Lists.newArrayList();
+        final List<SchemaSourceRegistration<YangTextSchemaSource>> registeredYangLibSources = Lists.newArrayList();
         if (node.getYangLibrary() != null) {
             final String yangLibURL = node.getYangLibrary().getYangLibraryUrl().getValue();
             final String yangLibUsername = node.getYangLibrary().getUsername();
             final String yangLigPassword = node.getYangLibrary().getPassword();
 
-            LibraryModulesSchemas libraryModulesSchemas;
-            if(yangLibURL != null) {
-                if(yangLibUsername != null && yangLigPassword != null) {
+            final LibraryModulesSchemas libraryModulesSchemas;
+            if (yangLibURL != null) {
+                if (yangLibUsername != null && yangLigPassword != null) {
                     libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL, yangLibUsername, yangLigPassword);
                 } else {
                     libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL);
                 }
 
-                for (Map.Entry<SourceIdentifier, URL> sourceIdentifierURLEntry : libraryModulesSchemas.getAvailableModels().entrySet()) {
+                for (final Map.Entry<SourceIdentifier, URL> sourceIdentifierURLEntry : libraryModulesSchemas.getAvailableModels().entrySet()) {
                     registeredYangLibSources.
                             add(schemaRegistry.registerSchemaSource(
                                     new YangLibrarySchemaYangSourceProvider(remoteDeviceId, libraryModulesSchemas.getAvailableModels()),
                                     PotentialSchemaSource
                                             .create(sourceIdentifierURLEntry.getKey(), YangTextSchemaSource.class,
-                                            PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
+                                                    PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
                 }
             }
         }
@@ -315,7 +346,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         return new NetconfConnectorDTO(
                 userCapabilities.isPresent() ?
                         new NetconfDeviceCommunicator(
-                                remoteDeviceId, device, new UserPreferences(userCapabilities.get(), node.getYangModuleCapabilities().isOverride()), rpcMessageLimit):
+                                remoteDeviceId, device, new UserPreferences(userCapabilities.get(), node.getYangModuleCapabilities().isOverride()), rpcMessageLimit) :
                         new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit), salFacade);
     }
 
@@ -330,7 +361,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             // SchemaContextFactory remain the default values.
             if (!moduleSchemaCacheDirectory.equals(DEFAULT_CACHE_DIRECTORY)) {
                 // Multiple modules may be created at once;  synchronize to avoid issues with data consistency among threads.
-                synchronized(schemaResourcesDTOs) {
+                synchronized (schemaResourcesDTOs) {
                     // Look for the cached DTO to reuse SchemaRegistry and SchemaContextFactory variables if they already exist
                     schemaResourcesDTO = schemaResourcesDTOs.get(moduleSchemaCacheDirectory);
                     if (schemaResourcesDTO == null) {
@@ -387,7 +418,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         return new FilesystemSchemaSourceCache<>(schemaRegistry, YangTextSchemaSource.class, new File(relativeSchemaCacheDirectory));
     }
 
-    public NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener, NetconfNode node) {
+    public NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener, final NetconfNode node) {
 
         //setup default values since default value is not supported in mdsal
         final long clientConnectionTimeoutMillis = node.getConnectionTimeoutMillis() == null ? DEFAULT_CONNECTION_TIMEOUT_MILLIS : node.getConnectionTimeoutMillis();
@@ -426,8 +457,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
     protected abstract RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id, final Broker domBroker, final BindingAwareBroker bindingBroker);
 
-    private InetSocketAddress getSocketAddress(final Host host, int port) {
-        if(host.getDomainName() != null) {
+    private InetSocketAddress getSocketAddress(final Host host, final int port) {
+        if (host.getDomainName() != null) {
             return new InetSocketAddress(host.getDomainName().getValue(), port);
         } else {
             final IpAddress ipAddress = host.getIpAddress();
@@ -437,12 +468,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     }
 
     private Optional<NetconfSessionPreferences> getUserCapabilities(final NetconfNode node) {
-        if(node.getYangModuleCapabilities() == null) {
+        if (node.getYangModuleCapabilities() == null) {
             return Optional.absent();
         }
 
         final List<String> capabilities = node.getYangModuleCapabilities().getCapability();
-        if(capabilities == null || capabilities.isEmpty()) {
+        if (capabilities == null || capabilities.isEmpty()) {
             return Optional.absent();
         }
 

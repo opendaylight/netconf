@@ -10,14 +10,18 @@ package org.opendaylight.netconf.topology.singleton.impl;
 
 import akka.actor.ActorRef;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.util.concurrent.EventExecutor;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.URL;
@@ -59,12 +63,16 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
@@ -108,6 +116,29 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(
                 TextToASTTransformer.create(NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY,
                         NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY));
+        SourceIdentifier sId = RevisionSourceIdentifier.create("notifications", "2008-07-14");
+        registerSource(NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY, "/META-INF/yang/notifications@2008-07-14.yang", sId);
+        sId = RevisionSourceIdentifier.create("ietf-netconf", "2011-06-02");
+        registerSource(NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY, "/META-INF/yang/ietf-netconf-notifications@2012-02-06.yang", sId);
+    }
+
+    private static void registerSource(final SharedSchemaRepository consumer, final String resource, final SourceIdentifier sourceId) {
+        consumer.registerSchemaSource(new SchemaSourceProvider<SchemaSourceRepresentation>() {
+            @Override
+            public CheckedFuture<? extends SchemaSourceRepresentation, SchemaSourceException> getSource(final SourceIdentifier sourceIdentifier) {
+                return Futures.immediateCheckedFuture(new YangTextSchemaSource(sourceId) {
+                    @Override
+                    protected MoreObjects.ToStringHelper addToStringAttributes(final MoreObjects.ToStringHelper toStringHelper) {
+                        return toStringHelper;
+                    }
+
+                    @Override
+                    public InputStream openStream() throws IOException {
+                        return getClass().getResourceAsStream(resource);
+                    }
+                });
+            }
+        }, PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
     }
 
     public RemoteDeviceConnectorImpl(final NetconfTopologySetup netconfTopologyDeviceSetup,
