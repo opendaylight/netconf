@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_e8c2b051",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/NetconfReadOnlyTransaction.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5761
+      },
+      "writtenOn": "2017-02-28T14:02:53Z",
+      "side": 1,
+      "message": "Remove \u0026 check things",
+      "range": {
+        "startLine": 68,
+        "startChar": 19,
+        "endLine": 68,
+        "endChar": 44
+      },
+      "revId": "68dd1eb5f4f5078b4ab4676910f9881f78bdbfbf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_48a3fcb1",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 536,
+      "author": {
+        "id": 5761
+      },
+      "writtenOn": "2017-02-28T14:02:53Z",
+      "side": 1,
+      "message": "generate msg from Get cause",
+      "range": {
+        "startLine": 536,
+        "startChar": 24,
+        "endLine": 536,
+        "endChar": 59
+      },
+      "revId": "68dd1eb5f4f5078b4ab4676910f9881f78bdbfbf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
