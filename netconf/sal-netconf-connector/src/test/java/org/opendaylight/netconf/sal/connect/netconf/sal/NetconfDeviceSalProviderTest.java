@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -94,4 +95,12 @@ public class NetconfDeviceSalProviderTest {
         verify(chain).close();
     }
 
+    @Test
+    public void closeWithoutNPE() throws Exception {
+        provider.onSessionInitiated(session);
+        provider.onSessionInitiated(context);
+        provider.close();
+        provider.close();
+        verify(chain, atLeast(2)).close();
+    }
 }
