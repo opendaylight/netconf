@@ -94,4 +94,11 @@ public class NetconfDeviceSalProviderTest {
         verify(chain).close();
     }
 
+    @Test
+    public void closeWithoutNPE() throws Exception {
+        provider.onSessionInitiated(session);
+        provider.onSessionInitiated(context);
+        provider.close();
+        provider.close();
+    }
 }
