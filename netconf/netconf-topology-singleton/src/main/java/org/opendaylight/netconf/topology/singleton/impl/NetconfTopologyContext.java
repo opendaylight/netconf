@@ -41,6 +41,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
     private RemoteDeviceConnector remoteDeviceConnector;
     private NetconfNodeManager netconfNodeManager;
     private boolean finalClose = false;
+    private boolean closed = false;
     private boolean isMaster;
 
     private ActorRef masterActorRef;
@@ -90,13 +91,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
             // in case that master changes role to slave, new NodeDeviceManager must be created and listener registered
             netconfNodeManager = createNodeDeviceManager();
         }
-        if (masterActorRef != null) {
-            netconfTopologyDeviceSetup.getActorSystem().stop(masterActorRef);
-            masterActorRef = null;
-        }
-        if (remoteDeviceConnector != null) {
-            remoteDeviceConnector.stopRemoteDeviceConnection();
-        }
+        stopDeviceConnectorAndActor();
 
         return Futures.immediateCheckedFuture(null);
     }
@@ -122,15 +117,8 @@ class NetconfTopologyContext implements ClusterSingletonService {
         if (netconfNodeManager != null) {
             netconfNodeManager.close();
         }
+        stopDeviceConnectorAndActor();
 
-        if (remoteDeviceConnector != null) {
-            remoteDeviceConnector.stopRemoteDeviceConnection();
-        }
-
-        if (masterActorRef != null) {
-            netconfTopologyDeviceSetup.getActorSystem().stop(masterActorRef);
-            masterActorRef = null;
-        }
     }
 
     /**
@@ -165,5 +153,20 @@ class NetconfTopologyContext implements ClusterSingletonService {
                 }
             }, netconfTopologyDeviceSetup.getActorSystem().dispatcher());
         }
+    }
+
+    private synchronized void stopDeviceConnectorAndActor() {
+        if (closed) {
+            return;
+        }
+        if (remoteDeviceConnector != null) {
+            remoteDeviceConnector.stopRemoteDeviceConnection();
+        }
+
+        if (masterActorRef != null) {
+            netconfTopologyDeviceSetup.getActorSystem().stop(masterActorRef);
+            masterActorRef = null;
+        }
+        closed = true;
     }
 }
