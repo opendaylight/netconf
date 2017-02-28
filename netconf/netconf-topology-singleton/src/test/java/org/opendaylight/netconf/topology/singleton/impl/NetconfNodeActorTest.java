@@ -178,7 +178,7 @@ public class NetconfNodeActorTest {
     @Test
     public void testYangTextSchemaSourceRequestMessage() throws Exception {
         final SchemaRepository schemaRepository = mock(SchemaRepository.class);
-        final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create("testID", Optional.absent());
+        final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create("testID", "2017-02-28");
         final Props props = NetconfNodeActor.props(mock(NetconfTopologySetup.class), remoteDeviceId,
                 DEFAULT_SCHEMA_REPOSITORY, schemaRepository);
 
@@ -192,7 +192,7 @@ public class NetconfNodeActorTest {
 
         final YangTextSchemaSource yangTextSchemaSource = new YangTextSchemaSource(sourceIdentifier) {
             @Override
-            protected MoreObjects.ToStringHelper addToStringAttributes(MoreObjects.ToStringHelper toStringHelper) {
+            protected MoreObjects.ToStringHelper addToStringAttributes(final MoreObjects.ToStringHelper toStringHelper) {
                 return null;
             }
 
@@ -325,8 +325,8 @@ public class NetconfNodeActorTest {
 
     }
 
-    private String convertStreamToString(java.io.InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+    private String convertStreamToString(final java.io.InputStream is) {
+        final java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
     }
 
