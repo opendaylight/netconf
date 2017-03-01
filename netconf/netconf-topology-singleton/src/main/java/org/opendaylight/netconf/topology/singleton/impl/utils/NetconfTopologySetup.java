@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.singleton.impl.utils;
 
 import akka.actor.ActorSystem;
 import io.netty.util.concurrent.EventExecutor;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -36,6 +37,8 @@ public class NetconfTopologySetup {
     private final EventExecutor eventExecutor;
     private final NetconfClientDispatcher netconfClientDispatcher;
     private final String topologyId;
+    private final AAAEncryptionService encryptionService;
+
     private NetconfTopologySetup(final NetconfTopologySetupBuilder builder) {
         this.clusterSingletonServiceProvider = builder.getClusterSingletonServiceProvider();
         this.rpcProviderRegistry = builder.getRpcProviderRegistry();
@@ -50,6 +53,7 @@ public class NetconfTopologySetup {
         this.eventExecutor = builder.getEventExecutor();
         this.netconfClientDispatcher = builder.getNetconfClientDispatcher();
         this.topologyId = builder.getTopologyId();
+        this.encryptionService = builder.getEncryptionService();
     }
 
     public ClusterSingletonServiceProvider getClusterSingletonServiceProvider() {
@@ -104,6 +108,10 @@ public class NetconfTopologySetup {
         return netconfClientDispatcher;
     }
 
+    public AAAEncryptionService getEncryptionService() {
+        return encryptionService;
+    }
+
     public static class NetconfTopologySetupBuilder {
 
         private ClusterSingletonServiceProvider clusterSingletonServiceProvider;
@@ -119,6 +127,7 @@ public class NetconfTopologySetup {
         private EventExecutor eventExecutor;
         private String topologyId;
         private NetconfClientDispatcher netconfClientDispatcher;
+        private AAAEncryptionService encryptionService;
 
         public NetconfTopologySetupBuilder(){
         }
@@ -242,6 +251,15 @@ public class NetconfTopologySetup {
 
         public NetconfTopologySetupBuilder setNetconfClientDispatcher(NetconfClientDispatcher clientDispatcher) {
             this.netconfClientDispatcher = clientDispatcher;
+            return this;
+        }
+
+        private AAAEncryptionService getEncryptionService() {
+            return this.encryptionService;
+        }
+
+        public NetconfTopologySetupBuilder setEncryptionService(final AAAEncryptionService encryptionService) {
+            this.encryptionService = encryptionService;
             return this;
         }
 
