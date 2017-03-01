@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_b5a3d8b0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-03-01T07:01:46Z",
+      "side": 1,
+      "message": "Probably not, but I think it\u0027s a convention since most other commit messages of patches that fix some bugs are in a similar format",
+      "parentUuid": "fafc7978_343371ac",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 14
+      },
+      "revId": "9eb27d08280f89f44bb3ed91a80b932ab0b59179",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_a67dc2b3",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1
