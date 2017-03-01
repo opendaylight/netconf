@@ -9,6 +9,8 @@
 package org.opendaylight.netconf.callhome.mount;
 
 import io.netty.util.concurrent.EventExecutor;
+
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -20,21 +22,19 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
 
-
 public class CallHomeTopology extends BaseCallHomeTopology {
 
-    public CallHomeTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
-                            final EventExecutor eventExecutor,
-                            final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
-                            final SchemaRepositoryProvider schemaRepositoryProvider,
-                            final DataBroker dataBroker, final DOMMountPointService mountPointService) {
-        super(topologyId, clientDispatcher, eventExecutor,
-                keepaliveExecutor, processingExecutor, schemaRepositoryProvider,
-                dataBroker, mountPointService);
-    }
+	public CallHomeTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
+			final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
+			final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
+			final DataBroker dataBroker, final DOMMountPointService mountPointService,
+			AAAEncryptionService encryptionService) {
+		super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
+				schemaRepositoryProvider, dataBroker, mountPointService, encryptionService);
+	}
 
-    @Override
-    protected RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id) {
-        return new NetconfDeviceSalFacade(id, mountPointService, dataBroker);
-    }
+	@Override
+	protected RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id) {
+		return new NetconfDeviceSalFacade(id, mountPointService, dataBroker);
+	}
 }
