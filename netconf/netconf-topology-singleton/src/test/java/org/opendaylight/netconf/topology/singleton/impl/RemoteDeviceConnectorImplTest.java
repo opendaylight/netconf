@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutorService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
@@ -105,6 +106,8 @@ public class RemoteDeviceConnectorImplTest {
     @Mock
     private WriteTransaction writeTx;
 
+    private AAAEncryptionService encryptionService;
+
     private NetconfTopologySetup.NetconfTopologySetupBuilder builder;
     private RemoteDeviceId remoteDeviceId;
 
@@ -115,6 +118,7 @@ public class RemoteDeviceConnectorImplTest {
         remoteDeviceId = new RemoteDeviceId(TOPOLOGY_ID,
                 new InetSocketAddress(InetAddresses.forString("127.0.0.1"), 9999));
 
+        encryptionService = mock(AAAEncryptionService.class);
         doReturn(txChain).when(dataBroker).createTransactionChain(any(TransactionChainListener.class));
         doReturn(writeTx).when(txChain).newWriteOnlyTransaction();
         doNothing().when(writeTx).merge(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
@@ -130,6 +134,7 @@ public class RemoteDeviceConnectorImplTest {
         builder.setEventExecutor(eventExecutor);
         builder.setNetconfClientDispatcher(clientDispatcher);
         builder.setTopologyId(TOPOLOGY_ID);
+        builder.setEncryptionService(encryptionService);
     }
 
     @Test
@@ -258,7 +263,7 @@ public class RemoteDeviceConnectorImplTest {
         assertEquals(defaultClientConfig.getAddress(), new InetSocketAddress(InetAddresses.forString("127.0.0.1"),
             9999));
         assertSame(defaultClientConfig.getSessionListener(), listener);
-        assertEquals(defaultClientConfig.getAuthHandler().getUsername(), "testuser");
+        assertEquals(defaultClientConfig.getAuthHandler().getUsername(), encryptionService.encrypt("testuser"));
         assertEquals(defaultClientConfig.getProtocol(), NetconfClientConfiguration.NetconfClientProtocol.TCP);
     }
 }
