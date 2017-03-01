@@ -13,6 +13,7 @@ import akka.util.Timeout;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -26,6 +27,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
+import org.opendaylight.controller.md.sal.binding.api.DataBroker;
+import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
+import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
@@ -57,9 +63,17 @@ import org.opendaylight.protocol.framework.TimedReconnectStrategy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
@@ -91,11 +105,60 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         this.mountService = mountService;
     }
 
+    private void encryptIfNeeded(final NodeId nodeId, final NetconfNode netconfNode) {
+        final org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node
+                .credentials.credentials.LoginPassword creds =
+                (org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node
+                        .credentials.credentials.LoginPassword)netconfNode.getCredentials();
+        if (creds.isEncrypted() != null && !creds.isEncrypted()) {
+            LOG.info("Encrypting the provided credentials");
+            final AAAEncryptionService encryptionService = netconfTopologyDeviceSetup.getEncryptionService();
+            final String topologyId = netconfTopologyDeviceSetup.getTopologyId();
+            final DataBroker dataBroker = netconfTopologyDeviceSetup.getDataBroker();
+            final String username = encryptionService.encrypt(creds.getUsername());
+            final String password = encryptionService.encrypt(creds.getPassword());
+            final Boolean encrypted = Boolean.TRUE;
+            org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node
+                    .credentials.credentials.LoginPasswordBuilder passwordBuilder =
+                    new org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114
+                            .netconf.node.credentials.credentials.LoginPasswordBuilder();
+            passwordBuilder.setEncrypted(encrypted);
+            passwordBuilder.setUsername(username);
+            passwordBuilder.setPassword(password);
+            NetconfNodeBuilder nnb = new NetconfNodeBuilder();
+            nnb.setCredentials(passwordBuilder.build());
+
+            final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
+            final InstanceIdentifier<NetworkTopology> networkTopologyId =
+                    InstanceIdentifier.builder(NetworkTopology.class).build();
+            final InstanceIdentifier<NetconfNode> niid = networkTopologyId.child(Topology.class,
+                    new TopologyKey(new TopologyId(topologyId))).child(Node.class,
+                    new NodeKey(nodeId)).augmentation(NetconfNode.class);
+            writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, niid, nnb.build());
+            final CheckedFuture<Void, TransactionCommitFailedException> future = writeTransaction.submit();
+            Futures.addCallback(future, new FutureCallback<Void>() {
+
+                @Override
+                public void onSuccess(Void result) {
+                    LOG.info("Encrypted netconf username/password successfully");
+                }
+
+                @Override
+                public void onFailure(Throwable exception) {
+                    LOG.error("Unable to encrypt netconf username/password." + exception.getMessage());
+                }
+            });
+        }
+    }
+
     @Override
     public void startRemoteDeviceConnection(final ActorRef deviceContextActorRef) {
 
         final NetconfNode netconfNode = netconfTopologyDeviceSetup.getNode().getAugmentation(NetconfNode.class);
         final NodeId nodeId = netconfTopologyDeviceSetup.getNode().getNodeId();
+
+        this.encryptIfNeeded(nodeId, netconfNode);
+
         Preconditions.checkNotNull(netconfNode.getHost());
         Preconditions.checkNotNull(netconfNode.getPort());
         Preconditions.checkNotNull(netconfNode.isTcpOnly());
