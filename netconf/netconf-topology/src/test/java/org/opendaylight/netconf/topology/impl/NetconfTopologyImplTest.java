@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -89,6 +90,9 @@ public class NetconfTopologyImplTest {
     @Mock
     private DOMMountPointService mountPointService;
 
+    @Mock
+    private AAAEncryptionService encryptionService;
+
     private TestingNetconfTopologyImpl topology;
     private TestingNetconfTopologyImpl spyTopology;
 
@@ -105,7 +109,7 @@ public class NetconfTopologyImplTest {
 
         topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher,
                 mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, mockedSchemaRepositoryProvider,
-                dataBroker, mountPointService);
+                dataBroker, mountPointService, encryptionService);
 
         spyTopology = spy(topology);
     }
@@ -186,15 +190,71 @@ public class NetconfTopologyImplTest {
 
     }
 
+    @Test
+    public void testOnDataTreeChangeEncryptedPassword() {
+
+        final DataObjectModification<Node> newNode = mock(DataObjectModification.class);
+        when(newNode.getModificationType()).thenReturn(DataObjectModification.ModificationType.WRITE);
+
+        InstanceIdentifier.PathArgument pa = null;
+
+        for (final InstanceIdentifier.PathArgument p
+                : TopologyUtil.createTopologyListPath(TOPOLOGY_ID)
+                    .child(Node.class, new NodeKey(NODE_ID)).getPathArguments()) {
+            pa = p;
+        }
+
+        when(newNode.getIdentifier()).thenReturn(pa);
+
+
+        final NetconfNode testingNode = new NetconfNodeBuilder()
+                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+                .setPort(new PortNumber(9999))
+                .setReconnectOnChangedSchema(true)
+                .setDefaultRequestTimeoutMillis(1000L)
+                .setBetweenAttemptsTimeoutMillis(100)
+                .setKeepaliveDelay(1000L)
+                .setTcpOnly(true)
+                .setCredentials(new LoginPasswordBuilder().setUsername("testuser").setPassword("testpassword")
+                .setEncrypted(true).build())
+                .build();
+
+        final NodeBuilder nn = new NodeBuilder().addAugmentation(NetconfNode.class, testingNode);
+
+        when(newNode.getDataAfter()).thenReturn(nn.build());
+
+
+        final Collection<DataTreeModification<Node>> changes = Sets.newHashSet();
+        final DataTreeModification<Node> ch = mock(DataTreeModification.class);
+        when(ch.getRootNode()).thenReturn(newNode);
+        changes.add(ch);
+        spyTopology.onDataTreeChanged(changes);
+        verify(spyTopology).connectNode(TopologyUtil.getNodeId(pa), nn.build());
+
+        when(newNode.getModificationType()).thenReturn(DataObjectModification.ModificationType.DELETE);
+        spyTopology.onDataTreeChanged(changes);
+        verify(spyTopology).disconnectNode(TopologyUtil.getNodeId(pa));
+
+        when(newNode.getModificationType()).thenReturn(DataObjectModification.ModificationType.SUBTREE_MODIFIED);
+        spyTopology.onDataTreeChanged(changes);
+
+        //one in previous creating and deleting node and one in updating
+        verify(spyTopology, times(2)).disconnectNode(TopologyUtil.getNodeId(pa));
+        verify(spyTopology, times(2)).connectNode(TopologyUtil.getNodeId(pa), nn.build());
+
+
+    }
+
     public static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
 
         public TestingNetconfTopologyImpl(
                 final String topologyId, final NetconfClientDispatcher clientDispatcher,
                 final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
                 final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
-                final DataBroker dataBroker, final DOMMountPointService mountPointService) {
+                final DataBroker dataBroker, final DOMMountPointService mountPointService,
+                final AAAEncryptionService encryptionService) {
             super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,
-                    processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService);
+                    processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService, encryptionService);
         }
 
         @Override
