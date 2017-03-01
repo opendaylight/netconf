@@ -400,7 +400,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         if (credentials instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) {
             authHandler = new LoginPassword(
                     ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getUsername(),
-                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getPassword());
+                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getPassword(),
+                    netconfTopologyDeviceSetup.getEncryptionService());
         } else {
             throw new IllegalStateException(remoteDeviceId + ": Only login/password authentication is supported");
         }
