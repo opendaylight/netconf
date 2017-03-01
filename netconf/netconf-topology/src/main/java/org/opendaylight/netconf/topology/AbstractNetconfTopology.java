@@ -23,6 +23,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -167,11 +169,13 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
     protected final HashMap<NodeId, NetconfConnectorDTO> activeConnectors = new HashMap<>();
 
+    protected final AAAEncryptionService encryptionService;
+
     protected AbstractNetconfTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                                       final BindingAwareBroker bindingAwareBroker, final Broker domBroker,
                                       final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
                                       final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
-                                      final DataBroker dataBroker) {
+                                      final DataBroker dataBroker, final AAAEncryptionService encryptionService) {
         this.topologyId = topologyId;
         this.clientDispatcher = clientDispatcher;
         this.bindingAwareBroker = bindingAwareBroker;
@@ -181,6 +185,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         this.processingExecutor = processingExecutor;
         this.sharedSchemaRepository = schemaRepositoryProvider.getSharedSchemaRepository();
         this.dataBroker = dataBroker;
+        this.encryptionService = encryptionService;
     }
 
     public void setSchemaRegistry(final SchemaSourceRegistry schemaRegistry) {
@@ -406,7 +411,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         if (credentials instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) {
             authHandler = new LoginPassword(
                     ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getUsername(),
-                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getPassword());
+                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getPassword(),
+                    encryptionService);
         } else {
             throw new IllegalStateException("Only login/password authentification is supported");
         }

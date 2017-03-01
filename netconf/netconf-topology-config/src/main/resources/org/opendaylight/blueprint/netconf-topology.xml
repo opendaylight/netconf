@@ -29,6 +29,9 @@
     <reference id="dataBroker"
                interface="org.opendaylight.controller.md.sal.binding.api.DataBroker"/>
 
+    <reference id="encryptionService"
+               interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />
+
     <bean id="schemaRepository" class="org.opendaylight.netconf.topology.impl.SchemaRepositoryProviderImpl">
         <argument value="shared-schema-repository-impl"/>
     </bean>
@@ -45,6 +48,7 @@
         <argument ref="processingExecutor"/>
         <argument ref="schemaRepository"/>
         <argument ref="dataBroker"/>
+        <argument ref="encryptionService" />
     </bean>
 
     <bean id="netconfConnectorFactory" class="org.opendaylight.netconf.topology.impl.NetconfConnectorFactoryImpl"/>
