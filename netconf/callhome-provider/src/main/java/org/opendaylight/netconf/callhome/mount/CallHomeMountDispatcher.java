@@ -12,6 +12,8 @@ import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.FailedFuture;
 import io.netty.util.concurrent.Future;
 import java.net.InetSocketAddress;
+
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -42,6 +44,7 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     private final CallHomeMountSessionManager sessionManager;
     private final DataBroker dataBroker;
     private final DOMMountPointService mountService;
+    private final AAAEncryptionService encryptionService;
 
     protected CallHomeTopology topology;
 
@@ -53,13 +56,10 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
         }
     };
 
-    public CallHomeMountDispatcher(final String topologyId,
-                                   final EventExecutor eventExecutor,
-                                   final ScheduledThreadPool keepaliveExecutor,
-                                   final ThreadPool processingExecutor,
-                                   final SchemaRepositoryProvider schemaRepositoryProvider,
-                                   final DataBroker dataBroker,
-                                   final DOMMountPointService mountService) {
+    public CallHomeMountDispatcher(final String topologyId, final EventExecutor eventExecutor,
+            final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
+            final SchemaRepositoryProvider schemaRepositoryProvider, final DataBroker dataBroker,
+            final DOMMountPointService mountService, final AAAEncryptionService encryptionService) {
         this.topologyId = topologyId;
         this.eventExecutor = eventExecutor;
         this.keepaliveExecutor = keepaliveExecutor;
@@ -68,6 +68,7 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
         this.sessionManager = new CallHomeMountSessionManager();
         this.dataBroker = dataBroker;
         this.mountService = mountService;
+        this.encryptionService = encryptionService;
     }
 
     @Override
@@ -91,15 +92,15 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     }
 
     void createTopology() {
-        this.topology = new CallHomeTopology(topologyId, this, eventExecutor,
-                keepaliveExecutor, processingExecutor, schemaRepositoryProvider, dataBroker, mountService);
+        this.topology = new CallHomeTopology(topologyId, this, eventExecutor, keepaliveExecutor, processingExecutor,
+                schemaRepositoryProvider, dataBroker, mountService, encryptionService);
     }
 
     @Override
     public void onNetconfSubsystemOpened(final CallHomeProtocolSessionContext session,
-                                         final CallHomeChannelActivator activator) {
-        final CallHomeMountSessionContext deviceContext = getSessionManager()
-            .createSession(session, activator, onCloseHandler);
+            final CallHomeChannelActivator activator) {
+        final CallHomeMountSessionContext deviceContext =
+                getSessionManager().createSession(session, activator, onCloseHandler);
         final NodeId nodeId = deviceContext.getId();
         final Node configNode = deviceContext.getConfigNode();
         LOG.info("Provisioning fake config {}", configNode);
