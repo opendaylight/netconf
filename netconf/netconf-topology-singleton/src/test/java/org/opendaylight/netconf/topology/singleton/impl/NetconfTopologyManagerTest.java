@@ -31,6 +31,7 @@ import javax.annotation.Nonnull;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -83,10 +84,11 @@ public class NetconfTopologyManagerTest {
         final ActorSystemProvider actorSystemProvider = mock(ActorSystemProvider.class);
         final EventExecutor eventExecutor = mock(EventExecutor.class);
         final NetconfClientDispatcher clientDispatcher = mock(NetconfClientDispatcher.class);
+        final AAAEncryptionService encryptionService = mock(AAAEncryptionService.class);
 
         netconfTopologyManager = new NetconfTopologyManager(dataBroker, rpcProviderRegistry,
                 clusterSingletonServiceProvider, bindingAwareBroker, keepaliveExecutor, processingExecutor, domBroker,
-                actorSystemProvider, eventExecutor, clientDispatcher, topologyId);
+                actorSystemProvider, eventExecutor, clientDispatcher, topologyId, encryptionService);
     }
     @Test
     public void testWriteConfiguration() throws Exception {

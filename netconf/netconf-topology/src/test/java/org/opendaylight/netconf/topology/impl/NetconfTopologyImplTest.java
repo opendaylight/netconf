@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -93,6 +94,9 @@ public class NetconfTopologyImplTest {
     @Mock
     private DataBroker dataBroker;
 
+    @Mock
+    private AAAEncryptionService encryptionService;
+
     private TestingNetconfTopologyImpl topology;
     private TestingNetconfTopologyImpl spyTopology;
 
@@ -107,7 +111,7 @@ public class NetconfTopologyImplTest {
 
         topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedBindingAwareBroker,
                 mockedDataBroker, mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, mockedSchemaRepositoryProvider,
-                dataBroker);
+                dataBroker, encryptionService);
 
         spyTopology = spy(topology);
     }
@@ -189,9 +193,9 @@ public class NetconfTopologyImplTest {
                                           BindingAwareBroker bindingAwareBroker, Broker domBroker,
                                           EventExecutor eventExecutor, ScheduledThreadPool keepaliveExecutor,
                                           ThreadPool processingExecutor, SchemaRepositoryProvider schemaRepositoryProvider,
-                                          DataBroker dataBroker) {
+                                          DataBroker dataBroker, AAAEncryptionService encryptionService) {
             super(topologyId, clientDispatcher, bindingAwareBroker, domBroker, eventExecutor, keepaliveExecutor,
-                    processingExecutor, schemaRepositoryProvider, dataBroker);
+                    processingExecutor, schemaRepositoryProvider, dataBroker, encryptionService);
         }
 
         @Override

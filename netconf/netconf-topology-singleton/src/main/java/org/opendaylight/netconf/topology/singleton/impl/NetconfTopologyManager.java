@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nonnull;
+
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -74,13 +76,14 @@ public class NetconfTopologyManager
     private final EventExecutor eventExecutor;
     private final NetconfClientDispatcher clientDispatcher;
     private final String topologyId;
+    private final AAAEncryptionService encryptionService;
 
     public NetconfTopologyManager(final DataBroker dataBroker, final RpcProviderRegistry rpcProviderRegistry,
                            final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
                            final BindingAwareBroker bindingAwareBroker,
                            final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
                            final Broker domBroker, final ActorSystemProvider actorSystemProvider, final EventExecutor eventExecutor,
-                           final NetconfClientDispatcher clientDispatcher, final String topologyId) {
+                           final NetconfClientDispatcher clientDispatcher, final String topologyId, final AAAEncryptionService encryptionService) {
         this.dataBroker = Preconditions.checkNotNull(dataBroker);
         this.rpcProviderRegistry = Preconditions.checkNotNull(rpcProviderRegistry);
         this.clusterSingletonServiceProvider = Preconditions.checkNotNull(clusterSingletonServiceProvider);
@@ -92,6 +95,7 @@ public class NetconfTopologyManager
         this.eventExecutor = Preconditions.checkNotNull(eventExecutor);
         this.clientDispatcher = Preconditions.checkNotNull(clientDispatcher);
         this.topologyId = Preconditions.checkNotNull(topologyId);
+        this.encryptionService = Preconditions.checkNotNull(encryptionService);
     }
 
     // Blueprint init method
@@ -236,7 +240,8 @@ public class NetconfTopologyManager
                 .setKeepaliveExecutor(keepaliveExecutor)
                 .setProcessingExecutor(processingExecutor)
                 .setTopologyId(topologyId)
-                .setNetconfClientDispatcher(clientDispatcher);
+                .setNetconfClientDispatcher(clientDispatcher)
+                .setEncryptionService(encryptionService);
 
         return builder.build();
     }

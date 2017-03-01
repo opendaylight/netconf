@@ -27,6 +27,11 @@ module netconf-node-topology {
                 leaf password {
                     type string;
                 }
+
+                leaf encrypted {
+                    type boolean;
+                    default false;
+                }
             }
         }
     }

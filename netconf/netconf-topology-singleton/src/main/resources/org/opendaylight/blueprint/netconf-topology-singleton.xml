@@ -36,6 +36,9 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
                interface="org.opendaylight.netconf.client.NetconfClientDispatcher"
                odl:type="netconf-client-dispatcher"/>
 
+    <reference id="encryptionService"
+               interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />
+
     <bean id="netconfTopologyManager"
           class="org.opendaylight.netconf.topology.singleton.impl.NetconfTopologyManager"
           init-method="init" destroy-method="close">
@@ -50,6 +53,7 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
         <argument ref="eventExecutor"/>
         <argument ref="clientDispatcherDependency"/>
         <argument value="topology-netconf"/>
+        <argument ref="encryptionService" />
     </bean>
     <service ref="netconfTopologyManager"
              interface="org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService"/>
