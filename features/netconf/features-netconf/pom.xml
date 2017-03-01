@@ -248,6 +248,18 @@
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>mdsal-netconf-impl</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.opendaylight.aaa</groupId>
+      <artifactId>aaa-encrypt-service</artifactId>
+      <version>0.5.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.aaa</groupId>
+      <artifactId>aaa-encrypt-service</artifactId>
+      <version>0.5.0-SNAPSHOT</version>
+      <classifier>config</classifier>
+      <type>xml</type>
+    </dependency>
   </dependencies>
 
   <scm>

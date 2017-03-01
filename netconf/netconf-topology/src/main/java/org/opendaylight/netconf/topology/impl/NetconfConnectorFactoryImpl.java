@@ -11,10 +11,13 @@ import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import javax.annotation.Nullable;
+
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
+import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
 import org.opendaylight.netconf.topology.api.NetconfConnectorFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.HostBuilder;
@@ -56,14 +59,12 @@ public class NetconfConnectorFactoryImpl implements NetconfConnectorFactory {
                             final String username,
                             final String password,
                             final Boolean tcpOnly,
-                            final Boolean reconnectOnSchemaChange) {
+                            final Boolean reconnectOnSchemaChange,
+                            final AAAEncryptionService encryptionService) {
 
         final NodeId nodeId = new NodeId(instanceName);
         final NodeKey nodeKey = new NodeKey(nodeId);
-        final Credentials credentials = new LoginPasswordBuilder()
-                .setUsername(username)
-                .setPassword(password)
-                .build();
+        final Credentials credentials = new LoginPassword(username, password, encryptionService);
         final Host host = HostBuilder.getDefaultInstance(address);
         final PortNumber portNumber = new PortNumber(port);
         final NetconfNode netconfNode = new NetconfNodeBuilder()

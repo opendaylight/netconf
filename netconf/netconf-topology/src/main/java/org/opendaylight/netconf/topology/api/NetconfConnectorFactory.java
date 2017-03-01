@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.topology.api;
 
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -31,6 +32,7 @@ public interface NetconfConnectorFactory {
      * @param password The password of the netconf session
      * @param tcpOnly Whether to create a TCP or SSH session
      * @param reconnectOnSchemaChange Whether to enable ietf-netconf-monitoring and register the NETCONF stream.
+     * @param encryptionService the encryption provider
      * @return The created {@link Node}
      */
     Node newInstance(final DataBroker dataBroker,
@@ -40,5 +42,6 @@ public interface NetconfConnectorFactory {
                      final String username,
                      final String password,
                      final Boolean tcpOnly,
-                     final Boolean reconnectOnSchemaChange);
+                     final Boolean reconnectOnSchemaChange,
+                     final AAAEncryptionService encryptionService);
 }
