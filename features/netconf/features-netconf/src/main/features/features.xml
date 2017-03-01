@@ -80,6 +80,10 @@
     <feature version='${project.version}'>odl-netconf-mapping-api</feature>
     <feature version='${project.version}'>odl-netconf-util</feature>
     <feature version='[4.0.30,5.0.0)'>odl-netty</feature>
+    <configfile finalname="etc/opendaylight/datastore/initial/config/aaa-encrypt-service-config.xml">
+      mvn:org.opendaylight.aaa/aaa-encrypt-service/{{VERSION}}/xml/config
+    </configfile>
+    <bundle>mvn:org.opendaylight.aaa/aaa-encrypt-service/{{VERSION}}</bundle>
     <bundle>mvn:org.opendaylight.netconf/netconf-netty-util/{{VERSION}}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/{{VERSION}}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/{{VERSION}}</bundle>
