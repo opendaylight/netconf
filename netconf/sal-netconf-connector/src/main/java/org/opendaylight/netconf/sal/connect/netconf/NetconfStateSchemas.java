@@ -198,7 +198,12 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
             }
 
             childNode = NetconfMessageTransformUtil.IETF_NETCONF_MONITORING_SCHEMA_NAMESPACE;
-            final String namespaceAsString = getSingleChildNodeValue(schemaNode, childNode).get();
+            Optional<String> namespaceValue = getSingleChildNodeValue(schemaNode, childNode);
+            if (!namespaceValue.isPresent()) {
+                LOG.debug("{}: Ignoring schema due to missing namespace", id);
+                return Optional.absent();
+            }
+            final String namespaceAsString = namespaceValue.get();
 
             childNode = NetconfMessageTransformUtil.IETF_NETCONF_MONITORING_SCHEMA_VERSION;
             // Revision does not have to be filled
