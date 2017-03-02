@@ -66,6 +66,9 @@ public class NetconfStateSchemasTest {
     private static final NetconfSessionPreferences CAPS = NetconfSessionPreferences.fromStrings(Collections.singleton("urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04"));
     private final RemoteDeviceId deviceId = new RemoteDeviceId("device", new InetSocketAddress(99));
     private ContainerNode compositeNodeSchemas;
+    private final int NUMBER_OF_SCHEMAS = 73;
+    private final int NUMBER_OF_LEGAL_SCHEMAS = NUMBER_OF_SCHEMAS - 1;
+
     @Mock
     private DOMRpcService rpc;
 
@@ -87,7 +90,7 @@ public class NetconfStateSchemasTest {
         final NetconfStateSchemas schemas = NetconfStateSchemas.create(deviceId, compositeNodeSchemas);
 
         final Set<QName> availableYangSchemasQNames = schemas.getAvailableYangSchemasQNames();
-        assertEquals(73, availableYangSchemasQNames.size());
+        assertEquals(NUMBER_OF_LEGAL_SCHEMAS, availableYangSchemasQNames.size());
 
         assertThat(availableYangSchemasQNames,
                 hasItem(QName.create("urn:TBD:params:xml:ns:yang:network-topology", "2013-07-12", "network-topology")));
@@ -110,7 +113,7 @@ public class NetconfStateSchemasTest {
         when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any())).thenReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(rpcReply)));
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
-        assertEquals(73, availableYangSchemasQNames.size());
+        assertEquals(NUMBER_OF_LEGAL_SCHEMAS, availableYangSchemasQNames.size());
 
         assertThat(availableYangSchemasQNames,
                 hasItem(QName.create("urn:TBD:params:xml:ns:yang:network-topology", "2013-07-12", "network-topology")));

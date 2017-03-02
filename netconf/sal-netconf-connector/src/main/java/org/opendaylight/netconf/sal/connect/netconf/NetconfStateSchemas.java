@@ -14,7 +14,6 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -81,12 +80,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
     @Override
     public Set<QName> getAvailableYangSchemasQNames() {
-        return Sets.newHashSet(Collections2.transform(getAvailableYangSchemas(), new Function<RemoteYangSchema, QName>() {
-            @Override
-            public QName apply(final RemoteYangSchema input) {
-                return input.getQName();
-            }
-        }));
+        return Sets.newHashSet(Collections2.transform(getAvailableYangSchemas(), input -> input.getQName()));
     }
 
     /**
@@ -121,7 +115,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
         if(schemasNode.isPresent()) {
             Preconditions.checkState(schemasNode.get() instanceof ContainerNode,
                     "Expecting container containing schemas, but was %s", schemasNode.get());
-            return create(id, ((ContainerNode) schemasNode.get()));
+            return create(id, (ContainerNode) schemasNode.get());
         } else {
             LOG.warn("{}: Unable to detect available schemas, get to {} was empty", id, STATE_SCHEMAS_IDENTIFIER);
             return EMPTY;
@@ -198,7 +192,12 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
             }
 
             childNode = NetconfMessageTransformUtil.IETF_NETCONF_MONITORING_SCHEMA_NAMESPACE;
-            final String namespaceAsString = getSingleChildNodeValue(schemaNode, childNode).get();
+            Optional<String> namespaceValue = getSingleChildNodeValue(schemaNode, childNode);
+            if (!namespaceValue.isPresent()) {
+                LOG.debug("{}: Ignoring schema due to missing namespace", id);
+                return Optional.absent();
+            }
+            final String namespaceAsString = namespaceValue.get();
 
             childNode = NetconfMessageTransformUtil.IETF_NETCONF_MONITORING_SCHEMA_VERSION;
             // Revision does not have to be filled
@@ -230,8 +229,12 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
         private static Optional<String> getSingleChildNodeValue(final DataContainerNode<?> schemaNode, final QName childNode) {
             final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> node = schemaNode.getChild(toId(childNode));
-            Preconditions.checkArgument(node.isPresent(), "Child node %s not present", childNode);
-            return getValueOfSimpleNode(node.get());
+            if (node.isPresent()) {
+                return getValueOfSimpleNode(node.get());
+            } else {
+                LOG.warn("Child node {} not present", childNode);
+                return Optional.<String>absent();
+            }
         }
 
         private static Optional<String> getValueOfSimpleNode(final NormalizedNode<? extends YangInstanceIdentifier.PathArgument, ?> node) {
