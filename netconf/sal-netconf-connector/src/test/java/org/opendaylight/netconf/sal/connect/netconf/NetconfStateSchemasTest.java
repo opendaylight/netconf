@@ -87,7 +87,7 @@ public class NetconfStateSchemasTest {
         final NetconfStateSchemas schemas = NetconfStateSchemas.create(deviceId, compositeNodeSchemas);
 
         final Set<QName> availableYangSchemasQNames = schemas.getAvailableYangSchemasQNames();
-        assertEquals(73, availableYangSchemasQNames.size());
+        assertEquals(72, availableYangSchemasQNames.size());
 
         assertThat(availableYangSchemasQNames,
                 hasItem(QName.create("urn:TBD:params:xml:ns:yang:network-topology", "2013-07-12", "network-topology")));
@@ -110,7 +110,7 @@ public class NetconfStateSchemasTest {
         when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any())).thenReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(rpcReply)));
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
-        assertEquals(73, availableYangSchemasQNames.size());
+        assertEquals(72, availableYangSchemasQNames.size());
 
         assertThat(availableYangSchemasQNames,
                 hasItem(QName.create("urn:TBD:params:xml:ns:yang:network-topology", "2013-07-12", "network-topology")));

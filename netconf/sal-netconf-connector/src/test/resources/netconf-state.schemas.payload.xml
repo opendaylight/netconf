@@ -505,7 +505,6 @@
         <ncm:version>2013-12-18</ncm:version>
     </ncm:schema>
     <ncm:schema>
-        <ncm:namespace>urn:opendaylight:model:topology:inventory</ncm:namespace>
         <ncm:location>NETCONF</ncm:location>
         <ncm:identifier>opendaylight-topology-inventory</ncm:identifier>
                 <ncm:format xmlns:prefix="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">prefix:yang</ncm:format>
