@@ -554,7 +554,7 @@ public class ControllerContext implements SchemaContextListener {
 
                 final Module moduleBehindMountPoint = mountPointSchema.findModuleByName(moduleNameBehindMountPoint, null);
                 if (moduleBehindMountPoint == null) {
-                    throw new RestconfDocumentedException("\"" + moduleName
+                    throw new RestconfDocumentedException("\"" + moduleNameBehindMountPoint
                             + "\" module does not exist in mount point.", ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
                 }
 
