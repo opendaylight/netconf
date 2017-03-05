@@ -38,6 +38,9 @@ module instance-identifier-patch-module {
             leaf my-leaf22 {
                 type string;
             }
+            leaf-list my-leaf-list {
+                type string;
+            }
         }
     }
   }

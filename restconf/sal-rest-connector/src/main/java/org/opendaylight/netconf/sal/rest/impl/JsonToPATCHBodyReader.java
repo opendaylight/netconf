@@ -273,7 +273,11 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
             value.append("[");
 
             while (in.hasNext()) {
-                readValueObject(value, in);
+                if (in.peek() == JsonToken.STRING) {
+                    value.append("\"" + in.nextString() + "\"");
+                } else {
+                    readValueObject(value, in);
+                }
                 if (in.peek() != JsonToken.END_ARRAY) {
                     value.append(",");
                 }
@@ -311,7 +315,11 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
                     value.append("[");
 
                     while (in.hasNext()) {
-                        readValueObject(value, in);
+                        if (in.peek() == JsonToken.STRING) {
+                            value.append("\"" + in.nextString() + "\"");
+                        } else {
+                            readValueObject(value, in);
+                        }
                         if (in.peek() != JsonToken.END_ARRAY) {
                             value.append(",");
                         }
