@@ -25,7 +25,8 @@
           "my-list2": {
             "name": "my-leaf20",
             "my-leaf21": "I am leaf21-1",
-            "my-leaf22": "I am leaf22-1"
+            "my-leaf22": "I am leaf22-1",
+            "my-leaf-list": ["listelement"]
           }
         }
       }
