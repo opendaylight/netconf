@@ -268,7 +268,11 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
             value.append("[");
 
             while (in.hasNext()) {
-                readValueObject(value, in);
+                if (in.peek() == JsonToken.STRING) {
+                    value.append("\"" + in.nextString() + "\"");
+                } else {
+                    readValueObject(value, in);
+                }
                 if (in.peek() != JsonToken.END_ARRAY) {
                     value.append(",");
                 }
@@ -306,7 +310,11 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
                     value.append("[");
 
                     while (in.hasNext()) {
-                        readValueObject(value, in);
+                        if (in.peek() == JsonToken.STRING) {
+                            value.append("\"" + in.nextString() + "\"");
+                        } else {
+                            readValueObject(value, in);
+                        }
                         if (in.peek() != JsonToken.END_ARRAY) {
                             value.append(",");
                         }
@@ -349,7 +357,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
      */
     private static PATCHEntity prepareEditOperation(@Nonnull final PatchEdit edit) {
         if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
-                && checkDataPresence(edit.getOperation(), (edit.getData() != null))) {
+                && checkDataPresence(edit.getOperation(), edit.getData() != null)) {
             if (isPatchOperationWithValue(edit.getOperation())) {
                 // for lists allow to manipulate with list items through their parent
                 final YangInstanceIdentifier targetNode;
