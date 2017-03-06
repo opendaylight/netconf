@@ -251,7 +251,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
      */
     @Nullable
     private NormalizedNode<?, ?> rpcToNNode(final XmlElement oElement, @Nullable final ContainerSchemaNode input) {
-        return input == null ? null : DomToNormalizedNodeParserFactory
+        return input.getChildNodes().isEmpty() ? null : DomToNormalizedNodeParserFactory
                 .getInstance(DomUtils.defaultValueCodecProvider(), schemaContext.getCurrentContext())
                 .getContainerNodeParser()
                 .parse(Collections.singletonList(oElement.getDomElement()), input);
