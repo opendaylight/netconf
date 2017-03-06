@@ -60,7 +60,7 @@ public class BaseRpcSchemalessTransformer implements MessageTransformer<NetconfM
 
         Preconditions.checkNotNull(mappedRpcs.get(rpcQName), "Unknown rpc %s, available rpcs: %s", rpcQName, mappedRpcs.keySet());
         final DOMResult domResult = NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpcQName, counter);
-        if(mappedRpcs.get(rpcQName).getInput() == null) {
+        if (mappedRpcs.get(rpcQName).getInput().getChildNodes().isEmpty()) {
             return new NetconfMessage(domResult.getNode().getOwnerDocument());
         }
 

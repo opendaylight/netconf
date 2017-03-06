@@ -634,7 +634,7 @@ public class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException("RPC does not exist.", ErrorType.RPC, ErrorTag.UNKNOWN_ELEMENT);
         }
 
-        if (rpc.getInput() != null) {
+        if (!rpc.getInput().getChildNodes().isEmpty()) {
             LOG.debug("RPC " + rpc + " does not need input value.");
             // FIXME : find a correct Error from specification
             throw new IllegalStateException("RPC " + rpc + " does'n need input value!");
