@@ -103,6 +103,8 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.meta.StatementSource;
 import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.effective.EffectiveSchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -634,7 +636,7 @@ public class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException("RPC does not exist.", ErrorType.RPC, ErrorTag.UNKNOWN_ELEMENT);
         }
 
-        if (rpc.getInput() != null) {
+        if (rpc.getInput() != null && isExplicitStatement(rpc.getInput())) {
             LOG.debug("RPC " + rpc + " does not need input value.");
             // FIXME : find a correct Error from specification
             throw new IllegalStateException("RPC " + rpc + " does'n need input value!");
@@ -655,6 +657,11 @@ public class RestconfImpl implements RestconfService {
 
         return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpc, mountPoint, schemaContext),
                 result.getResult(), QueryParametersParser.parseWriterParameters(uriInfo));
+    }
+
+    private static boolean isExplicitStatement(final ContainerSchemaNode node) {
+        return node instanceof EffectiveStatement
+                && ((EffectiveStatement) node).getDeclared().getStatementSource() == StatementSource.DECLARATION;
     }
 
     private static RpcDefinition findRpc(final SchemaContext schemaContext, final String identifierDecoded) {
