@@ -419,10 +419,10 @@ public class BaseYangSwaggerGenerator {
         operationSpec.setMethod("POST");
         operationSpec.setNotes(rpcDefn.getDescription());
         operationSpec.setNickname(rpcDefn.getQName().getLocalName());
-        if (rpcDefn.getOutput() != null) {
+        if (!rpcDefn.getOutput().getChildNodes().isEmpty()) {
             operationSpec.setType("(" + rpcDefn.getQName().getLocalName() + ")output" + OperationBuilder.TOP);
         }
-        if (rpcDefn.getInput() != null) {
+        if (!rpcDefn.getInput().getChildNodes().isEmpty()) {
             final Parameter payload = new Parameter();
             payload.setParamType("body");
             payload.setType("(" + rpcDefn.getQName().getLocalName() + ")input" + OperationBuilder.TOP);

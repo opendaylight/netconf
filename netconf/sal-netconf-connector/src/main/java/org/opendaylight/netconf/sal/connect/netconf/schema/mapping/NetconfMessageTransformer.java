@@ -139,7 +139,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         }
 
         Preconditions.checkNotNull(currentMappedRpcs.get(rpcQName), "Unknown rpc %s, available rpcs: %s", rpcQName, currentMappedRpcs.keySet());
-        if(currentMappedRpcs.get(rpcQName).getInput() == null) {
+        if(currentMappedRpcs.get(rpcQName).getInput().getChildNodes().isEmpty()) {
             return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpcQName, counter).getNode().getOwnerDocument());
         }
 
@@ -204,7 +204,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             Preconditions.checkArgument(rpcDefinition != null, "Unable to parse response of %s, the rpc is unknown", rpcQName);
 
             // In case no input for rpc is defined, we can simply construct the payload here
-            if (rpcDefinition.getOutput() == null) {
+            if (rpcDefinition.getOutput().getChildNodes().isEmpty()) {
                 Preconditions.checkArgument(XmlElement.fromDomDocument(
                     message.getDocument()).getOnlyChildElementWithSameNamespaceOptionally("ok").isPresent(),
                     "Unexpected content in response of rpc: %s, %s", rpcDefinition.getQName(), message);
