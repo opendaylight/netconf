@@ -17,6 +17,24 @@
       "revId": "87f4c08a436279f1b6374fcb9ff4f9aa737a51fe",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_c28143fc",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/jersey/providers/JsonToPATCHBodyReader.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 656
+      },
+      "writtenOn": "2017-03-09T09:13:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_22c2cf52",
+      "revId": "87f4c08a436279f1b6374fcb9ff4f9aa737a51fe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
