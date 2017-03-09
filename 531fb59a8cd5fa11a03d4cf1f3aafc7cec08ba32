@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "fafc7978_045cf817",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 1120,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-03-09T10:32:52Z",
+      "side": 1,
+      "message": "\"odl-leaf-nodes-only\" to keep this consistent with \u0027start-time\u0027 and others.\n\nI think we need a wiki page for our extensions and provide a pointer. BUG-7892 is a candidate for another extension.",
+      "range": {
+        "startLine": 1120,
+        "startChar": 22,
+        "endLine": 1120,
+        "endChar": 38
+      },
+      "revId": "531fb59a8cd5fa11a03d4cf1f3aafc7cec08ba32",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_97f875c4",
         "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/AbstractQueryParams.java",
         "patchSetId": 3
