@@ -295,8 +295,7 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
         return normalizedNodeContext;
     }
 
-    private void verifyNormaluizedNodeContext(
-            final NormalizedNodeContext normalizedNodeContext,
+    private static void verifyNormaluizedNodeContext(final NormalizedNodeContext normalizedNodeContext,
             final String topLevelElementName) {
         assertEquals(topLevelElementName, normalizedNodeContext.getData()
                 .getNodeType().getLocalName());
@@ -311,8 +310,7 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
         assertTrue(dataTree.contains("lf1"));
     }
 
-    private void verityMultipleItemsInList(
-            final NormalizedNodeContext normalizedNodeContext) {
+    private static void verityMultipleItemsInList(final NormalizedNodeContext normalizedNodeContext) {
 
         final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext
                 .getData());

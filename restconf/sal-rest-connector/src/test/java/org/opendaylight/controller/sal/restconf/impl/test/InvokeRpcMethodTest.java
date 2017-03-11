@@ -126,7 +126,7 @@ public class InvokeRpcMethodTest {
 
     }
 
-    private NormalizedNodeContext prepareDomPayload() {
+    private static NormalizedNodeContext prepareDomPayload() {
         final SchemaContext schema = controllerContext.getGlobalSchema();
         final Module rpcModule = schema.findModuleByName("invoke-rpc-module", null);
         assertNotNull(rpcModule);

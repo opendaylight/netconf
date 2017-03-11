@@ -36,7 +36,7 @@ public class LibraryModulesSchemasTest {
     }
 
 
-    private void verifySchemas(final LibraryModulesSchemas libraryModulesSchemas) throws MalformedURLException {
+    private static void verifySchemas(final LibraryModulesSchemas libraryModulesSchemas) throws MalformedURLException {
         final Map<SourceIdentifier, URL> resolvedModulesSchema = libraryModulesSchemas.getAvailableModels();
         Assert.assertThat(resolvedModulesSchema.size(), is(3));
 

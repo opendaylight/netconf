@@ -101,7 +101,7 @@ public class RestPostOperationTest extends JerseyTest {
         return resourceConfig;
     }
 
-    private void setSchemaControllerContext(final SchemaContext schema) {
+    private static void setSchemaControllerContext(final SchemaContext schema) {
         final ControllerContext context = ControllerContext.getInstance();
         context.setSchemas(schema);
         restconfImpl.setControllerContext(context);

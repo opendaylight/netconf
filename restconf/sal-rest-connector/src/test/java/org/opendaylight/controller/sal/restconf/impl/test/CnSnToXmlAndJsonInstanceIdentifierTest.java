@@ -41,7 +41,7 @@ public class CnSnToXmlAndJsonInstanceIdentifierTest extends YangAndXmlAndDataSch
     }
 
 
-    private void validateXmlOutput(final String xml) throws XMLStreamException {
+    private static void validateXmlOutput(final String xml) throws XMLStreamException {
         final XMLInputFactory xmlInFactory = XMLInputFactory.newInstance();
         XMLEventReader eventReader;
 
@@ -82,7 +82,7 @@ public class CnSnToXmlAndJsonInstanceIdentifierTest extends YangAndXmlAndDataSch
 
     }
 
-    private void validateXmlOutputWithLeafList(final String xml) throws XMLStreamException {
+    private static void validateXmlOutputWithLeafList(final String xml) throws XMLStreamException {
         final XMLInputFactory xmlInFactory = XMLInputFactory.newInstance();
         XMLEventReader eventReader;
 
@@ -118,7 +118,7 @@ public class CnSnToXmlAndJsonInstanceIdentifierTest extends YangAndXmlAndDataSch
 
     }
 
-    private YangInstanceIdentifier createInstanceIdentifier() throws URISyntaxException {
+    private static YangInstanceIdentifier createInstanceIdentifier() throws URISyntaxException {
         final List<PathArgument> pathArguments = new ArrayList<>();
         pathArguments.add(new NodeIdentifier(new QName(new URI("instance:identifier:module"), "cont")));
         pathArguments.add(new NodeIdentifier(new QName(new URI("instance:identifier:module"), "cont1")));
@@ -135,7 +135,7 @@ public class CnSnToXmlAndJsonInstanceIdentifierTest extends YangAndXmlAndDataSch
         return YangInstanceIdentifier.create(pathArguments);
     }
 
-    private YangInstanceIdentifier createInstanceIdentifierWithLeafList() throws URISyntaxException {
+    private static YangInstanceIdentifier createInstanceIdentifierWithLeafList() throws URISyntaxException {
         final List<PathArgument> pathArguments = new ArrayList<>();
         pathArguments.add(new NodeIdentifier(new QName(new URI("instance:identifier:module"), "cont")));
         pathArguments.add(new NodeIdentifier(new QName(new URI("instance:identifier:module"), "cont1")));

@@ -157,7 +157,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
     public void close() {
     }
 
-    private String toJson(final NormalizedNodeContext readData) throws IOException {
+    private static String toJson(final NormalizedNodeContext readData) throws IOException {
         final NormalizedNodeJsonBodyWriter writer = new NormalizedNodeJsonBodyWriter();
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writer.writeTo(readData, NormalizedNodeContext.class, null, EMPTY_ANNOTATIONS,
@@ -165,9 +165,9 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         return outputStream.toString(StandardCharsets.UTF_8.name());
     }
 
-    private boolean isDataMissing(final Exception e) {
+    private static boolean isDataMissing(final Exception e) {
         boolean dataMissing = false;
-        if(e instanceof RestconfDocumentedException) {
+        if (e instanceof RestconfDocumentedException) {
             final RestconfDocumentedException rde = (RestconfDocumentedException)e;
             if(!rde.getErrors().isEmpty()) {
                 if(rde.getErrors().get(0).getErrorTag() == ErrorTag.DATA_MISSING) {

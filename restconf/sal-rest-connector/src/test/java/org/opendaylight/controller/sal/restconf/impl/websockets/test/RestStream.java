@@ -99,7 +99,7 @@ public class RestStream extends JerseyTest {
         return target(uri).request(mediaType).get();
     }
 
-    private String getRpcInput() {
+    private static String getRpcInput() {
         final StringBuilder sb = new StringBuilder();
         sb.append("<input xmlns=\"urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote\">");
         sb.append("<path xmlns:int=\"urn:ietf:params:xml:ns:yang:ietf-interfaces\">/int:interfaces/int:interface[int:name='eth0']</path>");

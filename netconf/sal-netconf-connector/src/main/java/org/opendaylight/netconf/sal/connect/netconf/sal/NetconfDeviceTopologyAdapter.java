@@ -57,14 +57,9 @@ import org.slf4j.LoggerFactory;
 public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceTopologyAdapter.class);
-    public static final Function<Entry<QName, FailureReason>, UnavailableCapability> UNAVAILABLE_CAPABILITY_TRANSFORMER = new Function<Entry<QName, FailureReason>, UnavailableCapability>() {
-        @Override
-        public UnavailableCapability apply(final Entry<QName, FailureReason> input) {
-            return new UnavailableCapabilityBuilder()
-                    .setCapability(input.getKey().toString())
-                    .setFailureReason(input.getValue()).build();
-        }
-    };
+    public static final Function<Entry<QName, FailureReason>, UnavailableCapability> UNAVAILABLE_CAPABILITY_TRANSFORMER = input -> new UnavailableCapabilityBuilder()
+            .setCapability(input.getKey().toString())
+            .setFailureReason(input.getValue()).build();
 
     private final RemoteDeviceId id;
     private BindingTransactionChain txChain;
@@ -115,7 +110,7 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         commitTransaction(writeTx, "init");
     }
 
-    public void updateDeviceData(boolean up, NetconfDeviceCapabilities capabilities) {
+    public void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities) {
         final NetconfNode data = buildDataForNetconfNode(up, capabilities);
 
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
@@ -130,7 +125,7 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         commitTransaction(writeTx, "update");
     }
 
-    public void updateClusteredDeviceData(boolean up, String masterAddress, NetconfDeviceCapabilities capabilities) {
+    public void updateClusteredDeviceData(final boolean up, final String masterAddress, final NetconfDeviceCapabilities capabilities) {
         final NetconfNode data = buildDataForNetconfClusteredNode(up, masterAddress, capabilities);
 
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
@@ -145,7 +140,7 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         commitTransaction(writeTx, "update");
     }
 
-    public void setDeviceAsFailed(Throwable throwable) {
+    public void setDeviceAsFailed(final Throwable throwable) {
         String reason = (throwable != null && throwable.getMessage() != null) ? throwable.getMessage() : UNKNOWN_REASON;
 
         final NetconfNode data = new NetconfNodeBuilder().setConnectionStatus(ConnectionStatus.UnableToConnect).setConnectedMessage(reason).build();
@@ -162,7 +157,7 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         commitTransaction(writeTx, "update-failed-device");
     }
 
-    private NetconfNode buildDataForNetconfNode(boolean up, NetconfDeviceCapabilities capabilities) {
+    private NetconfNode buildDataForNetconfNode(final boolean up, final NetconfDeviceCapabilities capabilities) {
         List<AvailableCapability> capabilityList = new ArrayList<>();
         capabilityList.addAll(capabilities.getNonModuleBasedCapabilities());
         capabilityList.addAll(capabilities.getResolvedCapabilities());
@@ -184,7 +179,7 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         return netconfNodeBuilder.build();
     }
 
-    private NetconfNode buildDataForNetconfClusteredNode(boolean up, String masterNodeAddress, NetconfDeviceCapabilities capabilities) {
+    private NetconfNode buildDataForNetconfClusteredNode(final boolean up, final String masterNodeAddress, final NetconfDeviceCapabilities capabilities) {
         List<AvailableCapability> capabilityList = new ArrayList<>();
         capabilityList.addAll(capabilities.getNonModuleBasedCapabilities());
         capabilityList.addAll(capabilities.getResolvedCapabilities());
@@ -231,12 +226,12 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
 
         final NetworkTopology networkTopology = new NetworkTopologyBuilder().build();
         LOG.trace("{}: Merging {} container to ensure its presence", id,
-                networkTopology.QNAME, writeTx.getIdentifier());
+                NetworkTopology.QNAME, writeTx.getIdentifier());
         writeTx.merge(LogicalDatastoreType.OPERATIONAL, networkTopologyPath, networkTopology);
 
         final Topology topology = new TopologyBuilder().setTopologyId(new TopologyId(TopologyNetconf.QNAME.getLocalName())).build();
         LOG.trace("{}: Merging {} container to ensure its presence", id,
-                topology.QNAME, writeTx.getIdentifier());
+                Topology.QNAME, writeTx.getIdentifier());
         writeTx.merge(LogicalDatastoreType.OPERATIONAL, topologyListPath, topology);
     }
 
@@ -278,7 +273,7 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         removeDeviceConfiguration();
     }
 
-    public void setTxChain(BindingTransactionChain txChain) {
+    public void setTxChain(final BindingTransactionChain txChain) {
         this.txChain = Preconditions.checkNotNull(txChain);
     }
 }

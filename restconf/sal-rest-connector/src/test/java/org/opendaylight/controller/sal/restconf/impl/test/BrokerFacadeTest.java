@@ -124,19 +124,20 @@ public class BrokerFacadeTest {
         ControllerContext.getInstance().setSchemas(TestUtils.loadSchemaContext("/full-versions/test-module"));
     }
 
-    private CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> wrapDummyNode(
+    private static CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> wrapDummyNode(
             final NormalizedNode<?, ?> dummyNode) {
         return Futures.immediateCheckedFuture(Optional.<NormalizedNode<?, ?>> of(dummyNode));
     }
 
-    private CheckedFuture<Boolean, ReadFailedException> wrapExistence(final Boolean exists) {
+    private static CheckedFuture<Boolean, ReadFailedException> wrapExistence(final Boolean exists) {
         return Futures.immediateCheckedFuture(exists);
     }
 
     /**
      * Value of this node shouldn't be important for testing purposes
      */
-    private NormalizedNode<?, ?> createDummyNode(final String namespace, final String date, final String localName) {
+    private static NormalizedNode<?, ?> createDummyNode(final String namespace, final String date,
+            final String localName) {
         return Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(QName.create(namespace, date, localName))).build();
     }

@@ -84,7 +84,7 @@ public class NnToJsonLeafrefType extends AbstractBodyReaderTest {
                 json);
     }
 
-    private void validateJson(final String regex, final String value) {
+    private static void validateJson(final String regex, final String value) {
         assertNotNull(value);
         final Pattern ptrn = Pattern.compile(regex, Pattern.DOTALL);
         final Matcher mtch = ptrn.matcher(value);

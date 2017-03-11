@@ -193,14 +193,11 @@ public final class NetconfBaseOps {
 
     private ListenableFuture<Optional<NormalizedNode<?, ?>>> extractData(final Optional<YangInstanceIdentifier> path,
                                                                          final ListenableFuture<DOMRpcResult> configRunning) {
-        return Futures.transform(configRunning, new Function<DOMRpcResult, Optional<NormalizedNode<?, ?>>>() {
-            @Override
-            public Optional<NormalizedNode<?, ?>> apply(final DOMRpcResult result) {
-                Preconditions.checkArgument(result.getErrors().isEmpty(), "Unable to read data: %s, errors: %s", path, result.getErrors());
-                final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> dataNode =
-                        ((ContainerNode) result.getResult()).getChild(NetconfMessageTransformUtil.toId(NetconfMessageTransformUtil.NETCONF_DATA_QNAME)).get();
-                return transformer.selectFromDataStructure(dataNode, path.get());
-            }
+        return Futures.transform(configRunning, (Function<DOMRpcResult, Optional<NormalizedNode<?, ?>>>) result -> {
+            Preconditions.checkArgument(result.getErrors().isEmpty(), "Unable to read data: %s, errors: %s", path, result.getErrors());
+            final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> dataNode =
+                    ((ContainerNode) result.getResult()).getChild(NetconfMessageTransformUtil.toId(NetconfMessageTransformUtil.NETCONF_DATA_QNAME)).get();
+            return transformer.selectFromDataStructure(dataNode, path.get());
         });
     }
 
@@ -225,7 +222,7 @@ public final class NetconfBaseOps {
         return future;
     }
 
-    private boolean isFilterPresent(final Optional<YangInstanceIdentifier> filterPath) {
+    private static boolean isFilterPresent(final Optional<YangInstanceIdentifier> filterPath) {
         return filterPath.isPresent() && !filterPath.get().isEmpty();
     }
 
@@ -261,8 +258,10 @@ public final class NetconfBaseOps {
         return Builders.choiceBuilder().withNodeIdentifier(toId(EditContent.QNAME)).withChild(configContent).build();
     }
 
-    private ContainerNode getEditConfigContent(final QName datastore, final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> defaultOperation, final boolean rollback) {
-        final DataContainerNodeAttrBuilder<YangInstanceIdentifier.NodeIdentifier, ContainerNode> editBuilder = Builders.containerBuilder().withNodeIdentifier(toId(NETCONF_EDIT_CONFIG_QNAME));
+    private static ContainerNode getEditConfigContent(final QName datastore,
+            final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> defaultOperation, final boolean rollback) {
+        final DataContainerNodeAttrBuilder<YangInstanceIdentifier.NodeIdentifier, ContainerNode> editBuilder =
+                Builders.containerBuilder().withNodeIdentifier(toId(NETCONF_EDIT_CONFIG_QNAME));
 
         // Target
         editBuilder.withChild(getTargetNode(datastore));

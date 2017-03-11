@@ -90,7 +90,7 @@ public class PATCHJsonBodyWriter implements MessageBodyWriter<PATCHStatusContext
         jsonWriter.flush();
     }
 
-    private void reportSuccess(final JsonWriter jsonWriter) throws IOException {
+    private static void reportSuccess(final JsonWriter jsonWriter) throws IOException {
         jsonWriter.name("ok").beginArray().nullValue().endArray();
     }
 

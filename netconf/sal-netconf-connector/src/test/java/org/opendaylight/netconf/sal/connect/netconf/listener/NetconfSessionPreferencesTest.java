@@ -163,7 +163,8 @@ public class NetconfSessionPreferencesTest {
         assertCaps(sessionCaps1, 0, 4);
     }
 
-    private void assertCaps(final NetconfSessionPreferences sessionCaps1, final int nonModuleCaps, final int moduleCaps) {
+    private static void assertCaps(final NetconfSessionPreferences sessionCaps1, final int nonModuleCaps,
+            final int moduleCaps) {
         assertEquals(nonModuleCaps, sessionCaps1.getNonModuleCaps().size());
         assertEquals(moduleCaps, sessionCaps1.getModuleBasedCaps().size());
     }
