@@ -16,7 +16,6 @@ import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import java.util.Collections;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMSource;
 import org.junit.Assert;
@@ -30,6 +29,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -81,7 +81,7 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
         final YangInstanceIdentifier.NodeIdentifier childId = YangInstanceIdentifier.NodeIdentifier.create(
                 QName.create("urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring", "2010-10-04", "data")
         );
-        Document xmlDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        Document xmlDoc = UntrustedXML.newDocumentBuilder().newDocument();
         Element root = xmlDoc.createElement("data");
         root.setTextContent("module test {}");
         final DOMSource v = new DOMSource(root);

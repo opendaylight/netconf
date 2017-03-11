@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
@@ -38,11 +37,8 @@ public class NetconfToNotificationTest {
 
     NetconfMessage userNotification;
 
-    @SuppressWarnings("deprecation")
     @Before
     public void setup() throws Exception {
-        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
         InputStream notifyPayloadStream = getClass().getResourceAsStream("/notification-payload.xml");
         assertNotNull(notifyPayloadStream);
 
@@ -51,7 +47,7 @@ public class NetconfToNotificationTest {
         userNotification = new NetconfMessage(doc);
     }
 
-    static SchemaContext getNotificationSchemaContext(Class<?> loadClass, boolean getExceptionTest) throws Exception {
+    static SchemaContext getNotificationSchemaContext(final Class<?> loadClass, final boolean getExceptionTest) throws Exception {
         final List<InputStream> modelsToParse = new ArrayList<>();
 
         if (getExceptionTest) {

@@ -12,9 +12,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Date;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.Test;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -23,10 +22,7 @@ public class NetconfNotificationTest {
 
     @Test
     public void testWrapNotification() throws Exception {
-        final DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        final DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-        final Document document = docBuilder.newDocument();
+        final Document document = UntrustedXML.newDocumentBuilder().newDocument();
 
         final Element rootElement = document.createElement("test-root");
         document.appendChild(rootElement);

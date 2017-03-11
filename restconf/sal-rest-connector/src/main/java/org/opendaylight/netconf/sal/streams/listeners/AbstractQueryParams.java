@@ -9,12 +9,11 @@ package org.opendaylight.netconf.sal.streams.listeners;
 
 import java.io.StringReader;
 import java.util.Date;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -107,9 +106,7 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      * @throws Exception
      */
     private boolean parseFilterParam() throws Exception {
-        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        final DocumentBuilder builder = factory.newDocumentBuilder();
-        final Document docOfXml = builder.parse(new InputSource(new StringReader(this.xml)));
+        final Document docOfXml = UntrustedXML.newDocumentBuilder().parse(new InputSource(new StringReader(this.xml)));
         final XPath xPath = XPathFactory.newInstance().newXPath();
         return (boolean) xPath.compile(this.filter).evaluate(docOfXml, XPathConstants.BOOLEAN);
     }
