@@ -10,13 +10,17 @@ package org.opendaylight.netconf.sal.streams.listeners;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -45,8 +49,8 @@ import org.w3c.dom.Element;
  *
  */
 abstract class AbstractNotificationsData {
-
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNotificationsData.class);
+    private static final TransformerFactory TF = TransformerFactory.newInstance();
 
     private TransactionChainHandler transactionChainHandler;
     private SchemaContextHandler schemaHandler;
@@ -91,12 +95,11 @@ abstract class AbstractNotificationsData {
     /**
      * Formats data specified by RFC3339.
      *
-     * @param d
-     *            Date
+     * @param now time stamp
      * @return Data specified by RFC3339.
      */
-    protected static String toRFC3339(final Date d) {
-        return ListenersConstants.RFC3339_PATTERN.matcher(ListenersConstants.RFC3339.format(d)).replaceAll("$1:$2");
+    protected static String toRFC3339(final Instant now) {
+        return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(now, ZoneId.systemDefault()));
     }
 
     /**
@@ -165,7 +168,7 @@ abstract class AbstractNotificationsData {
         doc.appendChild(notificationElement);
 
         final Element eventTimeElement = doc.createElement("eventTime");
-        eventTimeElement.setTextContent(toRFC3339(new Date()));
+        eventTimeElement.setTextContent(toRFC3339(Instant.now()));
         notificationElement.appendChild(eventTimeElement);
 
         return notificationElement;
@@ -182,7 +185,7 @@ abstract class AbstractNotificationsData {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         try {
-            final Transformer transformer = ListenersConstants.FACTORY.newTransformer();
+            final Transformer transformer = TF.newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");

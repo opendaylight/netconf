@@ -7,12 +7,13 @@
  */
 package org.opendaylight.netconf.sal.streams.listeners;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import org.json.JSONObject;
@@ -134,11 +135,22 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      *
      * @return json as {@link String}
      */
-    private String prepareJson() {
+    @VisibleForTesting
+    String prepareJson() {
         final JSONObject json = new JSONObject();
         json.put("ietf-restconf:notification",
-                new JSONObject(writeBodyToString()).put("event-time", ListenerAdapter.toRFC3339(new Date())));
+                new JSONObject(writeBodyToString()).put("event-time", ListenerAdapter.toRFC3339(Instant.now())));
         return json.toString();
+    }
+
+    @VisibleForTesting
+    void setNotification(final DOMNotification notification) {
+        this.notification = Preconditions.checkNotNull(notification);
+    }
+
+    @VisibleForTesting
+    void setSchemaContext(final SchemaContext schemaContext) {
+        this.schemaContext = Preconditions.checkNotNull(schemaContext);
     }
 
     private String writeBodyToString() {
