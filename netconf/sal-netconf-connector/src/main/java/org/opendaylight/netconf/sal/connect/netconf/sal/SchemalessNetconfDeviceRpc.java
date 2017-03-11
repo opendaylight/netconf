@@ -42,7 +42,7 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
     private final SchemalessMessageTransformer schemalessTransformer;
     private final RemoteDeviceId deviceId;
 
-    public SchemalessNetconfDeviceRpc(RemoteDeviceId deviceId, final RemoteDeviceCommunicator<NetconfMessage> listener,
+    public SchemalessNetconfDeviceRpc(final RemoteDeviceId deviceId, final RemoteDeviceCommunicator<NetconfMessage> listener,
                                       final BaseRpcSchemalessTransformer baseRpcTransformer,
                                       final SchemalessMessageTransformer messageTransformer) {
         this.deviceId = deviceId;
@@ -72,14 +72,11 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
         final NetconfMessage netconfMessage = transformer.toRpcRequest(type, input);
         final ListenableFuture<RpcResult<NetconfMessage>> rpcResultListenableFuture = listener.sendRequest(netconfMessage, type.getLastComponent());
 
-        final ListenableFuture<DOMRpcResult> transformed = Futures.transform(rpcResultListenableFuture, new Function<RpcResult<NetconfMessage>, DOMRpcResult>() {
-            @Override
-            public DOMRpcResult apply(final RpcResult<NetconfMessage> input) {
-                if (input.isSuccessful()) {
-                    return transformer.toRpcResult(input.getResult(), type);
-                } else {
-                    return new DefaultDOMRpcResult(input.getErrors());
-                }
+        final ListenableFuture<DOMRpcResult> transformed = Futures.transform(rpcResultListenableFuture, (Function<RpcResult<NetconfMessage>, DOMRpcResult>) input1 -> {
+            if (input1.isSuccessful()) {
+                return transformer.toRpcResult(input1.getResult(), type);
+            } else {
+                return new DefaultDOMRpcResult(input1.getErrors());
             }
         });
 
@@ -93,7 +90,7 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
     }
 
 
-    private boolean isBaseRpc(final SchemaPath type) {
+    private static boolean isBaseRpc(final SchemaPath type) {
         return NetconfMessageTransformUtil.NETCONF_URI.equals(type.getLastComponent().getNamespace());
     }
 

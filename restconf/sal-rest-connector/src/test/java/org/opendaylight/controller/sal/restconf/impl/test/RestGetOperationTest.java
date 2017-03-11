@@ -48,8 +48,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
@@ -134,7 +132,7 @@ public class RestGetOperationTest extends JerseyTest {
         return resourceConfig;
     }
 
-    private void setControllerContext(final SchemaContext schemaContext) {
+    private static void setControllerContext(final SchemaContext schemaContext) {
         final ControllerContext controllerContext = ControllerContext.getInstance();
         controllerContext.setSchemas(schemaContext);
         restconfImpl.setControllerContext(controllerContext);
@@ -218,7 +216,7 @@ public class RestGetOperationTest extends JerseyTest {
         assertEquals(200, get(uri, MediaType.APPLICATION_XML));
     }
 
-    private YangInstanceIdentifier prepareInstanceIdentifierForList() throws Exception {
+    private static YangInstanceIdentifier prepareInstanceIdentifierForList() throws Exception {
         final List<PathArgument> parameters = new ArrayList<>();
 
         final QName qNameCont = newTestModuleQName("cont");
@@ -232,7 +230,7 @@ public class RestGetOperationTest extends JerseyTest {
         return YangInstanceIdentifier.create(parameters);
     }
 
-    private QName newTestModuleQName(final String localPart) throws Exception {
+    private static QName newTestModuleQName(final String localPart) throws Exception {
         final Date revision = new SimpleDateFormat("yyyy-MM-dd").parse("2014-01-09");
         final URI uri = new URI("test:module");
         return QName.create(uri, revision, localPart);
@@ -375,7 +373,7 @@ public class RestGetOperationTest extends JerseyTest {
 
     }
 
-    private void validateOperationsResponseXml(final Document responseDoc, final SchemaContext schemaContext) {
+    private static void validateOperationsResponseXml(final Document responseDoc, final SchemaContext schemaContext) {
 
         final Element operationsElem = responseDoc.getDocumentElement();
         assertEquals(RESTCONF_NS, operationsElem.getNamespaceURI());
@@ -425,7 +423,8 @@ public class RestGetOperationTest extends JerseyTest {
 
     }
 
-    private Matcher validateOperationsResponseJson(final String searchIn, final String rpcName, final String moduleName) {
+    private static Matcher validateOperationsResponseJson(final String searchIn, final String rpcName,
+            final String moduleName) {
         final StringBuilder regex = new StringBuilder();
         regex.append(".*\"" + rpcName + "\"");
         final Pattern ptrn = Pattern.compile(regex.toString(), Pattern.DOTALL);
@@ -433,7 +432,8 @@ public class RestGetOperationTest extends JerseyTest {
 
     }
 
-    private Matcher validateOperationsResponseXml(final String searchIn, final String rpcName, final String namespace) {
+    private static Matcher validateOperationsResponseXml(final String searchIn, final String rpcName,
+            final String namespace) {
         final StringBuilder regex = new StringBuilder();
 
         regex.append("^");
@@ -528,7 +528,7 @@ public class RestGetOperationTest extends JerseyTest {
 
     }
 
-    private void validateModulesResponseXml(final Response response, final SchemaContext schemaContext) {
+    private static void validateModulesResponseXml(final Response response, final SchemaContext schemaContext) {
         assertEquals(200, response.getStatus());
         final Document responseBody = response.readEntity(Document.class);
         final NodeList moduleNodes = responseBody.getDocumentElement().getElementsByTagNameNS(RESTCONF_NS, "module");
@@ -547,7 +547,7 @@ public class RestGetOperationTest extends JerseyTest {
         assertAllModules(foundModules,schemaContext);
     }
 
-    private void assertAllModules(final Set<QName> foundModules, final SchemaContext schemaContext) {
+    private static void assertAllModules(final Set<QName> foundModules, final SchemaContext schemaContext) {
         for(final Module module : schemaContext.getModules()) {
             final QName current = QName.create(module.getQNameModule(),module.getName());
             assertTrue("Module not found in response.",foundModules.contains(current));
@@ -555,7 +555,7 @@ public class RestGetOperationTest extends JerseyTest {
 
     }
 
-    private QName assertedModuleXmlToModuleQName(final org.w3c.dom.Node module) {
+    private static QName assertedModuleXmlToModuleQName(final org.w3c.dom.Node module) {
         assertEquals("module", module.getLocalName());
         assertEquals(RESTCONF_NS, module.getNamespaceURI());
         String revision = null;
@@ -596,7 +596,7 @@ public class RestGetOperationTest extends JerseyTest {
         return QName.create(namespace,revision,name);
     }
 
-    private void validateModulesResponseJson(final Response response) {
+    private static void validateModulesResponseJson(final Response response) {
         assertEquals(200, response.getStatus());
         final String responseBody = response.readEntity(String.class);
 
@@ -608,7 +608,7 @@ public class RestGetOperationTest extends JerseyTest {
                 .find());
     }
 
-    private Matcher prepareJsonRegex(final String module, final String revision, final String namespace,
+    private static Matcher prepareJsonRegex(final String module, final String revision, final String namespace,
             final String searchIn) {
         final StringBuilder regex = new StringBuilder();
         regex.append("^");
@@ -648,7 +648,8 @@ public class RestGetOperationTest extends JerseyTest {
             }
     */
     @SuppressWarnings("rawtypes")
-    private NormalizedNode prepareCnDataForMountPointTest(final boolean wrapToCont) throws URISyntaxException, ParseException {
+    private static NormalizedNode prepareCnDataForMountPointTest(final boolean wrapToCont)
+            throws URISyntaxException, ParseException {
         final String testModuleDate = "2014-01-09";
         final ContainerNode contChild = Builders
                 .containerBuilder()
@@ -668,18 +669,18 @@ public class RestGetOperationTest extends JerseyTest {
     }
 
     @SuppressWarnings("unchecked")
-    private void mockReadOperationalDataMethod() {
+    private static void mockReadOperationalDataMethod() {
         when(brokerFacade.readOperationalData(any(YangInstanceIdentifier.class))).thenReturn(answerFromGet);
     }
 
     @SuppressWarnings("unchecked")
-    private void mockReadConfigurationDataMethod() {
+    private static void mockReadConfigurationDataMethod() {
         when(brokerFacade.readConfigurationData(any(YangInstanceIdentifier.class), Mockito.anyString()))
                 .thenReturn(answerFromGet);
     }
 
     @SuppressWarnings("rawtypes")
-    private NormalizedNode prepareCnDataForSlashesBehindMountPointTest() throws ParseException {
+    private static NormalizedNode prepareCnDataForSlashesBehindMountPointTest() throws ParseException {
         return ImmutableMapEntryNodeBuilder
                 .create()
                 .withNodeIdentifier(
@@ -736,12 +737,7 @@ public class RestGetOperationTest extends JerseyTest {
         final MultivaluedMap<String, String> paramMap = new MultivaluedHashMap<>();
         paramMap.putSingle("depth", "1o");
         final UriInfo mockInfo = mock(UriInfo.class);
-        when(mockInfo.getQueryParameters(false)).thenAnswer(new Answer<MultivaluedMap<String, String>>() {
-            @Override
-            public MultivaluedMap<String, String> answer(final InvocationOnMock invocation) {
-                return paramMap;
-            }
-        });
+        when(mockInfo.getQueryParameters(false)).thenAnswer(invocation -> paramMap);
 
         getDataWithInvalidDepthParameterTest(mockInfo);
 
@@ -753,7 +749,7 @@ public class RestGetOperationTest extends JerseyTest {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private void getDataWithInvalidDepthParameterTest(final UriInfo uriInfo) {
+    private static void getDataWithInvalidDepthParameterTest(final UriInfo uriInfo) {
         try {
             final QName qNameDepth1Cont = QName.create("urn:nested:module", "2014-06-3", "depth1-cont");
             final YangInstanceIdentifier ii = YangInstanceIdentifier.builder().node(qNameDepth1Cont).build();

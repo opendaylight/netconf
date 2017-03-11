@@ -39,8 +39,6 @@ import java.util.concurrent.Executors;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
@@ -49,7 +47,6 @@ import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
-import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
@@ -111,13 +108,7 @@ public class NetconfDeviceTest {
             RevisionSourceIdentifier.create(TEST_MODULE + "2", Optional.of(TEST_REVISION));
     public static final String TEST_CAPABILITY2 = TEST_NAMESPACE + "?module=" + TEST_MODULE + "2" + "&amp;revision=" + TEST_REVISION;
 
-    private static final NetconfDeviceSchemasResolver stateSchemasResolver = new NetconfDeviceSchemasResolver() {
-
-        @Override
-        public NetconfDeviceSchemas resolve(final NetconfDeviceRpc deviceRpc, final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id) {
-            return NetconfStateSchemas.EMPTY;
-        }
-    };
+    private static final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id) -> NetconfStateSchemas.EMPTY;
 
     @Test
     public void testNetconfDeviceFlawedModelFailedResolution() throws Exception {
@@ -213,26 +204,20 @@ public class NetconfDeviceTest {
         // Make fallback attempt to fail due to empty resolved sources
         final MissingSchemaSourceException schemaResolutionException = new MissingSchemaSourceException("fail first", TEST_SID);
         doReturn(Futures.immediateFailedCheckedFuture(schemaResolutionException)).when(schemaRepository).getSchemaSource(eq(TEST_SID), eq(ASTSchemaSource.class));
-        doAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(final InvocationOnMock invocation) throws Throwable {
-                if (((Collection<?>) invocation.getArguments()[0]).size() == 2) {
-                    return Futures.immediateFailedCheckedFuture(schemaResolutionException);
-                } else {
-                    return Futures.immediateCheckedFuture(schema);
-                }
+        doAnswer(invocation -> {
+            if (((Collection<?>) invocation.getArguments()[0]).size() == 2) {
+                return Futures.immediateFailedCheckedFuture(schemaResolutionException);
+            } else {
+                return Futures.immediateCheckedFuture(schema);
             }
         }).when(schemaFactory).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
 
-        final NetconfDeviceSchemasResolver stateSchemasResolver = new NetconfDeviceSchemasResolver() {
-            @Override
-            public NetconfDeviceSchemas resolve(final NetconfDeviceRpc deviceRpc, final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id) {
-                final Module first = Iterables.getFirst(schema.getModules(), null);
-                final QName qName = QName.create(first.getQNameModule(), first.getName());
-                final NetconfStateSchemas.RemoteYangSchema source1 = new NetconfStateSchemas.RemoteYangSchema(qName);
-                final NetconfStateSchemas.RemoteYangSchema source2 = new NetconfStateSchemas.RemoteYangSchema(QName.create(first.getQNameModule(), "test-module2"));
-                return new NetconfStateSchemas(Sets.newHashSet(source1, source2));
-            }
+        final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id) -> {
+            final Module first = Iterables.getFirst(schema.getModules(), null);
+            final QName qName = QName.create(first.getQNameModule(), first.getName());
+            final NetconfStateSchemas.RemoteYangSchema source1 = new NetconfStateSchemas.RemoteYangSchema(qName);
+            final NetconfStateSchemas.RemoteYangSchema source2 = new NetconfStateSchemas.RemoteYangSchema(QName.create(first.getQNameModule(), "test-module2"));
+            return new NetconfStateSchemas(Sets.newHashSet(source1, source2));
         };
 
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO
@@ -253,7 +238,7 @@ public class NetconfDeviceTest {
         Mockito.verify(schemaFactory, times(1)).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
     }
 
-    private SchemaSourceRegistry getSchemaRegistry() {
+    private static SchemaSourceRegistry getSchemaRegistry() {
         final SchemaSourceRegistry mock = mock(SchemaSourceRegistry.class);
         final SchemaSourceRegistration<?> mockReg = mock(SchemaSourceRegistration.class);
         doNothing().when(mockReg).close();
@@ -261,7 +246,7 @@ public class NetconfDeviceTest {
         return mock;
     }
 
-    private SchemaRepository getSchemaRepository() {
+    private static SchemaRepository getSchemaRepository() {
         final SchemaRepository mock = mock(SchemaRepository.class);
         final SchemaSourceRepresentation mockRep = mock(SchemaSourceRepresentation.class);
         doReturn(Futures.immediateCheckedFuture(mockRep)).when(mock).getSchemaSource(any(SourceIdentifier.class), eq(ASTSchemaSource.class));
@@ -367,7 +352,7 @@ public class NetconfDeviceTest {
                 moduleBasedCaps.get(QName.create(entry.getCapability())).getName(), entry.getCapabilityOrigin().getName()));
     }
 
-    private SchemaContextFactory getSchemaFactory() throws Exception {
+    private static SchemaContextFactory getSchemaFactory() throws Exception {
         final SchemaContextFactory schemaFactory = mockClass(SchemaContextFactory.class);
         doReturn(Futures.immediateCheckedFuture(getSchema())).when(schemaFactory).createSchemaContext(any(Collection.class));
         return schemaFactory;
@@ -380,7 +365,7 @@ public class NetconfDeviceTest {
         return YangParserTestUtils.parseYangStreams(modelsToParse);
     }
 
-    private RemoteDeviceHandler<NetconfSessionPreferences> getFacade() throws Exception {
+    private static RemoteDeviceHandler<NetconfSessionPreferences> getFacade() throws Exception {
         final RemoteDeviceHandler<NetconfSessionPreferences> remoteDeviceHandler = mockCloseableClass(RemoteDeviceHandler.class);
         doNothing().when(remoteDeviceHandler).onDeviceConnected(any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class));
         doNothing().when(remoteDeviceHandler).onDeviceDisconnected();
@@ -388,7 +373,8 @@ public class NetconfDeviceTest {
         return remoteDeviceHandler;
     }
 
-    private <T extends AutoCloseable> T mockCloseableClass(final Class<T> remoteDeviceHandlerClass) throws Exception {
+    private static <T extends AutoCloseable> T mockCloseableClass(final Class<T> remoteDeviceHandlerClass)
+            throws Exception {
         final T mock = mockClass(remoteDeviceHandlerClass);
         doNothing().when(mock).close();
         return mock;

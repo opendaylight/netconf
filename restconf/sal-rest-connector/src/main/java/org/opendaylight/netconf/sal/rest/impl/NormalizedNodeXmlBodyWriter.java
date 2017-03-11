@@ -102,7 +102,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
         writeNormalizedNode(xmlWriter, schemaPath, pathContext, data, Optional.fromNullable(t.getWriterParameters().getDepth()));
     }
 
-    private void writeNormalizedNode(final XMLStreamWriter xmlWriter, final SchemaPath schemaPath,
+    private static void writeNormalizedNode(final XMLStreamWriter xmlWriter, final SchemaPath schemaPath,
             final InstanceIdentifierContext<?> pathContext, NormalizedNode<?, ?> data, final Optional<Integer> depth)
             throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
@@ -126,7 +126,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
         nnWriter.flush();
     }
 
-    private RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
+    private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
             final SchemaContext schemaContext, final SchemaPath schemaPath, final Optional<Integer> depth) {
         final NormalizedNodeStreamWriter xmlStreamWriter =
                 XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, schemaContext, schemaPath);
@@ -137,7 +137,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
         }
     }
 
-    private void writeElements(final XMLStreamWriter xmlWriter, final RestconfNormalizedNodeWriter nnWriter,
+    private static void writeElements(final XMLStreamWriter xmlWriter, final RestconfNormalizedNodeWriter nnWriter,
                                final ContainerNode data)
             throws IOException {
         try {

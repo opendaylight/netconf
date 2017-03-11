@@ -37,17 +37,17 @@ public class RestconfErrorTest {
 
         private final String text;
 
-        public Contains(String text) {
+        public Contains(final String text) {
             this.text = text;
         }
 
         @Override
-        public void describeTo(Description desc) {
+        public void describeTo(final Description desc) {
             desc.appendText("contains ").appendValue(text);
         }
 
         @Override
-        public boolean matches(Object arg) {
+        public boolean matches(final Object arg) {
             return arg != null && arg.toString().contains(text);
         }
     }
@@ -74,7 +74,7 @@ public class RestconfErrorTest {
 
     @Test
     public void testErrorTagStatusCodes() {
-        Map<String, Integer> lookUpMap = new HashMap<String, Integer>();
+        Map<String, Integer> lookUpMap = new HashMap<>();
 
         lookUpMap.put("in-use", 409);
         lookUpMap.put("invalid-value", 400);
@@ -183,15 +183,17 @@ public class RestconfErrorTest {
                                null, "<severity>error</severity>", new RestconfError( rpcError ) );
     }
 
-    private void validateRestConfError(String expectedMessage, ErrorType expectedErrorType, ErrorTag expectedErrorTag,
-            String expectedErrorAppTag, String errorInfo, RestconfError e) {
+    private static void validateRestConfError(final String expectedMessage, final ErrorType expectedErrorType,
+            final ErrorTag expectedErrorTag, final String expectedErrorAppTag, final String errorInfo,
+            final RestconfError e) {
 
         validateRestConfError(expectedMessage, expectedErrorType, expectedErrorTag, expectedErrorAppTag,
                 equalTo(errorInfo), e);
     }
 
-    private void validateRestConfError(String expectedMessage, ErrorType expectedErrorType, ErrorTag expectedErrorTag,
-            String expectedErrorAppTag, Matcher<String> errorInfoMatcher, RestconfError e) {
+    private static void validateRestConfError(final String expectedMessage, final ErrorType expectedErrorType,
+            final ErrorTag expectedErrorTag, final String expectedErrorAppTag, final Matcher<String> errorInfoMatcher,
+            final RestconfError e) {
 
         assertEquals("getErrorMessage", expectedMessage, e.getErrorMessage());
         assertEquals("getErrorType", expectedErrorType, e.getErrorType());

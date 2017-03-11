@@ -178,7 +178,8 @@ public class RestconfMappingNodeUtilTest {
         testData(map, mappedData);
     }
 
-    private Map<QName, Object> prepareMap(final String name, final URI uri, final Date start, final String outputType) {
+    private static Map<QName, Object> prepareMap(final String name, final URI uri, final Date start,
+            final String outputType) {
         final Map<QName, Object> map = new HashMap<>();
         map.put(MonitoringModule.LEAF_NAME_STREAM_QNAME, name);
         map.put(MonitoringModule.LEAF_LOCATION_ACCESS_QNAME, uri.toString());
@@ -189,7 +190,7 @@ public class RestconfMappingNodeUtilTest {
         return map;
     }
 
-    private void testData(final Map<QName, Object> map, final NormalizedNode mappedData) {
+    private static void testData(final Map<QName, Object> map, final NormalizedNode mappedData) {
         for (final DataContainerChild<? extends PathArgument, ?> child : ((MapEntryNode) mappedData).getValue()) {
             if (child instanceof LeafNode) {
                 final LeafNode leaf = ((LeafNode) child);
@@ -205,7 +206,7 @@ public class RestconfMappingNodeUtilTest {
      * @param containerNode
      *            - modules
      */
-    private void verifyLoadedModules(final ContainerNode containerNode) {
+    private static void verifyLoadedModules(final ContainerNode containerNode) {
 
         final Map<String, String> loadedModules = new HashMap<>();
 
@@ -243,8 +244,8 @@ public class RestconfMappingNodeUtilTest {
      * @param expectedModules Modules from <code>SchemaContext</code>
      * @param loadedModules Loaded modules into Restconf module
      */
-    private final void verifyLoadedModules(final Set<Module> expectedModules,
-                                           final Map<String, String> loadedModules) {
+    private static void verifyLoadedModules(final Set<Module> expectedModules,
+            final Map<String, String> loadedModules) {
         assertEquals("Number of loaded modules is not as expected", expectedModules.size(), loadedModules.size());
         for (final Module m : expectedModules) {
             final String name = m.getName();

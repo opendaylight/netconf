@@ -841,8 +841,7 @@ public class BrokerFacade {
         }
     }
 
-    private DataSchemaNode checkListAndOrderedType(final SchemaContext ctx,
-            final YangInstanceIdentifier path) {
+    private static DataSchemaNode checkListAndOrderedType(final SchemaContext ctx, final YangInstanceIdentifier path) {
         final YangInstanceIdentifier parent = path.getParent();
         final DataSchemaContextNode<?> node = DataSchemaContextTree.from(ctx).getChild(parent);
         final DataSchemaNode dataSchemaNode = node.getDataSchemaNode();
@@ -887,14 +886,15 @@ public class BrokerFacade {
         }
     }
 
-    private void simplePostPut(final DOMDataReadWriteTransaction rWTransaction, final LogicalDatastoreType datastore,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
+    private static void simplePostPut(final DOMDataReadWriteTransaction rWTransaction,
+            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
+            final SchemaContext schemaContext) {
         checkItemDoesNotExists(rWTransaction, datastore, path);
         ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
         rWTransaction.put(datastore, path, payload);
     }
 
-    private boolean doesItemExist(final DOMDataReadWriteTransaction rWTransaction,
+    private static boolean doesItemExist(final DOMDataReadWriteTransaction rWTransaction,
             final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         try {
             return rWTransaction.exists(store, path).checkedGet();
@@ -911,8 +911,8 @@ public class BrokerFacade {
      * @param store Used datastore
      * @param path Path to item to verify its existence
      */
-    private void checkItemExists(final DOMDataReadWriteTransaction rWTransaction,
-                                 final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+    private static void checkItemExists(final DOMDataReadWriteTransaction rWTransaction,
+            final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         if (!doesItemExist(rWTransaction, store, path)) {
             final String errMsg = "Operation via Restconf was not executed because data does not exist";
             LOG.trace("{}:{}", errMsg, path);
@@ -928,8 +928,8 @@ public class BrokerFacade {
      * @param store Used datastore
      * @param path Path to item to verify its existence
      */
-    private void checkItemDoesNotExists(final DOMDataReadWriteTransaction rWTransaction,
-                                        final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+    private static void checkItemDoesNotExists(final DOMDataReadWriteTransaction rWTransaction,
+            final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         if (doesItemExist(rWTransaction, store, path)) {
             final String errMsg = "Operation via Restconf was not executed because data already exists";
             LOG.trace("{}:{}", errMsg, path);
@@ -1116,8 +1116,9 @@ public class BrokerFacade {
         }
     }
 
-    private void makePut(final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
-            final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
+    private static void makePut(final DOMDataReadWriteTransaction writeTransaction,
+            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
+            final SchemaContext schemaContext) {
         if (payload instanceof MapNode) {
             final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
             writeTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
@@ -1131,14 +1132,14 @@ public class BrokerFacade {
         }
     }
 
-    private void simplePut(final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
+    private static void simplePut(final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
             final DOMDataReadWriteTransaction writeTransaction, final SchemaContext schemaContext,
             final NormalizedNode<?, ?> payload) {
         ensureParentsByMerge(datastore, path, writeTransaction, schemaContext);
         writeTransaction.put(datastore, path, payload);
     }
 
-    private CheckedFuture<Void, TransactionCommitFailedException> deleteDataViaTransaction(
+    private static CheckedFuture<Void, TransactionCommitFailedException> deleteDataViaTransaction(
             final DOMDataReadWriteTransaction readWriteTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path) {
         LOG.trace("Delete {} via Restconf: {}", datastore.name(), path);
@@ -1147,14 +1148,13 @@ public class BrokerFacade {
         return readWriteTransaction.submit();
     }
 
-    private void deleteDataWithinTransaction(
-            final DOMDataWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
-            final YangInstanceIdentifier path) {
+    private static void deleteDataWithinTransaction(final DOMDataWriteTransaction writeTransaction,
+            final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
         LOG.trace("Delete {} within Restconf PATCH: {}", datastore.name(), path);
         writeTransaction.delete(datastore, path);
     }
 
-    private void mergeDataWithinTransaction(
+    private static void mergeDataWithinTransaction(
             final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         LOG.trace("Merge {} within Restconf PATCH: {} with payload {}", datastore.name(), path, payload);
@@ -1198,8 +1198,9 @@ public class BrokerFacade {
         }
     }
 
-    private void ensureParentsByMerge(final LogicalDatastoreType store, final YangInstanceIdentifier normalizedPath,
-            final DOMDataReadWriteTransaction rwTx, final SchemaContext schemaContext) {
+    private static void ensureParentsByMerge(final LogicalDatastoreType store,
+            final YangInstanceIdentifier normalizedPath, final DOMDataReadWriteTransaction rwTx,
+            final SchemaContext schemaContext) {
         final List<PathArgument> normalizedPathWithoutChildArgs = new ArrayList<>();
         YangInstanceIdentifier rootNormalizedPath = null;
 

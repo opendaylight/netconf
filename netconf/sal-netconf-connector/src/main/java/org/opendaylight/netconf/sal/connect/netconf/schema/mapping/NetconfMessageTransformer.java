@@ -57,19 +57,9 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformer.class);
 
-    private static final Function<SchemaNode, QName> QNAME_FUNCTION = new Function<SchemaNode, QName>() {
-        @Override
-        public QName apply(final SchemaNode rpcDefinition) {
-            return rpcDefinition.getQName();
-        }
-    };
+    private static final Function<SchemaNode, QName> QNAME_FUNCTION = rpcDefinition -> rpcDefinition.getQName();
 
-    private static final Function<SchemaNode, QName> QNAME_NOREV_FUNCTION = new Function<SchemaNode, QName>() {
-        @Override
-        public QName apply(final SchemaNode notification) {
-            return QNAME_FUNCTION.apply(notification).withoutRevision();
-        }
-    };
+    private static final Function<SchemaNode, QName> QNAME_NOREV_FUNCTION = notification -> QNAME_FUNCTION.apply(notification).withoutRevision();
 
     private final SchemaContext schemaContext;
     private final BaseSchema baseSchema;
@@ -165,7 +155,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         return new NetconfMessage(node);
     }
 
-    private boolean isBaseOrNotificationRpc(final QName rpc) {
+    private static boolean isBaseOrNotificationRpc(final QName rpc) {
         return rpc.getNamespace().equals(NETCONF_URI) ||
                 rpc.getNamespace().equals(IETF_NETCONF_NOTIFICATIONS.getNamespace()) ||
                 rpc.getNamespace().equals(NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME.getNamespace());

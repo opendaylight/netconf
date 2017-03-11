@@ -71,7 +71,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
      */
     @Override
     public AnyXmlNode createEditConfigStructure(final Optional<NormalizedNode<?, ?>> data,
-                                                final YangInstanceIdentifier dataPath, Optional<ModifyAction> operation) {
+                                                final YangInstanceIdentifier dataPath, final Optional<ModifyAction> operation) {
         Preconditions.checkArgument(data.isPresent());
         Preconditions.checkArgument(data.get() instanceof AnyXmlNode);
 
@@ -127,7 +127,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
                 .build();
     }
 
-    private void checkDataValidForPath(final YangInstanceIdentifier dataPath, final Element dataNode) {
+    private static void checkDataValidForPath(final YangInstanceIdentifier dataPath, final Element dataNode) {
         //if datapath is empty, consider dataNode to be a root node
         if (dataPath.equals(YangInstanceIdentifier.EMPTY)) {
             return;
@@ -146,7 +146,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
 
     }
 
-    private void checkKeyValuesValidForPath(final XmlElement dataElement,
+    private static void checkKeyValuesValidForPath(final XmlElement dataElement,
                                             final YangInstanceIdentifier.PathArgument lastPathArgument) {
         final YangInstanceIdentifier.NodeIdentifierWithPredicates keyedId =
                 (YangInstanceIdentifier.NodeIdentifierWithPredicates) lastPathArgument;
@@ -172,7 +172,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
         }
     }
 
-    private void setOperationAttribute(final Optional<ModifyAction> operation, final Document document,
+    private static void setOperationAttribute(final Optional<ModifyAction> operation, final Document document,
                                        final Element dataNode) {
         final QName operationQname = NetconfMessageTransformUtil.NETCONF_OPERATION_QNAME;
         final Attr operationAttribute =
@@ -203,7 +203,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
         return parent;
     }
 
-    private List<XmlElement> selectMatchingNodes(final Element domElement, final YangInstanceIdentifier path) {
+    private static List<XmlElement> selectMatchingNodes(final Element domElement, final YangInstanceIdentifier path) {
         XmlElement element = XmlElement.fromDomElement(domElement);
         for (YangInstanceIdentifier.PathArgument pathArgument : path.getPathArguments()) {
             List<XmlElement> childElements = element.getChildElements(pathArgument.getNodeType().getLocalName());
