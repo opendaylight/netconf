@@ -16,13 +16,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.opendaylight.controller.sal.rest.impl.test.providers.TestJsonBodyWriter;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlUtils;
 import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
@@ -52,26 +50,6 @@ public class TestRestconfUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestRestconfUtils.class);
 
-    private static final DocumentBuilderFactory BUILDERFACTORY;
-
-    static {
-        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        try {
-            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            factory.setXIncludeAware(false);
-            factory.setExpandEntityReferences(false);
-        } catch (final ParserConfigurationException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-        factory.setNamespaceAware(true);
-        factory.setCoalescing(true);
-        factory.setIgnoringElementContentWhitespace(true);
-        factory.setIgnoringComments(true);
-        BUILDERFACTORY = factory;
-    }
-
     private TestRestconfUtils() {
         throw new UnsupportedOperationException("Test utility class");
     }
@@ -100,8 +78,7 @@ public class TestRestconfUtils {
         final InstanceIdentifierContext<?> iiContext = ControllerContext.getInstance().toInstanceIdentifier(uri);
         final InputStream inputStream = TestJsonBodyWriter.class.getResourceAsStream(pathToInputFile);
         try {
-            final DocumentBuilder dBuilder = BUILDERFACTORY.newDocumentBuilder();
-            final Document doc = dBuilder.parse(inputStream);
+            final Document doc = UntrustedXML.newDocumentBuilder().parse(inputStream);
             final NormalizedNode<?, ?> nn = parse(iiContext, doc);
             return new NormalizedNodeContext(iiContext, nn);
         } catch (final Exception e) {
@@ -158,12 +135,11 @@ public class TestRestconfUtils {
         final String path = TestRestconfUtils.class.getResource(resourceDirectory).getPath();
         final File testDir = new File(path);
         final String[] fileList = testDir.list();
-        final List<File> testFiles = new ArrayList<File>();
+        final List<File> testFiles = new ArrayList<>();
         if (fileList == null) {
             throw new FileNotFoundException(resourceDirectory);
         }
-        for (int i = 0; i < fileList.length; i++) {
-            final String fileName = fileList[i];
+        for (final String fileName : fileList) {
             if (new File(testDir, fileName).isDirectory() == false) {
                 testFiles.add(new File(testDir, fileName));
             }

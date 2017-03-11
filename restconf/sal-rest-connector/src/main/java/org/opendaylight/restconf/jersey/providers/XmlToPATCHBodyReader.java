@@ -25,9 +25,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHEditOperation;
@@ -37,6 +34,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.restconf.Rfc8040;
 import org.opendaylight.restconf.utils.RestconfConstants;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -63,26 +61,6 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
         MessageBodyReader<PATCHContext> {
 
     private final static Logger LOG = LoggerFactory.getLogger(XmlToPATCHBodyReader.class);
-    private static final DocumentBuilderFactory BUILDERFACTORY;
-
-    static {
-        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        try {
-            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            factory.setXIncludeAware(false);
-            factory.setExpandEntityReferences(false);
-        } catch (final ParserConfigurationException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-        factory.setNamespaceAware(true);
-        factory.setCoalescing(true);
-        factory.setIgnoringElementContentWhitespace(true);
-        factory.setIgnoringComments(true);
-        BUILDERFACTORY = factory;
-    }
-
     @Override
     public boolean isReadable(final Class<?> type, final Type genericType,
                               final Annotation[] annotations, final MediaType mediaType) {
@@ -103,14 +81,7 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                 return new PATCHContext(path, null, null);
             }
 
-            final DocumentBuilder dBuilder;
-            try {
-                dBuilder = BUILDERFACTORY.newDocumentBuilder();
-            } catch (final ParserConfigurationException e) {
-                throw new IllegalStateException("Failed to parse XML document", e);
-            }
-            final Document doc = dBuilder.parse(entityStream);
-
+            final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
             return parse(path, doc);
         } catch (final RestconfDocumentedException e) {
             throw e;
@@ -245,7 +216,7 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
      */
     private String prepareNonCondXpath(@Nonnull final DataSchemaNode schemaNode, @Nonnull final String target,
                                        @Nonnull final Element value, @Nonnull final String namespace,
-                                       @Nonnull String revision) {
+                                       @Nonnull final String revision) {
         final Iterator<String> args = Splitter.on("/").split(target.substring(target.indexOf(':') + 1)).iterator();
 
         final StringBuilder nonCondXpath = new StringBuilder();
