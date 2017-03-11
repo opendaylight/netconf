@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.controller.sal.streams.listeners;
+package org.opendaylight.netconf.sal.streams.listeners;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -15,8 +15,6 @@ import static org.mockito.Mockito.when;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -30,8 +28,6 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.sal.restconf.impl.test.TestUtils;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
-import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
-import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.util.SingletonSet;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -236,21 +232,9 @@ public class NotificationListenerTest {
         final List<NotificationListenerAdapter> listNotifi =
                 Notificator.createNotificationListener(paths, "stream-name", NotificationOutputType.JSON.toString());
         final NotificationListenerAdapter notifi = listNotifi.get(0);
-
-        final Class<?> vars[] = {};
-        final Method prepareJsonM = notifi.getClass().getDeclaredMethod("prepareJson", vars);
-        prepareJsonM.setAccessible(true);
-
-        final Field notification = notifi.getClass().getDeclaredField("notification");
-        notification.setAccessible(true);
-        notification.set(notifi, notificationData);
-
-        final Field schema = notifi.getClass().getDeclaredField("schemaContext");
-        schema.setAccessible(true);
-        schema.set(notifi, this.schmeaCtx);
-
-        final String result = (String) prepareJsonM.invoke(notifi, null);
-        Preconditions.checkNotNull(result);
-        return result;
+        notifi.setNotification(notificationData);
+        notifi.setSchemaContext(this.schmeaCtx);
+        final String result = notifi.prepareJson();
+        return Preconditions.checkNotNull(result);
     }
 }
