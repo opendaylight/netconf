@@ -32,13 +32,13 @@ import org.slf4j.LoggerFactory;
 public class WebSocketClient {
 
     private final URI uri;
-    private Bootstrap bootstrap = new Bootstrap();;
+    private final Bootstrap bootstrap = new Bootstrap();
     private final WebSocketClientHandler clientHandler;
     private static final Logger logger = LoggerFactory.getLogger(WebSocketClient.class);
     private Channel clientChannel;
     private final EventLoopGroup group = new NioEventLoopGroup();
 
-    public WebSocketClient(URI uri, IClientMessageCallback clientMessageCallback) {
+    public WebSocketClient(final URI uri, final IClientMessageCallback clientMessageCallback) {
         this.uri = uri;
         clientHandler = new WebSocketClientHandler(WebSocketClientHandshakerFactory.newHandshaker(uri,
                 WebSocketVersion.V13, null, false, null), clientMessageCallback); // last
@@ -60,7 +60,7 @@ public class WebSocketClient {
 
         bootstrap.group(group).channel(NioSocketChannel.class).handler(new ChannelInitializer<SocketChannel>() {
             @Override
-            public void initChannel(SocketChannel ch) throws Exception {
+            public void initChannel(final SocketChannel ch) throws Exception {
                 ChannelPipeline pipeline = ch.pipeline();
                 pipeline.addLast("http-codec", new HttpClientCodec());
                 pipeline.addLast("aggregator", new HttpObjectAggregator(8192));
@@ -75,11 +75,11 @@ public class WebSocketClient {
         clientHandler.handshakeFuture().sync();
     }
 
-    public void writeAndFlush(String message) {
+    public void writeAndFlush(final String message) {
         clientChannel.writeAndFlush(new TextWebSocketFrame(message));
     }
 
-    public void writeAndFlush(Object message) {
+    public void writeAndFlush(final Object message) {
         clientChannel.writeAndFlush(message);
     }
 
@@ -87,7 +87,7 @@ public class WebSocketClient {
         clientChannel.writeAndFlush(new PingWebSocketFrame(Unpooled.copiedBuffer(new byte[] { 1, 2, 3, 4, 5, 6 })));
     }
 
-    public void close(String reasonText) throws InterruptedException {
+    public void close(final String reasonText) throws InterruptedException {
         CloseWebSocketFrame closeWebSocketFrame = new CloseWebSocketFrame(1000, reasonText);
         clientChannel.writeAndFlush(closeWebSocketFrame);
 
@@ -97,7 +97,7 @@ public class WebSocketClient {
         group.shutdownGracefully();
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
         URI uri;
         if (args.length > 0) {
             uri = new URI(args[0]);
@@ -124,7 +124,7 @@ public class WebSocketClient {
 
     private static class ClientMessageCallback implements IClientMessageCallback {
         @Override
-        public void onMessageReceived(Object message) {
+        public void onMessageReceived(final Object message) {
             if (message instanceof TextWebSocketFrame) {
                 logger.info("received message {}" + ((TextWebSocketFrame) message).text());
             }
