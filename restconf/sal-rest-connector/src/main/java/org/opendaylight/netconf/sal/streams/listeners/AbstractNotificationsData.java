@@ -9,8 +9,6 @@ package org.opendaylight.netconf.sal.streams.listeners;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import javax.xml.stream.XMLOutputFactory;
@@ -181,22 +179,23 @@ abstract class AbstractNotificationsData {
      * @return - string from {@link Document}
      */
     protected String transformDoc(final Document doc) {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+
         try {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream();
             final Transformer transformer = ListenersConstants.FACTORY.newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-            transformer.transform(new DOMSource(doc),
-                    new StreamResult(new OutputStreamWriter(out, StandardCharsets.UTF_8)));
-            final byte[] charData = out.toByteArray();
-            return new String(charData, "UTF-8");
-        } catch (TransformerException | UnsupportedEncodingException e) {
+            transformer.transform(new DOMSource(doc), new StreamResult(out));
+        } catch (TransformerException e) {
+            // FIXME: this should raise an exception
             final String msg = "Error during transformation of Document into String";
             LOG.error(msg, e);
             return msg;
         }
+
+        return new String(out.toByteArray(), StandardCharsets.UTF_8);
     }
 }
