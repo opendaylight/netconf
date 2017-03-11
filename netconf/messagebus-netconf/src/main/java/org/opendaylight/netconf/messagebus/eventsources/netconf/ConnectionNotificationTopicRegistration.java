@@ -12,9 +12,6 @@ import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
@@ -22,6 +19,7 @@ import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.even
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.EventSourceStatus;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.EventSourceStatusNotification;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.EventSourceStatusNotificationBuilder;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
@@ -49,7 +47,8 @@ class ConnectionNotificationTopicRegistration extends NotificationTopicRegistrat
 
     private final DOMNotificationListener domNotificationListener;
 
-    public ConnectionNotificationTopicRegistration(String SourceName, DOMNotificationListener domNotificationListener) {
+    public ConnectionNotificationTopicRegistration(final String SourceName,
+            final DOMNotificationListener domNotificationListener) {
         super(NotificationSourceType.ConnectionStatusChange, SourceName,
             EVENT_SOURCE_STATUS_PATH.getLastComponent().getNamespace().toString());
         this.domNotificationListener = Preconditions.checkNotNull(domNotificationListener);
@@ -58,7 +57,8 @@ class ConnectionNotificationTopicRegistration extends NotificationTopicRegistrat
         setReplaySupported(false);
     }
 
-    @Override public void close() throws Exception {
+    @Override
+    public void close() {
         if (isActive()) {
             LOG.debug("Connection notification - publish Deactive");
             publishNotification(EventSourceStatus.Deactive);
@@ -67,22 +67,26 @@ class ConnectionNotificationTopicRegistration extends NotificationTopicRegistrat
         }
     }
 
-    @Override void activateNotificationSource() {
+    @Override
+    void activateNotificationSource() {
         LOG.debug("Connection notification - publish Active");
         publishNotification(EventSourceStatus.Active);
     }
 
-    @Override void deActivateNotificationSource() {
+    @Override
+    void deActivateNotificationSource() {
         LOG.debug("Connection notification - publish Inactive");
         publishNotification(EventSourceStatus.Inactive);
     }
 
-    @Override void reActivateNotificationSource() {
+    @Override
+    void reActivateNotificationSource() {
         LOG.debug("Connection notification - reactivate - publish active");
         publishNotification(EventSourceStatus.Active);
     }
 
-    @Override boolean registerNotificationTopic(SchemaPath notificationPath, TopicId topicId) {
+    @Override
+    boolean registerNotificationTopic(final SchemaPath notificationPath, final TopicId topicId) {
         if (!checkNotificationPath(notificationPath)) {
             LOG.debug("Bad SchemaPath for notification try to register");
             return false;
@@ -93,7 +97,8 @@ class ConnectionNotificationTopicRegistration extends NotificationTopicRegistrat
         return true;
     }
 
-    @Override synchronized void unRegisterNotificationTopic(TopicId topicId) {
+    @Override
+    synchronized void unRegisterNotificationTopic(final TopicId topicId) {
         List<SchemaPath> notificationPathToRemove = new ArrayList<>();
         for (SchemaPath notifKey : notificationTopicMap.keySet()) {
             Set<TopicId> topicList = notificationTopicMap.get(notifKey);
@@ -109,14 +114,14 @@ class ConnectionNotificationTopicRegistration extends NotificationTopicRegistrat
         }
     }
 
-    private void publishNotification(EventSourceStatus eventSourceStatus) {
+    private void publishNotification(final EventSourceStatus eventSourceStatus) {
 
         final EventSourceStatusNotification notification = new EventSourceStatusNotificationBuilder()
             .setStatus(eventSourceStatus).build();
         domNotificationListener.onNotification(createNotification(notification));
     }
 
-    private DOMNotification createNotification(EventSourceStatusNotification notification) {
+    private static DOMNotification createNotification(final EventSourceStatusNotification notification) {
         final ContainerNode cn = Builders.containerBuilder().withNodeIdentifier(EVENT_SOURCE_STATUS_ARG)
             .withChild(encapsulate(notification)).build();
         DOMNotification dn = new DOMNotification() {
@@ -132,18 +137,8 @@ class ConnectionNotificationTopicRegistration extends NotificationTopicRegistrat
         return dn;
     }
 
-    private AnyXmlNode encapsulate(EventSourceStatusNotification notification) {
-
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder;
-
-        try {
-            docBuilder = docFactory.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new IllegalStateException("Can not create XML DocumentBuilder");
-        }
-
-        Document doc = docBuilder.newDocument();
+    private static AnyXmlNode encapsulate(final EventSourceStatusNotification notification) {
+        Document doc = UntrustedXML.newDocumentBuilder().newDocument();
 
         final Optional<String> namespace = Optional.of(EVENT_SOURCE_STATUS_ARG.getNodeType().getNamespace().toString());
         final Element rootElement = createElement(doc, "EventSourceStatusNotification", namespace);
@@ -154,11 +149,11 @@ class ConnectionNotificationTopicRegistration extends NotificationTopicRegistrat
 
         return Builders.anyXmlBuilder().withNodeIdentifier(EVENT_SOURCE_STATUS_ARG)
             .withValue(new DOMSource(rootElement)).build();
-
     }
 
     // Helper to create root XML element with correct namespace and attribute
-    private Element createElement(final Document document, final String qName, final Optional<String> namespaceURI) {
+    private static Element createElement(final Document document, final String qName,
+            final Optional<String> namespaceURI) {
         if (namespaceURI.isPresent()) {
             final Element element = document.createElementNS(namespaceURI.get(), qName);
             String name = XMLNS_ATTRIBUTE_KEY;
