@@ -26,9 +26,6 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
@@ -36,6 +33,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.restconf.Rfc8040;
 import org.opendaylight.restconf.utils.RestconfConstants;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlUtils;
@@ -61,25 +59,6 @@ import org.w3c.dom.Element;
 public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsProvider implements MessageBodyReader<NormalizedNodeContext> {
 
     private final static Logger LOG = LoggerFactory.getLogger(XmlNormalizedNodeBodyReader.class);
-    private static final DocumentBuilderFactory BUILDERFACTORY;
-
-    static {
-        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        try {
-            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            factory.setXIncludeAware(false);
-            factory.setExpandEntityReferences(false);
-        } catch (final ParserConfigurationException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-        factory.setNamespaceAware(true);
-        factory.setCoalescing(true);
-        factory.setIgnoringElementContentWhitespace(true);
-        factory.setIgnoringComments(true);
-        BUILDERFACTORY = factory;
-    }
 
     @Override
     public boolean isReadable(final Class<?> type, final Type genericType, final Annotation[] annotations,
@@ -100,14 +79,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
                 return new NormalizedNodeContext(path, null);
             }
 
-            final DocumentBuilder dBuilder;
-            try {
-                dBuilder = BUILDERFACTORY.newDocumentBuilder();
-            } catch (final ParserConfigurationException e) {
-                throw new RuntimeException("Failed to parse XML document", e);
-            }
-            final Document doc = dBuilder.parse(entityStream);
-
+            final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
             return parse(path,doc);
         } catch (final RestconfDocumentedException e){
             throw e;
@@ -141,7 +113,8 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
 
 
         final DomToNormalizedNodeParserFactory parserFactory =
-                DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, pathContext.getSchemaContext());
+                DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER,
+                    pathContext.getSchemaContext());
 
         if (isPost() && !isRpc) {
             final Deque<Object> foundSchemaNodes = findPathToSchemaNodeByName(schemaNode, docRootElm, docRootNamespace);
@@ -164,7 +137,8 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
         NormalizedNode<?, ?> parsed = null;
 
         if (schemaNode instanceof ContainerSchemaNode) {
-            parsed = parserFactory.getContainerNodeParser().parse(Collections.singletonList(doc.getDocumentElement()), (ContainerSchemaNode) schemaNode);
+            parsed = parserFactory.getContainerNodeParser().parse(Collections.singletonList(doc.getDocumentElement()),
+                (ContainerSchemaNode) schemaNode);
         } else if(schemaNode instanceof ListSchemaNode) {
             final ListSchemaNode casted = (ListSchemaNode) schemaNode;
             parsed = parserFactory.getMapEntryNodeParser().parse(elements, casted);
@@ -176,7 +150,8 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
         final YangInstanceIdentifier fullIIToData = YangInstanceIdentifier.create(Iterables.concat(
                 pathContext.getInstanceIdentifier().getPathArguments(), iiToDataList));
 
-        outIIContext = new InstanceIdentifierContext<>(fullIIToData, pathContext.getSchemaNode(), pathContext.getMountPoint(),
+        outIIContext = new InstanceIdentifierContext<>(fullIIToData, pathContext.getSchemaNode(),
+                pathContext.getMountPoint(),
                 pathContext.getSchemaContext());
 
         return new NormalizedNodeContext(outIIContext, parsed);

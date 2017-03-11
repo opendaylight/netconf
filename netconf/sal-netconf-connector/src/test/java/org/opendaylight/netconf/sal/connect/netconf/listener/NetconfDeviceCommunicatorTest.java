@@ -44,7 +44,6 @@ import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,8 +63,8 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.protocol.framework.ReconnectStrategy;
-import org.opendaylight.protocol.framework.ReconnectStrategyFactory;
 import org.opendaylight.protocol.framework.TimedReconnectStrategy;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
@@ -102,7 +101,7 @@ public class NetconfDeviceCommunicatorTest {
 
     @SuppressWarnings("unchecked")
     private ListenableFuture<RpcResult<NetconfMessage>> sendRequest( final String messageID, final boolean doLastTest ) throws Exception {
-        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        Document doc = UntrustedXML.newDocumentBuilder().newDocument();
         Element element = doc.createElement( "request" );
         element.setAttribute( "message-id", messageID );
         doc.appendChild( element );
@@ -204,8 +203,7 @@ public class NetconfDeviceCommunicatorTest {
     public void testSendRequest() throws Exception {
         setupSession();
 
-        NetconfMessage message = new NetconfMessage(
-                              DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument() );
+        NetconfMessage message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
         QName rpc = QName.create( "mock rpc" );
 
         ArgumentCaptor<GenericFutureListener> futureListener =
@@ -235,8 +233,7 @@ public class NetconfDeviceCommunicatorTest {
 
     @Test
     public void testSendRequestWithNoSession() throws Exception {
-        NetconfMessage message = new NetconfMessage(
-                              DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument() );
+        NetconfMessage message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
         QName rpc = QName.create( "mock rpc" );
 
         ListenableFuture<RpcResult<NetconfMessage>> resultFuture = communicator.sendRequest( message, rpc );
@@ -254,8 +251,7 @@ public class NetconfDeviceCommunicatorTest {
     public void testSendRequestWithWithSendFailure() throws Exception {
         setupSession();
 
-        NetconfMessage message = new NetconfMessage(
-                              DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument() );
+        NetconfMessage message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
         QName rpc = QName.create( "mock rpc" );
 
         ArgumentCaptor<GenericFutureListener> futureListener =
@@ -286,7 +282,7 @@ public class NetconfDeviceCommunicatorTest {
     }
 
     private static NetconfMessage createSuccessResponseMessage( final String messageID ) throws ParserConfigurationException {
-        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        Document doc = UntrustedXML.newDocumentBuilder().newDocument();
         Element rpcReply = doc.createElementNS( URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, XmlMappingConstants.RPC_REPLY_KEY);
         rpcReply.setAttribute( "message-id", messageID );
         Element element = doc.createElementNS( "ns", "data" );
@@ -388,12 +384,7 @@ public class NetconfDeviceCommunicatorTest {
             final NetconfReconnectingClientConfiguration cfg = NetconfReconnectingClientConfigurationBuilder.create()
                     .withAddress(new InetSocketAddress("localhost", 65000))
                     .withReconnectStrategy(reconnectStrategy)
-                    .withConnectStrategyFactory(new ReconnectStrategyFactory() {
-                        @Override
-                        public ReconnectStrategy createReconnectStrategy() {
-                            return reconnectStrategy;
-                        }
-                    })
+                    .withConnectStrategyFactory(() -> reconnectStrategy)
                     .withAuthHandler(new LoginPassword("admin", "admin"))
                     .withConnectionTimeoutMillis(10000)
                     .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
@@ -469,7 +460,7 @@ public class NetconfDeviceCommunicatorTest {
             "</rpc-reply>";
 
         ByteArrayInputStream bis = new ByteArrayInputStream( xmlStr.getBytes() );
-        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse( bis );
+        Document doc = UntrustedXML.newDocumentBuilder().parse(bis);
         return new NetconfMessage( doc );
     }
 

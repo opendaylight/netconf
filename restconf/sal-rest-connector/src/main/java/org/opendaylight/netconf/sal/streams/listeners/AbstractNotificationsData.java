@@ -13,8 +13,6 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -30,6 +28,7 @@ import org.opendaylight.restconf.Rfc8040.MonitoringModule;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.parser.IdentifierCodec;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -108,13 +107,7 @@ abstract class AbstractNotificationsData {
      * @return {@link Document} document.
      */
     protected static Document createDocument() {
-        final DocumentBuilder bob;
-        try {
-            bob = ListenersConstants.DBF.newDocumentBuilder();
-        } catch (final ParserConfigurationException e) {
-            return null;
-        }
-        return bob.newDocument();
+        return UntrustedXML.newDocumentBuilder().newDocument();
     }
 
     /**

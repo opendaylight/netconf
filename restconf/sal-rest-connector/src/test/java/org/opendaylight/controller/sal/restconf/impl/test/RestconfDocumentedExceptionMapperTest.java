@@ -43,7 +43,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -67,9 +66,13 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Unit tests for RestconfDocumentedExceptionMapper.
@@ -108,6 +111,7 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
         }
     }
 
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfDocumentedExceptionMapperTest.class);
     static RestconfService mockRestConf = mock(RestconfService.class);
 
     static XPath XPATH = XPathFactory.newInstance().newXPath();
@@ -767,25 +771,13 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
                 errorInfoVerifier);
     }
 
-    private Document parseXMLDocument(final InputStream stream) throws IOException {
-        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
-        factory.setCoalescing(true);
-        factory.setIgnoringElementContentWhitespace(true);
-        factory.setIgnoringComments(true);
-
+    private static Document parseXMLDocument(final InputStream stream) throws IOException, SAXException {
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ByteStreams.copy(stream, bos);
 
-        System.out.println("XML: " + bos.toString());
+        LOG.debug("XML: " + bos.toString());
 
-        Document doc = null;
-        try {
-            doc = factory.newDocumentBuilder().parse(new ByteArrayInputStream(bos.toByteArray()));
-        } catch (final Exception e) {
-            throw new IllegalArgumentException("Invalid XML response:\n" + bos.toString(), e);
-        }
-        return doc;
+        return UntrustedXML.newDocumentBuilder().parse(new ByteArrayInputStream(bos.toByteArray()));
     }
 
     void verifyXMLErrorNode(final Node errorNode, final ErrorType expErrorType, final ErrorTag expErrorTag,

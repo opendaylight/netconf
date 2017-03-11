@@ -30,17 +30,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
@@ -64,8 +63,7 @@ public final class TestUtils {
     public static SchemaContext loadSchemaContext(final String... yangPath)
             throws FileNotFoundException, ReactorException {
         final List<InputStream> files = new ArrayList<>();
-        for (int i = 0; i < yangPath.length; i++) {
-            final String path = yangPath[i];
+        for (final String path : yangPath) {
             final String pathToFile = TestUtils.class.getResource(path).getPath();
             final File testDir = new File(pathToFile);
             final String[] fileList = testDir.list();
@@ -73,8 +71,7 @@ public final class TestUtils {
                 throw new FileNotFoundException(pathToFile);
             }
 
-            for (int j = 0; j < fileList.length; j++) {
-                final String fileName = fileList[j];
+            for (final String fileName : fileList) {
                 final File file = new File(testDir, fileName);
                 if (file.isDirectory() == false) {
                     files.add(new NamedFileInputStream(file, file.getPath()));
@@ -95,10 +92,8 @@ public final class TestUtils {
 
     public static Document loadDocumentFrom(final InputStream inputStream) {
         try {
-            final DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-            final DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-            return docBuilder.parse(inputStream);
-        } catch (SAXException | IOException | ParserConfigurationException e) {
+            return UntrustedXML.newDocumentBuilder().parse(inputStream);
+        } catch (SAXException | IOException e) {
             LOG.error("Error during loading Document from XML", e);
             return null;
         }
@@ -213,28 +208,25 @@ public final class TestUtils {
         return matcher.matches();
     }
 
-    public static YangInstanceIdentifier.NodeIdentifier getNodeIdentifier(final String localName, final String namespace,
+    public static NodeIdentifier getNodeIdentifier(final String localName, final String namespace,
             final String revision) throws ParseException {
-        return new YangInstanceIdentifier.NodeIdentifier(QName.create(namespace, revision, localName));
+        return new NodeIdentifier(QName.create(namespace, revision, localName));
     }
 
-    public static YangInstanceIdentifier.NodeIdentifierWithPredicates getNodeIdentifierPredicate(final String localName,
+    public static NodeIdentifierWithPredicates getNodeIdentifierPredicate(final String localName,
             final String namespace, final String revision, final Map<String, Object> keys) throws ParseException {
         final Map<QName, Object> predicate = new HashMap<>();
         for (final String key : keys.keySet()) {
             predicate.put(QName.create(namespace, revision, key), keys.get(key));
         }
 
-        return new YangInstanceIdentifier.NodeIdentifierWithPredicates(
-
-        QName.create(namespace, revision, localName), predicate);
+        return new NodeIdentifierWithPredicates(QName.create(namespace, revision, localName), predicate);
     }
 
-    public static YangInstanceIdentifier.NodeIdentifierWithPredicates getNodeIdentifierPredicate(final String localName,
+    public static NodeIdentifierWithPredicates getNodeIdentifierPredicate(final String localName,
             final String namespace, final String revision, final String... keysAndValues) throws ParseException {
-        if ((keysAndValues.length % 2) != 0) {
-            new IllegalArgumentException("number of keys argument have to be divisible by 2 (map)");
-        }
+        Preconditions.checkArgument((keysAndValues.length % 2) == 0,
+                "number of keys argument have to be divisible by 2 (map)");
         final Map<QName, Object> predicate = new HashMap<>();
 
         int i = 0;
@@ -242,14 +234,14 @@ public final class TestUtils {
             predicate.put(QName.create(namespace, revision, keysAndValues[i++]), keysAndValues[i++]);
         }
 
-        return new YangInstanceIdentifier.NodeIdentifierWithPredicates(QName.create(namespace, revision, localName),
-                predicate);
+        return new NodeIdentifierWithPredicates(QName.create(namespace, revision, localName), predicate);
     }
 
     static NormalizedNode<?,?> prepareNormalizedNodeWithIetfInterfacesInterfacesData() throws ParseException {
         final String ietfInterfacesDate = "2013-07-04";
         final String namespace = "urn:ietf:params:xml:ns:yang:ietf-interfaces";
-        final DataContainerNodeAttrBuilder<YangInstanceIdentifier.NodeIdentifierWithPredicates, MapEntryNode> mapEntryNode = ImmutableMapEntryNodeBuilder.create();
+        final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryNode =
+                ImmutableMapEntryNodeBuilder.create();
 
         final Map<String, Object> predicates = new HashMap<>();
         predicates.put("name", "eth0");
