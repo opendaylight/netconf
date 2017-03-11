@@ -11,8 +11,8 @@ import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.time.LocalTime;
 import java.util.Collection;
-import java.util.Date;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import org.json.JSONObject;
@@ -137,7 +137,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     private String prepareJson() {
         final JSONObject json = new JSONObject();
         json.put("ietf-restconf:notification",
-                new JSONObject(writeBodyToString()).put("event-time", ListenerAdapter.toRFC3339(new Date())));
+                new JSONObject(writeBodyToString()).put("event-time", ListenerAdapter.toRFC3339(LocalTime.now())));
         return json.toString();
     }
 
