@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
@@ -164,7 +167,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
         private Date start = null;
         private Date stop = null;
-        private String filter = null;
+        private XPathExpression filter = null;
 
         private NotificationQueryParams() {
 
@@ -196,7 +199,16 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                     case "filter":
                         if (!filter_used) {
                             filter_used = true;
-                            this.filter = entry.getValue().iterator().next();
+                            final String expr = entry.getValue().iterator().next();
+                            if (expr != null) {
+                                try {
+                                    this.filter = XPathFactory.newInstance().newXPath().compile(expr);
+                                } catch (XPathExpressionException e) {
+                                    throw new RestconfDocumentedException("Invalid expression specified", e);
+                                }
+                            } else {
+                                this.filter = null;
+                            }
                         }
                         break;
                     default:
@@ -236,7 +248,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          *
          * @return filter
          */
-        public String getFilter() {
+        public XPathExpression getFilter() {
             return this.filter;
         }
     }
