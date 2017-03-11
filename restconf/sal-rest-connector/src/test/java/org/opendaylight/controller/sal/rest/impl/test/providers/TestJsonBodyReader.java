@@ -81,7 +81,6 @@ public class TestJsonBodyReader extends AbstractBodyReaderTest {
     @BeforeClass
     public static void initialization() throws NoSuchFieldException, SecurityException, FileNotFoundException, SourceException, ReactorException {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
-        testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
         schemaContext = TestRestconfUtils.parseYangSources(testFiles);
         controllerContext.setSchemas(schemaContext);
