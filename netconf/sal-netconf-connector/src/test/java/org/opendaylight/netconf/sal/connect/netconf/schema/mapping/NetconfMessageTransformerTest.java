@@ -273,7 +273,8 @@ public class NetconfMessageTransformerTest {
                 "</rpc>");
     }
 
-    private void assertSimilarXml(final NetconfMessage netconfMessage, final String xmlContent) throws SAXException, IOException {
+    private static void assertSimilarXml(final NetconfMessage netconfMessage, final String xmlContent)
+            throws SAXException, IOException {
         final Diff diff = XMLUnit.compareXML(netconfMessage.getDocument(), XmlUtil.readXmlToDocument(xmlContent));
         diff.overrideElementQualifier(new ElementNameAndAttributeQualifier());
         assertTrue(diff.toString(), diff.similar());
@@ -284,7 +285,8 @@ public class NetconfMessageTransformerTest {
 
         final QName capability = QName.create(Capabilities.QNAME, "capability");
         final DataContainerChild<?, ?> filter = toFilterStructure(
-                YangInstanceIdentifier.create(toId(NetconfState.QNAME), toId(Capabilities.QNAME), toId(capability), new YangInstanceIdentifier.NodeWithValue(capability, "a:b:c")), schema);
+                YangInstanceIdentifier.create(toId(NetconfState.QNAME), toId(Capabilities.QNAME), toId(capability),
+                    new YangInstanceIdentifier.NodeWithValue<>(capability, "a:b:c")), schema);
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(toPath(NETCONF_GET_QNAME),
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_QNAME, filter));
@@ -302,7 +304,7 @@ public class NetconfMessageTransformerTest {
                 "</rpc>");
     }
 
-    private NetconfMessageTransformer getTransformer(final SchemaContext schema) {
+    private static NetconfMessageTransformer getTransformer(final SchemaContext schema) {
         return new NetconfMessageTransformer(schema, true);
     }
 
@@ -316,7 +318,7 @@ public class NetconfMessageTransformerTest {
         assertNull(compositeNodeRpcResult.getResult());
     }
 
-    public SchemaContext getSchema(boolean addBase) {
+    public SchemaContext getSchema(final boolean addBase) {
         final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
         if(addBase) {
             moduleInfoBackedContext.addModuleInfos(Collections.singleton($YangModuleInfoImpl.getInstance()));

@@ -338,7 +338,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @param in reader JsonReader reader
      * @return NormalizedNode representing data
      */
-    private NormalizedNode readEditData(@Nonnull final JsonReader in, @Nonnull final SchemaNode targetSchemaNode,
+    private static NormalizedNode readEditData(@Nonnull final JsonReader in, @Nonnull final SchemaNode targetSchemaNode,
                                         @Nonnull final InstanceIdentifierContext path) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
@@ -352,7 +352,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @param edit Instance of PatchEdit
      * @return PATCHEntity
      */
-    private PATCHEntity prepareEditOperation(@Nonnull final PatchEdit edit) {
+    private static PATCHEntity prepareEditOperation(@Nonnull final PatchEdit edit) {
         if ((edit.getOperation() != null) && (edit.getTargetSchemaNode() != null)
                 && checkDataPresence(edit.getOperation(), (edit.getData() != null))) {
             if (isPatchOperationWithValue(edit.getOperation())) {
@@ -380,19 +380,11 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @return true if data is present when operation requires it or if there are no data when operation does not
      * allow it, false otherwise
      */
-    private boolean checkDataPresence(@Nonnull final String operation, final boolean hasData) {
+    private static boolean checkDataPresence(@Nonnull final String operation, final boolean hasData) {
         if (isPatchOperationWithValue(operation)) {
-            if (hasData) {
-                return true;
-            } else {
-                return false;
-            }
+            return hasData;
         } else  {
-            if (!hasData) {
-                return true;
-            } else {
-                return false;
-            }
+            return !hasData;
         }
     }
 

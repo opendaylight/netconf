@@ -207,15 +207,13 @@ public class TestJsonBodyReader extends AbstractBodyReaderTest {
                 .toString()));
     }
 
-    private void checkExpectValueNormalizeNodeContext(
-            final DataSchemaNode dataSchemaNode,
+    private static void checkExpectValueNormalizeNodeContext(final DataSchemaNode dataSchemaNode,
             final NormalizedNodeContext nnContext) {
         checkExpectValueNormalizeNodeContext(dataSchemaNode, nnContext, null);
     }
 
-    private void checkExpectValueNormalizeNodeContext(final DataSchemaNode dataSchemaNode,
-                                                      final NormalizedNodeContext nnContext,
-                                                      final YangInstanceIdentifier dataNodeIdent) {
+    private static void checkExpectValueNormalizeNodeContext(final DataSchemaNode dataSchemaNode,
+            final NormalizedNodeContext nnContext, final YangInstanceIdentifier dataNodeIdent) {
         assertEquals(dataSchemaNode, nnContext.getInstanceIdentifierContext().getSchemaNode());
         assertEquals(dataNodeIdent, nnContext.getInstanceIdentifierContext().getInstanceIdentifier());
         assertNotNull(NormalizedNodes.findNode(nnContext.getData(), dataNodeIdent));

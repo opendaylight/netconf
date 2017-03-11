@@ -68,7 +68,7 @@ public class SchemalessNetconfDeviceTest {
     }
 
     @SuppressWarnings("unchecked")
-    private RemoteDeviceHandler<NetconfSessionPreferences> getFacade() throws Exception {
+    private static RemoteDeviceHandler<NetconfSessionPreferences> getFacade() throws Exception {
         final RemoteDeviceHandler<NetconfSessionPreferences> remoteDeviceHandler = mockCloseableClass(RemoteDeviceHandler.class);
         doNothing().when(remoteDeviceHandler).onDeviceConnected(any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class));
         doNothing().when(remoteDeviceHandler).onDeviceDisconnected();
@@ -76,7 +76,7 @@ public class SchemalessNetconfDeviceTest {
         return remoteDeviceHandler;
     }
 
-    private <T extends AutoCloseable> T mockCloseableClass(final Class<T> remoteDeviceHandlerClass) throws Exception {
+    private static <T extends AutoCloseable> T mockCloseableClass(final Class<T> remoteDeviceHandlerClass) throws Exception {
         final T mock = mockClass(remoteDeviceHandlerClass);
         doNothing().when(mock).close();
         return mock;
@@ -88,7 +88,7 @@ public class SchemalessNetconfDeviceTest {
         return mock;
     }
 
-    private NetconfSessionPreferences getSessionCaps(final boolean addMonitor, final Collection<String> additionalCapabilities) {
+    private static NetconfSessionPreferences getSessionCaps(final boolean addMonitor, final Collection<String> additionalCapabilities) {
         final ArrayList<String> capabilities = Lists.newArrayList(
                 XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
                 XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1);

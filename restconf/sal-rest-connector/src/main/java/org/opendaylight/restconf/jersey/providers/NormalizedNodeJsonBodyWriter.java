@@ -96,12 +96,9 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         jsonWriter.flush();
     }
 
-    private void writeNormalizedNode(final JsonWriter jsonWriter,
-                                     final SchemaPath path,
-                                     final InstanceIdentifierContext<SchemaNode> context,
-                                     final NormalizedNode<?, ?> data,
-                                     final Integer depth,
-                                     final List<Set<QName>> fields) throws IOException {
+    private static void writeNormalizedNode(final JsonWriter jsonWriter,
+            final SchemaPath path, final InstanceIdentifierContext<SchemaNode> context, final NormalizedNode<?, ?> data,
+            final Integer depth, final List<Set<QName>> fields) throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
 
         if (context.getSchemaNode() instanceof RpcDefinition) {
@@ -139,18 +136,16 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         nnWriter.flush();
     }
 
-    private void writeChildren(final RestconfNormalizedNodeWriter nnWriter,
+    private static void writeChildren(final RestconfNormalizedNodeWriter nnWriter,
                                final ContainerNode data) throws IOException {
         for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
             nnWriter.write(child);
         }
     }
 
-    private RestconfNormalizedNodeWriter createNormalizedNodeWriter(final InstanceIdentifierContext<SchemaNode> context,
-                                                                    final SchemaPath path,
-                                                                    final JsonWriter jsonWriter,
-                                                                    final Integer depth,
-                                                                    final List<Set<QName>> fields) {
+    private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(
+            final InstanceIdentifierContext<SchemaNode> context, final SchemaPath path, final JsonWriter jsonWriter,
+            final Integer depth, final List<Set<QName>> fields) {
 
         final SchemaNode schema = context.getSchemaNode();
         final JSONCodecFactory codecs = getCodecFactory(context);
@@ -170,7 +165,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         return ParameterAwareNormalizedNodeWriter.forStreamWriter(streamWriter, depth, fields);
     }
 
-    private JsonWriter createJsonWriter(final OutputStream entityStream, final boolean prettyPrint) {
+    private static JsonWriter createJsonWriter(final OutputStream entityStream, final boolean prettyPrint) {
         if (prettyPrint) {
             return JsonWriterFactory.createJsonWriter(
                     new OutputStreamWriter(entityStream, StandardCharsets.UTF_8), DEFAULT_INDENT_SPACES_NUM);
@@ -179,7 +174,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         }
     }
 
-    private JSONCodecFactory getCodecFactory(final InstanceIdentifierContext<?> context) {
+    private static JSONCodecFactory getCodecFactory(final InstanceIdentifierContext<?> context) {
         // TODO: Performance: Cache JSON Codec factory and schema context
         return JSONCodecFactory.create(context.getSchemaContext());
     }

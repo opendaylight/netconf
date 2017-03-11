@@ -99,7 +99,7 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
         }
     }
 
-    private PATCHContext parse(final InstanceIdentifierContext<?> pathContext, final Document doc) {
+    private static PATCHContext parse(final InstanceIdentifierContext<?> pathContext, final Document doc) {
         final List<PATCHEntity> resultCollection = new ArrayList<>();
         final String patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
         final NodeList editNodes = doc.getElementsByTagName("edit");
@@ -182,7 +182,7 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
      * @param operation Name of current operation
      * @return List of value elements
      */
-    private List<Element> readValueNodes(@Nonnull final Element element, @Nonnull final String operation) {
+    private static List<Element> readValueNodes(@Nonnull final Element element, @Nonnull final String operation) {
         final Node valueNode = element.getElementsByTagName("value").item(0);
 
         if (PATCHEditOperation.isPatchOperationWithValue(operation) && (valueNode == null)) {
@@ -220,9 +220,8 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
      * @param revision Module revision
      * @return Non-conditional XPath
      */
-    private String prepareNonCondXpath(@Nonnull final DataSchemaNode schemaNode, @Nonnull final String target,
-                                       @Nonnull final Element value, @Nonnull final String namespace,
-                                       @Nonnull final String revision) {
+    private static String prepareNonCondXpath(@Nonnull final DataSchemaNode schemaNode, @Nonnull final String target,
+            @Nonnull final Element value, @Nonnull final String namespace, @Nonnull final String revision) {
         final Iterator<String> args = Splitter.on("/").split(target.substring(target.indexOf(':') + 1)).iterator();
 
         final StringBuilder nonCondXpath = new StringBuilder();
@@ -254,7 +253,7 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
      * @param keys Iterator of list keys names
      * @return Iterator of list keys values
      */
-    private Iterator<String> readKeyValues(@Nonnull final Element value, @Nonnull final Iterator<QName> keys) {
+    private static Iterator<String> readKeyValues(@Nonnull final Element value, @Nonnull final Iterator<QName> keys) {
         final List<String> result = new ArrayList<>();
 
         while (keys.hasNext()) {
@@ -270,7 +269,7 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
      * @param keyNames Iterator of list keys names
      * @param keyValues Iterator of list keys values
      */
-    private void appendKeys(@Nonnull final StringBuilder nonCondXpath, @Nonnull final Iterator<QName> keyNames,
+    private static void appendKeys(@Nonnull final StringBuilder nonCondXpath, @Nonnull final Iterator<QName> keyNames,
                             @Nonnull final Iterator<String> keyValues) {
         while (keyNames.hasNext()) {
             nonCondXpath.append("[");

@@ -151,7 +151,7 @@ public class ExpressionParserTest {
         return (boolean) m.invoke(listener, null);
     }
 
-    private String readFile(final File xml) throws Exception {
+    private static String readFile(final File xml) throws Exception {
         final BufferedReader br = new BufferedReader(new FileReader(xml));
         try {
             final StringBuilder sb = new StringBuilder();

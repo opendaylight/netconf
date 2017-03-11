@@ -94,7 +94,7 @@ public class NnToXmlWithDataFromSeveralModulesTest extends
         return null;
     }
 
-    private NormalizedNodeContext prepareNormalizedNodeContext() {
+    private static NormalizedNodeContext prepareNormalizedNodeContext() {
         final String rev = "2014-01-17";
 
         final DataSchemaNode schemaContNode = schemaContext;
@@ -115,14 +115,14 @@ public class NnToXmlWithDataFromSeveralModulesTest extends
         dataContSchemaContNode.withChild(modul2.build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<DataSchemaNode>(null,
+                new InstanceIdentifierContext<>(null,
                         schemaContNode, null, schemaContext),
                 dataContSchemaContNode.build());
 
         return testNormalizedNodeContext;
     }
 
-    private DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> buildContBuilderMod1(
+    private static DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> buildContBuilderMod1(
             final String uri, final String rev, final String cont, final String contB, final String lf1,
             final String lf1_value) {
         final QName contQname = QName.create(uri, rev, cont);

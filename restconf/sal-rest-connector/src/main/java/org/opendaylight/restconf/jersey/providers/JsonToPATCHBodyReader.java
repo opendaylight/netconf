@@ -333,8 +333,8 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @param in reader JsonReader reader
      * @return NormalizedNode representing data
      */
-    private NormalizedNode readEditData(@Nonnull final JsonReader in, @Nonnull SchemaNode targetSchemaNode,
-                                        @Nonnull InstanceIdentifierContext path) {
+    private static NormalizedNode readEditData(@Nonnull final JsonReader in, @Nonnull final SchemaNode targetSchemaNode,
+                                        @Nonnull final InstanceIdentifierContext path) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         JsonParserStream.create(writer, path.getSchemaContext(), targetSchemaNode).parse(in);
@@ -347,7 +347,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @param edit Instance of PatchEdit
      * @return PATCHEntity
      */
-    private PATCHEntity prepareEditOperation(@Nonnull final PatchEdit edit) {
+    private static PATCHEntity prepareEditOperation(@Nonnull final PatchEdit edit) {
         if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
                 && checkDataPresence(edit.getOperation(), (edit.getData() != null))) {
             if (isPatchOperationWithValue(edit.getOperation())) {
@@ -375,19 +375,11 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @return true if data is present when operation requires it or if there are no data when operation does not
      * allow it, false otherwise
      */
-    private boolean checkDataPresence(@Nonnull final String operation, final boolean hasData) {
+    private static boolean checkDataPresence(@Nonnull final String operation, final boolean hasData) {
         if (isPatchOperationWithValue(operation)) {
-            if (hasData) {
-                return true;
-            } else {
-                return false;
-            }
+            return hasData;
         } else  {
-            if (!hasData) {
-                return true;
-            } else {
-                return false;
-            }
+            return !hasData;
         }
     }
 
@@ -405,7 +397,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
             return id;
         }
 
-        public void setId(String id) {
+        public void setId(final String id) {
             this.id = id;
         }
 
@@ -413,7 +405,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
             return operation;
         }
 
-        public void setOperation(String operation) {
+        public void setOperation(final String operation) {
             this.operation = operation;
         }
 
@@ -421,7 +413,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
             return target;
         }
 
-        public void setTarget(YangInstanceIdentifier target) {
+        public void setTarget(final YangInstanceIdentifier target) {
             this.target = target;
         }
 
@@ -429,7 +421,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
             return targetSchemaNode;
         }
 
-        public void setTargetSchemaNode(SchemaNode targetSchemaNode) {
+        public void setTargetSchemaNode(final SchemaNode targetSchemaNode) {
             this.targetSchemaNode = targetSchemaNode;
         }
 
@@ -437,7 +429,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
             return data;
         }
 
-        public void setData(NormalizedNode data) {
+        public void setData(final NormalizedNode data) {
             this.data = data;
         }
 

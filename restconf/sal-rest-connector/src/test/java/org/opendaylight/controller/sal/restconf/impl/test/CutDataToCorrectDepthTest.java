@@ -306,15 +306,13 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
         return new NodeWithValue(QName.create("urn:nested:module", "2014-06-3", localName), value);
     }
 
-
-
-    private UnkeyedListEntryNode nodeDataDepth3Operational() {
+    private static UnkeyedListEntryNode nodeDataDepth3Operational() {
         return unkeyedEntry("depth2-cont1",
                 container("depth3-cont1", container("depth4-cont1"), leaf("depth4-leaf1", "depth4-leaf1-value")),
                 leaf("depth3-leaf1", "depth3-leaf1-value"));
     }
 
-    private ContainerNode nodeDataDepth5() {
+    private static ContainerNode nodeDataDepth5() {
         return container(
                 "depth1-cont",
                 unkeyedList(
@@ -336,7 +334,7 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
                 leaf("depth2-leaf1", "depth2-leaf1-value"));
     }
 
-    private ContainerNode nodeDataDepth4() {
+    private static ContainerNode nodeDataDepth4() {
         return container(
                 "depth1-cont",
                 unkeyedList("depth2-cont1", nodeDataDepth3Operational()),
@@ -350,7 +348,7 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
                         leaf("depth3-leaf2", "depth3-leaf2-value")), leaf("depth2-leaf1", "depth2-leaf1-value"));
     }
 
-    private ContainerNode nodeDataDepth3() {
+    private static ContainerNode nodeDataDepth3() {
         return container(
                 "depth1-cont",
                 unkeyedList("depth2-cont1",
@@ -363,7 +361,7 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
                 leaf("depth2-leaf1", "depth2-leaf1-value"));
     }
 
-    private ContainerNode nodeDataDepth2() {
+    private static ContainerNode nodeDataDepth2() {
         return container(
                 "depth1-cont",
                 unkeyedList("depth2-cont1", unkeyedEntry("depth2-cont1")),
@@ -374,7 +372,7 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
                 leaf("depth2-leaf1", "depth2-leaf1-value"));
     }
 
-    private ContainerNode nodeDataDepth1() {
+    private static ContainerNode nodeDataDepth1() {
         return container("depth1-cont");
     }
 }
