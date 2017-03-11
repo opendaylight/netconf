@@ -81,7 +81,6 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
     @BeforeClass
     public static void initialization() throws Exception {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
-        testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
         schemaContext = YangParserTestUtils.parseYangSources(testFiles);
 
