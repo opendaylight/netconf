@@ -45,6 +45,9 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.OptimisticLockFailedException;
@@ -1087,7 +1090,7 @@ public class RestconfImpl implements RestconfService {
         boolean filter_used = false;
         Date start = null;
         Date stop = null;
-        String filter = null;
+        XPathExpression filter = null;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             switch (entry.getKey()) {
@@ -1108,11 +1111,20 @@ public class RestconfImpl implements RestconfService {
                     }
                     break;
                 case "filter":
-                    if (!filter_used) {
-                        filter_used = true;
-                        filter = entry.getValue().iterator().next();
-                    } else {
+                    if (filter_used) {
                         throw new RestconfDocumentedException("Filter parameter can be used only once.");
+                    }
+
+                    filter_used = true;
+                    final String expr = entry.getValue().iterator().next();
+                    if (expr != null) {
+                        try {
+                            filter = XPathFactory.newInstance().newXPath().compile(expr);
+                        } catch (XPathExpressionException e) {
+                            throw new RestconfDocumentedException("Invalid expression specified", e);
+                        }
+                    } else {
+                        filter = null;
                     }
                     break;
                 default:
@@ -1205,11 +1217,11 @@ public class RestconfImpl implements RestconfService {
      * @param start
      *            - start-time of getting notification
      * @param filter
-     *            - indicate wh ich subset of allpossible events are of interest
+     *            - indicate which subset of all possible events are of interest
      * @return {@link URI} of location
      */
     private URI notifStream(final String identifier, final UriInfo uriInfo, final Date start, final Date stop,
-            final String filter) {
+            final XPathExpression filter) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -1255,7 +1267,7 @@ public class RestconfImpl implements RestconfService {
      * @return {@link URI} of location
      */
     private URI dataSubs(final String identifier, final UriInfo uriInfo, final Date start, final Date stop,
-            final String filter) {
+            final XPathExpression filter) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);

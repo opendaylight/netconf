@@ -10,9 +10,10 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.lang.reflect.Field;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import javax.xml.xpath.XPathFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -133,7 +134,7 @@ public class ExpressionParserTest {
         final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-14-12", "localName"));
         Mockito.when(path.getLastPathArgument()).thenReturn(pathValue);
         final ListenerAdapter listener = Notificator.createListener(path, "streamName", NotificationOutputType.JSON);
-        listener.setQueryParams(null, null, filter);
+        listener.setQueryParams(null, null, XPathFactory.newInstance().newXPath().compile(filter));
         final Class<?> superclass = listener.getClass().getSuperclass().getSuperclass();
         Method m = null;
         for (final Method method : superclass.getDeclaredMethods()) {
@@ -145,15 +146,11 @@ public class ExpressionParserTest {
             throw new Exception("Methode parseFilterParam doesn't exist in " + superclass.getName());
         }
         m.setAccessible(true);
-        final Field xmlField = superclass.getDeclaredField("xml");
-        xmlField.setAccessible(true);
-        xmlField.set(listener, readFile(xml));
-        return (boolean) m.invoke(listener, null);
+        return (boolean) m.invoke(listener, readFile(xml));
     }
 
-    private String readFile(final File xml) throws Exception {
-        final BufferedReader br = new BufferedReader(new FileReader(xml));
-        try {
+    private static String readFile(final File xml) throws IOException {
+        try (final BufferedReader br = new BufferedReader(new FileReader(xml))) {
             final StringBuilder sb = new StringBuilder();
             String line = br.readLine();
 
@@ -163,8 +160,6 @@ public class ExpressionParserTest {
                 line = br.readLine();
             }
             return sb.toString();
-        } finally {
-            br.close();
         }
     }
 

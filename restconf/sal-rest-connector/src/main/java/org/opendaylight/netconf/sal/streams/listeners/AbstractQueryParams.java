@@ -9,11 +9,9 @@ package org.opendaylight.netconf.sal.streams.listeners;
 
 import java.io.StringReader;
 import java.util.Date;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.XPathExpression;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -23,12 +21,11 @@ import org.xml.sax.InputSource;
  *
  */
 abstract class AbstractQueryParams extends AbstractNotificationsData {
+    private static final DocumentBuilderFactory DBF = DocumentBuilderFactory.newInstance();
 
-    protected Date start = null;
-    protected Date stop = null;
-    protected String filter = null;
-
-    private String xml;
+    private Date start = null;
+    private Date stop = null;
+    private XPathExpression filter = null;
 
     /**
      * Set query parameters for listener
@@ -38,9 +35,9 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      * @param stop
      *            - stop-time of getting notification
      * @param filter
-     *            - indicate which subset of all possible events are of interest
+     *            - indicate which subset of all possible events are of interest, may be null
      */
-    public void setQueryParams(final Date start, final Date stop, final String filter) {
+    public void setQueryParams(final Date start, final Date stop, final XPathExpression filter) {
         this.start = start;
         this.stop = stop;
         this.filter = filter;
@@ -57,11 +54,10 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      *         false otherwise
      */
     protected <T extends BaseListenerInterface> boolean checkQueryParams(final String xml, final T listener) {
-        this.xml = xml;
         final Date now = new Date();
         if (this.stop != null) {
             if ((this.start.compareTo(now) < 0) && (this.stop.compareTo(now) > 0)) {
-                return checkFilter();
+                return checkFilter(xml);
             }
             if (this.stop.compareTo(now) < 0) {
                 try {
@@ -73,10 +69,10 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
         } else if (this.start != null) {
             if (this.start.compareTo(now) < 0) {
                 this.start = null;
-                return checkFilter();
+                return checkFilter(xml);
             }
         } else {
-            return checkFilter();
+            return checkFilter(xml);
         }
         return false;
     }
@@ -87,15 +83,15 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      * @param change
      *            - data of notification
      */
-    private boolean checkFilter() {
+    private boolean checkFilter(final String xml) {
         if (this.filter == null) {
             return true;
-        } else {
-            try {
-                return parseFilterParam();
-            } catch (final Exception e) {
-                throw new RestconfDocumentedException("Problem while parsing filter.", e);
-            }
+        }
+
+        try {
+            return parseFilterParam(xml);
+        } catch (final Exception e) {
+            throw new RestconfDocumentedException("Problem while parsing filter.", e);
         }
     }
 
@@ -106,11 +102,11 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      *         notifiaction
      * @throws Exception
      */
-    private boolean parseFilterParam() throws Exception {
-        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        final DocumentBuilder builder = factory.newDocumentBuilder();
-        final Document docOfXml = builder.parse(new InputSource(new StringReader(this.xml)));
-        final XPath xPath = XPathFactory.newInstance().newXPath();
-        return (boolean) xPath.compile(this.filter).evaluate(docOfXml, XPathConstants.BOOLEAN);
+    private boolean parseFilterParam(final String xml) throws Exception {
+        final Document docOfXml = DBF.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
+
+        synchronized (filter) {
+            return (boolean) filter.evaluate(docOfXml, XPathConstants.BOOLEAN);
+        }
     }
 }
