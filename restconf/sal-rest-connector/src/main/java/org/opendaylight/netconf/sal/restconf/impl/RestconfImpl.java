@@ -353,7 +353,7 @@ public class RestconfImpl implements RestconfService {
      *            - mount point, if in use otherwise null
      * @return {@link NormalizedNodeContext}
      */
-    private NormalizedNodeContext operationsFromModulesToNormalizedContext(final Set<Module> modules,
+    private static NormalizedNodeContext operationsFromModulesToNormalizedContext(final Set<Module> modules,
             final DOMMountPoint mountPoint) {
 
         final Collection<Module> neededModules = new ArrayList<>(modules.size());
@@ -1161,7 +1161,7 @@ public class RestconfImpl implements RestconfService {
         throw new RestconfDocumentedException(msg);
     }
 
-    private Date parseDateFromQueryParam(final Entry<String, List<String>> entry) {
+    private static Date parseDateFromQueryParam(final Entry<String, List<String>> entry) {
         final DateAndTime event = new DateAndTime(entry.getValue().iterator().next());
         String numOf_ms = "";
         final String value = event.getValue();
@@ -1191,7 +1191,7 @@ public class RestconfImpl implements RestconfService {
      * @return {@link InstanceIdentifierContext} of location leaf for
      *         notification
      */
-    private InstanceIdentifierContext<?> prepareIIDSubsStreamOutput() {
+    private static InstanceIdentifierContext<?> prepareIIDSubsStreamOutput() {
         final QName qnameBase = QName.create("subscribe:to:notification", "2016-10-28", "notifi");
         final SchemaContext schemaCtx = ControllerContext.getInstance().getGlobalSchema();
         final DataSchemaNode location = ((ContainerSchemaNode) schemaCtx
@@ -1514,8 +1514,8 @@ public class RestconfImpl implements RestconfService {
      *            - contains list of qnames of notifications
      * @return - checked future object
      */
-    private CheckedFuture<DOMRpcResult, DOMRpcException>
-            invokeSalRemoteRpcNotifiStrRPC(final NormalizedNodeContext payload) {
+    private static CheckedFuture<DOMRpcResult, DOMRpcException> invokeSalRemoteRpcNotifiStrRPC(
+            final NormalizedNodeContext payload) {
         final ContainerNode data = (ContainerNode) payload.getData();
         LeafSetNode leafSet = null;
         String outputType = "XML";

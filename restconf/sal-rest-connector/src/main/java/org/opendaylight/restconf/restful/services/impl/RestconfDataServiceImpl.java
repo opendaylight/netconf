@@ -222,7 +222,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         return PutDataTransactionUtil.putData(payload, ref, transactionNode, insert, point);
     }
 
-    private void checkQueryParams(final boolean insert_used, final boolean point_used, final String insert) {
+    private static void checkQueryParams(final boolean insert_used, final boolean point_used, final String insert) {
         if (point_used && !insert_used) {
             throw new RestconfDocumentedException("Point parameter can't be used without Insert parameter.");
         }

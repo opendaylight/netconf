@@ -69,8 +69,8 @@ public class SchemaRetrievalServiceImpl implements SchemaRetrievalService {
         return getExportUsingNameAndRevision(schemaContext, moduleName, revisionString);
     }
 
-    private SchemaExportContext getExportUsingNameAndRevision(final SchemaContext schemaContext, final String moduleName,
-            final String revisionStr) {
+    private static SchemaExportContext getExportUsingNameAndRevision(final SchemaContext schemaContext,
+            final String moduleName, final String revisionStr) {
         try {
             final Date revision = SimpleDateFormatUtil.getRevisionFormat().parse(revisionStr);
             final Module module = schemaContext.findModuleByName(moduleName, revision);
@@ -84,8 +84,5 @@ public class SchemaRetrievalServiceImpl implements SchemaRetrievalService {
         final InstanceIdentifierContext<?> mountContext = salContext.toMountPointIdentifier(identifier);
         return mountContext.getSchemaContext();
     }
-
-
-
 }
 

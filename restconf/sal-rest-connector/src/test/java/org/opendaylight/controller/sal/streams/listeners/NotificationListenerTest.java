@@ -180,7 +180,7 @@ public class NotificationListenerTest {
         assertTrue(result.contains("lf-augm" + '"' + ":" + '"' + "value"));
     }
 
-    private AugmentationNode mockAugm(final LeafNode leaf) {
+    private static AugmentationNode mockAugm(final LeafNode leaf) {
         final AugmentationNode augm = mock(AugmentationNode.class);
         final AugmentationIdentifier augmId = new AugmentationIdentifier(SingletonSet.of(leaf.getNodeType()));
         when(augm.getIdentifier()).thenReturn(augmId);
@@ -192,7 +192,7 @@ public class NotificationListenerTest {
         return augm;
     }
 
-    private MapEntryNode mockMapEntry(final QName entryQName, final LeafNode leaf) {
+    private static MapEntryNode mockMapEntry(final QName entryQName, final LeafNode leaf) {
         final MapEntryNode entry = mock(MapEntryNode.class);
         final Map<QName, Object> keyValues = new HashMap<>();
         keyValues.put(leaf.getNodeType(), "value");
@@ -207,7 +207,7 @@ public class NotificationListenerTest {
         return entry;
     }
 
-    private MapNode mockList(final QName listQName, final MapEntryNode... entries) {
+    private static MapNode mockList(final QName listQName, final MapEntryNode... entries) {
         final MapNode list = mock(MapNode.class);
         when(list.getIdentifier()).thenReturn(NodeIdentifier.create(listQName));
         when(list.getNodeType()).thenReturn(listQName);
@@ -215,7 +215,7 @@ public class NotificationListenerTest {
         return list;
     }
 
-    private ContainerNode mockCont(final QName contQName, final DataContainerChild<? extends PathArgument, ?> child) {
+    private static ContainerNode mockCont(final QName contQName, final DataContainerChild<? extends PathArgument, ?> child) {
         final ContainerNode cont = mock(ContainerNode.class);
         when(cont.getIdentifier()).thenReturn(NodeIdentifier.create(contQName));
         when(cont.getNodeType()).thenReturn(contQName);
@@ -226,7 +226,7 @@ public class NotificationListenerTest {
         return cont;
     }
 
-    private LeafNode mockLeaf(final QName leafQName) {
+    private static LeafNode mockLeaf(final QName leafQName) {
         final LeafNode child = mock(LeafNode.class);
         when(child.getNodeType()).thenReturn(leafQName);
         when(child.getIdentifier()).thenReturn(NodeIdentifier.create(leafQName));

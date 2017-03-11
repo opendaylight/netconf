@@ -101,12 +101,9 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
                 t.getWriterParameters().getFields());
     }
 
-    private void writeNormalizedNode(final XMLStreamWriter xmlWriter,
-                                     final SchemaPath path,
-                                     final InstanceIdentifierContext<?> pathContext,
-                                     final NormalizedNode<?, ?> data,
-                                     final Integer depth,
-                                     final List<Set<QName>> fields) throws IOException {
+    private static void writeNormalizedNode(final XMLStreamWriter xmlWriter,
+            final SchemaPath path, final InstanceIdentifierContext<?> pathContext, final NormalizedNode<?, ?> data,
+            final Integer depth, final List<Set<QName>> fields) throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
         final SchemaContext schemaCtx = pathContext.getSchemaContext();
 
@@ -141,19 +138,16 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
         nnWriter.flush();
     }
 
-    private RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
-                                                                    final SchemaContext schemaContext,
-                                                                    final SchemaPath schemaPath,
-                                                                    final Integer depth,
-                                                                    final List<Set<QName>> fields) {
+    private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
+            final SchemaContext schemaContext, final SchemaPath schemaPath, final Integer depth,
+            final List<Set<QName>> fields) {
         final NormalizedNodeStreamWriter xmlStreamWriter = XMLStreamNormalizedNodeStreamWriter
                 .create(xmlWriter, schemaContext, schemaPath);
         return ParameterAwareNormalizedNodeWriter.forStreamWriter(xmlStreamWriter, depth, fields);
     }
 
-    private void writeElements(final XMLStreamWriter xmlWriter,
-                               final RestconfNormalizedNodeWriter nnWriter,
-                               final ContainerNode data) throws IOException {
+    private static void writeElements(final XMLStreamWriter xmlWriter, final RestconfNormalizedNodeWriter nnWriter,
+            final ContainerNode data) throws IOException {
         try {
             final QName name = data.getNodeType();
             xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,

@@ -157,7 +157,8 @@ public class RestPutListDataTest {
         }
     }
 
-    private void verifyException(final RestconfDocumentedException e, final ErrorType errorType, final ErrorTag errorTag) {
+    private static void verifyException(final RestconfDocumentedException e, final ErrorType errorType,
+            final ErrorTag errorTag) {
         final List<RestconfError> errors = e.getErrors();
         assertEquals("getErrors() size", 1, errors.size());
         assertEquals("RestconfError getErrorType()", errorType, errors.get(0).getErrorType());
@@ -212,7 +213,7 @@ public class RestPutListDataTest {
         putListDataTest(uriKey1, uriKey2, payloadKey1, payloadKey2);
     }
 
-    private String toUri(final String uriKey1, final String uriKey2) {
+    private static String toUri(final String uriKey1, final String uriKey2) {
         final StringBuilder uriBuilder = new StringBuilder("/test-module:lst-with-composite-key/");
         uriBuilder.append(uriKey1);
         if (uriKey2 != null) {

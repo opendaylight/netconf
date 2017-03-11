@@ -114,7 +114,7 @@ public class NetconfDeviceSalFacadeTest {
         verify(mountInstance).publish(domNotification);
     }
 
-   private List<String> getCapabilities(){
+   private static List<String> getCapabilities() {
         return Arrays.asList(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
     }
 }

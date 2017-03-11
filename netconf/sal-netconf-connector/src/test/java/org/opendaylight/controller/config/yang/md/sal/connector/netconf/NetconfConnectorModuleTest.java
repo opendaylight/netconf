@@ -100,7 +100,7 @@ public class NetconfConnectorModuleTest {
         verify(transaction, times(2)).submit();
     }
 
-    private void verifyNode(final NodeId nodeId, final Node node) {
+    private static void verifyNode(final NodeId nodeId, final Node node) {
         Assert.assertEquals(nodeId, node.getNodeId());
         final NetconfNode netconfNode = node.getAugmentation(NetconfNode.class);
         Assert.assertEquals(HOST, netconfNode.getHost());
@@ -109,7 +109,7 @@ public class NetconfConnectorModuleTest {
         Assert.assertEquals(TCP_ONLY, netconfNode.isTcpOnly());
     }
 
-    private void setViaReflection(final Object object, final String fieldName, final Object value) {
+    private static void setViaReflection(final Object object, final String fieldName, final Object value) {
         try {
             final Field field = AbstractNetconfConnectorModule.class.getDeclaredField(fieldName);
             field.setAccessible(true);

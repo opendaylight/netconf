@@ -14,8 +14,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.FutureListener;
-import io.netty.util.concurrent.GenericFutureListener;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.List;
@@ -147,16 +145,12 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         }
 
 
-        initFuture.addListener(new GenericFutureListener<Future<Object>>(){
-
-            @Override
-            public void operationComplete(final Future<Object> future) throws Exception {
-                if (!future.isSuccess() && !future.isCancelled()) {
-                    LOG.debug("{}: Connection failed", id, future.cause());
-                    NetconfDeviceCommunicator.this.remoteDevice.onRemoteSessionFailed(future.cause());
-                    if (firstConnectionFuture.isDone()) {
-                        firstConnectionFuture.setException(future.cause());
-                    }
+        initFuture.addListener(future -> {
+            if (!future.isSuccess() && !future.isCancelled()) {
+                LOG.debug("{}: Connection failed", id, future.cause());
+                NetconfDeviceCommunicator.this.remoteDevice.onRemoteSessionFailed(future.cause());
+                if (firstConnectionFuture.isDone()) {
+                    firstConnectionFuture.setException(future.cause());
                 }
             }
         });
@@ -222,7 +216,8 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                              String.format( "The netconf session to %1$s is disconnected", id.getName() ) );
     }
 
-    private RpcResult<NetconfMessage> createErrorRpcResult(final RpcError.ErrorType errorType, final String message) {
+    private static RpcResult<NetconfMessage> createErrorRpcResult(final RpcError.ErrorType errorType,
+            final String message) {
         return RpcResultBuilder.<NetconfMessage>failed()
                 .withError(errorType, NetconfDocumentedException.ErrorTag.OPERATION_FAILED.getTagValue(), message).build();
     }
@@ -368,26 +363,23 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         final Request req = new Request(new UncancellableFuture<>(true), message);
         requests.add(req);
 
-        session.sendMessage(req.request).addListener(new FutureListener<Void>() {
-            @Override
-            public void operationComplete(final Future<Void> future) throws Exception {
-                if( !future.isSuccess() ) {
-                    // We expect that a session down will occur at this point
-                    LOG.debug("{}: Failed to send request {}", id,
-                            XmlUtil.toString(req.request.getDocument()),
-                            future.cause());
+        session.sendMessage(req.request).addListener(future -> {
+            if( !future.isSuccess() ) {
+                // We expect that a session down will occur at this point
+                LOG.debug("{}: Failed to send request {}", id,
+                        XmlUtil.toString(req.request.getDocument()),
+                        future.cause());
 
-                    if( future.cause() != null ) {
-                        req.future.set( createErrorRpcResult( RpcError.ErrorType.TRANSPORT,
-                                                              future.cause().getLocalizedMessage() ) );
-                    } else {
-                        req.future.set( createSessionDownRpcResult() ); // assume session is down
-                    }
-                    req.future.setException( future.cause() );
+                if( future.cause() != null ) {
+                    req.future.set( createErrorRpcResult( RpcError.ErrorType.TRANSPORT,
+                                                          future.cause().getLocalizedMessage() ) );
+                } else {
+                    req.future.set( createSessionDownRpcResult() ); // assume session is down
                 }
-                else {
-                    LOG.trace("Finished sending request {}", req.request);
-                }
+                req.future.setException( future.cause() );
+            }
+            else {
+                LOG.trace("Finished sending request {}", req.request);
             }
         });
 

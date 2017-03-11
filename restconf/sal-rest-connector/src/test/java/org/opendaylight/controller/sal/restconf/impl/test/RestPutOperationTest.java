@@ -205,7 +205,7 @@ public class RestPutOperationTest extends JerseyTest {
         return target(uri).request(mediaType).put(Entity.entity(data, mediaType)).getStatus();
     }
 
-    private void mockCommitConfigurationDataPutMethod(final boolean noErrors) {
+    private static void mockCommitConfigurationDataPutMethod(final boolean noErrors) {
         final PutResult putResMock = mock(PutResult.class);
         if (noErrors) {
             doReturn(putResMock).when(brokerFacade).commitConfigurationDataPut(

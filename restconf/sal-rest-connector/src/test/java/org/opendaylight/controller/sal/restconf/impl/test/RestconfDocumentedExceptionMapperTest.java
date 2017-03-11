@@ -669,7 +669,7 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
                 errorInfoVerifier);
     }
 
-    private JsonArray parseJsonErrorArrayElement(final InputStream stream) throws IOException {
+    private static JsonArray parseJsonErrorArrayElement(final InputStream stream) throws IOException {
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ByteStreams.copy(stream, bos);
 

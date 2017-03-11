@@ -40,7 +40,7 @@ final class ResponseFactory extends FutureDataFactory<Void> implements Builder<R
         return this.responseBuilder.build();
     }
 
-    private Status prepareStatus(final NormalizedNode<?, ?> readData) {
+    private static Status prepareStatus(final NormalizedNode<?, ?> readData) {
         return readData != null ? Status.OK : Status.CREATED;
     }
 }

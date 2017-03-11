@@ -228,7 +228,7 @@ public class RestCodec {
 
         @Override
         public YangInstanceIdentifier deserialize(final IdentityValuesDTO data) {
-            final List<PathArgument> result = new ArrayList<PathArgument>();
+            final List<PathArgument> result = new ArrayList<>();
             final IdentityValue valueWithNamespace = data.getValuesWithNamespaces().get(0);
             final Module module = getModuleByNamespace(valueWithNamespace.getNamespace(), this.mountPoint);
             if (module == null) {
@@ -301,7 +301,7 @@ public class RestCodec {
             return result.isEmpty() ? null : YangInstanceIdentifier.create(result);
         }
 
-        private List<Predicate> keyValuesToPredicateList(final Map<QName, Object> keyValues) {
+        private static List<Predicate> keyValuesToPredicateList(final Map<QName, Object> keyValues) {
             final List<Predicate> result = new ArrayList<>();
             for (final QName qName : keyValues.keySet()) {
                 final Object value = keyValues.get(qName);
@@ -310,7 +310,7 @@ public class RestCodec {
             return result;
         }
 
-        private IdentityValue qNameToIdentityValue(final QName qName) {
+        private static IdentityValue qNameToIdentityValue(final QName qName) {
             if (qName != null) {
                 return new IdentityValue(qName.getNamespace().toString(), qName.getLocalName());
             }

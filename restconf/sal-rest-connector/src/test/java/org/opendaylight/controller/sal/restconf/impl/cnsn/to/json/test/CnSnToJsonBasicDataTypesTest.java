@@ -181,7 +181,7 @@ public class CnSnToJsonBasicDataTypesTest extends YangAndXmlAndDataSchemaLoader 
         dataLoad("/cnsn-to-json/simple-data-types");
     }
 
-    private void verifyJsonOutput(final String jsonOutput) {
+    private static void verifyJsonOutput(final String jsonOutput) {
         final StringReader strReader = new StringReader(jsonOutput);
         final JsonReader jReader = new JsonReader(strReader);
 
@@ -195,7 +195,7 @@ public class CnSnToJsonBasicDataTypesTest extends YangAndXmlAndDataSchemaLoader 
         assertNull("Error during reading Json output: " + exception, exception);
     }
 
-    private void jsonReadCont(final JsonReader jReader) throws IOException {
+    private static void jsonReadCont(final JsonReader jReader) throws IOException {
         jReader.beginObject();
         assertNotNull("cont1 is missing.", jReader.hasNext());
 
@@ -208,7 +208,7 @@ public class CnSnToJsonBasicDataTypesTest extends YangAndXmlAndDataSchemaLoader 
         // return dataFromJson;
     }
 
-    private void jsonReadContElements(final JsonReader jReader) throws IOException {
+    private static void jsonReadContElements(final JsonReader jReader) throws IOException {
         jReader.beginObject();
 
         final Map<String, LeafVerifier> expectedMap = Maps.newHashMap();

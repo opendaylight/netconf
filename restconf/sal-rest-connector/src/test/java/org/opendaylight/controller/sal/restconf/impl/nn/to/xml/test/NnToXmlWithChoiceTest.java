@@ -69,8 +69,7 @@ public class NnToXmlWithChoiceTest extends AbstractBodyReaderTest {
         assertTrue(output.toString().contains("<lf2>String data2</lf2>"));
     }
 
-    private NormalizedNodeContext prepareNNC(final String name,
-            final Object value) {
+    private static NormalizedNodeContext prepareNNC(final String name, final Object value) {
 
         final QName contQname = QName.create("module:with:choice", "2013-12-18",
                 "cont");
@@ -100,7 +99,7 @@ public class NnToXmlWithChoiceTest extends AbstractBodyReaderTest {
         dataContainerNodeAttrBuilder.withChild(dataChoice.build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<DataSchemaNode>(null,
+                new InstanceIdentifierContext<>(null,
                         contSchemaNode, null, schemaContext),
                 dataContainerNodeAttrBuilder.build());
 

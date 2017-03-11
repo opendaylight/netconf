@@ -37,15 +37,15 @@ public class RestconfSchemaUtilTest {
         findSchemaNodeInCollection("bad_key", origSchNode);
     }
 
-    private SchemaNode findSchemaNodeInCollection(final String key, final SchemaNode... origSchNode) {
+    private static SchemaNode findSchemaNodeInCollection(final String key, final SchemaNode... origSchNode) {
         final List<SchemaNode> collection = new ArrayList<>();
-        for (int i = 0; i < origSchNode.length; i++) {
-            collection.add(origSchNode[i]);
+        for (SchemaNode element : origSchNode) {
+            collection.add(element);
         }
         return RestconfSchemaUtil.findSchemaNodeInCollection(collection, key);
     }
 
-    private SchemaNode mockSchemaNode(final String origKey) {
+    private static SchemaNode mockSchemaNode(final String origKey) {
         final SchemaNode mockSchNode = Mockito.mock(SchemaNode.class);
         Mockito.when(mockSchNode.getQName())
                 .thenReturn(QName.create("ns", new SimpleDateFormat("yyyy-MM-dd").format(new Date()), origKey));

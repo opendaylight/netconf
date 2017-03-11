@@ -99,8 +99,7 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
         assertTrue(outputJson.contains("</cont>"));
     }
 
-    private NormalizedNodeContext prepareNNCLeafList()
-            throws URISyntaxException {
+    private static NormalizedNodeContext prepareNNCLeafList() throws URISyntaxException {
         final QName cont = QName.create("instance:identifier:module", "2014-01-17",
                 "cont");
         final QName cont1 = QName.create("instance:identifier:module", "2014-01-17",
@@ -145,7 +144,7 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
         dataCont.withChild(dataCont1.build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<DataSchemaNode>(null, schemaCont,
+                new InstanceIdentifierContext<>(null, schemaCont,
                         null, schemaContext), dataCont.build());
 
         return testNormalizedNodeContext;
@@ -194,7 +193,7 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
         assertTrue(outputJson.contains("</lst11></cont1></cont>"));
     }
 
-    private NormalizedNodeContext preparNNC() {
+    private static NormalizedNodeContext preparNNC() {
         final QName cont = QName.create("instance:identifier:module", "2014-01-17",
                 "cont");
         final QName cont1 = QName.create("instance:identifier:module", "2014-01-17",
@@ -249,14 +248,13 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
         dataCont.withChild(dataCont1.build());
 
         final NormalizedNodeContext testNormalizedNodeContext = new NormalizedNodeContext(
-                new InstanceIdentifierContext<DataSchemaNode>(null, schemaCont,
+                new InstanceIdentifierContext<>(null, schemaCont,
                         null, schemaContext), dataCont.build());
 
         return testNormalizedNodeContext;
     }
 
-    private DataContainerChild<?, ?> buildLeaf(final DataSchemaNode lst11Schema,
-            final QName qname,
+    private static DataContainerChild<?, ?> buildLeaf(final DataSchemaNode lst11Schema, final QName qname,
             final CollectionNodeBuilder<MapEntryNode, MapNode> dataLst11, final Object value) {
 
         final List<DataSchemaNode> instanceLf = ControllerContext
