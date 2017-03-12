@@ -10,7 +10,6 @@ package org.opendaylight.restconf.utils.parser;
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
@@ -26,6 +25,7 @@ import org.opendaylight.restconf.parser.IdentifierCodec;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.restconf.utils.validation.RestconfValidation;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
@@ -107,7 +107,7 @@ public final class ParserIdentifier {
                     break;
                 }
             }
-            return new InstanceIdentifierContext<RpcDefinition>(mountYangInstanceIdentifier, def, mountPoint.get(),
+            return new InstanceIdentifierContext<>(mountYangInstanceIdentifier, def, mountPoint.get(),
                     mountPoint.get().getSchemaContext());
         } else {
             final YangInstanceIdentifier deserialize = IdentifierCodec.deserialize(identifier, schemaContext);
@@ -124,7 +124,7 @@ public final class ParserIdentifier {
                     break;
                 }
             }
-            return new InstanceIdentifierContext<RpcDefinition>(deserialize, def, null, schemaContext);
+            return new InstanceIdentifierContext<>(deserialize, def, null, schemaContext);
         }
     }
 
@@ -166,27 +166,24 @@ public final class ParserIdentifier {
             moduleNameAndRevision = identifier;
         }
 
-        final Splitter splitter = Splitter.on(RestconfConstants.SLASH);
-        final Iterable<String> split = splitter.split(moduleNameAndRevision);
-        final List<String> pathArgs = Lists.newArrayList(split);
+        final List<String> pathArgs = RestconfConstants.SLASH_SPLITTER.splitToList(moduleNameAndRevision);
         if (pathArgs.size() != 2) {
-            LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' " + identifier);
+            LOG.debug("URI has bad format '{}'. It should be 'moduleName/yyyy-MM-dd'", identifier);
             throw new RestconfDocumentedException(
                     "URI has bad format. End of URI should be in format \'moduleName/yyyy-MM-dd\'", ErrorType.PROTOCOL,
                     ErrorTag.INVALID_VALUE);
         }
 
+        final Date moduleRevision;
         try {
-            final String moduleName = pathArgs.get(0);
-            final String revision = pathArgs.get(1);
-            final Date moduleRevision = RestconfConstants.REVISION_FORMAT.parse(revision);
-
-            return QName.create(null, moduleRevision, moduleName);
+            moduleRevision = SimpleDateFormatUtil.getRevisionFormat().parse(pathArgs.get(1));
         } catch (final ParseException e) {
-            LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' " + identifier);
+            LOG.debug("URI has bad format: '{}'. It should be 'moduleName/yyyy-MM-dd'", identifier);
             throw new RestconfDocumentedException("URI has bad format. It should be \'moduleName/yyyy-MM-dd\'",
                     ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
+
+        return QName.create(null, moduleRevision, pathArgs.get(0));
     }
 
     /**

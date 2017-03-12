@@ -334,7 +334,7 @@ public class NetconfDeviceSimulator implements Closeable {
     private void addModuleCapability(final SharedSchemaRepository consumer, final Set<Capability> capabilities, final Module module) {
         final SourceIdentifier moduleSourceIdentifier = SourceIdentifier.create(module.getName(),
                 (SimpleDateFormatUtil.DEFAULT_DATE_REV == module.getRevision() ? Optional.<String>absent() :
-                        Optional.of(SimpleDateFormatUtil.getRevisionFormat().format(module.getRevision()))));
+                        Optional.of(module.getQNameModule().getFormattedRevision())));
         try {
             final String moduleContent = new String(consumer.getSchemaSource(moduleSourceIdentifier, YangTextSchemaSource.class)
                     .checkedGet().read());

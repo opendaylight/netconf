@@ -116,7 +116,7 @@ public final class RestconfMappingNodeUtil {
         addCommonLeafs(module, mapEntryBuilder, ietfYangLibraryModule);
         addChildOfModuleBySpecificModuleInternal(
                 IetfYangLibrary.SPECIFIC_MODULE_SCHEMA_LEAF_QNAME, mapEntryBuilder, IetfYangLibrary.BASE_URI_OF_SCHEMA
-                        + module.getName() + "/" + new SimpleDateFormat("yyyy-MM-dd").format(module.getRevision()),
+                        + module.getName() + "/" + module.getQNameModule().getFormattedRevision(),
                 ietfYangLibraryModule);
         if (!isSubmodule) {
             addChildOfModuleBySpecificModuleOfListChild(IetfYangLibrary.SPECIFIC_MODULE_NAMESPACE_LEAF_QNAME,
@@ -246,7 +246,7 @@ public final class RestconfMappingNodeUtil {
         addChildOfModuleBySpecificModuleInternal(IetfYangLibrary.SPECIFIC_MODULE_NAME_LEAF_QNAME, mapEntryBuilder,
                 module.getName(), ietfYangLibraryModule);
         addChildOfModuleBySpecificModuleInternal(IetfYangLibrary.SPECIFIC_MODULE_REVISION_LEAF_QNAME, mapEntryBuilder,
-                new SimpleDateFormat("yyyy-MM-dd").format(module.getRevision()), ietfYangLibraryModule);
+                module.getQNameModule().getFormattedRevision(), ietfYangLibraryModule);
     }
 
     /**

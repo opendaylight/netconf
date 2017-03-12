@@ -8,7 +8,6 @@
 
 package org.opendaylight.restconf.utils.schema.context;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,6 +16,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 /**
@@ -48,7 +48,7 @@ public class RestconfSchemaUtilTest {
     private static SchemaNode mockSchemaNode(final String origKey) {
         final SchemaNode mockSchNode = Mockito.mock(SchemaNode.class);
         Mockito.when(mockSchNode.getQName())
-                .thenReturn(QName.create("ns", new SimpleDateFormat("yyyy-MM-dd").format(new Date()), origKey));
+                .thenReturn(QName.create("ns", SimpleDateFormatUtil.getRevisionFormat().format(new Date()), origKey));
         return mockSchNode;
     }
 }

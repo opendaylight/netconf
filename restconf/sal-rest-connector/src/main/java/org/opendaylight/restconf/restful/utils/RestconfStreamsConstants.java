@@ -10,7 +10,6 @@ package org.opendaylight.restconf.restful.utils;
 import com.google.common.collect.Sets;
 import java.net.URI;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -21,6 +20,7 @@ import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.restconf.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +74,7 @@ public final class RestconfStreamsConstants {
     static {
         Date eventSubscriptionAugRevision;
         try {
-            eventSubscriptionAugRevision = new SimpleDateFormat("yyyy-MM-dd").parse("2014-07-08");
+            eventSubscriptionAugRevision = SimpleDateFormatUtil.getRevisionFormat().parse("2014-07-08");
         } catch (final ParseException e) {
             final String errMsg = "It wasn't possible to convert revision date of sal-remote-augment to date";
             LOG.debug(errMsg);

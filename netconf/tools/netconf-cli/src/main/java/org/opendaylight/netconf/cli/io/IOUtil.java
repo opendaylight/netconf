@@ -15,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opendaylight.netconf.cli.reader.ReadingException;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -35,9 +36,8 @@ public class IOUtil {
     }
 
     public static Date parseDate(final String revision) {
-        final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         try {
-            return formatter.parse(revision);
+            return SimpleDateFormatUtil.getRevisionFormat().parse(revision);
         } catch (final ParseException e) {
             throw new IllegalArgumentException("Date not valid", e);
         }

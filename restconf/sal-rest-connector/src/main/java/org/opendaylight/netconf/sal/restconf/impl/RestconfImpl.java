@@ -68,6 +68,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -118,8 +119,6 @@ public class RestconfImpl implements RestconfService {
 
     private static final int CHAR_NOT_FOUND = -1;
 
-    private static final SimpleDateFormat REVISION_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
     private static final String SAL_REMOTE_NAMESPACE = "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote";
 
     private BrokerFacade broker;
@@ -158,7 +157,7 @@ public class RestconfImpl implements RestconfService {
 
     static {
         try {
-            final Date eventSubscriptionAugRevision = new SimpleDateFormat("yyyy-MM-dd").parse("2014-07-08");
+            final Date eventSubscriptionAugRevision = SimpleDateFormatUtil.getRevisionFormat().parse("2014-07-08");
             NETCONF_BASE_QNAME =
                     QName.create(QNameModule.create(new URI(NETCONF_BASE), null), NETCONF_BASE_PAYLOAD_NAME);
             SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT, eventSubscriptionAugRevision);
@@ -418,7 +417,7 @@ public class RestconfImpl implements RestconfService {
         try {
             final String moduleName = pathArgs.get(0);
             final String revision = pathArgs.get(1);
-            final Date moduleRevision = REVISION_FORMAT.parse(revision);
+            final Date moduleRevision = SimpleDateFormatUtil.getRevisionFormat().parse(revision);
             return QName.create(null, moduleRevision, moduleName);
         } catch (final ParseException e) {
             LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' " + identifier);
@@ -1427,7 +1426,7 @@ public class RestconfImpl implements RestconfService {
                 ControllerContext.findInstanceDataChildrenByName(listModuleSchemaNode, "revision");
         final DataSchemaNode revisionSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(revisionSchemaNode instanceof LeafSchemaNode);
-        final String revision = REVISION_FORMAT.format(module.getRevision());
+        final String revision = module.getQNameModule().getFormattedRevision();
         moduleNodeValues
                 .withChild(Builders.leafBuilder((LeafSchemaNode) revisionSchemaNode).withValue(revision).build());
 

@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
@@ -32,6 +31,7 @@ import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -61,7 +61,7 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
     private static QNameModule initializeInstanceIdentifierModule() {
         try {
             return QNameModule.create(URI.create("instance:identifier:module"),
-                    new SimpleDateFormat("yyyy-MM-dd").parse("2014-01-17"));
+                SimpleDateFormatUtil.getRevisionFormat().parse("2014-01-17"));
         } catch (final ParseException e) {
             throw new Error(e);
         }

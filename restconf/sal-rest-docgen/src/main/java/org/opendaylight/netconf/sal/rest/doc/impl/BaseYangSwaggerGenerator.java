@@ -91,7 +91,7 @@ public class BaseYangSwaggerGenerator {
         LOG.info("Modules found [{}]", modules.size());
 
         for (final Module module : modules) {
-            final String revisionString = SimpleDateFormatUtil.getRevisionFormat().format(module.getRevision());
+            final String revisionString = module.getQNameModule().getFormattedRevision();
             final Resource resource = new Resource();
             LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
             final ApiDeclaration doc =

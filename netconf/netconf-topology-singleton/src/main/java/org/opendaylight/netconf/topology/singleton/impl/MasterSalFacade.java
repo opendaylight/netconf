@@ -155,7 +155,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
                 remoteSchemaContext.getAllModuleIdentifiers().stream().map(mi ->
                         RevisionSourceIdentifier.create(mi.getName(),
                             (SimpleDateFormatUtil.DEFAULT_DATE_REV == mi.getRevision() ? Optional.<String>absent() :
-                                    Optional.of(SimpleDateFormatUtil.getRevisionFormat().format(mi.getRevision())))))
+                                    Optional.of(mi.getQNameModule().getFormattedRevision()))))
                         .collect(Collectors.toList());
 
         // send initial data to master actor and create actor for providing it

@@ -14,7 +14,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.net.URI;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Set;
 import org.junit.Before;
@@ -29,6 +28,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -80,7 +80,7 @@ public class ParserFieldsParameterTest {
                 YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/jukebox"));
 
         final QNameModule qNameModule = QNameModule.create(URI.create("http://example.com/ns/example-jukebox"),
-                new SimpleDateFormat("yyyy-MM-dd").parse("2015-04-04"));
+            SimpleDateFormatUtil.getRevisionFormat().parse("2015-04-04"));
 
         this.jukeboxQName = QName.create(qNameModule, "jukebox");
         this.playerQName = QName.create(qNameModule, "player");
@@ -88,7 +88,7 @@ public class ParserFieldsParameterTest {
         this.augmentedLibraryQName = QName.create(
                 QNameModule.create(
                         URI.create("http://example.com/ns/augmented-jukebox"),
-                        new SimpleDateFormat("yyyy-MM-dd").parse("2016-05-05")),
+                        SimpleDateFormatUtil.getRevisionFormat().parse("2016-05-05")),
                 "augmented-library");
         this.albumQName = QName.create(qNameModule, "album");
         this.nameQName = QName.create(qNameModule, "name");

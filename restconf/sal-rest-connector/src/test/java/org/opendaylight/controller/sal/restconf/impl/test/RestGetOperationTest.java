@@ -27,7 +27,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -61,6 +60,7 @@ import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -201,7 +201,7 @@ public class RestGetOperationTest extends JerseyTest {
      * @throws ParseException
      */
     @Test
-    public void getDataWithSlashesBehindMountPoint() throws Exception {
+    public void getDataWithSlashesBehindMountPoint() throws ParseException {
         final YangInstanceIdentifier awaitedInstanceIdentifier = prepareInstanceIdentifierForList();
         when(brokerFacade.readConfigurationData(any(DOMMountPoint.class), eq(awaitedInstanceIdentifier),
                 Mockito.anyString())).thenReturn(prepareCnDataForSlashesBehindMountPointTest());
@@ -216,7 +216,7 @@ public class RestGetOperationTest extends JerseyTest {
         assertEquals(200, get(uri, MediaType.APPLICATION_XML));
     }
 
-    private static YangInstanceIdentifier prepareInstanceIdentifierForList() throws Exception {
+    private static YangInstanceIdentifier prepareInstanceIdentifierForList() throws ParseException {
         final List<PathArgument> parameters = new ArrayList<>();
 
         final QName qNameCont = newTestModuleQName("cont");
@@ -230,9 +230,9 @@ public class RestGetOperationTest extends JerseyTest {
         return YangInstanceIdentifier.create(parameters);
     }
 
-    private static QName newTestModuleQName(final String localPart) throws Exception {
-        final Date revision = new SimpleDateFormat("yyyy-MM-dd").parse("2014-01-09");
-        final URI uri = new URI("test:module");
+    private static QName newTestModuleQName(final String localPart) throws ParseException {
+        final Date revision = SimpleDateFormatUtil.getRevisionFormat().parse("2014-01-09");
+        final URI uri = URI.create("test:module");
         return QName.create(uri, revision, localPart);
     }
 

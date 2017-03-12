@@ -31,7 +31,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.module.submodules.SubmoduleBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
@@ -113,7 +112,7 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCl
         // TODO Conformance type is always set to Implement value, but it should it really be like this?
         // TODO Add also deviations and features lists to module entries
         moduleBuilder.setName(new YangIdentifier(module.getName()))
-                .setRevision(new OptionalRevision(SimpleDateFormatUtil.getRevisionFormat().format(module.getRevision())))
+                .setRevision(new OptionalRevision(module.getQNameModule().getFormattedRevision()))
                 .setNamespace(new Uri(module.getNamespace().toString()))
                 .setConformanceType(ConformanceType.Implement)
                 .setSubmodules(createSubmodulesForModule(module));
@@ -126,7 +125,7 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCl
         for (final Module subModule : module.getSubmodules()) {
             final SubmoduleBuilder subModuleEntryBuilder = new SubmoduleBuilder();
             subModuleEntryBuilder.setName(new YangIdentifier(subModule.getName()))
-                    .setRevision(new OptionalRevision(SimpleDateFormatUtil.getRevisionFormat().format(subModule.getRevision())));
+                    .setRevision(new OptionalRevision(subModule.getQNameModule().getFormattedRevision()));
             submodulesList.add(subModuleEntryBuilder.build());
         }
 

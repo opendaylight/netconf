@@ -112,7 +112,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
 
         final SourceIdentifier moduleSourceIdentifier = SourceIdentifier.create(module.getName(),
                 (SimpleDateFormatUtil.DEFAULT_DATE_REV == module.getRevision() ? Optional.absent() :
-                        Optional.of(SimpleDateFormatUtil.getRevisionFormat().format(module.getRevision()))));
+                        Optional.of(module.getQNameModule().getFormattedRevision())));
 
         InputStream sourceStream = null;
         String source;

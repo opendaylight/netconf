@@ -18,7 +18,7 @@ import com.google.common.collect.Lists;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.text.SimpleDateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,6 +36,7 @@ import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev14070
 import org.opendaylight.yangtools.util.SingletonSet;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -50,6 +51,15 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 public class NotificationListenerTest {
+    private static final QNameModule MODULE;
+    static {
+        try {
+            MODULE = QNameModule.create(URI.create("notifi:mod"),
+                SimpleDateFormatUtil.getRevisionFormat().parse("2016-11-23"));
+        } catch (ParseException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
 
     private SchemaContext schmeaCtx;
 
@@ -62,13 +72,11 @@ public class NotificationListenerTest {
 
     @Test
     public void notifi_leafTest() throws Exception {
-        final QNameModule moduleQName =
-                QNameModule.create(new URI("notifi:mod"), new SimpleDateFormat("yyyy-MM-dd").parse("2016-11-23"));
-        final SchemaPath schemaPathNotifi = SchemaPath.create(false, QName.create(moduleQName, "notifi-leaf"));
+        final SchemaPath schemaPathNotifi = SchemaPath.create(false, QName.create(MODULE, "notifi-leaf"));
 
         final DOMNotification notificationData = mock(DOMNotification.class);
 
-        final LeafNode leaf = mockLeaf(QName.create(moduleQName, "lf"));
+        final LeafNode leaf = mockLeaf(QName.create(MODULE, "lf"));
         final ContainerNode notifiBody = mockCont(schemaPathNotifi.getLastComponent(), leaf);
 
         when(notificationData.getType()).thenReturn(schemaPathNotifi);
@@ -84,16 +92,12 @@ public class NotificationListenerTest {
 
     @Test
     public void notifi_cont_leafTest() throws Exception {
-        final QNameModule moduleQName =
-                QNameModule.create(new URI("notifi:mod"), new SimpleDateFormat("yyyy-MM-dd").parse("2016-11-23"));
-
-        final SchemaPath schemaPathNotifi =
-                SchemaPath.create(false, QName.create(moduleQName, "notifi-cont"));
+        final SchemaPath schemaPathNotifi = SchemaPath.create(false, QName.create(MODULE, "notifi-cont"));
 
         final DOMNotification notificationData = mock(DOMNotification.class);
 
-        final LeafNode leaf = mockLeaf(QName.create(moduleQName, "lf"));
-        final ContainerNode cont = mockCont(QName.create(moduleQName, "cont"), leaf);
+        final LeafNode leaf = mockLeaf(QName.create(MODULE, "lf"));
+        final ContainerNode cont = mockCont(QName.create(MODULE, "cont"), leaf);
         final ContainerNode notifiBody = mockCont(schemaPathNotifi.getLastComponent(), cont);
 
         when(notificationData.getType()).thenReturn(schemaPathNotifi);
@@ -110,17 +114,14 @@ public class NotificationListenerTest {
 
     @Test
     public void notifi_list_Test() throws Exception {
-        final QNameModule moduleQName =
-                QNameModule.create(new URI("notifi:mod"), new SimpleDateFormat("yyyy-MM-dd").parse("2016-11-23"));
-
-        final SchemaPath schemaPathNotifi = SchemaPath.create(false, QName.create(moduleQName, "notifi-list"));
+        final SchemaPath schemaPathNotifi = SchemaPath.create(false, QName.create(MODULE, "notifi-list"));
 
         final DOMNotification notificationData = mock(DOMNotification.class);
 
-        final LeafNode leaf = mockLeaf(QName.create(moduleQName, "lf"));
-        final MapEntryNode entry = mockMapEntry(QName.create(moduleQName, "lst"), leaf);
-        final MapNode list = mockList(QName.create(moduleQName, "lst"), entry);
-        final ContainerNode cont = mockCont(QName.create(moduleQName, "cont"), list);
+        final LeafNode leaf = mockLeaf(QName.create(MODULE, "lf"));
+        final MapEntryNode entry = mockMapEntry(QName.create(MODULE, "lst"), leaf);
+        final MapNode list = mockList(QName.create(MODULE, "lst"), entry);
+        final ContainerNode cont = mockCont(QName.create(MODULE, "cont"), list);
         final ContainerNode notifiBody = mockCont(schemaPathNotifi.getLastComponent(), cont);
 
         when(notificationData.getType()).thenReturn(schemaPathNotifi);
@@ -137,14 +138,11 @@ public class NotificationListenerTest {
 
     @Test
     public void notifi_grpTest() throws Exception {
-        final QNameModule moduleQName =
-                QNameModule.create(new URI("notifi:mod"), new SimpleDateFormat("yyyy-MM-dd").parse("2016-11-23"));
-
-        final SchemaPath schemaPathNotifi = SchemaPath.create(false, QName.create(moduleQName, "notifi-grp"));
+        final SchemaPath schemaPathNotifi = SchemaPath.create(false, QName.create(MODULE, "notifi-grp"));
 
         final DOMNotification notificationData = mock(DOMNotification.class);
 
-        final LeafNode leaf = mockLeaf(QName.create(moduleQName, "lf"));
+        final LeafNode leaf = mockLeaf(QName.create(MODULE, "lf"));
         final ContainerNode notifiBody = mockCont(schemaPathNotifi.getLastComponent(), leaf);
 
         when(notificationData.getType()).thenReturn(schemaPathNotifi);
@@ -159,14 +157,11 @@ public class NotificationListenerTest {
 
     @Test
     public void notifi_augmTest() throws Exception {
-        final QNameModule moduleQName =
-                QNameModule.create(new URI("notifi:mod"), new SimpleDateFormat("yyyy-MM-dd").parse("2016-11-23"));
-
-        final SchemaPath schemaPathNotifi = SchemaPath.create(false, QName.create(moduleQName, "notifi-augm"));
+        final SchemaPath schemaPathNotifi = SchemaPath.create(false, QName.create(MODULE, "notifi-augm"));
 
         final DOMNotification notificationData = mock(DOMNotification.class);
 
-        final LeafNode leaf = mockLeaf(QName.create(moduleQName, "lf-augm"));
+        final LeafNode leaf = mockLeaf(QName.create(MODULE, "lf-augm"));
         final AugmentationNode augm = mockAugm(leaf);
         final ContainerNode notifiBody = mockCont(schemaPathNotifi.getLastComponent(), augm);
 
