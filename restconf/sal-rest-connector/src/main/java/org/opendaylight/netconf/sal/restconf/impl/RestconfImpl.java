@@ -27,10 +27,10 @@ import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -68,6 +68,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -158,10 +159,10 @@ public class RestconfImpl implements RestconfService {
 
     static {
         try {
-            final Date eventSubscriptionAugRevision = new SimpleDateFormat("yyyy-MM-dd").parse("2014-07-08");
             NETCONF_BASE_QNAME =
                     QName.create(QNameModule.create(new URI(NETCONF_BASE), null), NETCONF_BASE_PAYLOAD_NAME);
-            SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT, eventSubscriptionAugRevision);
+            SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT,
+                SimpleDateFormatUtil.getRevisionFormat().parse("2014-07-08"));
             SAL_REMOTE_AUG_IDENTIFIER = new YangInstanceIdentifier.AugmentationIdentifier(Sets.newHashSet(
                     QName.create(SAL_REMOTE_AUGMENT, "scope"), QName.create(SAL_REMOTE_AUGMENT, "datastore"),
                     QName.create(SAL_REMOTE_AUGMENT, "notification-output-type")));
@@ -418,8 +419,7 @@ public class RestconfImpl implements RestconfService {
         try {
             final String moduleName = pathArgs.get(0);
             final String revision = pathArgs.get(1);
-            final Date moduleRevision = REVISION_FORMAT.parse(revision);
-            return QName.create(null, moduleRevision, moduleName);
+            return QName.create(null, REVISION_FORMAT.parse(revision), moduleName);
         } catch (final ParseException e) {
             LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' " + identifier);
             throw new RestconfDocumentedException("URI has bad format. It should be \'moduleName/yyyy-MM-dd\'",
@@ -1085,8 +1085,8 @@ public class RestconfImpl implements RestconfService {
         boolean startTime_used = false;
         boolean stopTime_used = false;
         boolean filter_used = false;
-        Date start = null;
-        Date stop = null;
+        Instant start = null;
+        Instant stop = null;
         String filter = null;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
@@ -1149,7 +1149,7 @@ public class RestconfImpl implements RestconfService {
         throw new RestconfDocumentedException(msg);
     }
 
-    private static Date parseDateFromQueryParam(final Entry<String, List<String>> entry) {
+    private static Instant parseDateFromQueryParam(final Entry<String, List<String>> entry) {
         final DateAndTime event = new DateAndTime(entry.getValue().iterator().next());
         String numOf_ms = "";
         final String value = event.getValue();
@@ -1168,6 +1168,7 @@ public class RestconfImpl implements RestconfService {
         final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss" + numOf_ms + zone);
 
         try {
+            // FIXME: just run the regular expression and parse the parts, constructing an Instant
             return dateFormatter.parse(value.contains("Z") ? value.replace('T', ' ').substring(0, value.indexOf("Z"))
                     : value.replace('T', ' '));
         } catch (final ParseException e) {
@@ -1205,11 +1206,11 @@ public class RestconfImpl implements RestconfService {
      * @param start
      *            - start-time of getting notification
      * @param filter
-     *            - indicate wh ich subset of allpossible events are of interest
+     *            - indicate which subset of all possible events are of interest
      * @return {@link URI} of location
      */
-    private URI notifStream(final String identifier, final UriInfo uriInfo, final Date start, final Date stop,
-            final String filter) {
+    private URI notifStream(final String identifier, final UriInfo uriInfo, final Instant start,
+            final Instant stop, final String filter) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -1222,7 +1223,7 @@ public class RestconfImpl implements RestconfService {
 
         for (final NotificationListenerAdapter listener : listeners) {
             this.broker.registerToListenNotification(listener);
-            listener.setQueryParams(start, stop, filter);
+            listener.setQueryParams(start, java.util.Optional.ofNullable(stop), java.util.Optional.ofNullable(filter));
         }
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
@@ -1254,7 +1255,7 @@ public class RestconfImpl implements RestconfService {
      *            - indicate which subset of all possible events are of interest
      * @return {@link URI} of location
      */
-    private URI dataSubs(final String identifier, final UriInfo uriInfo, final Date start, final Date stop,
+    private URI dataSubs(final String identifier, final UriInfo uriInfo, final Instant start, final Instant stop,
             final String filter) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
@@ -1266,7 +1267,7 @@ public class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException("Stream was not found.", ErrorType.PROTOCOL,
                     ErrorTag.UNKNOWN_ELEMENT);
         }
-        listener.setQueryParams(start, stop, filter);
+        listener.setQueryParams(start, java.util.Optional.ofNullable(stop), java.util.Optional.ofNullable(filter));
 
         final Map<String, String> paramToValues = resolveValuesFromUri(identifier);
         final LogicalDatastoreType datastore =
