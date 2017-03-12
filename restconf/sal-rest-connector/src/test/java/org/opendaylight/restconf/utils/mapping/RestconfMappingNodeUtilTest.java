@@ -12,10 +12,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -142,7 +142,7 @@ public class RestconfMappingNodeUtilTest {
     public void toStreamEntryNodeTest() throws Exception {
         final YangInstanceIdentifier path =
                 ParserIdentifier.toInstanceIdentifier("nested-module:depth1-cont/depth2-leaf1", schemaContextMonitoring, null).getInstanceIdentifier();
-        final Date start = new Date();
+        final Instant start = Instant.now();
         final String outputType = "XML";
         final URI uri = new URI("uri");
         final Module monitoringModule = schemaContextMonitoring
@@ -160,7 +160,7 @@ public class RestconfMappingNodeUtilTest {
 
     @Test
     public void toStreamEntryNodeNotifiTest() throws Exception {
-        final Date start = new Date();
+        final Instant start = Instant.now();
         final String outputType = "JSON";
         final URI uri = new URI("uri");
         final Module monitoringModule = schemaContextMonitoring
@@ -172,20 +172,19 @@ public class RestconfMappingNodeUtilTest {
 
         final QName notifiQName = QName.create("urn:nested:module", "2014-06-3", "notifi");
         final NormalizedNode mappedData =
-                RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(notifiQName, schemaContextMonitoring.getNotifications(), start,
-                        outputType, uri, monitoringModule, exist);
+                RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(notifiQName,
+                    schemaContextMonitoring.getNotifications(), start, outputType, uri, monitoringModule, exist);
         assertNotNull(mappedData);
         testData(map, mappedData);
     }
 
-    private static Map<QName, Object> prepareMap(final String name, final URI uri, final Date start,
+    private static Map<QName, Object> prepareMap(final String name, final URI uri, final Instant start,
             final String outputType) {
         final Map<QName, Object> map = new HashMap<>();
         map.put(MonitoringModule.LEAF_NAME_STREAM_QNAME, name);
         map.put(MonitoringModule.LEAF_LOCATION_ACCESS_QNAME, uri.toString());
         map.put(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME, true);
-        map.put(MonitoringModule.LEAF_START_TIME_STREAM_QNAME,
-                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'XXX").format(start));
+        map.put(MonitoringModule.LEAF_START_TIME_STREAM_QNAME, DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(start));
         map.put(MonitoringModule.LEAF_ENCODING_ACCESS_QNAME, outputType);
         return map;
     }

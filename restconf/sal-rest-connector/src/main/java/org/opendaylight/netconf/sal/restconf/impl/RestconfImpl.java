@@ -19,18 +19,19 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -68,7 +69,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
@@ -118,13 +121,7 @@ public class RestconfImpl implements RestconfService {
 
     private static final int CHAR_NOT_FOUND = -1;
 
-    private static final SimpleDateFormat REVISION_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
     private static final String SAL_REMOTE_NAMESPACE = "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote";
-
-    private BrokerFacade broker;
-
-    private ControllerContext controllerContext;
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfImpl.class);
 
@@ -144,11 +141,23 @@ public class RestconfImpl implements RestconfService {
 
     private static final String NETCONF_BASE_PAYLOAD_NAME = "data";
 
-    private static final QName NETCONF_BASE_QNAME;
+    private static final QName NETCONF_BASE_QNAME = QName.create(QNameModule.create(URI.create(NETCONF_BASE), null),
+        NETCONF_BASE_PAYLOAD_NAME).intern();
 
     private static final QNameModule SAL_REMOTE_AUGMENT;
+    static {
+        try {
+            SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT,
+                SimpleDateFormatUtil.getRevisionFormat().parse("2014-07-08"));
+        } catch (final ParseException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
 
-    private static final YangInstanceIdentifier.AugmentationIdentifier SAL_REMOTE_AUG_IDENTIFIER;
+    private static final AugmentationIdentifier SAL_REMOTE_AUG_IDENTIFIER =
+            new AugmentationIdentifier(ImmutableSet.of(
+                QName.create(SAL_REMOTE_AUGMENT, "scope"), QName.create(SAL_REMOTE_AUGMENT, "datastore"),
+                QName.create(SAL_REMOTE_AUGMENT, "notification-output-type")));
 
     public static final CharSequence DATA_SUBSCR = "data-change-event-subscription";
     private static final CharSequence CREATE_DATA_SUBSCR = "create-" + DATA_SUBSCR;
@@ -156,24 +165,19 @@ public class RestconfImpl implements RestconfService {
     public static final CharSequence NOTIFICATION_STREAM = "notification-stream";
     private static final CharSequence CREATE_NOTIFICATION_STREAM = "create-" + NOTIFICATION_STREAM;
 
-    static {
-        try {
-            final Date eventSubscriptionAugRevision = new SimpleDateFormat("yyyy-MM-dd").parse("2014-07-08");
-            NETCONF_BASE_QNAME =
-                    QName.create(QNameModule.create(new URI(NETCONF_BASE), null), NETCONF_BASE_PAYLOAD_NAME);
-            SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT, eventSubscriptionAugRevision);
-            SAL_REMOTE_AUG_IDENTIFIER = new YangInstanceIdentifier.AugmentationIdentifier(Sets.newHashSet(
-                    QName.create(SAL_REMOTE_AUGMENT, "scope"), QName.create(SAL_REMOTE_AUGMENT, "datastore"),
-                    QName.create(SAL_REMOTE_AUGMENT, "notification-output-type")));
-        } catch (final ParseException e) {
-            final String errMsg = "It wasn't possible to convert revision date of sal-remote-augment to date";
-            LOG.debug(errMsg);
-            throw new RestconfDocumentedException(errMsg, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
-        } catch (final URISyntaxException e) {
-            final String errMsg = "It wasn't possible to create instance of URI class with " + NETCONF_BASE + " URI";
-            throw new RestconfDocumentedException(errMsg, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
-        }
-    }
+    private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
+            .appendValue(ChronoField.YEAR, 4).appendLiteral('-')
+            .appendValue(ChronoField.MONTH_OF_YEAR, 2).appendLiteral('-')
+            .appendValue(ChronoField.DAY_OF_MONTH, 2).appendLiteral('T')
+            .appendValue(ChronoField.HOUR_OF_DAY, 2).appendLiteral(':')
+            .appendValue(ChronoField.MINUTE_OF_HOUR, 2).appendLiteral(':')
+            .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+            .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true)
+            .appendOffset("+HH:MM", "Z").toFormatter();
+
+    private BrokerFacade broker;
+
+    private ControllerContext controllerContext;
 
     public void setBroker(final BrokerFacade broker) {
         this.broker = broker;
@@ -418,8 +422,7 @@ public class RestconfImpl implements RestconfService {
         try {
             final String moduleName = pathArgs.get(0);
             final String revision = pathArgs.get(1);
-            final Date moduleRevision = REVISION_FORMAT.parse(revision);
-            return QName.create(null, moduleRevision, moduleName);
+            return QName.create(null, SimpleDateFormatUtil.getRevisionFormat().parse(revision), moduleName);
         } catch (final ParseException e) {
             LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' " + identifier);
             throw new RestconfDocumentedException("URI has bad format. It should be \'moduleName/yyyy-MM-dd\'",
@@ -1085,8 +1088,8 @@ public class RestconfImpl implements RestconfService {
         boolean startTime_used = false;
         boolean stopTime_used = false;
         boolean filter_used = false;
-        Date start = null;
-        Date stop = null;
+        Instant start = null;
+        Instant stop = null;
         String filter = null;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
@@ -1149,30 +1152,16 @@ public class RestconfImpl implements RestconfService {
         throw new RestconfDocumentedException(msg);
     }
 
-    private static Date parseDateFromQueryParam(final Entry<String, List<String>> entry) {
+    private static Instant parseDateFromQueryParam(final Entry<String, List<String>> entry) {
         final DateAndTime event = new DateAndTime(entry.getValue().iterator().next());
-        String numOf_ms = "";
         final String value = event.getValue();
-        if (value.contains(".")) {
-            numOf_ms = numOf_ms + ".";
-            final int lastChar = value.contains("Z") ? value.indexOf("Z") : value.contains("+") ? value.indexOf("+")
-                    : value.contains("-") ? value.indexOf("-") : value.length();
-            for (int i = 0; i < lastChar - value.indexOf(".") - 1; i++) {
-                numOf_ms = numOf_ms + "S";
-            }
-        }
-        String zone = "";
-        if (!value.contains("Z")) {
-            zone = zone + "XXX";
-        }
-        final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss" + numOf_ms + zone);
-
+        final TemporalAccessor p;
         try {
-            return dateFormatter.parse(value.contains("Z") ? value.replace('T', ' ').substring(0, value.indexOf("Z"))
-                    : value.replace('T', ' '));
-        } catch (final ParseException e) {
-            throw new RestconfDocumentedException("Cannot parse of value in date: " + value + e);
+            p = FORMATTER.parse(value);
+        } catch (DateTimeParseException e) {
+            throw new RestconfDocumentedException("Cannot parse of value in date: " + value, e);
         }
+        return Instant.from(p);
     }
 
     /**
@@ -1205,11 +1194,11 @@ public class RestconfImpl implements RestconfService {
      * @param start
      *            - start-time of getting notification
      * @param filter
-     *            - indicate wh ich subset of allpossible events are of interest
+     *            - indicate which subset of all possible events are of interest
      * @return {@link URI} of location
      */
-    private URI notifStream(final String identifier, final UriInfo uriInfo, final Date start, final Date stop,
-            final String filter) {
+    private URI notifStream(final String identifier, final UriInfo uriInfo, final Instant start,
+            final Instant stop, final String filter) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -1222,7 +1211,7 @@ public class RestconfImpl implements RestconfService {
 
         for (final NotificationListenerAdapter listener : listeners) {
             this.broker.registerToListenNotification(listener);
-            listener.setQueryParams(start, stop, filter);
+            listener.setQueryParams(start, java.util.Optional.ofNullable(stop), java.util.Optional.ofNullable(filter));
         }
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
@@ -1254,7 +1243,7 @@ public class RestconfImpl implements RestconfService {
      *            - indicate which subset of all possible events are of interest
      * @return {@link URI} of location
      */
-    private URI dataSubs(final String identifier, final UriInfo uriInfo, final Date start, final Date stop,
+    private URI dataSubs(final String identifier, final UriInfo uriInfo, final Instant start, final Instant stop,
             final String filter) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
@@ -1266,7 +1255,7 @@ public class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException("Stream was not found.", ErrorType.PROTOCOL,
                     ErrorTag.UNKNOWN_ELEMENT);
         }
-        listener.setQueryParams(start, stop, filter);
+        listener.setQueryParams(start, java.util.Optional.ofNullable(stop), java.util.Optional.ofNullable(filter));
 
         final Map<String, String> paramToValues = resolveValuesFromUri(identifier);
         final LogicalDatastoreType datastore =
@@ -1427,7 +1416,7 @@ public class RestconfImpl implements RestconfService {
                 ControllerContext.findInstanceDataChildrenByName(listModuleSchemaNode, "revision");
         final DataSchemaNode revisionSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(revisionSchemaNode instanceof LeafSchemaNode);
-        final String revision = REVISION_FORMAT.format(module.getRevision());
+        final String revision = SimpleDateFormatUtil.getRevisionFormat().format(module.getRevision());
         moduleNodeValues
                 .withChild(Builders.leafBuilder((LeafSchemaNode) revisionSchemaNode).withValue(revision).build());
 

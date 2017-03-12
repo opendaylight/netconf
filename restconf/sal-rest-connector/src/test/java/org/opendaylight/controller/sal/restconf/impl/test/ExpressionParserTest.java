@@ -12,7 +12,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.time.Instant;
 import java.util.Collection;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -133,7 +135,7 @@ public class ExpressionParserTest {
         final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-14-12", "localName"));
         Mockito.when(path.getLastPathArgument()).thenReturn(pathValue);
         final ListenerAdapter listener = Notificator.createListener(path, "streamName", NotificationOutputType.JSON);
-        listener.setQueryParams(null, null, filter);
+        listener.setQueryParams(Instant.now(), Optional.empty(), Optional.ofNullable(filter));
 
         // FIXME: do not use reflection here
         final Class<?> superclass = listener.getClass().getSuperclass().getSuperclass();
