@@ -13,8 +13,8 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -234,14 +234,14 @@ public final class SubscribeToStreamUtil {
 
     /**
      * Parse input of query parameters - start-time or stop-time - from
-     * {@link DateAndTime} format to {@link Date} format
+     * {@link DateAndTime} format to {@link Instant} format
      *
      * @param entry
      *            - start-time or stop-time as string in {@link DateAndTime}
      *            format
-     * @return parsed {@link Date} by entry
+     * @return parsed {@link Instant} by entry
      */
-    public static Date parseDateFromQueryParam(final Entry<String, List<String>> entry) {
+    public static Instant parseDateFromQueryParam(final Entry<String, List<String>> entry) {
         final DateAndTime event = new DateAndTime(entry.getValue().iterator().next());
         String numOf_ms = "";
         final String value = event.getValue();
