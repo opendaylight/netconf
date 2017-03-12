@@ -10,11 +10,13 @@ package org.opendaylight.restconf.restful.utils;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import java.net.URI;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +71,15 @@ import org.slf4j.LoggerFactory;
 public final class SubscribeToStreamUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(SubscribeToStreamUtil.class);
+    private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
+            .appendValue(ChronoField.YEAR, 4).appendLiteral('-')
+            .appendValue(ChronoField.MONTH_OF_YEAR, 2).appendLiteral('-')
+            .appendValue(ChronoField.DAY_OF_MONTH, 2).appendLiteral('T')
+            .appendValue(ChronoField.HOUR_OF_DAY, 2).appendLiteral(':')
+            .appendValue(ChronoField.MINUTE_OF_HOUR, 2).appendLiteral(':')
+            .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+            .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true)
+            .appendOffset("+HH:MM", "Z").toFormatter();
 
     private SubscribeToStreamUtil() {
         throw new UnsupportedOperationException("Util class");
@@ -234,37 +245,24 @@ public final class SubscribeToStreamUtil {
 
     /**
      * Parse input of query parameters - start-time or stop-time - from
-     * {@link DateAndTime} format to {@link Date} format
+     * {@link DateAndTime} format to {@link Instant} format
      *
      * @param entry
      *            - start-time or stop-time as string in {@link DateAndTime}
      *            format
-     * @return parsed {@link Date} by entry
+     * @return parsed {@link Instant} by entry
      */
-    public static Date parseDateFromQueryParam(final Entry<String, List<String>> entry) {
+    public static Instant parseDateFromQueryParam(final Entry<String, List<String>> entry) {
         final DateAndTime event = new DateAndTime(entry.getValue().iterator().next());
-        String numOf_ms = "";
         final String value = event.getValue();
-        if (value.contains(".")) {
-            numOf_ms = numOf_ms + ".";
-            final int lastChar = value.contains("Z") ? value.indexOf("Z") : (value.contains("+") ? value.indexOf("+")
-                    : (value.contains("-") ? value.indexOf("-") : value.length()));
-            for (int i = 0; i < (lastChar - value.indexOf(".") - 1); i++) {
-                numOf_ms = numOf_ms + "S";
-            }
-        }
-        String zone = "";
-        if (!value.contains("Z")) {
-            zone = zone + "XXX";
-        }
-        final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss" + numOf_ms + zone);
-
+        final TemporalAccessor p;
         try {
-            return dateFormatter.parse(value.contains("Z") ? value.replace('T', ' ').substring(0, value.indexOf("Z"))
-                    : value.replace('T', ' '));
-        } catch (final ParseException e) {
-            throw new RestconfDocumentedException("Cannot parse of value in date: " + value + e);
+            p = FORMATTER.parse(value);
+        } catch (DateTimeParseException e) {
+            throw new RestconfDocumentedException("Cannot parse of value in date: " + value, e);
         }
+        return Instant.from(p);
+
     }
 
     @SuppressWarnings("rawtypes")
@@ -297,8 +295,7 @@ public final class SubscribeToStreamUtil {
      */
     public static Map<String, String> mapValuesFromUri(final String identifier) {
         final HashMap<String, String> result = new HashMap<>();
-        final String[] tokens = identifier.split(String.valueOf(RestconfConstants.SLASH));
-        for (final String token : tokens) {
+        for (final String token : RestconfConstants.SLASH_SPLITTER.split(identifier)) {
             final String[] paramToken = token.split(String.valueOf(RestconfStreamsConstants.EQUAL));
             if (paramToken.length == 2) {
                 result.put(paramToken[0], paramToken[1]);

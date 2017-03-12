@@ -14,11 +14,11 @@ import static org.opendaylight.restconf.restful.utils.RestconfStreamsConstants.S
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.TimeZone;
 import javax.annotation.Nonnull;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -58,7 +58,8 @@ import org.slf4j.LoggerFactory;
  */
 public class RestconfDataServiceImpl implements RestconfDataService {
 
-    private final static Logger LOG = LoggerFactory.getLogger(RestconfDataServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfDataServiceImpl.class);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
 
     private final SchemaContextHandler schemaContextHandler;
     private final TransactionChainHandler transactionChainHandler;
@@ -104,11 +105,11 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
         boolean tagged = false;
         if (withDefa_used) {
-            if (withDefa.equals("report-all-tagged")) {
+            if ("report-all-tagged".equals(withDefa)) {
                 tagged = true;
                 withDefa = null;
             }
-            if (withDefa.equals("report-all")) {
+            if ("report-all".equals(withDefa)) {
                 withDefa = null;
             }
         }
@@ -143,26 +144,18 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                     RestconfError.ErrorType.PROTOCOL,
                     RestconfError.ErrorTag.DATA_MISSING);
         }
-        final SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
-        dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
-        final String etag = '"' + node.getNodeType().getModule().getFormattedRevision()
-                + node.getNodeType().getLocalName() + '"';
-        final Response resp;
 
         if ((parameters.getContent().equals(RestconfDataServiceConstant.ReadData.ALL))
                     || parameters.getContent().equals(RestconfDataServiceConstant.ReadData.CONFIG)) {
-            resp = Response.status(200)
+            return Response.status(200)
                     .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
-                    .header("ETag", etag)
-                    .header("Last-Modified", dateFormatGmt.format(new Date()))
-                    .build();
-        } else {
-            resp = Response.status(200)
-                    .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
+                    .header("ETag", '"' + node.getNodeType().getModule().getFormattedRevision()
+                        + node.getNodeType().getLocalName() + '"')
+                    .header("Last-Modified", FORMATTER.format(LocalDateTime.now(Clock.systemUTC())))
                     .build();
         }
 
-        return resp;
+        return Response.status(200).entity(new NormalizedNodeContext(instanceIdentifier, node, parameters)).build();
     }
 
     @Override
@@ -341,11 +334,10 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
             return domDataBrokerService.get().createTransactionChain(RestConnectorProvider.transactionListener);
-        } else {
-            final String errMsg = "DOM data broker service isn't available for mount point "
-                    + mountPoint.getIdentifier();
-            LOG.warn(errMsg);
-            throw new RestconfDocumentedException(errMsg);
         }
+
+        final String errMsg = "DOM data broker service isn't available for mount point " + mountPoint.getIdentifier();
+        LOG.warn(errMsg);
+        throw new RestconfDocumentedException(errMsg);
     }
 }
