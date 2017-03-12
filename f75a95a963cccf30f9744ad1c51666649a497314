@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_7fc906ab",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfStateSchemas.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 656
+      },
+      "writtenOn": "2017-03-12T08:15:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_04fb4d47",
+      "range": {
+        "startLine": 203,
+        "startChar": 20,
+        "endLine": 203,
+        "endChar": 25
+      },
+      "revId": "f75a95a963cccf30f9744ad1c51666649a497314",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_4498b51b",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfStateSchemas.java",
         "patchSetId": 7
@@ -36,6 +60,30 @@
       "writtenOn": "2017-03-11T20:31:53Z",
       "side": 1,
       "message": "this should be a debug, as it does not provide a lot in terms of which device is causing the problem -- the caller is better-equiped to log this.",
+      "range": {
+        "startLine": 241,
+        "startChar": 20,
+        "endLine": 241,
+        "endChar": 24
+      },
+      "revId": "f75a95a963cccf30f9744ad1c51666649a497314",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_5fcc02bb",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfStateSchemas.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 656
+      },
+      "writtenOn": "2017-03-12T08:15:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_4498b51b",
       "range": {
         "startLine": 241,
         "startChar": 20,
