@@ -8,11 +8,13 @@
 package org.opendaylight.restconf.restful.services.impl;
 
 import java.net.URI;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import javax.annotation.Nonnull;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
@@ -67,8 +69,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
     @Override
     public NormalizedNodeContext subscribeToStream(final String identifier, final UriInfo uriInfo) {
-        final NotificationQueryParams notificationQueryParams = new NotificationQueryParams();
-        notificationQueryParams.prepareParams(uriInfo);
+        final NotificationQueryParams notificationQueryParams = NotificationQueryParams.fromUriInfo(uriInfo);
 
         URI response = null;
         if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCR)) {
@@ -160,19 +161,24 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      * Parser and holder of query paramteres from uriInfo for notifications
      *
      */
-    public final class NotificationQueryParams {
+    public static final class NotificationQueryParams {
 
-        private Date start = null;
-        private Date stop = null;
-        private String filter = null;
+        private final Instant start;
+        private final Instant stop;
+        private final String filter;
 
-        private NotificationQueryParams() {
-
+        private NotificationQueryParams(final Instant start, final Instant stop, final String filter) {
+            this.start = start == null ? Instant.now() : start;
+            this.stop = stop;
+            this.filter = filter;
         }
 
-        private void prepareParams(final UriInfo uriInfo) {
+        static NotificationQueryParams fromUriInfo(final UriInfo uriInfo) {
+            Instant start = null;
             boolean startTime_used = false;
+            Instant stop = null;
             boolean stopTime_used = false;
+            String filter = null;
             boolean filter_used = false;
 
             for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
@@ -180,7 +186,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                     case "start-time":
                         if (!startTime_used) {
                             startTime_used = true;
-                            this.start = SubscribeToStreamUtil.parseDateFromQueryParam(entry);
+                            start = SubscribeToStreamUtil.parseDateFromQueryParam(entry);
                         } else {
                             throw new RestconfDocumentedException("Start-time parameter can be used only once.");
                         }
@@ -188,7 +194,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                     case "stop-time":
                         if (!stopTime_used) {
                             stopTime_used = true;
-                            this.stop = SubscribeToStreamUtil.parseDateFromQueryParam(entry);
+                            stop = SubscribeToStreamUtil.parseDateFromQueryParam(entry);
                         } else {
                             throw new RestconfDocumentedException("Stop-time parameter can be used only once.");
                         }
@@ -196,7 +202,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                     case "filter":
                         if (!filter_used) {
                             filter_used = true;
-                            this.filter = entry.getValue().iterator().next();
+                            filter = entry.getValue().iterator().next();
                         }
                         break;
                     default:
@@ -208,9 +214,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                 throw new RestconfDocumentedException("Stop-time parameter has to be used with start-time parameter.");
             }
 
-            if (this.start == null) {
-                this.start = new Date();
-            }
+            return new NotificationQueryParams(start, stop, filter);
         }
 
         /**
@@ -218,8 +222,8 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          *
          * @return start-time
          */
-        public Date getStart() {
-            return this.start;
+        public @Nonnull Instant getStart() {
+            return start;
         }
 
         /**
@@ -227,8 +231,8 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          *
          * @return stop-time
          */
-        public Date getStop() {
-            return this.stop;
+        public Optional<Instant> getStop() {
+            return Optional.ofNullable(stop);
         }
 
         /**
@@ -236,8 +240,8 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          *
          * @return filter
          */
-        public String getFilter() {
-            return this.filter;
+        public Optional<String> getFilter() {
+            return Optional.ofNullable(filter);
         }
     }
 
