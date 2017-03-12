@@ -32,20 +32,10 @@ abstract class AbstractBodyReaderTest {
 
     protected final static ControllerContext controllerContext = ControllerContext.getInstance();
     protected final MediaType mediaType;
-    private static Field uriField;
-    private static Field requestField;
     protected final static DOMMountPointServiceHandler mountPointServiceHandler = mock(
             DOMMountPointServiceHandler.class);
 
     AbstractBodyReaderTest() throws NoSuchFieldException, IllegalAccessException {
-        uriField = AbstractIdentifierAwareJaxRsProvider.class
-                .getDeclaredField("uriInfo");
-        uriField.setAccessible(true);
-
-        requestField = AbstractIdentifierAwareJaxRsProvider.class
-                .getDeclaredField("request");
-        requestField.setAccessible(true);
-
         mediaType = getMediaType();
 
         final Field mountPointServiceHandlerField = RestConnectorProvider.class.
@@ -75,7 +65,7 @@ abstract class AbstractBodyReaderTest {
         when(uriInfoMock.getPathParameters()).thenReturn(pathParm);
         when(uriInfoMock.getPathParameters(false)).thenReturn(pathParm);
         when(uriInfoMock.getPathParameters(true)).thenReturn(pathParm);
-        uriField.set(normalizedNodeProvider, uriInfoMock);
+        normalizedNodeProvider.setUriInfo(uriInfoMock);
 
         final Request request = mock(Request.class);
         if (isPost) {
@@ -84,7 +74,7 @@ abstract class AbstractBodyReaderTest {
             when(request.getMethod()).thenReturn("PUT");
         }
 
-        requestField.set(normalizedNodeProvider, request);
+        normalizedNodeProvider.setRequest(request);
     }
 
     protected static void checkNormalizedNodeContext(

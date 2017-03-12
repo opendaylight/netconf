@@ -7,8 +7,11 @@
  */
 package org.opendaylight.netconf.sal.streams.listeners;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import java.io.StringReader;
-import java.util.Date;
+import java.time.Instant;
+import java.util.Optional;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -45,9 +48,14 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
     }
 
     // FIXME: these should be final
-    private Date start = null;
-    private Date stop = null;
+    private Instant start = null;
+    private Instant stop = null;
     private String filter = null;
+
+    @VisibleForTesting
+    public final Instant getStart() {
+        return start;
+    }
 
     /**
      * Set query parameters for listener
@@ -59,10 +67,10 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      * @param filter
      *            - indicate which subset of all possible events are of interest
      */
-    public void setQueryParams(final Date start, final Date stop, final String filter) {
-        this.start = start;
-        this.stop = stop;
-        this.filter = filter;
+    public void setQueryParams(final Instant start, final Optional<Instant> stop, final Optional<String> filter) {
+        this.start = Preconditions.checkNotNull(start);
+        this.stop = stop.orElse(null);
+        this.filter = filter.orElse(null);
     }
 
     /**
@@ -76,7 +84,7 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      *         false otherwise
      */
     protected <T extends BaseListenerInterface> boolean checkQueryParams(final String xml, final T listener) {
-        final Date now = new Date();
+        final Instant now = Instant.now();
         if (this.stop != null) {
             if ((this.start.compareTo(now) < 0) && (this.stop.compareTo(now) > 0)) {
                 return checkFilter(xml);

@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.restful.utils;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.Date;
@@ -21,7 +21,7 @@ import org.opendaylight.restconf.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,22 @@ public final class RestconfStreamsConstants {
 
     public static final QNameModule SAL_REMOTE_AUGMENT;
 
-    public static final YangInstanceIdentifier.AugmentationIdentifier SAL_REMOTE_AUG_IDENTIFIER;
+    static {
+        final Date eventSubscriptionAugRevision;
+        try {
+            eventSubscriptionAugRevision = SimpleDateFormatUtil.getRevisionFormat().parse("2014-07-08");
+        } catch (final ParseException e) {
+            final String errMsg = "It wasn't possible to convert revision date of sal-remote-augment to date";
+            LOG.debug(errMsg);
+            throw new RestconfDocumentedException(errMsg, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
+        }
+        SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT, eventSubscriptionAugRevision)
+                .intern();
+    }
+
+    public static final AugmentationIdentifier SAL_REMOTE_AUG_IDENTIFIER = new AugmentationIdentifier(
+        ImmutableSet.of(QName.create(SAL_REMOTE_AUGMENT, "scope"), QName.create(SAL_REMOTE_AUGMENT, "datastore"),
+            QName.create(SAL_REMOTE_AUGMENT, "notification-output-type")));
 
     public static final DataChangeScope DEFAULT_SCOPE = DataChangeScope.BASE;
 
@@ -70,21 +85,6 @@ public final class RestconfStreamsConstants {
     public static final String STREAM_PATH = STREAMS_PATH + STREAM_PATH_PART;
     public static final String STREAM_ACCESS_PATH_PART = "/access=";
     public static final String STREAM_LOCATION_PATH_PART = "/location";
-
-    static {
-        Date eventSubscriptionAugRevision;
-        try {
-            eventSubscriptionAugRevision = SimpleDateFormatUtil.getRevisionFormat().parse("2014-07-08");
-        } catch (final ParseException e) {
-            final String errMsg = "It wasn't possible to convert revision date of sal-remote-augment to date";
-            LOG.debug(errMsg);
-            throw new RestconfDocumentedException(errMsg, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
-        }
-        SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT, eventSubscriptionAugRevision);
-        SAL_REMOTE_AUG_IDENTIFIER = new YangInstanceIdentifier.AugmentationIdentifier(Sets
-                .newHashSet(QName.create(SAL_REMOTE_AUGMENT, "scope"), QName.create(SAL_REMOTE_AUGMENT, "datastore"),
-                        QName.create(SAL_REMOTE_AUGMENT, "notification-output-type")));
-    }
 
     private RestconfStreamsConstants() {
         throw new UnsupportedOperationException("Util class.");

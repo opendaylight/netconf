@@ -8,9 +8,11 @@
 package org.opendaylight.restconf.utils.mapping;
 
 import java.net.URI;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Set;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.restconf.Rfc8040.IetfYangLibrary;
@@ -471,8 +473,8 @@ public final class RestconfMappingNodeUtil {
      */
     @SuppressWarnings("rawtypes")
     public static NormalizedNode mapYangNotificationStreamByIetfRestconfMonitoring(final QName notifiQName,
-            final Set<NotificationDefinition> notifications, final Date start, final String outputType, final URI uri,
-            final Module monitoringModule, final boolean existParent) {
+            final Set<NotificationDefinition> notifications, final Instant start, final String outputType,
+            final URI uri, final Module monitoringModule, final boolean existParent) {
         for (final NotificationDefinition notificationDefinition : notifications) {
             if (notificationDefinition.getQName().equals(notifiQName)) {
                 final DataSchemaNode streamListSchema = ((ContainerSchemaNode) ((ContainerSchemaNode) monitoringModule
@@ -497,7 +499,8 @@ public final class RestconfMappingNodeUtil {
                 if (start != null) {
                     prepareLeafAndFillEntryBuilder(streamEntry,
                         listSchema.getDataChildByName(MonitoringModule.LEAF_START_TIME_STREAM_QNAME),
-                        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'XXX").format(start));
+                        DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(start,
+                            ZoneId.systemDefault())));
                 }
                 prepareListAndFillEntryBuilder(streamEntry,
                         (ListSchemaNode) listSchema.getDataChildByName(MonitoringModule.LIST_ACCESS_STREAM_QNAME),
@@ -569,7 +572,7 @@ public final class RestconfMappingNodeUtil {
      */
     @SuppressWarnings("rawtypes")
     public static NormalizedNode mapDataChangeNotificationStreamByIetfRestconfMonitoring(
-            final YangInstanceIdentifier path, final Date start, final String outputType, final URI uri,
+            final YangInstanceIdentifier path, final Instant start, final String outputType, final URI uri,
             final Module monitoringModule, final boolean existParent, final SchemaContext schemaContext) {
         final SchemaNode schemaNode = ParserIdentifier
                 .toInstanceIdentifier(ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContext),
@@ -595,7 +598,7 @@ public final class RestconfMappingNodeUtil {
                 listSchema.getDataChildByName(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME), true);
         prepareLeafAndFillEntryBuilder(streamEntry,
                 listSchema.getDataChildByName(MonitoringModule.LEAF_START_TIME_STREAM_QNAME),
-                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'XXX").format(start));
+                DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(start, ZoneId.systemDefault())));
         prepareListAndFillEntryBuilder(streamEntry,
                 (ListSchemaNode) listSchema.getDataChildByName(MonitoringModule.LIST_ACCESS_STREAM_QNAME), outputType,
                 uri);

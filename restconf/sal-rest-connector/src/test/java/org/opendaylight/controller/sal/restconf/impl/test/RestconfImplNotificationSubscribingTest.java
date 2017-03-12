@@ -7,9 +7,8 @@
  */
 package org.opendaylight.controller.sal.restconf.impl.test;
 
-import java.lang.reflect.Field;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -235,16 +234,11 @@ public class RestconfImplNotificationSubscribingTest {
 
         final AsyncDataChangeEvent<YangInstanceIdentifier, NormalizedNode<?, ?>> change =
                 Mockito.mock(AsyncDataChangeEvent.class);
-        final Class<?> superclass = listener.getClass().getSuperclass().getSuperclass();
-        Field start = superclass.getDeclaredField("start");
-        start.setAccessible(true);
-        Date startOrig = (Date) start.get(listener);
+        Instant startOrig = listener.getStart();
         Assert.assertNotNull(startOrig);
         listener.onDataChanged(change);
 
-        start = superclass.getDeclaredField("start");
-        start.setAccessible(true);
-        startOrig = (Date) start.get(listener);
+        startOrig = listener.getStart();
         Assert.assertNull(startOrig);
     }
 
