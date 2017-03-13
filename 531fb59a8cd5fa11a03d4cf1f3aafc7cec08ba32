@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_721f785c",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 1120,
+      "author": {
+        "id": 5357
+      },
+      "writtenOn": "2017-03-13T13:03:30Z",
+      "side": 1,
+      "message": "changed the param name and added some documentation to the docs project:\nhttps://git.opendaylight.org/gerrit/#/c/53216/",
+      "parentUuid": "fafc7978_045cf817",
+      "range": {
+        "startLine": 1120,
+        "startChar": 22,
+        "endLine": 1120,
+        "endChar": 38
+      },
+      "revId": "531fb59a8cd5fa11a03d4cf1f3aafc7cec08ba32",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_97f875c4",
         "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/AbstractQueryParams.java",
         "patchSetId": 3
