@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_59e89416",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-14T10:40:50Z",
+      "side": 1,
+      "message": "Currently lists with simple objects (string, int, etc.)",
+      "revId": "8c195b21d3dd0704a4676092298d841565c44dc8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_99f2fc04",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-14T10:40:50Z",
+      "side": 1,
+      "message": "Yeah cool, but I don\u0027t think we need this kind of info in commit message.",
+      "revId": "8c195b21d3dd0704a4676092298d841565c44dc8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
