@@ -162,4 +162,20 @@ public class JsonPATCHBodyReaderTest extends AbstractBodyReaderTest {
                 .readFrom(null, null, null, mediaType, null, inputStream);
         checkPATCHContext(returnValue);
     }
+
+    /**
+     * Test reading simple leaf value
+     */
+    @Test
+    public void modulePATCHSimpleLeafValueTest() throws Exception {
+        final String uri = "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
+        mockBodyReader(uri, jsonPATCHBodyReader, false);
+
+        final InputStream inputStream = TestJsonBodyReader.class
+                .getResourceAsStream("/instanceidentifier/json/jsonPATCHSimpleLeafValue.json");
+
+        final PATCHContext returnValue = jsonPATCHBodyReader
+                .readFrom(null, null, null, mediaType, null, inputStream);
+        checkPATCHContext(returnValue);
+    }
 }

@@ -300,6 +300,12 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @throws IOException
      */
     private void readValueObject(@Nonnull final StringBuffer value, @Nonnull final JsonReader in) throws IOException {
+        // read simple leaf value
+        if (in.peek() == JsonToken.STRING) {
+            value.append("\"" + in.nextString() + "\"");
+            return;
+        }
+
         in.beginObject();
         value.append("{");
 
