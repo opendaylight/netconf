@@ -259,23 +259,33 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         unionTypeBuilder.addType(BaseTypes.int8Type());
         unionTypeBuilder.addType(bitsTypeBuilder.build());
         unionTypeBuilder.addType(BaseTypes.booleanType());
+        unionTypeBuilder.addType(BaseTypes.stringType());
 
         final String elName = "lfUnion";
 
+        // test int8
         final String int8 = "15";
         NormalizedNodeContext normalizedNodeContext = prepareNNC(
                 TypeDefinitionAwareCodec.from(unionTypeBuilder.build()).deserialize(int8), elName);
         nnToXml(normalizedNodeContext, "<" + elName + ">15</" + elName + ">");
 
+        // test bits
         final String bits = "first second";
         normalizedNodeContext = prepareNNC(TypeDefinitionAwareCodec.from(unionTypeBuilder.build()).deserialize(bits),
                 elName);
-        nnToXml(normalizedNodeContext, "<" + elName + ">first second</" + elName + ">");
+        nnToXml(normalizedNodeContext, "<" + elName + ">[first, second]</" + elName + ">");
 
+        // test boolean
         final String bool = "true";
         normalizedNodeContext = prepareNNC(TypeDefinitionAwareCodec.from(unionTypeBuilder.build()).deserialize(bool),
                 elName);
         nnToXml(normalizedNodeContext, "<" + elName + ">true</" + elName + ">");
+
+        // test string
+        final String s = "Hi!";
+        normalizedNodeContext = prepareNNC(TypeDefinitionAwareCodec.from(unionTypeBuilder.build()).deserialize(s),
+                elName);
+        nnToXml(normalizedNodeContext, "<" + elName + ">Hi!</" + elName + ">");
     }
 
     private NormalizedNodeContext prepareNNC(final Object object, final String name) {
