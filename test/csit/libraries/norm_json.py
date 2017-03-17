@@ -84,6 +84,7 @@ class _Decoder(_json.JSONDecoder):
 
     Based on: http://stackoverflow.com/questions/10885238/
     python-change-list-type-for-json-decoding"""
+
     def __init__(self, **kwargs):
         """Initialize decoder with special array implementation."""
         _json.JSONDecoder.__init__(self, **kwargs)
