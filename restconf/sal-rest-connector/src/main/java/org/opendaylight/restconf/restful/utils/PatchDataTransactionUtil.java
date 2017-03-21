@@ -205,13 +205,7 @@ public final class PatchDataTransactionUtil {
                                                    final SchemaContextRef schemaContextRef) {
         LOG.trace("Merge {} within Restconf PATCH: {} with payload {}", dataStore.name(), path, payload);
         TransactionUtil.ensureParentsByMerge(path, schemaContextRef.get(), writeTransaction);
-
-        // merging is necessary only for lists otherwise we can call put method
-        if (payload instanceof MapNode) {
-            writeTransaction.merge(dataStore, path, payload);
-        } else {
-            writeTransaction.put(dataStore, path, payload);
-        }
+        writeTransaction.merge(dataStore, path, payload);
     }
 
     /**
