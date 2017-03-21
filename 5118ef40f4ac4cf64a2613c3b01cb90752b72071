@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_a5120656",
+        "filename": "features/netconf/odl-netconf-tcp/src/main/feature/feature.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2017-03-21T15:29:34Z",
+      "side": 0,
+      "message": "This should have been a dash.",
+      "range": {
+        "startLine": 11,
+        "startChar": 31,
+        "endLine": 11,
+        "endChar": 32
+      },
+      "revId": "5118ef40f4ac4cf64a2613c3b01cb90752b72071",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
