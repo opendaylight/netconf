@@ -8,6 +8,6 @@
  -->
 <features name="odl-netconf-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0">
     <feature name="odl-netconf-tcp" version="${project.version}">
-        <feature version="1.2.0.SNAPSHOT" prerequisite="true">odl-netconf-util</feature>
+        <feature version="${project.version}" prerequisite="true">odl-netconf-util</feature>
     </feature>
 </features>
