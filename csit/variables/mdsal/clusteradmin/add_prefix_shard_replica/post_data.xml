@@ -1,0 +1,5 @@
+<input xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:cluster:admin">
+  <shard-prefix>$SHARD_PREFIX</shard-prefix>
+  <data-store-type>$DATA_STORE_TYPE</data-store-type>
+</input>
+
