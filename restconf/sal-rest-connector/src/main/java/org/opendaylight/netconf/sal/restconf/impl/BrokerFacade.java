@@ -1160,12 +1160,8 @@ public class BrokerFacade {
         LOG.trace("Merge {} within Restconf PATCH: {} with payload {}", datastore.name(), path, payload);
         ensureParentsByMerge(datastore, path, writeTransaction, schemaContext);
 
-        // merging is necessary only for lists otherwise we can call put method
-        if (payload instanceof MapNode) {
-            writeTransaction.merge(datastore, path, payload);
-        } else {
-            writeTransaction.put(datastore, path, payload);
-        }
+        // OpenDaylight should not change opertation in YANG Patch request, no matter what target is.
+        writeTransaction.merge(datastore, path, payload);
     }
 
     public void setDomDataBroker(final DOMDataBroker domDataBroker) {
