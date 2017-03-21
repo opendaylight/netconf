@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_051792a4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2017-03-21T16:44:20Z",
+      "side": 1,
+      "message": "https://lists.opendaylight.org/pipermail/release/2017-March/009672.html",
+      "range": {
+        "startLine": 7,
+        "startChar": 4,
+        "endLine": 7,
+        "endChar": 15
+      },
+      "revId": "5a42ea1d44e3aae22deedb0e7d46389b67593177",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
