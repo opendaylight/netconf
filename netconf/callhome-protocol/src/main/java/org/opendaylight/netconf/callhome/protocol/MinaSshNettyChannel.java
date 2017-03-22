@@ -28,7 +28,7 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandlerWrit
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MinaSshNettyChannel extends AbstractServerChannel {
+class MinaSshNettyChannel extends AbstractServerChannel {
 
     private static final Logger LOG = LoggerFactory.getLogger(MinaSshNettyChannel.class);
     private static final ChannelMetadata METADATA = new ChannelMetadata(false);
@@ -42,7 +42,7 @@ public class MinaSshNettyChannel extends AbstractServerChannel {
 
     private volatile boolean nettyClosed = false;
 
-    public MinaSshNettyChannel(CallHomeSessionContext context, ClientSession session, ClientChannel sshChannel) {
+    MinaSshNettyChannel(CallHomeSessionContext context, ClientSession session, ClientChannel sshChannel) {
         this.context = Preconditions.checkNotNull(context);
         this.session = Preconditions.checkNotNull(session);
         this.sshChannel = Preconditions.checkNotNull(sshChannel);

@@ -12,9 +12,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -46,13 +44,14 @@ public class CallHomeAuthorizationTest
     }
 
     @Test
-    @Ignore
     public void AnAuthorizationOfAcceptanceIsAllowed()
     {
         // given
         String session = "some-session";
         String user = "some-user-name";
         ClientSessionImpl mockSession = mock(ClientSessionImpl.class);
+        doNothing().when(mockSession).setUsername(user);
+
         // and
         CallHomeAuthorization auth = CallHomeAuthorization.serverAccepted(session, user).build();
         // when
@@ -62,17 +61,20 @@ public class CallHomeAuthorizationTest
     }
 
     @Test
-    @Ignore
     public void AnAuthorizationOfAcceptanceCanBeAppliedToASession()
     {
         // given
         String session = "some-session";
         String user = "some-user-name";
+        String pwd = "pwd1";
         KeyPair pair = new KeyPair(mock(PublicKey.class), mock(PrivateKey.class));
         ClientSessionImpl mockSession = mock(ClientSessionImpl.class);
+        doNothing().when(mockSession).setUsername(user);
+        doNothing().when(mockSession).addPasswordIdentity(pwd);
+        doNothing().when(mockSession).addPublicKeyIdentity(pair);
         // and
         CallHomeAuthorization auth = CallHomeAuthorization.serverAccepted(session, user)
-                .addPassword("pwd1")
+                .addPassword(pwd)
                 .addClientKeys(pair)
                 .build();
         // when

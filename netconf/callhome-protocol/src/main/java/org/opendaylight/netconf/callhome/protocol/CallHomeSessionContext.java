@@ -85,39 +85,29 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
     }
 
     SshFutureListener<OpenFuture> newSshFutureListener(final ClientChannel netconfChannel) {
-        return new SshFutureListener<OpenFuture>() {
-
-            @Override
-            public void operationComplete(OpenFuture future) {
-                if (future.isOpened()) {
-                    netconfChannelOpened(netconfChannel);
-                } else {
-                    channelOpenFailed(future.getException());
-                }
-
+	return future -> 
+	{
+	    if (future.isOpened()) {
+                netconfChannelOpened(netconfChannel);
+            } else {
+                channelOpenFailed(future.getException());
             }
         };
     }
 
-    protected void channelOpenFailed(Throwable e) {
+    private void channelOpenFailed(Throwable e) {
         LOG.error("Unable to open netconf subsystem, disconnecting.", e);
         sshSession.close(false);
     }
 
-    protected void netconfChannelOpened(ClientChannel netconfChannel) {
+    private void netconfChannelOpened(ClientChannel netconfChannel) {
         nettyChannel = newMinaSshNettyChannel(netconfChannel);
         factory.getChannelOpenListener().onNetconfSubsystemOpened(CallHomeSessionContext.this,
-                new CallHomeChannelActivator() {
-
-                    @Override
-                    public Promise<NetconfClientSession> activate(NetconfClientSessionListener listener) {
-                        return doActivate(listener);
-                    }
-                });
+	    listener -> doActivate(listener));
     }
 
     @GuardedBy("this")
-    protected synchronized Promise<NetconfClientSession> doActivate(NetconfClientSessionListener listener) {
+    private synchronized Promise<NetconfClientSession> doActivate(NetconfClientSessionListener listener) {
         if(activated) {
             return newSessionPromise().setFailure(new IllegalStateException("Session already activated."));
         }
@@ -168,7 +158,7 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         private final CallHomeNetconfSubsystemListener subsystemListener;
         private final ConcurrentMap<String, CallHomeSessionContext> sessions = new ConcurrentHashMap<>();
 
-        public Factory(EventLoopGroup nettyGroup, NetconfClientSessionNegotiatorFactory negotiatorFactory,
+        Factory(EventLoopGroup nettyGroup, NetconfClientSessionNegotiatorFactory negotiatorFactory,
                 CallHomeNetconfSubsystemListener subsystemListener) {
             this.nettyGroup = Preconditions.checkNotNull(nettyGroup, "nettyGroup");
             this.negotiatorFactory = Preconditions.checkNotNull(negotiatorFactory, "negotiatorFactory");

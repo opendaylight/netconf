@@ -21,19 +21,4 @@
     <version>1.2.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>${project.artifactId}</name>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.opendaylight.mdsal.model</groupId>
-            <artifactId>ietf-inet-types</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal.model</groupId>
-            <artifactId>ietf-yang-types</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.mdsal.model</groupId>
-            <artifactId>yang-ext</artifactId>
-        </dependency>
-    </dependencies>
 </project>

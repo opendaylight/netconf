@@ -105,11 +105,11 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
         };
     }
 
-    protected void doPostAuth(final ClientSession cSession) {
+    private void doPostAuth(final ClientSession cSession) {
         CallHomeSessionContext.getFrom(cSession).openNetconfChannel();
     }
 
-    protected void doAuth(final ClientSession cSession) {
+    private void doAuth(final ClientSession cSession) {
         try {
             final AuthFuture authFuture = CallHomeSessionContext.getFrom(cSession).authorize();
             authFuture.addListener(newAuthSshFutureListener(cSession));

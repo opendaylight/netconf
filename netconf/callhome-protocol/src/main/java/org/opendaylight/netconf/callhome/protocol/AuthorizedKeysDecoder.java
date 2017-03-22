@@ -90,8 +90,7 @@ public class AuthorizedKeysDecoder {
         return ecdsaFactory.generatePublic(pubKeySpec);
     }
 
-    private PublicKey decodeAsDSA() throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException
-    {
+    private PublicKey decodeAsDSA() throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {
         KeyFactory dsaFactory = SecurityUtils.getKeyFactory(KEY_FACTORY_TYPE_DSA);
         BigInteger p = decodeBigInt();
         BigInteger q = decodeBigInt();

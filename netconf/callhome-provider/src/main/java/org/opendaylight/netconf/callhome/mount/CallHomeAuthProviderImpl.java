@@ -61,8 +61,8 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
     @Override
     public CallHomeAuthorization provideAuth(SocketAddress remoteAddress, PublicKey serverKey) {
         Device deviceSpecific = deviceConfig.get(serverKey);
-        final String sessionName;
-        final Credentials deviceCred;
+        String sessionName;
+        Credentials deviceCred;
         if (deviceSpecific != null) {
             sessionName = deviceSpecific.getUniqueId();
             deviceCred = deviceSpecific.getCredentials();

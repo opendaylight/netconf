@@ -35,8 +35,7 @@ public class CallHomeTopology extends BaseCallHomeTopology {
 
     @Override
     protected RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(RemoteDeviceId id, Broker domBroker,
-            BindingAwareBroker bindingBroker)
-    {
+            BindingAwareBroker bindingBroker) {
         return new NetconfDeviceSalFacade(id, domBroker, bindingAwareBroker);
     }
 }

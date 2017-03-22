@@ -114,9 +114,4 @@ public class CallHomeMountDispatcherTest {
         // then
         // verify(instance.topology, times(1)).connectNode(any(NodeId.class), any(Node.class));
     }
-
-    @Test
-    public void coverage() {
-        instance.createTopology();
-    }
 }

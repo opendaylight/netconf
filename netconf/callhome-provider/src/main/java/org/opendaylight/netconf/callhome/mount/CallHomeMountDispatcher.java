@@ -64,7 +64,6 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     public CallHomeMountDispatcher(String topologyId, BindingAwareBroker bindingAwareBroker,
             EventExecutor eventExecutor, ScheduledThreadPool keepaliveExecutor, ThreadPool processingExecutor,
             SchemaRepositoryProvider schemaRepositoryProvider, Broker domBroker, DataBroker dataBroker, DOMMountPointService mountService) {
-        super();
         this.topologyId = topologyId;
         this.bindingAwareBroker = bindingAwareBroker;
         this.eventExecutor = eventExecutor;

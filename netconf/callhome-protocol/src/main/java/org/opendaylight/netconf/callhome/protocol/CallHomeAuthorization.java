@@ -18,7 +18,7 @@ import org.apache.sshd.client.session.ClientSessionImpl;
 
 /**
  *
- * Authorization context for incomming call home sessions.
+ * Authorization context for incoming call home sessions.
  *
  * @see CallHomeAuthorizationProvider
  */

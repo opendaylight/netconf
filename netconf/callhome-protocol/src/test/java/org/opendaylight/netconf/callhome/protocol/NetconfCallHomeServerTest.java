@@ -39,8 +39,6 @@ import org.slf4j.LoggerFactory;
 
 public class NetconfCallHomeServerTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfCallHomeServerTest.class);
-
     SshClient mockSshClient;
     CallHomeAuthorizationProvider mockCallHomeAuthProv;
     CallHomeAuthorization mockAuth;

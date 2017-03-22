@@ -40,15 +40,11 @@ public class CallHomeMountSessionManager implements CallHomeMountSessionContext.
             CallHomeChannelActivator activator, final CloseCallback onCloseHandler) {
 
         String name = session.getSessionName();
-        CallHomeMountSessionContext deviceContext = new CallHomeMountSessionContext(name, session, activator, new CloseCallback() {
+        CallHomeMountSessionContext deviceContext = new CallHomeMountSessionContext(name, session, activator, devCtxt -> {
+                CallHomeMountSessionManager.this.onClosed(devCtxt);
+                onCloseHandler.onClosed(devCtxt);
+            });
 
-            @Override
-            public void onClosed(CallHomeMountSessionContext deviceContext) {
-                CallHomeMountSessionManager.this.onClosed(deviceContext);
-                onCloseHandler.onClosed(deviceContext);
-            }
-
-        });
         contextByAddress.put(deviceContext.getRemoteAddress(), deviceContext);
         contextByPublicKey.put(deviceContext.getRemoteServerKey(), deviceContext);
 
