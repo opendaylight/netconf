@@ -861,6 +861,51 @@ public class BrokerFacade {
         throw new RestconfDocumentedException("Insert parameter can be used only with list or leaf-list");
     }
 
+    static final public class PostNormalizedNode<K extends PathArgument,V> implements NormalizedNode<K,V> {
+
+        final public NormalizedNode normalizedNode;
+
+        public PostNormalizedNode(NormalizedNode normalizedNode) {
+            this.normalizedNode = normalizedNode;
+        }
+
+        @Override
+        public QName getNodeType() {
+            return normalizedNode.getNodeType();
+
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (null != o) {
+                if (NormalizedNode.class == o.getClass()) {
+                    return this.normalizedNode == o;
+                } else if (this.getClass() == o.getClass()) {
+                    PostNormalizedNode<?, ?> that = (PostNormalizedNode<?, ?>) o;
+                    return normalizedNode != null ? normalizedNode.equals(that.normalizedNode) : that.normalizedNode == null;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return normalizedNode != null ? normalizedNode.hashCode() : 0;
+        }
+
+        @Override
+        public K getIdentifier() {
+            return (K)normalizedNode.getIdentifier();
+        }
+
+        @Override
+        public V getValue() {
+            return (V)normalizedNode.getValue();
+        }
+    }
+
+
     private void makeNormalPost(final DOMDataReadWriteTransaction rWTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         if (payload instanceof MapNode) {
@@ -870,7 +915,8 @@ public class BrokerFacade {
             for (final MapEntryNode child : ((MapNode) payload).getValue()) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
                 checkItemDoesNotExists(rWTransaction, datastore, childPath);
-                rWTransaction.put(datastore, childPath, child);
+                PostNormalizedNode wrappedChild = new PostNormalizedNode(child);
+                rWTransaction.put(datastore, childPath, wrappedChild);
             }
         } else if (payload instanceof LeafSetNode) {
             final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
@@ -879,10 +925,12 @@ public class BrokerFacade {
             for (final LeafSetEntryNode<?> child : ((LeafSetNode<?>) payload).getValue()) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
                 checkItemDoesNotExists(rWTransaction, datastore, childPath);
-                rWTransaction.put(datastore, childPath, child);
+                PostNormalizedNode wrappedChild = new PostNormalizedNode(child);
+                rWTransaction.put(datastore, childPath, wrappedChild);
             }
         } else {
-            simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+            PostNormalizedNode wrappedPayload = new PostNormalizedNode(payload);
+            simplePostPut(rWTransaction, datastore, path, wrappedPayload, schemaContext);
         }
     }
 
