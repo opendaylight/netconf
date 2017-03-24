@@ -14,8 +14,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -31,10 +30,7 @@ import com.google.common.util.concurrent.Futures;
 import java.util.concurrent.Future;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
@@ -251,7 +247,7 @@ public class BrokerFacadeTest {
         final InOrder inOrder = inOrder(this.domDataBroker, this.rwTransaction);
         inOrder.verify(this.domDataBroker).newReadWriteTransaction();
         inOrder.verify(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.instanceID);
-        inOrder.verify(this.rwTransaction).put(LogicalDatastoreType.CONFIGURATION, this.instanceID, this.dummyNode);
+        inOrder.verify(this.rwTransaction).put(eq(LogicalDatastoreType.CONFIGURATION), eq(this.instanceID), eq(new BrokerFacade.PostNormalizedNode<>(this.dummyNode)));
         inOrder.verify(this.rwTransaction).submit();
     }
 

@@ -100,7 +100,14 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
             return;
         }
 
-        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>fromNullable(data), Optional.of(ModifyAction.REPLACE), path);
+
+        //Since we could not import PostNormalizedNode from sal-rest-connecter, we can only check its class name
+        Optional<ModifyAction> operation = data.getClass().getName().equals("org.opendaylight.netconf.sal.restconf.impl.BrokerFacade$PostNormalizedNode")
+                ? Optional.of(ModifyAction.CREATE) : Optional.of(ModifyAction.REPLACE);
+
+        LOG.trace("Using {} operation for {} and data {}.", operation, path, data);
+
+        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>fromNullable(data), operation, path);
         editConfig(path, Optional.fromNullable(data), editStructure, Optional.of(ModifyAction.NONE), "put");
     }
 
