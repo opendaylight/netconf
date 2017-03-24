@@ -306,8 +306,11 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
     }
 
     private static Optional<NormalizedNode<?, ?>> readXml(final InputStream in) {
+        // TODO one module node with bad revision will fail parsing of whole modules-state node
+        // we have to parse them one by one and just ignore modules with bad revisions
         final DomToNormalizedNodeParserFactory parserFactory =
-                DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, LIBRARY_CONTEXT);
+                DomToNormalizedNodeParserFactory
+                        .getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, LIBRARY_CONTEXT);
 
         try {
             final NormalizedNode<?, ?> parsed =
