@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.ws.rs.HEAD;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.controller.md.sal.common.impl.util.compat.DataNormalizationException;
 import org.opendaylight.controller.md.sal.common.impl.util.compat.DataNormalizationOperation;
@@ -749,7 +750,8 @@ public class ControllerContext implements SchemaContextListener {
         String additionalInfo = "";
         if (decoded == null) {
             if ((typedef instanceof IdentityrefTypeDefinition)) {
-                decoded = toQName(urlDecoded, null);
+                final SchemaContext schemaContext = mountPoint == null ? this.globalSchema : mountPoint.getSchemaContext();
+                decoded = toQName(schemaContext, urlDecoded, null);
                 additionalInfo =
                         "For key which is of type identityref it should be in format module_name:identity_name.";
             }
@@ -791,11 +793,11 @@ public class ControllerContext implements SchemaContextListener {
         return str.substring(idx + 1);
     }
 
-    private QName toQName(final String name, final Date revisionDate) {
+    private QName toQName(final SchemaContext schemaContext, final String name, final Date revisionDate) {
         checkPreconditions();
         final String module = toModuleName(name);
         final String node = toNodeName(name);
-        final Module m = this.globalSchema.findModuleByName(module, revisionDate);
+        final Module m = schemaContext.findModuleByName(module, revisionDate);
         return m == null ? null : QName.create(m.getQNameModule(), node);
     }
 
@@ -804,7 +806,7 @@ public class ControllerContext implements SchemaContextListener {
     }
 
     public RpcDefinition getRpcDefinition(final String name, final Date revisionDate) {
-        final QName validName = toQName(name, revisionDate);
+        final QName validName = toQName(this.globalSchema, name, revisionDate);
         return validName == null ? null : this.qnameToRpc.get().get(validName);
     }
 
