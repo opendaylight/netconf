@@ -69,8 +69,6 @@ public class LibraryModulesSchemasTest {
 
         Assert.assertFalse(resolvedModulesSchema.containsKey(
                 RevisionSourceIdentifier.create("module-with-bad-url")));
-        Assert.assertFalse(resolvedModulesSchema.containsKey(
-                RevisionSourceIdentifier.create("module-with-bad-revision", "bad-revision")));
         Assert.assertTrue(resolvedModulesSchema.containsKey(
                 RevisionSourceIdentifier.create("good-ol-module")));
     }
