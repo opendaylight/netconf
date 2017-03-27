@@ -43,4 +43,10 @@ public class CreateInitialMasterActorData implements Serializable {
     public DOMRpcService getDeviceRpc() {
         return deviceRpc;
     }
+
+    @Override
+    public String toString() {
+        return "CreateInitialMasterActorData [deviceDataBroker=" + deviceDataBroker
+                + ", allSourceIdentifiers=" + allSourceIdentifiers + ", deviceRpc=" + deviceRpc + "]";
+    }
 }
