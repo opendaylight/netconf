@@ -29,4 +29,9 @@ public class DeleteRequest implements TransactionRequest {
     public YangInstanceIdentifier getPath() {
         return path;
     }
+
+    @Override
+    public String toString() {
+        return "DeleteRequest [" + "store=" + store + ", path=" + path + ']';
+    }
 }

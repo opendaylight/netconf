@@ -29,4 +29,9 @@ public class PutRequest implements TransactionRequest {
     public LogicalDatastoreType getStore() {
         return store;
     }
+
+    @Override
+    public String toString() {
+        return "PutRequest [" + "store=" + store + ", data=" + data + "]";
+    }
 }

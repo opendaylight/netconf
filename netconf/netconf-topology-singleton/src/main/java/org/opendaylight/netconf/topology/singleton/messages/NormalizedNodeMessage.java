@@ -56,4 +56,9 @@ public class NormalizedNodeMessage implements Externalizable {
         instance.identifier = path;
         instance.node = node;
     };
+
+    @Override
+    public String toString() {
+        return "NormalizedNodeMessage [identifier=" + identifier + ", node=" + node + "]";
+    }
 }

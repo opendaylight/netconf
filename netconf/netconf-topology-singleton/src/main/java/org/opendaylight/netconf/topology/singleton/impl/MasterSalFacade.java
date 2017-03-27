@@ -92,12 +92,13 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
         sendInitialDataToActor().onComplete(new OnComplete<Object>() {
             @Override
-            public void onComplete(final Throwable failure, final Object success) throws Throwable {
+            public void onComplete(final Throwable failure, final Object success) {
                 if (failure == null) {
+                    LOG.debug("{}: Master NetconfNodeActor initialized successfully", id);
                     updateDeviceData();
-                    return;
+                } else {
+                    LOG.error("{}: Sending initial data to master NetconfNodeActor failed", id, failure);
                 }
-                throw failure;
             }
         }, actorSystem.dispatcher());
 

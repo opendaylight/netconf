@@ -29,4 +29,9 @@ public class ReadRequest implements TransactionRequest {
     public YangInstanceIdentifier getPath() {
         return path;
     }
+
+    @Override
+    public String toString() {
+        return "ReadRequest [store=" + store + ", path=" + path + "]";
+    }
 }

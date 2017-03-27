@@ -29,4 +29,9 @@ public class MergeRequest implements TransactionRequest {
     public LogicalDatastoreType getStore() {
         return store;
     }
+
+    @Override
+    public String toString() {
+        return "MergeRequest [data=" + data + ", store=" + store + "]";
+    }
 }

@@ -28,4 +28,8 @@ public class RegisterMountPoint implements Serializable {
         return allSourceIdentifiers;
     }
 
+    @Override
+    public String toString() {
+        return "RegisterMountPoint [allSourceIdentifiers=" + allSourceIdentifiers + "]";
+    }
 }

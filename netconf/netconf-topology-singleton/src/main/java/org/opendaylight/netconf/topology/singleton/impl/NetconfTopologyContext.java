@@ -151,7 +151,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
                 @Override
                 public void onComplete(final Throwable failure, final Object success) throws Throwable {
                     if (failure != null) {
-                        LOG.error("Failed to refresh master actor data: {}", failure);
+                        LOG.error("{}: Failed to refresh master actor data", remoteDeviceId, failure);
                         return;
                     }
                     remoteDeviceConnector.startRemoteDeviceConnection(masterActorRef);
