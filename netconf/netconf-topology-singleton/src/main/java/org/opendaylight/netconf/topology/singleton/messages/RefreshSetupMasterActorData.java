@@ -34,4 +34,10 @@ public class RefreshSetupMasterActorData implements Serializable {
     public RemoteDeviceId getRemoteDeviceId() {
         return remoteDeviceId;
     }
+
+    @Override
+    public String toString() {
+        return "RefreshSetupMasterActorData [netconfTopologyDeviceSetup=" + netconfTopologyDeviceSetup
+                + ", remoteDeviceId=" + remoteDeviceId + "]";
+    }
 }

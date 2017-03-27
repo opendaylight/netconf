@@ -10,7 +10,6 @@ package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;
-import akka.actor.UntypedActor;
 import akka.util.Timeout;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
@@ -19,6 +18,7 @@ import java.io.IOException;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opendaylight.controller.cluster.common.actor.AbstractUntypedActor;
 import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.RemoteSchemaProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
@@ -54,7 +54,6 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitR
 import org.opendaylight.netconf.topology.singleton.messages.transactions.TransactionRequest;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
@@ -67,8 +66,7 @@ import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfNodeActor extends UntypedActor {
-
+public class NetconfNodeActor extends AbstractUntypedActor {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeActor.class);
 
     private NetconfTopologySetup setup;
@@ -100,98 +98,91 @@ public class NetconfNodeActor extends UntypedActor {
     }
 
     @Override
-    public void onReceive(final Object message) throws Exception {
-        if (message instanceof CreateInitialMasterActorData) { // master
+    public void postStop() throws Exception {
+        LOG.info("{}: Stopping NetconfNodeActor", id);
+    }
 
-            sourceIdentifiers = ((CreateInitialMasterActorData) message).getSourceIndentifiers();
-            operationsProcessor =
-                    new RemoteOperationTxProcessorImpl(((CreateInitialMasterActorData) message).getDeviceDataBroker(),
-                            id);
-            this.deviceRpc = ((CreateInitialMasterActorData) message).getDeviceRpc();
-
-            sender().tell(new MasterActorDataInitialized(), self());
-
-            LOG.debug("{}: Master is ready.", id);
-
+    @Override
+    public void handleReceive(final Object message) throws Exception {
+        if (message instanceof CreateInitialMasterActorData) {
+            // master
+            onCreateInitialMasterActorData((CreateInitialMasterActorData) message);
         } else if (message instanceof  RefreshSetupMasterActorData) {
-            setup = ((RefreshSetupMasterActorData) message).getNetconfTopologyDeviceSetup();
-            id = ((RefreshSetupMasterActorData) message).getRemoteDeviceId();
-            sender().tell(new MasterActorDataInitialized(), self());
-        } else if (message instanceof AskForMasterMountPoint) { // master
-            // only master contains reference to operations processor
-            if (operationsProcessor != null) {
-                getSender().tell(new RegisterMountPoint(sourceIdentifiers), getSelf());
-            }
-
-        } else if (message instanceof TransactionRequest) { // master
-
-            resolveProxyCalls(message, sender(), getSelf());
-
-        } else if (message instanceof YangTextSchemaSourceRequest) { // master
-
-            final YangTextSchemaSourceRequest yangTextSchemaSourceRequest = (YangTextSchemaSourceRequest) message;
-            sendYangTextSchemaSourceProxy(yangTextSchemaSourceRequest.getSourceIdentifier(), sender());
-
+            onRefreshSetupMasterActorData((RefreshSetupMasterActorData) message);
+        } else if (message instanceof AskForMasterMountPoint) {
+            // master
+            onAskForMasterMountPoint();
+        } else if (message instanceof TransactionRequest) {
+            // master
+            resolveProxyCalls((TransactionRequest) message, sender(), getSelf());
+        } else if (message instanceof YangTextSchemaSourceRequest) {
+            // master
+            onYangTextSchemaSource((YangTextSchemaSourceRequest) message);
         } else if (message instanceof InvokeRpcMessage) {
-
-            final InvokeRpcMessage invokeRpcMessage = ((InvokeRpcMessage) message);
-            invokeSlaveRpc(invokeRpcMessage.getSchemaPath(), invokeRpcMessage.getNormalizedNodeMessage(), sender());
-
-        } else if (message instanceof RegisterMountPoint) { //slaves
-
-            sourceIdentifiers = ((RegisterMountPoint) message).getSourceIndentifiers();
-            registerSlaveMountPoint(getSender());
-
-        } else if (message instanceof UnregisterSlaveMountPoint) { //slaves
-            if (slaveSalManager != null) {
-                slaveSalManager.close();
-                slaveSalManager = null;
-            }
-
+            onInvokeRpc((InvokeRpcMessage) message);
+        } else if (message instanceof RegisterMountPoint) {
+            //slaves
+            onRegisterMountPoint((RegisterMountPoint) message);
+        } else if (message instanceof UnregisterSlaveMountPoint) {
+            //slaves
+            onUnregisterSlaveMountPoint();
+        } else {
+            unknownMessage(message);
         }
     }
 
-    private void resolveProxyCalls(final Object message, final ActorRef recipient, final ActorRef futureSender) {
-        if (message instanceof OpenTransaction) {
-            operationsProcessor.doOpenTransaction(recipient, futureSender);
-        } else if (message instanceof ReadRequest) {
+    private void onUnregisterSlaveMountPoint() {
+        LOG.debug("{}: onUnregisteredSlaveMountPoint", id);
 
-            final ReadRequest readRequest = (ReadRequest) message;
-            operationsProcessor.doRead(readRequest.getStore(), readRequest.getPath(), recipient, futureSender);
-
-        } else if (message instanceof ExistsRequest) {
-
-            final ExistsRequest readRequest = (ExistsRequest) message;
-            operationsProcessor.doExists(readRequest.getStore(), readRequest.getPath(), recipient, futureSender);
-
-        } else if (message instanceof MergeRequest) {
-
-            final MergeRequest mergeRequest = (MergeRequest) message;
-            operationsProcessor.doMerge(mergeRequest.getStore(), mergeRequest.getNormalizedNodeMessage());
-
-        } else if (message instanceof PutRequest) {
-
-            final PutRequest putRequest = (PutRequest) message;
-            operationsProcessor.doPut(putRequest.getStore(), putRequest.getNormalizedNodeMessage());
-
-        } else if (message instanceof DeleteRequest) {
-
-            final DeleteRequest deleteRequest = (DeleteRequest) message;
-            operationsProcessor.doDelete(deleteRequest.getStore(), deleteRequest.getPath());
-
-        } else if (message instanceof CancelRequest) {
-
-            operationsProcessor.doCancel(recipient, futureSender);
-
-        } else if (message instanceof SubmitRequest) {
-
-            operationsProcessor.doSubmit(recipient, futureSender);
+        if (slaveSalManager != null) {
+            slaveSalManager.close();
+            slaveSalManager = null;
         }
     }
 
-    private void sendYangTextSchemaSourceProxy(final SourceIdentifier sourceIdentifier, final ActorRef sender) {
+    private void onRegisterMountPoint(final RegisterMountPoint registerMountPoint) {
+        LOG.debug("{}: RegisterMountPoint message received: {}", id, registerMountPoint);
+
+        sourceIdentifiers = registerMountPoint.getSourceIndentifiers();
+        registerSlaveMountPoint(getSender());
+    }
+
+    private void onCreateInitialMasterActorData(final CreateInitialMasterActorData initialMasterActorData) {
+        LOG.debug("{}: CreateInitialMasterActorData message received: {}", id, initialMasterActorData);
+
+        sourceIdentifiers = initialMasterActorData.getSourceIndentifiers();
+        operationsProcessor =
+                new RemoteOperationTxProcessorImpl(initialMasterActorData.getDeviceDataBroker(), id);
+        deviceRpc = initialMasterActorData.getDeviceRpc();
+
+        sender().tell(new MasterActorDataInitialized(), self());
+
+        LOG.info("{}: Master is ready", id);
+    }
+
+    private void onRefreshSetupMasterActorData(final RefreshSetupMasterActorData refreshSetupMasterActorData) {
+        LOG.debug("{}: RefreshSetupMasterActorData message received: {}", id, refreshSetupMasterActorData);
+
+        setup = refreshSetupMasterActorData.getNetconfTopologyDeviceSetup();
+        id = refreshSetupMasterActorData.getRemoteDeviceId();
+        sender().tell(new MasterActorDataInitialized(), self());
+    }
+
+    private void onAskForMasterMountPoint() {
+        LOG.debug("{}: onAskForMasterMountPoint", id);
+
+        // only master contains reference to operations processor
+        if (operationsProcessor != null) {
+            getSender().tell(new RegisterMountPoint(sourceIdentifiers), getSelf());
+        }
+    }
+
+    private void onYangTextSchemaSource(final YangTextSchemaSourceRequest sourceRequest) {
+        LOG.debug("{}: YangTextSchemaSourceRequest message received: {}", id, sourceRequest);
+
+        final ActorRef sender = sender();
         final CheckedFuture<YangTextSchemaSource, SchemaSourceException> yangTextSchemaSource =
-                schemaRepository.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class);
+                schemaRepository.getSchemaSource(sourceRequest.getSourceIdentifier(), YangTextSchemaSource.class);
 
         Futures.addCallback(yangTextSchemaSource, new FutureCallback<YangTextSchemaSource>() {
             @Override
@@ -210,17 +201,18 @@ public class NetconfNodeActor extends UntypedActor {
         });
     }
 
-    private void invokeSlaveRpc(final SchemaPath schemaPath, final NormalizedNodeMessage normalizedNodeMessage,
-                                final ActorRef recipient) {
+    private void onInvokeRpc(InvokeRpcMessage invokeRpcMessage) {
+        LOG.debug("{}: InvokeRpcMessage received: {}", id, invokeRpcMessage);
 
+        final ActorRef recipient = sender();
         final CheckedFuture<DOMRpcResult, DOMRpcException> rpcResult =
-                deviceRpc.invokeRpc(schemaPath, normalizedNodeMessage.getNode());
+                deviceRpc.invokeRpc(invokeRpcMessage.getSchemaPath(), invokeRpcMessage.getNormalizedNodeMessage().getNode());
 
         Futures.addCallback(rpcResult, new FutureCallback<DOMRpcResult>() {
             @Override
             public void onSuccess(@Nullable final DOMRpcResult domRpcResult) {
                 if (domRpcResult == null) {
-                    recipient.tell(new EmptyResultResponse(), getSender());
+                    recipient.tell(new EmptyResultResponse(), getSelf());
                     return;
                 }
                 NormalizedNodeMessage nodeMessageReply = null;
@@ -236,6 +228,47 @@ public class NetconfNodeActor extends UntypedActor {
                 recipient.tell(throwable, getSelf());
             }
         });
+    }
+
+    private void resolveProxyCalls(final TransactionRequest txOperationRequest,
+                                   final ActorRef replyTo, final ActorRef futureSender) {
+        LOG.debug("{}: TransactionRequest message received: {}", id, txOperationRequest);
+
+        if (txOperationRequest instanceof OpenTransaction) {
+            operationsProcessor.doOpenTransaction(replyTo, futureSender);
+        } else if (txOperationRequest instanceof ReadRequest) {
+
+            final ReadRequest readRequest = (ReadRequest) txOperationRequest;
+            operationsProcessor.doRead(readRequest.getStore(), readRequest.getPath(), replyTo, futureSender);
+
+        } else if (txOperationRequest instanceof ExistsRequest) {
+
+            final ExistsRequest readRequest = (ExistsRequest) txOperationRequest;
+            operationsProcessor.doExists(readRequest.getStore(), readRequest.getPath(), replyTo, futureSender);
+
+        } else if (txOperationRequest instanceof MergeRequest) {
+
+            final MergeRequest mergeRequest = (MergeRequest) txOperationRequest;
+            operationsProcessor.doMerge(mergeRequest.getStore(), mergeRequest.getNormalizedNodeMessage());
+
+        } else if (txOperationRequest instanceof PutRequest) {
+
+            final PutRequest putRequest = (PutRequest) txOperationRequest;
+            operationsProcessor.doPut(putRequest.getStore(), putRequest.getNormalizedNodeMessage());
+
+        } else if (txOperationRequest instanceof DeleteRequest) {
+
+            final DeleteRequest deleteRequest = (DeleteRequest) txOperationRequest;
+            operationsProcessor.doDelete(deleteRequest.getStore(), deleteRequest.getPath());
+
+        } else if (txOperationRequest instanceof CancelRequest) {
+
+            operationsProcessor.doCancel(replyTo, futureSender);
+
+        } else if (txOperationRequest instanceof SubmitRequest) {
+
+            operationsProcessor.doSubmit(replyTo, futureSender);
+        }
     }
 
     private void registerSlaveMountPoint(final ActorRef masterReference) {
