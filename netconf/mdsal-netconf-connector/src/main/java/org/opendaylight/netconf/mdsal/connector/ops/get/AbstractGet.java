@@ -135,20 +135,22 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
      *         if filter is not present we want to read the entire datastore - return ROOT.
      * @throws DocumentedException
      */
-    protected Optional<YangInstanceIdentifier> getDataRootFromFilter(final XmlElement operationElement) throws DocumentedException {
+    protected Optional<YangInstanceIdentifier> getDataRootFromFilter(final XmlElement operationElement,
+                                                                     final Document doc) throws DocumentedException {
         final Optional<XmlElement> filterElement = operationElement.getOnlyChildElementOptionally(FILTER);
         if (filterElement.isPresent()) {
             if (filterElement.get().getChildElements().size() == 0) {
                 return Optional.absent();
             }
-            return Optional.of(getInstanceIdentifierFromFilter(filterElement.get()));
+            return Optional.of(getInstanceIdentifierFromFilter(filterElement.get(), doc));
         } else {
             return Optional.of(ROOT);
         }
     }
 
     @VisibleForTesting
-    protected YangInstanceIdentifier getInstanceIdentifierFromFilter(final XmlElement filterElement) throws DocumentedException {
+    protected YangInstanceIdentifier getInstanceIdentifierFromFilter(final XmlElement filterElement,
+                                                                     final Document doc) throws DocumentedException {
 
         if (filterElement.getChildElements().size() != 1) {
             throw new DocumentedException("Multiple filter roots not supported yet",
@@ -156,7 +158,7 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         }
 
         final XmlElement element = filterElement.getOnlyChildElement();
-        return validator.validate(element);
+        return validator.validate(element, doc);
     }
 
     protected static final class GetConfigExecution {

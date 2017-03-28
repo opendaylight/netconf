@@ -88,12 +88,12 @@ public class FilterContentValidatorTest {
     public void testValidate() throws Exception {
         if (expected.startsWith("success")) {
             final String expId = expected.replace("success=", "");
-            final YangInstanceIdentifier actual = validator.validate(filterContent);
+            final YangInstanceIdentifier actual = validator.validate(filterContent, null);
             final YangInstanceIdentifier expected = fromString(expId);
             Assert.assertEquals(expected, actual);
         } else if (expected.startsWith("error")) {
             try {
-                validator.validate(filterContent);
+                validator.validate(filterContent, null);
                 Assert.fail(XmlUtil.toString(filterContent) + " is not valid and should throw exception.");
             } catch (final Exception e) {
                 final String expectedExceptionClass = expected.replace("error=", "");
