@@ -53,7 +53,7 @@ public class GetConfig extends AbstractGet {
             throw e;
         }
 
-        final Optional<YangInstanceIdentifier> dataRootOptional = getDataRootFromFilter(operationElement);
+        final Optional<YangInstanceIdentifier> dataRootOptional = getDataRootFromFilter(operationElement, document);
         if (!dataRootOptional.isPresent()) {
             return XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.<String>absent());
         }

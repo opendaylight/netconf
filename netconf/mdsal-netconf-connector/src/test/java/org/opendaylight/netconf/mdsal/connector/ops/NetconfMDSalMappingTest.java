@@ -571,7 +571,7 @@ public class NetconfMDSalMappingTest {
 
         public YangInstanceIdentifier getInstanceIdentifierFromDocument(final Document request) throws DocumentedException {
             final XmlElement filterElement = XmlElement.fromDomDocument(request).getOnlyChildElement(GET_CONFIG).getOnlyChildElement(FILTER_NODE);
-            return getInstanceIdentifierFromFilter(filterElement);
+            return getInstanceIdentifierFromFilter(filterElement, request);
         }
     }
 
