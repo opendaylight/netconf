@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_b56cd19e",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-03-28T14:16:28Z",
+      "side": 1,
+      "message": "this creates strong runtime binding. no production code should ever do this kind of thing. This needs a clean solution.",
+      "range": {
+        "startLine": 105,
+        "startChar": 43,
+        "endLine": 105,
+        "endChar": 114
+      },
+      "revId": "9aa6aa2cc40b58ec3aeae4c6e9240e1afcc091b3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
