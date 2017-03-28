@@ -32,18 +32,20 @@ public class NetconfCallHomeServerBuilder implements Builder<NetconfCallHomeServ
 
     private final CallHomeAuthorizationProvider authProvider;
     private final CallHomeNetconfSubsystemListener subsystemListener;
+    private final StatusRecorder recorder;
 
     public NetconfCallHomeServerBuilder(CallHomeAuthorizationProvider authProvider,
-            CallHomeNetconfSubsystemListener subsystemListener) {
+            CallHomeNetconfSubsystemListener subsystemListener, StatusRecorder recorder) {
         this.authProvider = authProvider;
         this.subsystemListener = subsystemListener;
+        this.recorder = recorder;
     }
 
     @Override
     public NetconfCallHomeServer build() {
         Factory factory =
                 new CallHomeSessionContext.Factory(nettyGroup(), negotiatorFactory(), subsystemListener());
-        return new NetconfCallHomeServer(sshClient(), authProvider(), factory, bindAddress());
+        return new NetconfCallHomeServer(sshClient(), authProvider(), factory, bindAddress(), this.recorder);
     }
 
     public SshClient getSshClient() {

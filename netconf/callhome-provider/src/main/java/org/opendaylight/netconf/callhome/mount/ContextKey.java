@@ -25,7 +25,7 @@ class ContextKey {
     private final IpAddress address;
     private final PortNumber port;
 
-    public ContextKey(IpAddress address, PortNumber port) {
+    ContextKey(IpAddress address, PortNumber port) {
         this.address = Preconditions.checkNotNull(address);
         this.port = Preconditions.checkNotNull(port);
     }
@@ -50,16 +50,16 @@ class ContextKey {
         return Objects.equal(address, other.address) && Objects.equal(port, other.port);
     }
 
-    public static ContextKey from(NetconfNode node) {
-        return new ContextKey(node.getHost().getIpAddress(), node.getPort());
-    }
-
     IpAddress getIpAddress() {
         return address;
     }
 
     PortNumber getPort() {
         return port;
+    }
+
+    public static ContextKey from(NetconfNode node) {
+        return new ContextKey(node.getHost().getIpAddress(), node.getPort());
     }
 
     public static ContextKey from(SocketAddress remoteAddress) {
