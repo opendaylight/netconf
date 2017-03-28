@@ -5,6 +5,9 @@ module config {
 
     revision "2015-02-26";
 
+    identity foo {
+            description "dummy identity";
+    }
     container mapping-nodes {
 
         list multiple-keys {

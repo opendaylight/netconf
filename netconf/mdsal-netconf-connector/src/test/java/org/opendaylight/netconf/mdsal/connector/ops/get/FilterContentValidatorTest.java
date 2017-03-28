@@ -78,6 +78,7 @@ public class FilterContentValidatorTest {
         final List<InputStream> sources = new ArrayList<>();
         sources.add(getClass().getResourceAsStream("/yang/filter-validator-test-mod-0.yang"));
         sources.add(getClass().getResourceAsStream("/yang/filter-validator-test-augment.yang"));
+        sources.add(getClass().getResourceAsStream("/yang/mdsal-netconf-mapping-test.yang"));
         final SchemaContext context = YangParserTestUtils.parseYangStreams(sources);
         final CurrentSchemaContext currentContext = mock(CurrentSchemaContext.class);
         doReturn(context).when(currentContext).getCurrentContext();
