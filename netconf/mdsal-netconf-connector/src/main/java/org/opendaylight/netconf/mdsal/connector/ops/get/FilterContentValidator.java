@@ -27,8 +27,10 @@ import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
 import org.opendaylight.yangtools.yang.model.api.ChoiceCaseNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.slf4j.Logger;
@@ -164,15 +166,15 @@ public class FilterContentValidator {
                                     final InstanceIdentifierBuilder builder) {
         Preconditions.checkArgument(tree.getSchemaNode() instanceof ListSchemaNode);
         final ListSchemaNode listSchemaNode = (ListSchemaNode) tree.getSchemaNode();
-        final List<QName> keyDefinition = listSchemaNode.getKeyDefinition();
-        final Map<QName, Object> map = getKeyValues(pathToList, filterContent, keyDefinition);
+
+        final Map<QName, Object> map = getKeyValues(pathToList, filterContent, listSchemaNode);
         if (!map.isEmpty()) {
             builder.nodeWithKey(tree.getName(), map);
         }
     }
 
     private Map<QName, Object> getKeyValues(final List<String> path, final XmlElement filterContent,
-                                            final List<QName> keyDefinition) {
+                                            final ListSchemaNode listSchemaNode) {
         XmlElement current = filterContent;
         //find list element
         for (final String pathElement : path) {
@@ -184,6 +186,7 @@ public class FilterContentValidator {
             current = childElements.get(0);
         }
         final Map<QName, Object> keys = new HashMap<>();
+        final List<QName> keyDefinition = listSchemaNode.getKeyDefinition();
         for (final QName qName : keyDefinition) {
             final Optional<XmlElement> childElements = current.getOnlyChildElementOptionally(qName.getLocalName());
             if (!childElements.isPresent()) {
@@ -191,7 +194,9 @@ public class FilterContentValidator {
             }
             final Optional<String> keyValue = childElements.get().getOnlyTextContentOptionally();
             if (keyValue.isPresent()) {
-                keys.put(qName, keyValue.get());
+                final LeafSchemaNode listKey = (LeafSchemaNode) listSchemaNode.getDataChildByName(qName);
+                final Object deserializedKey = TypeDefinitionAwareCodec.from(listKey.getType()).deserialize(keyValue.get());
+                keys.put(qName, deserializedKey);
             }
         }
         return keys;
