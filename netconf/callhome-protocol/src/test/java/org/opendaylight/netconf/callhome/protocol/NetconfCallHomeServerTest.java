@@ -38,13 +38,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NetconfCallHomeServerTest {
-
     SshClient mockSshClient;
     CallHomeAuthorizationProvider mockCallHomeAuthProv;
     CallHomeAuthorization mockAuth;
     CallHomeSessionContext.Factory mockFactory;
     InetSocketAddress mockAddress;
     ClientSession mockSession;
+    StatusRecorder mockStatusRecorder;
 
     NetconfCallHomeServer instance;
 
@@ -56,12 +56,13 @@ public class NetconfCallHomeServerTest {
         mockFactory = mock(CallHomeSessionContext.Factory.class);
         mockAddress = InetSocketAddress.createUnresolved("1.2.3.4", 123);
         mockSession = mock(ClientSession.class);
+        mockStatusRecorder = mock(StatusRecorder.class);
 
         Map<String,String> props = new HashMap<>();
         props.put("nio-workers", "1");
         Mockito.doReturn(props).when(mockSshClient).getProperties();
         Mockito.doReturn("test").when(mockSession).toString();
-        instance = new NetconfCallHomeServer(mockSshClient, mockCallHomeAuthProv, mockFactory, mockAddress);
+        instance = new NetconfCallHomeServer(mockSshClient, mockCallHomeAuthProv, mockFactory, mockAddress, mockStatusRecorder);
     }
 
     @Test
@@ -149,8 +150,8 @@ public class NetconfCallHomeServerTest {
 
         TestableCallHomeServer(SshClient sshClient, CallHomeAuthorizationProvider authProvider,
                                    CallHomeSessionContext.Factory factory, InetSocketAddress socketAddress,
-                                   IoServiceFactory minaFactory) {
-            super(factoryHook(sshClient, minaFactory), authProvider, factory, socketAddress);
+                                   IoServiceFactory minaFactory, StatusRecorder recorder) {
+            super(factoryHook(sshClient, minaFactory), authProvider, factory, socketAddress, recorder);
             client = sshClient;
         }
 
@@ -170,7 +171,7 @@ public class NetconfCallHomeServerTest {
         Mockito.doReturn(mockAcceptor).when(mockMinaFactory).createAcceptor(any(IoHandler.class));
         Mockito.doReturn(mockAcceptor).when(mockMinaFactory).createAcceptor(any(IoHandler.class));
         Mockito.doNothing().when(mockAcceptor).bind(mockAddress);
-        instance = new TestableCallHomeServer(mockSshClient, mockCallHomeAuthProv, mockFactory, mockAddress, mockMinaFactory);
+        instance = new TestableCallHomeServer(mockSshClient, mockCallHomeAuthProv, mockFactory, mockAddress, mockMinaFactory, mockStatusRecorder);
         // when
         instance.bind();
         // then
