@@ -32,19 +32,19 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 
 
 public class ContextKeyTest {
-    IpAddress address1;
-    IpAddress address2;
+    private IpAddress address1;
+    private IpAddress address2;
 
-    PortNumber port1;
-    PortNumber port2;
+    private PortNumber port1;
+    private PortNumber port2;
 
-    NetconfNode mockNode;
-    NetconfClientSession mockSession;
+    private NetconfNode mockNode;
+    private NetconfClientSession mockSession;
 
-    ContextKey instance1;
-    ContextKey instance2;
-    ContextKey instance3;
-    ContextKey instance4;
+    private ContextKey instance1;
+    private ContextKey instance2;
+    private ContextKey instance3;
+    private ContextKey instance4;
 
     @Before
     public void setup() {

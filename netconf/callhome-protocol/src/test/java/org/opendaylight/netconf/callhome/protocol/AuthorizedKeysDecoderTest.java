@@ -15,12 +15,11 @@ import java.security.PublicKey;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.netconf.callhome.protocol.AuthorizedKeysDecoder;
 
 
 public class AuthorizedKeysDecoderTest {
 
-    AuthorizedKeysDecoder instance;
+    private AuthorizedKeysDecoder instance;
 
     @Before
     public void setup() {
