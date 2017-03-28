@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.security.PublicKey;
+import org.apache.sshd.client.session.ClientSessionImpl;
+import org.apache.sshd.common.KeyExchange;
 import org.apache.sshd.ClientSession;
 import org.apache.sshd.SshClient;
 import org.apache.sshd.client.ServerKeyVerifier;
@@ -38,13 +40,15 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
     private final CallHomeAuthorizationProvider authProvider;
     private final CallHomeSessionContext.Factory sessionFactory;
     private final InetSocketAddress bindAddress;
+    private StatusRecorder recorder;
 
     NetconfCallHomeServer(SshClient sshClient, CallHomeAuthorizationProvider authProvider, Factory factory,
-            InetSocketAddress socketAddress) {
+            InetSocketAddress socketAddress, StatusRecorder recorder) {
         this.client = Preconditions.checkNotNull(sshClient);
         this.authProvider = Preconditions.checkNotNull(authProvider);
         this.sessionFactory = Preconditions.checkNotNull(factory);
         this.bindAddress = socketAddress;
+        this.recorder = recorder;
 
         sshClient.setServerKeyVerifier(this);
 
@@ -56,7 +60,7 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
         this.acceptor = minaFactory.createAcceptor(clientSessions);
     }
 
-    IoServiceFactory createServiceFactory(SshClient sshClient) {
+    private IoServiceFactory createServiceFactory(SshClient sshClient) {
         try {
             return createMinaServiceFactory(sshClient);
         } catch (NoClassDefFoundError e) {
@@ -72,7 +76,6 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
 
     SessionListener createSessionListener() {
         return new SessionListener() {
-
             @Override
             public void sessionEvent(Session session, Event event) {
                 ClientSession cSession = (ClientSession) session;
@@ -118,7 +121,7 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
         }
     }
 
-    SshFutureListener<AuthFuture> newAuthSshFutureListener(final ClientSession cSession) {
+    private SshFutureListener<AuthFuture> newAuthSshFutureListener(final ClientSession cSession) {
         return new SshFutureListener<AuthFuture>() {
             @Override
             public void operationComplete(AuthFuture authFuture) {
@@ -137,7 +140,13 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
             }
 
             private void onFailure(Throwable throwable) {
-                LOG.error("Failed to authorize session {}", cSession, throwable);
+                ClientSessionImpl impl = (ClientSessionImpl) cSession;
+                LOG.error("Authorize failed for session {}", cSession, throwable);
+
+                KeyExchange kex = impl.getKex();
+                PublicKey key = kex.getServerKey();
+                recorder.reportFailedAuth(key);
+
                 cSession.close(true);
             }
 
@@ -175,7 +184,6 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
             throw e;
         }
     }
-
 
     @Override
     public void close() throws Exception {

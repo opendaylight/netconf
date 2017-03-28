@@ -48,11 +48,9 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     private final DataBroker dataBroker;
     private final DOMMountPointService mountService;
 
-
-    private CallHomeTopology topology;
+    protected CallHomeTopology topology;
 
     private final CloseCallback onCloseHandler = new CloseCallback() {
-
         @Override
         public void onClosed(CallHomeMountSessionContext deviceContext) {
             LOG.info("Removing {} from Netconf Topology.", deviceContext.getId());
@@ -60,10 +58,13 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
         }
     };
 
-
     public CallHomeMountDispatcher(String topologyId, BindingAwareBroker bindingAwareBroker,
-            EventExecutor eventExecutor, ScheduledThreadPool keepaliveExecutor, ThreadPool processingExecutor,
-            SchemaRepositoryProvider schemaRepositoryProvider, Broker domBroker, DataBroker dataBroker, DOMMountPointService mountService) {
+                                   EventExecutor eventExecutor,
+                                   ScheduledThreadPool keepaliveExecutor,
+                                   ThreadPool processingExecutor,
+                                   SchemaRepositoryProvider schemaRepositoryProvider,
+                                   Broker domBroker, DataBroker dataBroker,
+                                   DOMMountPointService mountService) {
         this.topologyId = topologyId;
         this.bindingAwareBroker = bindingAwareBroker;
         this.eventExecutor = eventExecutor;
@@ -75,7 +76,6 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
         this.dataBroker = dataBroker;
         this.mountService = mountService;
     }
-
 
     @Override
     public Future<NetconfClientSession> createClient(NetconfClientConfiguration clientConfiguration) {
@@ -89,7 +89,7 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
 
     private <V> Future<V> activateChannel(NetconfClientConfiguration conf) {
         InetSocketAddress remoteAddr = conf.getAddress();
-        CallHomeMountSessionContext context = sessionManager.getByAddress(remoteAddr);
+        CallHomeMountSessionContext context = getSessionManager().getByAddress(remoteAddr);
         LOG.info("Activating NETCONF channel for ip {} device context {}", remoteAddr, context);
         if (context == null) {
             return new FailedFuture<>(eventExecutor, new NullPointerException());
@@ -103,8 +103,9 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     }
 
     @Override
-    public void onNetconfSubsystemOpened(CallHomeProtocolSessionContext session, CallHomeChannelActivator activator) {
-        CallHomeMountSessionContext deviceContext = sessionManager.createSession(session, activator, onCloseHandler);
+    public void onNetconfSubsystemOpened(CallHomeProtocolSessionContext session,
+                                         CallHomeChannelActivator activator) {
+        CallHomeMountSessionContext deviceContext = getSessionManager().createSession(session, activator, onCloseHandler);
         NodeId nodeId = deviceContext.getId();
         Node configNode = deviceContext.getConfigNode();
         LOG.info("Provisioning fake config {}", configNode);

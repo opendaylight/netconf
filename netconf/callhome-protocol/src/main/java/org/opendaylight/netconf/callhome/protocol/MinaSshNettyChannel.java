@@ -29,16 +29,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class MinaSshNettyChannel extends AbstractServerChannel {
-
     private static final Logger LOG = LoggerFactory.getLogger(MinaSshNettyChannel.class);
     private static final ChannelMetadata METADATA = new ChannelMetadata(false);
+
     private final ChannelConfig config = new DefaultChannelConfig(this);
     private final CallHomeSessionContext context;
     private final ClientSession session;
     private final ClientChannel sshChannel;
     private final AsyncSshHandlerReader  sshReadHandler;
     private final AsyncSshHandlerWriter sshWriteAsyncHandler;
-
 
     private volatile boolean nettyClosed = false;
 
@@ -71,7 +70,6 @@ class MinaSshNettyChannel extends AbstractServerChannel {
     private boolean notClosing(org.apache.sshd.common.Closeable sshCloseable) {
         return !sshCloseable.isClosing() && !sshCloseable.isClosed();
     }
-
 
     @Override
     public boolean isOpen() {
@@ -156,12 +154,10 @@ class MinaSshNettyChannel extends AbstractServerChannel {
     }
 
     private final class FireReadMessage implements ReadMsgHandler {
-
         @Override
         public void onMessageRead(ByteBuf msg) {
             pipeline().fireChannelRead(msg);
         }
-
     }
 
     private final class ConnectionClosedDuringRead implements AutoCloseable {
@@ -173,7 +169,6 @@ class MinaSshNettyChannel extends AbstractServerChannel {
         public void close() throws Exception {
             doNettyDisconnect();
         }
-
     }
 
     private class SshUnsafe extends AbstractUnsafe {
@@ -182,6 +177,5 @@ class MinaSshNettyChannel extends AbstractServerChannel {
         public void connect(SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) {
             throw new UnsupportedOperationException("Unsafe is not supported.");
         }
-
     }
 }
