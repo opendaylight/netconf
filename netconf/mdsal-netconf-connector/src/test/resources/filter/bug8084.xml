@@ -1,0 +1,25 @@
+<!--
+  ~ Copyright (c) 2017 Cisco Systems, Inc. and others.  All rights reserved.
+  ~
+  ~ This program and the accompanying materials are made available under the
+  ~ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+  ~ and is available at http://www.eclipse.org/legal/epl-v10.html
+  -->
+
+<mainroot xmlns="urn:dummy:mod-0">
+    <multi-key-list2>
+        <id1>aaa</id1>
+        <id2>-9</id2>
+        <id3>-30000</id3>
+        <id4>-2000000000</id4>
+        <id5>-2000000000000000</id5>
+        <id6>9</id6>
+        <id7>30000</id7>
+        <id8>2000000000</id8>
+        <id9>2000000000000000</id9>
+        <id10>true</id10>
+        <id11>128.55</id11>
+        <id12>foo</id12>
+        <id13 xmlns:map-test="urn:opendaylight:mdsal:mapping:test">map-test:foo</id13>
+    </multi-key-list2>
+</mainroot>
