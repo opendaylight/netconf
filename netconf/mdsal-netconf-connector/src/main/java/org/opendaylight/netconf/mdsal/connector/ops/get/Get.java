@@ -44,7 +44,7 @@ public class Get extends AbstractGet {
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
 
-        final Optional<YangInstanceIdentifier> dataRootOptional = getDataRootFromFilter(operationElement);
+        final Optional<YangInstanceIdentifier> dataRootOptional = getDataRootFromFilter(operationElement, document);
         if (!dataRootOptional.isPresent()) {
             return XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.<String>absent());
         }
