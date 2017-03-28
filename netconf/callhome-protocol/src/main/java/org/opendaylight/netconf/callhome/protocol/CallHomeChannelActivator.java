@@ -14,14 +14,11 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 
 /**
  * Activator of NETCONF channel on incoming SSH Call Home session.
- *
  */
 public interface CallHomeChannelActivator {
-
     /**
-     *
      * Activates Netconf Client Channel with supplied client session listener.
-     *
+     * <p>
      * Activation of channel will result in start of NETCONF client
      * session negotiation on underlying ssh channel.
      *
@@ -30,5 +27,4 @@ public interface CallHomeChannelActivator {
      */
     @Nonnull
     Promise<NetconfClientSession> activate(@Nonnull NetconfClientSessionListener listener);
-
 }

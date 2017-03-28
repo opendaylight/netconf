@@ -11,9 +11,7 @@ import java.net.InetSocketAddress;
 import java.security.PublicKey;
 
 /**
- *
  * Protocol level Session Context for incoming Call Home connections.
- *
  */
 public interface CallHomeProtocolSessionContext {
 
@@ -32,7 +30,6 @@ public interface CallHomeProtocolSessionContext {
     PublicKey getRemoteServerKey();
 
     /**
-     *
      * Returns remote socket address associated with this session.
      *
      * @return remote socket address associated with this session.
@@ -45,5 +42,4 @@ public interface CallHomeProtocolSessionContext {
      * @return Version string provided by remote server.
      */
     String getRemoteServerVersion();
-
 }

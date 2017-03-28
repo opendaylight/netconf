@@ -7,11 +7,17 @@
  */
 package org.opendaylight.netconf.callhome.protocol;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
+import java.security.interfaces.DSAParams;
+import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.ECPoint;
 import java.security.spec.ECPublicKeySpec;
@@ -22,15 +28,15 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.sshd.common.util.Base64;
 import org.apache.sshd.common.util.SecurityUtils;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.ECPointUtil;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECNamedCurveSpec;
 
+
 /**
- *
  * FIXME: This should be probably located at AAA library
- *
  */
 public class AuthorizedKeysDecoder {
 
@@ -38,12 +44,14 @@ public class AuthorizedKeysDecoder {
     private static final String KEY_FACTORY_TYPE_DSA = "DSA";
     private static final String KEY_FACTORY_TYPE_ECDSA = "EC";
 
-    private static Map<String,String> ECDSA_CURVES = new HashMap<>();
+    private static Map<String, String> ECDSA_CURVES = new HashMap<>();
+
     static {
         ECDSA_CURVES.put("nistp256", "secp256r1");
         ECDSA_CURVES.put("nistp384", "secp384r1");
         ECDSA_CURVES.put("nistp512", "secp512r1");
     }
+
     private static String ECDSA_SUPPORTED_CURVE_NAME = "nistp256";
     private static String ECDSA_SUPPORTED_CURVE_NAME_SPEC = ECDSA_CURVES.get(ECDSA_SUPPORTED_CURVE_NAME);
 
@@ -71,7 +79,7 @@ public class AuthorizedKeysDecoder {
         if (type.equals(KEY_TYPE_DSA))
             return decodeAsDSA();
 
-        if(type.equals(KEY_TYPE_ECDSA))
+        if (type.equals(KEY_TYPE_ECDSA))
             return decodeAsECDSA();
 
         throw new IllegalArgumentException("Unknown decode key type " + type + " in " + keyLine);
@@ -84,7 +92,7 @@ public class AuthorizedKeysDecoder {
         ECNamedCurveParameterSpec spec256r1 = ECNamedCurveTable.getParameterSpec(ECDSA_SUPPORTED_CURVE_NAME_SPEC);
         ECNamedCurveSpec params256r1 = new ECNamedCurveSpec(ECDSA_SUPPORTED_CURVE_NAME_SPEC, spec256r1.getCurve(), spec256r1.getG(), spec256r1.getN());
         // copy last 65 bytes from ssh key.
-        ECPoint point =  ECPointUtil.decodePoint(params256r1.getCurve(), Arrays.copyOfRange(bytes,39,bytes.length));
+        ECPoint point = ECPointUtil.decodePoint(params256r1.getCurve(), Arrays.copyOfRange(bytes, 39, bytes.length));
         ECPublicKeySpec pubKeySpec = new ECPublicKeySpec(point, params256r1);
 
         return ecdsaFactory.generatePublic(pubKeySpec);
@@ -128,5 +136,53 @@ public class AuthorizedKeysDecoder {
         System.arraycopy(bytes, pos, bigIntBytes, 0, len);
         pos += len;
         return new BigInteger(bigIntBytes);
+    }
+
+    public static String encodePublicKey(PublicKey publicKey) throws IOException {
+        String publicKeyEncoded;
+        ByteArrayOutputStream byteOs = new ByteArrayOutputStream();
+        if (publicKey.getAlgorithm().equals(KEY_FACTORY_TYPE_RSA)) {
+            RSAPublicKey rsaPublicKey = (RSAPublicKey) publicKey;
+            DataOutputStream dout = new DataOutputStream(byteOs);
+            dout.writeInt(KEY_TYPE_RSA.getBytes().length);
+            dout.write(KEY_TYPE_RSA.getBytes());
+            dout.writeInt(rsaPublicKey.getPublicExponent().toByteArray().length);
+            dout.write(rsaPublicKey.getPublicExponent().toByteArray());
+            dout.writeInt(rsaPublicKey.getModulus().toByteArray().length);
+            dout.write(rsaPublicKey.getModulus().toByteArray());
+        } else if (publicKey.getAlgorithm().equals(KEY_FACTORY_TYPE_DSA)) {
+            DSAPublicKey dsaPublicKey = (DSAPublicKey) publicKey;
+            DSAParams dsaParams = dsaPublicKey.getParams();
+            DataOutputStream dout = new DataOutputStream(byteOs);
+            dout.writeInt(KEY_TYPE_DSA.getBytes().length);
+            dout.write(KEY_TYPE_DSA.getBytes());
+            dout.writeInt(dsaParams.getP().toByteArray().length);
+            dout.write(dsaParams.getP().toByteArray());
+            dout.writeInt(dsaParams.getQ().toByteArray().length);
+            dout.write(dsaParams.getQ().toByteArray());
+            dout.writeInt(dsaParams.getG().toByteArray().length);
+            dout.write(dsaParams.getG().toByteArray());
+            dout.writeInt(dsaPublicKey.getY().toByteArray().length);
+            dout.write(dsaPublicKey.getY().toByteArray());
+        } else if (publicKey.getAlgorithm().equals(KEY_FACTORY_TYPE_ECDSA)) {
+            BCECPublicKey ecPublicKey = (BCECPublicKey) publicKey;
+            DataOutputStream dout = new DataOutputStream(byteOs);
+            dout.writeInt(KEY_TYPE_ECDSA.getBytes().length);
+            dout.write(KEY_TYPE_ECDSA.getBytes());
+            dout.writeInt(ECDSA_SUPPORTED_CURVE_NAME.getBytes().length);
+            dout.write(ECDSA_SUPPORTED_CURVE_NAME.getBytes());
+
+            byte[] x = ecPublicKey.getQ().getAffineXCoord().getEncoded();
+            byte[] y = ecPublicKey.getQ().getAffineYCoord().getEncoded();
+            dout.writeInt(x.length + y.length + 1);
+            dout.writeByte(0x04);
+            dout.write(x);
+            dout.write(y);
+        } else {
+            throw new IllegalArgumentException("Unknown public key encoding: " + publicKey.getAlgorithm());
+        }
+        publicKeyEncoded = new String(Base64.encodeBase64(byteOs.toByteArray()));
+        return publicKeyEncoded;
+
     }
 }

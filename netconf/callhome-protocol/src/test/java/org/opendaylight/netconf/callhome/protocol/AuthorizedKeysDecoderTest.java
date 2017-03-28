@@ -12,15 +12,13 @@ import static org.junit.Assert.assertEquals;
 
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.netconf.callhome.protocol.AuthorizedKeysDecoder;
 
 
 public class AuthorizedKeysDecoderTest {
 
-    AuthorizedKeysDecoder instance;
+    private AuthorizedKeysDecoder instance;
 
     @Before
     public void setup() {
@@ -28,7 +26,7 @@ public class AuthorizedKeysDecoderTest {
     }
 
     @Test
-    public void authorizedKeysDecoderValidRSAKey () throws GeneralSecurityException {
+    public void authorizedKeysDecoderValidRSAKey() throws GeneralSecurityException {
         // given
         String rsaStr = "AAAAB3NzaC1yc2EAAAADAQABAAABAQCvLigTfPZMqOQwHp051Co4lwwPwO21NFIXWgjQmCPEgRTqQpei7qQaxlLGkrIPjZtJQRgCuC+Sg8HFw1YpUaMybN0nFInInQLp/qe0yc9ByDZM2G86NX6W5W3+j87I8Fh1dnMov1iJ0DFVn8RLwdEGjreiZCRyJOMuHghh6y4EG7W8BwmZrse17zhSpc2wFOVhxeZnYAQFEw6g48LutFRDpoTjGgz1nz/L4zcaUxxigs8wdY+qTTOHxSTxlLqwSZPFLyYrV2KJ9mKahMuYUy6o2b8snsjvnSjyK0kY+U0C6c8fmPDFUc0RqJqfdnsIUyh11U8d3NZdaFWg0UW0SNK3";
         // when
@@ -38,7 +36,7 @@ public class AuthorizedKeysDecoderTest {
     }
 
     @Test(expected = Exception.class)
-    public void authorizedKeysDecoderInvalidRSAKey () throws GeneralSecurityException {
+    public void authorizedKeysDecoderInvalidRSAKey() throws GeneralSecurityException {
         // given
         String rsaStr = "AAAB3NzaC1yc2EAAAADAQABAAABAQCvLigTfPZMqOQwHp051Co4lwwPwO21NFIXWgjQmCPEgRTqQpei7qQaxlLGkrIPjZtJQRgCuC+Sg8HFw1YpUaMybN0nFInInQLp/qe0yc9ByDZM2G86NX6W5W3+j87I8Fh1dnMov1iJ0DFVn8RLwdEGjreiZCRyJOMuHghh6y4EG7W8BwmZrse17zhSpc2wFOVhxeZnYAQFEw6g48LutFRDpoTjGgz1nz/L4zcaUxxigs8wdY+qTTOHxSTxlLqwSZPFLyYrV2KJ9mKahMuYUy6o2b8snsjvnSjyK0kY+U0C6c8fmPDFUc0RqJqfdnsIUyh11U8d3NZdaFWg0UW0SNK3";
         // when
@@ -93,5 +91,5 @@ public class AuthorizedKeysDecoderTest {
     public void decodingOfBlankInputIsCaughtAsAnError() throws GeneralSecurityException {
         // when
         instance.decodePublicKey("");
-   }
+    }
 }

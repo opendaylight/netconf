@@ -9,13 +9,18 @@
 package org.opendaylight.netconf.callhome.mount;
 
 import static org.junit.Assert.assertFalse;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
@@ -26,6 +31,7 @@ import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
+import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
@@ -33,6 +39,8 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
 import org.opendaylight.protocol.framework.ReconnectStrategy;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 
 public class CallHomeMountDispatcherTest {
     private String topologyId;
@@ -47,6 +55,10 @@ public class CallHomeMountDispatcherTest {
     private DataBroker mockDataBroker;
     private DOMMountPointService mockMount;
 
+    private CallHomeMountSessionManager mockSessMgr;
+    private CallHomeTopology mockTopology;
+    private CallHomeProtocolSessionContext mockProtoSess;
+
     @Before
     public void setup() {
         topologyId = "";
@@ -58,8 +70,21 @@ public class CallHomeMountDispatcherTest {
         mockDomBroker = mock(Broker.class);
         mockDataBroker = mock(DataBroker.class);
         mockMount = mock(DOMMountPointService.class);
+        mockSessMgr = mock(CallHomeMountSessionManager.class);
+        mockTopology = mock(CallHomeTopology.class);
+        mockProtoSess = mock(CallHomeProtocolSessionContext.class);
+
         instance = new CallHomeMountDispatcher(topologyId, mockBroker, mockExecutor, mockKeepAlive,
-                mockProcessingExecutor, mockSchemaRepoProvider, mockDomBroker, mockDataBroker, mockMount);
+                mockProcessingExecutor, mockSchemaRepoProvider, mockDomBroker, mockDataBroker, mockMount) {
+            @Override
+            public CallHomeMountSessionManager getSessionManager() {
+                return mockSessMgr;
+            }
+            @Override
+            void createTopology() {
+                this.topology = mockTopology;
+            }
+        };
     }
 
     NetconfClientConfiguration someConfiguration(InetSocketAddress address) {
@@ -83,13 +108,13 @@ public class CallHomeMountDispatcherTest {
         // given
         CallHomeMountSessionContext mockContext = mock(CallHomeMountSessionContext.class);
         InetSocketAddress someAddress = InetSocketAddress.createUnresolved("1.2.3.4", 123);
-        // instance.contextByAddress.put(someAddress, mockContext);
+        doReturn(mockContext).when(mockSessMgr).getByAddress(eq(someAddress));
 
         NetconfClientConfiguration someCfg = someConfiguration(someAddress);
         // when
         instance.createClient(someCfg);
         // then
-        // verify(mockContext, times(1)).activate(any(NetconfClientSessionListener.class));
+        verify(mockContext, times(1)).activateNetconfChannel(any(NetconfClientSessionListener.class));
     }
 
     @Test
@@ -106,12 +131,18 @@ public class CallHomeMountDispatcherTest {
     @Test
     public void nodeIsInsertedIntoTopologyWhenSubsystemIsOpened() throws UnknownHostException {
         // given
-        InetSocketAddress someAddress = new InetSocketAddress(InetAddress.getByName("1.2.3.4"), 123);
+        NodeId mockNodeId = mock(NodeId.class);
+        Node mockNode = mock(Node.class);
+        CallHomeMountSessionContext mockDevCtxt = mock(CallHomeMountSessionContext.class);
+        doReturn(mockNodeId).when(mockDevCtxt).getId();
+        doReturn(mockNode).when(mockDevCtxt).getConfigNode();
+        doReturn(mockDevCtxt).when(mockSessMgr).createSession(any(CallHomeProtocolSessionContext.class),
+                any(CallHomeChannelActivator.class), any(CallHomeMountSessionContext.CloseCallback.class));
         CallHomeChannelActivator activator = mock(CallHomeChannelActivator.class);
-        // instance.topology = mock(CallHomeTopology.class);
+        instance.createTopology();
         // when
-        // instance.onNetconfSubsystemOpened(someAddress, activator);
+        instance.onNetconfSubsystemOpened(mockProtoSess, activator);
         // then
-        // verify(instance.topology, times(1)).connectNode(any(NodeId.class), any(Node.class));
+        verify(instance.topology, times(1)).connectNode(any(NodeId.class), any(Node.class));
     }
 }

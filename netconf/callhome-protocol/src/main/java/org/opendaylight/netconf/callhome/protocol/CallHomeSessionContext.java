@@ -51,8 +51,8 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
     private InetSocketAddress remoteAddress;
     private PublicKey serverKey;
 
-    CallHomeSessionContext(ClientSession sshSession, CallHomeAuthorization authorization, SocketAddress remoteAddress,
-            Factory factory) {
+    CallHomeSessionContext(ClientSession sshSession, CallHomeAuthorization authorization,
+                           SocketAddress remoteAddress, Factory factory) {
         this.authorization = Preconditions.checkNotNull(authorization, "authorization");
         Preconditions.checkArgument(this.authorization.isServerAllowed(), "Server was not allowed.");
         Preconditions.checkArgument(sshSession instanceof ClientSessionImpl,
@@ -85,9 +85,8 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
     }
 
     SshFutureListener<OpenFuture> newSshFutureListener(final ClientChannel netconfChannel) {
-	return future -> 
-	{
-	    if (future.isOpened()) {
+        return future -> {
+            if (future.isOpened()) {
                 netconfChannelOpened(netconfChannel);
             } else {
                 channelOpenFailed(future.getException());
@@ -103,12 +102,12 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
     private void netconfChannelOpened(ClientChannel netconfChannel) {
         nettyChannel = newMinaSshNettyChannel(netconfChannel);
         factory.getChannelOpenListener().onNetconfSubsystemOpened(CallHomeSessionContext.this,
-	    listener -> doActivate(listener));
+                listener -> doActivate(listener));
     }
 
     @GuardedBy("this")
     private synchronized Promise<NetconfClientSession> doActivate(NetconfClientSessionListener listener) {
-        if(activated) {
+        if (activated) {
             return newSessionPromise().setFailure(new IllegalStateException("Session already activated."));
         }
         activated = true;
@@ -179,8 +178,9 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
 
         @Nullable
         CallHomeSessionContext createIfNotExists(ClientSession sshSession, CallHomeAuthorization authorization,
-                SocketAddress remoteAddress) {
-            CallHomeSessionContext session = new CallHomeSessionContext(sshSession, authorization, remoteAddress, this);
+                                                 SocketAddress remoteAddress) {
+            CallHomeSessionContext session = new CallHomeSessionContext(sshSession, authorization,
+                    remoteAddress, this);
             CallHomeSessionContext preexisting = sessions.putIfAbsent(session.getSessionName(), session);
             // If preexisting is null - session does not exist, so we can safely create new one, otherwise we return
             // null and incoming connection will be rejected.
@@ -190,7 +190,5 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         EventLoopGroup getNettyGroup() {
             return nettyGroup;
         }
-
     }
-
 }

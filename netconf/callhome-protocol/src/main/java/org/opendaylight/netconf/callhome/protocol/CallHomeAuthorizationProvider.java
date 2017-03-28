@@ -12,23 +12,18 @@ import java.security.PublicKey;
 import javax.annotation.Nonnull;
 
 /**
- *
  * Provider responsible for resolving CallHomeAuthorization
- *
  */
 public interface CallHomeAuthorizationProvider {
 
     /**
-     *
      * Provides authorization parameters for incoming call-home connection.
      *
      * @param remoteAddress Remote socket address of incoming connection
-     * @param serverKey SSH key provided by SSH server on incoming connection
-     *
+     * @param serverKey     SSH key provided by SSH server on incoming connection
      * @return {@link CallHomeAuthorization} with authorization information.
-     *
      */
     @Nonnull
-    CallHomeAuthorization provideAuth(@Nonnull SocketAddress remoteAddress,@Nonnull PublicKey serverKey);
+    CallHomeAuthorization provideAuth(@Nonnull SocketAddress remoteAddress, @Nonnull PublicKey serverKey);
 
 }

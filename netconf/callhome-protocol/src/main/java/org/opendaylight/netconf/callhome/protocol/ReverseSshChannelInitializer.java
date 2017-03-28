@@ -23,14 +23,14 @@ class ReverseSshChannelInitializer extends AbstractChannelInitializer<NetconfCli
     private final NetconfClientSessionListener sessionListener;
 
     private ReverseSshChannelInitializer(NetconfClientSessionNegotiatorFactory negotiatorFactory,
-            NetconfClientSessionListener sessionListener) {
+                                         NetconfClientSessionListener sessionListener) {
         super();
         this.negotiatorFactory = negotiatorFactory;
         this.sessionListener = sessionListener;
     }
 
     public static ReverseSshChannelInitializer create(NetconfClientSessionNegotiatorFactory negotiatorFactory,
-            NetconfClientSessionListener listener) {
+                                                      NetconfClientSessionListener listener) {
         return new ReverseSshChannelInitializer(negotiatorFactory, listener);
     }
 
@@ -44,5 +44,4 @@ class ReverseSshChannelInitializer extends AbstractChannelInitializer<NetconfCli
         ch.pipeline().addAfter(NETCONF_MESSAGE_DECODER, AbstractChannelInitializer.NETCONF_SESSION_NEGOTIATOR,
                 negotiatorFactory.getSessionNegotiator(this, ch, promise));
     }
-
 }

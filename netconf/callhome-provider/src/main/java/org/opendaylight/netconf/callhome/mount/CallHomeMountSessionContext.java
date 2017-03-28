@@ -29,9 +29,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 class CallHomeMountSessionContext {
 
     public interface CloseCallback {
-
         void onClosed(CallHomeMountSessionContext deviceContext);
-
     }
 
     private final NodeId nodeId;
@@ -61,9 +59,7 @@ class CallHomeMountSessionContext {
 
     Node getConfigNode() {
         NodeBuilder builder = new NodeBuilder();
-
         return builder.setNodeId(getId()).addAugmentation(NetconfNode.class, configNetconfNode()).build();
-
     }
 
     private NetconfNode configNetconfNode() {
@@ -84,7 +80,6 @@ class CallHomeMountSessionContext {
     @SuppressWarnings("deprecation")
     private NetconfClientSessionListener wrap(final NetconfClientSessionListener delegate) {
         return new NetconfClientSessionListener() {
-
             @Override
             public void onSessionUp(NetconfClientSession session) {
                 delegate.onSessionUp(session);
@@ -126,5 +121,4 @@ class CallHomeMountSessionContext {
     PublicKey getRemoteServerKey() {
         return protocol.getRemoteServerKey();
     }
-
 }

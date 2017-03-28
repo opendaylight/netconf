@@ -17,7 +17,6 @@ import org.apache.sshd.ClientSession;
 import org.apache.sshd.client.session.ClientSessionImpl;
 
 /**
- *
  * Authorization context for incoming call home sessions.
  *
  * @see CallHomeAuthorizationProvider
@@ -31,7 +30,7 @@ public abstract class CallHomeAuthorization {
         }
 
         @Override
-        protected String getSessionName(){
+        protected String getSessionName() {
             return "";
         }
 
@@ -42,10 +41,9 @@ public abstract class CallHomeAuthorization {
     };
 
     /**
-     *
      * Returns CallHomeAuthorization object with intent to
      * reject incoming connection.
-     *
+     * <p>
      * {@link CallHomeAuthorizationProvider} may use returned object
      * as return value for {@link CallHomeAuthorizationProvider#provideAuth(java.net.SocketAddress, java.security.PublicKey)}
      * if the incoming session should be rejected due to policy implemented
@@ -60,12 +58,12 @@ public abstract class CallHomeAuthorization {
     /**
      * Creates a builder for CallHomeAuthorization with intent
      * to accept incoming connection and to provide credentials.
-     *
+     * <p>
      * Note: If session with same sessionName is already opened and
      * active, incoming session will be rejected.
      *
      * @param sessionName Application specific unique identifier for incoming session
-     * @param username Username to be used for authorization
+     * @param username    Username to be used for authorization
      * @return Builder which allows to specify credentials.
      */
     public static final Builder serverAccepted(String sessionName, String username) {
@@ -80,7 +78,6 @@ public abstract class CallHomeAuthorization {
     public abstract boolean isServerAllowed();
 
     /**
-     *
      * Applies provided authentification to Mina SSH Client Session
      *
      * @param session Client Session to which authorization parameters will by applied
@@ -90,12 +87,10 @@ public abstract class CallHomeAuthorization {
     protected abstract String getSessionName();
 
     /**
-     *
      * Builder for CallHomeAuthorization which accepts incoming connection.
-     *
+     * <p>
      * Use {@link CallHomeAuthorization#serverAccepted(String, String)} to instantiate
      * builder.
-     *
      */
     public static class Builder implements org.opendaylight.yangtools.concepts.Builder<CallHomeAuthorization> {
 
@@ -110,7 +105,6 @@ public abstract class CallHomeAuthorization {
         }
 
         /**
-         *
          * Adds password, which will be used for password-based authorization.
          *
          * @param password Password to be used for password-based authorization.
@@ -122,13 +116,12 @@ public abstract class CallHomeAuthorization {
         }
 
         /**
-         *
          * Adds public / private key pair to be used for public-key based authorization.
          *
          * @param clientKey Keys to be used for authorization.
          * @return this builder.
          */
-        public Builder addClientKeys(KeyPair clientKey){
+        public Builder addClientKeys(KeyPair clientKey) {
             this.clientKeys.add(clientKey);
             return this;
         }
@@ -147,7 +140,7 @@ public abstract class CallHomeAuthorization {
         private final Set<String> passwords;
         private final Set<KeyPair> clientKeyPair;
 
-        ServerAllowed(String nodeId, String username, Collection<String >passwords, Collection<KeyPair> clientKeyPairs) {
+        ServerAllowed(String nodeId, String username, Collection<String> passwords, Collection<KeyPair> clientKeyPairs) {
             this.username = Preconditions.checkNotNull(username);
             this.passwords = ImmutableSet.copyOf(passwords);
             this.clientKeyPair = ImmutableSet.copyOf(clientKeyPairs);
