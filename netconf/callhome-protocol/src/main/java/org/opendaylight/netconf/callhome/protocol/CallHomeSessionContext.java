@@ -51,8 +51,8 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
     private InetSocketAddress remoteAddress;
     private PublicKey serverKey;
 
-    CallHomeSessionContext(ClientSession sshSession, CallHomeAuthorization authorization, SocketAddress remoteAddress,
-            Factory factory) {
+    CallHomeSessionContext(ClientSession sshSession, CallHomeAuthorization authorization,
+                           SocketAddress remoteAddress, Factory factory) {
         this.authorization = Preconditions.checkNotNull(authorization, "authorization");
         Preconditions.checkArgument(this.authorization.isServerAllowed(), "Server was not allowed.");
         Preconditions.checkArgument(sshSession instanceof ClientSessionImpl,
@@ -180,7 +180,8 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         @Nullable
         CallHomeSessionContext createIfNotExists(ClientSession sshSession, CallHomeAuthorization authorization,
                 SocketAddress remoteAddress) {
-            CallHomeSessionContext session = new CallHomeSessionContext(sshSession, authorization, remoteAddress, this);
+            CallHomeSessionContext session = new CallHomeSessionContext(sshSession, authorization,
+                    remoteAddress, this);
             CallHomeSessionContext preexisting = sessions.putIfAbsent(session.getSessionName(), session);
             // If preexisting is null - session does not exist, so we can safely create new one, otherwise we return
             // null and incoming connection will be rejected.
@@ -190,7 +191,5 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         EventLoopGroup getNettyGroup() {
             return nettyGroup;
         }
-
     }
-
 }

@@ -60,7 +60,5 @@
       <artifactId>mockito-configuration</artifactId>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
-
 </project>

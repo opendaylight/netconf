@@ -17,7 +17,6 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
  *
  */
 public interface CallHomeChannelActivator {
-
     /**
      *
      * Activates Netconf Client Channel with supplied client session listener.
@@ -30,5 +29,4 @@ public interface CallHomeChannelActivator {
      */
     @Nonnull
     Promise<NetconfClientSession> activate(@Nonnull NetconfClientSessionListener listener);
-
 }

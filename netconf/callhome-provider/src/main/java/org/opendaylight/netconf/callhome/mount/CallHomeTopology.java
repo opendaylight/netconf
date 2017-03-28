@@ -26,16 +26,20 @@ import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
 public class CallHomeTopology extends BaseCallHomeTopology {
 
     public CallHomeTopology(String topologyId, NetconfClientDispatcher clientDispatcher,
-            BindingAwareBroker bindingAwareBroker, Broker domBroker, EventExecutor eventExecutor,
-            ScheduledThreadPool keepaliveExecutor, ThreadPool processingExecutor,
-            SchemaRepositoryProvider schemaRepositoryProvider,final DataBroker dataBroker, final DOMMountPointService mountPointService) {
-        super(topologyId, clientDispatcher, bindingAwareBroker, domBroker, eventExecutor, keepaliveExecutor, processingExecutor,
-                schemaRepositoryProvider, dataBroker, mountPointService);
+                            BindingAwareBroker bindingAwareBroker,
+                            Broker domBroker, EventExecutor eventExecutor,
+                            ScheduledThreadPool keepaliveExecutor, ThreadPool processingExecutor,
+                            SchemaRepositoryProvider schemaRepositoryProvider,
+                            DataBroker dataBroker, DOMMountPointService mountPointService) {
+        super(topologyId, clientDispatcher, bindingAwareBroker, domBroker, eventExecutor,
+                keepaliveExecutor, processingExecutor, schemaRepositoryProvider,
+                dataBroker, mountPointService);
     }
 
     @Override
-    protected RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(RemoteDeviceId id, Broker domBroker,
-            BindingAwareBroker bindingBroker) {
+    protected RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(RemoteDeviceId id,
+                                                                             Broker domBroker,
+                                                                             BindingAwareBroker bindingBroker) {
         return new NetconfDeviceSalFacade(id, domBroker, bindingAwareBroker);
     }
 }

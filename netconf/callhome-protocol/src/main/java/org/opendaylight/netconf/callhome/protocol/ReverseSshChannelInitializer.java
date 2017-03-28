@@ -44,5 +44,4 @@ class ReverseSshChannelInitializer extends AbstractChannelInitializer<NetconfCli
         ch.pipeline().addAfter(NETCONF_MESSAGE_DECODER, AbstractChannelInitializer.NETCONF_SESSION_NEGOTIATOR,
                 negotiatorFactory.getSessionNegotiator(this, ch, promise));
     }
-
 }

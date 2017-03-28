@@ -11,9 +11,7 @@ package org.opendaylight.netconf.callhome.protocol;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -69,8 +67,6 @@ public class CallHomeSessionContextTest {
 
         realFactory = new CallHomeSessionContext.Factory(mockNettyGroup, mockNegotiatior, subListener);
 
-
-
         KeyExchange kexMock = Mockito.mock(KeyExchange.class);
         Mockito.doReturn(kexMock).when(mockSession).getKex();
 
@@ -93,7 +89,7 @@ public class CallHomeSessionContextTest {
         Mockito.doReturn(null).when(mockSession).getAttribute(any(AttributeKey.class));
         Mockito.doReturn("testSession").when(mockSession).toString();
 
-        Mockito.doNothing().when(mockAuth).applyTo(mockSession);
+        doNothing().when(mockAuth).applyTo(mockSession);
         Mockito.doReturn("test").when(mockAuth).getSessionName();
     }
 
@@ -127,7 +123,7 @@ public class CallHomeSessionContextTest {
         Mockito.doReturn(mockChannel).when(mockSession).createSubsystemChannel(anyString());
 
         Mockito.doReturn(null).when(mockFuture).addListener(any(SshFutureListener.class));
-        Mockito.doNothing().when(mockChannel).setStreaming(any(Streaming.class));
+        doNothing().when(mockChannel).setStreaming(any(Streaming.class));
         instance = realFactory.createIfNotExists(mockSession, mockAuth, address);
         // when
         instance.openNetconfChannel();
@@ -138,8 +134,9 @@ public class CallHomeSessionContextTest {
     static class TestableContext extends CallHomeSessionContext {
         MinaSshNettyChannel minaMock;
 
-        public TestableContext(ClientSession sshSession, CallHomeAuthorization authorization, InetSocketAddress address,
-                CallHomeSessionContext.Factory factory, MinaSshNettyChannel minaMock) {
+        TestableContext(ClientSession sshSession, CallHomeAuthorization authorization,
+                        InetSocketAddress address, CallHomeSessionContext.Factory factory,
+                        MinaSshNettyChannel minaMock) {
             super(sshSession, authorization, address, factory);
             this.minaMock = minaMock;
         }
@@ -150,12 +147,15 @@ public class CallHomeSessionContextTest {
         }
     }
 
-    @Ignore
     @Test
-    public void openingTheChannelSuccessfullyShouldFireActiveChannel() {
+    public void openingTheChannelSuccessfullyNotifyTheChannelListener() {
         // given
         MinaSshNettyChannel mockMinaChannel = mock(MinaSshNettyChannel.class);
         CallHomeSessionContext.Factory mockFactory = mock(CallHomeSessionContext.Factory.class);
+
+        CallHomeNetconfSubsystemListener mockListener = mock(CallHomeNetconfSubsystemListener.class);
+        doNothing().when(mockListener).onNetconfSubsystemOpened(any(CallHomeProtocolSessionContext.class),
+                any(CallHomeChannelActivator.class));
 
         ChannelFuture mockChanFuture = mock(ChannelFuture.class);
         Mockito.doReturn(mockChanFuture).when(mockNettyGroup).register(any(Channel.class));
@@ -163,6 +163,7 @@ public class CallHomeSessionContextTest {
         Mockito.doReturn(mockNettyGroup).when(mockFactory).getNettyGroup();
         Mockito.doReturn(mockChannelInitializer).when(mockFactory)
                 .getChannelInitializer(any(NetconfClientSessionListener.class));
+        Mockito.doReturn(mockListener).when(mockFactory).getChannelOpenListener();
 
         ChannelPipeline mockPipeline = mock(ChannelPipeline.class);
         Mockito.doReturn(mockPipeline).when(mockMinaChannel).pipeline();
@@ -175,20 +176,26 @@ public class CallHomeSessionContextTest {
         // when
         listener.operationComplete(mockFuture);
         // then
-        verify(mockPipeline, times(1)).fireChannelActive();
+        verify(mockListener, times(1)).onNetconfSubsystemOpened(any(CallHomeProtocolSessionContext.class),
+                any(CallHomeChannelActivator.class));
     }
 
     @Test
-    @Ignore
     public void failureToOpenTheChannelShouldCauseTheSessionToClose() {
         // given
+        instance = realFactory.createIfNotExists(mockSession, mockAuth, address);
+
         SshFutureListener<OpenFuture> listener = instance.newSshFutureListener(mockChannel);
         OpenFuture mockFuture = mock(OpenFuture.class);
         Mockito.doReturn(false).when(mockFuture).isOpened();
         Mockito.doReturn(new RuntimeException("test")).when(mockFuture).getException();
+
+        doReturn(null).when(mockSession).close(anyBoolean());
+
         // when
         listener.operationComplete(mockFuture);
         // then
+        // You'll see an error message logged to the console - it is expected.
         verify(mockSession, times(1)).close(anyBoolean());
     }
 }

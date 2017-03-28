@@ -40,7 +40,8 @@ public class CallHomeMountSessionManager implements CallHomeMountSessionContext.
             CallHomeChannelActivator activator, final CloseCallback onCloseHandler) {
 
         String name = session.getSessionName();
-        CallHomeMountSessionContext deviceContext = new CallHomeMountSessionContext(name, session, activator, devCtxt -> {
+        CallHomeMountSessionContext deviceContext = new CallHomeMountSessionContext(name,
+                session, activator, devCtxt -> {
                 CallHomeMountSessionManager.this.onClosed(devCtxt);
                 onCloseHandler.onClosed(devCtxt);
             });
@@ -56,5 +57,4 @@ public class CallHomeMountSessionManager implements CallHomeMountSessionContext.
         contextByAddress.remove(deviceContext.getRemoteAddress());
         contextByPublicKey.remove(deviceContext.getRemoteServerKey(),deviceContext);
     }
-
 }

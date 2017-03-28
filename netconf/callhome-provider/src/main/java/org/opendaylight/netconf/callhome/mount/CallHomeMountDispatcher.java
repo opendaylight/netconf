@@ -48,11 +48,9 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     private final DataBroker dataBroker;
     private final DOMMountPointService mountService;
 
-
     private CallHomeTopology topology;
 
     private final CloseCallback onCloseHandler = new CloseCallback() {
-
         @Override
         public void onClosed(CallHomeMountSessionContext deviceContext) {
             LOG.info("Removing {} from Netconf Topology.", deviceContext.getId());
@@ -60,10 +58,13 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
         }
     };
 
-
     public CallHomeMountDispatcher(String topologyId, BindingAwareBroker bindingAwareBroker,
-            EventExecutor eventExecutor, ScheduledThreadPool keepaliveExecutor, ThreadPool processingExecutor,
-            SchemaRepositoryProvider schemaRepositoryProvider, Broker domBroker, DataBroker dataBroker, DOMMountPointService mountService) {
+                                   EventExecutor eventExecutor,
+                                   ScheduledThreadPool keepaliveExecutor,
+                                   ThreadPool processingExecutor,
+                                   SchemaRepositoryProvider schemaRepositoryProvider,
+                                   Broker domBroker, DataBroker dataBroker,
+                                   DOMMountPointService mountService) {
         this.topologyId = topologyId;
         this.bindingAwareBroker = bindingAwareBroker;
         this.eventExecutor = eventExecutor;
@@ -103,7 +104,8 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     }
 
     @Override
-    public void onNetconfSubsystemOpened(CallHomeProtocolSessionContext session, CallHomeChannelActivator activator) {
+    public void onNetconfSubsystemOpened(CallHomeProtocolSessionContext session,
+                                         CallHomeChannelActivator activator) {
         CallHomeMountSessionContext deviceContext = sessionManager.createSession(session, activator, onCloseHandler);
         NodeId nodeId = deviceContext.getId();
         Node configNode = deviceContext.getConfigNode();
