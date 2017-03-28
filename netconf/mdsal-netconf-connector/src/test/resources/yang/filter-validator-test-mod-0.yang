@@ -2,6 +2,16 @@ module filter-validator-test-mod-0 {
     namespace "urn:dummy:mod-0";
     prefix "mod-0";
     revision "2016-03-01";
+
+    import config {
+        prefix map-test;
+        revision-date "2015-02-26";
+    }
+
+    identity foo {
+        description "dummy identity";
+    }
+
     container mainroot {
         leaf maincontent {
             mandatory true;
@@ -46,6 +56,55 @@ module filter-validator-test-mod-0 {
             }
             leaf id2 {
                 type string;
+            }
+        }
+
+        list multi-key-list2 {
+            key "id1 id2 id3 id4 id5 id6 id7 id8 id9 id10 id11 id12 id13";
+            leaf id1 {
+                type string;
+            }
+            leaf id2 {
+                type int8;
+            }
+            leaf id3 {
+                type int16;
+            }
+            leaf id4 {
+                type int32;
+            }
+            leaf id5 {
+                type int64;
+            }
+            leaf id6 {
+                type uint8;
+            }
+            leaf id7 {
+                type uint16;
+            }
+            leaf id8 {
+                type uint32;
+            }
+            leaf id9 {
+                type uint64;
+            }
+            leaf id10 {
+                type boolean;
+            }
+            leaf id11 {
+                type decimal64{
+                    fraction-digits 2;
+                }
+            }
+            leaf id12 {
+                type identityref {
+                    base "foo";
+                }
+            }
+            leaf id13 {
+                type identityref {
+                    base "map-test:foo";
+                }
             }
         }
     }
