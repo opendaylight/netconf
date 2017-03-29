@@ -108,8 +108,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
 
     private NetconfNodeManager createNodeDeviceManager() {
         final NetconfNodeManager ndm =
-                new NetconfNodeManager(netconfTopologyDeviceSetup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY,
-                        DEFAULT_SCHEMA_REPOSITORY, actorResponseWaitTime);
+                new NetconfNodeManager(netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime);
         ndm.registerDataTreeChangeListener(netconfTopologyDeviceSetup.getTopologyId(),
                 netconfTopologyDeviceSetup.getNode().getKey());
 

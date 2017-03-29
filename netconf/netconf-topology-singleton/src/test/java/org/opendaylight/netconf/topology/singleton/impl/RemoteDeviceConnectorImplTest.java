@@ -45,6 +45,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfConnectorDTO;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
+import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -116,7 +117,6 @@ public class RemoteDeviceConnectorImplTest {
         builder.setEventExecutor(eventExecutor);
         builder.setNetconfClientDispatcher(clientDispatcher);
         builder.setTopologyId(TOPOLOGY_ID);
-
     }
 
     @Test
@@ -171,6 +171,8 @@ public class RemoteDeviceConnectorImplTest {
                 .setCredentials(credentials)
                 .build();
 
+        final Node node = new NodeBuilder().setNodeId(NODE_ID).addAugmentation(NetconfNode.class, netconfNode).build();
+        builder.setSchemaResourceDTO(NetconfTopologyUtils.setupSchemaCacheDTO(node));
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
                 new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, TIMEOUT);
 
@@ -202,6 +204,8 @@ public class RemoteDeviceConnectorImplTest {
 
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId(TOPOLOGY_ID,
                 new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 9999));
+        final Node node = new NodeBuilder().setNodeId(NODE_ID).addAugmentation(NetconfNode.class, netconfNode).build();
+        builder.setSchemaResourceDTO(NetconfTopologyUtils.setupSchemaCacheDTO(node));
 
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
                 new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, TIMEOUT);
@@ -242,33 +246,4 @@ public class RemoteDeviceConnectorImplTest {
         assertEquals(defaultClientConfig.getAuthHandler().getUsername(), "testuser");
         assertEquals(defaultClientConfig.getProtocol(), NetconfClientConfiguration.NetconfClientProtocol.TCP);
     }
-
-    @Test
-    public void testSchemaResourceDTO() throws UnknownHostException {
-        final ExecutorService executorService = mock(ExecutorService.class);
-        doReturn(executorService).when(processingExecutor).getExecutor();
-
-        final Credentials credentials = new LoginPasswordBuilder().setPassword("admin").setUsername("admin").build();
-        final NetconfNode netconfNode = new NetconfNodeBuilder()
-                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(9999))
-                .setReconnectOnChangedSchema(true)
-                .setDefaultRequestTimeoutMillis(1000L)
-                .setBetweenAttemptsTimeoutMillis(100)
-                .setSchemaless(false)
-                .setTcpOnly(false)
-                .setCredentials(credentials)
-                .setSchemaCacheDirectory("schemas-test")
-                .build();
-
-        final RemoteDeviceConnectorImpl remoteDeviceConnection =
-                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, TIMEOUT);
-
-        final ActorRef masterRef = mock(ActorRef.class);
-
-        remoteDeviceConnection.createDeviceCommunicator(NODE_ID, netconfNode, masterRef);
-
-        assertTrue(remoteDeviceConnection.getSchemaResourcesDTOs().containsKey("schemas-test"));
-    }
-
 }

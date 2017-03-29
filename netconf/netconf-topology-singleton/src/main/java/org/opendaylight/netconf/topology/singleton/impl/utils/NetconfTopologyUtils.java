@@ -8,9 +8,14 @@
 
 package org.opendaylight.netconf.topology.singleton.impl.utils;
 
+import com.google.common.base.Strings;
 import java.io.File;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemasResolverImpl;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
@@ -25,12 +30,18 @@ import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
+import org.opendaylight.yangtools.yang.parser.util.TextToASTTransformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NetconfTopologyUtils {
+    private static Logger LOG = LoggerFactory.getLogger(NetconfTopologyUtils.class);
 
     private static final String DEFAULT_SCHEMA_REPOSITORY_NAME = "sal-netconf-connector";
 
@@ -68,6 +79,104 @@ public class NetconfTopologyUtils {
     // The default factory for creating <code>SchemaContext</code> instances.
     public static final SchemaContextFactory DEFAULT_SCHEMA_CONTEXT_FACTORY =
             DEFAULT_SCHEMA_REPOSITORY.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
+
+    /**
+     * Keeps track of initialized Schema resources.  A Map is maintained in which the key represents the name
+     * of the schema cache directory, and the value is a corresponding <code>SchemaResourcesDTO</code>.  The
+     * <code>SchemaResourcesDTO</code> is essentially a container that allows for the extraction of the
+     * <code>SchemaRegistry</code> and <code>SchemaContextFactory</code> which should be used for a particular
+     * Netconf mount.  Access to <code>schemaResourcesDTOs</code> should be surrounded by appropriate
+     * synchronization locks.
+     */
+    private static final Map<String, NetconfDevice.SchemaResourcesDTO> schemaResourcesDTOs = new HashMap<>();
+
+    // Initializes default constant instances for the case when the default schema repository
+    // directory cache/schema is used.
+    static {
+        schemaResourcesDTOs.put(DEFAULT_CACHE_DIRECTORY,
+                new NetconfDevice.SchemaResourcesDTO(DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY,
+                        DEFAULT_SCHEMA_CONTEXT_FACTORY, new NetconfStateSchemasResolverImpl()));
+        DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(DEFAULT_CACHE);
+        DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(
+                TextToASTTransformer.create(DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY));
+    }
+
+    public static NetconfDevice.SchemaResourcesDTO setupSchemaCacheDTO(final Node node) {
+        final NetconfNode netconfNode = node.getAugmentation(NetconfNode.class);
+        final String moduleSchemaCacheDirectory = netconfNode.getSchemaCacheDirectory();
+        final RemoteDeviceId deviceId = createRemoteDeviceId(node.getNodeId(), netconfNode);
+
+        // Setup information related to the SchemaRegistry, SchemaResourceFactory, etc.
+        NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = null;
+        // Only checks to ensure the String is not empty or null;  further checks related to directory accessibility
+        // and file permissions are handled during the FilesystemSchemaSourceCache initialization.
+        if (!Strings.isNullOrEmpty(moduleSchemaCacheDirectory)) {
+            // If a custom schema cache directory is specified, create the backing DTO; otherwise, the SchemaRegistry
+            // and SchemaContextFactory remain the default values.
+            if (!moduleSchemaCacheDirectory.equals(DEFAULT_CACHE_DIRECTORY)) {
+                // Multiple modules may be created at once;  synchronize to avoid issues with data consistency among
+                // threads.
+                synchronized (schemaResourcesDTOs) {
+                    // Look for the cached DTO to reuse SchemaRegistry and SchemaContextFactory variables if
+                    // they already exist
+                    schemaResourcesDTO = schemaResourcesDTOs.get(moduleSchemaCacheDirectory);
+                    if (schemaResourcesDTO == null) {
+                        schemaResourcesDTO = createSchemaResourcesDTO(moduleSchemaCacheDirectory);
+                        schemaResourcesDTO.getSchemaRegistry().registerSchemaSourceListener(
+                                TextToASTTransformer.create((SchemaRepository) schemaResourcesDTO.getSchemaRegistry(),
+                                        schemaResourcesDTO.getSchemaRegistry())
+                        );
+                        schemaResourcesDTOs.put(moduleSchemaCacheDirectory, schemaResourcesDTO);
+                    }
+                }
+                LOG.info("{} : netconf connector will use schema cache directory {} instead of {}",
+                        deviceId, moduleSchemaCacheDirectory, DEFAULT_CACHE_DIRECTORY);
+            }
+        }
+
+        if (schemaResourcesDTO == null) {
+            synchronized (schemaResourcesDTOs) {
+                schemaResourcesDTO = schemaResourcesDTOs.get(DEFAULT_CACHE_DIRECTORY);
+            }
+            LOG.info("{} : using the default directory {}",
+                    deviceId, QUALIFIED_DEFAULT_CACHE_DIRECTORY);
+        }
+
+        return schemaResourcesDTO;
+    }
+
+    /**
+     * Creates the backing Schema classes for a particular directory.
+     *
+     * @param moduleSchemaCacheDirectory The string directory relative to "cache"
+     * @return A DTO containing the Schema classes for the Netconf mount.
+     */
+    private static NetconfDevice.SchemaResourcesDTO createSchemaResourcesDTO(final String moduleSchemaCacheDirectory) {
+        final SharedSchemaRepository repository = new SharedSchemaRepository(moduleSchemaCacheDirectory);
+        final SchemaContextFactory schemaContextFactory
+                = repository.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
+
+        final FilesystemSchemaSourceCache<YangTextSchemaSource> deviceCache =
+                createDeviceFilesystemCache(moduleSchemaCacheDirectory, repository);
+        repository.registerSchemaSourceListener(deviceCache);
+        return new NetconfDevice.SchemaResourcesDTO(repository, repository, schemaContextFactory,
+                new NetconfStateSchemasResolverImpl());
+    }
+
+    /**
+     * Creates a <code>FilesystemSchemaSourceCache</code> for the custom schema cache directory.
+     *
+     * @param schemaCacheDirectory The custom cache directory relative to "cache"
+     * @return A <code>FilesystemSchemaSourceCache</code> for the custom schema cache directory
+     */
+    private static FilesystemSchemaSourceCache<YangTextSchemaSource> createDeviceFilesystemCache(
+            final String schemaCacheDirectory, final SchemaSourceRegistry schemaRegistry) {
+        final String relativeSchemaCacheDirectory =
+                NetconfTopologyUtils.CACHE_DIRECTORY + File.separator + schemaCacheDirectory;
+        return new FilesystemSchemaSourceCache<>(schemaRegistry, YangTextSchemaSource.class,
+                new File(relativeSchemaCacheDirectory));
+    }
+
 
     public static RemoteDeviceId createRemoteDeviceId(final NodeId nodeId, final NetconfNode node) {
         final IpAddress ipAddress = node.getHost().getIpAddress();

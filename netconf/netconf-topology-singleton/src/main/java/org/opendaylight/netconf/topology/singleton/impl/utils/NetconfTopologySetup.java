@@ -18,6 +18,7 @@ import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
 import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -36,6 +37,8 @@ public class NetconfTopologySetup {
     private final EventExecutor eventExecutor;
     private final NetconfClientDispatcher netconfClientDispatcher;
     private final String topologyId;
+    private final NetconfDevice.SchemaResourcesDTO schemaResourceDTO;
+
     private NetconfTopologySetup(final NetconfTopologySetupBuilder builder) {
         this.clusterSingletonServiceProvider = builder.getClusterSingletonServiceProvider();
         this.rpcProviderRegistry = builder.getRpcProviderRegistry();
@@ -50,6 +53,7 @@ public class NetconfTopologySetup {
         this.eventExecutor = builder.getEventExecutor();
         this.netconfClientDispatcher = builder.getNetconfClientDispatcher();
         this.topologyId = builder.getTopologyId();
+        this.schemaResourceDTO = builder.getSchemaResourceDTO();
     }
 
     public ClusterSingletonServiceProvider getClusterSingletonServiceProvider() {
@@ -104,6 +108,10 @@ public class NetconfTopologySetup {
         return netconfClientDispatcher;
     }
 
+    public NetconfDevice.SchemaResourcesDTO getSchemaResourcesDTO() {
+        return  schemaResourceDTO;
+    }
+
     public static class NetconfTopologySetupBuilder {
 
         private ClusterSingletonServiceProvider clusterSingletonServiceProvider;
@@ -119,6 +127,7 @@ public class NetconfTopologySetup {
         private EventExecutor eventExecutor;
         private String topologyId;
         private NetconfClientDispatcher netconfClientDispatcher;
+        private NetconfDevice.SchemaResourcesDTO schemaResourceDTO;
 
         public NetconfTopologySetupBuilder(){
         }
@@ -243,6 +252,16 @@ public class NetconfTopologySetup {
         public NetconfTopologySetupBuilder setNetconfClientDispatcher(NetconfClientDispatcher clientDispatcher) {
             this.netconfClientDispatcher = clientDispatcher;
             return this;
+        }
+
+        public NetconfTopologySetupBuilder setSchemaResourceDTO(
+                final NetconfDevice.SchemaResourcesDTO schemaResourceDTO) {
+            this.schemaResourceDTO = schemaResourceDTO;
+            return this;
+        }
+
+        private NetconfDevice.SchemaResourcesDTO getSchemaResourceDTO() {
+            return schemaResourceDTO;
         }
 
         public static NetconfTopologySetupBuilder create() {

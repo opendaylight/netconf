@@ -12,18 +12,15 @@ import akka.actor.ActorRef;
 import akka.util.Timeout;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.util.concurrent.EventExecutor;
-import java.io.File;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,7 +37,6 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.LibraryModulesSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceBuilder;
-import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemasResolverImpl;
 import org.opendaylight.netconf.sal.connect.netconf.SchemalessNetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
@@ -62,17 +58,10 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
-import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
-import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
-import org.opendaylight.yangtools.yang.parser.util.TextToASTTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,36 +69,13 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
     private static final Logger LOG = LoggerFactory.getLogger(RemoteDeviceConnectorImpl.class);
 
-    /**
-     * Keeps track of initialized Schema resources.  A Map is maintained in which the key represents the name
-     * of the schema cache directory, and the value is a corresponding <code>SchemaResourcesDTO</code>.  The
-     * <code>SchemaResourcesDTO</code> is essentially a container that allows for the extraction of the
-     * <code>SchemaRegistry</code> and <code>SchemaContextFactory</code> which should be used for a particular
-     * Netconf mount.  Access to <code>schemaResourcesDTOs</code> should be surrounded by appropriate
-     * synchronization locks.
-     */
-    private static final Map<String, NetconfDevice.SchemaResourcesDTO> schemaResourcesDTOs = new HashMap<>();
     private final Timeout actorResponseWaitTime;
 
     // Initializes default constant instances for the case when the default schema repository
     // directory cache/schema is used.
-    static {
-        schemaResourcesDTOs.put(NetconfTopologyUtils.DEFAULT_CACHE_DIRECTORY,
-                new NetconfDevice.SchemaResourcesDTO(NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY,
-                        NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY,
-                        NetconfTopologyUtils.DEFAULT_SCHEMA_CONTEXT_FACTORY,
-                        new NetconfStateSchemasResolverImpl()));
-        NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(NetconfTopologyUtils.DEFAULT_CACHE);
-        NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(
-                TextToASTTransformer.create(NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY,
-                        NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY));
-    }
 
     private final NetconfTopologySetup netconfTopologyDeviceSetup;
     private final RemoteDeviceId remoteDeviceId;
-    private SchemaSourceRegistry schemaRegistry = NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
-    private final SchemaRepository schemaRepository = NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
-    private SchemaContextFactory schemaContextFactory = NetconfTopologyUtils.DEFAULT_SCHEMA_CONTEXT_FACTORY;
     private NetconfConnectorDTO deviceCommunicatorDTO;
 
     public RemoteDeviceConnectorImpl(final NetconfTopologySetup netconfTopologyDeviceSetup,
@@ -181,6 +147,9 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                     defaultRequestTimeoutMillis);
         }
 
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = netconfTopologyDeviceSetup.getSchemaResourcesDTO();
+
+
         // pre register yang library sources as fallback schemas to schema registry
         final List<SchemaSourceRegistration<YangTextSchemaSource>> registeredYangLibSources = Lists.newArrayList();
         if (node.getYangLibrary() != null) {
@@ -199,7 +168,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                 for (final Map.Entry<SourceIdentifier, URL> sourceIdentifierURLEntry :
                         libraryModulesSchemas.getAvailableModels().entrySet()) {
                     registeredYangLibSources
-                            .add(schemaRegistry.registerSchemaSource(
+                            .add(schemaResourcesDTO.getSchemaRegistry().registerSchemaSource(
                                     new YangLibrarySchemaYangSourceProvider(remoteDeviceId,
                                             libraryModulesSchemas.getAvailableModels()),
                                     PotentialSchemaSource
@@ -209,7 +178,6 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
             }
         }
 
-        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = setupSchemaCacheDTO(nodeId, node);
         final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> device;
         if (node.isSchemaless()) {
             device = new SchemalessNetconfDevice(remoteDeviceId, salFacade);
@@ -262,82 +230,6 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         }
 
         return Optional.of(NetconfSessionPreferences.fromStrings(capabilities, CapabilityOrigin.UserDefined));
-    }
-
-    private NetconfDevice.SchemaResourcesDTO setupSchemaCacheDTO(final NodeId nodeId, final NetconfNode node) {
-        // Setup information related to the SchemaRegistry, SchemaResourceFactory, etc.
-        NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = null;
-        final String moduleSchemaCacheDirectory = node.getSchemaCacheDirectory();
-        // Only checks to ensure the String is not empty or null;  further checks related to directory accessibility
-        // and file permissions are handled during the FilesystemSchemaSourceCache initialization.
-        if (!Strings.isNullOrEmpty(moduleSchemaCacheDirectory)) {
-            // If a custom schema cache directory is specified, create the backing DTO; otherwise, the SchemaRegistry
-            // and SchemaContextFactory remain the default values.
-            if (!moduleSchemaCacheDirectory.equals(NetconfTopologyUtils.DEFAULT_CACHE_DIRECTORY)) {
-                // Multiple modules may be created at once;  synchronize to avoid issues with data consistency among
-                // threads.
-                synchronized (schemaResourcesDTOs) {
-                    // Look for the cached DTO to reuse SchemaRegistry and SchemaContextFactory variables if
-                    // they already exist
-                    schemaResourcesDTO = schemaResourcesDTOs.get(moduleSchemaCacheDirectory);
-                    if (schemaResourcesDTO == null) {
-                        schemaResourcesDTO = createSchemaResourcesDTO(moduleSchemaCacheDirectory);
-                        schemaResourcesDTO.getSchemaRegistry().registerSchemaSourceListener(
-                                TextToASTTransformer.create((SchemaRepository) schemaResourcesDTO.getSchemaRegistry(),
-                                        schemaResourcesDTO.getSchemaRegistry())
-                        );
-                        schemaResourcesDTOs.put(moduleSchemaCacheDirectory, schemaResourcesDTO);
-                    }
-                }
-                LOG.info("{} : netconf connector will use schema cache directory {} instead of {}",
-                        remoteDeviceId, moduleSchemaCacheDirectory, NetconfTopologyUtils.DEFAULT_CACHE_DIRECTORY);
-            }
-        } else {
-            LOG.info("{} : using the default directory {}",
-                    remoteDeviceId, NetconfTopologyUtils.QUALIFIED_DEFAULT_CACHE_DIRECTORY);
-        }
-
-        if (schemaResourcesDTO == null) {
-            schemaResourcesDTO =
-                    new NetconfDevice.SchemaResourcesDTO(schemaRegistry, schemaRepository, schemaContextFactory,
-                            new NetconfStateSchemasResolverImpl());
-        }
-
-        return schemaResourcesDTO;
-    }
-
-    /**
-     * Creates the backing Schema classes for a particular directory.
-     *
-     * @param moduleSchemaCacheDirectory The string directory relative to "cache"
-     * @return A DTO containing the Schema classes for the Netconf mount.
-     */
-    private NetconfDevice.SchemaResourcesDTO createSchemaResourcesDTO(final String moduleSchemaCacheDirectory) {
-        final SharedSchemaRepository repository = new SharedSchemaRepository(moduleSchemaCacheDirectory);
-        final SchemaContextFactory schemaContextFactory
-                = repository.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
-        this.schemaRegistry = repository;
-        this.schemaContextFactory = schemaContextFactory;
-
-        final FilesystemSchemaSourceCache<YangTextSchemaSource> deviceCache =
-                createDeviceFilesystemCache(moduleSchemaCacheDirectory);
-        repository.registerSchemaSourceListener(deviceCache);
-        return new NetconfDevice.SchemaResourcesDTO(repository, repository, schemaContextFactory,
-                new NetconfStateSchemasResolverImpl());
-    }
-
-    /**
-     * Creates a <code>FilesystemSchemaSourceCache</code> for the custom schema cache directory.
-     *
-     * @param schemaCacheDirectory The custom cache directory relative to "cache"
-     * @return A <code>FilesystemSchemaSourceCache</code> for the custom schema cache directory
-     */
-    private FilesystemSchemaSourceCache<YangTextSchemaSource> createDeviceFilesystemCache(
-            final String schemaCacheDirectory) {
-        final String relativeSchemaCacheDirectory =
-                NetconfTopologyUtils.CACHE_DIRECTORY + File.separator + schemaCacheDirectory;
-        return new FilesystemSchemaSourceCache<>(schemaRegistry, YangTextSchemaSource.class,
-                new File(relativeSchemaCacheDirectory));
     }
 
     //TODO: duplicate code
@@ -394,11 +286,6 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                 .withConnectStrategyFactory(sf)
                 .withSessionListener(listener)
                 .build();
-    }
-
-    @VisibleForTesting
-    Map<String, NetconfDevice.SchemaResourcesDTO> getSchemaResourcesDTOs() {
-        return schemaResourcesDTOs;
     }
 
     private static final class TimedReconnectStrategyFactory implements ReconnectStrategyFactory {
