@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_897c1474",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-03-29T08:59:37Z",
+      "side": 1,
+      "message": "Please write a more meaningful commit message and also add the bug number from bugzilla since this has a bug number.\n\nhints: https://wiki.openstack.org/wiki/GitCommitMessages",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 8,
+        "endChar": 20
+      },
+      "revId": "63b437b3ccd89d22c51748d098f82303a9ee428c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_a90d9837",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServer.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-03-29T08:59:37Z",
+      "side": 1,
+      "message": "I dont think you need this log, just move the second log entry thats logging the throwable up.",
+      "range": {
+        "startLine": 144,
+        "startChar": 16,
+        "endLine": 144,
+        "endChar": 47
+      },
+      "revId": "63b437b3ccd89d22c51748d098f82303a9ee428c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_494d0c72",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeAuthProviderImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-03-29T08:59:37Z",
+      "side": 1,
+      "message": "never swallow exceptions, at the least log them.",
+      "range": {
+        "startLine": 234,
+        "startChar": 12,
+        "endLine": 237,
+        "endChar": 13
+      },
+      "revId": "63b437b3ccd89d22c51748d098f82303a9ee428c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
