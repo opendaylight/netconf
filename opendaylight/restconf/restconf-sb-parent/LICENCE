@@ -1,0 +1,16 @@
+ietf-restconf-monitoring -> /models/ietf-restconf-monitoring/src/main/yang/ietf-restconf-monitoring.yang
+
+    This version of this YANG module is part of draft-ietf-netconf-restconf-04;
+    see the draft itself for full legal notices."
+
+    source: https://tools.ietf.org/html/draft-ietf-netconf-restconf-04#section-9.3
+
+
+ietf-yang-library -> /models/ietf-restconf-monitoring/src/main/yang/ietf-yang-library.yang
+
+    This version of this YANG module is part of draft-ietf-netconf-restconf-04;
+    see the draft itself for full legal notices."
+
+    source: https://tools.ietf.org/html/draft-ietf-netconf-yang-library-00#section-2.2
+
+These files are following the IETF license according to https://trustee.ietf.org/license-info/IETF-TLP-5.htm

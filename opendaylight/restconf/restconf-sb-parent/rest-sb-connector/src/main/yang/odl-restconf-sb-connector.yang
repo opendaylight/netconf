@@ -1,0 +1,97 @@
+module odl-restconf-sb-connector {
+    yang-version 1;
+    namespace "urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:restconf:sb";
+    prefix "sal-restconf";
+
+    import config { prefix config; revision-date 2013-04-05; }
+    import opendaylight-md-sal-dom {prefix dom;}
+    import opendaylight-md-sal-binding {prefix md-sal-binding; revision-date 2013-10-28;}
+    import restconf-node {prefix node; revision-date 2016-05-11;}
+    import threadpool {prefix th;}
+
+    description
+        "Config definition for Netconf Connector modules";
+
+    revision "2016-05-06" {
+        description
+            "Non-mandatory keepalive executor";
+    }
+
+    identity restconf-sb-connector {
+        base config:module-type;
+        config:java-name-prefix RestconfSbConnector;
+    }
+
+    augment "/config:modules/config:module/config:configuration" {
+            case restconf-sb-connector {
+                when "/config:modules/config:module/config:type = 'restconf-sb-connector'";
+
+                leaf id {
+                    type string;
+                }
+
+            leaf reconnect-streams-fail {
+                mandatory true;
+                type int64;
+                default 5;
+                description "Interval that how often it tries to subscribe to streams if connection is down";
+            }
+
+                leaf truststore-path {
+                    type string;
+                }
+
+                leaf truststore-type {
+                    type string;
+                }
+
+                leaf truststore-password {
+                    type string;
+                }
+
+                leaf truststore-path-type {
+                    type string;
+                }
+
+                uses node:node-fields;
+
+                container dom-registry {
+                    uses config:service-ref {
+                        refine type {
+                            mandatory true;
+                            config:required-identity dom:dom-broker-osgi-registry;
+                        }
+                    }
+                }
+
+                container binding-registry {
+                    uses config:service-ref {
+                        refine type {
+                            mandatory true;
+                            config:required-identity md-sal-binding:binding-broker-osgi-registry;
+                        }
+                    }
+                }
+
+                container processing-executor {
+                    uses config:service-ref {
+                        refine type {
+                            mandatory true;
+                            config:required-identity th:threadpool;
+                        }
+                    }
+
+                    description "Executor for long term tasks";
+                }
+                container reconnect-executor {
+                    uses config:service-ref {
+                        refine type {
+                            mandatory true;
+                            config:required-identity th:scheduled-threadpool;
+                        }
+                    }
+                    description "Dedicated to stream reconnecting in case of connection loss";
+                }
+            }
+    }
+}

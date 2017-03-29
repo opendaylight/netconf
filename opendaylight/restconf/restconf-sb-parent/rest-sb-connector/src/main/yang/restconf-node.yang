@@ -1,0 +1,118 @@
+module restconf-node {
+
+    yang-version 1;
+    namespace "urn:opendaylight:restconf:sb:node";
+    prefix "restconf-node";
+
+    revision 2016-05-11;
+
+    import ietf-yang-types { prefix yang; }
+    import ietf-inet-types {prefix inet; revision-date "2010-09-24";}
+    import network-topology { prefix nt; revision-date 2013-10-21; }
+    import yang-ext { prefix ext; revision-date "2013-07-09";}
+
+    typedef revision-identifier {
+        type string {
+            pattern '\d{4}-\d{2}-\d{2}';
+        }
+    }
+
+    grouping node-fields {
+        leaf address {
+            type inet:host;
+        }
+
+        leaf port {
+            type inet:port-number;
+        }
+
+        leaf username {
+            type string;
+        }
+
+        leaf password {
+            type string;
+        }
+
+        leaf request-timeout {
+            type uint16;
+            default 5000;
+        }
+
+        leaf https {
+            type boolean;
+            default true;
+        }
+
+        container yang-module-capabilities {
+            config true;
+            leaf override {
+                type boolean;
+                default false;
+                description "Whether to override or merge this list of capabilities with capabilities from device";
+            }
+
+            leaf-list capability {
+                type string;
+                description "Set a list of capabilities to override capabilities provided in device's hello message.
+                             Can be used for devices that do not report any yang modules in their hello message";
+            }
+        }
+    }
+
+    grouping node-status {
+        leaf status {
+            config false;
+            type enumeration {
+                enum connecting;
+                enum connected;
+                enum failed;
+            }
+        }
+        list module {
+            key "name revision";
+            description
+            "Each entry represents one module currently
+            supported by the server.";
+
+            leaf name {
+                type yang:yang-identifier;
+                description "The YANG module or submodule name.";
+            }
+
+            leaf revision {
+                type revision-identifier;
+                description
+                    "The YANG module or submodule revision date.
+                    An empty string is used if no revision statement
+                    is present in the YANG module or submodule.";
+            }
+
+            leaf namespace {
+                type inet:uri;
+                mandatory true;
+                description
+                 "The XML namespace identifier for this module.";
+            }
+
+            leaf capability-origin {
+                type enumeration {
+                    enum user-defined;
+                    enum device-advertised;
+                }
+            }
+        }
+    }
+
+    augment "/nt:network-topology/nt:topology/nt:topology-types" {
+          container topology-restconf {
+          }
+      }
+
+      augment "/nt:network-topology/nt:topology/nt:node" {
+          when "../../nt:topology-types/topology-restconf";
+          ext:augment-identifier "restconf-node";
+          uses node-fields;
+          uses node-status;
+      }
+}

@@ -1,0 +1,5 @@
+<errors xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf"><error>
+<error-type>application</error-type>
+<error-tag>operation-not-supported</error-tag>
+<error-message>No implementation of RPC available</error-message>
+</error></errors>
