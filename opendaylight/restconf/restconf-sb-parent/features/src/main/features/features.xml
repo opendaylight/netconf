@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<features name="odl-netconf-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.2.0 http://karaf.apache.org/xmlns/features/v1.2.0">
+  <repository>mvn:org.opendaylight.odlparent/features-odlparent/{{VERSION}}/xml/features</repository>
+  <repository>mvn:org.opendaylight.yangtools/features-yangtools/{{VERSION}}/xml/features</repository>
+  <repository>mvn:org.opendaylight.controller/features-config/{{VERSION}}/xml/features</repository>
+  <repository>mvn:org.opendaylight.controller/features-mdsal/{{VERSION}}/xml/features</repository>
+  <repository>mvn:org.opendaylight.netconf/features-netconf-connector/{{VERSION}}/xml/features</repository>
+
+  <feature name='odl-restconf-sb' version='${project.version}' description="OpenDaylight :: Restconf :: Southbound">
+    <feature version='${config.version}'>odl-config-all</feature>
+    <feature version='${mdsal.model.version}'>odl-mdsal-models</feature>
+    <feature version='${controller.mdsal.version}'>odl-mdsal-broker</feature>
+    <feature version='${netconf.version}'>odl-netconf-connector</feature>
+    <bundle>mvn:org.opendaylight.restconf-sb/rest-sb-connector/{{VERSION}}</bundle>
+    <bundle>mvn:org.opendaylight.restconf-sb/ietf-yang-library/{{VERSION}}</bundle>
+    <bundle>mvn:org.opendaylight.restconf-sb/ietf-restconf-monitoring/{{VERSION}}</bundle>
+    <bundle>mvn:com.ning/async-http-client/{{VERSION}}</bundle>
+    <bundle>mvn:io.netty/netty/{{VERSION}}</bundle>
+    <bundle>mvn:com.google.guava/guava/14.0.1</bundle>
+    <bundle>mvn:org.atmosphere/wasync/{{VERSION}}</bundle>
+  </feature>
+
+  <feature name='odl-restconf-topology' version='${project.version}' description="OpenDaylight :: Restconf :: Topology">
+    <feature version='${project.version}'>odl-restconf-sb</feature>
+    <bundle>mvn:org.opendaylight.restconf-sb/restconf-topology/{{VERSION}}</bundle>
+    <configfile finalname='${config.configfile.directory}/${restconf.topology.configfile}'>mvn:org.opendaylight.restconf-sb/restconf-topology-config/{{VERSION}}/xml/config</configfile>
+  </feature>
+  <feature name='odl-restconf-clustered-topology' version='${project.version}' description="OpenDaylight :: Restconf :: Topology">
+    <feature version='${project.version}'>odl-restconf-sb</feature>
+    <bundle>mvn:org.opendaylight.netconf/abstract-topology/{{VERSION}}</bundle>
+    <bundle>mvn:org.opendaylight.netconf/netconf-topology/{{VERSION}}</bundle>
+    <bundle>mvn:org.opendaylight.restconf-sb/restconf-topology/{{VERSION}}</bundle>
+    <configfile finalname='${config.configfile.directory}/${restconf.topology.configfile}'>mvn:org.opendaylight.restconf-sb/restconf-topology-config/{{VERSION}}/xml/clustered-config</configfile>
+  </feature>
+
+  <feature name='odl-restconf-notification-testtool' version='${project.version}' description="OpenDaylight :: Restconf :: Notification test tool">
+    <feature version='${config.version}'>odl-config-all</feature>
+    <feature version='${controller.mdsal.version}'>odl-mdsal-broker</feature>
+    <bundle>mvn:org.opendaylight.restconf-sb/notification-testtool/{{VERSION}}</bundle>
+    <bundle>mvn:com.google.guava/guava/18.0</bundle>
+    <configfile finalname='${config.configfile.directory}/${restconf.notification.test.configfile}'>mvn:org.opendaylight.restconf-sb/notification-testtool-config/{{VERSION}}/xml/config</configfile>
+  </feature>
+
+</features>

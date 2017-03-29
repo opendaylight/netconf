@@ -1,0 +1,35 @@
+module rpc-test-module {
+    namespace "urn:dummy:rpc:test";
+    prefix "mod-0";
+    revision "2016-03-01";
+
+    rpc rpc-test {
+        input {
+            container input-container {
+                leaf input-leaf {
+                    type string;
+                }
+            }
+        }
+    }
+
+    rpc reboot {
+        input {
+            leaf delay {
+                units seconds;
+                type uint32;
+                default 0;
+            }
+            leaf message { type string; }
+            leaf language { type string; }
+        }
+        output {
+            leaf reboot-time {
+                units seconds;
+                type uint32;
+            }
+            leaf message { type string; }
+            leaf language { type string; }
+        }
+    }
+}

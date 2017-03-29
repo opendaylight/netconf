@@ -1,0 +1,3 @@
+        <node xmlns="urn:TBD:params:xml:ns:yang:network-topology">
+            <node-id>new-netconf-device</node-id>
+        </node>

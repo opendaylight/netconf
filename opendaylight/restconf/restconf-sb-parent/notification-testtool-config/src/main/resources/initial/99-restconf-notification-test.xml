@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- vi: set et smarttab sw=4 tabstop=4: -->
+<!--
+ Copyright (c) 2015 Cisco Systems, Inc. and others.  All rights reserved.
+
+ This program and the accompanying materials are made available under the
+ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ and is available at http://www.eclipse.org/legal/epl-v10.html
+-->
+<snapshot>
+    <configuration>
+        <data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+            <modules xmlns="urn:opendaylight:params:xml:ns:yang:controller:config">
+                <module xmlns="urn:opendaylight:params:xml:ns:yang:controller:config">
+                    <type xmlns:prefix="urn:opendaylight:restconf-notification-test">prefix:notifications-testtool</type>
+                    <name>notifications-testtool</name>
+                    <dom-registry xmlns="urn:opendaylight:restconf-notification-test">
+                        <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:md:sal:dom">prefix:dom-broker-osgi-registry</type>
+                        <name>dom-broker</name>
+                    </dom-registry>
+                    <binding-registry xmlns="urn:opendaylight:restconf-notification-test">
+                        <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding">prefix:binding-broker-osgi-registry</type>
+                        <name>binding-osgi-broker</name>
+                    </binding-registry>
+                </module>
+            </modules>
+        </data>
+    </configuration>
+</snapshot>

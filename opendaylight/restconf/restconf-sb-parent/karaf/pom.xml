@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <!--
+      Necessary TODO: Hookup your parent pom here, else you will not get necessary versions,
+      maven repos etc.  If you run this archetype in a subdirectory of your project, it
+      will pick the pom.xml from the parent directory as the parent pom, which may or may
+      not be correct.
+    -->
+    <parent>
+        <groupId>org.opendaylight.controller</groupId>
+        <artifactId>karaf-parent</artifactId>
+        <version>1.6.3-Beryllium-SR3</version>
+        <relativePath></relativePath>
+    </parent>
+    <groupId>org.opendaylight.netconf</groupId>
+    <artifactId>restconf-sb-karaf</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <prerequisites>
+        <maven>3.1.1</maven>
+    </prerequisites>
+    <properties>
+        <netconf.version>1.0.3-Beryllium-SR3</netconf.version>
+        <restconf.version>1.3.3-Beryllium-SR3</restconf.version>
+        <restconf-sb.version>1.0.0-SNAPSHOT</restconf-sb.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <!-- scope is compile so all features (there is only one) are installed
+            into startup.properties and the feature repo itself is not installed -->
+            <groupId>org.apache.karaf.features</groupId>
+            <artifactId>framework</artifactId>
+            <type>kar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.restconf-sb</groupId>
+            <artifactId>features-restconf-sb</artifactId>
+            <version>${restconf-sb.version}</version>
+            <classifier>features</classifier>
+            <type>xml</type>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>features-netconf</artifactId>
+            <version>${netconf.version}</version>
+            <classifier>features</classifier>
+            <type>xml</type>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>features-netconf-connector</artifactId>
+            <version>${netconf.version}</version>
+            <classifier>features</classifier>
+            <type>xml</type>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>features-restconf</artifactId>
+            <version>${restconf.version}</version>
+            <classifier>features</classifier>
+            <type>xml</type>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.karaf.tooling</groupId>
+                <artifactId>karaf-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <startupFeatures>
+                     <!-- For some reason, the eventadmin bundle works fine when installed via the
+                          startup.properties but doesn't work properly when installed via the
+                          boot features.  -->
+                        <feature>eventadmin</feature>
+                    </startupFeatures>
+                    <bootFeatures>
+
+                    </bootFeatures>
+               <!-- no installedFeatures -->
+             </configuration>
+          </plugin>
+        </plugins>
+    </build>
+</project>

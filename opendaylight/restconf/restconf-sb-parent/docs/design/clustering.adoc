@@ -1,0 +1,124 @@
+= RESTCONF southbound plugin
+
+== Clustering
+
+Reused from odl-netconf-clustered-topology. NodeManagerCallback implemented to adapt it to restconf-connector.
+
+. onNodeCreated() --  all peers make HTTP GET /modules request to receive list of supported modules. Successful ones register themselves as role candidates.
+. onRoleChanged() --  master node creates master device and registers master mountpoint. When master mountpoint is registered, AnnounceMasterPoint message is sent to other peers.
+. onReceive() -- slaves register slave mountpoint when they receive AnnounceMasterPoint message
+
+All peers must have successfuly completed GET /modules call, because every peer build its schema context according to module list received from this call. Only sideloading is supported, all devices yang models must be present in ODL cache directory.
+
+Slave peers create ProxyRestconfFacade, which has actor reference to master RestconfFacadeActor. When user on slave peer make a request, proxy facade transforms it to akka message and sends it to the master facade actor. Master facade actor transforms message back to NormalizedNode and use RestconfFacade to handle the request. Response is sent the same way back.
+
+[graphviz, facadeactor, svg] 
+---------
+digraph G {
+    compound=true;
+    fontsize = 8
+    node [
+            fontname = "Bitstream Vera Sans"
+            fontsize = 8
+            shape = "record"
+    ]
+
+    edge [
+            fontname = "Bitstream Vera Sans"
+            fontsize = 8
+    ]
+        
+    subgraph clusterMasterPeer {
+        label="Master"
+        Master[shape="none"][style="invis"][label=""];
+        RestconfFacadeActor
+        RestconfFacade
+    }
+    subgraph clusterSlavePeer1 {
+        label="Slave 1"
+        Slave[shape="none"][style="invis"][label=""];
+        ActorRef1[shape="oval"]
+        ProxyRestconfFacade1
+    }
+    
+    subgraph clusterSlavePeer2 {
+        label="Slave 2"
+        Slave[shape="none"][style="invis"][label=""];
+        ActorRef2[shape="oval"]
+        ProxyRestconfFacade2
+    }
+    
+    ProxyRestconfFacade1 -> ActorRef1[label="AkkaMessage"]
+    ProxyRestconfFacade2 -> ActorRef2[label="AkkaMessage"]
+    RestconfFacadeActor -> RestconfFacade[label="NormalizedNode"]
+    ActorRef1 -> RestconfFacadeActor
+    ActorRef2 -> RestconfFacadeActor
+    RestconfFacade -> Device[label="HTTP"]
+    User1-> ProxyRestconfFacade1[label="NormalizedNode"]
+    User2-> ProxyRestconfFacade2[label="NormalizedNode"]
+    User3-> RestconfFacade[label="NormalizedNode"]
+    
+}
+---------
+
+=== Notification support
+
+Restconf southbound clustering supports also notifications. Master peer handles notifications in a same way, as they are handled in non-clustered ODL. In clustered ODL, there is another RestconfDeviceStreamListener added to RestconfDeviceStreamHandler on master peer. It is called ClusterNotificatonDistributor. 
+
+When a slave mountpoint is created, also new actor implemented by class SlaveNotificationReceiver is created. Its ActorRef is sent to the master peer and registered in ClusterNotificationDistributor. ClusterNotificatonDistributor then sends notification messages to all registered actors. SlaveNotificationReceiver passes notifications to ordinary RestconfNotificationService.
+
+[graphviz, clusternotifications, svg] 
+---------
+digraph G {
+    compound=true;
+    fontsize = 8
+    node [
+            fontname = "Bitstream Vera Sans"
+            fontsize = 8
+            shape = "record"
+    ]
+
+    edge [
+            fontname = "Bitstream Vera Sans"
+            fontsize = 8
+    ]
+        
+    subgraph clusterMasterPeer {
+        label="Master"
+        Master[shape="none"][style="invis"][label=""];
+        RestconfDeviceStreamsHandler
+        RestconfNotificationService3
+        ClusterNotificationDistributor
+        ActorRef1[shape="oval"]
+        ActorRef2[shape="oval"]
+    }
+    subgraph clusterSlavePeer1 {
+        label="Slave 1"
+        Slave[shape="none"][style="invis"][label=""];
+        SlaveNotificationReceiver1
+        RestconfNotificationService1
+    }
+    
+    subgraph clusterSlavePeer2 {
+        label="Slave 2"
+        Slave[shape="none"][style="invis"][label=""];
+        SlaveNotificationReceiver2
+        RestconfNotificationService2
+    }
+    
+    Device -> RestconfDeviceStreamsHandler[label="Server sent event"];
+    RestconfDeviceStreamsHandler -> RestconfNotificationService3[label="DomNotification"];
+    RestconfDeviceStreamsHandler -> ClusterNotificationDistributor[label="DomNotification"];
+    ClusterNotificationDistributor -> ActorRef1[label="NotificationMessage"];
+    ClusterNotificationDistributor -> ActorRef2[label="NotificationMessage"];
+    ActorRef1 -> SlaveNotificationReceiver1
+    ActorRef2 -> SlaveNotificationReceiver2
+    SlaveNotificationReceiver1 -> RestconfNotificationService1[label="DomNotification"];
+    SlaveNotificationReceiver2 -> RestconfNotificationService2[label="DomNotification"];
+    RestconfNotificationService1 -> User1[label="DomNotification"];
+    RestconfNotificationService2 -> User2[label="DomNotification"];
+    RestconfNotificationService3 -> User3[label="DomNotification"];
+     
+    
+}
+---------

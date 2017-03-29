@@ -1,0 +1,22 @@
+<modules xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library">
+    <module>
+        <name>ietf-yang-types</name>
+        <revision>2013-07-15</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-yang-types</namespace>
+    </module>
+    <module>
+        <name>ietf-yang-types</name>
+        <revision>2010-09-24</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-yang-types</namespace>
+    </module>
+    <module>
+        <name>ietf-restconf</name>
+        <revision>2013-10-19</revision>
+        <namespace>urn:ietf:params:xml:ns:yang:ietf-restconf</namespace>
+    </module>
+    <module>
+    <name>ietf-inet-types</name>
+    <revision>2010-09-24</revision>
+    <namespace>urn:ietf:params:xml:ns:yang:ietf-inet-types</namespace>
+</module>
+</modules>
