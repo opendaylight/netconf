@@ -1,0 +1,23 @@
+<streams>
+    <stream name="restconf">
+        <notification>
+            <delay>2</delay>
+            <period>5</period>
+            <content>
+                <notification xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
+                    <event-time>#eventtime#</event-time>
+                    <not1 xmlns="urn:dummy:mod-0">
+                    <aa>
+                        <bb>
+                            bb-value
+                        </bb>
+                        <cc>
+                            cc-value
+                        </cc>
+                    </aa>
+                    </not1>
+                </notification>
+            </content>
+        </notification>
+    </stream>
+</streams>

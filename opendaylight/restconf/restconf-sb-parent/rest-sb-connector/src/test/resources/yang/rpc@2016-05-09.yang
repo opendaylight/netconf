@@ -1,0 +1,29 @@
+ module rpc {
+
+   namespace "urn:opendaylight:params:xml:ns:yang:controller:md:sal:rpc";
+   prefix "rpc";
+
+   revision 2016-05-09 {
+     description
+       "Initial revision.";
+   }
+
+   rpc method {
+         output {
+           leaf param1 {
+               type int16;
+           }
+            leaf param2 {
+               type string;
+           }
+       }
+   }
+
+   rpc method2 {
+         input {
+           leaf param1 {
+             type string;
+           }
+       }
+   }
+ }

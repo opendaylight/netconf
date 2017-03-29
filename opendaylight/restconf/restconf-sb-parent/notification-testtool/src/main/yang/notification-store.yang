@@ -1,0 +1,39 @@
+module notification-store {
+    yang-version 1;
+    namespace "urn:opendaylight:restconf:notification:store";
+    prefix ns;
+
+
+    description
+        "Testing purpose store for placing restconf device notifications.";
+
+    revision "2016-05-06" {
+        description
+            "Initial revision";
+    }
+
+    container notifications {
+        list device {
+            key device-id;
+            leaf device-id {
+                type string;
+            }
+            list notification {
+                key id;
+                leaf id {
+                    type uint32;
+                }
+                anyxml content;
+            }
+        }
+    }
+
+    rpc reset {
+        input {
+            leaf device-id {
+                type string;
+            }
+        }
+    }
+
+}

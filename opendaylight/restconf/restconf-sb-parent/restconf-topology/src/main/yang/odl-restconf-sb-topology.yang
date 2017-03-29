@@ -1,0 +1,103 @@
+module odl-restconf-sb-topology {
+
+    yang-version 1;
+    namespace "urn:opendaylight:params:xml:ns:yang:restconf:sb:topology";
+    prefix "nt";
+
+    import config { prefix config; revision-date 2013-04-05; }
+    import threadpool {prefix th;}
+    import opendaylight-md-sal-dom {prefix dom;}
+    import opendaylight-md-sal-binding {prefix md-sal-binding; revision-date 2013-10-28;}
+
+    description
+            "Module definition for Restconf topolgy. Restconf topology provides a set of common configuration ";
+
+    revision "2016-06-02" {
+        description
+            "Initial revision";
+    }
+
+    identity restconf-topology {
+        base config:service-type;
+        config:java-class "org.opendaylight.restconfsb.topology.RestconfTopology";
+    }
+
+    identity restconf-topology-impl {
+        base config:module-type;
+        config:java-name-prefix RestconfTopology;
+        config:provided-service restconf-topology;
+    }
+
+    augment "/config:modules/config:module/config:configuration" {
+        case restconf-topology-impl {
+            when "/config:modules/config:module/config:type = 'restconf-topology-impl'";
+
+            leaf topology-id {
+                mandatory true;
+                type string;
+            }
+
+            leaf reconnect-streams-fail {
+                mandatory true;
+                type int64;
+                default 5;
+                description "Interval that how often it tries to subscribe to streams if connection is down";
+            }
+
+            leaf truststore-path {
+                type string;
+            }
+
+            leaf truststore-type {
+                type string;
+            }
+
+            leaf truststore-password {
+                type string;
+            }
+
+            leaf truststore-path-type {
+                type string;
+            }
+
+            container dom-registry {
+                uses config:service-ref {
+                    refine type {
+                        mandatory true;
+                        config:required-identity dom:dom-broker-osgi-registry;
+                    }
+                }
+            }
+
+            container binding-registry {
+                uses config:service-ref {
+                    refine type {
+                        mandatory true;
+                        config:required-identity md-sal-binding:binding-broker-osgi-registry;
+                    }
+                }
+            }
+
+            container processing-executor {
+                uses config:service-ref {
+                    refine type {
+                        mandatory true;
+                        config:required-identity th:threadpool;
+                    }
+                }
+
+                description "Executor for long term tasks";
+            }
+            container reconnect-executor {
+                uses config:service-ref {
+                    refine type {
+                        mandatory true;
+                        config:required-identity th:scheduled-threadpool;
+                    }
+                }
+                description "Dedicated to stream reconnecting in case of connection loss";
+            }
+
+        }
+    }
+}

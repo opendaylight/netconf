@@ -1,0 +1,9 @@
+<notification xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
+    <event-time>2013-12-21T00:01:00Z</event-time>
+    <not1 xmlns="urn:dummy:mod-0">
+        <aa>
+            <bb>bb-value</bb>
+            <cc>cc-value</cc>
+        </aa>
+    </not1>
+</notification>

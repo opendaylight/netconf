@@ -1,0 +1,47 @@
+module module-0 {
+    namespace "urn:dummy:mod";
+    prefix "mod-0";
+    revision "2016-03-01";
+    container mainroot {
+        list policy {
+            key name;
+            leaf name { type string; }
+            list rule {
+                key name;
+                leaf name { type string; }
+            }
+        }
+    }
+
+    container root {
+        choice ch {
+            case a {
+                leaf leaf-case {
+                    type string;
+                }
+                leaf leaf-case-1 {
+                    type string;
+                }
+            }
+            case b {
+                container container-case {
+                    leaf b-leaf {
+                        type string;
+                    }
+                }
+            }
+        }
+    }
+
+    notification not1 {
+        container aa {
+            leaf bb {
+                type string;
+            }
+            leaf cc {
+                type string;
+            }
+        }
+    }
+
+    }

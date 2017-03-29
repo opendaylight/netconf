@@ -1,0 +1,37 @@
+module clustered-node {
+
+    yang-version 1;
+    namespace "urn:opendaylight:restconf:sb:clustered:node";
+    prefix "cn";
+
+    revision 2016-06-15;
+
+    import ietf-yang-types { prefix yang; }
+    import network-topology { prefix nt; revision-date 2013-10-21; }
+    import yang-ext { prefix ext; revision-date "2013-07-09";}
+
+    augment "/nt:network-topology/nt:topology/nt:topology-types" {
+          container topology-restconf {
+          }
+      }
+
+      augment "/nt:network-topology/nt:topology/nt:node" {
+          when "../../nt:topology-types/topology-restconf";
+          ext:augment-identifier "clustered-node";
+          container clustered-connection-status {
+              config false;
+              list clustered-status {
+                  leaf node {
+                      type string;
+                  }
+                  leaf status {
+                      type enumeration {
+                          enum connected;
+                          enum unavailable;
+                          enum failed;
+                      }
+                  }
+              }
+          }
+      }
+}
