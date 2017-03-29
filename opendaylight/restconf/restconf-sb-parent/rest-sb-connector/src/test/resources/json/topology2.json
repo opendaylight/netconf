@@ -1,0 +1,8 @@
+{
+  "topology": {
+    "topology-id": "topology-netconf",
+    "node": {
+      "node-id": "new-netconf-device"
+    }
+  }
+}

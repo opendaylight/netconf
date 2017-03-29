@@ -1,0 +1,5 @@
+<output xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:rpc">
+    <param1>10</param1>
+    <param2>foo</param2>
+</output>
+

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<rpcs>
+
+    <rpc>
+        <module>rpc-test-module</module>
+        <name>reboot</name>
+        <invocation>
+            <input>
+                <input xmlns="urn:dummy:rpc:test">
+                    <delay>600</delay>
+                    <message>Going down for system maintenance</message>
+                    <language>en-US</language>
+                </input>
+            </input>
+            <output>
+                <output xmlns="urn:dummy:rpc:test">
+                    <reboot-time>600</reboot-time>
+                    <message>Going down for system maintenance</message>
+                    <language>en-US</language>
+                </output>
+            </output>
+        </invocation>
+        <invocation>
+            <input>
+                <input xmlns="urn:dummy:rpc:test">
+                    <delay>800</delay>
+                    <message>Going down for system maintenance2</message>
+                    <language>en-US</language>
+                </input>
+            </input>
+            <output>
+                <output xmlns="urn:dummy:rpc:test">
+                    <reboot-time>800</reboot-time>
+                    <message>Going down for system maintenance2</message>
+                    <language>en-US</language>
+                </output>
+            </output>
+        </invocation>
+    </rpc>
+    <rpc>
+        <module>rpc-test-module</module>
+        <name>rpc-test</name>
+        <invocation>
+            <input>
+                <input xmlns="urn:dummy:rpc:test">
+                    <input-container>
+                        <input-leaf>aaa</input-leaf>
+                    </input-container>
+                </input>
+            </input>
+            <output>
+
+            </output>
+        </invocation>
+    </rpc>
+    <rpc>
+        <module>example-jukebox</module>
+        <name>play</name>
+        <invocation>
+            <input>
+                <input xmlns="http://example.com/ns/example-jukebox">
+                    <playlist>playlist 1</playlist>
+                    <song-number>11</song-number>
+                </input>
+            </input>
+            <output>
+
+            </output>
+        </invocation>
+    </rpc>
+
+</rpcs>

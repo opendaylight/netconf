@@ -1,0 +1,43 @@
+<streams xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf-monitoring">
+    <stream>
+        <name>NETCONF</name>
+        <description>default NETCONF event stream
+        </description>
+        <replay-support>true</replay-support>
+        <replay-log-creation-time>
+            2007-07-08T00:00:00Z
+        </replay-log-creation-time>
+        <encoding>
+            <type>xml</type>
+            <events>https://example.com/streams/NETCONF</events>
+        </encoding>
+        <encoding>
+            <type>json</type>
+            <events>https://example.com/streams/NETCONF-JSON</events>
+        </encoding>
+    </stream>
+    <stream>
+        <name>SNMP</name>
+        <description>SNMP notifications</description>
+        <replay-support>false</replay-support>
+        <encoding>
+            <type>xml</type>
+            <events>https://example.com/streams/SNMP</events>
+        </encoding>
+    </stream>
+    <stream>
+        <name>syslog-critical</name>
+        <description>Critical and higher severity
+        </description>
+        <replay-support>true</replay-support>
+        <replay-log-creation-time>
+            2007-07-01T00:00:00Z
+        </replay-log-creation-time>
+        <encoding>
+            <type>xml</type>
+            <events>
+                https://example.com/streams/syslog-critical
+            </events>
+        </encoding>
+    </stream>
+</streams>

@@ -1,0 +1,120 @@
+module odl-restconf-sb-clustered-topology {
+
+    yang-version 1;
+    namespace "urn:opendaylight:params:xml:ns:yang:restconf:sb:clustered:topology";
+    prefix "cnt";
+
+    import config { prefix config; revision-date 2013-04-05; }
+    import threadpool {prefix th;}
+    import opendaylight-md-sal-dom {prefix dom;}
+    import opendaylight-md-sal-binding {prefix md-sal-binding; revision-date 2013-10-28;}
+    import odl-restconf-sb-topology { prefix topo; revision-date 2016-06-02; }
+    import opendaylight-entity-ownership-service { prefix eos; revision-date 2015-08-10; }
+    import actor-system-provider-service { prefix asp; revision-date 2015-10-05; }
+
+    description
+            "Module definition for Restconf topolgy. Restconf topology provides a set of common configuration ";
+
+    revision "2016-06-02" {
+        description
+            "Initial revision";
+    }
+
+    identity clustered-restconf-topology-impl {
+        base config:module-type;
+        config:java-name-prefix ClusteredRestconfTopology;
+        config:provided-service topo:restconf-topology;
+    }
+
+    augment "/config:modules/config:module/config:configuration" {
+        case clustered-restconf-topology-impl {
+            when "/config:modules/config:module/config:type = 'clustered-restconf-topology-impl'";
+
+            leaf topology-id {
+                mandatory true;
+                type string;
+            }
+
+            leaf reconnect-streams-fail {
+                mandatory true;
+                type int64;
+                default 5;
+                description "Interval that how often it tries to subscribe to streams if connection is down";
+            }
+
+            leaf truststore-path {
+                type string;
+            }
+
+            leaf truststore-type {
+                type string;
+            }
+
+            leaf truststore-password {
+                type string;
+            }
+
+            leaf truststore-path-type {
+                type string;
+            }
+
+            container dom-registry {
+                uses config:service-ref {
+                    refine type {
+                        mandatory true;
+                        config:required-identity dom:dom-broker-osgi-registry;
+                    }
+                }
+            }
+
+            container binding-registry {
+                uses config:service-ref {
+                    refine type {
+                        mandatory true;
+                        config:required-identity md-sal-binding:binding-broker-osgi-registry;
+                    }
+                }
+            }
+
+            container processing-executor {
+                uses config:service-ref {
+                    refine type {
+                        mandatory true;
+                        config:required-identity th:threadpool;
+                    }
+                }
+
+                description "Executor for long term tasks";
+            }
+            container reconnect-executor {
+                uses config:service-ref {
+                    refine type {
+                        mandatory true;
+                        config:required-identity th:scheduled-threadpool;
+                    }
+                }
+                description "Dedicated to stream reconnecting in case of connection loss";
+            }
+            container entity-ownership-service {
+                uses config:service-ref {
+                    refine type {
+                        mandatory true;
+                        config:required-identity eos:entity-ownership-service;
+                    }
+                }
+            }
+            container actor-system-provider-service {
+                uses config:service-ref {
+                    refine type {
+                        mandatory true;
+                        config:required-identity asp:actor-system-provider-service;
+                    }
+                }
+            }
+            leaf akka-ask-timeout {
+                type uint32;
+            }
+
+        }
+    }
+}

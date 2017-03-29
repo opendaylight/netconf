@@ -1,0 +1,46 @@
+= RESTCONF southbound plugin
+
+== Notifications
+
+Some of the restconf devices can support streams feature. It allows user to subscribe on stream and receive notifications from the stream. Notifications are implemented using server sent events.
+
+Notification processing is set up when connector starts. First, streams list is requested by issuing HTTP GET on /restconf/streams resource. Than connector subscribes NotificationHandler to all available streams.
+ 
+NotificationHandler is main component responsible for handling device notifications. It has its own async HTTP client, which is used to receiving server sent events. Event messages are parsed and converted to DOMNotification object. If connection is lost, NotificationHandler tries to reconnect in regular time intervals.
+
+Notification service allows user to register listener on certain notification type. User is notified only about events he is registered to.
+
+[graphviz, notifications, svg] 
+---------
+digraph G {
+fontname = "Bitstream Vera Sans"
+        fontsize = 8
+
+        node [
+                fontname = "Bitstream Vera Sans"
+                fontsize = 8
+                shape = "record"
+        ]
+
+        edge [
+                fontname = "Bitstream Vera Sans"
+                fontsize = 8
+        ]
+        
+        edge [
+            label = "Stream 1"
+        ]
+        Device -> NotificationHandler
+        edge [
+            label = "Stream 2"
+        ]
+        Device -> NotificationHandler
+        edge [
+            label = "DomNotification"
+        ]
+        NotificationHandler -> NotificationService
+        NotificationService -> Listener1
+        NotificationService -> Listener2
+}
+---------
+

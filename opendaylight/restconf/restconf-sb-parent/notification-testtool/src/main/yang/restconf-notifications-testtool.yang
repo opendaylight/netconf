@@ -1,0 +1,46 @@
+module restconf-notifications-testtool {
+    yang-version 1;
+    namespace "urn:opendaylight:restconf-notification-test";
+    prefix "notifications-testtool";
+
+    import config { prefix config; revision-date 2013-04-05; }
+    import opendaylight-md-sal-dom {prefix dom;}
+    import opendaylight-md-sal-binding {prefix md-sal-binding; revision-date 2013-10-28;}
+
+    description
+        "Config definition for Netconf Connector modules";
+
+    revision "2016-05-06" {
+        description
+            "Non-mandatory keepalive executor";
+    }
+
+    identity notifications-testtool {
+        base config:module-type;
+        config:java-name-prefix NotificationsTesttool;
+    }
+
+    augment "/config:modules/config:module/config:configuration" {
+            case notifications-testtool {
+                when "/config:modules/config:module/config:type = 'notifications-testtool'";
+
+                container dom-registry {
+                    uses config:service-ref {
+                        refine type {
+                            mandatory true;
+                            config:required-identity dom:dom-broker-osgi-registry;
+                        }
+                    }
+                }
+                container binding-registry {
+                    uses config:service-ref {
+                        refine type {
+                            mandatory true;
+                            config:required-identity md-sal-binding:binding-broker-osgi-registry;
+                        }
+                    }
+                }
+
+            }
+    }
+}

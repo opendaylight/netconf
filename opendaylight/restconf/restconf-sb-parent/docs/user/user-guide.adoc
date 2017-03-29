@@ -1,0 +1,97 @@
+= Restconf connector
+
+Restconf connector is ODL southbound plugin. It allows communication with restconf devices. It implements md-sal Data broker, Rpc service and Notification service.
+
+Connectors to Restconf devices can be managed via Opendaylight config datastore. To enable this, either odl-restconf-topology or odl-restconf-clustered topology features needs to be installed.
+
+To create new connector, following request must be sent:
+
+*Method*: POST
+
+*Content-Type*: application/json
+
+*URL*: http://localhost:8181/restconf/config/network-topology:network-topology/topology/topology-restconf/
+
+.Payload
+[source,json]
+----
+{
+  "node": {
+    "node-id": "restconf1",
+    "restconf-node:address": "0.0.0.0",
+    "restconf-node:port": "8181",
+    "restconf-node:username":"admin",
+    "restconf-node:password":"admin",
+    "request-timeout": 5000
+  }
+}
+----
+
+Supported parameters and their meaning are explained in model restconf-node.yang.
+
+All yang models supported by device must be present in distribution cache/schema directory. Status of connector can be checked in operational datastore.
+
+*Method*: GET
+
+*Accept*: application/json
+
+*URL*: http://localhost:8181/restconf/operational/network-topology:network-topology/topology/topology-restconf/node/restconf1
+
+.Response
+[source,json]
+----
+ {
+    "node-id": "restconf1",
+    "restconf-node:module": [
+        {
+          "name": "ietf-inet-types",
+          "revision": "2010-09-24",
+          "namespace": "urn:ietf:params:xml:ns:yang:ietf-inet-types"
+        },
+        {
+          "name": "ietf-yang-types",
+          "revision": "2010-09-24",
+          "namespace": "urn:ietf:params:xml:ns:yang:ietf-yang-types"
+        },
+        {
+          "name": "example-jukebox",
+          "revision": "2014-07-03",
+          "namespace": "http://example.com/ns/example-jukebox"
+        }
+    ],
+    "restconf-node:status": "connected"
+    }
+}
+----
+
+Status contains node id, list of supported yang modules and status. If initialization wasn't successful, restconf-node:status would be "failed".
+
+== TLS support
+
+When creating mountpoint, secure HTTPS connection is used by default. Certificates of all connected devices must be imported to a truststore used by restconf topology. Truststore parameters can be set in files 01-restconf-topology.xml or 01-clustered-restconf-topology.xml in case of clustered topology. These files are located in restconf-topology-config module or inside karaf <ODLINSTALL>/etc/opendaylight/karaf/ directory.
+
+Truststore can be stored either as a resource in a classpath(CLASSPATH) or as a file in a filesystem(PATH). This is defined by "truststore-path-type" element in the settings file. The path is defined in a "truststore-path" element.
+
+.Config
+[source,xml]
+----
+<module xmlns="urn:opendaylight:params:xml:ns:yang:controller:config">
+    <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:restconf:sb:topology">prefix:restconf-topology-impl</type>
+    <name>restconf-topology</name>
+    <truststore-path-type xmlns="urn:opendaylight:params:xml:ns:yang:restconf:sb:topology">
+        CLASSPATH
+    </truststore-path-type>
+    <truststore-path xmlns="urn:opendaylight:params:xml:ns:yang:restconf:sb:topology">
+        /cacerts
+    </truststore-path>
+    <truststore-password xmlns="urn:opendaylight:params:xml:ns:yang:restconf:sb:topology">
+        changeit
+    </truststore-password>
+    <truststore-type xmlns="urn:opendaylight:params:xml:ns:yang:restconf:sb:topology">
+        JKS
+    </truststore-type>
+
+    ...
+
+</module>
+----

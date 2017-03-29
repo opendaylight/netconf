@@ -1,0 +1,15 @@
+= Project directory structure
+
+- artifacts -- maven module providing dependency management of all restconf connector modules
+- docs -- documentation in .adoc format
+- features --  karaf features definition
+- karaf -- restconf connector karaf distribution
+- models -- ietf models needed by restconf
+- notification-testtool -- feature used by notification integration test
+- notification-testtool-config -- config snapshot for notification testtool feature
+- rest-sb-connector -- allows connecting restconf devices, package org.opendaylight.restconfsb contains implementation
+    * communicator -- low level components – http communication, response parsing etc.
+    * mountpoint -- high level components – MD-SAL services, yang schema resolving etc.
+- restconf-topology -- same as netconf topology, allows connector creation via config datastore
+- restconf-topology-config -- config snapshot for topology feature
+- testtool -- restconf device simulator used for test purposes
