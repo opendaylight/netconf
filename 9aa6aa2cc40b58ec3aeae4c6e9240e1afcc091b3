@@ -22,6 +22,30 @@
       "revId": "9aa6aa2cc40b58ec3aeae4c6e9240e1afcc091b3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_a1eda1b9",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 7178
+      },
+      "writtenOn": "2017-03-30T23:51:16Z",
+      "side": 1,
+      "message": "Different Types in Yang Models are mapped into different classes which implement NormalizedNode and are defined in Yangtools.\nI don\u0027t think we should create wrapped classes for every type.\nAnother way maybe using proxy object to wrap these payloads, but it also introduces runtime binding.",
+      "parentUuid": "fafc7978_b56cd19e",
+      "range": {
+        "startLine": 105,
+        "startChar": 43,
+        "endLine": 105,
+        "endChar": 114
+      },
+      "revId": "9aa6aa2cc40b58ec3aeae4c6e9240e1afcc091b3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
