@@ -127,7 +127,7 @@ public final class SubscribeToStreamUtil {
         for (final NotificationListenerAdapter listener : listeners) {
             registerToListenNotification(listener, handlersHolder.getNotificationServiceHandler());
             listener.setQueryParams(notificationQueryParams.getStart(), notificationQueryParams.getStop(),
-                    notificationQueryParams.getFilter());
+                    notificationQueryParams.getFilter(), false);
             listener.setCloseVars(handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
             final NormalizedNode mapToStreams =
                     RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(listener.getSchemaPath().getLastComponent(),
@@ -215,7 +215,7 @@ public final class SubscribeToStreamUtil {
         Preconditions.checkNotNull(listener, "Listener doesn't exist : " + streamName);
 
         listener.setQueryParams(notificationQueryParams.getStart(), notificationQueryParams.getStop(),
-                notificationQueryParams.getFilter());
+                notificationQueryParams.getFilter(), false);
         listener.setCloseVars(handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
 
         registration(ds, scope, listener, handlersHolder.getDomDataBrokerHandler().get());
