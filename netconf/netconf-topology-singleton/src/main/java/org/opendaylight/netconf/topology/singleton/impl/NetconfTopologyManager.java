@@ -35,6 +35,7 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvid
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup.NetconfTopologySetupBuilder;
@@ -242,7 +243,8 @@ public class NetconfTopologyManager
                 .setKeepaliveExecutor(keepaliveExecutor)
                 .setProcessingExecutor(processingExecutor)
                 .setTopologyId(topologyId)
-                .setNetconfClientDispatcher(clientDispatcher);
+                .setNetconfClientDispatcher(clientDispatcher)
+                .setSchemaResourceDTO(NetconfTopologyUtils.setupSchemaCacheDTO(node));
 
         return builder.build();
     }
