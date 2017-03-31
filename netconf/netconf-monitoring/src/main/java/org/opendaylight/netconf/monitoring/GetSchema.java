@@ -56,7 +56,7 @@ public class GetSchema extends AbstractSingletonNetconfOperation {
             schema = cap.getSchemaForCapability(entry.identifier, entry.version);
         } catch (final IllegalStateException e) {
             final Map<String, String> errorInfo = Maps.newHashMap();
-            errorInfo.put(entry.identifier, e.getMessage());
+            errorInfo.put(DocumentedException.ErrorTag.OPERATION_FAILED.toString(), e.getMessage());
             LOG.warn("Rpc error: {}", DocumentedException.ErrorTag.OPERATION_FAILED, e);
             throw new DocumentedException(e.getMessage(), DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.OPERATION_FAILED,
