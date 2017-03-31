@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_cd1bbe7e",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeAuthProviderImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-03-31T06:54:43Z",
+      "side": 1,
+      "message": "formatting",
+      "range": {
+        "startLine": 230,
+        "startChar": 7,
+        "endLine": 244,
+        "endChar": 9
+      },
+      "revId": "1b14563ce3e6916e0e4d37cb3b2e17f18df7cadc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_8d01b608",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallhomeStatusReporter.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-03-31T06:54:43Z",
+      "side": 1,
+      "message": "formatting",
+      "range": {
+        "startLine": 171,
+        "startChar": 4,
+        "endLine": 202,
+        "endChar": 5
+      },
+      "revId": "1b14563ce3e6916e0e4d37cb3b2e17f18df7cadc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_6d0c5243",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/IetfZeroTouchCallHomeServerProvider.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-03-31T06:54:43Z",
+      "side": 1,
+      "message": "formatting in the whole class",
+      "revId": "1b14563ce3e6916e0e4d37cb3b2e17f18df7cadc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
