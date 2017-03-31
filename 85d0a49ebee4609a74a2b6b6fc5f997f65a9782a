@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_34abae1f",
+        "filename": "karaf/pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4540
+      },
+      "writtenOn": "2017-03-31T13:20:24Z",
+      "side": 1,
+      "message": "This needs to be changed to features4-netconf.",
+      "revId": "85d0a49ebee4609a74a2b6b6fc5f997f65a9782a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_94aa5a17",
+        "filename": "karaf/pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4540
+      },
+      "writtenOn": "2017-03-31T13:20:24Z",
+      "side": 1,
+      "message": "This also needs to be fixed...",
+      "revId": "85d0a49ebee4609a74a2b6b6fc5f997f65a9782a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_74a53646",
+        "filename": "karaf/pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4540
+      },
+      "writtenOn": "2017-03-31T13:20:24Z",
+      "side": 1,
+      "message": "... and this ...",
+      "revId": "85d0a49ebee4609a74a2b6b6fc5f997f65a9782a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_d4634218",
+        "filename": "karaf/pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 4540
+      },
+      "writtenOn": "2017-03-31T13:20:24Z",
+      "side": 1,
+      "message": "... and this.",
+      "revId": "85d0a49ebee4609a74a2b6b6fc5f997f65a9782a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
