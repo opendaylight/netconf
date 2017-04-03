@@ -36,6 +36,7 @@ import org.opendaylight.netconf.topology.singleton.messages.AskForMasterMountPoi
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.MasterActorDataInitialized;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
+import org.opendaylight.netconf.topology.singleton.messages.RefreshSlaveActor;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.RegisterMountPoint;
 import org.opendaylight.netconf.topology.singleton.messages.UnregisterSlaveMountPoint;
@@ -73,14 +74,14 @@ public class NetconfNodeActor extends UntypedActor {
 
     private NetconfTopologySetup setup;
     private RemoteDeviceId id;
-    private final SchemaSourceRegistry schemaRegistry;
-    private final SchemaRepository schemaRepository;
+    private SchemaSourceRegistry schemaRegistry;
+    private SchemaRepository schemaRepository;
 
     private RemoteOperationTxProcessor operationsProcessor;
     private List<SourceIdentifier> sourceIdentifiers;
     private DOMRpcService deviceRpc;
     private SlaveSalFacade slaveSalManager;
-    private final Timeout actorResponseWaitTime;
+    private Timeout actorResponseWaitTime;
 
     public static Props props(final NetconfTopologySetup setup,
                               final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
@@ -147,8 +148,14 @@ public class NetconfNodeActor extends UntypedActor {
                 slaveSalManager.close();
                 slaveSalManager = null;
             }
-
+        } else if (message instanceof RefreshSlaveActor) { //slave
+            actorResponseWaitTime = ((RefreshSlaveActor) message).getActorResponseWaitTime();
+            id = ((RefreshSlaveActor) message).getId();
+            schemaRegistry = ((RefreshSlaveActor) message).getSchemaRegistry();
+            setup = ((RefreshSlaveActor) message).getSetup();
+            schemaRepository = ((RefreshSlaveActor) message).getSchemaRepository();
         }
+
     }
 
     private void resolveProxyCalls(final Object message, final ActorRef recipient, final ActorRef futureSender) {
