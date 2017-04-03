@@ -41,6 +41,7 @@ import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterA
 import org.opendaylight.netconf.topology.singleton.messages.MasterActorDataInitialized;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
+import org.opendaylight.netconf.topology.singleton.messages.RefreshSlaveActor;
 import org.opendaylight.netconf.topology.singleton.messages.RegisterMountPoint;
 import org.opendaylight.netconf.topology.singleton.messages.UnregisterSlaveMountPoint;
 import org.opendaylight.netconf.topology.singleton.messages.YangTextSchemaSourceRequest;
@@ -74,12 +75,13 @@ public class NetconfNodeActor extends UntypedActor {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeActor.class);
 
-    private final SchemaSourceRegistry schemaRegistry;
-    private final SchemaRepository schemaRepository;
-    private final Timeout actorResponseWaitTime;
+
     private final Duration writeTxIdleTimeout;
     private final DOMMountPointService mountPointService;
 
+    private SchemaSourceRegistry schemaRegistry;
+    private SchemaRepository schemaRepository;
+    private Timeout actorResponseWaitTime;
     private RemoteDeviceId id;
     private NetconfTopologySetup setup;
     private List<SourceIdentifier> sourceIdentifiers;
@@ -178,8 +180,14 @@ public class NetconfNodeActor extends UntypedActor {
                 slaveSalManager.close();
                 slaveSalManager = null;
             }
-
+        } else if (message instanceof RefreshSlaveActor) { //slave
+            actorResponseWaitTime = ((RefreshSlaveActor) message).getActorResponseWaitTime();
+            id = ((RefreshSlaveActor) message).getId();
+            schemaRegistry = ((RefreshSlaveActor) message).getSchemaRegistry();
+            setup = ((RefreshSlaveActor) message).getSetup();
+            schemaRepository = ((RefreshSlaveActor) message).getSchemaRepository();
         }
+
     }
 
     @Override
