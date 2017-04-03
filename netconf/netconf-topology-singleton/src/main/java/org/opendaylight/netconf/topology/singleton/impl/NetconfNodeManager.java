@@ -11,6 +11,8 @@ package org.opendaylight.netconf.topology.singleton.impl;
 import akka.actor.ActorRef;
 import akka.actor.PoisonPill;
 import akka.util.Timeout;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Collection;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.binding.api.ClusteredDataTreeChangeListener;
@@ -133,8 +135,9 @@ class NetconfNodeManager
 
     private void createActorRef() {
         if (slaveActorRef == null) {
+            final Timestamp timestamp = new Timestamp(Calendar.getInstance().getTimeInMillis());
             slaveActorRef = setup.getActorSystem().actorOf(NetconfNodeActor.props(setup, id, schemaRegistry,
-                    schemaRepository, actorResponseWaitTime), id.getName());
+                    schemaRepository, actorResponseWaitTime), id.getName() + "-" + timestamp);
         }
     }
 
