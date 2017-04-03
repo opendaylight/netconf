@@ -11,6 +11,7 @@ package org.opendaylight.netconf.topology.singleton.impl;
 import akka.actor.ActorRef;
 import akka.actor.PoisonPill;
 import akka.util.Timeout;
+import java.time.Instant;
 import java.util.Collection;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.binding.api.ClusteredDataTreeChangeListener;
@@ -24,6 +25,7 @@ import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.AskForMasterMountPoint;
+import org.opendaylight.netconf.topology.singleton.messages.RefreshSlaveActor;
 import org.opendaylight.netconf.topology.singleton.messages.UnregisterSlaveMountPoint;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus;
@@ -81,8 +83,8 @@ class NetconfNodeManager
                     handleSlaveMountPoint(rootNode);
                     break;
                 case DELETE:
-                    LOG.debug("{}: Operational for node {} deleted. Trying to remove slave mount point", id, nodeId);
-                    closeActor();
+                    LOG.debug("{}: Operational for node {} deleted.", id, nodeId);
+                    unregisterSlaveMountpoint();
                     break;
                 default:
                     LOG.debug("{}: Uknown operation for node: {}", id, nodeId);
@@ -92,8 +94,8 @@ class NetconfNodeManager
 
     @Override
     public void close() {
+        unregisterSlaveMountpoint();
         closeActor();
-
         if (dataChangeListenerRegistration != null) {
             dataChangeListenerRegistration.close();
             dataChangeListenerRegistration = null;
@@ -102,9 +104,16 @@ class NetconfNodeManager
 
     private void closeActor() {
         if (slaveActorRef != null) {
-            slaveActorRef.tell(new UnregisterSlaveMountPoint(), ActorRef.noSender());
+            LOG.debug("Seding message to kill {}", slaveActorRef.toString());
             slaveActorRef.tell(PoisonPill.getInstance(), ActorRef.noSender());
             slaveActorRef = null;
+        }
+    }
+
+    private void unregisterSlaveMountpoint() {
+        if (slaveActorRef != null) {
+            LOG.debug("Seding message to unregister slave mountpoint on {}", slaveActorRef.toString());
+            slaveActorRef.tell(new UnregisterSlaveMountPoint(), ActorRef.noSender());
         }
     }
 
@@ -120,21 +129,24 @@ class NetconfNodeManager
         final NetconfNode netconfNodeAfter = rootNode.getDataAfter().getAugmentation(NetconfNode.class);
 
         if (NetconfNodeConnectionStatus.ConnectionStatus.Connected.equals(netconfNodeAfter.getConnectionStatus())) {
-            createActorRef();
+            createOrUpdateActorRef();
             final String masterAddress = netconfNodeAfter.getClusteredConnectionStatus().getNetconfMasterNode();
             final String path = NetconfTopologyUtils.createActorPath(masterAddress,
                     NetconfTopologyUtils.createMasterActorName(id.getName(),
                             netconfNodeAfter.getClusteredConnectionStatus().getNetconfMasterNode()));
             setup.getActorSystem().actorSelection(path).tell(new AskForMasterMountPoint(), slaveActorRef);
         } else {
-            closeActor();
+            unregisterSlaveMountpoint();
         }
     }
 
-    private void createActorRef() {
+    private void createOrUpdateActorRef() {
         if (slaveActorRef == null) {
             slaveActorRef = setup.getActorSystem().actorOf(NetconfNodeActor.props(setup, id, schemaRegistry,
-                    schemaRepository, actorResponseWaitTime), id.getName());
+                    schemaRepository, actorResponseWaitTime), id.getName() + "-" + Instant.now().toString());
+        } else {
+            slaveActorRef.tell(new RefreshSlaveActor(setup, id, schemaRegistry, schemaRepository, actorResponseWaitTime),
+                    ActorRef.noSender());
         }
     }
 
