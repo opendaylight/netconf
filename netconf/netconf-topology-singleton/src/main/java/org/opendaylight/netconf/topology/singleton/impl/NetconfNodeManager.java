@@ -24,6 +24,7 @@ import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.AskForMasterMountPoint;
+import org.opendaylight.netconf.topology.singleton.messages.RefreshActor;
 import org.opendaylight.netconf.topology.singleton.messages.UnregisterSlaveMountPoint;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus;
@@ -44,6 +45,7 @@ class NetconfNodeManager
         implements ClusteredDataTreeChangeListener<Node>, NetconfTopologySingletonService, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeManager.class);
+    private static int ID = 1;
 
     private NetconfTopologySetup setup;
     private ListenerRegistration<NetconfNodeManager> dataChangeListenerRegistration;
@@ -82,6 +84,7 @@ class NetconfNodeManager
                     break;
                 case DELETE:
                     LOG.debug("{}: Operational for node {} deleted. Trying to remove slave mount point", id, nodeId);
+                    unregisterSlaveMountpoint();
                     closeActor();
                     break;
                 default:
@@ -92,7 +95,7 @@ class NetconfNodeManager
 
     @Override
     public void close() {
-        closeActor();
+        unregisterSlaveMountpoint();
 
         if (dataChangeListenerRegistration != null) {
             dataChangeListenerRegistration.close();
@@ -102,9 +105,14 @@ class NetconfNodeManager
 
     private void closeActor() {
         if (slaveActorRef != null) {
-            slaveActorRef.tell(new UnregisterSlaveMountPoint(), ActorRef.noSender());
             slaveActorRef.tell(PoisonPill.getInstance(), ActorRef.noSender());
             slaveActorRef = null;
+        }
+    }
+
+    private void unregisterSlaveMountpoint() {
+        if (slaveActorRef != null) {
+            slaveActorRef.tell(new UnregisterSlaveMountPoint(), ActorRef.noSender());
         }
     }
 
@@ -127,14 +135,17 @@ class NetconfNodeManager
                             netconfNodeAfter.getClusteredConnectionStatus().getNetconfMasterNode()));
             setup.getActorSystem().actorSelection(path).tell(new AskForMasterMountPoint(), slaveActorRef);
         } else {
-            closeActor();
+            unregisterSlaveMountpoint();
         }
     }
 
     private void createActorRef() {
         if (slaveActorRef == null) {
             slaveActorRef = setup.getActorSystem().actorOf(NetconfNodeActor.props(setup, id, schemaRegistry,
-                    schemaRepository, actorResponseWaitTime), id.getName());
+                    schemaRepository, actorResponseWaitTime), "ODL-" + ID++);
+        } else {
+            slaveActorRef.tell(new RefreshActor(setup, id, schemaRegistry, schemaRepository, actorResponseWaitTime),
+                    ActorRef.noSender());
         }
     }
 
