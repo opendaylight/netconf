@@ -134,7 +134,7 @@ class NetconfNodeManager
     private void createActorRef() {
         if (slaveActorRef == null) {
             slaveActorRef = setup.getActorSystem().actorOf(NetconfNodeActor.props(setup, id, schemaRegistry,
-                    schemaRepository, actorResponseWaitTime), id.getName());
+                    schemaRepository, actorResponseWaitTime), id.getName() + "-" + this.hashCode());
         }
     }
 
