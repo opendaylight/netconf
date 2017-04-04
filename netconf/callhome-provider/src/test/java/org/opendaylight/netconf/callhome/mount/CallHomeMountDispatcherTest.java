@@ -11,8 +11,8 @@ package org.opendaylight.netconf.callhome.mount;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -20,15 +20,12 @@ import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
-import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
 import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext;
@@ -44,12 +41,10 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 
 public class CallHomeMountDispatcherTest {
     private String topologyId;
-    private BindingAwareBroker mockBroker;
     private EventExecutor mockExecutor;
     private ScheduledThreadPool mockKeepAlive;
     private ThreadPool mockProcessingExecutor;
     private SchemaRepositoryProvider mockSchemaRepoProvider;
-    private Broker mockDomBroker;
 
     private CallHomeMountDispatcher instance;
     private DataBroker mockDataBroker;
@@ -62,20 +57,18 @@ public class CallHomeMountDispatcherTest {
     @Before
     public void setup() {
         topologyId = "";
-        mockBroker = mock(BindingAwareBroker.class);
         mockExecutor = mock(EventExecutor.class);
         mockKeepAlive = mock(ScheduledThreadPool.class);
         mockProcessingExecutor = mock(ThreadPool.class);
         mockSchemaRepoProvider = mock(SchemaRepositoryProvider.class);
-        mockDomBroker = mock(Broker.class);
         mockDataBroker = mock(DataBroker.class);
         mockMount = mock(DOMMountPointService.class);
         mockSessMgr = mock(CallHomeMountSessionManager.class);
         mockTopology = mock(CallHomeTopology.class);
         mockProtoSess = mock(CallHomeProtocolSessionContext.class);
 
-        instance = new CallHomeMountDispatcher(topologyId, mockBroker, mockExecutor, mockKeepAlive,
-                mockProcessingExecutor, mockSchemaRepoProvider, mockDomBroker, mockDataBroker, mockMount) {
+        instance = new CallHomeMountDispatcher(topologyId, mockExecutor, mockKeepAlive,
+                mockProcessingExecutor, mockSchemaRepoProvider, mockDataBroker, mockMount) {
             @Override
             public CallHomeMountSessionManager getSessionManager() {
                 return mockSessMgr;
@@ -87,15 +80,15 @@ public class CallHomeMountDispatcherTest {
         };
     }
 
-    NetconfClientConfiguration someConfiguration(InetSocketAddress address) {
+    NetconfClientConfiguration someConfiguration(final InetSocketAddress address) {
         // NetconfClientConfiguration has mostly final methods, making it un-mock-able
 
-        NetconfClientConfiguration.NetconfClientProtocol protocol =
+        final NetconfClientConfiguration.NetconfClientProtocol protocol =
                 NetconfClientConfiguration.NetconfClientProtocol.SSH;
-        NetconfHelloMessageAdditionalHeader additionalHeader = mock(NetconfHelloMessageAdditionalHeader.class);
-        NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
-        ReconnectStrategy reconnectStrategy = mock(ReconnectStrategy.class);
-        AuthenticationHandler authHandler = mock(AuthenticationHandler.class);
+        final NetconfHelloMessageAdditionalHeader additionalHeader = mock(NetconfHelloMessageAdditionalHeader.class);
+        final NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
+        final ReconnectStrategy reconnectStrategy = mock(ReconnectStrategy.class);
+        final AuthenticationHandler authHandler = mock(AuthenticationHandler.class);
 
         return NetconfClientConfigurationBuilder.create().withProtocol(protocol).withAddress(address)
                 .withConnectionTimeoutMillis(0).withAdditionalHeader(additionalHeader)
@@ -106,11 +99,11 @@ public class CallHomeMountDispatcherTest {
     @Test
     public void canCreateASessionFromAConfiguration() {
         // given
-        CallHomeMountSessionContext mockContext = mock(CallHomeMountSessionContext.class);
-        InetSocketAddress someAddress = InetSocketAddress.createUnresolved("1.2.3.4", 123);
+        final CallHomeMountSessionContext mockContext = mock(CallHomeMountSessionContext.class);
+        final InetSocketAddress someAddress = InetSocketAddress.createUnresolved("1.2.3.4", 123);
         doReturn(mockContext).when(mockSessMgr).getByAddress(eq(someAddress));
 
-        NetconfClientConfiguration someCfg = someConfiguration(someAddress);
+        final NetconfClientConfiguration someCfg = someConfiguration(someAddress);
         // when
         instance.createClient(someCfg);
         // then
@@ -120,10 +113,10 @@ public class CallHomeMountDispatcherTest {
     @Test
     public void noSessionIsCreatedWithoutAContextAvailableForAGivenAddress() {
         // given
-        InetSocketAddress someAddress = InetSocketAddress.createUnresolved("1.2.3.4", 123);
-        NetconfClientConfiguration someCfg = someConfiguration(someAddress);
+        final InetSocketAddress someAddress = InetSocketAddress.createUnresolved("1.2.3.4", 123);
+        final NetconfClientConfiguration someCfg = someConfiguration(someAddress);
         // when
-        Future<NetconfClientSession> future = instance.createClient(someCfg);
+        final Future<NetconfClientSession> future = instance.createClient(someCfg);
         // then
         assertFalse(future.isSuccess());
     }
@@ -131,14 +124,14 @@ public class CallHomeMountDispatcherTest {
     @Test
     public void nodeIsInsertedIntoTopologyWhenSubsystemIsOpened() throws UnknownHostException {
         // given
-        NodeId mockNodeId = mock(NodeId.class);
-        Node mockNode = mock(Node.class);
-        CallHomeMountSessionContext mockDevCtxt = mock(CallHomeMountSessionContext.class);
+        final NodeId mockNodeId = mock(NodeId.class);
+        final Node mockNode = mock(Node.class);
+        final CallHomeMountSessionContext mockDevCtxt = mock(CallHomeMountSessionContext.class);
         doReturn(mockNodeId).when(mockDevCtxt).getId();
         doReturn(mockNode).when(mockDevCtxt).getConfigNode();
         doReturn(mockDevCtxt).when(mockSessMgr).createSession(any(CallHomeProtocolSessionContext.class),
                 any(CallHomeChannelActivator.class), any(CallHomeMountSessionContext.CloseCallback.class));
-        CallHomeChannelActivator activator = mock(CallHomeChannelActivator.class);
+        final CallHomeChannelActivator activator = mock(CallHomeChannelActivator.class);
         instance.createTopology();
         // when
         instance.onNetconfSubsystemOpened(mockProtoSess, activator);
