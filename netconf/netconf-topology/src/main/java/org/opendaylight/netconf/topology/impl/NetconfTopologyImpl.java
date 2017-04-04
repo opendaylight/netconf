@@ -22,8 +22,7 @@ import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
-import org.opendaylight.controller.sal.core.api.Broker;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -50,19 +49,17 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
     private ListenerRegistration<NetconfTopologyImpl> datastoreListenerRegistration = null;
 
     public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
-                               final BindingAwareBroker bindingAwareBroker, final Broker domBroker,
                                final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
                                final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
-                               final DataBroker dataBroker) {
-        super(topologyId, clientDispatcher,
-                bindingAwareBroker, domBroker, eventExecutor,
-                keepaliveExecutor, processingExecutor, schemaRepositoryProvider, dataBroker);
+                               final DataBroker dataBroker, final DOMMountPointService mountPointService) {
+        super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
+                schemaRepositoryProvider, dataBroker, mountPointService);
     }
 
     @Override
     public void close() throws Exception {
         // close all existing connectors, delete whole topology in datastore?
-        for (NetconfConnectorDTO connectorDTO : activeConnectors.values()) {
+        for (final NetconfConnectorDTO connectorDTO : activeConnectors.values()) {
             connectorDTO.close();
         }
         activeConnectors.clear();
@@ -74,8 +71,8 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
     }
 
     @Override
-    protected RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(RemoteDeviceId id, Broker domBroker, BindingAwareBroker bindingBroker) {
-        return new NetconfDeviceSalFacade(id, domBroker, bindingAwareBroker);
+    protected RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id) {
+        return new NetconfDeviceSalFacade(id, mountPointService, dataBroker);
     }
 
     /**
@@ -87,12 +84,12 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
         initTopology(wtx, LogicalDatastoreType.OPERATIONAL);
         Futures.addCallback(wtx.submit(), new FutureCallback<Void>() {
             @Override
-            public void onSuccess(Void result) {
+            public void onSuccess(final Void result) {
                 LOG.debug("topology initialization successful");
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFailure(final Throwable t) {
                 LOG.error("Unable to initialize netconf-topology, {}", t);
             }
         });
@@ -107,8 +104,8 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
     }
 
     @Override
-    public void onDataTreeChanged(@Nonnull Collection<DataTreeModification<Node>> collection) {
-        for (DataTreeModification<Node> change : collection) {
+    public void onDataTreeChanged(@Nonnull final Collection<DataTreeModification<Node>> collection) {
+        for (final DataTreeModification<Node> change : collection) {
             final DataObjectModification<Node> rootNode = change.getRootNode();
             switch (rootNode.getModificationType()) {
                 case SUBTREE_MODIFIED:
