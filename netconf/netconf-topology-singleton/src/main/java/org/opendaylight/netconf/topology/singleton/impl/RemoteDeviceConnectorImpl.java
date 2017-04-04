@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
@@ -69,21 +70,24 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
     private static final Logger LOG = LoggerFactory.getLogger(RemoteDeviceConnectorImpl.class);
 
-    private final Timeout actorResponseWaitTime;
-
     // Initializes default constant instances for the case when the default schema repository
     // directory cache/schema is used.
 
     private final NetconfTopologySetup netconfTopologyDeviceSetup;
     private final RemoteDeviceId remoteDeviceId;
+    private final DOMMountPointService mountService;
+    private final Timeout actorResponseWaitTime;
+
     private NetconfConnectorDTO deviceCommunicatorDTO;
 
     public RemoteDeviceConnectorImpl(final NetconfTopologySetup netconfTopologyDeviceSetup,
-                                     final RemoteDeviceId remoteDeviceId, final Timeout actorResponseWaitTime) {
+                                     final RemoteDeviceId remoteDeviceId, final Timeout actorResponseWaitTime,
+                                     final DOMMountPointService mountService) {
 
         this.netconfTopologyDeviceSetup = Preconditions.checkNotNull(netconfTopologyDeviceSetup);
         this.remoteDeviceId = remoteDeviceId;
         this.actorResponseWaitTime = actorResponseWaitTime;
+        this.mountService = mountService;
     }
 
     @Override
@@ -138,8 +142,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                 ? NetconfTopologyUtils.DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
 
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade = new MasterSalFacade(remoteDeviceId,
-                netconfTopologyDeviceSetup.getDomBroker(), netconfTopologyDeviceSetup.getBindingAwareBroker(),
-                netconfTopologyDeviceSetup.getActorSystem(), deviceContextActorRef, actorResponseWaitTime);
+                netconfTopologyDeviceSetup.getActorSystem(), deviceContextActorRef, actorResponseWaitTime,
+                mountService, netconfTopologyDeviceSetup.getDataBroker());
         if (keepaliveDelay > 0) {
             LOG.info("{}: Adding keepalive facade.", remoteDeviceId);
             salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade,
