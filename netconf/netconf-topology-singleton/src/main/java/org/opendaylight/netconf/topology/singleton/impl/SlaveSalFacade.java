@@ -11,8 +11,8 @@ package org.opendaylight.netconf.topology.singleton.impl;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -26,25 +26,17 @@ public class SlaveSalFacade {
 
     private final RemoteDeviceId id;
     private final NetconfDeviceSalProvider salProvider;
-
     private final ActorSystem actorSystem;
     private final Timeout actorResponseWaitTime;
 
     public SlaveSalFacade(final RemoteDeviceId id,
-                          final Broker domBroker,
                           final ActorSystem actorSystem,
-                          final Timeout actorResponseWaitTime) {
+                          final Timeout actorResponseWaitTime,
+                          final DOMMountPointService mountPointService) {
         this.id = id;
-        this.salProvider = new NetconfDeviceSalProvider(id);
+        this.salProvider = new NetconfDeviceSalProvider(id, mountPointService);
         this.actorSystem = actorSystem;
         this.actorResponseWaitTime = actorResponseWaitTime;
-
-        registerToSal(domBroker);
-    }
-
-    private void registerToSal(final Broker domRegistryDependency) {
-        domRegistryDependency.registerProvider(salProvider);
-
     }
 
     public void registerSlaveMountPoint(final SchemaContext remoteSchemaContext, final DOMRpcService deviceRpc,

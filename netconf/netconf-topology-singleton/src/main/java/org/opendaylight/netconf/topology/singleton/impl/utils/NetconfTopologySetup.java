@@ -13,9 +13,7 @@ import io.netty.util.concurrent.EventExecutor;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
-import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
@@ -30,10 +28,8 @@ public class NetconfTopologySetup {
     private final DataBroker dataBroker;
     private final InstanceIdentifier<Node> instanceIdentifier;
     private final Node node;
-    private final BindingAwareBroker bindingAwareBroker;
     private final ScheduledThreadPool keepaliveExecutor;
     private final ThreadPool processingExecutor;
-    private final Broker domBroker;
     private final ActorSystem actorSystem;
     private final EventExecutor eventExecutor;
     private final NetconfClientDispatcher netconfClientDispatcher;
@@ -47,10 +43,8 @@ public class NetconfTopologySetup {
         this.dataBroker = builder.getDataBroker();
         this.instanceIdentifier = builder.getInstanceIdentifier();
         this.node = builder.getNode();
-        this.bindingAwareBroker = builder.getBindingAwareBroker();
         this.keepaliveExecutor = builder.getKeepaliveExecutor();
         this.processingExecutor = builder.getProcessingExecutor();
-        this.domBroker = builder.getDomBroker();
         this.actorSystem = builder.getActorSystem();
         this.eventExecutor = builder.getEventExecutor();
         this.netconfClientDispatcher = builder.getNetconfClientDispatcher();
@@ -79,20 +73,12 @@ public class NetconfTopologySetup {
         return node;
     }
 
-    public BindingAwareBroker getBindingAwareBroker() {
-        return bindingAwareBroker;
-    }
-
     public ThreadPool getProcessingExecutor() {
         return processingExecutor;
     }
 
     public ScheduledThreadPool getKeepaliveExecutor() {
         return keepaliveExecutor;
-    }
-
-    public Broker getDomBroker() {
-        return domBroker;
     }
 
     public ActorSystem getActorSystem() {
@@ -126,10 +112,8 @@ public class NetconfTopologySetup {
         private DataBroker dataBroker;
         private InstanceIdentifier<Node> instanceIdentifier;
         private Node node;
-        private BindingAwareBroker bindingAwareBroker;
         private ScheduledThreadPool keepaliveExecutor;
         private ThreadPool processingExecutor;
-        private Broker domBroker;
         private ActorSystem actorSystem;
         private EventExecutor eventExecutor;
         private String topologyId;
@@ -190,15 +174,6 @@ public class NetconfTopologySetup {
             return new NetconfTopologySetup(this);
         }
 
-        private BindingAwareBroker getBindingAwareBroker() {
-            return bindingAwareBroker;
-        }
-
-        public NetconfTopologySetupBuilder setBindingAwareBroker(final BindingAwareBroker bindingAwareBroker) {
-            this.bindingAwareBroker = bindingAwareBroker;
-            return this;
-        }
-
         private ScheduledThreadPool getKeepaliveExecutor() {
             return keepaliveExecutor;
         }
@@ -214,15 +189,6 @@ public class NetconfTopologySetup {
 
         public NetconfTopologySetupBuilder setProcessingExecutor(final ThreadPool processingExecutor) {
             this.processingExecutor = processingExecutor;
-            return this;
-        }
-
-        private Broker getDomBroker() {
-            return domBroker;
-        }
-
-        public NetconfTopologySetupBuilder setDomBroker(final Broker domBroker) {
-            this.domBroker = domBroker;
             return this;
         }
 
