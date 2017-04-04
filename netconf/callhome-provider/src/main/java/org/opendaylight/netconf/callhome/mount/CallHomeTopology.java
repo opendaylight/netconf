@@ -13,8 +13,6 @@ import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
-import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -25,21 +23,18 @@ import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
 
 public class CallHomeTopology extends BaseCallHomeTopology {
 
-    public CallHomeTopology(String topologyId, NetconfClientDispatcher clientDispatcher,
-                            BindingAwareBroker bindingAwareBroker,
-                            Broker domBroker, EventExecutor eventExecutor,
-                            ScheduledThreadPool keepaliveExecutor, ThreadPool processingExecutor,
-                            SchemaRepositoryProvider schemaRepositoryProvider,
-                            DataBroker dataBroker, DOMMountPointService mountPointService) {
-        super(topologyId, clientDispatcher, bindingAwareBroker, domBroker, eventExecutor,
+    public CallHomeTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
+                            final EventExecutor eventExecutor,
+                            final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
+                            final SchemaRepositoryProvider schemaRepositoryProvider,
+                            final DataBroker dataBroker, final DOMMountPointService mountPointService) {
+        super(topologyId, clientDispatcher, eventExecutor,
                 keepaliveExecutor, processingExecutor, schemaRepositoryProvider,
                 dataBroker, mountPointService);
     }
 
     @Override
-    protected RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(RemoteDeviceId id,
-                                                                             Broker domBroker,
-                                                                             BindingAwareBroker bindingBroker) {
-        return new NetconfDeviceSalFacade(id, domBroker, bindingAwareBroker);
+    protected RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id) {
+        return new NetconfDeviceSalFacade(id, mountPointService, dataBroker);
     }
 }

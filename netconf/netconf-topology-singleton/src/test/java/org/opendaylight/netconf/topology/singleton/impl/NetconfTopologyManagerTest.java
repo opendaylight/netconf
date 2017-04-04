@@ -40,9 +40,8 @@ import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
-import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
@@ -78,18 +77,17 @@ public class NetconfTopologyManagerTest {
         initMocks(this);
 
         final RpcProviderRegistry rpcProviderRegistry = mock(RpcProviderRegistry.class);
-        final BindingAwareBroker bindingAwareBroker = mock(BindingAwareBroker.class);
         final ScheduledThreadPool keepaliveExecutor = mock(ScheduledThreadPool.class);
         final ThreadPool processingExecutor = mock(ThreadPool.class);
-        final Broker domBroker = mock(Broker.class);
         final ActorSystemProvider actorSystemProvider = mock(ActorSystemProvider.class);
         final EventExecutor eventExecutor = mock(EventExecutor.class);
         final NetconfClientDispatcher clientDispatcher = mock(NetconfClientDispatcher.class);
+        final DOMMountPointService mountPointService = mock(DOMMountPointService.class);
 
         final Config config = new ConfigBuilder().setWriteTransactionIdleTimeout(0).build();
         netconfTopologyManager = new NetconfTopologyManager(dataBroker, rpcProviderRegistry,
-                clusterSingletonServiceProvider, bindingAwareBroker, keepaliveExecutor, processingExecutor, domBroker,
-                actorSystemProvider, eventExecutor, clientDispatcher, topologyId, config);
+                clusterSingletonServiceProvider, keepaliveExecutor, processingExecutor,
+                actorSystemProvider, eventExecutor, clientDispatcher, topologyId, config, mountPointService);
     }
 
     @Test
