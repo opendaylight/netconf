@@ -27,8 +27,7 @@ import java.util.Map;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
-import org.opendaylight.controller.sal.core.api.Broker;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
@@ -154,13 +153,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
     protected final String topologyId;
     private final NetconfClientDispatcher clientDispatcher;
-    protected final BindingAwareBroker bindingAwareBroker;
-    protected final Broker domBroker;
     private final EventExecutor eventExecutor;
     protected final ScheduledThreadPool keepaliveExecutor;
     protected final ThreadPool processingExecutor;
     protected final SharedSchemaRepository sharedSchemaRepository;
     protected final DataBroker dataBroker;
+    protected final DOMMountPointService mountPointService;
 
     protected SchemaSourceRegistry schemaRegistry = DEFAULT_SCHEMA_REPOSITORY;
     protected SchemaRepository schemaRepository = DEFAULT_SCHEMA_REPOSITORY;
@@ -169,19 +167,17 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     protected final HashMap<NodeId, NetconfConnectorDTO> activeConnectors = new HashMap<>();
 
     protected AbstractNetconfTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
-                                      final BindingAwareBroker bindingAwareBroker, final Broker domBroker,
                                       final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
                                       final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
-                                      final DataBroker dataBroker) {
+                                      final DataBroker dataBroker, final DOMMountPointService mountPointService) {
         this.topologyId = topologyId;
         this.clientDispatcher = clientDispatcher;
-        this.bindingAwareBroker = bindingAwareBroker;
-        this.domBroker = domBroker;
         this.eventExecutor = eventExecutor;
         this.keepaliveExecutor = keepaliveExecutor;
         this.processingExecutor = processingExecutor;
         this.sharedSchemaRepository = schemaRepositoryProvider.getSharedSchemaRepository();
         this.dataBroker = dataBroker;
+        this.mountPointService = mountPointService;
     }
 
     public void setSchemaRegistry(final SchemaSourceRegistry schemaRegistry) {
@@ -258,7 +254,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId(nodeId.getValue(), address);
 
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade =
-                createSalFacade(remoteDeviceId, domBroker, bindingAwareBroker);
+                createSalFacade(remoteDeviceId);
 
         if (keepaliveDelay > 0) {
             LOG.warn("Adding keepalive facade, for device {}", nodeId);
@@ -423,7 +419,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 .build();
     }
 
-    protected abstract RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id, final Broker domBroker, final BindingAwareBroker bindingBroker);
+    protected abstract RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id);
 
     private InetSocketAddress getSocketAddress(final Host host, final int port) {
         if(host.getDomainName() != null) {

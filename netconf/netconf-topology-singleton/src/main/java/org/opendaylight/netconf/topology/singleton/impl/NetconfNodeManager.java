@@ -14,10 +14,12 @@ import akka.util.Timeout;
 import java.util.Collection;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.binding.api.ClusteredDataTreeChangeListener;
+import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
@@ -45,21 +47,26 @@ class NetconfNodeManager
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeManager.class);
 
+    private final Timeout actorResponseWaitTime;
+    private final DOMMountPointService mountPointService;
+    private final SchemaSourceRegistry schemaRegistry;
+    private final SchemaRepository schemaRepository;
+
     private NetconfTopologySetup setup;
     private ListenerRegistration<NetconfNodeManager> dataChangeListenerRegistration;
     private RemoteDeviceId id;
-    private final SchemaSourceRegistry schemaRegistry;
-    private final SchemaRepository schemaRepository;
     private ActorRef slaveActorRef;
-    private final Timeout actorResponseWaitTime;
+
 
     NetconfNodeManager(final NetconfTopologySetup setup,
-                       final RemoteDeviceId id, final Timeout actorResponseWaitTime) {
+                       final RemoteDeviceId id, final Timeout actorResponseWaitTime,
+                       final DOMMountPointService mountPointService) {
         this.setup = setup;
         this.id = id;
         this.schemaRegistry = setup.getSchemaResourcesDTO().getSchemaRegistry();
         this.schemaRepository = setup.getSchemaResourcesDTO().getSchemaRepository();
         this.actorResponseWaitTime = actorResponseWaitTime;
+        this.mountPointService = mountPointService;
     }
 
     @Override
@@ -134,7 +141,7 @@ class NetconfNodeManager
     private void createActorRef() {
         if (slaveActorRef == null) {
             slaveActorRef = setup.getActorSystem().actorOf(NetconfNodeActor.props(setup, id, schemaRegistry,
-                    schemaRepository, actorResponseWaitTime), id.getName());
+                    schemaRepository, actorResponseWaitTime, mountPointService), id.getName());
         }
     }
 

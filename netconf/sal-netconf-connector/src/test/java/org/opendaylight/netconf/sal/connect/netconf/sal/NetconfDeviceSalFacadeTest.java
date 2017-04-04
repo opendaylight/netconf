@@ -27,8 +27,6 @@ import org.mockito.Mock;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
-import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -56,9 +54,7 @@ public class NetconfDeviceSalFacadeTest {
         final InetSocketAddress address = new InetSocketAddress("127.0.0.1", 8000);
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId("test", address);
 
-        final Broker domRegistry = mock(Broker.class);
-        final BindingAwareBroker bindingRegistry = mock(BindingAwareBroker.class);
-        deviceFacade = new NetconfDeviceSalFacade(remoteDeviceId, salProvider, domRegistry, bindingRegistry);
+        deviceFacade = new NetconfDeviceSalFacade(remoteDeviceId, salProvider);
 
         netconfDeviceTopologyAdapter = PowerMockito.mock(NetconfDeviceTopologyAdapter.class);
         mountInstance = PowerMockito.mock(NetconfDeviceSalProvider.MountInstance.class);
