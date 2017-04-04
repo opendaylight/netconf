@@ -25,6 +25,7 @@ import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.binding.api.BindingAwareProvider;
 import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.controller.sal.core.api.Provider;
+import org.opendaylight.netconf.sal.connect.netconf.sal.tx.MissingMountpointServiceException;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -133,10 +134,13 @@ public class NetconfDeviceSalProvider implements AutoCloseable, Provider, Bindin
         }
 
         public synchronized void onTopologyDeviceConnected(final SchemaContext initialCtx,
-                                                    final DOMDataBroker broker, final DOMRpcService rpc,
-                                                    final NetconfDeviceNotificationService notificationService) {
+                                                           final DOMDataBroker broker, final DOMRpcService rpc,
+                                                           final NetconfDeviceNotificationService notificationService)
+                                                           throws MissingMountpointServiceException {
+            if (mountService == null) {
+                throw new MissingMountpointServiceException("Device was disconnected. Canceling Mountpoint creation.");
+            }
 
-            Preconditions.checkNotNull(mountService, "Closed");
             Preconditions.checkState(topologyRegistration == null, "Already initialized");
 
             final DOMMountPointService.DOMMountPointBuilder mountBuilder = mountService.createMountPoint(id.getTopologyPath());
