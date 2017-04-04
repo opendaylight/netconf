@@ -11,7 +11,10 @@ package org.opendaylight.netconf.topology.singleton.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -20,6 +23,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
+import com.google.common.util.concurrent.Futures;
 import io.netty.util.concurrent.EventExecutor;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -30,10 +34,13 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
+import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
+import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
+import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
-import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
@@ -75,16 +82,10 @@ public class RemoteDeviceConnectorImplTest {
     private ClusterSingletonServiceProvider clusterSingletonServiceProvider;
 
     @Mock
-    private BindingAwareBroker bindingAwareBroker;
-
-    @Mock
     private ScheduledThreadPool keepaliveExecutor;
 
     @Mock
     private ThreadPool processingExecutor;
-
-    @Mock
-    private Broker domBroker;
 
     @Mock
     private ActorSystem actorSystem;
@@ -94,6 +95,15 @@ public class RemoteDeviceConnectorImplTest {
 
     @Mock
     private NetconfClientDispatcher clientDispatcher;
+
+    @Mock
+    private DOMMountPointService mountPointService;
+
+    @Mock
+    private BindingTransactionChain txChain;
+
+    @Mock
+    private WriteTransaction writeTx;
 
     private NetconfTopologySetup.NetconfTopologySetupBuilder builder;
     private RemoteDeviceId remoteDeviceId;
@@ -105,14 +115,17 @@ public class RemoteDeviceConnectorImplTest {
         remoteDeviceId = new RemoteDeviceId(TOPOLOGY_ID,
                 new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 9999));
 
+        doReturn(txChain).when(dataBroker).createTransactionChain(any(TransactionChainListener.class));
+        doReturn(writeTx).when(txChain).newWriteOnlyTransaction();
+        doNothing().when(writeTx).merge(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
+        doReturn("Some object").when(writeTx).getIdentifier();
+        doReturn(Futures.immediateCheckedFuture(null)).when(writeTx).submit();
         builder = new NetconfTopologySetup.NetconfTopologySetupBuilder();
         builder.setDataBroker(dataBroker);
         builder.setRpcProviderRegistry(rpcProviderRegistry);
         builder.setClusterSingletonServiceProvider(clusterSingletonServiceProvider);
-        builder.setBindingAwareBroker(bindingAwareBroker);
         builder.setKeepaliveExecutor(keepaliveExecutor);
         builder.setProcessingExecutor(processingExecutor);
-        builder.setDomBroker(domBroker);
         builder.setActorSystem(actorSystem);
         builder.setEventExecutor(eventExecutor);
         builder.setNetconfClientDispatcher(clientDispatcher);
@@ -141,7 +154,8 @@ public class RemoteDeviceConnectorImplTest {
         final RemoteDeviceHandler salFacade = mock(RemoteDeviceHandler.class);
 
         final TestingRemoteDeviceConnectorImpl remoteDeviceConnection =
-                new TestingRemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, communicator, salFacade, TIMEOUT);
+                new TestingRemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, communicator, salFacade, TIMEOUT,
+                        mountPointService, dataBroker);
 
         final ActorRef masterRef = mock(ActorRef.class);
 
@@ -174,7 +188,7 @@ public class RemoteDeviceConnectorImplTest {
         final Node node = new NodeBuilder().setNodeId(NODE_ID).addAugmentation(NetconfNode.class, netconfNode).build();
         builder.setSchemaResourceDTO(NetconfTopologyUtils.setupSchemaCacheDTO(node));
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
-                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, TIMEOUT);
+                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, TIMEOUT, mountPointService, dataBroker);
 
         final ActorRef masterRef = mock(ActorRef.class);
 
@@ -208,7 +222,7 @@ public class RemoteDeviceConnectorImplTest {
         builder.setSchemaResourceDTO(NetconfTopologyUtils.setupSchemaCacheDTO(node));
 
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
-                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, TIMEOUT);
+                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, TIMEOUT, mountPointService, dataBroker);
 
         final ActorRef masterRef = mock(ActorRef.class);
 
@@ -235,7 +249,7 @@ public class RemoteDeviceConnectorImplTest {
                 .build();
 
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
-                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, TIMEOUT);
+                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, TIMEOUT, mountPointService, dataBroker);
 
         final NetconfReconnectingClientConfiguration defaultClientConfig =
                 remoteDeviceConnection.getClientConfig(listener, testingNode);
