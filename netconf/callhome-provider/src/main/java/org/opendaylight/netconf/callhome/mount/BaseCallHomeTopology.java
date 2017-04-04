@@ -13,8 +13,6 @@ import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
-import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.topology.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
@@ -23,17 +21,15 @@ abstract class BaseCallHomeTopology extends AbstractNetconfTopology {
 
     protected DOMMountPointService mountPointService = null;
 
-    BaseCallHomeTopology(String topologyId, NetconfClientDispatcher clientDispatcher,
-                         BindingAwareBroker bindingAwareBroker,
-                         Broker domBroker,
-                         EventExecutor eventExecutor,
-                         ScheduledThreadPool keepaliveExecutor,
-                         ThreadPool processingExecutor,
-                         SchemaRepositoryProvider schemaRepositoryProvider,
-                         DataBroker dataBroker,
-                         DOMMountPointService mountPointService) {
-        super(topologyId, clientDispatcher, bindingAwareBroker, domBroker, eventExecutor, keepaliveExecutor,
-                processingExecutor, schemaRepositoryProvider, dataBroker);
+    BaseCallHomeTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
+                         final EventExecutor eventExecutor,
+                         final ScheduledThreadPool keepaliveExecutor,
+                         final ThreadPool processingExecutor,
+                         final SchemaRepositoryProvider schemaRepositoryProvider,
+                         final DataBroker dataBroker,
+                         final DOMMountPointService mountPointService) {
+        super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,
+                processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService);
         this.mountPointService = mountPointService;
     }
 }

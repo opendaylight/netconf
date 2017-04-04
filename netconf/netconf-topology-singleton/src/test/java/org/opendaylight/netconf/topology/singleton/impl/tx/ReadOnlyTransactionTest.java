@@ -40,6 +40,7 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMDataBroker;
@@ -68,14 +69,16 @@ public class ReadOnlyTransactionTest {
     private ActorRef masterRef;
     private ProxyDOMDataBroker slaveDataBroker;
     private List<SourceIdentifier> sourceIdentifiers;
+    private YangInstanceIdentifier instanceIdentifier;
+    private LogicalDatastoreType storeType;
     @Mock
     private DOMDataBroker deviceDataBroker;
     @Mock
     private DOMDataReadOnlyTransaction readTx;
     @Mock
     private DOMRpcService domRpcService;
-    private YangInstanceIdentifier instanceIdentifier;
-    private LogicalDatastoreType storeType;
+    @Mock
+    private DOMMountPointService mountPointService;
 
     @Before
     public void setup() throws Exception {
@@ -88,7 +91,7 @@ public class ReadOnlyTransactionTest {
 
         final NetconfTopologySetup setup = mock(NetconfTopologySetup.class);
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY,
-                DEFAULT_SCHEMA_REPOSITORY, TIMEOUT);
+                DEFAULT_SCHEMA_REPOSITORY, TIMEOUT, mountPointService);
 
         masterRef = TestActorRef.create(system, props, "master_read");
 
