@@ -28,6 +28,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabi
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
+import org.opendaylight.netconf.sal.connect.netconf.sal.tx.MissingMountpointServiceException;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfDOMTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.tx.NetconfMasterDOMTransaction;
@@ -83,7 +84,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     @Override
     public void onDeviceConnected(final SchemaContext remoteSchemaContext,
                                   final NetconfSessionPreferences netconfSessionPreferences,
-                                  final DOMRpcService deviceRpc) {
+                                  final DOMRpcService deviceRpc)  throws MissingMountpointServiceException {
         this.remoteSchemaContext = remoteSchemaContext;
         this.netconfSessionPreferences = netconfSessionPreferences;
         this.deviceRpc = deviceRpc;
@@ -126,7 +127,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
         closeGracefully(salProvider);
     }
 
-    private void registerMasterMountPoint() {
+    private void registerMasterMountPoint() throws MissingMountpointServiceException {
         Preconditions.checkNotNull(id);
         Preconditions.checkNotNull(remoteSchemaContext,
                 "Device has no remote schema context yet. Probably not fully connected.");
