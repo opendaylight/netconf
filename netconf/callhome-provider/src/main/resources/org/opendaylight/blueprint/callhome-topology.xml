@@ -10,16 +10,12 @@
            xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
            odl:use-default-for-reference-types="true">
 
-    <reference id="bindingAwareBroker"
-               interface="org.opendaylight.controller.sal.binding.api.BindingAwareBroker"/>
     <reference id="keepAliveExecutor"
                interface="org.opendaylight.controller.config.threadpool.ScheduledThreadPool"
                odl:type="global-netconf-ssh-scheduled-executor"/>
     <reference id="processingExecutor"
                interface="org.opendaylight.controller.config.threadpool.ThreadPool"
                odl:type="global-netconf-processing-executor"/>
-    <reference id="domBroker"
-               interface="org.opendaylight.controller.sal.core.api.Broker"/>
     <reference id="eventExecutor"
                interface="io.netty.util.concurrent.EventExecutor"
                odl:type="global-event-executor"/>
@@ -42,12 +38,10 @@
 
     <bean id="callhomeDispatcher" class="org.opendaylight.netconf.callhome.mount.CallHomeMountDispatcher">
         <argument value="topology-netconf"/>
-        <argument ref="bindingAwareBroker"/>
         <argument ref="eventExecutor"/>
         <argument ref="keepAliveExecutor"/>
         <argument ref="processingExecutor"/>
         <argument ref="schemaRepository"/>
-        <argument ref="domBroker"/>
         <argument ref="dataBroker"/>
         <argument ref="domMountPointService"/>
     </bean>

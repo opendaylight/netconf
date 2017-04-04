@@ -10,11 +10,11 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import java.util.List;
+import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
-import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -29,26 +29,18 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
 
     private final RemoteDeviceId id;
     private final NetconfDeviceSalProvider salProvider;
-
     private final List<AutoCloseable> salRegistrations = Lists.newArrayList();
 
-    public NetconfDeviceSalFacade(final RemoteDeviceId id, final Broker domBroker, final BindingAwareBroker bindingBroker) {
+    public NetconfDeviceSalFacade(final RemoteDeviceId id, final DOMMountPointService mountPointService,
+                                  final DataBroker dataBroker) {
         this.id = id;
-        this.salProvider = new NetconfDeviceSalProvider(id);
-        registerToSal(domBroker, bindingBroker);
+        this.salProvider = new NetconfDeviceSalProvider(id, mountPointService, dataBroker);
     }
 
     @VisibleForTesting
-    NetconfDeviceSalFacade(final RemoteDeviceId id, NetconfDeviceSalProvider salProvider,
-                           final Broker domBroker, final BindingAwareBroker bindingBroker) {
+    NetconfDeviceSalFacade(final RemoteDeviceId id, final NetconfDeviceSalProvider salProvider) {
         this.id = id;
         this.salProvider = salProvider;
-        registerToSal(domBroker, bindingBroker);
-    }
-
-    public void registerToSal(final Broker domRegistryDependency, final BindingAwareBroker bindingBroker) {
-        domRegistryDependency.registerProvider(salProvider);
-        bindingBroker.registerProvider(salProvider);
     }
 
     @Override

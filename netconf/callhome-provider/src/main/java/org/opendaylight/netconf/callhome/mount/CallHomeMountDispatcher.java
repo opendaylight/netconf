@@ -16,8 +16,6 @@ import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
-import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.callhome.mount.CallHomeMountSessionContext.CloseCallback;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
 import org.opendaylight.netconf.callhome.protocol.CallHomeNetconfSubsystemListener;
@@ -38,12 +36,10 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     private final static Logger LOG = LoggerFactory.getLogger(CallHomeMountDispatcher.class);
 
     private final String topologyId;
-    private final BindingAwareBroker bindingAwareBroker;
     private final EventExecutor eventExecutor;
     private final ScheduledThreadPool keepaliveExecutor;
     private final ThreadPool processingExecutor;
     private final SchemaRepositoryProvider schemaRepositoryProvider;
-    private final org.opendaylight.controller.sal.core.api.Broker domBroker;
     private final CallHomeMountSessionManager sessionManager;
     private final DataBroker dataBroker;
     private final DOMMountPointService mountService;
@@ -52,44 +48,42 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
 
     private final CloseCallback onCloseHandler = new CloseCallback() {
         @Override
-        public void onClosed(CallHomeMountSessionContext deviceContext) {
+        public void onClosed(final CallHomeMountSessionContext deviceContext) {
             LOG.info("Removing {} from Netconf Topology.", deviceContext.getId());
             topology.disconnectNode(deviceContext.getId());
         }
     };
 
-    public CallHomeMountDispatcher(String topologyId, BindingAwareBroker bindingAwareBroker,
-                                   EventExecutor eventExecutor,
-                                   ScheduledThreadPool keepaliveExecutor,
-                                   ThreadPool processingExecutor,
-                                   SchemaRepositoryProvider schemaRepositoryProvider,
-                                   Broker domBroker, DataBroker dataBroker,
-                                   DOMMountPointService mountService) {
+    public CallHomeMountDispatcher(final String topologyId,
+                                   final EventExecutor eventExecutor,
+                                   final ScheduledThreadPool keepaliveExecutor,
+                                   final ThreadPool processingExecutor,
+                                   final SchemaRepositoryProvider schemaRepositoryProvider,
+                                   final DataBroker dataBroker,
+                                   final DOMMountPointService mountService) {
         this.topologyId = topologyId;
-        this.bindingAwareBroker = bindingAwareBroker;
         this.eventExecutor = eventExecutor;
         this.keepaliveExecutor = keepaliveExecutor;
         this.processingExecutor = processingExecutor;
         this.schemaRepositoryProvider = schemaRepositoryProvider;
-        this.domBroker = domBroker;
         this.sessionManager = new CallHomeMountSessionManager();
         this.dataBroker = dataBroker;
         this.mountService = mountService;
     }
 
     @Override
-    public Future<NetconfClientSession> createClient(NetconfClientConfiguration clientConfiguration) {
+    public Future<NetconfClientSession> createClient(final NetconfClientConfiguration clientConfiguration) {
         return activateChannel(clientConfiguration);
     }
 
     @Override
-    public Future<Void> createReconnectingClient(NetconfReconnectingClientConfiguration clientConfiguration) {
+    public Future<Void> createReconnectingClient(final NetconfReconnectingClientConfiguration clientConfiguration) {
         return activateChannel(clientConfiguration);
     }
 
-    private <V> Future<V> activateChannel(NetconfClientConfiguration conf) {
-        InetSocketAddress remoteAddr = conf.getAddress();
-        CallHomeMountSessionContext context = getSessionManager().getByAddress(remoteAddr);
+    private <V> Future<V> activateChannel(final NetconfClientConfiguration conf) {
+        final InetSocketAddress remoteAddr = conf.getAddress();
+        final CallHomeMountSessionContext context = getSessionManager().getByAddress(remoteAddr);
         LOG.info("Activating NETCONF channel for ip {} device context {}", remoteAddr, context);
         if (context == null) {
             return new FailedFuture<>(eventExecutor, new NullPointerException());
@@ -98,16 +92,16 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     }
 
     void createTopology() {
-        this.topology = new CallHomeTopology(topologyId, this, bindingAwareBroker, domBroker, eventExecutor,
+        this.topology = new CallHomeTopology(topologyId, this, eventExecutor,
                 keepaliveExecutor, processingExecutor, schemaRepositoryProvider, dataBroker, mountService);
     }
 
     @Override
-    public void onNetconfSubsystemOpened(CallHomeProtocolSessionContext session,
-                                         CallHomeChannelActivator activator) {
-        CallHomeMountSessionContext deviceContext = getSessionManager().createSession(session, activator, onCloseHandler);
-        NodeId nodeId = deviceContext.getId();
-        Node configNode = deviceContext.getConfigNode();
+    public void onNetconfSubsystemOpened(final CallHomeProtocolSessionContext session,
+                                         final CallHomeChannelActivator activator) {
+        final CallHomeMountSessionContext deviceContext = getSessionManager().createSession(session, activator, onCloseHandler);
+        final NodeId nodeId = deviceContext.getId();
+        final Node configNode = deviceContext.getConfigNode();
         LOG.info("Provisioning fake config {}", configNode);
         topology.connectNode(nodeId, configNode);
     }
