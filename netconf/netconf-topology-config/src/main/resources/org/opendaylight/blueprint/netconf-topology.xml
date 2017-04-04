@@ -13,21 +13,20 @@
     <reference id="clientDispatcherDependency"
                interface="org.opendaylight.netconf.client.NetconfClientDispatcher"
                odl:type="netconf-client-dispatcher"/>
-    <reference id="bindingAwareBroker"
-               interface="org.opendaylight.controller.sal.binding.api.BindingAwareBroker"/>
     <reference id="keepAliveExecutor"
                interface="org.opendaylight.controller.config.threadpool.ScheduledThreadPool"
                odl:type="global-netconf-ssh-scheduled-executor"/>
     <reference id="processingExecutor"
                interface="org.opendaylight.controller.config.threadpool.ThreadPool"
                odl:type="global-netconf-processing-executor"/>
-    <reference id="domBroker"
-               interface="org.opendaylight.controller.sal.core.api.Broker"/>
     <reference id="eventExecutor"
                interface="io.netty.util.concurrent.EventExecutor"
                odl:type="global-event-executor"/>
     <reference id="dataBroker"
                interface="org.opendaylight.controller.md.sal.binding.api.DataBroker"/>
+    <reference id="mountPointService"
+               interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"
+               odl:type="default"/>
 
     <bean id="schemaRepository" class="org.opendaylight.netconf.topology.impl.SchemaRepositoryProviderImpl">
         <argument value="shared-schema-repository-impl"/>
@@ -38,13 +37,12 @@
           destroy-method="close">
         <argument value="topology-netconf"/>
         <argument ref="clientDispatcherDependency"/>
-        <argument ref="bindingAwareBroker"/>
-        <argument ref="domBroker"/>
         <argument ref="eventExecutor"/>
         <argument ref="keepAliveExecutor"/>
         <argument ref="processingExecutor"/>
         <argument ref="schemaRepository"/>
         <argument ref="dataBroker"/>
+        <argument ref="mountPointService"/>
     </bean>
 
     <bean id="netconfConnectorFactory" class="org.opendaylight.netconf.topology.impl.NetconfConnectorFactoryImpl"/>

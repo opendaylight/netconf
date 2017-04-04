@@ -51,7 +51,9 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
+import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
@@ -103,6 +105,10 @@ public class NetconfNodeActorTest {
 
     @Mock
     private DOMRpcService domRpcService;
+    @Mock
+    private DOMMountPointService mountPointService;
+    @Mock
+    private DataBroker dataBroker;
 
     @Before
     public void setup() throws UnknownHostException {
@@ -113,7 +119,7 @@ public class NetconfNodeActorTest {
         final NetconfTopologySetup setup = mock(NetconfTopologySetup.class);
 
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY,
-                DEFAULT_SCHEMA_REPOSITORY, TIMEOUT);
+                DEFAULT_SCHEMA_REPOSITORY, TIMEOUT, mountPointService);
 
         system = ActorSystem.create();
 
@@ -226,7 +232,7 @@ public class NetconfNodeActorTest {
         final SchemaRepository schemaRepository = mock(SchemaRepository.class);
         final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create("testID", Optional.absent());
         final Props props = NetconfNodeActor.props(mock(NetconfTopologySetup.class), remoteDeviceId,
-                DEFAULT_SCHEMA_REPOSITORY, schemaRepository, TIMEOUT);
+                DEFAULT_SCHEMA_REPOSITORY, schemaRepository, TIMEOUT, mountPointService);
 
         final ActorRef actorRefSchemaRepo = TestActorRef.create(system, props, "master_mocked_schema_repository");
         final ActorContext actorContext = mock(ActorContext.class);
