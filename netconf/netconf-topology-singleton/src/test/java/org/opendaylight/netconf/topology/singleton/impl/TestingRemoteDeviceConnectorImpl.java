@@ -14,6 +14,8 @@ import static org.mockito.Mockito.doReturn;
 import akka.actor.ActorRef;
 import akka.util.Timeout;
 import com.google.common.util.concurrent.Futures;
+import org.opendaylight.controller.md.sal.binding.api.DataBroker;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -31,8 +33,10 @@ class TestingRemoteDeviceConnectorImpl extends RemoteDeviceConnectorImpl {
                                      final RemoteDeviceId remoteDeviceId,
                                      final NetconfDeviceCommunicator communicator,
                                      final RemoteDeviceHandler salFacade,
-                                     final Timeout actorResponseWaitTime) {
-        super(netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime);
+                                     final Timeout actorResponseWaitTime,
+                                     final DOMMountPointService mountPointService,
+                                     final DataBroker dataBroker) {
+        super(netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime, mountPointService, dataBroker);
         this.communicator = communicator;
         this.salFacade = salFacade;
     }

@@ -19,6 +19,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import javax.annotation.Nonnull;
+import org.opendaylight.controller.md.sal.binding.api.DataBroker;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonService;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -36,30 +38,35 @@ class NetconfTopologyContext implements ClusterSingletonService {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyContext.class);
 
+    private final DataBroker dataBroker;
     private final ServiceGroupIdentifier serviceGroupIdent;
     private final Timeout actorResponseWaitTime;
+    private final DOMMountPointService mountService;
+
     private NetconfTopologySetup netconfTopologyDeviceSetup;
     private RemoteDeviceId remoteDeviceId;
     private RemoteDeviceConnector remoteDeviceConnector;
     private NetconfNodeManager netconfNodeManager;
+    private ActorRef masterActorRef;
     private boolean finalClose = false;
     private boolean closed = false;
     private boolean isMaster;
 
-    private ActorRef masterActorRef;
-
     NetconfTopologyContext(final NetconfTopologySetup netconfTopologyDeviceSetup,
                            final ServiceGroupIdentifier serviceGroupIdent,
-                           final Timeout actorResponseWaitTime) {
+                           final Timeout actorResponseWaitTime, final DOMMountPointService mountService,
+                           final DataBroker dataBroker) {
         this.netconfTopologyDeviceSetup = Preconditions.checkNotNull(netconfTopologyDeviceSetup);
         this.serviceGroupIdent = serviceGroupIdent;
         this.actorResponseWaitTime = actorResponseWaitTime;
+        this.mountService = mountService;
+        this.dataBroker = dataBroker;
 
         remoteDeviceId = NetconfTopologyUtils.createRemoteDeviceId(netconfTopologyDeviceSetup.getNode().getNodeId(),
                 netconfTopologyDeviceSetup.getNode().getAugmentation(NetconfNode.class));
 
         remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId,
-                actorResponseWaitTime);
+                actorResponseWaitTime, mountService, dataBroker);
 
         netconfNodeManager = createNodeDeviceManager();
     }
@@ -80,7 +87,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
             final String masterAddress = Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
             masterActorRef = netconfTopologyDeviceSetup.getActorSystem().actorOf(NetconfNodeActor.props(
                     netconfTopologyDeviceSetup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY,
-                    actorResponseWaitTime),
+                    actorResponseWaitTime, mountService),
                     NetconfTopologyUtils.createMasterActorName(remoteDeviceId.getName(), masterAddress));
 
             remoteDeviceConnector.startRemoteDeviceConnection(masterActorRef);
@@ -108,7 +115,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
 
     private NetconfNodeManager createNodeDeviceManager() {
         final NetconfNodeManager ndm =
-                new NetconfNodeManager(netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime);
+                new NetconfNodeManager(netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime, mountService);
         ndm.registerDataTreeChangeListener(netconfTopologyDeviceSetup.getTopologyId(),
                 netconfTopologyDeviceSetup.getNode().getKey());
 
@@ -140,7 +147,8 @@ class NetconfTopologyContext implements ClusterSingletonService {
         if (!isMaster) {
             netconfNodeManager.refreshDevice(netconfTopologyDeviceSetup, remoteDeviceId);
         }
-        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime);
+        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId,
+                actorResponseWaitTime, mountService, dataBroker);
 
         if (isMaster) {
             final Future<Object> future = Patterns.ask(masterActorRef, new RefreshSetupMasterActorData(
