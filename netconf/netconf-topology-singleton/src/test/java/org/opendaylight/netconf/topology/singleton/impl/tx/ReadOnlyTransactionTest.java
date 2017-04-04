@@ -37,10 +37,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
+import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMDataBroker;
@@ -75,6 +77,10 @@ public class ReadOnlyTransactionTest {
     private DOMDataReadOnlyTransaction readTx;
     @Mock
     private DOMRpcService domRpcService;
+    @Mock
+    private DOMMountPointService mountPointService;
+    @Mock
+    private DataBroker dataBroker;
 
     @Before
     public void setup() throws UnknownHostException {
@@ -87,7 +93,7 @@ public class ReadOnlyTransactionTest {
 
         final NetconfTopologySetup setup = mock(NetconfTopologySetup.class);
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY,
-                DEFAULT_SCHEMA_REPOSITORY, TIMEOUT);
+                DEFAULT_SCHEMA_REPOSITORY, TIMEOUT, mountPointService);
 
         masterRef = TestActorRef.create(system, props, "master_read");
 
