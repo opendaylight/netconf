@@ -37,8 +37,7 @@ import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
-import org.opendaylight.controller.sal.core.api.Broker;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
@@ -70,13 +69,7 @@ public class NetconfTopologyImplTest {
     private static final String TOPOLOGY_ID = "testing-topology";
 
     @Mock
-    private Broker mockedDataBroker;
-
-    @Mock
     private NetconfClientDispatcher mockedClientDispatcher;
-
-    @Mock
-    private BindingAwareBroker mockedBindingAwareBroker;
 
     @Mock
     private EventExecutor mockedEventExecutor;
@@ -93,6 +86,9 @@ public class NetconfTopologyImplTest {
     @Mock
     private DataBroker dataBroker;
 
+    @Mock
+    private DOMMountPointService mountPointService;
+
     private TestingNetconfTopologyImpl topology;
     private TestingNetconfTopologyImpl spyTopology;
 
@@ -102,19 +98,19 @@ public class NetconfTopologyImplTest {
 
         when(mockedSchemaRepositoryProvider.getSharedSchemaRepository()).thenReturn(new SharedSchemaRepository("testingSharedSchemaRepo"));
         when(mockedProcessingExecutor.getExecutor()).thenReturn(MoreExecutors.newDirectExecutorService());
-        Future future = new SucceededFuture(ImmediateEventExecutor.INSTANCE, new NetconfDeviceCapabilities());
+        final Future future = new SucceededFuture(ImmediateEventExecutor.INSTANCE, new NetconfDeviceCapabilities());
         when(mockedClientDispatcher.createReconnectingClient(any(NetconfReconnectingClientConfiguration.class))).thenReturn(future);
 
-        topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedBindingAwareBroker,
-                mockedDataBroker, mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, mockedSchemaRepositoryProvider,
-                dataBroker);
+        topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher,
+                mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, mockedSchemaRepositoryProvider,
+                dataBroker, mountPointService);
 
         spyTopology = spy(topology);
     }
 
     @Test
     public void testInit() {
-        WriteTransaction wtx = mock(WriteTransaction.class);
+        final WriteTransaction wtx = mock(WriteTransaction.class);
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(wtx);
         doNothing().when(wtx).merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
         when(wtx.submit()).thenReturn(Futures.<Void, TransactionCommitFailedException>immediateCheckedFuture(null));
@@ -133,19 +129,19 @@ public class NetconfTopologyImplTest {
     @Test
     public void testOnDataTreeChange() {
 
-        DataObjectModification<Node> newNode = mock(DataObjectModification.class);
+        final DataObjectModification<Node> newNode = mock(DataObjectModification.class);
         when(newNode.getModificationType()).thenReturn(DataObjectModification.ModificationType.WRITE);
 
         InstanceIdentifier.PathArgument pa = null;
 
-        for (InstanceIdentifier.PathArgument p : TopologyUtil.createTopologyListPath(TOPOLOGY_ID).child(Node.class, new NodeKey(NODE_ID)).getPathArguments()) {
+        for (final InstanceIdentifier.PathArgument p : TopologyUtil.createTopologyListPath(TOPOLOGY_ID).child(Node.class, new NodeKey(NODE_ID)).getPathArguments()) {
             pa = p;
         }
 
         when(newNode.getIdentifier()).thenReturn(pa);
 
 
-        NetconfNode testingNode = new NetconfNodeBuilder()
+        final NetconfNode testingNode = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                 .setPort(new PortNumber(9999))
                 .setReconnectOnChangedSchema(true)
@@ -156,14 +152,13 @@ public class NetconfTopologyImplTest {
                 .setCredentials(new LoginPasswordBuilder().setUsername("testuser").setPassword("testpassword").build())
                 .build();
 
-        NodeBuilder nn = new NodeBuilder().addAugmentation(NetconfNode.class, testingNode);
+        final NodeBuilder nn = new NodeBuilder().addAugmentation(NetconfNode.class, testingNode);
 
         when(newNode.getDataAfter()).thenReturn(nn.build());
 
 
-
-        Collection<DataTreeModification<Node>> changes = Sets.newHashSet();
-        DataTreeModification<Node> ch = mock(DataTreeModification.class);
+        final Collection<DataTreeModification<Node>> changes = Sets.newHashSet();
+        final DataTreeModification<Node> ch = mock(DataTreeModification.class);
         when(ch.getRootNode()).thenReturn(newNode);
         changes.add(ch);
         spyTopology.onDataTreeChanged(changes);
@@ -185,22 +180,21 @@ public class NetconfTopologyImplTest {
 
     public static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
 
-        public TestingNetconfTopologyImpl(String topologyId, NetconfClientDispatcher clientDispatcher,
-                                          BindingAwareBroker bindingAwareBroker, Broker domBroker,
-                                          EventExecutor eventExecutor, ScheduledThreadPool keepaliveExecutor,
-                                          ThreadPool processingExecutor, SchemaRepositoryProvider schemaRepositoryProvider,
-                                          DataBroker dataBroker) {
-            super(topologyId, clientDispatcher, bindingAwareBroker, domBroker, eventExecutor, keepaliveExecutor,
-                    processingExecutor, schemaRepositoryProvider, dataBroker);
+        public TestingNetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
+                                          final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
+                                          final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
+                                          final DataBroker dataBroker, final DOMMountPointService mountPointService) {
+            super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,
+                    processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService);
         }
 
         @Override
-        public ListenableFuture<NetconfDeviceCapabilities> connectNode(NodeId nodeId, Node configNode) {
+        public ListenableFuture<NetconfDeviceCapabilities> connectNode(final NodeId nodeId, final Node configNode) {
             return Futures.immediateFuture(new NetconfDeviceCapabilities());
         }
 
         @Override
-        public ListenableFuture<Void> disconnectNode(NodeId nodeId) {
+        public ListenableFuture<Void> disconnectNode(final NodeId nodeId) {
             return Futures.immediateFuture(null);
         }
     }
