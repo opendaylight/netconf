@@ -201,7 +201,9 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
         return remoteSessionCapabilities.isNotificationsSupported() && reconnectOnSchemasChange;
     }
 
-    void handleSalInitializationSuccess(final SchemaContext result, final NetconfSessionPreferences remoteSessionCapabilities, final DOMRpcService deviceRpc) {
+    void handleSalInitializationSuccess(final SchemaContext result,
+                                        final NetconfSessionPreferences remoteSessionCapabilities,
+                                        final DOMRpcService deviceRpc) {
         final BaseSchema baseSchema =
                 remoteSessionCapabilities.isNotificationsSupported() ?
                 BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS :

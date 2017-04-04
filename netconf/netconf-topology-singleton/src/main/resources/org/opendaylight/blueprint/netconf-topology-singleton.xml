@@ -17,16 +17,12 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
                interface="org.opendaylight.controller.sal.binding.api.RpcProviderRegistry"/>
     <reference id="clusterSingletonService"
                interface="org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider"/>
-    <reference id="bindingAwareBroker"
-               interface="org.opendaylight.controller.sal.binding.api.BindingAwareBroker"/>
     <reference id="keepAliveExecutor"
                interface="org.opendaylight.controller.config.threadpool.ScheduledThreadPool"
                odl:type="global-netconf-ssh-scheduled-executor"/>
     <reference id="processingExecutor"
                interface="org.opendaylight.controller.config.threadpool.ThreadPool"
                odl:type="global-netconf-processing-executor"/>
-    <reference id="domBroker"
-               interface="org.opendaylight.controller.sal.core.api.Broker"/>
     <reference id="actorSystemProvider"
                interface="org.opendaylight.controller.cluster.ActorSystemProvider"/>
     <reference id="eventExecutor"
@@ -35,6 +31,9 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
     <reference id="clientDispatcherDependency"
                interface="org.opendaylight.netconf.client.NetconfClientDispatcher"
                odl:type="netconf-client-dispatcher"/>
+    <reference id="mountPointService"
+               interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"
+               odl:type="default"/>
 
     <bean id="netconfTopologyManager"
           class="org.opendaylight.netconf.topology.singleton.impl.NetconfTopologyManager"
@@ -42,14 +41,13 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
         <argument ref="dataBroker"/>
         <argument ref="rpcRegistry"/>
         <argument ref="clusterSingletonService"/>
-        <argument ref="bindingAwareBroker"/>
         <argument ref="keepAliveExecutor"/>
         <argument ref="processingExecutor"/>
-        <argument ref="domBroker"/>
         <argument ref="actorSystemProvider"/>
         <argument ref="eventExecutor"/>
         <argument ref="clientDispatcherDependency"/>
         <argument value="topology-netconf"/>
+        <argument ref="mountPointService"/>
     </bean>
     <service ref="netconfTopologyManager"
              interface="org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService"/>

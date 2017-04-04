@@ -28,14 +28,12 @@ import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
-import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup.NetconfTopologySetupBuilder;
@@ -64,37 +62,35 @@ public class NetconfTopologyManager
     private final Map<InstanceIdentifier<Node>, ClusterSingletonServiceRegistration>
             clusterRegistrations = new HashMap<>();
 
-    private ListenerRegistration<NetconfTopologyManager> dataChangeListenerRegistration;
-
     private final DataBroker dataBroker;
     private final RpcProviderRegistry rpcProviderRegistry;
     private final ClusterSingletonServiceProvider clusterSingletonServiceProvider;
-    private final BindingAwareBroker bindingAwareBroker;
     private final ScheduledThreadPool keepaliveExecutor;
     private final ThreadPool processingExecutor;
-    private final Broker domBroker;
     private final ActorSystem actorSystem;
     private final EventExecutor eventExecutor;
     private final NetconfClientDispatcher clientDispatcher;
     private final String topologyId;
+    private final DOMMountPointService mountPointService;
+
+    private ListenerRegistration<NetconfTopologyManager> dataChangeListenerRegistration;
 
     public NetconfTopologyManager(final DataBroker dataBroker, final RpcProviderRegistry rpcProviderRegistry,
                                   final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
-                                  final BindingAwareBroker bindingAwareBroker,
                                   final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
-                                  final Broker domBroker, final ActorSystemProvider actorSystemProvider, final EventExecutor eventExecutor,
-                                  final NetconfClientDispatcher clientDispatcher, final String topologyId) {
+                                  final ActorSystemProvider actorSystemProvider, final EventExecutor eventExecutor,
+                                  final NetconfClientDispatcher clientDispatcher, final String topologyId,
+                                  final DOMMountPointService mountPointService) {
         this.dataBroker = Preconditions.checkNotNull(dataBroker);
         this.rpcProviderRegistry = Preconditions.checkNotNull(rpcProviderRegistry);
         this.clusterSingletonServiceProvider = Preconditions.checkNotNull(clusterSingletonServiceProvider);
-        this.bindingAwareBroker = Preconditions.checkNotNull(bindingAwareBroker);
         this.keepaliveExecutor = Preconditions.checkNotNull(keepaliveExecutor);
         this.processingExecutor = Preconditions.checkNotNull(processingExecutor);
-        this.domBroker = Preconditions.checkNotNull(domBroker);
         this.actorSystem = Preconditions.checkNotNull(actorSystemProvider).getActorSystem();
         this.eventExecutor = Preconditions.checkNotNull(eventExecutor);
         this.clientDispatcher = Preconditions.checkNotNull(clientDispatcher);
         this.topologyId = Preconditions.checkNotNull(topologyId);
+        this.mountPointService = mountPointService;
     }
 
     // Blueprint init method
@@ -151,9 +147,9 @@ public class NetconfTopologyManager
 
         final NetconfTopologyContext newNetconfTopologyContext =
                 new NetconfTopologyContext(createSetup(instanceIdentifier, node), serviceGroupIdent,
-                        actorResponseWaitTime);
+                        actorResponseWaitTime, mountPointService, dataBroker);
 
-        final ClusterSingletonServiceRegistration clusterSingletonServiceRegistration  =
+        final ClusterSingletonServiceRegistration clusterSingletonServiceRegistration =
                 clusterSingletonServiceProvider.registerClusterSingletonService(newNetconfTopologyContext);
 
         clusterRegistrations.put(instanceIdentifier, clusterSingletonServiceRegistration);
@@ -215,8 +211,8 @@ public class NetconfTopologyManager
 
         LOG.debug("Registering datastore listener");
         return dataBroker.registerDataTreeChangeListener(
-                        new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
-                                NetconfTopologyUtils.createTopologyListPath(topologyId).child(Node.class)), this);
+                new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
+                        NetconfTopologyUtils.createTopologyListPath(topologyId).child(Node.class)), this);
     }
 
     private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType, final String topologyId) {
@@ -236,10 +232,8 @@ public class NetconfTopologyManager
                 .setInstanceIdentifier(instanceIdentifier)
                 .setRpcProviderRegistry(rpcProviderRegistry)
                 .setNode(node)
-                .setBindingAwareBroker(bindingAwareBroker)
                 .setActorSystem(actorSystem)
                 .setEventExecutor(eventExecutor)
-                .setDomBroker(domBroker)
                 .setKeepaliveExecutor(keepaliveExecutor)
                 .setProcessingExecutor(processingExecutor)
                 .setTopologyId(topologyId)

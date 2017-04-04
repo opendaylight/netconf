@@ -22,6 +22,8 @@ import javax.annotation.Nullable;
 import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.RemoteSchemaProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
+import org.opendaylight.controller.md.sal.binding.api.DataBroker;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
@@ -75,6 +77,7 @@ public class NetconfNodeActor extends UntypedActor {
     private RemoteDeviceId id;
     private final SchemaSourceRegistry schemaRegistry;
     private final SchemaRepository schemaRepository;
+    private final DOMMountPointService mountPointService;
 
     private RemoteOperationTxProcessor operationsProcessor;
     private List<SourceIdentifier> sourceIdentifiers;
@@ -84,19 +87,23 @@ public class NetconfNodeActor extends UntypedActor {
 
     public static Props props(final NetconfTopologySetup setup,
                               final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
-                              final SchemaRepository schemaRepository, final Timeout actorResponseWaitTime) {
+                              final SchemaRepository schemaRepository, final Timeout actorResponseWaitTime,
+                              final DOMMountPointService mountPointService) {
         return Props.create(NetconfNodeActor.class, () ->
-                new NetconfNodeActor(setup, id, schemaRegistry, schemaRepository, actorResponseWaitTime));
+                new NetconfNodeActor(setup, id, schemaRegistry, schemaRepository, actorResponseWaitTime,
+                        mountPointService));
     }
 
     private NetconfNodeActor(final NetconfTopologySetup setup,
                              final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
-                             final SchemaRepository schemaRepository, final Timeout actorResponseWaitTime) {
+                             final SchemaRepository schemaRepository, final Timeout actorResponseWaitTime,
+                             final DOMMountPointService mountPointService) {
         this.setup = setup;
         this.id = id;
         this.schemaRegistry = schemaRegistry;
         this.schemaRepository = schemaRepository;
         this.actorResponseWaitTime = actorResponseWaitTime;
+        this.mountPointService = mountPointService;
     }
 
     @Override
@@ -242,7 +249,8 @@ public class NetconfNodeActor extends UntypedActor {
         if (this.slaveSalManager != null) {
             slaveSalManager.close();
         }
-        slaveSalManager = new SlaveSalFacade(id, setup.getDomBroker(), setup.getActorSystem(), actorResponseWaitTime);
+        slaveSalManager = new SlaveSalFacade(id, setup.getActorSystem(), actorResponseWaitTime,
+                mountPointService, setup.getDataBroker());
 
         final CheckedFuture<SchemaContext, SchemaResolutionException> remoteSchemaContext =
                 getSchemaContext(masterReference);
