@@ -9,14 +9,13 @@ package org.opendaylight.netconf.callhome.mount;
 
 import com.google.common.base.Objects;
 import com.google.common.net.InetAddresses;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -101,7 +100,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         final Credentials credentials = deviceCred != null ? deviceCred : globalConfig.getCredentials();
 
         if (credentials == null) {
-            LOG.info("No credentials found for {}, rejecting.",remoteAddress);
+            LOG.info("No credentials found for {}, rejecting.", remoteAddress);
             return CallHomeAuthorization.rejected();
         }
 
@@ -236,8 +235,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
             try {
                 skey = AuthorizedKeysDecoder.encodePublicKey(serverKey);
                 return byPublicKey.get(skey);
-            }
-            catch (IOException | IllegalArgumentException e) {
+            } catch (IOException | IllegalArgumentException e) {
                 LOG.error("Unable to encode server key: {}", skey, e);
                 return null;
             }

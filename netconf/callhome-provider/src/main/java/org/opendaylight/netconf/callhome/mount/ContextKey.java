@@ -38,6 +38,7 @@ class ContextKey {
         result = prime * result + port.hashCode();
         return result;
     }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -68,7 +69,7 @@ class ContextKey {
         InetAddress ipAddress = inetSocketAddr.getAddress();
 
         final IpAddress yangIp;
-        if(ipAddress instanceof Inet4Address) {
+        if (ipAddress instanceof Inet4Address) {
             yangIp = new IpAddress(IetfInetUtil.INSTANCE.ipv4AddressFor(ipAddress));
         } else {
             Preconditions.checkArgument(ipAddress instanceof Inet6Address);
@@ -79,7 +80,7 @@ class ContextKey {
 
     @Override
     public String toString() {
-        if(address.getIpv4Address() != null) {
+        if (address.getIpv4Address() != null) {
             return address.getIpv4Address().getValue() + ":" + port.getValue();
         }
         return address.getIpv6Address().getValue() + ":" + port.getValue();

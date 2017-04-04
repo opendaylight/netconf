@@ -40,7 +40,7 @@ class CallHomeMountSessionContext {
     private final ContextKey key;
 
     CallHomeMountSessionContext(String nodeId, CallHomeProtocolSessionContext protocol,
-            CallHomeChannelActivator activator, CloseCallback callback) {
+                                CallHomeChannelActivator activator, CloseCallback callback) {
 
         this.nodeId = new NodeId(Preconditions.checkNotNull(nodeId, "nodeId"));
         this.key = ContextKey.from(protocol.getRemoteAddress());
@@ -73,7 +73,7 @@ class CallHomeMountSessionContext {
     }
 
     @SuppressWarnings("unchecked")
-     <V> Promise<V> activateNetconfChannel(NetconfClientSessionListener sessionListener) {
+    <V> Promise<V> activateNetconfChannel(NetconfClientSessionListener sessionListener) {
         return (Promise<V>) activator.activate(wrap(sessionListener));
     }
 

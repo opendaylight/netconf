@@ -13,8 +13,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -45,8 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataChangeListener
-{
+public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataChangeListener {
     private static final String APPNAME = "CallHomeServer";
     static final InstanceIdentifier<AllowedDevices> ALL_DEVICES = InstanceIdentifier.create(NetconfCallhomeServer.class).child(AllowedDevices.class);
 
@@ -54,14 +53,14 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
 
     private final DataBroker dataBroker;
     private final CallHomeMountDispatcher mountDispacher;
-    private CallHomeAuthProviderImpl authProvider ;
+    private CallHomeAuthProviderImpl authProvider;
 
     protected NetconfCallHomeServer server;
 
     private ListenerRegistration<IetfZeroTouchCallHomeServerProvider> listenerReg = null;
 
     private static final String CALL_HOME_PORT_KEY = "DefaultCallHomePort";
-    private static String configurationPath = "etc"+File.pathSeparator+"ztp-callhome-config.cfg";
+    private static String configurationPath = "etc" + File.pathSeparator + "ztp-callhome-config.cfg";
     private int port = 0; // 0 = use default in NetconfCallHomeBuilder
     private CallhomeStatusReporter statusReporter;
 
@@ -78,10 +77,9 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
             LOG.info("Initializing provider for {}", APPNAME);
             loadConfigurableValues(configurationPath);
             initializeServer();
-            dataBroker.registerDataChangeListener(LogicalDatastoreType.CONFIGURATION,ALL_DEVICES,this, AsyncDataBroker.DataChangeScope.SUBTREE);
-            LOG.info( "Initialization complete for {}", APPNAME);
-        }
-        catch(IOException | Configuration.ConfigurationException e) {
+            dataBroker.registerDataChangeListener(LogicalDatastoreType.CONFIGURATION, ALL_DEVICES, this, AsyncDataBroker.DataChangeScope.SUBTREE);
+            LOG.info("Initialization complete for {}", APPNAME);
+        } catch (IOException | Configuration.ConfigurationException e) {
             LOG.error("Unable to successfully initialize", e);
         }
     }
@@ -91,8 +89,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
         try {
             Configuration configuration = new Configuration(configurationPath);
             port = configuration.getAsPort(CALL_HOME_PORT_KEY);
-        }
-        catch(Configuration.ConfigurationException e) {
+        } catch (Configuration.ConfigurationException e) {
             LOG.error("Problem trying to load configuration values from {}", configurationPath, e);
         }
     }
@@ -102,7 +99,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
     }
 
     private void initializeServer() throws IOException {
-        LOG.info( "Initializing Call Home server instance");
+        LOG.info("Initializing Call Home server instance");
         CallHomeAuthorizationProvider provider = this.getCallHomeAuthorization();
         NetconfCallHomeServerBuilder builder = new NetconfCallHomeServerBuilder(
                 provider, mountDispacher, statusReporter);
@@ -111,7 +108,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
         server = builder.build();
         server.bind();
         mountDispacher.createTopology();
-        LOG.info( "Initialization complete for Call Home server instance");
+        LOG.info("Initialization complete for Call Home server instance");
     }
 
     @VisibleForTesting
@@ -126,10 +123,10 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
         statusReporter.close();
 
         // FIXME unbind the server
-        if ( this.listenerReg != null ) {
+        if (this.listenerReg != null) {
             listenerReg.close();
         }
-        if(server != null ) {
+        if (server != null) {
             server.close();
         }
 
@@ -152,11 +149,10 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
             handleDeletedDevices(change);
 
         try {
-            for(Device confDevice : getReadDevices(devicesFuture)) {
+            for (Device confDevice : getReadDevices(devicesFuture)) {
                 readAndUpdateStatus(confDevice);
             }
-        }
-        catch(ReadFailedException e) {
+        } catch (ReadFailedException e) {
             LOG.error("Error trying to read the whitelist devices: {}", e);
         }
     }
@@ -174,9 +170,9 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
         int numRemoved = removedDevices.size();
 
         Iterator<InstanceIdentifier<?>> iterator = removedDevices.iterator();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             InstanceIdentifier<?> removedIID = iterator.next();
-            LOG.info("Deleting the entry for callhome device {}",removedIID);
+            LOG.info("Deleting the entry for callhome device {}", removedIID);
             opTx.delete(LogicalDatastoreType.OPERATIONAL, removedIID);
         }
 
@@ -200,7 +196,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
     }
 
     private void readAndUpdateStatus(Device cfgDevice) throws ReadFailedException {
-        InstanceIdentifier<Device> deviceIID  = InstanceIdentifier.create(NetconfCallhomeServer.class)
+        InstanceIdentifier<Device> deviceIID = InstanceIdentifier.create(NetconfCallhomeServer.class)
                 .child(AllowedDevices.class)
                 .child(Device.class, new DeviceKey(cfgDevice.getUniqueId()));
 
@@ -209,7 +205,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
 
         Optional<Device> opDevGet = deviceFuture.checkedGet();
         Device1 devStatus = new Device1Builder().setDeviceStatus(Device1.DeviceStatus.DISCONNECTED).build();
-        if(opDevGet.isPresent()) {
+        if (opDevGet.isPresent()) {
             Device opDevice = opDevGet.get();
             devStatus = opDevice.getAugmentation(Device1.class);
         }

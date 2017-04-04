@@ -10,7 +10,6 @@ package org.opendaylight.netconf.callhome.mount;
 
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
-
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -19,7 +18,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.DataChangeListener;
 import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
@@ -74,7 +72,7 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
     @Override
     public void onDataChanged(AsyncDataChangeEvent<InstanceIdentifier<?>, DataObject> change) {
         for (InstanceIdentifier<?> removedPath : change.getRemovedPaths()) {
-            if(removedPath.getTargetType() != NetconfNode.class)
+            if (removedPath.getTargetType() != NetconfNode.class)
                 continue;
 
             final NodeId nodeId = getNodeId(removedPath);
@@ -127,8 +125,8 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
             LOG.warn("No corresponding callhome device found - exiting.");
         } else {
             Device modifiedDevice = withConnectedStatus(opDev);
-            if(modifiedDevice == null)
-                return ;
+            if (modifiedDevice == null)
+                return;
             LOG.info("Setting successful status for callhome device id:{}.", nodeId);
             writeDevice(nodeId, modifiedDevice);
         }
@@ -142,7 +140,7 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
             LOG.warn("No corresponding callhome device found - exiting.");
         } else {
             Device modifiedDevice = withDisconnectedStatus(opDev);
-            if(modifiedDevice == null)
+            if (modifiedDevice == null)
                 return;
             LOG.info("Setting disconnected status for callhome device id:{}.", nodeId);
             writeDevice(nodeId, modifiedDevice);
@@ -160,7 +158,7 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
             LOG.warn("No corresponding callhome device found - exiting.");
         } else {
             Device modifiedDevice = withFailedStatus(opDev);
-            if(modifiedDevice == null)
+            if (modifiedDevice == null)
                 return;
             LOG.info("Setting failed status for callhome device id:{}.", nodeId);
             writeDevice(nodeId, modifiedDevice);
@@ -237,7 +235,7 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
     private Device withConnectedStatus(Device opDev) {
         Device1 status = new Device1Builder().setDeviceStatus(Device1.DeviceStatus.CONNECTED).build();
         return new DeviceBuilder().addAugmentation(Device1.class, status).setUniqueId(opDev.getUniqueId())
-            .setSshHostKey(opDev.getSshHostKey()).build();
+                .setSshHostKey(opDev.getSshHostKey()).build();
     }
 
     private Device withFailedStatus(Device opDev) {
@@ -255,7 +253,7 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
     private Device withFailedAuthStatus(Device opDev) {
         Device1 status = new Device1Builder().setDeviceStatus(Device1.DeviceStatus.FAILEDAUTHFAILURE).build();
         return new DeviceBuilder().addAugmentation(Device1.class, status).setUniqueId(opDev.getUniqueId())
-               .setSshHostKey(opDev.getSshHostKey()).build();
+                .setSshHostKey(opDev.getSshHostKey()).build();
     }
 
     private void setDeviceStatus(Device device) {
@@ -304,7 +302,7 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
                 PublicKey pubKey = decoder.decodePublicKey(keyString);
                 if (sshKey.getAlgorithm().equals(pubKey.getAlgorithm()) && sshKey.equals(pubKey)) {
                     Device failedDevice = withFailedAuthStatus(device);
-                    if(failedDevice==null)
+                    if (failedDevice == null)
                         return;
                     LOG.info("Setting auth failed status for callhome device id:{}.", failedDevice.getUniqueId());
                     setDeviceStatus(failedDevice);
