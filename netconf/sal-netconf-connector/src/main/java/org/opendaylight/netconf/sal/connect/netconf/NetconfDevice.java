@@ -43,6 +43,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabi
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
+import org.opendaylight.netconf.sal.connect.netconf.sal.tx.MissingMountpointServiceException;
 import org.opendaylight.netconf.sal.connect.netconf.schema.NetconfRemoteSchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
@@ -201,7 +202,9 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
         return remoteSessionCapabilities.isNotificationsSupported() && reconnectOnSchemasChange;
     }
 
-    void handleSalInitializationSuccess(final SchemaContext result, final NetconfSessionPreferences remoteSessionCapabilities, final DOMRpcService deviceRpc) {
+    void handleSalInitializationSuccess(final SchemaContext result,
+                                        final NetconfSessionPreferences remoteSessionCapabilities,
+                                        final DOMRpcService deviceRpc) throws MissingMountpointServiceException {
         final BaseSchema baseSchema =
                 remoteSessionCapabilities.isNotificationsSupported() ?
                 BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS :
@@ -472,6 +475,13 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
                             continue;
                         }
                         requiredSources = handleSchemaResolutionException(requiredSources, (SchemaResolutionException) t);
+                    } else if (t instanceof MissingMountpointServiceException) {
+                        // This should happen only in clustering when new master is assigned while old one is creating
+                        // mountpoint and therefore DOMMountPointService is set to null
+                        LOG.info(t.getMessage());
+                        listener.close();
+                        onRemoteSessionDown();
+                        return;
                     } else {
                         // unknown error, fail
                         handleSalInitializationFailure(t, listener);
