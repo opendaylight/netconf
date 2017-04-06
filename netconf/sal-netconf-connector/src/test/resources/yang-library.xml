@@ -23,4 +23,12 @@
             http://localhost:8181/yanglib/schemas/module-without-revision/
         </schema>
     </module>
+    <module>
+        <name>module-with-wrong-revision</name>
+        <revision>2014-004-08</revision>
+        <namespace>namespace</namespace>
+        <schema>
+            http://localhost:8181/yanglib/schemas/module-with-revision/2014-04-08
+        </schema>
+    </module>
 </modules>
