@@ -22,6 +22,7 @@ import com.google.gson.stream.JsonReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -32,6 +33,16 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
@@ -62,6 +73,9 @@ import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 /**
@@ -71,7 +85,7 @@ import org.xml.sax.SAXException;
 public class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
     private static final Logger LOG = LoggerFactory.getLogger(LibraryModulesSchemas.class);
-
+    private static final Pattern DATE_PATTERN = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})");
     private static final SchemaContext LIBRARY_CONTEXT;
 
     static {
@@ -114,6 +128,7 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
     /**
      * Resolves URLs with YANG schema resources from modules-state. Uses basic http authenticaiton
+     *
      * @param url URL pointing to yang library
      * @return Resolved URLs with YANG schema resources for all yang modules from yang library
      */
@@ -123,7 +138,7 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
             final URL urlConnection = new URL(url);
             final URLConnection connection = urlConnection.openConnection();
 
-            if(connection instanceof HttpURLConnection) {
+            if (connection instanceof HttpURLConnection) {
                 connection.setRequestProperty("Accept", "application/xml");
                 final String userpass = username + ":" + password;
                 final String basicAuth = "Basic " + printBase64Binary(userpass.getBytes());
@@ -154,7 +169,7 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
             return new LibraryModulesSchemas(Collections.<QName, URL>emptyMap());
         }
 
-        if(moduleListNodeResult.getErrors().isEmpty() == false) {
+        if (moduleListNodeResult.getErrors().isEmpty() == false) {
             LOG.warn("{}: Unable to detect available schemas, get to {} failed, {}",
                     deviceId, MODULES_STATE_MODULE_LIST, moduleListNodeResult.getErrors());
             return new LibraryModulesSchemas(Collections.<QName, URL>emptyMap());
@@ -163,7 +178,7 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
         final Optional<? extends NormalizedNode<?, ?>> modulesStateNode =
                 findModulesStateNode(moduleListNodeResult.getResult());
-        if(modulesStateNode.isPresent()) {
+        if (modulesStateNode.isPresent()) {
             Preconditions.checkState(modulesStateNode.get() instanceof ContainerNode,
                     "Expecting container containing schemas, but was %s", modulesStateNode.get());
             return create(((ContainerNode) modulesStateNode.get()));
@@ -174,15 +189,15 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
     }
 
     private static Optional<? extends NormalizedNode<?, ?>> findModulesStateNode(final NormalizedNode<?, ?> result) {
-        if(result == null) {
+        if (result == null) {
             return Optional.absent();
         }
         final Optional<DataContainerChild<?, ?>> dataNode = ((DataContainerNode<?>) result).getChild(toId(NETCONF_DATA_QNAME));
-        if(dataNode.isPresent() == false) {
+        if (dataNode.isPresent() == false) {
             return Optional.absent();
         }
 
-       return ((DataContainerNode<?>) dataNode.get()).getChild(toId(ModulesState.QNAME));
+        return ((DataContainerNode<?>) dataNode.get()).getChild(toId(ModulesState.QNAME));
     }
 
     private static LibraryModulesSchemas create(final ContainerNode modulesStateNode) {
@@ -260,6 +275,7 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
     /**
      * Resolves URLs with YANG schema resources from modules-state
+     *
      * @param url URL pointing to yang library
      * @return Resolved URLs with YANG schema resources for all yang modules from yang library
      */
@@ -269,7 +285,7 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
             final URL urlConnection = new URL(url);
             final URLConnection connection = urlConnection.openConnection();
 
-            if(connection instanceof HttpURLConnection) {
+            if (connection instanceof HttpURLConnection) {
                 connection.setRequestProperty("Accept", "application/xml");
             }
 
@@ -284,7 +300,7 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
     private static boolean guessJsonFromFileName(final String fileName) {
         String extension = "";
         final int i = fileName.lastIndexOf(46);
-        if(i != -1) {
+        if (i != -1) {
             extension = fileName.substring(i).toLowerCase();
         }
 
@@ -306,18 +322,38 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
     }
 
     private static Optional<NormalizedNode<?, ?>> readXml(final InputStream in) {
-        // TODO one module node with bad revision will fail parsing of whole modules-state node
-        // we have to parse them one by one and just ignore modules with bad revisions
-        // See BUG 8071 https://bugs.opendaylight.org/show_bug.cgi?id=8071
         final DomToNormalizedNodeParserFactory parserFactory =
                 DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, LIBRARY_CONTEXT);
-
         try {
+            final DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            final DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+            final Document read = docBuilder.parse(in);
+            final Document doc = docBuilder.newDocument();
+            final Element rootElement = doc.createElementNS("urn:ietf:params:xml:ns:yang:ietf-yang-library",
+                    "modules");
+            doc.appendChild(rootElement);
+
+            for (int i = 0; i < read.getElementsByTagName("revision").getLength(); i++) {
+                final String revision = read.getElementsByTagName("revision").item(i).getTextContent();
+                if (DATE_PATTERN.matcher(revision).find() || revision.isEmpty()) {
+                    final Node module = doc.importNode(read.getElementsByTagName("module").item(i), true);
+                    rootElement.appendChild(module);
+                } else {
+                    LOG.warn("Xml contains wrong revision - {} - on module {}", revision,
+                            read.getElementsByTagName("module").item(i).getTextContent());
+                }
+            }
+
+            final Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            final StringWriter sw = new StringWriter();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.transform(new DOMSource(doc), new StreamResult(sw));
             final NormalizedNode<?, ?> parsed =
-                    parserFactory.getContainerNodeParser().parse(Collections.singleton(XmlUtil.readXmlToElement(in)),
+                    parserFactory.getContainerNodeParser().parse(Collections.singleton(XmlUtil.readXmlToElement(sw.toString())),
                             (ContainerSchemaNode) LIBRARY_CONTEXT.getDataChildByName(ModulesState.QNAME));
             return Optional.of(parsed);
-        } catch (IOException|SAXException e) {
+        } catch (final SAXException | IOException | ParserConfigurationException | TransformerException e) {
             LOG.warn("Unable to parse yang library xml content", e);
         }
 
@@ -334,8 +370,8 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
         childNodeId = new YangInstanceIdentifier.NodeIdentifier(QName.create(Module.QNAME, "revision"));
         final Optional<String> revision = getSingleChildNodeValue(moduleNode, childNodeId);
-        if(revision.isPresent()) {
-            if(!SourceIdentifier.REVISION_PATTERN.matcher(revision.get()).matches()) {
+        if (revision.isPresent()) {
+            if (!SourceIdentifier.REVISION_PATTERN.matcher(revision.get()).matches()) {
                 LOG.warn("Skipping library schema for {}. Revision {} is in wrong format.", moduleNode, revision.get());
                 return Optional.<Map.Entry<QName, URL>>absent();
             }
