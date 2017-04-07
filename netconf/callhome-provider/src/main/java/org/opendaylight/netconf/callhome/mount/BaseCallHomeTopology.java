@@ -24,14 +24,14 @@ abstract class BaseCallHomeTopology extends AbstractNetconfTopology {
     protected DOMMountPointService mountPointService = null;
 
     BaseCallHomeTopology(String topologyId, NetconfClientDispatcher clientDispatcher,
-                                   BindingAwareBroker bindingAwareBroker,
-                                   Broker domBroker,
-                                   EventExecutor eventExecutor,
-                                   ScheduledThreadPool keepaliveExecutor,
-                                   ThreadPool processingExecutor,
-                                   SchemaRepositoryProvider schemaRepositoryProvider,
-                                   DataBroker dataBroker,
-                                   DOMMountPointService mountPointService) {
+                         BindingAwareBroker bindingAwareBroker,
+                         Broker domBroker,
+                         EventExecutor eventExecutor,
+                         ScheduledThreadPool keepaliveExecutor,
+                         ThreadPool processingExecutor,
+                         SchemaRepositoryProvider schemaRepositoryProvider,
+                         DataBroker dataBroker,
+                         DOMMountPointService mountPointService) {
         super(topologyId, clientDispatcher, bindingAwareBroker, domBroker, eventExecutor, keepaliveExecutor,
                 processingExecutor, schemaRepositoryProvider, dataBroker);
         this.mountPointService = mountPointService;
