@@ -60,7 +60,6 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
     private ListenerRegistration<IetfZeroTouchCallHomeServerProvider> listenerReg = null;
 
     private static final String CALL_HOME_PORT_KEY = "DefaultCallHomePort";
-    private static String configurationPath = "etc" + File.pathSeparator + "ztp-callhome-config.cfg";
     private int port = 0; // 0 = use default in NetconfCallHomeBuilder
     private CallhomeStatusReporter statusReporter;
 
@@ -75,7 +74,6 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
         // Register itself as a listener to changes in Devices subtree
         try {
             LOG.info("Initializing provider for {}", APPNAME);
-            loadConfigurableValues(configurationPath);
             initializeServer();
             dataBroker.registerDataChangeListener(LogicalDatastoreType.CONFIGURATION, ALL_DEVICES, this, AsyncDataBroker.DataChangeScope.SUBTREE);
             LOG.info("Initialization complete for {}", APPNAME);
@@ -84,13 +82,15 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
         }
     }
 
-    private void loadConfigurableValues(String configurationPath)
-            throws Configuration.ConfigurationException {
+    public void setPort(String portStr) {
         try {
-            Configuration configuration = new Configuration(configurationPath);
+            Configuration configuration = new Configuration();
+            configuration.set(CALL_HOME_PORT_KEY, portStr);
             port = configuration.getAsPort(CALL_HOME_PORT_KEY);
-        } catch (Configuration.ConfigurationException e) {
-            LOG.error("Problem trying to load configuration values from {}", configurationPath, e);
+            LOG.info("Setting port for call home server to {}", portStr);
+        }
+        catch(Configuration.ConfigurationException e) {
+            LOG.error("Problem trying to set port for call home server {}", portStr, e);
         }
     }
 
