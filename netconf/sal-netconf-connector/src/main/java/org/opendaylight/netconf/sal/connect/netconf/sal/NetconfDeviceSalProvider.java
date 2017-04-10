@@ -112,9 +112,13 @@ public class NetconfDeviceSalProvider implements AutoCloseable, Provider, Bindin
 
     public void close() throws Exception {
         mountInstance.close();
-        topologyDatastoreAdapter.close();
+        if (topologyDatastoreAdapter != null) {
+            topologyDatastoreAdapter.close();
+        }
         topologyDatastoreAdapter = null;
-        txChain.close();
+        if (txChain != null) {
+            txChain.close();
+        }
     }
 
     public static final class MountInstance implements AutoCloseable {
