@@ -9,7 +9,6 @@
 package org.opendaylight.netconf.topology.singleton.impl.tx;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -41,7 +40,7 @@ public class NetconfMasterDOMTransaction implements NetconfDOMTransaction {
     private final RemoteDeviceId id;
     private final DOMDataBroker delegateBroker;
 
-    private DOMDataReadOnlyTransaction readTx;
+    private final DOMDataReadOnlyTransaction readTx;
     private DOMDataWriteTransaction writeTx;
 
     public NetconfMasterDOMTransaction(final RemoteDeviceId id,
@@ -151,7 +150,12 @@ public class NetconfMasterDOMTransaction implements NetconfDOMTransaction {
 
     @Override
     public boolean cancel() {
+        if (writeTx == null) {
+            return false;
+        }
+
         LOG.trace("{}: Cancel[{}} via NETCONF", id, writeTx.getIdentifier());
+
         try {
             return writeTx.cancel();
         } finally {
