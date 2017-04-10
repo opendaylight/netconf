@@ -1,0 +1,8 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+1: Marek Gradzki <mgradzki@cisco.com>
+Code-Review+2: Jakub Morvay <jmorvay@cisco.com>
+Submitted-by: Jakub Morvay <jmorvay@cisco.com>
+Submitted-at: Mon, 10 Apr 2017 09:53:39 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/53678
+Project: netconf
+Branch: refs/heads/stable/boron
