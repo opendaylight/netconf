@@ -66,6 +66,11 @@ public class Configuration {
     private String path;
     private Properties properties;
 
+    public Configuration() {
+        path = "<no-path>";
+        properties = new Properties();
+    }
+
     public Configuration(String path) throws ConfigurationException {
         this.path = path;
         try {
@@ -91,7 +96,11 @@ public class Configuration {
         return properties;
     }
 
-    public String get(String key) {
+    public void set(String key, String value) {
+        properties.setProperty(key, value);
+    }
+
+    String get(String key) {
         String result = (String) properties.get(key);
         if (result == null)
             throw new MissingException(key);
