@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.topology.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -19,13 +20,14 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.ImmediateEventExecutor;
 import io.netty.util.concurrent.SucceededFuture;
+import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -42,7 +44,9 @@ import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
+import org.opendaylight.netconf.topology.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -63,6 +67,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 
 public class NetconfTopologyImplTest {
 
@@ -91,8 +96,8 @@ public class NetconfTopologyImplTest {
     private DataBroker dataBroker;
 
     private SchemaRepositoryProvider schemaRepositoryProvider;
-    private TestingNetconfTopologyImpl topology;
-    private TestingNetconfTopologyImpl spyTopology;
+    private NetconfTopologyImpl topology;
+    private NetconfTopologyImpl spyTopology;
 
     @Before
     public void setUp() {
@@ -102,10 +107,10 @@ public class NetconfTopologyImplTest {
         assertEquals("testingSharedSchemaRepo", schemaRepositoryProvider
                 .getSharedSchemaRepository().getIdentifier());
         when(mockedProcessingExecutor.getExecutor()).thenReturn(MoreExecutors.newDirectExecutorService());
-        Future future = new SucceededFuture(ImmediateEventExecutor.INSTANCE, new NetconfDeviceCapabilities());
+        final Future future = new SucceededFuture(ImmediateEventExecutor.INSTANCE, new NetconfDeviceCapabilities());
         when(mockedClientDispatcher.createReconnectingClient(any(NetconfReconnectingClientConfiguration.class))).thenReturn(future);
 
-        topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedBindingAwareBroker,
+        topology = new NetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedBindingAwareBroker,
                 mockedDataBroker, mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, schemaRepositoryProvider,
                 dataBroker);
 
@@ -114,7 +119,7 @@ public class NetconfTopologyImplTest {
 
     @Test
     public void testInit() {
-        WriteTransaction wtx = mock(WriteTransaction.class);
+        final WriteTransaction wtx = mock(WriteTransaction.class);
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(wtx);
         doNothing().when(wtx).merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
         when(wtx.submit()).thenReturn(Futures.<Void, TransactionCommitFailedException>immediateCheckedFuture(null));
@@ -131,21 +136,30 @@ public class NetconfTopologyImplTest {
     }
 
     @Test
-    public void testOnDataTreeChange() {
+    public void testOnDataTreeChange() throws Exception {
+        final Field fieldSchemaResrources = AbstractNetconfTopology.class.getDeclaredField("schemaResourcesDTOs");
+        fieldSchemaResrources.setAccessible(true);
 
-        DataObjectModification<Node> newNode = mock(DataObjectModification.class);
+        final Map<String, NetconfDevice.SchemaResourcesDTO> schemaResrources = (Map<String, NetconfDevice.SchemaResourcesDTO>)
+                fieldSchemaResrources.get(topology);
+
+        final Field fieldActiveConnectors = AbstractNetconfTopology.class.getDeclaredField("activeConnectors");
+        fieldActiveConnectors.setAccessible(true);
+
+        final Map<NodeId, ?> activeConnectors = (Map<NodeId, ?>) fieldActiveConnectors.get(topology);
+
+        final DataObjectModification<Node> newNode = mock(DataObjectModification.class);
         when(newNode.getModificationType()).thenReturn(DataObjectModification.ModificationType.WRITE);
 
         InstanceIdentifier.PathArgument pa = null;
 
-        for (InstanceIdentifier.PathArgument p : TopologyUtil.createTopologyListPath(TOPOLOGY_ID).child(Node.class, new NodeKey(NODE_ID)).getPathArguments()) {
+        for (final InstanceIdentifier.PathArgument p : TopologyUtil.createTopologyListPath(TOPOLOGY_ID).child(Node.class, new NodeKey(NODE_ID)).getPathArguments()) {
             pa = p;
         }
 
         when(newNode.getIdentifier()).thenReturn(pa);
 
-
-        NetconfNode testingNode = new NetconfNodeBuilder()
+        final NetconfNode testingNode = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                 .setPort(new PortNumber(9999))
                 .setReconnectOnChangedSchema(true)
@@ -154,55 +168,50 @@ public class NetconfTopologyImplTest {
                 .setKeepaliveDelay(1000L)
                 .setTcpOnly(true)
                 .setCredentials(new LoginPasswordBuilder().setUsername("testuser").setPassword("testpassword").build())
+                .setSchemaless(false)
+                .setSchemaCacheDirectory("foo")
                 .build();
 
-        NodeBuilder nn = new NodeBuilder().addAugmentation(NetconfNode.class, testingNode);
+        final NodeBuilder nn = new NodeBuilder().addAugmentation(NetconfNode.class, testingNode);
 
         when(newNode.getDataAfter()).thenReturn(nn.build());
 
-
-
-        Collection<DataTreeModification<Node>> changes = Sets.newHashSet();
-        DataTreeModification<Node> ch = mock(DataTreeModification.class);
+        final Collection<DataTreeModification<Node>> changes = Sets.newHashSet();
+        final DataTreeModification<Node> ch = mock(DataTreeModification.class);
         when(ch.getRootNode()).thenReturn(newNode);
         changes.add(ch);
+        assertEquals(1, schemaResrources.size());
+        assertEquals(0, activeConnectors.size());
+
         spyTopology.onDataTreeChanged(changes);
         verify(spyTopology).connectNode(TopologyUtil.getNodeId(pa), nn.build());
+        assertEquals(1, activeConnectors.size());
+        assertEquals("testing-node", activeConnectors.keySet().iterator().next().getValue());
+        assertEquals(2, schemaResrources.size());
+        assertNotNull(schemaResrources.get("foo").getSchemaRepository());
+        assertNotNull(schemaResrources.get("foo").getSchemaRegistry());
+        assertNotNull(schemaResrources.get("foo").getSchemaContextFactory());
+        assertNotNull(schemaResrources.get("foo").getStateSchemasResolver());
+        assertEquals("foo", ((SharedSchemaRepository) schemaResrources.get("foo").getSchemaRepository()).getIdentifier());
 
         when(newNode.getModificationType()).thenReturn(DataObjectModification.ModificationType.DELETE);
         spyTopology.onDataTreeChanged(changes);
         verify(spyTopology).disconnectNode(TopologyUtil.getNodeId(pa));
+        assertEquals(0, activeConnectors.size());
+        assertEquals(2, schemaResrources.size());
 
         when(newNode.getModificationType()).thenReturn(DataObjectModification.ModificationType.SUBTREE_MODIFIED);
         spyTopology.onDataTreeChanged(changes);
+        assertEquals(1, activeConnectors.size());
+        assertEquals("testing-node", activeConnectors.keySet().iterator().next().getValue());
+        assertEquals(2, schemaResrources.size());
 
         //one in previous creating and deleting node and one in updating
         verify(spyTopology, times(2)).disconnectNode(TopologyUtil.getNodeId(pa));
         verify(spyTopology, times(2)).connectNode(TopologyUtil.getNodeId(pa), nn.build());
 
-
-    }
-
-    public static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
-
-        public TestingNetconfTopologyImpl(String topologyId, NetconfClientDispatcher clientDispatcher,
-                                          BindingAwareBroker bindingAwareBroker, Broker domBroker,
-                                          EventExecutor eventExecutor, ScheduledThreadPool keepaliveExecutor,
-                                          ThreadPool processingExecutor, SchemaRepositoryProvider schemaRepositoryProvider,
-                                          DataBroker dataBroker) {
-            super(topologyId, clientDispatcher, bindingAwareBroker, domBroker, eventExecutor, keepaliveExecutor,
-                    processingExecutor, schemaRepositoryProvider, dataBroker);
-        }
-
-        @Override
-        public ListenableFuture<NetconfDeviceCapabilities> connectNode(NodeId nodeId, Node configNode) {
-            return Futures.immediateFuture(new NetconfDeviceCapabilities());
-        }
-
-        @Override
-        public ListenableFuture<Void> disconnectNode(NodeId nodeId) {
-            return Futures.immediateFuture(null);
-        }
+        fieldActiveConnectors.setAccessible(false);
+        fieldSchemaResrources.setAccessible(false);
     }
 
 }
