@@ -83,10 +83,13 @@ public class NetconfTopologyImplTest {
     @Mock
     private DataBroker dataBroker;
 
+<<<<<<< 0daed243d5fa216f5274ad9257f9692dd91c77eb
     @Mock
     private DOMMountPointService mountPointService;
 
+=======
     private SchemaRepositoryProvider schemaRepositoryProvider;
+>>>>>>> Test SchemaRepositoryProviderImpl class
     private TestingNetconfTopologyImpl topology;
     private TestingNetconfTopologyImpl spyTopology;
 
@@ -101,9 +104,15 @@ public class NetconfTopologyImplTest {
         final Future future = new SucceededFuture(ImmediateEventExecutor.INSTANCE, new NetconfDeviceCapabilities());
         when(mockedClientDispatcher.createReconnectingClient(any(NetconfReconnectingClientConfiguration.class))).thenReturn(future);
 
-        topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedEventExecutor,
-                mockedKeepaliveExecutor, mockedProcessingExecutor, schemaRepositoryProvider, dataBroker,
-                mountPointService);
+<<<<<<< 0daed243d5fa216f5274ad9257f9692dd91c77eb
+        topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher,
+                mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, mockedSchemaRepositoryProvider,
+                dataBroker, mountPointService);
+=======
+        topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedBindingAwareBroker,
+                mockedDataBroker, mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, schemaRepositoryProvider,
+                dataBroker);
+>>>>>>> Test SchemaRepositoryProviderImpl class
 
         spyTopology = spy(topology);
     }
