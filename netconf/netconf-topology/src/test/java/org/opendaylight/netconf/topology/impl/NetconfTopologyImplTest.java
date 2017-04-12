@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.topology.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -62,7 +63,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 
 public class NetconfTopologyImplTest {
 
@@ -88,11 +88,9 @@ public class NetconfTopologyImplTest {
     private ThreadPool mockedProcessingExecutor;
 
     @Mock
-    private SchemaRepositoryProvider mockedSchemaRepositoryProvider;
-
-    @Mock
     private DataBroker dataBroker;
 
+    private SchemaRepositoryProvider schemaRepositoryProvider;
     private TestingNetconfTopologyImpl topology;
     private TestingNetconfTopologyImpl spyTopology;
 
@@ -100,13 +98,15 @@ public class NetconfTopologyImplTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        when(mockedSchemaRepositoryProvider.getSharedSchemaRepository()).thenReturn(new SharedSchemaRepository("testingSharedSchemaRepo"));
+        schemaRepositoryProvider = new SchemaRepositoryProviderImpl("testingSharedSchemaRepo");
+        assertEquals("testingSharedSchemaRepo", schemaRepositoryProvider
+                .getSharedSchemaRepository().getIdentifier());
         when(mockedProcessingExecutor.getExecutor()).thenReturn(MoreExecutors.newDirectExecutorService());
         Future future = new SucceededFuture(ImmediateEventExecutor.INSTANCE, new NetconfDeviceCapabilities());
         when(mockedClientDispatcher.createReconnectingClient(any(NetconfReconnectingClientConfiguration.class))).thenReturn(future);
 
         topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedBindingAwareBroker,
-                mockedDataBroker, mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, mockedSchemaRepositoryProvider,
+                mockedDataBroker, mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, schemaRepositoryProvider,
                 dataBroker);
 
         spyTopology = spy(topology);
