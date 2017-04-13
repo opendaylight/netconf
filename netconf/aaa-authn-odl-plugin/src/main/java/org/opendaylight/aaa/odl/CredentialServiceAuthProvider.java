@@ -25,10 +25,10 @@ import org.slf4j.LoggerFactory;
  * AuthProvider implementation delegating to AAA CredentialAuth&lt;PasswordCredentials&gt; instance.
  */
 public final class CredentialServiceAuthProvider implements AuthProvider, AutoCloseable {
-    private static final Logger logger = LoggerFactory.getLogger(CredentialServiceAuthProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CredentialServiceAuthProvider.class);
 
     /**
-     * Singleton instance with delayed instantiation
+     * Singleton instance with delayed instantiation.
      */
     public static volatile Map.Entry<BundleContext, CredentialServiceAuthProvider> INSTANCE;
 
@@ -39,23 +39,26 @@ public final class CredentialServiceAuthProvider implements AuthProvider, AutoCl
 
     public CredentialServiceAuthProvider(final BundleContext bundleContext) {
 
-        final ServiceTrackerCustomizer<CredentialAuth, CredentialAuth> customizer = new ServiceTrackerCustomizer<CredentialAuth, CredentialAuth>() {
+        final ServiceTrackerCustomizer<CredentialAuth, CredentialAuth> customizer =
+                new ServiceTrackerCustomizer<CredentialAuth, CredentialAuth>() {
             @Override
             public CredentialAuth addingService(final ServiceReference<CredentialAuth> reference) {
-                logger.trace("Credential service {} added", reference);
+                LOGGER.trace("Credential service {} added", reference);
                 nullableCredService = bundleContext.getService(reference);
                 return nullableCredService;
             }
 
             @Override
-            public void modifiedService(final ServiceReference<CredentialAuth> reference, final CredentialAuth service) {
-                logger.trace("Replacing modified Credential service {}", reference);
+            public void modifiedService(final ServiceReference<CredentialAuth> reference,
+                                        final CredentialAuth service) {
+                LOGGER.trace("Replacing modified Credential service {}", reference);
                 nullableCredService = service;
             }
 
             @Override
             public void removedService(final ServiceReference<CredentialAuth> reference, final CredentialAuth service) {
-                logger.trace("Removing Credential service {}. This AuthProvider will fail to authenticate every time", reference);
+                LOGGER.trace("Removing Credential service {}. "
+                        + "This AuthProvider will fail to authenticate every time", reference);
                 synchronized (CredentialServiceAuthProvider.this) {
                     nullableCredService = null;
                 }
@@ -66,13 +69,13 @@ public final class CredentialServiceAuthProvider implements AuthProvider, AutoCl
     }
 
     /**
-     * Authenticate user. This implementation tracks CredentialAuth&lt;PasswordCredentials&gt; and delegates the decision to it. If the service is not
-     * available, IllegalStateException is thrown.
+     * Authenticate user. This implementation tracks CredentialAuth&lt;PasswordCredentials&gt;
+     * and delegates the decision to it. If the service is not available, IllegalStateException is thrown.
      */
     @Override
     public synchronized boolean authenticated(final String username, final String password) {
         if (nullableCredService == null) {
-            logger.warn("Cannot authenticate user '{}', Credential service is missing", username);
+            LOGGER.warn("Cannot authenticate user '{}', Credential service is missing", username);
             throw new IllegalStateException("Credential service is not available");
         }
 
@@ -80,16 +83,16 @@ public final class CredentialServiceAuthProvider implements AuthProvider, AutoCl
         try {
             claim = nullableCredService.authenticate(new PasswordCredentialsWrapper(username, password));
         } catch (AuthenticationException e) {
-            logger.debug("Authentication failed for user '{}' : {}", username, e);
+            LOGGER.debug("Authentication failed for user '{}' : {}", username, e);
             return false;
         }
 
-        logger.debug("Authentication result for user '{}' : {}", username, claim.domain());
+        LOGGER.debug("Authentication result for user '{}' : {}", username, claim.domain());
         return true;
     }
 
     /**
-     * Invoke by blueprint
+     * Invoke by blueprint.
      */
     @Override
     public void close() {
@@ -101,6 +104,7 @@ public final class CredentialServiceAuthProvider implements AuthProvider, AutoCl
         private final String username;
         private final String password;
 
+        @SuppressWarnings("checkstyle:RedundantModifier")
         public PasswordCredentialsWrapper(final String username, final String password) {
             this.username = username;
             this.password = password;
