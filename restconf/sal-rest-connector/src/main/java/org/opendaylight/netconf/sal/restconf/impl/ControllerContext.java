@@ -83,7 +83,7 @@ public class ControllerContext implements SchemaContextListener {
 
     private static final String MOUNT_NODE = "mount";
 
-    private static final Charset URI_ENCODING_CHARSET = StandardCharsets.ISO_8859_1;
+    private static final Charset URI_ENCODING_CHARSET = StandardCharsets.UTF_8;
 
     private static final Splitter SLASH_SPLITTER = Splitter.on('/');
 
