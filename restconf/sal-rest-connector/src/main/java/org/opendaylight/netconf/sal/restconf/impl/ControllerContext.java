@@ -82,7 +82,7 @@ public class ControllerContext implements SchemaContextListener {
 
     public final static String MOUNT = "yang-ext:mount";
 
-    private final static String URI_ENCODING_CHAR_SET = "ISO-8859-1";
+    private final static String URI_ENCODING_CHAR_SET = "UTF-8";
 
     private static final Splitter SLASH_SPLITTER = Splitter.on('/');
 
