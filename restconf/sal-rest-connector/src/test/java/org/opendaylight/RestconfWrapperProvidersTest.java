@@ -15,7 +15,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.lang.reflect.Field;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -62,18 +61,12 @@ public class RestconfWrapperProvidersTest {
         final RestconfProviderImpl draft2 = mock(RestconfProviderImpl.class);
         final RestConnectorProvider draft18 = mock(RestConnectorProvider.class);
 
-        setDeclaredField(rwp, "providerDraft02", draft2);
-        setDeclaredField(rwp, "providerDraft18", draft18);
+        ReflectionTestUtils.setField(rwp, "providerDraft02", draft2);
+        ReflectionTestUtils.setField(rwp, "providerDraft18", draft18);
 
         rwp.close();
 
         verify(draft2, times(1)).close();
         verify(draft18, times(1)).close();
-    }
-
-    private static void setDeclaredField(final Object rwp, final String name, final Object value) throws Exception {
-        final Field declaredField = rwp.getClass().getDeclaredField(name);
-        declaredField.setAccessible(true);
-        declaredField.set(rwp, value);
     }
 }
