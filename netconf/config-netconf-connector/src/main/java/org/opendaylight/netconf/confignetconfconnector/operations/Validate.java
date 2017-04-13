@@ -48,9 +48,10 @@ public class Validate extends AbstractConfigNetconfOperation {
         final String datastoreValue = sourceChildNode.getName();
         final Datastore sourceDatastore = Datastore.valueOf(datastoreValue);
 
-        if (sourceDatastore != Datastore.candidate){
-            throw new DocumentedException( "Only " + Datastore.candidate
-                    + " is supported as source for " + VALIDATE + " but was " + datastoreValue, ErrorType.APPLICATION, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
+        if (sourceDatastore != Datastore.candidate) {
+            throw new DocumentedException("Only " + Datastore.candidate
+                    + " is supported as source for " + VALIDATE + " but was " + datastoreValue, ErrorType.APPLICATION,
+                    ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
         }
     }
 
@@ -60,7 +61,8 @@ public class Validate extends AbstractConfigNetconfOperation {
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement xml) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document,
+                                                       final XmlElement xml) throws DocumentedException {
         checkXml(xml);
         try {
             getConfigSubsystemFacade().validateConfiguration();
@@ -72,7 +74,8 @@ public class Validate extends AbstractConfigNetconfOperation {
             final Map<String, String> errorInfo = new HashMap<>();
             errorInfo
                     .put(ErrorTag.OPERATION_FAILED.name(),
-                            "Datastore is not present. Use 'get-config' or 'edit-config' before triggering 'operations' operation");
+                            "Datastore is not present. "
+                                    + "Use 'get-config' or 'edit-config' before triggering 'operations' operation");
             throw new DocumentedException(e.getMessage(), e, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
                     ErrorSeverity.ERROR, errorInfo);
 

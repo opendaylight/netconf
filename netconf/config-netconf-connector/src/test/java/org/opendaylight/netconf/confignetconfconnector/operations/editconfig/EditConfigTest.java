@@ -89,7 +89,8 @@ public class EditConfigTest {
         EditConfig edit = new EditConfig(cfgFacade, ValidateTest.NETCONF_SESSION_ID_FOR_REPORTING);
         EditConfigStrategy editStrat = mock(EditConfigStrategy.class);
 
-        doNothing().when(editStrat).executeConfiguration(anyString(), anyString(), anyMapOf(String.class, AttributeConfigElement.class),
+        doNothing().when(editStrat).executeConfiguration(anyString(), anyString(), anyMapOf(String.class,
+                AttributeConfigElement.class),
                 any(ConfigTransactionClient.class), any(ServiceRegistryWrapper.class));
 
         ConfigExecution editConfigExecution = mockExecution(editStrat);
@@ -103,7 +104,8 @@ public class EditConfigTest {
         verify(provider).getOrCreateTransaction();
 
         // For every instance execute strat
-        verify(editStrat, times(2/* Test */+ 2/* Set */ + 2/*Handle missing instance Test*/ + 2 /*Handle missing instance Set*/)).executeConfiguration(anyString(),
+        verify(editStrat, times(2/* Test */ + 2/* Set */ + 2/*Handle missing instance Test*/
+                + 2 /*Handle missing instance Set*/)).executeConfiguration(anyString(),
                 anyString(), anyMapOf(String.class, AttributeConfigElement.class),
                 any(ConfigTransactionClient.class), any(ServiceRegistryWrapper.class));
     }
@@ -122,7 +124,7 @@ public class EditConfigTest {
     }
 
     private Object getMappingDefinition(EditConfigStrategy editStrat) {
-        Map<String, Multimap<String, ModuleElementDefinition>> result = Maps.newHashMap();
+        final Map<String, Multimap<String, ModuleElementDefinition>> result = Maps.newHashMap();
 
         Multimap<String, ModuleElementDefinition> innerMultimap = HashMultimap.create();
         Map<String, AttributeConfigElement> attributes = getSimpleAttributes();
@@ -157,7 +159,7 @@ public class EditConfigTest {
     }
 
     private Map<String, Multimap<String, ModuleElementResolved>> getMapping(EditConfigStrategy editStrat) {
-        Map<String, Multimap<String, ModuleElementResolved>> result = Maps.newHashMap();
+        final Map<String, Multimap<String, ModuleElementResolved>> result = Maps.newHashMap();
 
         Multimap<String, ModuleElementResolved> innerMultimap = HashMultimap.create();
         Map<String, AttributeConfigElement> attributes = getSimpleAttributes();
@@ -178,10 +180,10 @@ public class EditConfigTest {
     }
 
     static Map<String, AttributeConfigElement> getSimpleAttributes() {
-        Map<String, AttributeConfigElement> attributes = Maps.newHashMap();
+        final Map<String, AttributeConfigElement> attributes = Maps.newHashMap();
         AttributeConfigElement ace1 = mock(AttributeConfigElement.class);
         doReturn("abcd").when(ace1).getResolvedDefaultValue();
-        doReturn(Optional.<String> of("abc")).when(ace1).getResolvedValue();
+        doReturn(Optional.<String>of("abc")).when(ace1).getResolvedValue();
         doReturn("mockedAce1").when(ace1).toString();
         doReturn("jmxNameAce1").when(ace1).getJmxName();
         attributes.put("a1", ace1);

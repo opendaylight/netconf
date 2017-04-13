@@ -26,7 +26,8 @@ import org.opendaylight.netconf.mapping.api.NetconfOperation;
 final class NetconfOperationProvider {
     private final Set<NetconfOperation> operations;
 
-    NetconfOperationProvider(final ConfigSubsystemFacade configSubsystemFacade, final String netconfSessionIdForReporting) {
+    NetconfOperationProvider(final ConfigSubsystemFacade configSubsystemFacade,
+                             final String netconfSessionIdForReporting) {
 
         operations = setUpOperations(configSubsystemFacade, netconfSessionIdForReporting);
     }

@@ -30,24 +30,30 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(final BundleContext context) throws Exception {
-        ServiceTrackerCustomizer<ConfigSubsystemFacadeFactory, ConfigSubsystemFacadeFactory> schemaServiceTrackerCustomizer = new ServiceTrackerCustomizer<ConfigSubsystemFacadeFactory, ConfigSubsystemFacadeFactory>() {
+        ServiceTrackerCustomizer<ConfigSubsystemFacadeFactory,
+                ConfigSubsystemFacadeFactory> schemaServiceTrackerCustomizer =
+                new ServiceTrackerCustomizer<ConfigSubsystemFacadeFactory, ConfigSubsystemFacadeFactory>() {
 
             @Override
-            public ConfigSubsystemFacadeFactory addingService(ServiceReference<ConfigSubsystemFacadeFactory> reference) {
+            public ConfigSubsystemFacadeFactory addingService(
+                    ServiceReference<ConfigSubsystemFacadeFactory> reference) {
                 LOG.debug("Got addingService(SchemaContextProvider) event");
                 // Yang store service should not be registered multiple times
-                ConfigSubsystemFacadeFactory configSubsystemFacade = reference.getBundle().getBundleContext().getService(reference);
+                ConfigSubsystemFacadeFactory configSubsystemFacade =
+                        reference.getBundle().getBundleContext().getService(reference);
                 osgiRegistration = startNetconfServiceFactory(configSubsystemFacade, context);
                 return configSubsystemFacade;
             }
 
             @Override
-            public void modifiedService(ServiceReference<ConfigSubsystemFacadeFactory> reference, ConfigSubsystemFacadeFactory service) {
+            public void modifiedService(ServiceReference<ConfigSubsystemFacadeFactory> reference,
+                                        ConfigSubsystemFacadeFactory service) {
                 LOG.warn("Config manager facade was modified unexpectedly");
             }
 
             @Override
-            public void removedService(ServiceReference<ConfigSubsystemFacadeFactory> reference, ConfigSubsystemFacadeFactory service) {
+            public void removedService(ServiceReference<ConfigSubsystemFacadeFactory> reference,
+                                       ConfigSubsystemFacadeFactory service) {
                 LOG.warn("Config manager facade was removed unexpectedly");
             }
         };
@@ -64,12 +70,15 @@ public class Activator implements BundleActivator {
         }
     }
 
-    private ServiceRegistration<NetconfOperationServiceFactory> startNetconfServiceFactory(final ConfigSubsystemFacadeFactory configSubsystemFacade, final BundleContext context) {
-        final NetconfOperationServiceFactoryImpl netconfOperationServiceFactory = new NetconfOperationServiceFactoryImpl(configSubsystemFacade);
+    private ServiceRegistration<NetconfOperationServiceFactory> startNetconfServiceFactory(
+            final ConfigSubsystemFacadeFactory configSubsystemFacade, final BundleContext context) {
+        final NetconfOperationServiceFactoryImpl netconfOperationServiceFactory =
+                new NetconfOperationServiceFactoryImpl(configSubsystemFacade);
         // Add properties to autowire with netconf-impl instance for cfg subsystem
         final Dictionary<String, String> properties = new Hashtable<>();
         properties.put(NetconfConstants.SERVICE_NAME, NetconfConstants.CONFIG_NETCONF_CONNECTOR);
-        return context.registerService(NetconfOperationServiceFactory.class, netconfOperationServiceFactory, properties);
+        return context.registerService(NetconfOperationServiceFactory.class,
+                netconfOperationServiceFactory, properties);
     }
 
 }

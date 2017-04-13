@@ -32,7 +32,8 @@ public class DiscardChanges extends AbstractConfigNetconfOperation {
 
     private static final Logger LOG = LoggerFactory.getLogger(DiscardChanges.class);
 
-    public DiscardChanges(final ConfigSubsystemFacade configSubsystemFacade, final String netconfSessionIdForReporting) {
+    public DiscardChanges(final ConfigSubsystemFacade configSubsystemFacade,
+                          final String netconfSessionIdForReporting) {
         super(configSubsystemFacade, netconfSessionIdForReporting);
     }
 
@@ -46,8 +47,10 @@ public class DiscardChanges extends AbstractConfigNetconfOperation {
         return DISCARD;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement xml) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document,
+                                                       final XmlElement xml) throws DocumentedException {
         fromXml(xml);
         try {
             getConfigSubsystemFacade().abortConfiguration();
