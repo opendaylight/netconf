@@ -39,6 +39,7 @@ public class SchemaExportContentYangBodyWriter implements MessageBodyWriter<Sche
         return -1;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void writeTo(final SchemaExportContext context, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType,
