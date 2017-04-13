@@ -24,7 +24,8 @@ public class NetconfOperationServiceFactoryImpl implements NetconfOperationServi
 
     @Override
     public NetconfOperationServiceImpl createService(String netconfSessionIdForReporting) {
-        return new NetconfOperationServiceImpl(configFacadeFactory.createFacade(netconfSessionIdForReporting), netconfSessionIdForReporting);
+        return new NetconfOperationServiceImpl(configFacadeFactory.createFacade(netconfSessionIdForReporting),
+                netconfSessionIdForReporting);
     }
 
     @Override

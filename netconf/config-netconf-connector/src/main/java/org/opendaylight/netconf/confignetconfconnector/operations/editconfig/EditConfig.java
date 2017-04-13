@@ -65,8 +65,10 @@ public class EditConfig extends AbstractConfigNetconfOperation {
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement xml) throws DocumentedException {
-        // FIXME config mapping getter works on dynamic yang store service and so does later executeConfigExecution method
+    protected Element handleWithNoSubsequentOperations(final Document document,
+                                                       final XmlElement xml) throws DocumentedException {
+        // FIXME config mapping getter works on dynamic yang store service
+        // and so does later executeConfigExecution method
         // They might have different view of current yangs in ODL and might cause race conditions
         final Config cfg = getConfigSubsystemFacade().getConfigMapping();
         final ConfigExecution configExecution = editConfigXmlParser.fromXml(xml, cfg);
