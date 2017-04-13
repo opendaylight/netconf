@@ -53,7 +53,7 @@ public class RuntimeRpc extends AbstractConfigNetconfOperation {
         final Optional<XmlElement> contextInstanceElement = operationElement
                 .getOnlyChildElementOptionally(RpcFacade.CONTEXT_INSTANCE);
 
-        if (!contextInstanceElement.isPresent()){
+        if (!contextInstanceElement.isPresent()) {
             return HandlingPriority.CANNOT_HANDLE;
         }
 
@@ -97,8 +97,8 @@ public class RuntimeRpc extends AbstractConfigNetconfOperation {
                 execution.getAttributes());
         final Object result = getConfigSubsystemFacade().getRpcFacade().executeOperation(execution);
 
-        LOG.trace("Operation {} called successfully on {} with arguments {} with result {}", execution.getOperationName(),
-                execution.getOn(), execution.getAttributes(), result);
+        LOG.trace("Operation {} called successfully on {} with arguments {} with result {}",
+                execution.getOperationName(), execution.getOn(), execution.getAttributes(), result);
 
         if (execution.isVoid()) {
             return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());

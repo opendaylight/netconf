@@ -22,7 +22,8 @@ import org.w3c.dom.Element;
 
 /**
  * Simple Lock implementation that pretends to lock candidate datastore.
- * Candidate datastore is allocated per session and is private so no real locking is needed (JMX is the only possible interference)
+ * Candidate datastore is allocated per session and is private so no real locking is needed
+ * (JMX is the only possible interference)
  */
 public class Lock extends AbstractLastNetconfOperation {
 
@@ -36,17 +37,20 @@ public class Lock extends AbstractLastNetconfOperation {
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document,
+                                                       final XmlElement operationElement) throws DocumentedException {
         final Datastore targetDatastore = extractTargetParameter(operationElement);
-        if(targetDatastore == Datastore.candidate) {
-            // Since candidate datastore instances are allocated per session and not accessible anywhere else, no need to lock
+        if (targetDatastore == Datastore.candidate) {
+            // Since candidate datastore instances are allocated per session and not accessible anywhere else,
+            // no need to lock
             LOG.debug("Locking {} datastore on session: {}", targetDatastore, getNetconfSessionIdForReporting());
             // TODO should this fail if we are already locked ?
             return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
         }
 
         // Not supported running lock
-        throw new DocumentedException("Unable to lock " + Datastore.running + " datastore", DocumentedException.ErrorType.APPLICATION,
+        throw new DocumentedException("Unable to lock " + Datastore.running + " datastore",
+                DocumentedException.ErrorType.APPLICATION,
                 DocumentedException.ErrorTag.OPERATION_NOT_SUPPORTED, DocumentedException.ErrorSeverity.ERROR);
     }
 
