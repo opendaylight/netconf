@@ -9,6 +9,7 @@ package org.opendaylight.controller.config.yang.sal.restconf.service;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
+
 import org.junit.Test;
 import org.opendaylight.controller.config.api.DependencyResolver;
 import org.opendaylight.controller.config.api.ModuleIdentifier;
