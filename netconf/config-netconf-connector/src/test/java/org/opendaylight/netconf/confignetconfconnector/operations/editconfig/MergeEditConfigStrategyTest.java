@@ -32,38 +32,38 @@ import org.opendaylight.controller.config.yang.test.impl.MultipleDependenciesMod
 import org.opendaylight.controller.config.yang.test.impl.MultipleDependenciesModuleMXBean;
 
 public class MergeEditConfigStrategyTest extends AbstractConfigTest {
-    private static final MultipleDependenciesModuleFactory factory = new MultipleDependenciesModuleFactory();
+    private static final MultipleDependenciesModuleFactory FACTORY = new MultipleDependenciesModuleFactory();
+    private static final String FACTORY_NAME = FACTORY.getImplementationName();
     public static final String PARENT = "parent";
     public static final String D1 = "d1";
     public static final String D2 = "d2";
     public static final String D3 = "d3";
 
-    private static final String factoryName = factory.getImplementationName();
-
     @Before
     public void setUp() throws Exception {
-        super.initConfigTransactionManagerImpl(new HardcodedModuleFactoriesResolver(mockedContext, factory));
+        super.initConfigTransactionManagerImpl(new HardcodedModuleFactoriesResolver(mockedContext, FACTORY));
 
         ConfigTransactionJMXClient transaction = configRegistryClient.createTransaction();
-        ObjectName d1 = transaction.createModule(factoryName, D1);
-        ObjectName d2 = transaction.createModule(factoryName, D2);
-        ObjectName parent = transaction.createModule(factoryName, PARENT);
+        ObjectName d1 = transaction.createModule(FACTORY_NAME, D1);
+        ObjectName d2 = transaction.createModule(FACTORY_NAME, D2);
+        ObjectName parent = transaction.createModule(FACTORY_NAME, PARENT);
         MultipleDependenciesModuleMXBean multipleDependenciesModuleMXBean = transaction.newMXBeanProxy(parent,
                 MultipleDependenciesModuleMXBean.class);
         multipleDependenciesModuleMXBean.setTestingDeps(asList(d1, d2));
-        transaction.createModule(factoryName, D3);
+        transaction.createModule(FACTORY_NAME, D3);
         transaction.commit();
     }
 
     @Test
     public void testMergingOfObjectNames() throws Exception {
-        MergeEditConfigStrategy strategy = new MergeEditConfigStrategy();
-        ConfigTransactionJMXClient transaction = configRegistryClient.createTransaction();
+        final MergeEditConfigStrategy strategy = new MergeEditConfigStrategy();
+        final ConfigTransactionJMXClient transaction = configRegistryClient.createTransaction();
 
         // add D3
 
         AttributeConfigElement attributeConfigElement = mock(AttributeConfigElement.class);
-        doReturn(Optional.of(new ObjectName[] {createReadOnlyModuleON(factoryName, D3)})).when(attributeConfigElement).getResolvedValue();
+        doReturn(Optional.of(new ObjectName[] {createReadOnlyModuleON(FACTORY_NAME, D3)}))
+                .when(attributeConfigElement).getResolvedValue();
         doReturn("mocked").when(attributeConfigElement).toString();
         String attributeName = MultipleDependenciesModule.testingDepsJmxAttribute.getAttributeName();
         doReturn(attributeName).when(attributeConfigElement).getJmxName();
@@ -71,18 +71,18 @@ public class MergeEditConfigStrategyTest extends AbstractConfigTest {
                 attributeName,
                 attributeConfigElement);
 
-        strategy.executeConfiguration(factoryName, PARENT, configuration, transaction,
+        strategy.executeConfiguration(FACTORY_NAME, PARENT, configuration, transaction,
                 mock(ServiceRegistryWrapper.class));
         transaction.commit();
 
         // parent's attribute should contain d1,d2,d3
         MultipleDependenciesModuleMXBean proxy = configRegistryClient.newMXBeanProxy(
-                createReadOnlyModuleON(factoryName, PARENT),
+                createReadOnlyModuleON(FACTORY_NAME, PARENT),
                 MultipleDependenciesModuleMXBean.class);
         List<ObjectName> testingDeps = proxy.getTestingDeps();
-        List<ObjectName> expected = asList(createReadOnlyModuleON(factoryName, D1),
-                createReadOnlyModuleON(factoryName, D2),
-                createReadOnlyModuleON(factoryName, D3));
+        List<ObjectName> expected = asList(createReadOnlyModuleON(FACTORY_NAME, D1),
+                createReadOnlyModuleON(FACTORY_NAME, D2),
+                createReadOnlyModuleON(FACTORY_NAME, D3));
         assertEquals(expected, testingDeps);
     }
 }

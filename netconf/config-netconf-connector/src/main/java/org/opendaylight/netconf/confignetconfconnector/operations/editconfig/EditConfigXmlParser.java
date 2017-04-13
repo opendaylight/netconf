@@ -45,8 +45,8 @@ public class EditConfigXmlParser {
         xml.checkNamespace(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
 
 
-        XmlElement targetElement = null;
-        XmlElement targetChildNode = null;
+        XmlElement targetElement;
+        XmlElement targetChildNode;
         targetElement  = xml.getOnlyChildElementWithSameNamespace(EditConfigXmlParser.TARGET_KEY);
         targetChildNode = targetElement.getOnlyChildElementWithSameNamespace();
 
@@ -55,7 +55,7 @@ public class EditConfigXmlParser {
         LOG.debug("Setting {} to '{}'", EditConfigXmlParser.TARGET_KEY, targetDatastore);
 
         // check target
-        if (targetDatastore != Datastore.candidate){
+        if (targetDatastore != Datastore.candidate) {
             throw new DocumentedException(String.format(
                     "Only %s datastore supported for edit config but was: %s",
                     Datastore.candidate,
@@ -82,7 +82,7 @@ public class EditConfigXmlParser {
                 .getOnlyChildElementWithSameNamespaceOptionally(EditConfigXmlParser.ERROR_OPTION_KEY);
         if (errorOptionElement.isPresent()) {
             final String errorOptionParsed = errorOptionElement.get().getTextContent();
-            if (!errorOptionParsed.equals(EditConfigXmlParser.DEFAULT_ERROR_OPTION)){
+            if (!errorOptionParsed.equals(EditConfigXmlParser.DEFAULT_ERROR_OPTION)) {
                 throw new UnsupportedOperationException("Only " + EditConfigXmlParser.DEFAULT_ERROR_OPTION
                         + " supported for " + EditConfigXmlParser.ERROR_OPTION_KEY + ", was " + errorOptionParsed);
             }
@@ -97,7 +97,7 @@ public class EditConfigXmlParser {
             editStrategyType = EditStrategyType.valueOf(mergeStrategyString);
         }
 
-        XmlElement configElement = null;
+        XmlElement configElement;
         configElement = xml.getOnlyChildElementWithSameNamespace(XmlNetconfConstants.CONFIG_KEY);
 
         return new ConfigExecution(cfgMapping, configElement, testOption, editStrategyType);

@@ -28,7 +28,8 @@ public class GetConfig extends AbstractConfigNetconfOperation {
 
     private static final Logger LOG = LoggerFactory.getLogger(GetConfig.class);
 
-    public GetConfig(final ConfigSubsystemFacade configSubsystemFacade, final Optional<String> maybeNamespace, final String netconfSessionIdForReporting) {
+    public GetConfig(final ConfigSubsystemFacade configSubsystemFacade, final Optional<String> maybeNamespace,
+                     final String netconfSessionIdForReporting) {
         super(configSubsystemFacade, netconfSessionIdForReporting);
         this.maybeNamespace = maybeNamespace;
     }
