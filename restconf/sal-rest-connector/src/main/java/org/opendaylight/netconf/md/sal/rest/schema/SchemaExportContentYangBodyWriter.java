@@ -36,13 +36,12 @@ public class SchemaExportContentYangBodyWriter implements MessageBodyWriter<Sche
         return -1;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
-    public void writeTo(final SchemaExportContext context, final Class<?> type, final Type genericType,
-            final Annotation[] annotations, final MediaType mediaType,
-            final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws IOException,
-            WebApplicationException {
+    public void writeTo(final SchemaExportContext t, final Class<?> type, final Type genericType,
+            final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,
+            final OutputStream entityStream) throws IOException, WebApplicationException {
         final PrintWriter writer = new PrintWriter(entityStream);
-        writer.write(context.getModule().getSource());
-
+        writer.write(t.getModule().getSource());
     }
 }
