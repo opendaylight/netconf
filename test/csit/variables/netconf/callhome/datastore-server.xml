@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datastores xmlns="urn:cesnet:tmc:datastores:file">
+  <running lock="">
+    <netconf xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-server">
+      <ssh>
+        <call-home>
+          <applications>
+            <application>
+              <name>test</name>
+              <servers>
+                <server>
+                  <address>ODL_SYSTEM_IP</address>
+                  <port>6666</port>
+                </server>
+              </servers>
+              <host-keys>
+                <host-key>
+                  <name>localhost</name>
+                </host-key>
+              </host-keys>
+            </application>
+          </applications>
+        </call-home>
+      </ssh>
+    </netconf>
+  </running>
+  <startup lock="">
+    <netconf xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-server">
+      <ssh>
+        <call-home>
+          <applications>
+            <application>
+              <name>test</name>
+              <servers>
+                <server>
+                  <address>ODL_SYSTEM_IP</address>
+                  <port>6666</port>
+                </server>
+              </servers>
+              <host-keys>
+                <host-key>
+                  <name>localhost</name>
+                </host-key>
+              </host-keys>
+            </application>
+          </applications>
+        </call-home>
+      </ssh>
+    </netconf>
+  </startup>
+  <candidate modified="false" lock=""/>
+</datastores>
