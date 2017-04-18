@@ -30,6 +30,7 @@ final class OperationProvider {
     private final DOMRpcService rpcService;
     private final TransactionProvider transactionProvider;
 
+    @SuppressWarnings("checkstyle:RedundantModifier")
     public OperationProvider(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext,
                              final DOMDataBroker dataBroker, final DOMRpcService rpcService) {
         this.netconfSessionIdForReporting = netconfSessionIdForReporting;

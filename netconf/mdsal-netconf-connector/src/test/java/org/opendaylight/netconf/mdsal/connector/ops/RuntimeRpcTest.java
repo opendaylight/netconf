@@ -76,6 +76,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+@SuppressWarnings("checkstyle:IllegalCatch")
 public class RuntimeRpcTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(RuntimeRpcTest.class);
@@ -96,13 +97,16 @@ public class RuntimeRpcTest {
     private final DOMRpcService rpcServiceVoidInvoke = new DOMRpcService() {
         @Nonnull
         @Override
-        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull final SchemaPath type, @Nullable final NormalizedNode<?, ?> input) {
-            return Futures.immediateCheckedFuture((DOMRpcResult) new DefaultDOMRpcResult(null, Collections.<RpcError>emptyList()));
+        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull final SchemaPath type, @Nullable final
+            NormalizedNode<?, ?> input) {
+            return Futures.immediateCheckedFuture((DOMRpcResult) new DefaultDOMRpcResult(null, Collections
+                    .<RpcError>emptyList()));
         }
 
         @Nonnull
         @Override
-        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(@Nonnull final T listener) {
+        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(@Nonnull final T
+                                                                                                          listener) {
             return null;
         }
     };
@@ -110,14 +114,17 @@ public class RuntimeRpcTest {
     private final DOMRpcService rpcServiceFailedInvocation = new DOMRpcService() {
         @Nonnull
         @Override
-        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull final SchemaPath type, @Nullable final NormalizedNode<?, ?> input) {
-            return Futures.immediateFailedCheckedFuture((DOMRpcException) new DOMRpcException("rpc invocation not implemented yet") {
+        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull final SchemaPath type, @Nullable final
+            NormalizedNode<?, ?> input) {
+            return Futures.immediateFailedCheckedFuture((DOMRpcException) new DOMRpcException("rpc invocation not "
+                    + "implemented yet") {
             });
         }
 
         @Nonnull
         @Override
-        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(@Nonnull final T listener) {
+        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(@Nonnull final T
+                                                                                                          listener) {
             return null;
         }
     };
@@ -125,10 +132,14 @@ public class RuntimeRpcTest {
     private final DOMRpcService rpcServiceSuccesfullInvocation = new DOMRpcService() {
         @Nonnull
         @Override
-        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull final SchemaPath type, @Nullable final NormalizedNode<?, ?> input) {
-            final Collection<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> children = (Collection) input.getValue();
-            final Module module = schemaContext.findModuleByNamespaceAndRevision(type.getLastComponent().getNamespace(), null);
-            final RpcDefinition rpcDefinition = getRpcDefinitionFromModule(module, module.getNamespace(), type.getLastComponent().getLocalName());
+        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull final SchemaPath type, @Nullable final
+            NormalizedNode<?, ?> input) {
+            final Collection<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> children =
+                    (Collection) input.getValue();
+            final Module module = schemaContext.findModuleByNamespaceAndRevision(type.getLastComponent().getNamespace(),
+                    null);
+            final RpcDefinition rpcDefinition = getRpcDefinitionFromModule(module, module.getNamespace(), type
+                    .getLastComponent().getLocalName());
             final ContainerSchemaNode outputSchemaNode = rpcDefinition.getOutput();
             final ContainerNode node = ImmutableContainerNodeBuilder.create()
                     .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(outputSchemaNode.getQName()))
@@ -139,7 +150,8 @@ public class RuntimeRpcTest {
 
         @Nonnull
         @Override
-        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(@Nonnull final T listener) {
+        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(@Nonnull final T
+                                                                                                          listener) {
             return null;
         }
     };
@@ -206,7 +218,8 @@ public class RuntimeRpcTest {
 
     @Test
     public void testSuccesfullNonVoidInvocation() throws Exception {
-        final RuntimeRpc rpc = new RuntimeRpc(sessionIdForReporting, currentSchemaContext, rpcServiceSuccesfullInvocation);
+        final RuntimeRpc rpc = new RuntimeRpc(sessionIdForReporting, currentSchemaContext,
+                rpcServiceSuccesfullInvocation);
 
         final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-nonvoid.xml");
         final HandlingPriority priority = rpc.canHandle(rpcDocument);
@@ -218,7 +231,8 @@ public class RuntimeRpcTest {
 
     @Test
     public void testSuccesfullContainerInvocation() throws Exception {
-        final RuntimeRpc rpc = new RuntimeRpc(sessionIdForReporting, currentSchemaContext, rpcServiceSuccesfullInvocation);
+        final RuntimeRpc rpc = new RuntimeRpc(sessionIdForReporting, currentSchemaContext,
+                rpcServiceSuccesfullInvocation);
 
         final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-container.xml");
         final HandlingPriority priority = rpc.canHandle(rpcDocument);
@@ -274,7 +288,8 @@ public class RuntimeRpcTest {
         }
     }
 
-    private void verifyResponse(final Document response, final Document template) throws IOException, TransformerException {
+    private void verifyResponse(final Document response, final Document template) throws IOException,
+            TransformerException {
         final DetailedDiff dd = new DetailedDiff(new Diff(response, template));
         dd.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
         //we care about order so response has to be identical

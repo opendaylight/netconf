@@ -71,7 +71,8 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
     private final DOMRpcService rpcService;
 
-    public RuntimeRpc(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext, final DOMRpcService rpcService) {
+    public RuntimeRpc(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext, final
+        DOMRpcService rpcService) {
         super(netconfSessionIdForReporting);
         this.schemaContext = schemaContext;
         this.rpcService = rpcService;
@@ -110,10 +111,12 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
     //this returns module with the newest revision if more then 1 module with same namespace is found
     private Optional<Module> getModule(final URI namespaceURI) {
-        return Optional.fromNullable(schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(namespaceURI, null));
+        return Optional.fromNullable(schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(namespaceURI,
+                null));
     }
 
-    private Optional<RpcDefinition> getRpcDefinitionFromModule(final Module module, final URI namespaceURI, final String name) {
+    private Optional<RpcDefinition> getRpcDefinitionFromModule(final Module module, final URI namespaceURI, final
+        String name) {
         for (final RpcDefinition rpcDef : module.getRpcs()) {
             if (rpcDef.getQName().getNamespace().equals(namespaceURI)
                     && rpcDef.getQName().getLocalName().equals(name)) {
@@ -124,7 +127,8 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
+            throws DocumentedException {
 
         final String netconfOperationName = operationElement.getName();
         final String netconfOperationNamespace;
@@ -140,15 +144,17 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         final Optional<Module> moduleOptional = getModule(namespaceURI);
 
         if (!moduleOptional.isPresent()) {
-            throw new DocumentedException("Unable to find module in Schema Context with namespace and name : " +
-                    namespaceURI + " " + netconfOperationName + schemaContext.getCurrentContext(),
+            throw new DocumentedException("Unable to find module in Schema Context with namespace and name : "
+                    + namespaceURI + " " + netconfOperationName + schemaContext.getCurrentContext(),
                     ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, ErrorSeverity.ERROR);
         }
 
-        final Optional<RpcDefinition> rpcDefinitionOptional = getRpcDefinitionFromModule(moduleOptional.get(), namespaceURI, netconfOperationName);
+        final Optional<RpcDefinition> rpcDefinitionOptional = getRpcDefinitionFromModule(moduleOptional.get(),
+                namespaceURI, netconfOperationName);
 
         if (!rpcDefinitionOptional.isPresent()) {
-            throw new DocumentedException("Unable to find RpcDefinition with namespace and name : " + namespaceURI + " " + netconfOperationName,
+            throw new DocumentedException("Unable to find RpcDefinition with namespace and name : " + namespaceURI
+                    + " " + netconfOperationName,
                     ErrorType.APPLICATION, ErrorTag.BAD_ELEMENT, ErrorSeverity.ERROR);
         }
 
@@ -160,7 +166,8 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         try {
             final DOMRpcResult result = rpcFuture.checkedGet();
             if (result.getResult() == null) {
-                return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
+                return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.of(XmlNetconfConstants
+                        .URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
             }
             return (Element) transformNormalizedNode(document, result.getResult(), rpcDefinition.getOutput().getPath());
         } catch (final DOMRpcException e) {
@@ -180,9 +187,10 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         final Map<String, Attr> attributes = requestElement.getAttributes();
 
         final Element response = handle(document, operationElement, subsequentOperation);
-        final Element rpcReply = XmlUtil.createElement(document, XmlMappingConstants.RPC_REPLY_KEY, Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
+        final Element rpcReply = XmlUtil.createElement(document, XmlMappingConstants.RPC_REPLY_KEY, Optional.of(
+                XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
 
-        if(XmlElement.fromDomElement(response).hasNamespace()) {
+        if (XmlElement.fromDomElement(response).hasNamespace()) {
             rpcReply.appendChild(response);
         } else {
             final NodeList list = response.getChildNodes();
@@ -202,7 +210,8 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         return document;
     }
 
-    private Node transformNormalizedNode(final Document document, final NormalizedNode<?, ?> data, final SchemaPath rpcOutputPath) {
+    private Node transformNormalizedNode(final Document document, final NormalizedNode<?, ?> data, final SchemaPath
+            rpcOutputPath) {
         final DOMResult result = new DOMResult(document.createElement(XmlMappingConstants.RPC_REPLY_KEY));
 
         final XMLStreamWriter xmlWriter = getXmlStreamWriter(result);
@@ -232,7 +241,8 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         }
     }
 
-    private void writeRootElement(final XMLStreamWriter xmlWriter, final SchemaOrderedNormalizedNodeWriter nnWriter, final ContainerNode data) {
+    private void writeRootElement(final XMLStreamWriter xmlWriter, final SchemaOrderedNormalizedNodeWriter nnWriter,
+                                  final ContainerNode data) {
         try {
             final Collection<DataContainerChild<?, ?>> value = (Collection) data.getValue();
             nnWriter.write(value);
@@ -244,17 +254,18 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
     }
 
     /**
-     * Parses xml element rpc input into normalized node or null if rpc does not take any input
-     * @param oElement rpc xml element
-     * @param input input container schema node, or null if rpc does not take any input
+     * Parses xml element rpc input into normalized node or null if rpc does not take any input.
+     *
+     * @param element rpc xml element
+     * @param input    input container schema node, or null if rpc does not take any input
      * @return parsed rpc into normalized node, or null if input schema is null
      */
     @Nullable
-    private NormalizedNode<?, ?> rpcToNNode(final XmlElement oElement, @Nullable final ContainerSchemaNode input) {
+    private NormalizedNode<?, ?> rpcToNNode(final XmlElement element, @Nullable final ContainerSchemaNode input) {
         return input.getChildNodes().isEmpty() ? null : DomToNormalizedNodeParserFactory
                 .getInstance(DomUtils.defaultValueCodecProvider(), schemaContext.getCurrentContext())
                 .getContainerNodeParser()
-                .parse(Collections.singletonList(oElement.getDomElement()), input);
+                .parse(Collections.singletonList(element.getDomElement()), input);
     }
 
 }

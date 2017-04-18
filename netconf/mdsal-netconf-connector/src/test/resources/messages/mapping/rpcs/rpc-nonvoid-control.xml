@@ -7,7 +7,7 @@
   -->
 
 <rpc-reply message-id="2"
-     xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+           xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
     <test-string xmlns="urn:opendaylight:mdsal:mapping:rpc:test">
         test rpc input string 1
     </test-string>

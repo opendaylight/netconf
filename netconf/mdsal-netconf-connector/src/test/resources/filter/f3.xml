@@ -1,12 +1,12 @@
 <mainroot xmlns="urn:dummy:mod-0">
-        <choiceList>
-            <choice-leaf>
-                aaa
-            </choice-leaf>
-        </choiceList>
-        <choiceList>
-            <choice-leaf>
-                bbb
-            </choice-leaf>
-        </choiceList>
+    <choiceList>
+        <choice-leaf>
+            aaa
+        </choice-leaf>
+    </choiceList>
+    <choiceList>
+        <choice-leaf>
+            bbb
+        </choice-leaf>
+    </choiceList>
 </mainroot>

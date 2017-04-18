@@ -36,7 +36,8 @@ public class Commit extends AbstractSingletonNetconfOperation {
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
+            throws DocumentedException {
 
         boolean commitStatus = transactionProvider.commitTransaction();
         LOG.trace("Commit completed successfully {}", commitStatus);

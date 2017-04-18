@@ -16,7 +16,8 @@
         </test-option>
         <default-operation>none</default-operation>
         <config>
-            <mapping-nodes xmlns="urn:opendaylight:mdsal:mapping:test" xmlns:a="urn:ietf:params:xml:ns:netconf:base:1.0" a:operation="create">
+            <mapping-nodes xmlns="urn:opendaylight:mdsal:mapping:test" xmlns:a="urn:ietf:params:xml:ns:netconf:base:1.0"
+                           a:operation="create">
                 <mapping-node>
                     <id>node1-put</id>
                     <content>put content</content>

@@ -36,13 +36,15 @@ public class Get extends AbstractGet {
     private static final String OPERATION_NAME = "get";
     private final TransactionProvider transactionProvider;
 
-    public Get(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext, final TransactionProvider transactionProvider) {
+    public Get(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext, final
+        TransactionProvider transactionProvider) {
         super(netconfSessionIdForReporting, schemaContext);
         this.transactionProvider = transactionProvider;
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
+            throws DocumentedException {
 
         final Optional<YangInstanceIdentifier> dataRootOptional = getDataRootFromFilter(operationElement);
         if (!dataRootOptional.isPresent()) {
@@ -53,7 +55,8 @@ public class Get extends AbstractGet {
 
         final DOMDataReadWriteTransaction rwTx = getTransaction(Datastore.running);
         try {
-            final Optional<NormalizedNode<?, ?>> normalizedNodeOptional = rwTx.read(LogicalDatastoreType.OPERATIONAL, dataRoot).checkedGet();
+            final Optional<NormalizedNode<?, ?>> normalizedNodeOptional = rwTx.read(LogicalDatastoreType.OPERATIONAL,
+                    dataRoot).checkedGet();
             transactionProvider.abortRunningTransaction(rwTx);
 
             if (!normalizedNodeOptional.isPresent()) {
@@ -73,7 +76,8 @@ public class Get extends AbstractGet {
         } else if (datastore == Datastore.running) {
             return transactionProvider.createRunningTransaction();
         }
-        throw new DocumentedException("Incorrect Datastore: ", ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT, ErrorSeverity.ERROR);
+        throw new DocumentedException("Incorrect Datastore: ", ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT,
+                ErrorSeverity.ERROR);
     }
 
     @Override

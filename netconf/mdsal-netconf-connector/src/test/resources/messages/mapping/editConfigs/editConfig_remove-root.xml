@@ -7,17 +7,18 @@
   -->
 
 <rpc message-id="a" a="64" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
-<edit-config>
-    <target>
-        <candidate/>
-    </target>
-    <test-option>
-        set
-    </test-option>
-    <default-operation>none</default-operation>
-    <config>
-        <mapping-nodes xmlns="urn:opendaylight:mdsal:mapping:test" xmlns:a="urn:ietf:params:xml:ns:netconf:base:1.0" a:operation="remove">
-        </mapping-nodes>
-    </config>
-</edit-config>
+    <edit-config>
+        <target>
+            <candidate/>
+        </target>
+        <test-option>
+            set
+        </test-option>
+        <default-operation>none</default-operation>
+        <config>
+            <mapping-nodes xmlns="urn:opendaylight:mdsal:mapping:test" xmlns:a="urn:ietf:params:xml:ns:netconf:base:1.0"
+                           a:operation="remove">
+            </mapping-nodes>
+        </config>
+    </edit-config>
 </rpc>
