@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_17ba0ec0",
+        "filename": "netconf/aaa-authn-odl-plugin/src/main/java/org/opendaylight/aaa/odl/CredentialServiceAuthProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-18T11:54:03Z",
+      "side": 1,
+      "message": "rename to LOG, the common name used for logger in odl is LOG.",
+      "range": {
+        "startLine": 28,
+        "startChar": 32,
+        "endLine": 28,
+        "endChar": 38
+      },
+      "revId": "475c6c9b76c0abfe96827b53db0bbace1317191e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_d771a645",
+        "filename": "netconf/aaa-authn-odl-plugin/src/main/java/org/opendaylight/aaa/odl/CredentialServiceAuthProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-18T11:54:03Z",
+      "side": 1,
+      "message": "Invoked i guess.",
+      "range": {
+        "startLine": 95,
+        "startChar": 7,
+        "endLine": 95,
+        "endChar": 13
+      },
+      "revId": "475c6c9b76c0abfe96827b53db0bbace1317191e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_779a7a64",
+        "filename": "netconf/aaa-authn-odl-plugin/src/main/java/org/opendaylight/aaa/odl/CredentialServiceAuthProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-18T11:54:03Z",
+      "side": 1,
+      "message": "why suppress? this can be package-private",
+      "range": {
+        "startLine": 107,
+        "startChar": 8,
+        "endLine": 108,
+        "endChar": 14
+      },
+      "revId": "475c6c9b76c0abfe96827b53db0bbace1317191e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
