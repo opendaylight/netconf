@@ -86,7 +86,7 @@ public class NetconfTopologyManagerTest {
 
         netconfTopologyManager = new NetconfTopologyManager(dataBroker, rpcProviderRegistry,
                 clusterSingletonServiceProvider, bindingAwareBroker, keepaliveExecutor, processingExecutor, domBroker,
-                actorSystemProvider, eventExecutor, clientDispatcher, topologyId);
+                actorSystemProvider, eventExecutor, clientDispatcher, topologyId, 0);
     }
     @Test
     public void testWriteConfiguration() throws Exception {
