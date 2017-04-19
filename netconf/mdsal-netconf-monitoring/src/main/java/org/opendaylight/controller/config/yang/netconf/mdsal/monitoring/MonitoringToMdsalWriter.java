@@ -52,11 +52,12 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMoni
     }
 
     /**
-     * Invoke using blueprint
+     * Invoked using blueprint.
      */
     @Override
     public void close() {
-        runTransaction((tx) -> tx.delete(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(NetconfState.class)));
+        runTransaction((tx) -> tx.delete(LogicalDatastoreType.OPERATIONAL,
+                InstanceIdentifier.create(NetconfState.class)));
     }
 
     @Override
@@ -80,7 +81,8 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMoni
 
     @Override
     public void onCapabilitiesChanged(Capabilities capabilities) {
-        runTransaction((tx) -> tx.put(LogicalDatastoreType.OPERATIONAL, CAPABILITIES_INSTANCE_IDENTIFIER, capabilities));
+        runTransaction((tx) -> tx.put(LogicalDatastoreType.OPERATIONAL, CAPABILITIES_INSTANCE_IDENTIFIER,
+                capabilities));
     }
 
     @Override
@@ -89,7 +91,7 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMoni
     }
 
     /**
-     * Invoke using blueprint
+     * Invoked using blueprint.
      */
     public void start() {
         serverMonitoringDependency.registerCapabilitiesListener(this);
@@ -107,8 +109,8 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMoni
             }
 
             @Override
-            public void onFailure(Throwable t) {
-                LOG.warn("Unable to update netconf state", t);
+            public void onFailure(Throwable throwable) {
+                LOG.warn("Unable to update netconf state", throwable);
             }
         });
     }
