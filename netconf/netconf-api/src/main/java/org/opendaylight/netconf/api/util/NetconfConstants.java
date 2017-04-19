@@ -13,7 +13,7 @@ import java.util.Set;
 
 /**
  * These constants mark operation service factories that are auto wired with netconf endpoint
- * for config subsystem
+ * for config subsystem.
  */
 public final class NetconfConstants {
     /*
@@ -25,5 +25,6 @@ public final class NetconfConstants {
     public static final String NETCONF_MONITORING = "ietf-netconf-monitoring";
     public static final String NETCONF_NOTIFICATION = "ietf-netconf-notifications";
 
-    public static final Set<String> CONFIG_SERVICE_MARKERS = Sets.newHashSet(SERVICE_NAME, CONFIG_NETCONF_CONNECTOR, NETCONF_MONITORING, NETCONF_NOTIFICATION);
+    public static final Set<String> CONFIG_SERVICE_MARKERS = Sets.newHashSet(SERVICE_NAME, CONFIG_NETCONF_CONNECTOR,
+            NETCONF_MONITORING, NETCONF_NOTIFICATION);
 }

@@ -18,12 +18,14 @@ public final class NetconfClientSessionPreferences extends NetconfSessionPrefere
     private final NetconfMessage startExiMessage;
 
     public NetconfClientSessionPreferences(final NetconfHelloMessage helloMessage,
-                                     final NetconfMessage startExiMessage) {
+                                           final NetconfMessage startExiMessage) {
         super(helloMessage);
         this.startExiMessage = startExiMessage;
     }
 
     /**
+     * Getter for {@code NetconfMessage}.
+     *
      * @return the startExiMessage
      */
     public NetconfMessage getStartExiMessage() {
