@@ -36,11 +36,12 @@ import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.Dom
 
 class EditOperationStrategyProvider extends DomToNormalizedNodeParserFactory.BuildingStrategyProvider {
 
-    private static final QName OPERATION_ATTRIBUTE = QName.create(EditConfigInput.QNAME.getNamespace(), null, XmlNetconfConstants.OPERATION_ATTR_KEY);
+    private static final QName OPERATION_ATTRIBUTE = QName.create(EditConfigInput.QNAME.getNamespace(), null,
+            XmlNetconfConstants.OPERATION_ATTR_KEY);
 
     private final DataTreeChangeTracker changeTracker;
 
-    public EditOperationStrategyProvider(final DataTreeChangeTracker changeTracker) {
+    EditOperationStrategyProvider(final DataTreeChangeTracker changeTracker) {
         this.changeTracker = changeTracker;
     }
 
@@ -60,27 +61,32 @@ class EditOperationStrategyProvider extends DomToNormalizedNodeParserFactory.Bui
     }
 
     @Override
-    protected ExtensibleParser.BuildingStrategy<YangInstanceIdentifier.NodeWithValue, LeafSetEntryNode<?>> forLeafSetEntry() {
+    protected ExtensibleParser.BuildingStrategy<YangInstanceIdentifier.NodeWithValue, LeafSetEntryNode<?>>
+        forLeafSetEntry() {
         return new NetconfOperationLeafSetEntryStrategy(changeTracker);
     }
 
     @Override
-    protected ExtensibleParser.BuildingStrategy<YangInstanceIdentifier.NodeIdentifierWithPredicates, MapEntryNode> forMapEntry() {
+    protected ExtensibleParser.BuildingStrategy<YangInstanceIdentifier.NodeIdentifierWithPredicates, MapEntryNode>
+        forMapEntry() {
         return new NetconfOperationContainerStrategy<>(changeTracker);
     }
 
     @Override
-    protected ExtensibleParser.BuildingStrategy<YangInstanceIdentifier.NodeIdentifier, OrderedMapNode> forOrderedList() {
+    protected ExtensibleParser
+            .BuildingStrategy<YangInstanceIdentifier.NodeIdentifier, OrderedMapNode> forOrderedList() {
         return new NetconfOperationCollectionStrategy<>(changeTracker);
     }
 
     @Override
-    protected ExtensibleParser.BuildingStrategy<YangInstanceIdentifier.NodeIdentifier, UnkeyedListEntryNode> forUnkeyedListEntry() {
+    protected ExtensibleParser.BuildingStrategy<YangInstanceIdentifier.NodeIdentifier, UnkeyedListEntryNode>
+        forUnkeyedListEntry() {
         return new NetconfOperationContainerStrategy<>(changeTracker);
     }
 
     @Override
-    protected ExtensibleParser.BuildingStrategy<YangInstanceIdentifier.NodeIdentifier, UnkeyedListNode> forUnkeyedList() {
+    protected ExtensibleParser.BuildingStrategy<YangInstanceIdentifier.NodeIdentifier, UnkeyedListNode>
+        forUnkeyedList() {
         return new NetconfOperationCollectionStrategy<>(changeTracker);
     }
 
@@ -90,14 +96,17 @@ class EditOperationStrategyProvider extends DomToNormalizedNodeParserFactory.Bui
     }
 
     @Override
-    public ExtensibleParser.BuildingStrategy<YangInstanceIdentifier.AugmentationIdentifier, AugmentationNode> forAugmentation() {
+    public ExtensibleParser.BuildingStrategy<YangInstanceIdentifier.AugmentationIdentifier, AugmentationNode>
+        forAugmentation() {
         return new NetconfOperationContainerStrategy<>(changeTracker);
     }
 
-    private static class NetconfOperationCollectionStrategy<N extends NormalizedNode<YangInstanceIdentifier.NodeIdentifier, ?>> implements ExtensibleParser.BuildingStrategy<YangInstanceIdentifier.NodeIdentifier, N> {
+    private static class NetconfOperationCollectionStrategy<N extends NormalizedNode<YangInstanceIdentifier
+            .NodeIdentifier, ?>> implements ExtensibleParser.BuildingStrategy<YangInstanceIdentifier.NodeIdentifier,
+            N> {
         private final DataTreeChangeTracker changeTracker;
 
-        public NetconfOperationCollectionStrategy(final DataTreeChangeTracker changeTracker) {
+        NetconfOperationCollectionStrategy(final DataTreeChangeTracker changeTracker) {
             this.changeTracker = changeTracker;
         }
 
@@ -109,41 +118,46 @@ class EditOperationStrategyProvider extends DomToNormalizedNodeParserFactory.Bui
         }
 
         @Override
-        public void prepareAttributes(final Map<QName, String> attributes, final NormalizedNodeBuilder<YangInstanceIdentifier.NodeIdentifier, ?, N> containerBuilder) {
+        public void prepareAttributes(final Map<QName, String> attributes,
+                          final NormalizedNodeBuilder<YangInstanceIdentifier.NodeIdentifier, ?, N> containerBuilder) {
             changeTracker.pushPath(containerBuilder.build().getIdentifier());
         }
     }
 
-    public static final class NetconfOperationLeafStrategy implements ExtensibleParser.BuildingStrategy<YangInstanceIdentifier.NodeIdentifier, LeafNode<?>> {
+    public static final class NetconfOperationLeafStrategy implements ExtensibleParser
+            .BuildingStrategy<YangInstanceIdentifier.NodeIdentifier, LeafNode<?>> {
 
         private final DataTreeChangeTracker dataTreeChangeTracker;
 
-        public NetconfOperationLeafStrategy(final DataTreeChangeTracker dataTreeChangeTracker) {
+        NetconfOperationLeafStrategy(final DataTreeChangeTracker dataTreeChangeTracker) {
             this.dataTreeChangeTracker = dataTreeChangeTracker;
         }
 
         @Nullable
         @Override
-        public LeafNode<?> build(final NormalizedNodeBuilder<YangInstanceIdentifier.NodeIdentifier, ?, LeafNode<?>> builder) {
+        public LeafNode<?> build(
+                final NormalizedNodeBuilder<YangInstanceIdentifier.NodeIdentifier, ?, LeafNode<?>> builder) {
             LeafNode<?> node = builder.build();
             String operation = (String) node.getAttributeValue(OPERATION_ATTRIBUTE);
             if (operation == null) {
                 return node;
             }
 
-            if(builder instanceof AttributesBuilder<?>) {
+            if (builder instanceof AttributesBuilder<?>) {
                 ((AttributesBuilder<?>) builder).withAttributes(Collections.<QName, String>emptyMap());
             }
 
             node = builder.build();
 
             ModifyAction action = ModifyAction.fromXmlValue(operation);
-            if (dataTreeChangeTracker.getDeleteOperationTracker() > 0 || dataTreeChangeTracker.getRemoveOperationTracker() > 0) {
+            if (dataTreeChangeTracker.getDeleteOperationTracker() > 0 || dataTreeChangeTracker
+                    .getRemoveOperationTracker() > 0) {
                 return node;
             } else {
                 if (!action.equals(dataTreeChangeTracker.peekAction())) {
                     dataTreeChangeTracker.pushPath(node.getIdentifier());
-                    dataTreeChangeTracker.addDataTreeChange(new DataTreeChangeTracker.DataTreeChange(node, action, new ArrayList<>(dataTreeChangeTracker.getCurrentPath())));
+                    dataTreeChangeTracker.addDataTreeChange(new DataTreeChangeTracker.DataTreeChange(node, action,
+                            new ArrayList<>(dataTreeChangeTracker.getCurrentPath())));
                     dataTreeChangeTracker.popPath();
                     return null;
                 } else {
@@ -153,22 +167,25 @@ class EditOperationStrategyProvider extends DomToNormalizedNodeParserFactory.Bui
         }
 
         @Override
-        public void prepareAttributes(final Map<QName, String> attributes, final NormalizedNodeBuilder<YangInstanceIdentifier.NodeIdentifier, ?, LeafNode<?>> containerBuilder) {
+        public void prepareAttributes(final Map<QName, String> attributes,
+                  final NormalizedNodeBuilder<YangInstanceIdentifier.NodeIdentifier, ?, LeafNode<?>> containerBuilder) {
             // Noop
         }
     }
 
-    public static final class NetconfOperationLeafSetEntryStrategy implements ExtensibleParser.BuildingStrategy<YangInstanceIdentifier.NodeWithValue, LeafSetEntryNode<?>> {
+    public static final class NetconfOperationLeafSetEntryStrategy implements ExtensibleParser
+            .BuildingStrategy<YangInstanceIdentifier.NodeWithValue, LeafSetEntryNode<?>> {
 
         private final DataTreeChangeTracker dataTreeChangeTracker;
 
-        public NetconfOperationLeafSetEntryStrategy(final DataTreeChangeTracker dataTreeChangeTracker) {
+        NetconfOperationLeafSetEntryStrategy(final DataTreeChangeTracker dataTreeChangeTracker) {
             this.dataTreeChangeTracker = dataTreeChangeTracker;
         }
 
         @Nullable
         @Override
-        public LeafSetEntryNode<?> build(final NormalizedNodeBuilder<YangInstanceIdentifier.NodeWithValue, ?, LeafSetEntryNode<?>> builder) {
+        public LeafSetEntryNode<?> build(
+                final NormalizedNodeBuilder<YangInstanceIdentifier.NodeWithValue, ?, LeafSetEntryNode<?>> builder) {
             LeafSetEntryNode<?> node = builder.build();
             String operation = (String) node.getAttributeValue(OPERATION_ATTRIBUTE);
             if (operation == null) {
@@ -182,12 +199,14 @@ class EditOperationStrategyProvider extends DomToNormalizedNodeParserFactory.Bui
             node = builder.build();
 
             ModifyAction action = ModifyAction.fromXmlValue(operation);
-            if (dataTreeChangeTracker.getDeleteOperationTracker() > 0 || dataTreeChangeTracker.getRemoveOperationTracker() > 0) {
+            if (dataTreeChangeTracker.getDeleteOperationTracker() > 0
+                    || dataTreeChangeTracker.getRemoveOperationTracker() > 0) {
                 return node;
             } else {
                 if (!action.equals(dataTreeChangeTracker.peekAction())) {
                     dataTreeChangeTracker.pushPath(node.getIdentifier());
-                    dataTreeChangeTracker.addDataTreeChange(new DataTreeChangeTracker.DataTreeChange(node, action, new ArrayList<>(dataTreeChangeTracker.getCurrentPath())));
+                    dataTreeChangeTracker.addDataTreeChange(new DataTreeChangeTracker.DataTreeChange(node, action,
+                            new ArrayList<>(dataTreeChangeTracker.getCurrentPath())));
                     dataTreeChangeTracker.popPath();
                     return null;
                 } else {
@@ -197,16 +216,19 @@ class EditOperationStrategyProvider extends DomToNormalizedNodeParserFactory.Bui
         }
 
         @Override
-        public void prepareAttributes(final Map<QName, String> attributes, final NormalizedNodeBuilder<YangInstanceIdentifier.NodeWithValue, ?, LeafSetEntryNode<?>> containerBuilder) {
+        public void prepareAttributes(final Map<QName, String> attributes,
+                              final NormalizedNodeBuilder
+                                      <YangInstanceIdentifier.NodeWithValue, ?, LeafSetEntryNode<?>> containerBuilder) {
 
         }
     }
 
-    public static final class NetconfOperationContainerStrategy<P extends YangInstanceIdentifier.PathArgument, N extends DataContainerNode<P>> implements ExtensibleParser.BuildingStrategy<P, N> {
+    public static final class NetconfOperationContainerStrategy<P extends YangInstanceIdentifier.PathArgument, N
+            extends DataContainerNode<P>> implements ExtensibleParser.BuildingStrategy<P, N> {
 
         private final DataTreeChangeTracker dataTreeChangeTracker;
 
-        public NetconfOperationContainerStrategy(final DataTreeChangeTracker dataTreeChangeTracker) {
+        NetconfOperationContainerStrategy(final DataTreeChangeTracker dataTreeChangeTracker) {
             this.dataTreeChangeTracker = dataTreeChangeTracker;
         }
 
@@ -221,14 +243,16 @@ class EditOperationStrategyProvider extends DomToNormalizedNodeParserFactory.Bui
             final ModifyAction currentAction = dataTreeChangeTracker.popAction();
 
             //if we know that we are going to delete a parent node just complete the entire subtree
-            if (dataTreeChangeTracker.getDeleteOperationTracker() > 0 || dataTreeChangeTracker.getRemoveOperationTracker() > 0) {
+            if (dataTreeChangeTracker.getDeleteOperationTracker() > 0
+                    || dataTreeChangeTracker.getRemoveOperationTracker() > 0) {
                 dataTreeChangeTracker.popPath();
                 return node;
             } else {
                 //if parent and current actions dont match create a DataTreeChange and add it to the change list
                 //dont add a new child to the parent node
                 if (!currentAction.equals(dataTreeChangeTracker.peekAction())) {
-                    dataTreeChangeTracker.addDataTreeChange(new DataTreeChangeTracker.DataTreeChange(node, currentAction, new ArrayList<>(dataTreeChangeTracker.getCurrentPath())));
+                    dataTreeChangeTracker.addDataTreeChange(new DataTreeChangeTracker.DataTreeChange(node,
+                            currentAction, new ArrayList<>(dataTreeChangeTracker.getCurrentPath())));
                     dataTreeChangeTracker.popPath();
                     return null;
                 } else {
@@ -239,7 +263,8 @@ class EditOperationStrategyProvider extends DomToNormalizedNodeParserFactory.Bui
         }
 
         @Override
-        public void prepareAttributes(final Map<QName, String> attributes, final NormalizedNodeBuilder<P, ?, N> containerBuilder) {
+        public void prepareAttributes(final Map<QName, String> attributes, final NormalizedNodeBuilder<P, ?, N>
+                containerBuilder) {
             dataTreeChangeTracker.pushPath(containerBuilder.build().getIdentifier());
             final String operation = attributes.get(OPERATION_ATTRIBUTE);
             if (operation != null) {

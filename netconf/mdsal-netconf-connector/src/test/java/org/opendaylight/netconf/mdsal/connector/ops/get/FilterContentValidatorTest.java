@@ -54,7 +54,8 @@ public class FilterContentValidatorTest {
     private FilterContentValidator validator;
 
     @Parameterized.Parameters
-    public static Collection<Object[]> data() throws IOException, SAXException, URISyntaxException, InitializationError {
+    public static Collection<Object[]> data() throws IOException, SAXException, URISyntaxException,
+            InitializationError {
         final List<Object[]> result = new ArrayList<>();
         final Path path = Paths.get(FilterContentValidatorTest.class.getResource("/filter/expected.txt").toURI());
         final List<String> expected = Files.readAllLines(path);
@@ -62,8 +63,9 @@ public class FilterContentValidatorTest {
             throw new InitializationError("Number of lines in results file must be same as test case count");
         }
         for (int i = 1; i <= TEST_CASE_COUNT; i++) {
-            final Document document = XmlUtil.readXmlToDocument(FilterContentValidatorTest.class.getResourceAsStream("/filter/f" + i + ".xml"));
-            result.add(new Object[]{document, expected.get(i-1)});
+            final Document document = XmlUtil.readXmlToDocument(FilterContentValidatorTest.class.getResourceAsStream(
+                    "/filter/f" + i + ".xml"));
+            result.add(new Object[]{document, expected.get(i - 1)});
         }
         return result;
     }
@@ -84,6 +86,7 @@ public class FilterContentValidatorTest {
         validator = new FilterContentValidator(currentContext);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Test
     public void testValidate() throws Exception {
         if (expected.startsWith("success")) {
@@ -141,12 +144,12 @@ public class FilterContentValidatorTest {
         return prev;
     }
 
-    private static QName createNodeQName(final QName prev, final String qNameString) {
-        final QName qName = QName.create(qNameString);
+    private static QName createNodeQName(final QName prev, final String qualifiedNameString) {
+        final QName qName = QName.create(qualifiedNameString);
         if (qName.getModule().getNamespace() != null) {
             return qName;
         } else {
-            return QName.create(Preconditions.checkNotNull(prev), qNameString);
+            return QName.create(Preconditions.checkNotNull(prev), qualifiedNameString);
         }
     }
 }
