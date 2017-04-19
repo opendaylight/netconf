@@ -1,0 +1,8 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+1: Ivan Hrasko <ivan.hrasko@pantheon.tech>
+Code-Review+2: Jakub Morvay <jmorvay@cisco.com>
+Submitted-by: Jakub Morvay <jmorvay@cisco.com>
+Submitted-at: Wed, 19 Apr 2017 14:01:51 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/55205
+Project: netconf
+Branch: refs/heads/stable/carbon
