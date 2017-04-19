@@ -35,6 +35,10 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
     <reference id="clientDispatcherDependency"
                interface="org.opendaylight.netconf.client.NetconfClientDispatcher"
                odl:type="netconf-client-dispatcher"/>
+    <odl:clustered-app-config
+            id="singletonConfig"
+            binding-class="org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.Config"
+    />
 
     <bean id="netconfTopologyManager"
           class="org.opendaylight.netconf.topology.singleton.impl.NetconfTopologyManager"
@@ -50,7 +54,7 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
         <argument ref="eventExecutor"/>
         <argument ref="clientDispatcherDependency"/>
         <argument value="topology-netconf"/>
-        <argument value="0"/>
+        <argument ref="singletonConfig"/>
     </bean>
     <service ref="netconfTopologyManager"
              interface="org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService"/>
