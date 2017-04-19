@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Listens for updates on global schema context, transforms context to ietf-yang-library:modules-state and
- * writes this state to operational data store
+ * writes this state to operational data store.
  */
 // TODO Implement also yang-library-change notfication
 public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCloseable {
@@ -66,7 +66,7 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCl
     }
 
     /**
-     * Invoke by blueprint
+     * Invoked by blueprint.
      */
     public void start() {
         schemaService.registerSchemaContextListener(this);
@@ -88,25 +88,28 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCl
             }
 
             @Override
-            public void onFailure(final Throwable t) {
-                LOG.warn("Failed to update modules state", t);
+            public void onFailure(final Throwable throwable) {
+                LOG.warn("Failed to update modules state", throwable);
             }
         });
     }
 
     private ModulesState createModuleStateFromModules(final Set<Module> modules) {
         final ModulesStateBuilder modulesStateBuilder = new ModulesStateBuilder();
-        final List<org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.Module> moduleList =
+        final List<org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list
+                .Module> moduleList =
                 Lists.newArrayList();
 
         for (final Module module : modules) {
             moduleList.add(createModuleEntryFromModule(module));
         }
 
-        return modulesStateBuilder.setModule(moduleList).setModuleSetId(String.valueOf(moduleSetId.getAndIncrement())).build();
+        return modulesStateBuilder.setModule(moduleList).setModuleSetId(String.valueOf(moduleSetId.getAndIncrement()))
+                .build();
     }
 
-    private org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.Module createModuleEntryFromModule(final Module module) {
+    private org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.Module
+        createModuleEntryFromModule(final Module module) {
         final ModuleBuilder moduleBuilder = new ModuleBuilder();
 
         // TODO Conformance type is always set to Implement value, but it should it really be like this?
@@ -129,6 +132,6 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCl
             submodulesList.add(subModuleEntryBuilder.build());
         }
 
-        return  new SubmodulesBuilder().setSubmodule(submodulesList).build();
+        return new SubmodulesBuilder().setSubmodule(submodulesList).build();
     }
 }
