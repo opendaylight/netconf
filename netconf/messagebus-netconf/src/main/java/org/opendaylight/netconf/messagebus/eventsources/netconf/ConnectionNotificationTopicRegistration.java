@@ -39,18 +39,18 @@ class ConnectionNotificationTopicRegistration extends NotificationTopicRegistrat
     private static final Logger LOG = LoggerFactory.getLogger(ConnectionNotificationTopicRegistration.class);
 
     public static final SchemaPath EVENT_SOURCE_STATUS_PATH = SchemaPath
-        .create(true, QName.create(EventSourceStatusNotification.QNAME, "event-source-status"));
+            .create(true, QName.create(EventSourceStatusNotification.QNAME, "event-source-status"));
     private static final NodeIdentifier EVENT_SOURCE_STATUS_ARG = NodeIdentifier.create(
-        EventSourceStatusNotification.QNAME);
+            EventSourceStatusNotification.QNAME);
     private static final String XMLNS_ATTRIBUTE_KEY = "xmlns";
     private static final String XMLNS_URI = "http://www.w3.org/2000/xmlns/";
 
     private final DOMNotificationListener domNotificationListener;
 
-    public ConnectionNotificationTopicRegistration(final String SourceName,
-            final DOMNotificationListener domNotificationListener) {
-        super(NotificationSourceType.ConnectionStatusChange, SourceName,
-            EVENT_SOURCE_STATUS_PATH.getLastComponent().getNamespace().toString());
+    ConnectionNotificationTopicRegistration(final String sourceName,
+                                                   final DOMNotificationListener domNotificationListener) {
+        super(NotificationSourceType.ConnectionStatusChange, sourceName,
+                EVENT_SOURCE_STATUS_PATH.getLastComponent().getNamespace().toString());
         this.domNotificationListener = Preconditions.checkNotNull(domNotificationListener);
         LOG.info("Connection notification source has been initialized.");
         setActive(true);
@@ -117,20 +117,22 @@ class ConnectionNotificationTopicRegistration extends NotificationTopicRegistrat
     private void publishNotification(final EventSourceStatus eventSourceStatus) {
 
         final EventSourceStatusNotification notification = new EventSourceStatusNotificationBuilder()
-            .setStatus(eventSourceStatus).build();
+                .setStatus(eventSourceStatus).build();
         domNotificationListener.onNotification(createNotification(notification));
     }
 
     private static DOMNotification createNotification(final EventSourceStatusNotification notification) {
         final ContainerNode cn = Builders.containerBuilder().withNodeIdentifier(EVENT_SOURCE_STATUS_ARG)
-            .withChild(encapsulate(notification)).build();
+                .withChild(encapsulate(notification)).build();
         DOMNotification dn = new DOMNotification() {
 
-            @Override public SchemaPath getType() {
+            @Override
+            public SchemaPath getType() {
                 return EVENT_SOURCE_STATUS_PATH;
             }
 
-            @Override public ContainerNode getBody() {
+            @Override
+            public ContainerNode getBody() {
                 return cn;
             }
         };
@@ -148,14 +150,14 @@ class ConnectionNotificationTopicRegistration extends NotificationTopicRegistrat
         rootElement.appendChild(sourceElement);
 
         return Builders.anyXmlBuilder().withNodeIdentifier(EVENT_SOURCE_STATUS_ARG)
-            .withValue(new DOMSource(rootElement)).build();
+                .withValue(new DOMSource(rootElement)).build();
     }
 
     // Helper to create root XML element with correct namespace and attribute
-    private static Element createElement(final Document document, final String qName,
-            final Optional<String> namespaceURI) {
+    private static Element createElement(final Document document, final String qualifiedName,
+                                         final Optional<String> namespaceURI) {
         if (namespaceURI.isPresent()) {
-            final Element element = document.createElementNS(namespaceURI.get(), qName);
+            final Element element = document.createElementNS(namespaceURI.get(), qualifiedName);
             String name = XMLNS_ATTRIBUTE_KEY;
             if (element.getPrefix() != null) {
                 name += ":" + element.getPrefix();
@@ -163,6 +165,6 @@ class ConnectionNotificationTopicRegistration extends NotificationTopicRegistrat
             element.setAttributeNS(XMLNS_URI, name, namespaceURI.get());
             return element;
         }
-        return document.createElement(qName);
+        return document.createElement(qualifiedName);
     }
 }

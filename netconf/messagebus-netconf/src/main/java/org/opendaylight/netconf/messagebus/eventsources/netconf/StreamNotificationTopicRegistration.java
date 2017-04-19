@@ -32,17 +32,19 @@ class StreamNotificationTopicRegistration extends NotificationTopicRegistration 
     private final String nodeId;
     private final NetconfEventSource netconfEventSource;
     private final NetconfEventSourceMount mountPoint;
-    private final ConcurrentHashMap<SchemaPath, ListenerRegistration<DOMNotificationListener>> notificationRegistrationMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<SchemaPath, ListenerRegistration<DOMNotificationListener>>
+            notificationRegistrationMap = new ConcurrentHashMap<>();
     private final Stream stream;
 
     /**
      * Creates registration to notification stream.
-     * @param stream stream
+     *
+     * @param stream             stream
      * @param notificationPrefix notifications namespace
      * @param netconfEventSource event source
      */
-    public StreamNotificationTopicRegistration(final Stream stream, final String notificationPrefix,
-        NetconfEventSource netconfEventSource) {
+    StreamNotificationTopicRegistration(final Stream stream, final String notificationPrefix,
+                                               NetconfEventSource netconfEventSource) {
         super(NotificationSourceType.NetconfDeviceStream, stream.getName().getValue(), notificationPrefix);
         this.netconfEventSource = netconfEventSource;
         this.mountPoint = netconfEventSource.getMount();
@@ -73,7 +75,8 @@ class StreamNotificationTopicRegistration extends NotificationTopicRegistration 
     }
 
     /**
-     * Subscribes to notification stream associated with this registration. If replay is supported, notifications from last
+     * Subscribes to notification stream associated with this registration. If replay is supported, notifications
+     * from last
      * received event time will be requested.
      */
     void reActivateNotificationSource() {
@@ -91,7 +94,8 @@ class StreamNotificationTopicRegistration extends NotificationTopicRegistration 
         }
     }
 
-    @Override void deActivateNotificationSource() {
+    @Override
+    void deActivateNotificationSource() {
         // no operations need
     }
 
@@ -110,7 +114,8 @@ class StreamNotificationTopicRegistration extends NotificationTopicRegistration 
         return getSourceName();
     }
 
-    @Override boolean registerNotificationTopic(SchemaPath notificationPath, TopicId topicId) {
+    @Override
+    boolean registerNotificationTopic(SchemaPath notificationPath, TopicId topicId) {
         if (!checkNotificationPath(notificationPath)) {
             LOG.debug("Bad SchemaPath for notification try to register");
             return false;
@@ -119,11 +124,12 @@ class StreamNotificationTopicRegistration extends NotificationTopicRegistration 
         activateNotificationSource();
         if (!isActive()) {
             LOG.warn("Stream {} is not active, listener for notification {} is not registered.", getStreamName(),
-                notificationPath.toString());
+                    notificationPath.toString());
             return false;
         }
 
-        ListenerRegistration<DOMNotificationListener> registration = mountPoint.registerNotificationListener(netconfEventSource, notificationPath);
+        ListenerRegistration<DOMNotificationListener> registration =
+                mountPoint.registerNotificationListener(netconfEventSource, notificationPath);
         notificationRegistrationMap.put(notificationPath, registration);
         Set<TopicId> topicIds = getTopicsForNotification(notificationPath);
         topicIds.add(topicId);
@@ -132,7 +138,8 @@ class StreamNotificationTopicRegistration extends NotificationTopicRegistration 
         return true;
     }
 
-    @Override synchronized void unRegisterNotificationTopic(TopicId topicId) {
+    @Override
+    synchronized void unRegisterNotificationTopic(TopicId topicId) {
         List<SchemaPath> notificationPathToRemove = new ArrayList<>();
         for (SchemaPath notifKey : notificationTopicMap.keySet()) {
             Set<TopicId> topicList = notificationTopicMap.get(notifKey);
@@ -152,7 +159,8 @@ class StreamNotificationTopicRegistration extends NotificationTopicRegistration 
         }
     }
 
-    @Override public void close() throws Exception {
+    @Override
+    public void close() throws Exception {
         closeStream();
     }
 
