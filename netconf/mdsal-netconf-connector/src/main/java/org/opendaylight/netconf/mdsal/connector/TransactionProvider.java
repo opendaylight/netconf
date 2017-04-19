@@ -23,7 +23,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TransactionProvider implements AutoCloseable{
+public class TransactionProvider implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransactionProvider.class);
 
@@ -35,7 +35,7 @@ public class TransactionProvider implements AutoCloseable{
 
     private final String netconfSessionIdForReporting;
 
-    private static final String  NO_TRANSACTION_FOUND_FOR_SESSION = "No candidateTransaction found for session ";
+    private static final String NO_TRANSACTION_FOUND_FOR_SESSION = "No candidateTransaction found for session ";
 
 
     public TransactionProvider(final DOMDataBroker dataBroker, final String netconfSessionIdForReporting) {
@@ -83,8 +83,8 @@ public class TransactionProvider implements AutoCloseable{
         } catch (final TransactionCommitFailedException e) {
             LOG.debug("Transaction {} failed on", candidateTransaction, e);
             final String cause = e.getCause() != null ? (" Cause: " + e.getCause().getMessage()) : "";
-            throw new DocumentedException("Transaction commit failed on " + e.getMessage() + " " + netconfSessionIdForReporting +
-                    cause,
+            throw new DocumentedException("Transaction commit failed on " + e.getMessage() + " "
+                    + netconfSessionIdForReporting + cause,
                     ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         } finally {
             allOpenReadWriteTransactions.remove(candidateTransaction);
@@ -98,7 +98,7 @@ public class TransactionProvider implements AutoCloseable{
         LOG.debug("Aborting current candidateTransaction");
         final Optional<DOMDataReadWriteTransaction> otx = getCandidateTransaction();
         if (!otx.isPresent()) {
-            LOG.warn("discard-changes triggerd on an empty transaction for session: {}", netconfSessionIdForReporting );
+            LOG.warn("discard-changes triggerd on an empty transaction for session: {}", netconfSessionIdForReporting);
             return;
         }
         candidateTransaction.cancel();
@@ -114,7 +114,8 @@ public class TransactionProvider implements AutoCloseable{
 
     public synchronized void abortRunningTransaction(final DOMDataReadWriteTransaction tx) {
         LOG.debug("Aborting current running Transaction");
-        Preconditions.checkState(runningTransaction != null, NO_TRANSACTION_FOUND_FOR_SESSION + netconfSessionIdForReporting);
+        Preconditions.checkState(runningTransaction != null, NO_TRANSACTION_FOUND_FOR_SESSION
+                + netconfSessionIdForReporting);
         tx.cancel();
         allOpenReadWriteTransactions.remove(tx);
     }
