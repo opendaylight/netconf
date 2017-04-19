@@ -24,7 +24,8 @@ public class NetconfNotificationOperationServiceFactory implements NetconfOperat
     private final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener;
 
     public NetconfNotificationOperationServiceFactory(final NetconfNotificationRegistry netconfNotificationRegistry,
-                                                      final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener) {
+                                                      final NetconfOperationServiceFactoryListener
+                                                              netconfOperationServiceFactoryListener) {
         this.netconfNotificationRegistry = netconfNotificationRegistry;
         this.netconfOperationServiceFactoryListener = netconfOperationServiceFactoryListener;
 
@@ -34,8 +35,10 @@ public class NetconfNotificationOperationServiceFactory implements NetconfOperat
     @Override
     public Set<Capability> getCapabilities() {
         // TODO
-        // No capabilities exposed to prevent clashes with schemas from config-netconf-connector (it exposes all the schemas)
-        // If the schemas exposed by config-netconf-connector are filtered, this class would expose monitoring related models
+        // No capabilities exposed to prevent clashes with schemas from
+        // config-netconf-connector (it exposes all the schemas)
+        // If the schemas exposed by config-netconf-connector are filtered,
+        // this class would expose monitoring related models
         return Collections.emptySet();
     }
 

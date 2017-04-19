@@ -26,14 +26,18 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Listens on changes in NetconfState/Sessions/Session datastore and publishes them
+ * Listens on changes in NetconfState/Sessions/Session datastore and publishes them.
  */
 public class SessionNotificationProducer extends OperationalDatastoreListener<Session> {
 
     private static final InstanceIdentifier<Session> SESSION_INSTANCE_IDENTIFIER =
             InstanceIdentifier.create(NetconfState.class).child(Sessions.class).child(Session.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SessionNotificationProducer.class);
+
 
     private final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
     private final ListenerRegistration sessionListenerRegistration;
@@ -46,6 +50,7 @@ public class SessionNotificationProducer extends OperationalDatastoreListener<Se
         this.sessionListenerRegistration = registerOnChanges(dataBroker);
     }
 
+    @SuppressWarnings("checkstyle:MissingSwitchDefault")
     @Override
     public void onDataTreeChanged(@Nonnull Collection<DataTreeModification<Session>> changes) {
         for (DataTreeModification<Session> change : changes) {
@@ -64,6 +69,8 @@ public class SessionNotificationProducer extends OperationalDatastoreListener<Se
                         publishEndedSession(removed);
                     }
                     break;
+                default:
+                    LOG.info("Received intentionally unhandled type: {}.", modificationType);
             }
         }
     }
@@ -92,7 +99,7 @@ public class SessionNotificationProducer extends OperationalDatastoreListener<Se
 
 
     /**
-     * Invoke by blueprint
+     * Invoked by blueprint.
      */
     public void close() {
         if (baseNotificationPublisherRegistration != null) {

@@ -60,19 +60,24 @@ public class CapabilityChangeNotificationProducerTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        doReturn(listenerRegistration).when(dataBroker).registerDataTreeChangeListener(any(DataTreeIdentifier.class), any(DataTreeChangeListener.class));
+        doReturn(listenerRegistration).when(dataBroker).registerDataTreeChangeListener(any(DataTreeIdentifier.class),
+                any(DataTreeChangeListener.class));
 
         doNothing().when(baseNotificationPublisherRegistration).onCapabilityChanged(any(NetconfCapabilityChange.class));
 
-        doReturn(baseNotificationPublisherRegistration).when(netconfNotificationCollector).registerBaseNotificationPublisher();
+        doReturn(baseNotificationPublisherRegistration).when(netconfNotificationCollector)
+                .registerBaseNotificationPublisher();
 
-        capabilityChangeNotificationProducer = new CapabilityChangeNotificationProducer(netconfNotificationCollector, dataBroker);
+        capabilityChangeNotificationProducer = new CapabilityChangeNotificationProducer(netconfNotificationCollector,
+                dataBroker);
     }
 
     @Test
     public void testOnDataChangedCreate() {
-        final InstanceIdentifier capabilitiesIdentifier = InstanceIdentifier.create(NetconfState.class).child(Capabilities.class).builder().build();
-        final List<Uri> newCapabilitiesList = Lists.newArrayList(new Uri("newCapability"), new Uri("createdCapability"));
+        final InstanceIdentifier capabilitiesIdentifier =
+                InstanceIdentifier.create(NetconfState.class).child(Capabilities.class).builder().build();
+        final List<Uri> newCapabilitiesList =
+                Lists.newArrayList(new Uri("newCapability"), new Uri("createdCapability"));
         Capabilities newCapabilities = new CapabilitiesBuilder().setCapability(newCapabilitiesList).build();
         Map<InstanceIdentifier<?>, DataObject> createdData = Maps.newHashMap();
         createdData.put(capabilitiesIdentifier, newCapabilities);
@@ -82,12 +87,16 @@ public class CapabilityChangeNotificationProducerTest {
 
     @Test
     public void testOnDataChangedUpdate() {
-        final List<Uri> originalCapabilitiesList = Lists.newArrayList(new Uri("originalCapability"), new Uri("anotherOriginalCapability"));
-        final List<Uri> updatedCapabilitiesList = Lists.newArrayList(new Uri("originalCapability"), new Uri("newCapability"));
+        final List<Uri> originalCapabilitiesList =
+                Lists.newArrayList(new Uri("originalCapability"), new Uri("anotherOriginalCapability"));
+        final List<Uri> updatedCapabilitiesList =
+                Lists.newArrayList(new Uri("originalCapability"), new Uri("newCapability"));
         Capabilities originalCapabilities = new CapabilitiesBuilder().setCapability(originalCapabilitiesList).build();
         Capabilities updatedCapabilities = new CapabilitiesBuilder().setCapability(updatedCapabilitiesList).build();
-        verifyDataTreeChange(DataObjectModification.ModificationType.WRITE, originalCapabilities, updatedCapabilities, changedCapabilitesFrom(
-                Lists.newArrayList(new Uri("newCapability")), Lists.newArrayList(new Uri("anotherOriginalCapability"))));
+        verifyDataTreeChange(DataObjectModification.ModificationType.WRITE, originalCapabilities,
+                updatedCapabilities, changedCapabilitesFrom(
+                Lists.newArrayList(new Uri("newCapability")), Lists.newArrayList(new Uri("anotherOriginalCapability")
+                        )));
     }
 
     @Test

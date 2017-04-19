@@ -30,7 +30,8 @@ import org.slf4j.LoggerFactory;
  * Listens on changes in netconf notification stream availability and writes
  * changes to the data store.
  */
-public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNotificationCollector.NetconfNotificationStreamListener {
+public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNotificationCollector
+        .NetconfNotificationStreamListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(NotificationToMdsalWriter.class);
 
@@ -52,7 +53,7 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
 
         Futures.addCallback(submit, new FutureCallback<Void>() {
             @Override
-            public void onSuccess(Void aVoid) {
+            public void onSuccess(Void avoid) {
                 LOG.debug("Streams cleared successfully");
             }
 
@@ -66,7 +67,7 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
     }
 
     /**
-     * Invoke by blueprint
+     * Invoked by blueprint.
      */
     public void start() {
         notificationRegistration = netconfNotificationCollector.registerStreamListener(this);
@@ -76,8 +77,8 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
     public void onStreamRegistered(Stream stream) {
         final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
 
-        final InstanceIdentifier streamIdentifier = InstanceIdentifier.create(Netconf.class).child(Streams.class).
-                builder().child(Stream.class, stream.getKey()).build();
+        final InstanceIdentifier streamIdentifier = InstanceIdentifier.create(Netconf.class).child(Streams.class)
+                .builder().child(Stream.class, stream.getKey()).build();
         tx.merge(LogicalDatastoreType.OPERATIONAL, streamIdentifier, stream, true);
 
         try {
@@ -93,8 +94,8 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
         final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
 
         final StreamKey streamKey = new StreamKey(stream);
-        final InstanceIdentifier streamIdentifier = InstanceIdentifier.create(Netconf.class).child(Streams.class).
-                builder().child(Stream.class, streamKey).build();
+        final InstanceIdentifier streamIdentifier = InstanceIdentifier.create(Netconf.class).child(Streams.class)
+                .builder().child(Stream.class, streamKey).build();
 
         tx.delete(LogicalDatastoreType.OPERATIONAL, streamIdentifier);
 
