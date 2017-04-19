@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
@@ -374,12 +375,14 @@ public final class ReadDataTransactionUtil {
      */
     private static @Nullable NormalizedNode<?, ?> readDataViaTransaction(
             @Nonnull final TransactionVarsWrapper transactionNode) {
-        final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> listenableFuture = transactionNode
-                .getTransactionChain().newReadOnlyTransaction().read(transactionNode.getLogicalDatastoreType(),
-                        transactionNode.getInstanceIdentifier().getInstanceIdentifier());
         final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
-        FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+        try (DOMDataReadOnlyTransaction tx = transactionNode.getTransactionChain().newReadOnlyTransaction()) {
+            final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> listenableFuture = tx.read(
+                transactionNode.getLogicalDatastoreType(),
+                transactionNode.getInstanceIdentifier().getInstanceIdentifier());
+            FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
                 dataFactory);
+        }
         return dataFactory.build();
     }
 

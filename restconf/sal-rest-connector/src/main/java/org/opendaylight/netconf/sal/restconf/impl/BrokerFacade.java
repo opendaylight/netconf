@@ -29,6 +29,7 @@ import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
@@ -131,7 +132,9 @@ public class BrokerFacade {
      */
     public NormalizedNode<?, ?> readConfigurationData(final YangInstanceIdentifier path, final String withDefa) {
         checkPreconditions();
-        return readDataViaTransaction(this.domDataBroker.newReadOnlyTransaction(), CONFIGURATION, path, withDefa);
+        try (DOMDataReadOnlyTransaction tx = this.domDataBroker.newReadOnlyTransaction()) {
+            return readDataViaTransaction(tx, CONFIGURATION, path, withDefa);
+        }
     }
 
     /**
@@ -163,8 +166,9 @@ public class BrokerFacade {
             final String withDefa) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
-            return readDataViaTransaction(domDataBrokerService.get().newReadOnlyTransaction(), CONFIGURATION, path,
-                    withDefa);
+            try (DOMDataReadOnlyTransaction tx = domDataBrokerService.get().newReadOnlyTransaction()) {
+                return readDataViaTransaction(tx, CONFIGURATION, path, withDefa);
+            }
         }
         final String errMsg = "DOM data broker service isn't available for mount point " + path;
         LOG.warn(errMsg);
@@ -180,7 +184,10 @@ public class BrokerFacade {
      */
     public NormalizedNode<?, ?> readOperationalData(final YangInstanceIdentifier path) {
         checkPreconditions();
-        return readDataViaTransaction(this.domDataBroker.newReadOnlyTransaction(), OPERATIONAL, path);
+
+        try (DOMDataReadOnlyTransaction tx = this.domDataBroker.newReadOnlyTransaction()) {
+            return readDataViaTransaction(tx, OPERATIONAL, path);
+        }
     }
 
     /**
@@ -195,7 +202,9 @@ public class BrokerFacade {
     public NormalizedNode<?, ?> readOperationalData(final DOMMountPoint mountPoint, final YangInstanceIdentifier path) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
-            return readDataViaTransaction(domDataBrokerService.get().newReadOnlyTransaction(), OPERATIONAL, path);
+            try (DOMDataReadOnlyTransaction tx = domDataBrokerService.get().newReadOnlyTransaction()) {
+                return readDataViaTransaction(tx, OPERATIONAL, path);
+            }
         }
         final String errMsg = "DOM data broker service isn't available for mount point " + path;
         LOG.warn(errMsg);
