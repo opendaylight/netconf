@@ -24,6 +24,7 @@ import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
@@ -62,20 +63,20 @@ public class Bug8084 {
         inputs.put(QName.create(base, "id10"), true);
         inputs.put(QName.create(base, "id11"), BigDecimal.valueOf(128.55));
         inputs.put(QName.create(base, "id12"), QName.create(base, "foo"));
-        inputs.put(QName.create(base, "id13"), QName.create("urn:opendaylight:mdsal:mapping:test", "2015-02-26", "foo"));
-        final QName idActual = (QName) ((YangInstanceIdentifier.NodeIdentifierWithPredicates) actual.getLastPathArgument()).
+        inputs.put(
+                QName.create(base, "id13"),
+                QName.create("urn:opendaylight:mdsal:mapping:test", "2015-02-26", "foo"));
+        final QName idActual = (QName) ((NodeIdentifierWithPredicates) actual.getLastPathArgument()).
                 getKeyValues().get(QName.create(base, "id12"));
-
 
         final YangInstanceIdentifier expected = YangInstanceIdentifier.builder()
                 .node(base)
                 .node(QName.create(base, "multi-key-list2"))
                 .nodeWithKey(QName.create(base, "multi-key-list2"), inputs)
                 .build();
-        final QName idExpected = (QName) ((YangInstanceIdentifier.NodeIdentifierWithPredicates) expected.getLastPathArgument()).
-                getKeyValues().get(QName.create(base, "id12"));
+        final QName idExpected = (QName) ((NodeIdentifierWithPredicates) expected.getLastPathArgument())
+                .getKeyValues().get(QName.create(base, "id12"));
         assertEquals(idExpected, idActual);
         assertEquals(expected, actual);
-
     }
 }
