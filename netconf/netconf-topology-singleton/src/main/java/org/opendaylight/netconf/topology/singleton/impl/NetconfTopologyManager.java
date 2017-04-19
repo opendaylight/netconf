@@ -16,6 +16,7 @@ import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
@@ -51,6 +52,7 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.concurrent.duration.Duration;
 
 public class NetconfTopologyManager
         implements ClusteredDataTreeChangeListener<Node>, NetconfTopologySingletonService, AutoCloseable {
@@ -74,13 +76,15 @@ public class NetconfTopologyManager
     private final EventExecutor eventExecutor;
     private final NetconfClientDispatcher clientDispatcher;
     private final String topologyId;
+    private final Duration writeTxIdleTimeout;
 
     public NetconfTopologyManager(final DataBroker dataBroker, final RpcProviderRegistry rpcProviderRegistry,
-                           final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
-                           final BindingAwareBroker bindingAwareBroker,
-                           final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
-                           final Broker domBroker, final ActorSystemProvider actorSystemProvider, final EventExecutor eventExecutor,
-                           final NetconfClientDispatcher clientDispatcher, final String topologyId) {
+                                  final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
+                                  final BindingAwareBroker bindingAwareBroker,
+                                  final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
+                                  final Broker domBroker, final ActorSystemProvider actorSystemProvider, final EventExecutor eventExecutor,
+                                  final NetconfClientDispatcher clientDispatcher, final String topologyId,
+                                  final int writeTxIdleTimeout) {
         this.dataBroker = Preconditions.checkNotNull(dataBroker);
         this.rpcProviderRegistry = Preconditions.checkNotNull(rpcProviderRegistry);
         this.clusterSingletonServiceProvider = Preconditions.checkNotNull(clusterSingletonServiceProvider);
@@ -92,6 +96,7 @@ public class NetconfTopologyManager
         this.eventExecutor = Preconditions.checkNotNull(eventExecutor);
         this.clientDispatcher = Preconditions.checkNotNull(clientDispatcher);
         this.topologyId = Preconditions.checkNotNull(topologyId);
+        this.writeTxIdleTimeout = Duration.apply(writeTxIdleTimeout, TimeUnit.SECONDS);
     }
 
     // Blueprint init method
@@ -101,7 +106,7 @@ public class NetconfTopologyManager
 
     @Override
     public void onDataTreeChanged(@Nonnull final Collection<DataTreeModification<Node>> changes) {
-        for (DataTreeModification<Node> change : changes) {
+        for (final DataTreeModification<Node> change : changes) {
             final DataObjectModification<Node> rootNode = change.getRootNode();
             final InstanceIdentifier<Node> dataModifIdent = change.getRootPath().getRootIdentifier();
             final NodeId nodeId = NetconfTopologyUtils.getNodeId(rootNode.getIdentifier());
@@ -129,7 +134,7 @@ public class NetconfTopologyManager
         }
     }
 
-    private void refreshNetconfDeviceContext(InstanceIdentifier<Node> instanceIdentifier, Node node) {
+    private void refreshNetconfDeviceContext(final InstanceIdentifier<Node> instanceIdentifier, final Node node) {
         final NetconfTopologyContext context = contexts.get(instanceIdentifier);
         context.refresh(createSetup(instanceIdentifier, node));
     }
@@ -158,7 +163,7 @@ public class NetconfTopologyManager
             try {
                 clusterRegistrations.get(instanceIdentifier).close();
                 contexts.get(instanceIdentifier).closeFinal();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 LOG.warn("Error at closing topology context. InstanceIdentifier: " + instanceIdentifier);
             }
             contexts.remove(instanceIdentifier);
@@ -175,14 +180,14 @@ public class NetconfTopologyManager
         contexts.forEach((instanceIdentifier, netconfTopologyContext) -> {
             try {
                 netconfTopologyContext.closeFinal();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 LOG.error("Error at closing topology context. InstanceIdentifier: " + instanceIdentifier, e);
             }
         });
         clusterRegistrations.forEach((instanceIdentifier, clusterSingletonServiceRegistration) -> {
             try {
                 clusterSingletonServiceRegistration.close();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 LOG.error("Error at unregistering from cluster. InstanceIdentifier: " + instanceIdentifier, e);
             }
         });
@@ -190,18 +195,18 @@ public class NetconfTopologyManager
         clusterRegistrations.clear();
     }
 
-    private ListenerRegistration<NetconfTopologyManager> registerDataTreeChangeListener(String topologyId) {
+    private ListenerRegistration<NetconfTopologyManager> registerDataTreeChangeListener(final String topologyId) {
         final WriteTransaction wtx = dataBroker.newWriteOnlyTransaction();
         initTopology(wtx, LogicalDatastoreType.CONFIGURATION, topologyId);
         initTopology(wtx, LogicalDatastoreType.OPERATIONAL, topologyId);
         Futures.addCallback(wtx.submit(), new FutureCallback<Void>() {
             @Override
-            public void onSuccess(Void result) {
+            public void onSuccess(final Void result) {
                 LOG.debug("topology initialization successful");
             }
 
             @Override
-            public void onFailure(@Nonnull Throwable throwable) {
+            public void onFailure(@Nonnull final Throwable throwable) {
                 LOG.error("Unable to initialize netconf-topology, {}", throwable);
             }
         });
@@ -212,7 +217,7 @@ public class NetconfTopologyManager
                                 NetconfTopologyUtils.createTopologyListPath(topologyId).child(Node.class)), this);
     }
 
-    private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType, String topologyId) {
+    private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType, final String topologyId) {
         final NetworkTopology networkTopology = new NetworkTopologyBuilder().build();
         final InstanceIdentifier<NetworkTopology> networkTopologyId =
                 InstanceIdentifier.builder(NetworkTopology.class).build();
@@ -236,7 +241,8 @@ public class NetconfTopologyManager
                 .setKeepaliveExecutor(keepaliveExecutor)
                 .setProcessingExecutor(processingExecutor)
                 .setTopologyId(topologyId)
-                .setNetconfClientDispatcher(clientDispatcher);
+                .setNetconfClientDispatcher(clientDispatcher)
+                .setIdleTimeout(writeTxIdleTimeout);
 
         return builder.build();
     }

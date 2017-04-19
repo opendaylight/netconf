@@ -61,16 +61,18 @@ import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.concurrent.duration.Duration;
 
 public class NetconfNodeActor extends UntypedActor {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeActor.class);
 
-    private NetconfTopologySetup setup;
-    private RemoteDeviceId id;
     private final SchemaSourceRegistry schemaRegistry;
     private final SchemaRepository schemaRepository;
+    private final Duration writeTxIdleTimeout;
 
+    private RemoteDeviceId id;
+    private NetconfTopologySetup setup;
     private List<SourceIdentifier> sourceIdentifiers;
     private DOMRpcService deviceRpc;
     private SlaveSalFacade slaveSalManager;
@@ -86,12 +88,13 @@ public class NetconfNodeActor extends UntypedActor {
     }
 
     private NetconfNodeActor(final NetconfTopologySetup setup,
-                             final RemoteDeviceId id, SchemaSourceRegistry schemaRegistry,
+                             final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
                              final SchemaRepository schemaRepository) {
         this.setup = setup;
         this.id = id;
         this.schemaRegistry = schemaRegistry;
         this.schemaRepository = schemaRepository;
+        this.writeTxIdleTimeout = setup.getIdleTimeout();
     }
 
     @Override
@@ -131,7 +134,7 @@ public class NetconfNodeActor extends UntypedActor {
         } else if (message instanceof NewWriteTransactionRequest) { // master
             try {
                 final DOMDataWriteTransaction tx = deviceDataBroker.newWriteOnlyTransaction();
-                final ActorRef txActor = context().actorOf(WriteTransactionActor.props(tx));
+                final ActorRef txActor = context().actorOf(WriteTransactionActor.props(tx, writeTxIdleTimeout));
                 sender().tell(new NewWriteTransactionReply(txActor), self());
             } catch (final Throwable t) {
                 sender().tell(t, self());
@@ -166,7 +169,7 @@ public class NetconfNodeActor extends UntypedActor {
             public void onSuccess(final YangTextSchemaSource yangTextSchemaSource) {
                 try {
                     sender.tell(new YangTextSchemaSourceSerializationProxy(yangTextSchemaSource), getSelf());
-                } catch (IOException exception) {
+                } catch (final IOException exception) {
                     sender.tell(exception.getCause(), getSelf());
                 }
             }
@@ -206,7 +209,7 @@ public class NetconfNodeActor extends UntypedActor {
         });
     }
 
-    private void registerSlaveMountPoint(ActorRef masterReference) {
+    private void registerSlaveMountPoint(final ActorRef masterReference) {
         if (this.slaveSalManager != null) {
             slaveSalManager.close();
         }
@@ -230,11 +233,11 @@ public class NetconfNodeActor extends UntypedActor {
         });
     }
 
-    private DOMRpcService getDOMRpcService(ActorRef masterReference) {
+    private DOMRpcService getDOMRpcService(final ActorRef masterReference) {
         return new ProxyDOMRpcService(setup.getActorSystem(), masterReference, id);
     }
 
-    private CheckedFuture<SchemaContext, SchemaResolutionException> getSchemaContext(ActorRef masterReference) {
+    private CheckedFuture<SchemaContext, SchemaResolutionException> getSchemaContext(final ActorRef masterReference) {
 
         final RemoteYangTextSourceProvider remoteYangTextSourceProvider =
                 new ProxyYangTextSourceProvider(masterReference, getContext());
