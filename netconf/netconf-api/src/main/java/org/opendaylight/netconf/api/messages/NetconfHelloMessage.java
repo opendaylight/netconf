@@ -22,7 +22,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * NetconfMessage that can carry additional header with session metadata. See {@link NetconfHelloMessageAdditionalHeader}
+ * NetconfMessage that can carry additional header with session metadata. See
+ * {@link NetconfHelloMessageAdditionalHeader}
  */
 public final class NetconfHelloMessage extends NetconfMessage {
 
@@ -30,7 +31,8 @@ public final class NetconfHelloMessage extends NetconfMessage {
 
     private final NetconfHelloMessageAdditionalHeader additionalHeader;
 
-    public NetconfHelloMessage(Document doc, NetconfHelloMessageAdditionalHeader additionalHeader) throws NetconfDocumentedException {
+    public NetconfHelloMessage(Document doc, NetconfHelloMessageAdditionalHeader additionalHeader) throws
+            NetconfDocumentedException {
         super(doc);
         checkHelloMessage(doc);
         this.additionalHeader = additionalHeader;
@@ -41,7 +43,8 @@ public final class NetconfHelloMessage extends NetconfMessage {
     }
 
     public Optional<NetconfHelloMessageAdditionalHeader> getAdditionalHeader() {
-        return additionalHeader== null ? Optional.<NetconfHelloMessageAdditionalHeader>absent() : Optional.of(additionalHeader);
+        return additionalHeader == null ? Optional.<NetconfHelloMessageAdditionalHeader>absent()
+                : Optional.of(additionalHeader);
     }
 
     private static void checkHelloMessage(Document doc) {
@@ -50,8 +53,9 @@ public final class NetconfHelloMessage extends NetconfMessage {
                 XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, XmlUtil.toString(doc));
     }
 
-    public static NetconfHelloMessage createClientHello(Iterable<String> capabilities,
-                                                        Optional<NetconfHelloMessageAdditionalHeader> additionalHeaderOptional) throws NetconfDocumentedException {
+    public static NetconfHelloMessage createClientHello(
+            Iterable<String> capabilities,
+            Optional<NetconfHelloMessageAdditionalHeader> additionalHeaderOptional) throws NetconfDocumentedException {
         Document doc = createHelloMessageDoc(capabilities);
         return additionalHeaderOptional.isPresent() ? new NetconfHelloMessage(doc, additionalHeaderOptional.get())
                 : new NetconfHelloMessage(doc);
@@ -77,7 +81,8 @@ public final class NetconfHelloMessage extends NetconfMessage {
         return doc;
     }
 
-    public static NetconfHelloMessage createServerHello(Set<String> capabilities, long sessionId) throws NetconfDocumentedException {
+    public static NetconfHelloMessage createServerHello(Set<String> capabilities, long sessionId) throws
+            NetconfDocumentedException {
         Document doc = createHelloMessageDoc(capabilities);
         Element sessionIdElement = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0,
                 XmlNetconfConstants.SESSION_ID);
@@ -95,8 +100,9 @@ public final class NetconfHelloMessage extends NetconfMessage {
         XmlElement element = XmlElement.fromDomElement(document.getDocumentElement());
         try {
             // accept even if hello has no namespace
-            return element.getName().equals(HELLO_TAG) &&
-                    (!element.hasNamespace() || element.getNamespace().equals(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
+            return element.getName().equals(HELLO_TAG)
+                    && (!element.hasNamespace()
+                    || element.getNamespace().equals(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
         } catch (DocumentedException e) {
             // Cannot happen, since we check for hasNamespace
             throw new IllegalStateException(e);

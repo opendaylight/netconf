@@ -11,7 +11,8 @@ import org.opendaylight.controller.config.util.xml.XmlMappingConstants;
 
 public final class XmlNetconfConstants {
 
-    private XmlNetconfConstants() {}
+    private XmlNetconfConstants() {
+    }
 
     public static final String CAPABILITY = "capability";
     public static final String CAPABILITIES = "capabilities";
@@ -32,12 +33,16 @@ public final class XmlNetconfConstants {
     public static final String GET = "get";
     public static final String GET_CONFIG = "get-config";
 
-    public static final String URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0 = XmlMappingConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0;
+    public static final String URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0 = XmlMappingConstants
+            .URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0;
     public static final String URN_IETF_PARAMS_NETCONF_BASE_1_0 = "urn:ietf:params:netconf:base:1.0";
     public static final String URN_IETF_PARAMS_NETCONF_BASE_1_1 = "urn:ietf:params:netconf:base:1.1";
     public static final String URN_IETF_PARAMS_XML_NS_NETCONF_EXI_1_0 = "urn:ietf:params:xml:ns:netconf:exi:1.0";
-    public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0 = "urn:ietf:params:netconf:capability:notification:1.0";
+    public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0 =
+            "urn:ietf:params:netconf:capability:notification:1.0";
 
-    public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_EXI_1_0 = "urn:ietf:params:netconf:capability:exi:1.0";
-    public static final String URN_IETF_PARAMS_XML_NS_YANG_IETF_NETCONF_MONITORING = "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring";
+    public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_EXI_1_0 =
+            "urn:ietf:params:netconf:capability:exi:1" + ".0";
+    public static final String URN_IETF_PARAMS_XML_NS_YANG_IETF_NETCONF_MONITORING =
+            "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring";
 }
