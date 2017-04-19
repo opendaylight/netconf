@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;
+import akka.actor.ReceiveTimeout;
 import akka.actor.UntypedActor;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
@@ -25,26 +26,37 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.MergeRe
 import org.opendaylight.netconf.topology.singleton.messages.transactions.PutRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import scala.concurrent.duration.Duration;
 
 /**
  * WriteTransactionActor is an interface to device's {@link DOMDataReadOnlyTransaction} for cluster nodes.
  */
 public class WriteTransactionActor extends UntypedActor {
 
+    private static final Logger LOG = LoggerFactory.getLogger(WriteTransactionActor.class);
+
     private final DOMDataWriteTransaction tx;
+    private final long idleTimeout;
 
     /**
      * Creates new actor Props.
      *
      * @param tx delegate device write transaction
+     * @param idleTimeout idle time in seconds, after which transaction is closed automatically
      * @return props
      */
-    static Props props(final DOMDataWriteTransaction tx) {
-        return Props.create(WriteTransactionActor.class, () -> new WriteTransactionActor(tx));
+    static Props props(final DOMDataWriteTransaction tx, final Duration idleTimeout) {
+        return Props.create(WriteTransactionActor.class, () -> new WriteTransactionActor(tx, idleTimeout));
     }
 
-    private WriteTransactionActor(final DOMDataWriteTransaction tx) {
+    private WriteTransactionActor(final DOMDataWriteTransaction tx, final Duration idleTimeout) {
         this.tx = tx;
+        this.idleTimeout = idleTimeout.toSeconds();
+        if (this.idleTimeout > 0) {
+            context().setReceiveTimeout(idleTimeout);
+        }
     }
 
     @Override
@@ -64,6 +76,11 @@ public class WriteTransactionActor extends UntypedActor {
             cancel();
         } else if (message instanceof SubmitRequest) {
             submit(sender(), self());
+        } else if (message instanceof ReceiveTimeout) {
+            LOG.warn("Haven't received any message for {} seconds, cancelling transaction and stopping actor",
+                    idleTimeout);
+            tx.cancel();
+            context().stop(self());
         } else {
             unhandled(message);
         }
