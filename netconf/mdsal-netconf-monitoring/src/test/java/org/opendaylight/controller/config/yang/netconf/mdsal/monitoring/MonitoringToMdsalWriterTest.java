@@ -39,7 +39,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class MonitoringToMdsalWriterTest {
 
-    private static final InstanceIdentifier<NetconfState> INSTANCE_IDENTIFIER = InstanceIdentifier.create(NetconfState.class);
+    private static final InstanceIdentifier<NetconfState> INSTANCE_IDENTIFIER =
+            InstanceIdentifier.create(NetconfState.class);
 
     @Mock
     private NetconfMonitoringService monitoring;
@@ -77,7 +78,8 @@ public class MonitoringToMdsalWriterTest {
 
     @Test
     public void testOnCapabilityChanged() throws Exception {
-        final InstanceIdentifier<Capabilities> capabilitiesId = InstanceIdentifier.create(NetconfState.class).child(Capabilities.class);
+        final InstanceIdentifier<Capabilities> capabilitiesId =
+                InstanceIdentifier.create(NetconfState.class).child(Capabilities.class);
         writer.start();
         final Capabilities capabilities = new CapabilitiesBuilder().build();
         writer.onCapabilitiesChanged(capabilities);
@@ -88,7 +90,8 @@ public class MonitoringToMdsalWriterTest {
 
     @Test
     public void testOnSchemasChanged() throws Exception {
-        final InstanceIdentifier<Schemas> schemasId = InstanceIdentifier.create(NetconfState.class).child(Schemas.class);
+        final InstanceIdentifier<Schemas> schemasId = InstanceIdentifier.create(NetconfState.class).child(Schemas
+                .class);
         writer.start();
         final Schemas schemas = new SchemasBuilder().build();
         writer.onSchemasChanged(schemas);
@@ -102,7 +105,8 @@ public class MonitoringToMdsalWriterTest {
         Session session = new SessionBuilder()
                 .setSessionId(1L)
                 .build();
-        final InstanceIdentifier<Session> id = InstanceIdentifier.create(NetconfState.class).child(Sessions.class).child(Session.class, session.getKey());
+        final InstanceIdentifier<Session> id = InstanceIdentifier.create(NetconfState.class).child(Sessions.class)
+                .child(Session.class, session.getKey());
         writer.start();
         writer.onSessionStarted(session);
         InOrder inOrder = inOrder(writeTransaction);
@@ -115,7 +119,8 @@ public class MonitoringToMdsalWriterTest {
         Session session = new SessionBuilder()
                 .setSessionId(1L)
                 .build();
-        final InstanceIdentifier<Session> id = InstanceIdentifier.create(NetconfState.class).child(Sessions.class).child(Session.class, session.getKey());
+        final InstanceIdentifier<Session> id = InstanceIdentifier.create(NetconfState.class).child(Sessions.class)
+                .child(Session.class, session.getKey());
         writer.start();
         writer.onSessionEnded(session);
         InOrder inOrder = inOrder(writeTransaction);
@@ -134,8 +139,10 @@ public class MonitoringToMdsalWriterTest {
         List<Session> sessions = new ArrayList<>();
         sessions.add(session1);
         sessions.add(session2);
-        final InstanceIdentifier<Session> id1 = InstanceIdentifier.create(NetconfState.class).child(Sessions.class).child(Session.class, session1.getKey());
-        final InstanceIdentifier<Session> id2 = InstanceIdentifier.create(NetconfState.class).child(Sessions.class).child(Session.class, session2.getKey());
+        final InstanceIdentifier<Session> id1 = InstanceIdentifier.create(NetconfState.class).child(Sessions.class)
+                .child(Session.class, session1.getKey());
+        final InstanceIdentifier<Session> id2 = InstanceIdentifier.create(NetconfState.class).child(Sessions.class)
+                .child(Session.class, session2.getKey());
         writer.start();
         writer.onSessionsUpdated(sessions);
         InOrder inOrder = inOrder(writeTransaction);
