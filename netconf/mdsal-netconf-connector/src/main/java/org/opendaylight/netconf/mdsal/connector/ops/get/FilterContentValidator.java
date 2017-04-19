@@ -43,7 +43,8 @@ public class FilterContentValidator {
     private final CurrentSchemaContext schemaContext;
 
     /**
-     * @param schemaContext current schema context
+     * Constructor to create FilterContentValidator.
+     * @param schemaContext current schema context.
      */
     public FilterContentValidator(final CurrentSchemaContext schemaContext) {
         this.schemaContext = schemaContext;
@@ -52,10 +53,12 @@ public class FilterContentValidator {
     /**
      * Validates filter content against this validator schema context. If the filter is valid,
      * method returns {@link YangInstanceIdentifier} of node which can be used as root for data selection.
+     *
      * @param filterContent filter content
      * @return YangInstanceIdentifier
      * @throws DocumentedException if filter content is not valid
      */
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public YangInstanceIdentifier validate(final XmlElement filterContent) throws DocumentedException {
         try {
             final URI namespace = new URI(filterContent.getNamespace());
@@ -76,10 +79,11 @@ public class FilterContentValidator {
     }
 
     /**
-     * Returns module's child data node of given name space and name
-     * @param module module
+     * Returns module's child data node of given name space and name.
+     *
+     * @param module    module
      * @param nameSpace name space
-     * @param name name
+     * @param name      name
      * @return child data node schema
      * @throws DocumentedException if child with given name is not present
      */
@@ -92,8 +96,8 @@ public class FilterContentValidator {
                 return childNode;
             }
         }
-        throw new DocumentedException("Unable to find node with namespace: " + nameSpace + "in schema context: " +
-                schemaContext.getCurrentContext().toString(),
+        throw new DocumentedException("Unable to find node with namespace: " + nameSpace + "in schema context: "
+                + schemaContext.getCurrentContext().toString(),
                 DocumentedException.ErrorType.APPLICATION,
                 DocumentedException.ErrorTag.UNKNOWN_NAMESPACE,
                 DocumentedException.ErrorSeverity.ERROR);
@@ -101,9 +105,10 @@ public class FilterContentValidator {
 
     /**
      * Recursively checks filter elements against the schema. Returns tree of nodes QNames as they appear in filter.
-     * @param element element to check
+     *
+     * @param element          element to check
      * @param parentNodeSchema parent node schema
-     * @param tree parent node tree
+     * @param tree             parent node tree
      * @return tree
      * @throws ValidationException if filter content is not valid
      */
@@ -134,9 +139,10 @@ public class FilterContentValidator {
      * Searches for YangInstanceIdentifier of node, which can be used as root for data selection.
      * It goes as deep in tree as possible. Method stops traversing, when there are multiple child elements. If element
      * represents list and child elements are key values, then it builds YangInstanceIdentifier of list entry.
-     * @param tree QName tree
+     *
+     * @param tree          QName tree
      * @param filterContent filter element
-     * @param builder builder  @return YangInstanceIdentifier
+     * @param builder       builder  @return YangInstanceIdentifier
      */
     private YangInstanceIdentifier getFilterDataRoot(FilterTree tree, final XmlElement filterContent,
                                                      final InstanceIdentifierBuilder builder) {
@@ -184,17 +190,23 @@ public class FilterContentValidator {
             current = childElements.get(0);
         }
         final Map<QName, Object> keys = new HashMap<>();
-        for (final QName qName : keyDefinition) {
-            final Optional<XmlElement> childElements = current.getOnlyChildElementOptionally(qName.getLocalName());
+
+        for (final QName qualifiedName : keyDefinition) {
+            final Optional<XmlElement> childElements =
+                    current.getOnlyChildElementOptionally(qualifiedName.getLocalName());
             if (!childElements.isPresent()) {
                 return Collections.emptyMap();
             }
             final Optional<String> keyValue = childElements.get().getOnlyTextContentOptionally();
             if (keyValue.isPresent()) {
-                keys.put(qName, keyValue.get());
+                keys.put(qualifiedName, keyValue.get());
             }
         }
         return keys;
+    }
+
+    private enum Type {
+        LIST, CHOICE_CASE, OTHER
     }
 
     /**
@@ -249,12 +261,8 @@ public class FilterContentValidator {
         }
     }
 
-    private enum Type {
-        LIST, CHOICE_CASE, OTHER
-    }
-
     private static class ValidationException extends Exception {
-        public ValidationException(final XmlElement parent, final XmlElement child) {
+        ValidationException(final XmlElement parent, final XmlElement child) {
             super("Element " + child + " can't be child of " + parent);
         }
     }
