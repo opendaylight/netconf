@@ -24,13 +24,14 @@ import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 
 public class Bug8084 {
 
-    private static final QName base = QName.create("urn:dummy:mod-0", "2016-03-01", "mainroot");
+    private static final QName BASE = QName.create("urn:dummy:mod-0", "2016-03-01", "mainroot");
 
     @Test
     public void testValidateTypes() throws Exception {
@@ -50,32 +51,32 @@ public class Bug8084 {
         final YangInstanceIdentifier actual = validator.validate(xmlElement);
 
         final Map<QName, Object> inputs = new HashMap<>();
-        inputs.put(QName.create(base, "id1"), "aaa");
-        inputs.put(QName.create(base, "id2"), Byte.valueOf("-9"));
-        inputs.put(QName.create(base, "id3"), Short.valueOf("-30000"));
-        inputs.put(QName.create(base, "id4"), Integer.valueOf("-2000000000"));
-        inputs.put(QName.create(base, "id5"), Long.valueOf("-2000000000000000"));
-        inputs.put(QName.create(base, "id6"), Short.valueOf("9"));
-        inputs.put(QName.create(base, "id7"), Integer.valueOf("30000"));
-        inputs.put(QName.create(base, "id8"), Long.valueOf("2000000000"));
-        inputs.put(QName.create(base, "id9"), BigInteger.valueOf(Long.valueOf("2000000000000000")));
-        inputs.put(QName.create(base, "id10"), true);
-        inputs.put(QName.create(base, "id11"), BigDecimal.valueOf(128.55));
-        inputs.put(QName.create(base, "id12"), QName.create(base, "foo"));
-        inputs.put(QName.create(base, "id13"), QName.create("urn:opendaylight:mdsal:mapping:test", "2015-02-26", "foo"));
-        final QName idActual = (QName) ((YangInstanceIdentifier.NodeIdentifierWithPredicates) actual.getLastPathArgument()).
-                getKeyValues().get(QName.create(base, "id12"));
-
+        inputs.put(QName.create(BASE, "id1"), "aaa");
+        inputs.put(QName.create(BASE, "id2"), Byte.valueOf("-9"));
+        inputs.put(QName.create(BASE, "id3"), Short.valueOf("-30000"));
+        inputs.put(QName.create(BASE, "id4"), Integer.valueOf("-2000000000"));
+        inputs.put(QName.create(BASE, "id5"), Long.valueOf("-2000000000000000"));
+        inputs.put(QName.create(BASE, "id6"), Short.valueOf("9"));
+        inputs.put(QName.create(BASE, "id7"), Integer.valueOf("30000"));
+        inputs.put(QName.create(BASE, "id8"), Long.valueOf("2000000000"));
+        inputs.put(QName.create(BASE, "id9"), BigInteger.valueOf(Long.valueOf("2000000000000000")));
+        inputs.put(QName.create(BASE, "id10"), true);
+        inputs.put(QName.create(BASE, "id11"), BigDecimal.valueOf(128.55));
+        inputs.put(QName.create(BASE, "id12"), QName.create(BASE, "foo"));
+        inputs.put(
+                QName.create(BASE, "id13"),
+                QName.create("urn:opendaylight:mdsal:mapping:test", "2015-02-26", "foo"));
+        final QName idActual = (QName) ((NodeIdentifierWithPredicates) actual.getLastPathArgument())
+                .getKeyValues().get(QName.create(BASE, "id12"));
 
         final YangInstanceIdentifier expected = YangInstanceIdentifier.builder()
-                .node(base)
-                .node(QName.create(base, "multi-key-list2"))
-                .nodeWithKey(QName.create(base, "multi-key-list2"), inputs)
+                .node(BASE)
+                .node(QName.create(BASE, "multi-key-list2"))
+                .nodeWithKey(QName.create(BASE, "multi-key-list2"), inputs)
                 .build();
-        final QName idExpected = (QName) ((YangInstanceIdentifier.NodeIdentifierWithPredicates) expected.getLastPathArgument()).
-                getKeyValues().get(QName.create(base, "id12"));
+        final QName idExpected = (QName) ((NodeIdentifierWithPredicates) expected.getLastPathArgument())
+                .getKeyValues().get(QName.create(BASE, "id12"));
         assertEquals(idExpected, idActual);
         assertEquals(expected, actual);
-
     }
 }
