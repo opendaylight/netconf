@@ -41,6 +41,7 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySet
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup.NetconfTopologySetupBuilder;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.Config;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -83,9 +84,9 @@ public class NetconfTopologyManager
                                   final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
                                   final BindingAwareBroker bindingAwareBroker,
                                   final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
-                                  final Broker domBroker, final ActorSystemProvider actorSystemProvider, final EventExecutor eventExecutor,
-                                  final NetconfClientDispatcher clientDispatcher, final String topologyId,
-                                  final int writeTxIdleTimeout) {
+                                  final Broker domBroker, final ActorSystemProvider actorSystemProvider,
+                                  final EventExecutor eventExecutor, final NetconfClientDispatcher clientDispatcher,
+                                  final String topologyId, final Config config) {
         this.dataBroker = Preconditions.checkNotNull(dataBroker);
         this.rpcProviderRegistry = Preconditions.checkNotNull(rpcProviderRegistry);
         this.clusterSingletonServiceProvider = Preconditions.checkNotNull(clusterSingletonServiceProvider);
@@ -97,7 +98,7 @@ public class NetconfTopologyManager
         this.eventExecutor = Preconditions.checkNotNull(eventExecutor);
         this.clientDispatcher = Preconditions.checkNotNull(clientDispatcher);
         this.topologyId = Preconditions.checkNotNull(topologyId);
-        this.writeTxIdleTimeout = Duration.apply(writeTxIdleTimeout, TimeUnit.SECONDS);
+        this.writeTxIdleTimeout = Duration.apply(config.getWriteTransactionIdleTimeout(), TimeUnit.SECONDS);
     }
 
     // Blueprint init method
