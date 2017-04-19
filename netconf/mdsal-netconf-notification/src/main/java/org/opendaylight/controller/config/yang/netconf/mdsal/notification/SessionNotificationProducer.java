@@ -28,7 +28,7 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 /**
- * Listens on changes in NetconfState/Sessions/Session datastore and publishes them
+ * Listens on changes in NetconfState/Sessions/Session datastore and publishes them.
  */
 public class SessionNotificationProducer extends OperationalDatastoreListener<Session> {
 
@@ -46,6 +46,7 @@ public class SessionNotificationProducer extends OperationalDatastoreListener<Se
         this.sessionListenerRegistration = registerOnChanges(dataBroker);
     }
 
+    @SuppressWarnings("checkstyle:MissingSwitchDefault")
     @Override
     public void onDataTreeChanged(@Nonnull Collection<DataTreeModification<Session>> changes) {
         for (DataTreeModification<Session> change : changes) {
@@ -92,7 +93,7 @@ public class SessionNotificationProducer extends OperationalDatastoreListener<Se
 
 
     /**
-     * Invoke by blueprint
+     * Invoked by blueprint.
      */
     public void close() {
         if (baseNotificationPublisherRegistration != null) {

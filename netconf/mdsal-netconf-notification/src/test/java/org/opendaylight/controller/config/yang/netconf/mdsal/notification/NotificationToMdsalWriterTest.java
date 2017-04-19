@@ -55,8 +55,8 @@ public class NotificationToMdsalWriterTest {
         doReturn(dataBroker).when(session).getSALService(DataBroker.class);
 
         WriteTransaction tx = mock(WriteTransaction.class);
-        doNothing().when(tx).merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class)
-                , any(DataObject.class), anyBoolean());
+        doNothing().when(tx).merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class),
+                any(DataObject.class), anyBoolean());
         doNothing().when(tx).delete(any(LogicalDatastoreType.class), any(InstanceIdentifier.class));
         doReturn(Futures.immediateCheckedFuture(null)).when(tx).submit();
         doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
@@ -74,7 +74,8 @@ public class NotificationToMdsalWriterTest {
 
         writer.onStreamRegistered(testStream);
 
-        verify(dataBroker.newWriteOnlyTransaction()).merge(LogicalDatastoreType.OPERATIONAL, streamIdentifier, testStream, true);
+        verify(dataBroker.newWriteOnlyTransaction()).merge(LogicalDatastoreType.OPERATIONAL, streamIdentifier,
+                testStream, true);
 
         writer.onStreamUnregistered(testStreamName);
 
@@ -82,7 +83,7 @@ public class NotificationToMdsalWriterTest {
     }
 
     @Test
-    public void testClose(){
+    public void testClose() {
         doNothing().when(notificationRegistration).close();
 
         final InstanceIdentifier streamIdentifier = InstanceIdentifier.create(Netconf.class);

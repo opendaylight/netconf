@@ -49,6 +49,7 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
         this.capabilityChangeListenerRegistration = registerOnChanges(dataBroker);
     }
 
+    @SuppressWarnings("checkstyle:MissingSwitchDefault")
     @Override
     public void onDataTreeChanged(@Nonnull Collection<DataTreeModification<Capabilities>> changes) {
         for (DataTreeModification<Capabilities> change : changes) {
@@ -58,8 +59,10 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
                 case WRITE: {
                     final Capabilities dataAfter = rootNode.getDataAfter();
                     final Capabilities dataBefore = rootNode.getDataBefore();
-                    final Set<Uri> before = dataBefore != null ? ImmutableSet.copyOf(dataBefore.getCapability()) : Collections.emptySet();
-                    final Set<Uri> after = dataAfter != null ? ImmutableSet.copyOf(dataAfter.getCapability()) : Collections.emptySet();
+                    final Set<Uri> before = dataBefore != null ? ImmutableSet.copyOf(dataBefore.getCapability()) :
+                            Collections.emptySet();
+                    final Set<Uri> after = dataAfter != null ? ImmutableSet.copyOf(dataAfter.getCapability()) :
+                            Collections.emptySet();
                     final Set<Uri> added = Sets.difference(after, before);
                     final Set<Uri> removed = Sets.difference(before, after);
                     publishNotification(added, removed);
@@ -80,7 +83,8 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
 
     private void publishNotification(Set<Uri> added, Set<Uri> removed) {
         final NetconfCapabilityChangeBuilder netconfCapabilityChangeBuilder = new NetconfCapabilityChangeBuilder();
-        netconfCapabilityChangeBuilder.setChangedBy(new ChangedByBuilder().setServerOrUser(new ServerBuilder().setServer(true).build()).build());
+        netconfCapabilityChangeBuilder.setChangedBy(new ChangedByBuilder().setServerOrUser(new ServerBuilder()
+                .setServer(true).build()).build());
         netconfCapabilityChangeBuilder.setAddedCapability(ImmutableList.copyOf(added));
         netconfCapabilityChangeBuilder.setDeletedCapability(ImmutableList.copyOf(removed));
         // TODO modified should be computed ... but why ?
@@ -89,7 +93,7 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
     }
 
     /**
-     * Invoke by blueprint
+     * Invoked by blueprint.
      */
     public void close() {
         if (baseNotificationPublisherRegistration != null) {

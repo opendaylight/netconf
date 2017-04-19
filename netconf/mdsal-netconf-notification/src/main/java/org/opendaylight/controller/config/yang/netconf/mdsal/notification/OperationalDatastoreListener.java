@@ -17,6 +17,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 /**
  * Abstract base class for subclasses, which want to listen for changes on specified subtree in operational datastore.
+ *
  * @param <T> data object class
  */
 abstract class OperationalDatastoreListener<T extends DataObject> implements DataTreeChangeListener<T> {
@@ -24,14 +25,17 @@ abstract class OperationalDatastoreListener<T extends DataObject> implements Dat
     private final InstanceIdentifier<T> instanceIdentifier;
 
     /**
-     * @param instanceIdentifier instance identifier of subtree, on which this instance should listen on changes
+     * Constructor.
+     *
+     * @param instanceIdentifier instance identifier of subtree, on which this instance should listen on changes.
      */
     OperationalDatastoreListener(InstanceIdentifier<T> instanceIdentifier) {
         this.instanceIdentifier = instanceIdentifier;
     }
 
     /**
-     * Registers this instance as OPERATIONAL datastore listener via provided dataBroker
+     * Registers this instance as OPERATIONAL datastore listener via provided dataBroker.
+     *
      * @param dataBroker data broker
      * @return listener registration
      */

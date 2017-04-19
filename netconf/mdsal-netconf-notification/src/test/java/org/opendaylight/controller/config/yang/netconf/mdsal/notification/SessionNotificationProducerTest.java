@@ -55,7 +55,8 @@ public class SessionNotificationProducerTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        doReturn(listenerRegistration).when(dataBroker).registerDataTreeChangeListener(any(DataTreeIdentifier.class), any(DataTreeChangeListener.class));
+        doReturn(listenerRegistration).when(dataBroker).registerDataTreeChangeListener(any(DataTreeIdentifier.class),
+                any(DataTreeChangeListener.class));
 
         doNothing().when(registration).onCapabilityChanged(any(NetconfCapabilityChange.class));
         doNothing().when(registration).onSessionStarted(any());
@@ -69,7 +70,8 @@ public class SessionNotificationProducerTest {
     @Test
     public void testOnDataChangedSessionCreated() throws Exception {
         final Session session = createSession(1);
-        final DataTreeModification<Session> treeChange = getTreeModification(session, DataObjectModification.ModificationType.WRITE);
+        final DataTreeModification<Session> treeChange = getTreeModification(session, DataObjectModification
+                .ModificationType.WRITE);
         publisher.onDataTreeChanged(Collections.singleton(treeChange));
         ArgumentCaptor<NetconfSessionStart> captor = ArgumentCaptor.forClass(NetconfSessionStart.class);
         verify(registration).onSessionStarted(captor.capture());
@@ -98,7 +100,8 @@ public class SessionNotificationProducerTest {
     @Test
     public void testOnDataChangedSessionDeleted() throws Exception {
         final Session session = createSession(1);
-        final DataTreeModification<Session> data = getTreeModification(session, DataObjectModification.ModificationType.DELETE);
+        final DataTreeModification<Session> data = getTreeModification(session, DataObjectModification
+                .ModificationType.DELETE);
         publisher.onDataTreeChanged(Collections.singleton(data));
         ArgumentCaptor<NetconfSessionEnd> captor = ArgumentCaptor.forClass(NetconfSessionEnd.class);
         verify(registration).onSessionEnded(captor.capture());
@@ -121,8 +124,9 @@ public class SessionNotificationProducerTest {
                 .build();
     }
 
-    @SuppressWarnings("unchecked")
-    private DataTreeModification<Session> getTreeModification(Session session, DataObjectModification.ModificationType type) {
+    @SuppressWarnings({"checkstyle:MissingSwitchDefault", "unchecked"})
+    private DataTreeModification<Session> getTreeModification(Session session, DataObjectModification
+            .ModificationType type) {
         final DataTreeModification<Session> treeChange = mock(DataTreeModification.class);
         final DataObjectModification<Session> changeObject = mock(DataObjectModification.class);
         switch (type) {
