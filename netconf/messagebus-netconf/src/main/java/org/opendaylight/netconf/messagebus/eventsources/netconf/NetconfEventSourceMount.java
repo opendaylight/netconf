@@ -49,25 +49,28 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 /**
- * Facade of mounted netconf device
+ * Facade of mounted netconf device.
  */
 class NetconfEventSourceMount {
 
     private static final BindingNormalizedNodeCodecRegistry CODEC_REGISTRY;
-    private static final YangInstanceIdentifier STREAMS_PATH = YangInstanceIdentifier.builder().node(Netconf.QNAME).node(Streams.QNAME).build();
+    private static final YangInstanceIdentifier STREAMS_PATH = YangInstanceIdentifier.builder().node(Netconf.QNAME)
+            .node(Streams.QNAME).build();
     private static final SchemaPath CREATE_SUBSCRIPTION = SchemaPath
             .create(true, QName.create(CreateSubscriptionInput.QNAME, "create-subscription"));
 
-    static{
+    static {
         final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-        moduleInfoBackedContext.addModuleInfos(Collections.singletonList(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.$YangModuleInfoImpl.getInstance()));
+        moduleInfoBackedContext.addModuleInfos(Collections.singletonList(org.opendaylight.yang.gen.v1.urn.ietf.params
+                .xml.ns.netmod.notification.rev080714.$YangModuleInfoImpl.getInstance()));
         final Optional<SchemaContext> schemaContextOptional = moduleInfoBackedContext.tryToCreateSchemaContext();
         Preconditions.checkState(schemaContextOptional.isPresent());
-        SchemaContext NOTIFICATIONS_SCHEMA_CTX = schemaContextOptional.get();
+        SchemaContext notificationsSchemaCtx = schemaContextOptional.get();
 
         final JavassistUtils javassist = JavassistUtils.forClassPool(ClassPool.getDefault());
         CODEC_REGISTRY = new BindingNormalizedNodeCodecRegistry(StreamWriterGenerator.create(javassist));
-        CODEC_REGISTRY.onBindingRuntimeContextUpdated(BindingRuntimeContext.create(moduleInfoBackedContext, NOTIFICATIONS_SCHEMA_CTX));
+        CODEC_REGISTRY.onBindingRuntimeContextUpdated(BindingRuntimeContext.create(moduleInfoBackedContext,
+                notificationsSchemaCtx));
     }
 
     private final DOMMountPoint mountPoint;
@@ -77,7 +80,7 @@ class NetconfEventSourceMount {
     private final Node node;
     private final String nodeId;
 
-    public NetconfEventSourceMount(final Node node, final DOMMountPoint mountPoint) {
+    NetconfEventSourceMount(final Node node, final DOMMountPoint mountPoint) {
         this.mountPoint = mountPoint;
         this.node = node;
         this.nodeId = node.getNodeId().getValue();
@@ -101,16 +104,19 @@ class NetconfEventSourceMount {
     }
 
     /**
-     * Invokes create-subscription rpc on mounted device stream. If lastEventTime is provided and stream supports replay,
+     * Invokes create-subscription rpc on mounted device stream. If lastEventTime is provided and stream supports
+     * replay,
      * rpc will be invoked with start time parameter.
-     * @param stream stream
+     *
+     * @param stream        stream
      * @param lastEventTime last event time
      * @return rpc result
      */
-    CheckedFuture<DOMRpcResult, DOMRpcException> invokeCreateSubscription(final Stream stream, final Optional<Date> lastEventTime) {
+    CheckedFuture<DOMRpcResult, DOMRpcException> invokeCreateSubscription(final Stream stream,
+                                                                          final Optional<Date> lastEventTime) {
         final CreateSubscriptionInputBuilder inputBuilder = new CreateSubscriptionInputBuilder()
                 .setStream(stream.getName());
-        if(lastEventTime.isPresent() && stream.isReplaySupport()) {
+        if (lastEventTime.isPresent() && stream.isReplaySupport()) {
             final ZonedDateTime dateTime = lastEventTime.get().toInstant().atZone(ZoneId.systemDefault());
             final String formattedDate = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(dateTime);
             inputBuilder.setStartTime(new DateAndTime(formattedDate));
@@ -122,6 +128,7 @@ class NetconfEventSourceMount {
 
     /**
      * Invokes create-subscription rpc on mounted device stream.
+     *
      * @param stream stream
      * @return rpc result
      */
@@ -130,7 +137,8 @@ class NetconfEventSourceMount {
     }
 
     /**
-     * Returns list of streams avaliable on device
+     * Returns list of streams avaliable on device.
+     *
      * @return list of streams
      * @throws ReadFailedException if data read fails
      */
@@ -140,8 +148,8 @@ class NetconfEventSourceMount {
                 .read(LogicalDatastoreType.OPERATIONAL, STREAMS_PATH);
         Optional<NormalizedNode<?, ?>> streams = checkFeature.checkedGet();
         if (streams.isPresent()) {
-            Streams s = (Streams) CODEC_REGISTRY.fromNormalizedNode(STREAMS_PATH, streams.get()).getValue();
-            return s.getStream();
+            Streams streams1 = (Streams) CODEC_REGISTRY.fromNormalizedNode(STREAMS_PATH, streams.get()).getValue();
+            return streams1.getStream();
         }
         return Collections.emptyList();
     }
@@ -152,12 +160,14 @@ class NetconfEventSourceMount {
 
     /**
      * Registers notification listener to receive a set of notifications.
-     * @see DOMNotificationService#registerNotificationListener(DOMNotificationListener, SchemaPath...)
-     * @param listener listener
+     *
+     * @param listener         listener
      * @param notificationPath notification path
-     * @return
+     * @return ListenerRegistration
+     * @see DOMNotificationService#registerNotificationListener(DOMNotificationListener, SchemaPath...)
      */
-    ListenerRegistration<DOMNotificationListener> registerNotificationListener(DOMNotificationListener listener, SchemaPath notificationPath) {
+    ListenerRegistration<DOMNotificationListener> registerNotificationListener(DOMNotificationListener listener,
+                                                                               SchemaPath notificationPath) {
         return notificationService.registerNotificationListener(listener, notificationPath);
     }
 
