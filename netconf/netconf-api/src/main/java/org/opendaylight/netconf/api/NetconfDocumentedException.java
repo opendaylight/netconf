@@ -22,27 +22,32 @@ public class NetconfDocumentedException extends DocumentedException {
         super(message);
     }
 
-    public NetconfDocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag, final ErrorSeverity errorSeverity) {
+    public NetconfDocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag, final
+        ErrorSeverity errorSeverity) {
         super(message, errorType, errorTag, errorSeverity);
     }
 
-    public NetconfDocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag, final ErrorSeverity errorSeverity, final Map<String, String> errorInfo) {
+    public NetconfDocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag, final
+        ErrorSeverity errorSeverity, final Map<String, String> errorInfo) {
         super(message, errorType, errorTag, errorSeverity, errorInfo);
     }
 
-    public NetconfDocumentedException(final String message, final Exception cause, final ErrorType errorType, final ErrorTag errorTag, final ErrorSeverity errorSeverity) {
+    public NetconfDocumentedException(final String message, final Exception cause, final ErrorType errorType, final
+        ErrorTag errorTag, final ErrorSeverity errorSeverity) {
         super(message, cause, errorType, errorTag, errorSeverity);
     }
 
-    public NetconfDocumentedException(final String message, final Exception cause, final ErrorType errorType, final ErrorTag errorTag, final ErrorSeverity errorSeverity, final Map<String, String> errorInfo) {
+    public NetconfDocumentedException(final String message, final Exception cause, final ErrorType errorType, final
+        ErrorTag errorTag, final ErrorSeverity errorSeverity, final Map<String, String> errorInfo) {
         super(message, cause, errorType, errorTag, errorSeverity, errorInfo);
     }
 
-    public NetconfDocumentedException(DocumentedException e) {
-        super(e.getMessage(), (Exception) e.getCause(), e.getErrorType(), e.getErrorTag(), e.getErrorSeverity(), e.getErrorInfo());
+    public NetconfDocumentedException(DocumentedException exception) {
+        super(exception.getMessage(), (Exception) exception.getCause(), exception.getErrorType(),
+                exception.getErrorTag(), exception.getErrorSeverity(), exception.getErrorInfo());
     }
 
-    public static NetconfDocumentedException fromXMLDocument( Document fromDoc) {
+    public static NetconfDocumentedException fromXMLDocument(Document fromDoc) {
         return new NetconfDocumentedException(DocumentedException.fromXMLDocument(fromDoc));
     }
 }
