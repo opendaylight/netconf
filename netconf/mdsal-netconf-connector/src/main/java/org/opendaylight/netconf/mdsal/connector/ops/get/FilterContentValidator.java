@@ -49,9 +49,6 @@ public class FilterContentValidator {
     private static final Logger LOG = LoggerFactory.getLogger(FilterContentValidator.class);
     private final CurrentSchemaContext schemaContext;
 
-    /**
-     * @param schemaContext current schema context
-     */
     public FilterContentValidator(final CurrentSchemaContext schemaContext) {
         this.schemaContext = schemaContext;
     }
@@ -62,19 +59,19 @@ public class FilterContentValidator {
      *
      * @param filterContent filter content
      * @return YangInstanceIdentifier
-     * @throws DocumentedException if filter content is not valid
+     * @throws DocumentedException if filter content validation failed
      */
     public YangInstanceIdentifier validate(final XmlElement filterContent) throws DocumentedException {
         try {
             final URI namespace = new URI(filterContent.getNamespace());
             final Module module = schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(namespace, null);
             final DataSchemaNode schema = getRootDataSchemaNode(module, namespace, filterContent.getName());
-            final FilterTree filterTree = validateNode(filterContent, schema, new FilterTree(schema.getQName(),
-                    Type.OTHER, schema));
+            final FilterTree filterTree = validateNode(
+                    filterContent, schema, new FilterTree(schema.getQName(), Type.OTHER, schema));
             return getFilterDataRoot(filterTree, filterContent, YangInstanceIdentifier.builder());
-        } catch (final DocumentedException e) {
-            throw e;
-        } catch (final Exception e) {
+        } catch (final URISyntaxException e) {
+            throw new RuntimeException("Wrong namespace in element + " + filterContent.toString());
+        } catch (final ValidationException e) {
             LOG.debug("Filter content isn't valid", e);
             throw new DocumentedException("Validation failed. Cause: " + e.getMessage(),
                     DocumentedException.ErrorType.APPLICATION,
@@ -84,7 +81,7 @@ public class FilterContentValidator {
     }
 
     /**
-     * Returns module's child data node of given name space and name
+     * Returns module's child data node of given name space and name.
      *
      * @param module    module
      * @param nameSpace name space
@@ -101,8 +98,8 @@ public class FilterContentValidator {
                 return childNode;
             }
         }
-        throw new DocumentedException("Unable to find node with namespace: " + nameSpace + "in schema context: " +
-                schemaContext.getCurrentContext().toString(),
+        throw new DocumentedException("Unable to find node with namespace: " + nameSpace
+                    + "in schema context: " + schemaContext.getCurrentContext().toString(),
                 DocumentedException.ErrorType.APPLICATION,
                 DocumentedException.ErrorTag.UNKNOWN_NAMESPACE,
                 DocumentedException.ErrorSeverity.ERROR);
@@ -196,33 +193,40 @@ public class FilterContentValidator {
         }
         final Map<QName, Object> keys = new HashMap<>();
         final List<QName> keyDefinition = listSchemaNode.getKeyDefinition();
-        for (final QName qName : keyDefinition) {
-            final Optional<XmlElement> childElements = current.getOnlyChildElementOptionally(qName.getLocalName());
+        for (final QName qualifiedName : keyDefinition) {
+            final Optional<XmlElement> childElements =
+                    current.getOnlyChildElementOptionally(qualifiedName.getLocalName());
             if (!childElements.isPresent()) {
                 return Collections.emptyMap();
             }
             final Optional<String> keyValue = childElements.get().getOnlyTextContentOptionally();
             if (keyValue.isPresent()) {
-                final LeafSchemaNode listKey = (LeafSchemaNode) listSchemaNode.getDataChildByName(qName);
+                final LeafSchemaNode listKey = (LeafSchemaNode) listSchemaNode.getDataChildByName(qualifiedName);
                 if (listKey instanceof IdentityrefTypeDefinition) {
-                    keys.put(qName, keyValue.get());
+                    keys.put(qualifiedName, keyValue.get());
                 } else {
                     if (listKey.getType() instanceof IdentityrefTypeDefinition) {
                         final Document document = filterContent.getDomElement().getOwnerDocument();
                         final NamespaceContext nsContext = new UniversalNamespaceContextImpl(document, false);
-                        final XmlCodecFactory xmlCodecFactory = XmlCodecFactory.create(schemaContext.getCurrentContext());
+                        final XmlCodecFactory xmlCodecFactory =
+                                XmlCodecFactory.create(schemaContext.getCurrentContext());
                         final TypeAwareCodec identityrefTypeCodec = xmlCodecFactory.codecFor(listKey);
-                        final QName deserializedKey = (QName) identityrefTypeCodec.parseValue(nsContext, keyValue.get());
-                        keys.put(qName, deserializedKey);
+                        final QName deserializedKey =
+                                (QName) identityrefTypeCodec.parseValue(nsContext, keyValue.get());
+                        keys.put(qualifiedName, deserializedKey);
                     } else {
                         final Object deserializedKey = TypeDefinitionAwareCodec.from(listKey.getType())
                                 .deserialize(keyValue.get());
-                        keys.put(qName, deserializedKey);
+                        keys.put(qualifiedName, deserializedKey);
                     }
                 }
             }
         }
         return keys;
+    }
+
+    private enum Type {
+        LIST, CHOICE_CASE, OTHER
     }
 
     /**
@@ -277,12 +281,8 @@ public class FilterContentValidator {
         }
     }
 
-    private enum Type {
-        LIST, CHOICE_CASE, OTHER
-    }
-
     private static class ValidationException extends Exception {
-        public ValidationException(final XmlElement parent, final XmlElement child) {
+        ValidationException(final XmlElement parent, final XmlElement child) {
             super("Element " + child + " can't be child of " + parent);
         }
     }
