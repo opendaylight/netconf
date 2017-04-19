@@ -46,6 +46,30 @@
       "revId": "9aa6aa2cc40b58ec3aeae4c6e9240e1afcc091b3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_057646a4",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-04-19T21:02:58Z",
+      "side": 1,
+      "message": "No. I think NETCONF should be exposing an extension of DOMDataBroker which would expose appropriate methods, so RESTCONF can actually invoke the correct methods.\n\nThis string check, or its equivalent \u0027data instalceof PostNormalizedNode\u0027, mean the two component\u0027s implementation are fused toghether: NETCONF should not care who it is who is making the request, much less about what is the implementation class.",
+      "parentUuid": "fafc7978_a1eda1b9",
+      "range": {
+        "startLine": 105,
+        "startChar": 43,
+        "endLine": 105,
+        "endChar": 114
+      },
+      "revId": "9aa6aa2cc40b58ec3aeae4c6e9240e1afcc091b3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
