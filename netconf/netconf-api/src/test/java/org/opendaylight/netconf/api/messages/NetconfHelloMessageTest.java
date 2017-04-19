@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.api.messages;
 
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -30,7 +29,8 @@ public class NetconfHelloMessageTest {
 
     @Test
     public void testConstructor() throws NetconfDocumentedException {
-        NetconfHelloMessageAdditionalHeader additionalHeader = new NetconfHelloMessageAdditionalHeader("name","host","1","transp","id");
+        NetconfHelloMessageAdditionalHeader additionalHeader = new NetconfHelloMessageAdditionalHeader("name",
+                "host", "1", "transp", "id");
         NetconfHelloMessage message = NetconfHelloMessage.createClientHello(caps, Optional.of(additionalHeader));
         assertTrue(NetconfHelloMessage.isHelloMessage(message));
         assertEquals(Optional.of(additionalHeader), message.getAdditionalHeader());

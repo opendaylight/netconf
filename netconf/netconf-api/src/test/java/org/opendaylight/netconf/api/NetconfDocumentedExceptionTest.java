@@ -40,10 +40,10 @@ public class NetconfDocumentedExceptionTest {
     public void setUp() throws Exception {
         final XPathFactory xPathfactory = XPathFactory.newInstance();
         xpath = xPathfactory.newXPath();
-        xpath.setNamespaceContext( new NamespaceContext() {
+        xpath.setNamespaceContext(new NamespaceContext() {
             @Override
             public Iterator<?> getPrefixes(final String namespaceURI) {
-                return Collections.singletonList( "netconf" ).iterator();
+                return Collections.singletonList("netconf").iterator();
             }
 
             @Override
@@ -55,67 +55,67 @@ public class NetconfDocumentedExceptionTest {
             public String getNamespaceURI(final String prefix) {
                 return XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0;
             }
-        } );
+        });
     }
 
     @Test
     public void testToAndFromXMLDocument() throws XPathExpressionException {
         final String errorMessage = "mock error message";
-        DocumentedException ex = new NetconfDocumentedException( errorMessage, null,
+        DocumentedException ex = new NetconfDocumentedException(errorMessage, null,
                 DocumentedException.ErrorType.PROTOCOL,
                 DocumentedException.ErrorTag.DATA_EXISTS,
                 DocumentedException.ErrorSeverity.WARNING,
-                ImmutableMap.of( "foo", "bar" ) );
+                ImmutableMap.of("foo", "bar"));
 
         final Document doc = ex.toXMLDocument();
-        assertNotNull( "Document is null", doc );
+        assertNotNull("Document is null", doc);
 
         final Node rootNode = doc.getDocumentElement();
 
-        assertEquals( "getNamespaceURI", "urn:ietf:params:xml:ns:netconf:base:1.0", rootNode.getNamespaceURI() );
-        assertEquals( "getLocalName", "rpc-reply", rootNode.getLocalName() );
+        assertEquals("getNamespaceURI", "urn:ietf:params:xml:ns:netconf:base:1.0", rootNode.getNamespaceURI());
+        assertEquals("getLocalName", "rpc-reply", rootNode.getLocalName());
 
         final Node rpcErrorNode = getNode("/netconf:rpc-reply/netconf:rpc-error", rootNode);
-        assertNotNull( "rpc-error not found", rpcErrorNode );
+        assertNotNull("rpc-error not found", rpcErrorNode);
 
         final Node errorTypeNode = getNode("netconf:error-type", rpcErrorNode);
-        assertNotNull( "error-type not found", errorTypeNode );
+        assertNotNull("error-type not found", errorTypeNode);
         assertEquals("error-type", DocumentedException.ErrorType.PROTOCOL.getTypeValue(),
-                      errorTypeNode.getTextContent() );
+                errorTypeNode.getTextContent());
 
         final Node errorTagNode = getNode("netconf:error-tag", rpcErrorNode);
-        assertNotNull( "error-tag not found", errorTagNode );
+        assertNotNull("error-tag not found", errorTagNode);
         assertEquals("error-tag", DocumentedException.ErrorTag.DATA_EXISTS.getTagValue(),
-                      errorTagNode.getTextContent() );
+                errorTagNode.getTextContent());
 
         final Node errorSeverityNode = getNode("netconf:error-severity", rpcErrorNode);
-        assertNotNull( "error-severity not found", errorSeverityNode );
+        assertNotNull("error-severity not found", errorSeverityNode);
         assertEquals("error-severity", DocumentedException.ErrorSeverity.WARNING.getSeverityValue(),
-                      errorSeverityNode.getTextContent() );
+                errorSeverityNode.getTextContent());
 
         final Node errorInfoNode = getNode("netconf:error-info/netconf:foo", rpcErrorNode);
-        assertNotNull( "foo not found", errorInfoNode );
-        assertEquals( "foo", "bar", errorInfoNode.getTextContent() );
+        assertNotNull("foo not found", errorInfoNode);
+        assertEquals("foo", "bar", errorInfoNode.getTextContent());
 
         final Node errorMsgNode = getNode("netconf:error-message", rpcErrorNode);
-        assertNotNull( "error-message not found", errorMsgNode );
-        assertEquals( "error-message", errorMessage, errorMsgNode.getTextContent() );
+        assertNotNull("error-message not found", errorMsgNode);
+        assertEquals("error-message", errorMessage, errorMsgNode.getTextContent());
 
         // Test fromXMLDocument
 
-        ex = DocumentedException.fromXMLDocument( doc );
+        ex = DocumentedException.fromXMLDocument(doc);
 
-        assertNotNull( "NetconfDocumentedException is null", ex );
+        assertNotNull("NetconfDocumentedException is null", ex);
         assertEquals("getErrorSeverity", DocumentedException.ErrorSeverity.WARNING, ex.getErrorSeverity());
         assertEquals("getErrorTag", DocumentedException.ErrorTag.DATA_EXISTS, ex.getErrorTag());
         assertEquals("getErrorType", DocumentedException.ErrorType.PROTOCOL, ex.getErrorType());
-        assertEquals( "getLocalizedMessage", errorMessage, ex.getLocalizedMessage() );
-        assertEquals( "getErrorInfo", ImmutableMap.of( "foo", "bar" ), ex.getErrorInfo() );
+        assertEquals("getLocalizedMessage", errorMessage, ex.getLocalizedMessage());
+        assertEquals("getErrorInfo", ImmutableMap.of("foo", "bar"), ex.getErrorInfo());
     }
 
     @SuppressWarnings("unchecked")
     <T> T getNode(final String xpathExp, final Node node) throws XPathExpressionException {
-        return (T)xpath.compile( xpathExp ).evaluate( node, XPathConstants.NODE );
+        return (T) xpath.compile(xpathExp).evaluate(node, XPathConstants.NODE);
     }
 }
 
