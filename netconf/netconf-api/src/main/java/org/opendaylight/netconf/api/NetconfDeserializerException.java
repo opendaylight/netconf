@@ -20,7 +20,7 @@ public class NetconfDeserializerException extends Exception {
         super(message);
     }
 
-    public NetconfDeserializerException(final String message, final Exception e) {
-        super(message, e);
+    public NetconfDeserializerException(final String message, final Exception exception) {
+        super(message, exception);
     }
 }

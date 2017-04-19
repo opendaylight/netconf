@@ -19,7 +19,9 @@ public interface NetconfMonitoringService {
     Sessions getSessions();
 
     /**
-     * Returns session monitoring service session listener, which is used to notify monitoring service about state of session.
+     * Returns session monitoring service session listener, which is used to notify monitoring service about state of
+     * session.
+     *
      * @return session listener
      */
     SessionListener getSessionListener();
@@ -31,7 +33,9 @@ public interface NetconfMonitoringService {
     Capabilities getCapabilities();
 
     /**
-     * Allows push based capabilities information transfer. After the listener is registered, current state is pushed to the listener.
+     * Allows push based capabilities information transfer. After the listener is registered, current state is pushed
+     * to the listener.
+     *
      * @param listener Monitoring listener
      * @return listener registration
      */
@@ -39,6 +43,7 @@ public interface NetconfMonitoringService {
 
     /**
      * Allows push based sessions information transfer.
+     *
      * @param listener Monitoring listener
      * @return listener registration
      */
@@ -47,13 +52,15 @@ public interface NetconfMonitoringService {
     interface CapabilitiesListener {
 
         /**
-         * Callback used to notify about a change in used capabilities
+         * Callback used to notify about a change in used capabilities.
+         *
          * @param capabilities resulting capabilities
          */
         void onCapabilitiesChanged(Capabilities capabilities);
 
         /**
-         * Callback used to notify about a change in used schemas
+         * Callback used to notify about a change in used schemas.
+         *
          * @param schemas resulting schemas
          */
         void onSchemasChanged(Schemas schemas);
@@ -61,13 +68,15 @@ public interface NetconfMonitoringService {
 
     interface SessionsListener {
         /**
-         * Callback used to notify about netconf session start
+         * Callback used to notify about netconf session start.
+         *
          * @param session started session
          */
         void onSessionStarted(Session session);
 
         /**
-         * Callback used to notify about netconf session end
+         * Callback used to notify about netconf session end.
+         *
          * @param session ended session
          */
         void onSessionEnded(Session session);
@@ -76,6 +85,7 @@ public interface NetconfMonitoringService {
          * Callback used to notify about activity in netconf session, like
          * rpc or notification. It is triggered at regular time interval. Session parameter
          * contains only sessions which state was changed.
+         *
          * @param sessions updated sessions
          */
         void onSessionsUpdated(Collection<Session> sessions);

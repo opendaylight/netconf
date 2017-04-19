@@ -20,7 +20,8 @@ public class SessionEvent {
     }
 
     /**
-     * Returns session, where event occurred
+     * Returns session, where event occurred.
+     *
      * @return session
      */
     public NetconfManagementSession getSession() {
@@ -28,7 +29,8 @@ public class SessionEvent {
     }
 
     /**
-     * Returns event type
+     * Returns event type.
+     *
      * @return type
      */
     public Type getType() {
@@ -52,17 +54,17 @@ public class SessionEvent {
     }
 
     /**
-     * Session event type
+     * Session event type.
      */
     public enum Type {
 
         /**
-         * Correct rpc message received
+         * Correct rpc message received.
          */
         IN_RPC_SUCCESS,
 
         /**
-         * Incorrect rpc message received
+         * Incorrect rpc message received.
          */
         IN_RPC_FAIL,
 
@@ -72,7 +74,7 @@ public class SessionEvent {
         OUT_RPC_ERROR,
 
         /**
-         *  Notification message sent
+         * Notification message sent.
          */
         NOTIFICATION
     }
