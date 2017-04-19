@@ -61,16 +61,19 @@ import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.concurrent.duration.Duration;
 
 public class NetconfNodeActor extends UntypedActor {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeActor.class);
 
-    private NetconfTopologySetup setup;
-    private RemoteDeviceId id;
     private final SchemaSourceRegistry schemaRegistry;
     private final SchemaRepository schemaRepository;
+    private final Timeout actorResponseWaitTime;
+    private final Duration writeTxIdleTimeout;
 
+    private RemoteDeviceId id;
+    private NetconfTopologySetup setup;
     private List<SourceIdentifier> sourceIdentifiers;
     private DOMRpcService deviceRpc;
     private SlaveSalFacade slaveSalManager;
@@ -92,6 +95,7 @@ public class NetconfNodeActor extends UntypedActor {
         this.id = id;
         this.schemaRegistry = schemaRegistry;
         this.schemaRepository = schemaRepository;
+        this.writeTxIdleTimeout = setup.getIdleTimeout();
     }
 
     @Override
@@ -131,7 +135,7 @@ public class NetconfNodeActor extends UntypedActor {
         } else if (message instanceof NewWriteTransactionRequest) { // master
             try {
                 final DOMDataWriteTransaction tx = deviceDataBroker.newWriteOnlyTransaction();
-                final ActorRef txActor = context().actorOf(WriteTransactionActor.props(tx));
+                final ActorRef txActor = context().actorOf(WriteTransactionActor.props(tx, writeTxIdleTimeout));
                 sender().tell(new NewWriteTransactionReply(txActor), self());
             } catch (final Throwable t) {
                 sender().tell(t, self());

@@ -92,6 +92,7 @@ public class WriteOnlyTransactionTest {
                 new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 9999));
 
         final NetconfTopologySetup setup = mock(NetconfTopologySetup.class);
+        doReturn(Duration.apply(0, TimeUnit.SECONDS)).when(setup).getIdleTimeout();
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY,
                 DEFAULT_SCHEMA_REPOSITORY);
 

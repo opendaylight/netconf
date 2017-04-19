@@ -20,6 +20,7 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvid
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import scala.concurrent.duration.Duration;
 
 public class NetconfTopologySetup {
 
@@ -36,6 +37,7 @@ public class NetconfTopologySetup {
     private final EventExecutor eventExecutor;
     private final NetconfClientDispatcher netconfClientDispatcher;
     private final String topologyId;
+    private final Duration idleTimeout;
     private NetconfTopologySetup(final NetconfTopologySetupBuilder builder) {
         this.clusterSingletonServiceProvider = builder.getClusterSingletonServiceProvider();
         this.rpcProviderRegistry = builder.getRpcProviderRegistry();
@@ -50,6 +52,7 @@ public class NetconfTopologySetup {
         this.eventExecutor = builder.getEventExecutor();
         this.netconfClientDispatcher = builder.getNetconfClientDispatcher();
         this.topologyId = builder.getTopologyId();
+        this.idleTimeout = builder.getIdleTimeout();
     }
 
     public ClusterSingletonServiceProvider getClusterSingletonServiceProvider() {
@@ -104,6 +107,10 @@ public class NetconfTopologySetup {
         return netconfClientDispatcher;
     }
 
+    public Duration getIdleTimeout() {
+        return idleTimeout;
+    }
+
     public static class NetconfTopologySetupBuilder {
 
         private ClusterSingletonServiceProvider clusterSingletonServiceProvider;
@@ -119,6 +126,7 @@ public class NetconfTopologySetup {
         private EventExecutor eventExecutor;
         private String topologyId;
         private NetconfClientDispatcher netconfClientDispatcher;
+        private Duration idleTimeout;
 
         public NetconfTopologySetupBuilder(){
         }
@@ -177,7 +185,7 @@ public class NetconfTopologySetup {
             return bindingAwareBroker;
         }
 
-        public NetconfTopologySetupBuilder setBindingAwareBroker(BindingAwareBroker bindingAwareBroker) {
+        public NetconfTopologySetupBuilder setBindingAwareBroker(final BindingAwareBroker bindingAwareBroker) {
             this.bindingAwareBroker = bindingAwareBroker;
             return this;
         }
@@ -186,7 +194,7 @@ public class NetconfTopologySetup {
             return keepaliveExecutor;
         }
 
-        public NetconfTopologySetupBuilder setKeepaliveExecutor(ScheduledThreadPool keepaliveExecutor) {
+        public NetconfTopologySetupBuilder setKeepaliveExecutor(final ScheduledThreadPool keepaliveExecutor) {
             this.keepaliveExecutor = keepaliveExecutor;
             return this;
         }
@@ -195,7 +203,7 @@ public class NetconfTopologySetup {
             return processingExecutor;
         }
 
-        public NetconfTopologySetupBuilder setProcessingExecutor(ThreadPool processingExecutor) {
+        public NetconfTopologySetupBuilder setProcessingExecutor(final ThreadPool processingExecutor) {
             this.processingExecutor = processingExecutor;
             return this;
         }
@@ -204,7 +212,7 @@ public class NetconfTopologySetup {
             return domBroker;
         }
 
-        public NetconfTopologySetupBuilder setDomBroker(Broker domBroker) {
+        public NetconfTopologySetupBuilder setDomBroker(final Broker domBroker) {
             this.domBroker = domBroker;
             return this;
         }
@@ -213,7 +221,7 @@ public class NetconfTopologySetup {
             return actorSystem;
         }
 
-        public NetconfTopologySetupBuilder setActorSystem(ActorSystem actorSystem) {
+        public NetconfTopologySetupBuilder setActorSystem(final ActorSystem actorSystem) {
             this.actorSystem = actorSystem;
             return this;
         }
@@ -222,7 +230,7 @@ public class NetconfTopologySetup {
             return eventExecutor;
         }
 
-        public NetconfTopologySetupBuilder setEventExecutor(EventExecutor eventExecutor) {
+        public NetconfTopologySetupBuilder setEventExecutor(final EventExecutor eventExecutor) {
             this.eventExecutor = eventExecutor;
             return this;
         }
@@ -231,7 +239,7 @@ public class NetconfTopologySetup {
             return topologyId;
         }
 
-        public NetconfTopologySetupBuilder setTopologyId(String topologyId) {
+        public NetconfTopologySetupBuilder setTopologyId(final String topologyId) {
             this.topologyId = topologyId;
             return this;
         }
@@ -240,11 +248,20 @@ public class NetconfTopologySetup {
             return netconfClientDispatcher;
         }
 
-        public NetconfTopologySetupBuilder setNetconfClientDispatcher(NetconfClientDispatcher clientDispatcher) {
+        public NetconfTopologySetupBuilder setNetconfClientDispatcher(final NetconfClientDispatcher clientDispatcher) {
             this.netconfClientDispatcher = clientDispatcher;
             return this;
         }
 
+        }
+
+        public NetconfTopologySetupBuilder setIdleTimeout(final Duration idleTimeout) {
+            this.idleTimeout = idleTimeout;
+            return this;
+        }
+
+        private Duration getIdleTimeout() {
+            return idleTimeout;
         public static NetconfTopologySetupBuilder create() {
             return new NetconfTopologySetupBuilder();
         }
