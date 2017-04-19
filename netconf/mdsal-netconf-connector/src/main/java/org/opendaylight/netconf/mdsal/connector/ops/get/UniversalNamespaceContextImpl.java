@@ -52,8 +52,9 @@ public class UniversalNamespaceContextImpl implements NamespaceContext {
             final NodeList chields = node.getChildNodes();
             for (int i = 0; i < chields.getLength(); i++) {
                 final Node chield = chields.item(i);
-                if (chield.getNodeType() == Node.ELEMENT_NODE)
+                if (chield.getNodeType() == Node.ELEMENT_NODE) {
                     readNode(chield, false);
+                }
             }
         }
     }
