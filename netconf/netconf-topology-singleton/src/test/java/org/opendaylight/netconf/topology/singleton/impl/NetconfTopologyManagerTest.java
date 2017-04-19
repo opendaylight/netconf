@@ -86,7 +86,7 @@ public class NetconfTopologyManagerTest {
 
         netconfTopologyManager = new NetconfTopologyManager(dataBroker, rpcProviderRegistry,
                 clusterSingletonServiceProvider, bindingAwareBroker, keepaliveExecutor, processingExecutor, domBroker,
-                actorSystemProvider, eventExecutor, clientDispatcher, topologyId);
+                actorSystemProvider, eventExecutor, clientDispatcher, topologyId, 0);
     }
     @Test
     public void testWriteConfiguration() throws Exception {
@@ -95,13 +95,11 @@ public class NetconfTopologyManagerTest {
 
         final Field fieldContexts = NetconfTopologyManager.class.getDeclaredField("contexts");
         fieldContexts.setAccessible(true);
-        @SuppressWarnings("unchecked")
         final Map<InstanceIdentifier<Node>, NetconfTopologyContext> contexts =
                 (Map<InstanceIdentifier<Node>, NetconfTopologyContext>) fieldContexts.get(netconfTopologyManager);
 
         final Field fieldClusterRegistrations = NetconfTopologyManager.class.getDeclaredField("clusterRegistrations");
         fieldClusterRegistrations.setAccessible(true);
-        @SuppressWarnings("unchecked")
         final Map<InstanceIdentifier<Node>, ClusterSingletonServiceRegistration> clusterRegistrations =
                 (Map<InstanceIdentifier<Node>, ClusterSingletonServiceRegistration>)
                         fieldClusterRegistrations.get(netconfTopologyManager);
@@ -120,7 +118,6 @@ public class NetconfTopologyManagerTest {
         final DataTreeIdentifier<Node> rootIdentifierDifferent =
                 new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION, instanceIdentifierDiferent);
 
-        @SuppressWarnings("unchecked")
         final DataObjectModification<Node> objectModification = mock(DataObjectModification.class);
 
         final NetconfNode netconfNode = new NetconfNodeBuilder()
@@ -138,7 +135,6 @@ public class NetconfTopologyManagerTest {
 
         final Identifier key = new NodeKey(new NodeId("node-id"));
 
-        @SuppressWarnings("unchecked")
         final InstanceIdentifier.IdentifiableItem<Node, NodeKey> pathArgument =
                 new InstanceIdentifier.IdentifiableItem(Node.class, key);
 
@@ -214,13 +210,11 @@ public class NetconfTopologyManagerTest {
 
         final Field fieldContexts = NetconfTopologyManager.class.getDeclaredField("contexts");
         fieldContexts.setAccessible(true);
-        @SuppressWarnings("unchecked")
         final Map<InstanceIdentifier<Node>, NetconfTopologyContext> contexts =
                 (Map<InstanceIdentifier<Node>, NetconfTopologyContext>) fieldContexts.get(netconfTopologyManager);
 
         final Field fieldClusterRegistrations = NetconfTopologyManager.class.getDeclaredField("clusterRegistrations");
         fieldClusterRegistrations.setAccessible(true);
-        @SuppressWarnings("unchecked")
         final Map<InstanceIdentifier<Node>, ClusterSingletonServiceRegistration> clusterRegistrations =
                 (Map<InstanceIdentifier<Node>, ClusterSingletonServiceRegistration>)
                         fieldClusterRegistrations.get(netconfTopologyManager);

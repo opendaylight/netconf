@@ -17,6 +17,7 @@ import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
@@ -35,7 +36,6 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvid
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
-import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup.NetconfTopologySetupBuilder;
@@ -77,13 +77,15 @@ public class NetconfTopologyManager
     private final EventExecutor eventExecutor;
     private final NetconfClientDispatcher clientDispatcher;
     private final String topologyId;
+    private final Duration writeTxIdleTimeout;
 
     public NetconfTopologyManager(final DataBroker dataBroker, final RpcProviderRegistry rpcProviderRegistry,
                                   final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
                                   final BindingAwareBroker bindingAwareBroker,
                                   final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
                                   final Broker domBroker, final ActorSystemProvider actorSystemProvider, final EventExecutor eventExecutor,
-                                  final NetconfClientDispatcher clientDispatcher, final String topologyId) {
+                                  final NetconfClientDispatcher clientDispatcher, final String topologyId,
+                                  final int writeTxIdleTimeout) {
         this.dataBroker = Preconditions.checkNotNull(dataBroker);
         this.rpcProviderRegistry = Preconditions.checkNotNull(rpcProviderRegistry);
         this.clusterSingletonServiceProvider = Preconditions.checkNotNull(clusterSingletonServiceProvider);
@@ -95,6 +97,7 @@ public class NetconfTopologyManager
         this.eventExecutor = Preconditions.checkNotNull(eventExecutor);
         this.clientDispatcher = Preconditions.checkNotNull(clientDispatcher);
         this.topologyId = Preconditions.checkNotNull(topologyId);
+        this.writeTxIdleTimeout = Duration.apply(writeTxIdleTimeout, TimeUnit.SECONDS);
     }
 
     // Blueprint init method
@@ -244,7 +247,8 @@ public class NetconfTopologyManager
                 .setProcessingExecutor(processingExecutor)
                 .setTopologyId(topologyId)
                 .setNetconfClientDispatcher(clientDispatcher)
-                .setSchemaResourceDTO(NetconfTopologyUtils.setupSchemaCacheDTO(node));
+                .setSchemaResourceDTO(NetconfTopologyUtils.setupSchemaCacheDTO(node))
+                .setIdleTimeout(writeTxIdleTimeout);
 
         return builder.build();
     }
