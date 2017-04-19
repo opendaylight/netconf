@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,6 +45,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
+import scala.concurrent.duration.Duration;
 
 public class WriteTransactionActorTest {
     private static final YangInstanceIdentifier PATH = YangInstanceIdentifier.EMPTY;
@@ -65,7 +67,8 @@ public class WriteTransactionActorTest {
         node = Builders.containerBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("cont")))
                 .build();
-        actorRef = TestActorRef.create(system, WriteTransactionActor.props(deviceWriteTx), "testA");
+        actorRef = TestActorRef.create(system, WriteTransactionActor.props(deviceWriteTx,
+                Duration.apply(2, TimeUnit.SECONDS)), "testA");
     }
 
     @Test
@@ -119,10 +122,17 @@ public class WriteTransactionActorTest {
         verify(deviceWriteTx).submit();
     }
 
+    @Test
+    public void testIdleTimeout() throws Exception {
+        final TestProbe probe = new TestProbe(system);
+        probe.watch(actorRef);
+        verify(deviceWriteTx, timeout(3000)).cancel();
+        probe.expectTerminated(actorRef, TIMEOUT.duration());
+    }
+
     @After
     public void tearDown() throws Exception {
         JavaTestKit.shutdownActorSystem(system);
-
     }
 
 }
