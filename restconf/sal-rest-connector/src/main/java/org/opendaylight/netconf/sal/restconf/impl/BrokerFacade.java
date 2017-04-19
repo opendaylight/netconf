@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Response.Status;
@@ -885,17 +886,45 @@ public class BrokerFacade {
             return;
         }
 
-        // We are putting multiple children, we really need a create() operation, but until we have that we make do
-        // with a two-step process of verifying if the children exist and then putting them in.
-        for (final NormalizedNode<?, ?> child : children) {
-            checkItemDoesNotExists(rWTransaction, datastore, path.node(child.getIdentifier()));
+        final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
+        if (children.isEmpty()) {
+            rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+            ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
+            return;
         }
 
-        final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
+        // Kick off batch existence check first...
+        final BatchedExistenceCheck check = BatchedExistenceCheck.start(rWTransaction, datastore, path, children);
+
+        // ... now enqueue modifications. This relies on proper ordering of requests, i.e. these will not affect the
+        // result of the existence checks...
         rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
         ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
         for (final NormalizedNode<?, ?> child : children) {
+            // FIXME: we really want a create(YangInstanceIdentifier, NormalizedNode) method in the transaction,
+            //        as that would allow us to skip the existence checks
             rWTransaction.put(datastore, path.node(child.getIdentifier()), child);
+        }
+
+        // ... finally collect existence checks and abort the transaction if any of them failed.
+        final Entry<YangInstanceIdentifier, ReadFailedException> failure;
+        try {
+            failure = check.getFailure();
+        } catch (InterruptedException e) {
+            rWTransaction.cancel();
+            throw new RestconfDocumentedException("Could not determine the existence of path " + path, e);
+        }
+
+        if (failure != null) {
+            rWTransaction.cancel();
+            final ReadFailedException e = failure.getValue();
+            if (e == null) {
+                throw new RestconfDocumentedException("Data already exists for path: " + failure.getKey(),
+                    ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS);
+            }
+
+            throw new RestconfDocumentedException("Could not determine the existence of path " + failure.getKey(), e,
+                e.getErrorList());
         }
     }
 
@@ -1196,18 +1225,6 @@ public class BrokerFacade {
         listener.setRegistration(registration);
     }
 
-    private final class PATCHStatusContextHelper {
-        PATCHStatusContext status;
-
-        public PATCHStatusContext getStatus() {
-            return this.status;
-        }
-
-        public void setStatus(final PATCHStatusContext status) {
-            this.status = status;
-        }
-    }
-
     private static void ensureParentsByMerge(final LogicalDatastoreType store,
             final YangInstanceIdentifier normalizedPath, final DOMDataReadWriteTransaction rwTx,
             final SchemaContext schemaContext) {
@@ -1236,5 +1253,17 @@ public class BrokerFacade {
         final NormalizedNode<?, ?> parentStructure = ImmutableNodes.fromInstanceId(schemaContext,
                 YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));
         rwTx.merge(store, rootNormalizedPath, parentStructure);
+    }
+
+    private static final class PATCHStatusContextHelper {
+        PATCHStatusContext status;
+
+        public PATCHStatusContext getStatus() {
+            return this.status;
+        }
+
+        public void setStatus(final PATCHStatusContext status) {
+            this.status = status;
+        }
     }
 }
