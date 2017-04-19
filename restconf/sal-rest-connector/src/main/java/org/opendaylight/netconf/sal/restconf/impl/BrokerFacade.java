@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
@@ -44,6 +45,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -876,17 +878,46 @@ public class BrokerFacade {
             return;
         }
 
-        // We are putting multiple children, we really need a create() operation, but until we have that we make do
-        // with a two-step process of verifying if the children exist and then putting them in.
-        for (final NormalizedNode<?, ?> child : children) {
-            checkItemDoesNotExists(rWTransaction, datastore, path.node(child.getIdentifier()));
+        if (children.isEmpty()) {
+            // FIXME: do we need to do anything here?
+            return;
         }
+
+        // Kick off batch validation. This relies on proper ordering of requests, i.e. the effects of subsequent
+        // put operations will not be seen.
+        // FIXME: we really want a create(YangInstanceIdentifier, NormalizedNode) method in the transaction
+        final BatchedReadCheck check = BatchedReadCheck.start(rWTransaction, datastore, path, children);
 
         final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
         rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
         ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
         for (final NormalizedNode<?, ?> child : children) {
             rWTransaction.put(datastore, path.node(child.getIdentifier()), child);
+        }
+
+        final java.util.Optional<YangInstanceIdentifier> failedChild;
+        try {
+            failedChild = check.getFailure();
+        } catch (InterruptedException e) {
+            rWTransaction.cancel();
+            throw new RestconfDocumentedException("Could not determine the existence of path " + path, e);
+        } catch (ExecutionException e) {
+            rWTransaction.cancel();
+
+            final Throwable cause = e.getCause();
+            if (cause instanceof OperationFailedException) {
+                final OperationFailedException ofe = (OperationFailedException) cause;
+                throw new RestconfDocumentedException("Could not determine the existence of path " + path, ofe,
+                    ofe.getErrorList());
+            }
+
+            throw new RestconfDocumentedException("Could not determine the existence of path " + path, cause);
+        }
+
+        if (failedChild.isPresent()) {
+            rWTransaction.cancel();
+            throw new RestconfDocumentedException("Data already exists for path: " + failedChild.get(),
+                ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS);
         }
     }
 
