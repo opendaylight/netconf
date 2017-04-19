@@ -47,10 +47,22 @@ import org.w3c.dom.Node;
 
 public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractGet.class);
-
     protected static final String FILTER = "filter";
     static final YangInstanceIdentifier ROOT = YangInstanceIdentifier.builder().build();
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractGet.class);
+    private static final XMLOutputFactory XML_OUTPUT_FACTORY;
+    private static final Function<PathArgument, QName> PATH_ARG_TO_QNAME = new Function<PathArgument, QName>() {
+        @Override
+        public QName apply(final PathArgument input) {
+            return input.getNodeType();
+        }
+    };
+
+    static {
+        XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
+        XML_OUTPUT_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
+    }
+
     protected final CurrentSchemaContext schemaContext;
     private final FilterContentValidator validator;
 
@@ -60,14 +72,8 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         this.validator = new FilterContentValidator(schemaContext);
     }
 
-    private static final XMLOutputFactory XML_OUTPUT_FACTORY;
-
-    static {
-        XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
-        XML_OUTPUT_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
-    }
-
-    protected Node transformNormalizedNode(final Document document, final NormalizedNode<?, ?> data, final YangInstanceIdentifier dataRoot) {
+    protected Node transformNormalizedNode(final Document document, final NormalizedNode<?, ?> data,
+                                           final YangInstanceIdentifier dataRoot) {
 
         final DOMResult result = new DOMResult(document.createElement(XmlNetconfConstants.DATA_KEY));
 
@@ -82,7 +88,6 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         return result.getNode();
     }
 
-
     private XMLStreamWriter getXmlStreamWriter(final DOMResult result) {
         try {
             return XML_OUTPUT_FACTORY.createXMLStreamWriter(result);
@@ -91,18 +96,13 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         }
     }
 
-    private static final Function<PathArgument, QName> PATH_ARG_TO_QNAME = new Function<YangInstanceIdentifier.PathArgument, QName>() {
-        @Override
-        public QName apply(final YangInstanceIdentifier.PathArgument input) {
-            return input.getNodeType();
-        }
-    };
-
     private SchemaPath getSchemaPath(final YangInstanceIdentifier dataRoot) {
-        return SchemaPath.create(Iterables.transform(dataRoot.getPathArguments(), PATH_ARG_TO_QNAME), dataRoot.equals(ROOT));
+        return SchemaPath.create(Iterables.transform(dataRoot.getPathArguments(), PATH_ARG_TO_QNAME), dataRoot.equals(
+                ROOT));
     }
 
-    private void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter, final ContainerNode data) {
+    private void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter,
+                                  final ContainerNode data) {
         try {
             if (data.getNodeType().equals(SchemaContext.NAME)) {
                 for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
@@ -118,24 +118,26 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         }
     }
 
-    protected Element serializeNodeWithParentStructure(final Document document, final YangInstanceIdentifier dataRoot, final NormalizedNode node) {
+    protected Element serializeNodeWithParentStructure(final Document document, final YangInstanceIdentifier dataRoot,
+                                                       final NormalizedNode node) {
         if (!dataRoot.equals(ROOT)) {
             return (Element) transformNormalizedNode(document,
                     ImmutableNodes.fromInstanceId(schemaContext.getCurrentContext(), dataRoot, node),
                     ROOT);
         }
-        return  (Element) transformNormalizedNode(document, node, ROOT);
+        return (Element) transformNormalizedNode(document, node, ROOT);
     }
 
     /**
-     *
+     * If Filter is present and not empty returns Optional of the InstanceIdentifier to the read location in
+     *     datastore.
+     *     Empty filter returns Optional.absent() which should equal an empty &lt;data/&gt; container in the response.
+     *     if filter is not present we want to read the entire datastore - return ROOT.
      * @param operationElement operation element
-     * @return if Filter is present and not empty returns Optional of the InstanceIdentifier to the read location in datastore.
-     *          empty filter returns Optional.absent() which should equal an empty &lt;data/&gt; container in the response.
-     *         if filter is not present we want to read the entire datastore - return ROOT.
-     * @throws DocumentedException
+     * @throws DocumentedException if fails
      */
-    protected Optional<YangInstanceIdentifier> getDataRootFromFilter(final XmlElement operationElement) throws DocumentedException {
+    protected Optional<YangInstanceIdentifier> getDataRootFromFilter(final XmlElement operationElement) throws
+            DocumentedException {
         final Optional<XmlElement> filterElement = operationElement.getOnlyChildElementOptionally(FILTER);
         if (filterElement.isPresent()) {
             if (filterElement.get().getChildElements().size() == 0) {
@@ -148,7 +150,8 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
     }
 
     @VisibleForTesting
-    protected YangInstanceIdentifier getInstanceIdentifierFromFilter(final XmlElement filterElement) throws DocumentedException {
+    protected YangInstanceIdentifier getInstanceIdentifierFromFilter(final XmlElement filterElement) throws
+            DocumentedException {
 
         if (filterElement.getChildElements().size() != 1) {
             throw new DocumentedException("Multiple filter roots not supported yet",
@@ -162,26 +165,25 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
     protected static final class GetConfigExecution {
 
         private final Optional<Datastore> datastore;
+
         public GetConfigExecution(final Optional<Datastore> datastore) {
             this.datastore = datastore;
-        }
-
-        public Optional<Datastore> getDatastore() {
-            return datastore;
         }
 
         static GetConfigExecution fromXml(final XmlElement xml, final String operationName) throws DocumentedException {
             try {
                 validateInputRpc(xml, operationName);
             } catch (final DocumentedException e) {
-                throw new DocumentedException("Incorrect RPC: " + e.getMessage(), e.getErrorType(), e.getErrorTag(), e.getErrorSeverity(), e.getErrorInfo());
+                throw new DocumentedException("Incorrect RPC: " + e.getMessage(), e.getErrorType(), e.getErrorTag(),
+                        e.getErrorSeverity(), e.getErrorInfo());
             }
 
             final Optional<Datastore> sourceDatastore;
             try {
                 sourceDatastore = parseSource(xml);
             } catch (final DocumentedException e) {
-                throw new DocumentedException("Get-config source attribute error: " + e.getMessage(), e.getErrorType(), e.getErrorTag(), e.getErrorSeverity(), e.getErrorInfo());
+                throw new DocumentedException("Get-config source attribute error: " + e.getMessage(), e.getErrorType(),
+                        e.getErrorTag(), e.getErrorSeverity(), e.getErrorInfo());
             }
 
             return new GetConfigExecution(sourceDatastore);
@@ -191,13 +193,19 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
             final Optional<XmlElement> sourceElement = xml.getOnlyChildElementOptionally(XmlNetconfConstants.SOURCE_KEY,
                     XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
 
-            return  sourceElement.isPresent() ?
-                    Optional.of(Datastore.valueOf(sourceElement.get().getOnlyChildElement().getName())) : Optional.<Datastore>absent();
+            return sourceElement.isPresent()
+                    ? Optional.of(Datastore.valueOf(sourceElement.get().getOnlyChildElement().getName()))
+                    : Optional.<Datastore>absent();
         }
 
-        private static void validateInputRpc(final XmlElement xml, final String operationName) throws DocumentedException {
+        private static void validateInputRpc(final XmlElement xml, final String operationName) throws
+                DocumentedException {
             xml.checkName(operationName);
             xml.checkNamespace(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
+        }
+
+        public Optional<Datastore> getDatastore() {
+            return datastore;
         }
 
     }

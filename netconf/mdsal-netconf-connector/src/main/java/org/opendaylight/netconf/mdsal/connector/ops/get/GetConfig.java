@@ -37,13 +37,15 @@ public class GetConfig extends AbstractGet {
     private static final String OPERATION_NAME = "get-config";
     private final TransactionProvider transactionProvider;
 
-    public GetConfig(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext, final TransactionProvider transactionProvider) {
+    public GetConfig(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext,
+                     final TransactionProvider transactionProvider) {
         super(netconfSessionIdForReporting, schemaContext);
         this.transactionProvider = transactionProvider;
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
+            throws DocumentedException {
         GetConfigExecution getConfigExecution = null;
         try {
             getConfigExecution = GetConfigExecution.fromXml(operationElement, OPERATION_NAME);
@@ -65,7 +67,8 @@ public class GetConfig extends AbstractGet {
 
         final DOMDataReadWriteTransaction rwTx = getTransaction(getConfigExecution.getDatastore().get());
         try {
-            final Optional<NormalizedNode<?, ?>> normalizedNodeOptional = rwTx.read(LogicalDatastoreType.CONFIGURATION, dataRoot).checkedGet();
+            final Optional<NormalizedNode<?, ?>> normalizedNodeOptional = rwTx.read(LogicalDatastoreType
+                    .CONFIGURATION, dataRoot).checkedGet();
             if (getConfigExecution.getDatastore().get() == Datastore.running) {
                 transactionProvider.abortRunningTransaction(rwTx);
             }
@@ -87,7 +90,8 @@ public class GetConfig extends AbstractGet {
         } else if (datastore == Datastore.running) {
             return transactionProvider.createRunningTransaction();
         }
-        throw new DocumentedException("Incorrect Datastore: ", ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT, ErrorSeverity.ERROR);
+        throw new DocumentedException("Incorrect Datastore: ", ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT,
+                ErrorSeverity.ERROR);
     }
 
     @Override
