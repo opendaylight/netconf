@@ -33,7 +33,8 @@ public class CurrentSchemaContext implements SchemaContextListener, AutoCloseabl
         return currentContext.get();
     }
 
-    public CurrentSchemaContext(final SchemaService schemaService, final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider) {
+    public CurrentSchemaContext(final SchemaService schemaService, final SchemaSourceProvider<YangTextSchemaSource>
+            rootSchemaSourceProvider) {
         this.rootSchemaSourceProvider = rootSchemaSourceProvider;
         schemaContextListenerListenerRegistration = schemaService.registerSchemaContextListener(this);
     }
@@ -42,7 +43,8 @@ public class CurrentSchemaContext implements SchemaContextListener, AutoCloseabl
     public void onGlobalContextUpdated(final SchemaContext schemaContext) {
         currentContext.set(schemaContext);
         // FIXME is notifying all the listeners from this callback wise ?
-        final Set<Capability> addedCaps = MdsalNetconfOperationServiceFactory.transformCapabilities(currentContext.get(), rootSchemaSourceProvider);
+        final Set<Capability> addedCaps = MdsalNetconfOperationServiceFactory.transformCapabilities(currentContext
+                .get(), rootSchemaSourceProvider);
         for (final CapabilityListener listener : listeners1) {
             listener.onCapabilitiesChanged(addedCaps, Collections.emptySet());
         }
@@ -56,7 +58,8 @@ public class CurrentSchemaContext implements SchemaContextListener, AutoCloseabl
     }
 
     public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
-        listener.onCapabilitiesChanged(MdsalNetconfOperationServiceFactory.transformCapabilities(currentContext.get(), rootSchemaSourceProvider), Collections.<Capability>emptySet());
+        listener.onCapabilitiesChanged(MdsalNetconfOperationServiceFactory.transformCapabilities(currentContext.get(),
+                rootSchemaSourceProvider), Collections.<Capability>emptySet());
         listeners1.add(listener);
         return () -> listeners1.remove(listener);
     }

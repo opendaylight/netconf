@@ -18,9 +18,11 @@ public class MdsalNetconfOperationService implements NetconfOperationService {
 
     private final OperationProvider operationProvider;
 
-    public MdsalNetconfOperationService(final CurrentSchemaContext schemaContext, final String netconfSessionIdForReporting,
+    public MdsalNetconfOperationService(final CurrentSchemaContext schemaContext,
+                                        final String netconfSessionIdForReporting,
                                         final DOMDataBroker dataBroker, final DOMRpcService rpcService) {
-        this.operationProvider = new OperationProvider(netconfSessionIdForReporting, schemaContext, dataBroker, rpcService);
+        this.operationProvider = new OperationProvider(netconfSessionIdForReporting, schemaContext, dataBroker,
+                rpcService);
     }
 
     @Override
