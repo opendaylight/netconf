@@ -18,8 +18,10 @@ import org.opendaylight.netconf.notifications.impl.ops.CreateSubscription;
 public class NetconfNotificationOperationService implements NetconfOperationService {
     private final Set<NetconfOperation> netconfOperations;
 
-    public NetconfNotificationOperationService(String netconfSessionIdForReporting, NetconfNotificationRegistry netconfNotificationRegistry) {
-        this.netconfOperations = Collections.singleton(new CreateSubscription(netconfSessionIdForReporting, netconfNotificationRegistry));
+    public NetconfNotificationOperationService(String netconfSessionIdForReporting, NetconfNotificationRegistry
+            netconfNotificationRegistry) {
+        this.netconfOperations = Collections.singleton(new CreateSubscription(netconfSessionIdForReporting,
+                netconfNotificationRegistry));
     }
 
 
@@ -28,6 +30,7 @@ public class NetconfNotificationOperationService implements NetconfOperationServ
         return netconfOperations;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void close() {
         for (NetconfOperation netconfOperation : netconfOperations) {
