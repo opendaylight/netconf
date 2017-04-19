@@ -47,6 +47,7 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
         <argument ref="eventExecutor"/>
         <argument ref="clientDispatcherDependency"/>
         <argument value="topology-netconf"/>
+        <argument value="0"/>
     </bean>
     <service ref="netconfTopologyManager"
              interface="org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService"/>
