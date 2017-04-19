@@ -50,7 +50,8 @@ public class FilterContentValidator {
     private final CurrentSchemaContext schemaContext;
 
     /**
-     * @param schemaContext current schema context
+     * Constructor to create FilterContentValidator.
+     * @param schemaContext current schema context.
      */
     public FilterContentValidator(final CurrentSchemaContext schemaContext) {
         this.schemaContext = schemaContext;
@@ -64,6 +65,7 @@ public class FilterContentValidator {
      * @return YangInstanceIdentifier
      * @throws DocumentedException if filter content is not valid
      */
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public YangInstanceIdentifier validate(final XmlElement filterContent) throws DocumentedException {
         try {
             final URI namespace = new URI(filterContent.getNamespace());
@@ -84,7 +86,7 @@ public class FilterContentValidator {
     }
 
     /**
-     * Returns module's child data node of given name space and name
+     * Returns module's child data node of given name space and name.
      *
      * @param module    module
      * @param nameSpace name space
@@ -101,8 +103,8 @@ public class FilterContentValidator {
                 return childNode;
             }
         }
-        throw new DocumentedException("Unable to find node with namespace: " + nameSpace + "in schema context: " +
-                schemaContext.getCurrentContext().toString(),
+        throw new DocumentedException("Unable to find node with namespace: " + nameSpace + "in schema context: "
+                + schemaContext.getCurrentContext().toString(),
                 DocumentedException.ErrorType.APPLICATION,
                 DocumentedException.ErrorTag.UNKNOWN_NAMESPACE,
                 DocumentedException.ErrorSeverity.ERROR);
@@ -196,33 +198,40 @@ public class FilterContentValidator {
         }
         final Map<QName, Object> keys = new HashMap<>();
         final List<QName> keyDefinition = listSchemaNode.getKeyDefinition();
-        for (final QName qName : keyDefinition) {
-            final Optional<XmlElement> childElements = current.getOnlyChildElementOptionally(qName.getLocalName());
+        for (final QName qualifiedName : keyDefinition) {
+            final Optional<XmlElement> childElements =
+                    current.getOnlyChildElementOptionally(qualifiedName.getLocalName());
             if (!childElements.isPresent()) {
                 return Collections.emptyMap();
             }
             final Optional<String> keyValue = childElements.get().getOnlyTextContentOptionally();
             if (keyValue.isPresent()) {
-                final LeafSchemaNode listKey = (LeafSchemaNode) listSchemaNode.getDataChildByName(qName);
+                final LeafSchemaNode listKey = (LeafSchemaNode) listSchemaNode.getDataChildByName(qualifiedName);
                 if (listKey instanceof IdentityrefTypeDefinition) {
-                    keys.put(qName, keyValue.get());
+                    keys.put(qualifiedName, keyValue.get());
                 } else {
                     if (listKey.getType() instanceof IdentityrefTypeDefinition) {
                         final Document document = filterContent.getDomElement().getOwnerDocument();
                         final NamespaceContext nsContext = new UniversalNamespaceContextImpl(document, false);
-                        final XmlCodecFactory xmlCodecFactory = XmlCodecFactory.create(schemaContext.getCurrentContext());
+                        final XmlCodecFactory xmlCodecFactory =
+                                XmlCodecFactory.create(schemaContext.getCurrentContext());
                         final TypeAwareCodec identityrefTypeCodec = xmlCodecFactory.codecFor(listKey);
-                        final QName deserializedKey = (QName) identityrefTypeCodec.parseValue(nsContext, keyValue.get());
-                        keys.put(qName, deserializedKey);
+                        final QName deserializedKey =
+                                (QName) identityrefTypeCodec.parseValue(nsContext, keyValue.get());
+                        keys.put(qualifiedName, deserializedKey);
                     } else {
                         final Object deserializedKey = TypeDefinitionAwareCodec.from(listKey.getType())
                                 .deserialize(keyValue.get());
-                        keys.put(qName, deserializedKey);
+                        keys.put(qualifiedName, deserializedKey);
                     }
                 }
             }
         }
         return keys;
+    }
+
+    private enum Type {
+        LIST, CHOICE_CASE, OTHER
     }
 
     /**
@@ -277,12 +286,8 @@ public class FilterContentValidator {
         }
     }
 
-    private enum Type {
-        LIST, CHOICE_CASE, OTHER
-    }
-
     private static class ValidationException extends Exception {
-        public ValidationException(final XmlElement parent, final XmlElement child) {
+        ValidationException(final XmlElement parent, final XmlElement child) {
             super("Element " + child + " can't be child of " + parent);
         }
     }

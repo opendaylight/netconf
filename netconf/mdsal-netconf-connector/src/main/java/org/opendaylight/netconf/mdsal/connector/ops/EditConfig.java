@@ -114,46 +114,48 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         final YangInstanceIdentifier path = YangInstanceIdentifier.create(change.getPath());
         final NormalizedNode<?, ?> changeData = change.getChangeRoot();
         switch (change.getAction()) {
-        case NONE:
-            return;
-        case MERGE:
-            mergeParentMap(rwtx, path, changeData);
-            rwtx.merge(LogicalDatastoreType.CONFIGURATION, path, changeData);
-            break;
-        case CREATE:
-            try {
-                final Optional<NormalizedNode<?, ?>> readResult = rwtx.read(LogicalDatastoreType.CONFIGURATION, path).checkedGet();
-                if (readResult.isPresent()) {
-                    throw new DocumentedException("Data already exists, cannot execute CREATE operation",
-                        ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, ErrorSeverity.ERROR);
+            case NONE:
+                return;
+            case MERGE:
+                mergeParentMap(rwtx, path, changeData);
+                rwtx.merge(LogicalDatastoreType.CONFIGURATION, path, changeData);
+                break;
+            case CREATE:
+                try {
+                    final Optional<NormalizedNode<?, ?>> readResult =
+                            rwtx.read(LogicalDatastoreType.CONFIGURATION, path).checkedGet();
+                    if (readResult.isPresent()) {
+                        throw new DocumentedException("Data already exists, cannot execute CREATE operation",
+                            ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, ErrorSeverity.ERROR);
+                    }
+                    mergeParentMap(rwtx, path, changeData);
+                    rwtx.put(LogicalDatastoreType.CONFIGURATION, path, changeData);
+                } catch (final ReadFailedException e) {
+                    LOG.warn("Read from datastore failed when trying to read data for create operation", change, e);
                 }
+                break;
+            case REPLACE:
                 mergeParentMap(rwtx, path, changeData);
                 rwtx.put(LogicalDatastoreType.CONFIGURATION, path, changeData);
-            } catch (final ReadFailedException e) {
-                LOG.warn("Read from datastore failed when trying to read data for create operation", change, e);
-            }
-            break;
-        case REPLACE:
-            mergeParentMap(rwtx, path, changeData);
-            rwtx.put(LogicalDatastoreType.CONFIGURATION, path, changeData);
-            break;
-        case DELETE:
-            try {
-                final Optional<NormalizedNode<?, ?>> readResult = rwtx.read(LogicalDatastoreType.CONFIGURATION, path).checkedGet();
-                if (!readResult.isPresent()) {
-                    throw new DocumentedException("Data is missing, cannot execute DELETE operation",
-                        ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
+                break;
+            case DELETE:
+                try {
+                    final Optional<NormalizedNode<?, ?>> readResult =
+                            rwtx.read(LogicalDatastoreType.CONFIGURATION, path).checkedGet();
+                    if (!readResult.isPresent()) {
+                        throw new DocumentedException("Data is missing, cannot execute DELETE operation",
+                            ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
+                    }
+                    rwtx.delete(LogicalDatastoreType.CONFIGURATION, path);
+                } catch (final ReadFailedException e) {
+                    LOG.warn("Read from datastore failed when trying to read data for delete operation", change, e);
                 }
+                break;
+            case REMOVE:
                 rwtx.delete(LogicalDatastoreType.CONFIGURATION, path);
-            } catch (final ReadFailedException e) {
-                LOG.warn("Read from datastore failed when trying to read data for delete operation", change, e);
-            }
-            break;
-        case REMOVE:
-            rwtx.delete(LogicalDatastoreType.CONFIGURATION, path);
-            break;
-        default:
-            LOG.warn("Unknown/not implemented operation, not executing");
+                break;
+            default:
+                LOG.warn("Unknown/not implemented operation, not executing");
         }
     }
 
@@ -163,7 +165,8 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
             final YangInstanceIdentifier mapNodeYid = path.getParent();
             //merge empty map
             final MapNode mixinNode = Builders.mapBuilder()
-                    .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(mapNodeYid.getLastPathArgument().getNodeType()))
+                    .withNodeIdentifier(
+                            new YangInstanceIdentifier.NodeIdentifier(mapNodeYid.getLastPathArgument().getNodeType()))
                     .build();
             rwtx.merge(LogicalDatastoreType.CONFIGURATION, mapNodeYid, mixinNode);
         }
@@ -173,12 +176,14 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
             final DomToNormalizedNodeParserFactory.BuildingStrategyProvider editOperationStrategyProvider) {
         if (schemaNode instanceof ContainerSchemaNode) {
             return DomToNormalizedNodeParserFactory
-                    .getInstance(DomUtils.defaultValueCodecProvider(), schemaContext.getCurrentContext(), editOperationStrategyProvider)
+                    .getInstance(DomUtils.defaultValueCodecProvider(),
+                            schemaContext.getCurrentContext(), editOperationStrategyProvider)
                     .getContainerNodeParser()
                     .parse(Collections.singletonList(element.getDomElement()), (ContainerSchemaNode) schemaNode);
         } else if (schemaNode instanceof ListSchemaNode) {
             return DomToNormalizedNodeParserFactory
-                    .getInstance(DomUtils.defaultValueCodecProvider(), schemaContext.getCurrentContext(), editOperationStrategyProvider)
+                    .getInstance(DomUtils.defaultValueCodecProvider(),
+                            schemaContext.getCurrentContext(), editOperationStrategyProvider)
                     .getMapNodeParser()
                     .parse(Collections.singletonList(element.getDomElement()), (ListSchemaNode) schemaNode);
         } else {
@@ -194,7 +199,8 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         try {
             // returns module with newest revision since findModuleByNamespace returns a set of modules and we only
             // need the newest one
-            final Module module = schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(new URI(namespace), null);
+            final Module module =
+                    schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(new URI(namespace), null);
             if (module == null) {
                 // no module is present with this namespace
                 throw new NetconfDocumentedException("Unable to find module by namespace: " + namespace,
@@ -205,7 +211,8 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
             if (schemaNode != null) {
                 dataSchemaNode = Optional.of(schemaNode);
             } else {
-                throw new DocumentedException("Unable to find node with namespace: " + namespace + "in module: " + module.toString(),
+                throw new DocumentedException("Unable to find node with namespace: " + namespace
+                        + "in module: " + module.toString(),
                         ErrorType.APPLICATION,
                         ErrorTag.UNKNOWN_NAMESPACE,
                         ErrorSeverity.ERROR);
@@ -229,7 +236,8 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
             throw new DocumentedException("Multiple target elements", ErrorType.RPC, ErrorTag.UNKNOWN_ATTRIBUTE,
                 ErrorSeverity.ERROR);
         } else {
-            final XmlElement targetChildNode = XmlElement.fromDomElement((Element) elementsByTagName.item(0)).getOnlyChildElement();
+            final XmlElement targetChildNode =
+                    XmlElement.fromDomElement((Element) elementsByTagName.item(0)).getOnlyChildElement();
             return Datastore.valueOf(targetChildNode.getName());
         }
     }
