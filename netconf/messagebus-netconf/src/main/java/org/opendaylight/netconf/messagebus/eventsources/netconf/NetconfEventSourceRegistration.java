@@ -27,17 +27,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Helper class to keep connection status of netconf node  and event source registration object
+ * Helper class to keep connection status of netconf node  and event source registration object.
  */
 public class NetconfEventSourceRegistration implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfEventSourceRegistration.class);
     private static final YangInstanceIdentifier NETCONF_DEVICE_DOM_PATH = YangInstanceIdentifier.builder()
-        .node(NetworkTopology.QNAME).node(Topology.QNAME)
-        .nodeWithKey(Topology.QNAME, QName.create(Topology.QNAME, "topology-id"), TopologyNetconf.QNAME.getLocalName())
-        .node(Node.QNAME).build();
+            .node(NetworkTopology.QNAME).node(Topology.QNAME)
+            .nodeWithKey(Topology.QNAME, QName.create(Topology.QNAME, "topology-id"), TopologyNetconf.QNAME
+                    .getLocalName())
+            .node(Node.QNAME).build();
     private static final QName NODE_ID_QNAME = QName.create(Node.QNAME, "node-id");
-    private static final String NotificationCapabilityPrefix = "(urn:ietf:params:xml:ns:netconf:notification";
+    private static final String NOTIFICATION_CAPABILITY_PREFIX = "(urn:ietf:params:xml:ns:netconf:notification";
 
     private final Node node;
     private final NetconfEventSourceManager netconfEventSourceManager;
@@ -45,7 +46,7 @@ public class NetconfEventSourceRegistration implements AutoCloseable {
     private EventSourceRegistration<NetconfEventSource> eventSourceRegistration;
 
     public static NetconfEventSourceRegistration create(final InstanceIdentifier<?> instanceIdent, final Node node,
-        final NetconfEventSourceManager netconfEventSourceManager) {
+                                                        final NetconfEventSourceManager netconfEventSourceManager) {
         Preconditions.checkNotNull(instanceIdent);
         Preconditions.checkNotNull(node);
         Preconditions.checkNotNull(netconfEventSourceManager);
@@ -71,7 +72,7 @@ public class NetconfEventSourceRegistration implements AutoCloseable {
             return false;
         }
         for (final AvailableCapability capability : netconfNode.getAvailableCapabilities().getAvailableCapability()) {
-            if (capability.getCapability().startsWith(NotificationCapabilityPrefix)) {
+            if (capability.getCapability().startsWith(NOTIFICATION_CAPABILITY_PREFIX)) {
                 return true;
             }
         }
@@ -140,14 +141,14 @@ public class NetconfEventSourceRegistration implements AutoCloseable {
 
     private void registrationEventSource() {
         final Optional<DOMMountPoint> domMountPoint = netconfEventSourceManager.getDomMounts()
-            .getMountPoint(domMountPath(node.getNodeId()));
+                .getMountPoint(domMountPath(node.getNodeId()));
         EventSourceRegistration<NetconfEventSource> registration = null;
         if (domMountPoint.isPresent()/* && mountPoint.isPresent()*/) {
             NetconfEventSourceMount mount = new NetconfEventSourceMount(node, domMountPoint.get());
             final NetconfEventSource netconfEventSource = new NetconfEventSource(
-                netconfEventSourceManager.getStreamMap(),
+                    netconfEventSourceManager.getStreamMap(),
                     mount,
-                netconfEventSourceManager.getPublishService());
+                    netconfEventSourceManager.getPublishService());
             registration = netconfEventSourceManager.getEventSourceRegistry().registerEventSource(netconfEventSource);
             LOG.info("Event source {} has been registered", node.getNodeId().getValue());
         }
@@ -156,7 +157,7 @@ public class NetconfEventSourceRegistration implements AutoCloseable {
 
     private YangInstanceIdentifier domMountPath(final NodeId nodeId) {
         return YangInstanceIdentifier.builder(NETCONF_DEVICE_DOM_PATH)
-            .nodeWithKey(Node.QNAME, NODE_ID_QNAME, nodeId.getValue()).build();
+                .nodeWithKey(Node.QNAME, NODE_ID_QNAME, nodeId.getValue()).build();
     }
 
     private void closeEventSourceRegistration() {
@@ -165,7 +166,8 @@ public class NetconfEventSourceRegistration implements AutoCloseable {
         }
     }
 
-    @Override public void close() {
+    @Override
+    public void close() {
         closeEventSourceRegistration();
     }
 

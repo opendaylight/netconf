@@ -40,12 +40,13 @@ public final class NetconfEventSourceManager implements DataChangeListener, Auto
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfEventSourceManager.class);
     private static final TopologyKey NETCONF_TOPOLOGY_KEY = new TopologyKey(
-        new TopologyId(TopologyNetconf.QNAME.getLocalName()));
+            new TopologyId(TopologyNetconf.QNAME.getLocalName()));
     private static final InstanceIdentifier<Node> NETCONF_DEVICE_PATH = InstanceIdentifier.create(NetworkTopology.class)
-        .child(Topology.class, NETCONF_TOPOLOGY_KEY).child(Node.class);
+            .child(Topology.class, NETCONF_TOPOLOGY_KEY).child(Node.class);
 
     private Map<String, String> streamMap;
-    private final ConcurrentHashMap<InstanceIdentifier<?>, NetconfEventSourceRegistration> registrationMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<InstanceIdentifier<?>, NetconfEventSourceRegistration> registrationMap =
+            new ConcurrentHashMap<>();
     private final DOMNotificationPublishService publishService;
     private final DOMMountPointService domMounts;
     private ListenerRegistration<DataChangeListener> listenerRegistration;
@@ -67,17 +68,18 @@ public final class NetconfEventSourceManager implements DataChangeListener, Auto
     }
 
     /**
-     * Invoke by blueprint
+     * Invoked by blueprint.
      */
     public void initialize() {
         Preconditions.checkNotNull(dataBroker);
         listenerRegistration = dataBroker
-            .registerDataChangeListener(LogicalDatastoreType.OPERATIONAL, NETCONF_DEVICE_PATH, this,
-                DataChangeScope.SUBTREE);
+                .registerDataChangeListener(LogicalDatastoreType.OPERATIONAL, NETCONF_DEVICE_PATH, this,
+                        DataChangeScope.SUBTREE);
         LOG.info("NetconfEventSourceManager initialized.");
     }
 
-    @Override public void onDataChanged(final AsyncDataChangeEvent<InstanceIdentifier<?>, DataObject> event) {
+    @Override
+    public void onDataChanged(final AsyncDataChangeEvent<InstanceIdentifier<?>, DataObject> event) {
 
         LOG.debug("[DataChangeEvent<InstanceIdentifier<?>, DataObject>: {}]", event);
         for (final Map.Entry<InstanceIdentifier<?>, DataObject> changeEntry : event.getCreatedData().entrySet()) {
@@ -166,8 +168,9 @@ public final class NetconfEventSourceManager implements DataChangeListener, Auto
     }
 
     /**
-     * Invoke by blueprint
-     * @param streamMap
+     * Invoked by blueprint.
+     *
+     * @param streamMap Stream map
      */
     public void setStreamMap(Map<String, String> streamMap) {
         this.streamMap = streamMap;
@@ -177,7 +180,8 @@ public final class NetconfEventSourceManager implements DataChangeListener, Auto
         return node.getAugmentation(NetconfNode.class) != null;
     }
 
-    @Override public void close() {
+    @Override
+    public void close() {
         listenerRegistration.close();
         for (final NetconfEventSourceRegistration reg : registrationMap.values()) {
             reg.close();

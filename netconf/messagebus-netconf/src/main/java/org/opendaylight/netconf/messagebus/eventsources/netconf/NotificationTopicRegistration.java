@@ -38,7 +38,7 @@ abstract class NotificationTopicRegistration implements AutoCloseable {
     protected final ConcurrentHashMap<SchemaPath, Set<TopicId>> notificationTopicMap = new ConcurrentHashMap<>();
 
     protected NotificationTopicRegistration(NotificationSourceType notificationSourceType, String sourceName,
-        String notificationUrnPrefix) {
+                                            String notificationUrnPrefix) {
         this.notificationSourceType = notificationSourceType;
         this.sourceName = sourceName;
         this.notificationUrnPrefix = notificationUrnPrefix;
@@ -68,6 +68,7 @@ abstract class NotificationTopicRegistration implements AutoCloseable {
 
     /**
      * Returns registered topics for given notification path.
+     *
      * @param notificationPath path
      * @return topicIds
      */
@@ -78,6 +79,7 @@ abstract class NotificationTopicRegistration implements AutoCloseable {
 
     /**
      * Checks, if notification is from namespace belonging to this registration.
+     *
      * @param notificationPath path
      * @return true, if notification belongs to registration namespace
      */
@@ -87,7 +89,7 @@ abstract class NotificationTopicRegistration implements AutoCloseable {
         }
         String nameSpace = notificationPath.getLastComponent().getNamespace().toString();
         LOG.debug("CheckNotification - name space {} - NotificationUrnPrefix {}", nameSpace,
-            getNotificationUrnPrefix());
+                getNotificationUrnPrefix());
         return nameSpace.startsWith(getNotificationUrnPrefix());
     }
 
@@ -107,14 +109,16 @@ abstract class NotificationTopicRegistration implements AutoCloseable {
 
     /**
      * Registers associated event source notification to topic.
+     *
      * @param notificationPath notification path
-     * @param topicId topic id
+     * @param topicId          topic id
      * @return true, if successful
      */
     abstract boolean registerNotificationTopic(SchemaPath notificationPath, TopicId topicId);
 
     /**
      * Registers associated event source notification to topic.
+     *
      * @param topicId topic id
      * @return true, if successful
      */

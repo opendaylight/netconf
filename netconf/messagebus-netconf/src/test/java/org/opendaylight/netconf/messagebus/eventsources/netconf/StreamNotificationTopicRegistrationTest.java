@@ -36,7 +36,8 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 public class StreamNotificationTopicRegistrationTest {
 
     private static final String STREAM_NAME = "stream-1";
-    private static final String PREFIX = ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH.getLastComponent().getNamespace().toString();
+    private static final String PREFIX = ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH
+            .getLastComponent().getNamespace().toString();
 
     @Mock
     private NetconfEventSource source;
@@ -56,13 +57,15 @@ public class StreamNotificationTopicRegistrationTest {
 
         Node node = new NodeBuilder().setNodeId(NodeId.getDefaultInstance("node-id")).build();
         when(mount.getNode()).thenReturn(node);
-        when(mount.registerNotificationListener(source, ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH))
+        when(mount.registerNotificationListener(source, ConnectionNotificationTopicRegistration
+                .EVENT_SOURCE_STATUS_PATH))
                 .thenReturn(listenerRegistration);
         when(mount.invokeCreateSubscription(any(), any())).thenReturn(Futures.immediateCheckedFuture(null));
         when(mount.invokeCreateSubscription(any())).thenReturn(Futures.immediateCheckedFuture(null));
 
         when(source.getMount()).thenReturn(mount);
-        stream = new StreamBuilder().setName(StreamNameType.getDefaultInstance(STREAM_NAME)).setReplaySupport(true).build();
+        stream = new StreamBuilder().setName(StreamNameType.getDefaultInstance(STREAM_NAME)).setReplaySupport(true)
+                .build();
 
         registration = new StreamNotificationTopicRegistration(stream, PREFIX, source);
     }
@@ -107,12 +110,14 @@ public class StreamNotificationTopicRegistrationTest {
         final TopicId topic1 = registerTopic("topic1");
         final TopicId topic2 = registerTopic("topic2");
         final TopicId topic3 = registerTopic("topic3");
-        final Set<TopicId> notificationTopicIds = registration.getTopicsForNotification(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH);
+        final Set<TopicId> notificationTopicIds =
+                registration.getTopicsForNotification(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH);
         Assert.assertNotNull(notificationTopicIds);
         Assert.assertThat(notificationTopicIds, hasItems(topic1, topic2, topic3));
 
         registration.unRegisterNotificationTopic(topic3);
-        final Set<TopicId> afterUnregister = registration.getTopicsForNotification(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH);
+        final Set<TopicId> afterUnregister =
+                registration.getTopicsForNotification(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH);
         Assert.assertNotNull(afterUnregister);
         Assert.assertThat(afterUnregister, hasItems(topic1, topic2));
         Assert.assertFalse(afterUnregister.contains(topic3));
