@@ -46,17 +46,19 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
     private final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency;
     private final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener;
 
-    public MdsalNetconfOperationServiceFactory(final SchemaService schemaService,
-                                               final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency,
-                                               final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
-                                               final DOMDataBroker dataBroker,
-                                               final DOMRpcService rpcService) {
+    public MdsalNetconfOperationServiceFactory(
+            final SchemaService schemaService,
+            final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency,
+            final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
+            final DOMDataBroker dataBroker,
+            final DOMRpcService rpcService) {
 
         this.dataBroker = dataBroker;
         this.rpcService = rpcService;
 
         this.rootSchemaSourceProviderDependency = rootSchemaSourceProviderDependency;
-        this.currentSchemaContext = new CurrentSchemaContext(Preconditions.checkNotNull(schemaService), rootSchemaSourceProviderDependency);
+        this.currentSchemaContext = new CurrentSchemaContext(Preconditions.checkNotNull(schemaService),
+                rootSchemaSourceProviderDependency);
         this.netconfOperationServiceFactoryListener = netconfOperationServiceFactoryListener;
         this.netconfOperationServiceFactoryListener.onAddNetconfOperationServiceFactory(this);
     }
@@ -64,9 +66,11 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
     @Override
     public MdsalNetconfOperationService createService(final String netconfSessionIdForReporting) {
         Preconditions.checkState(dataBroker != null, "MD-SAL provider not yet initialized");
-        return new MdsalNetconfOperationService(currentSchemaContext, netconfSessionIdForReporting, dataBroker, rpcService);
+        return new MdsalNetconfOperationService(currentSchemaContext, netconfSessionIdForReporting, dataBroker,
+                rpcService);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void close() {
         try {
@@ -74,7 +78,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
             if (netconfOperationServiceFactoryListener != null) {
                 netconfOperationServiceFactoryListener.onRemoveNetconfOperationServiceFactory(this);
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             LOG.error("Failed to close resources correctly - ignore", e);
         }
     }
@@ -84,7 +88,9 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
         return transformCapabilities(currentSchemaContext.getCurrentContext(), rootSchemaSourceProviderDependency);
     }
 
-    static Set<Capability> transformCapabilities(final SchemaContext currentContext, final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency) {
+    static Set<Capability> transformCapabilities(
+            final SchemaContext currentContext,
+            final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency) {
         final Set<Capability> capabilities = new HashSet<>();
 
         // Added by netconf-impl by default
@@ -93,12 +99,12 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
         final Set<Module> modules = currentContext.getModules();
         for (final Module module : modules) {
             Optional<YangModuleCapability> cap = moduleToCapability(module, rootSchemaSourceProviderDependency);
-            if(cap.isPresent()) {
+            if (cap.isPresent()) {
                 capabilities.add(cap.get());
             }
             for (final Module submodule : module.getSubmodules()) {
                 cap = moduleToCapability(submodule, rootSchemaSourceProviderDependency);
-                if(cap.isPresent()) {
+                if (cap.isPresent()) {
                     capabilities.add(cap.get());
                 }
             }
@@ -117,7 +123,8 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
         InputStream sourceStream = null;
         String source;
         try {
-            sourceStream = rootSchemaSourceProviderDependency.getSource(moduleSourceIdentifier).checkedGet().openStream();
+            sourceStream = rootSchemaSourceProviderDependency.getSource(moduleSourceIdentifier).checkedGet()
+                    .openStream();
             source = CharStreams.toString(new InputStreamReader(sourceStream, StandardCharsets.UTF_8));
         } catch (IOException | SchemaSourceException e) {
             LOG.warn("Ignoring source for module {}. Unable to read content", moduleSourceIdentifier, e);
@@ -132,7 +139,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
             LOG.warn("Error closing yang source stream {}. Ignoring", moduleSourceIdentifier, e);
         }
 
-        if(source !=null) {
+        if (source != null) {
             return Optional.of(new YangModuleCapability(module, source));
         } else {
             LOG.warn("Missing source for module {}. This module will not be available from netconf server",

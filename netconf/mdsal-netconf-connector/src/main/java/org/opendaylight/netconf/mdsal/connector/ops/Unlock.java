@@ -20,7 +20,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 // FIXME Duplicated code
-// netconf/netconf/config-netconf-connector/src/main/java/org/opendaylight/netconf/confignetconfconnector/operations/UnLock.java
+// netconf/netconf/config-netconf-connector/src/main/java/org/opendaylight/netconf/confignetconfconnector/operations
+// /UnLock.java
 public class Unlock extends AbstractSingletonNetconfOperation {
 
     private static final Logger LOG = LoggerFactory.getLogger(Unlock.class);
@@ -32,14 +33,16 @@ public class Unlock extends AbstractSingletonNetconfOperation {
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
+            throws DocumentedException {
         final Datastore targetDatastore = Lock.extractTargetParameter(operationElement);
         if (targetDatastore == Datastore.candidate) {
             LOG.debug("Unlocking candidate datastore on session: {}", getNetconfSessionIdForReporting());
             return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
         }
 
-        throw new DocumentedException("Unable to unlock " + targetDatastore + " datastore", DocumentedException.ErrorType.APPLICATION,
+        throw new DocumentedException("Unable to unlock " + targetDatastore + " datastore",
+                DocumentedException.ErrorType.APPLICATION,
                 DocumentedException.ErrorTag.OPERATION_NOT_SUPPORTED, DocumentedException.ErrorSeverity.ERROR);
     }
 
