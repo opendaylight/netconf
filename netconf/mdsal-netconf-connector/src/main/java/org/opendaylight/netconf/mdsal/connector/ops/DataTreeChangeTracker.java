@@ -100,7 +100,8 @@ public class DataTreeChangeTracker {
         private final ModifyAction action;
         private final List<PathArgument> path;
 
-        public DataTreeChange(final NormalizedNode<?, ?> changeRoot, final ModifyAction action, final ArrayList<PathArgument> path) {
+        public DataTreeChange(final NormalizedNode<?, ?> changeRoot, final ModifyAction action,
+                              final ArrayList<PathArgument> path) {
             this.changeRoot = changeRoot;
             this.action = action;
             this.path = Lists.reverse(path);
