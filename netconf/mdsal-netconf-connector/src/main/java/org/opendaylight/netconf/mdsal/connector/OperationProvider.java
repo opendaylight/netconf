@@ -30,8 +30,8 @@ final class OperationProvider {
     private final DOMRpcService rpcService;
     private final TransactionProvider transactionProvider;
 
-    public OperationProvider(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext,
-                             final DOMDataBroker dataBroker, final DOMRpcService rpcService) {
+    OperationProvider(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext,
+                      final DOMDataBroker dataBroker, final DOMRpcService rpcService) {
         this.netconfSessionIdForReporting = netconfSessionIdForReporting;
         this.schemaContext = schemaContext;
         this.dataBroker = dataBroker;

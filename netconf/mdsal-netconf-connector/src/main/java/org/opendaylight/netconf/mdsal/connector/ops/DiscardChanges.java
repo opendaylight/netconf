@@ -39,16 +39,17 @@ public class DiscardChanges extends AbstractSingletonNetconfOperation {
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
+            throws DocumentedException {
 
         try {
             transactionProvider.abortTransaction();
         } catch (final IllegalStateException e) {
             LOG.warn("Abort failed ", e);
             final Map<String, String> errorInfo = new HashMap<>();
-            errorInfo
-                    .put(ErrorTag.OPERATION_FAILED.name(),
-                            "Operation failed. Use 'get-config' or 'edit-config' before triggering 'discard-changes' operation");
+            errorInfo.put(ErrorTag.OPERATION_FAILED.name(),
+                    "Operation failed. Use 'get-config' or 'edit-config' before triggering "
+                            + OPERATION_NAME + " operation");
             throw new DocumentedException(e.getMessage(), e, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
                     ErrorSeverity.ERROR, errorInfo);
         }
