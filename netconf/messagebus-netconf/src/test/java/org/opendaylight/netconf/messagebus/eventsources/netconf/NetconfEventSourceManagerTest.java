@@ -66,30 +66,36 @@ public class NetconfEventSourceManagerTest {
 
     @Before
     public void setUp() throws Exception {
-        DataBroker dataBrokerMock = mock(DataBroker.class);
-        DOMNotificationPublishService domNotificationPublishServiceMock = mock(DOMNotificationPublishService.class);
+        final DataBroker dataBrokerMock = mock(DataBroker.class);
+        final DOMNotificationPublishService domNotificationPublishServiceMock =
+                mock(DOMNotificationPublishService.class);
         domMountPointServiceMock = mock(DOMMountPointService.class);
         eventSourceTopologyMock = mock(EventSourceRegistry.class);
         rpcProviderRegistryMock = mock(RpcProviderRegistry.class);
         eventSourceRegistry = mock(EventSourceRegistry.class);
 
         listenerRegistrationMock = mock(ListenerRegistration.class);
-        doReturn(listenerRegistrationMock).when(dataBrokerMock).registerDataChangeListener(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class), any(NetconfEventSourceManager.class), eq(
-            AsyncDataBroker.DataChangeScope.SUBTREE));
+        doReturn(listenerRegistrationMock).when(dataBrokerMock).registerDataChangeListener(eq(LogicalDatastoreType
+                .OPERATIONAL), any(InstanceIdentifier.class), any(NetconfEventSourceManager.class), eq(
+                AsyncDataBroker.DataChangeScope.SUBTREE));
 
         DOMMountPoint domMountPointMock = mock(DOMMountPoint.class);
         Optional<DOMMountPoint> optionalDomMountServiceMock = Optional.of(domMountPointMock);
-        doReturn(optionalDomMountServiceMock).when(domMountPointServiceMock).getMountPoint((YangInstanceIdentifier)notNull());
+        doReturn(optionalDomMountServiceMock).when(domMountPointServiceMock).getMountPoint((YangInstanceIdentifier)
+                notNull());
         DOMDataBroker mpDataBroker = mock(DOMDataBroker.class);
         doReturn(Optional.of(mpDataBroker)).when(domMountPointMock).getService(DOMDataBroker.class);
         doReturn(Optional.of(mock(DOMRpcService.class))).when(domMountPointMock).getService(DOMRpcService.class);
-        doReturn(Optional.of(mock(DOMNotificationService.class))).when(domMountPointMock).getService(DOMNotificationService.class);
+        doReturn(Optional.of(mock(DOMNotificationService.class))).when(domMountPointMock)
+                .getService(DOMNotificationService.class);
 
         DOMDataReadOnlyTransaction rtx = mock(DOMDataReadOnlyTransaction.class);
         doReturn(rtx).when(mpDataBroker).newReadOnlyTransaction();
-        CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> checkFeature = Futures.immediateCheckedFuture(Optional.of(NetconfTestUtils.getStreamsNode("stream-1")));
+        CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> checkFeature = Futures
+                .immediateCheckedFuture(Optional.of(NetconfTestUtils.getStreamsNode("stream-1")));
 
-        YangInstanceIdentifier pathStream = YangInstanceIdentifier.builder().node(Netconf.QNAME).node(Streams.QNAME).build();
+        YangInstanceIdentifier pathStream = YangInstanceIdentifier.builder().node(Netconf.QNAME).node(Streams.QNAME)
+                .build();
         doReturn(checkFeature).when(rtx).read(LogicalDatastoreType.OPERATIONAL, pathStream);
 
         netconfEventSourceManager = new NetconfEventSourceManager(dataBrokerMock,
@@ -99,33 +105,34 @@ public class NetconfEventSourceManagerTest {
 
     @Test
     public void onDataChangedCreateEventSourceTestByCreateEntry() throws Exception {
-        onDataChangedTestHelper(true,false,true, NetconfTestUtils.notification_capability_prefix);
+        onDataChangedTestHelper(true, false, true, NetconfTestUtils.NOTIFICATION_CAPABILITY_PREFIX);
         netconfEventSourceManager.onDataChanged(asyncDataChangeEventMock);
         verify(eventSourceRegistry, times(1)).registerEventSource(any(EventSource.class));
     }
 
     @Test
     public void onDataChangedCreateEventSourceTestByUpdateEntry() throws Exception {
-        onDataChangedTestHelper(false,true,true, NetconfTestUtils.notification_capability_prefix);
+        onDataChangedTestHelper(false, true, true, NetconfTestUtils.NOTIFICATION_CAPABILITY_PREFIX);
         netconfEventSourceManager.onDataChanged(asyncDataChangeEventMock);
         verify(eventSourceRegistry, times(1)).registerEventSource(any(EventSource.class));
     }
 
     @Test
     public void onDataChangedCreateEventSourceTestNotNeconf() throws Exception {
-        onDataChangedTestHelper(false,true,false, NetconfTestUtils.notification_capability_prefix);
+        onDataChangedTestHelper(false, true, false, NetconfTestUtils.NOTIFICATION_CAPABILITY_PREFIX);
         netconfEventSourceManager.onDataChanged(asyncDataChangeEventMock);
         verify(eventSourceRegistry, times(0)).registerEventSource(any(EventSource.class));
     }
 
     @Test
     public void onDataChangedCreateEventSourceTestNotNotificationCapability() throws Exception {
-        onDataChangedTestHelper(true,false,true,"bad-prefix");
+        onDataChangedTestHelper(true, false, true, "bad-prefix");
         netconfEventSourceManager.onDataChanged(asyncDataChangeEventMock);
         verify(eventSourceRegistry, times(0)).registerEventSource(any(EventSource.class));
     }
 
-    private void onDataChangedTestHelper(boolean create, boolean update, boolean isNetconf, String notificationCapabilityPrefix) throws Exception{
+    private void onDataChangedTestHelper(boolean create, boolean update, boolean isNetconf, String
+            notificationCapabilityPrefix) throws Exception {
         asyncDataChangeEventMock = mock(AsyncDataChangeEvent.class);
         Map<InstanceIdentifier, DataObject> mapCreate = new HashMap<>();
         Map<InstanceIdentifier, DataObject> mapUpdate = new HashMap<>();
@@ -135,18 +142,19 @@ public class NetconfEventSourceManagerTest {
         doReturn(mapCreate).when(asyncDataChangeEventMock).getCreatedData();
         doReturn(mapUpdate).when(asyncDataChangeEventMock).getUpdatedData();
 
-        if(isNetconf){
+        if (isNetconf) {
             node01 = NetconfTestUtils
-                .getNetconfNode(nodeId, "node01.test.local", ConnectionStatus.Connected, notificationCapabilityPrefix);
+                    .getNetconfNode(nodeId, "node01.test.local", ConnectionStatus.Connected,
+                            notificationCapabilityPrefix);
 
         } else {
             node01 = NetconfTestUtils.getNode(nodeId);
         }
 
-        if(create){
+        if (create) {
             mapCreate.put(NetconfTestUtils.getInstanceIdentifier(node01), node01);
         }
-        if(update){
+        if (update) {
             mapUpdate.put(NetconfTestUtils.getInstanceIdentifier(node01), node01);
         }
 

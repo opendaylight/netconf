@@ -46,22 +46,23 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNo
 
 public final class NetconfTestUtils {
 
-    public static final String notification_capability_prefix = "(urn:ietf:params:xml:ns:netconf:notification";
+    public static final String NOTIFICATION_CAPABILITY_PREFIX = "(urn:ietf:params:xml:ns:netconf:notification";
 
     private NetconfTestUtils() {
     }
 
     public static Node getNetconfNode(String nodeIdent, String hostName, ConnectionStatus cs,
-        String notificationCapabilityPrefix) {
+                                      String notificationCapabilityPrefix) {
 
         DomainName dn = new DomainName(hostName);
         Host host = new Host(dn);
 
         List<AvailableCapability> avCapList = new ArrayList<>();
-        avCapList.add(new AvailableCapabilityBuilder().setCapability(notificationCapabilityPrefix + "_availableCapabilityString1").build());
+        avCapList.add(new AvailableCapabilityBuilder().setCapability(notificationCapabilityPrefix
+                + "_availableCapabilityString1").build());
         AvailableCapabilities avCaps = new AvailableCapabilitiesBuilder().setAvailableCapability(avCapList).build();
         NetconfNode nn = new NetconfNodeBuilder().setConnectionStatus(cs).setHost(host).setAvailableCapabilities(avCaps)
-            .build();
+                .build();
 
         NodeId nodeId = new NodeId(nodeIdent);
         NodeKey nk = new NodeKey(nodeId);
@@ -81,14 +82,14 @@ public final class NetconfTestUtils {
     }
 
     public static InstanceIdentifier<Node> getInstanceIdentifier(Node node) {
-        TopologyKey NETCONF_TOPOLOGY_KEY = new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName()));
+        TopologyKey netconfTopologyKey = new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName()));
         InstanceIdentifier<Node> nodeII = InstanceIdentifier.create(NetworkTopology.class)
-            .child(Topology.class, NETCONF_TOPOLOGY_KEY).child(Node.class, node.getKey());
+                .child(Topology.class, netconfTopologyKey).child(Node.class, node.getKey());
         return nodeII;
     }
 
-    public static Optional<Streams> getAvailableStream(String Name, boolean replaySupport) {
-        Stream stream = new StreamBuilder().setName(new StreamNameType(Name)).setReplaySupport(replaySupport).build();
+    public static Optional<Streams> getAvailableStream(String name, boolean replaySupport) {
+        Stream stream = new StreamBuilder().setName(new StreamNameType(name)).setReplaySupport(replaySupport).build();
         List<Stream> streamList = new ArrayList<>();
         streamList.add(stream);
         Streams streams = new StreamsBuilder().setStream(streamList).build();
@@ -100,7 +101,8 @@ public final class NetconfTestUtils {
         Set<MapEntryNode> streamSet = new HashSet<>();
         for (String s : streamName) {
             MapEntryNode stream = Builders.mapEntryBuilder()
-                    .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifierWithPredicates(Stream.QNAME, nameNode, s))
+                    .withNodeIdentifier(new YangInstanceIdentifier
+                            .NodeIdentifierWithPredicates(Stream.QNAME, nameNode, s))
                     .withChild(Builders.leafBuilder()
                             .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(nameNode))
                             .withValue(s)
@@ -109,7 +111,8 @@ public final class NetconfTestUtils {
             streamSet.add(stream);
         }
 
-        CollectionNodeBuilder<MapEntryNode, MapNode> streams = Builders.mapBuilder().withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(Stream.QNAME));
+        CollectionNodeBuilder<MapEntryNode, MapNode> streams =
+                Builders.mapBuilder().withNodeIdentifier(YangInstanceIdentifier.NodeIdentifier.create(Stream.QNAME));
         for (MapEntryNode mapEntryNode : streamSet) {
             streams.withChild(mapEntryNode);
         }
