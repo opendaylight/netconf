@@ -53,7 +53,7 @@ public class NetconfCapabilityMonitoringServiceTest {
     private static final String TEST_MODULE_CONTENT2 = "content2";
     private static final String TEST_MODULE_REV = "1970-01-01";
     private static final String TEST_MODULE_REV2 = "1970-01-02";
-    private static final  Uri TEST_MODULE_NAMESPACE = new Uri("testModuleNamespace");
+    private static final Uri TEST_MODULE_NAMESPACE = new Uri("testModuleNamespace");
     private static final String TEST_MODULE_NAME = "testModule";
     private static Date TEST_MODULE_DATE;
     private static Date TEST_MODULE_DATE2;
@@ -67,7 +67,7 @@ public class NetconfCapabilityMonitoringServiceTest {
             .build();
     private int capabilitiesSize;
 
-    private final Set<Capability> CAPABILITIES = new HashSet<>();
+    private final Set<Capability> capabilities = new HashSet<>();
 
     @Mock
     private Module moduleMock;
@@ -87,7 +87,7 @@ public class NetconfCapabilityMonitoringServiceTest {
     @BeforeClass
     public static void suiteSetUp() throws Exception {
         TEST_MODULE_DATE = SimpleDateFormatUtil.getRevisionFormat().parse(TEST_MODULE_REV);
-        TEST_MODULE_DATE2= SimpleDateFormatUtil.getRevisionFormat().parse(TEST_MODULE_REV2);
+        TEST_MODULE_DATE2 = SimpleDateFormatUtil.getRevisionFormat().parse(TEST_MODULE_REV2);
     }
 
     @Before
@@ -99,19 +99,21 @@ public class NetconfCapabilityMonitoringServiceTest {
         doReturn(TEST_MODULE_DATE).when(moduleMock).getRevision();
         moduleCapability1 = new YangModuleCapability(moduleMock, TEST_MODULE_CONTENT);
 
-        CAPABILITIES.add(moduleCapability1);
+        capabilities.add(moduleCapability1);
 
         doReturn(new URI(TEST_MODULE_NAMESPACE.getValue())).when(moduleMock2).getNamespace();
         doReturn(TEST_MODULE_NAME).when(moduleMock2).getName();
         doReturn(TEST_MODULE_DATE2).when(moduleMock2).getRevision();
         moduleCapability2 = new YangModuleCapability(moduleMock2, TEST_MODULE_CONTENT2);
 
-        CAPABILITIES.add(new BasicCapability("urn:ietf:params:netconf:base:1.0"));
-        CAPABILITIES.add(new BasicCapability("urn:ietf:params:netconf:base:1.1"));
-        CAPABILITIES.add(new BasicCapability("urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&amp;revision=2010-09-24"));
+        capabilities.add(new BasicCapability("urn:ietf:params:netconf:base:1.0"));
+        capabilities.add(new BasicCapability("urn:ietf:params:netconf:base:1.1"));
+        capabilities.add(new BasicCapability("urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&amp;"
+                + "revision=2010-09-24"));
 
-        doReturn(CAPABILITIES).when(operationServiceFactoryMock).getCapabilities();
-        doReturn(null).when(operationServiceFactoryMock).registerCapabilityListener(any(NetconfCapabilityMonitoringService.class));
+        doReturn(capabilities).when(operationServiceFactoryMock).getCapabilities();
+        doReturn(null).when(operationServiceFactoryMock)
+                .registerCapabilityListener(any(NetconfCapabilityMonitoringService.class));
 
         doReturn(SESSION).when(sessionMock).toManagementSession();
         doNothing().when(listener).onCapabilitiesChanged(any());
@@ -122,7 +124,7 @@ public class NetconfCapabilityMonitoringServiceTest {
         doNothing().when(notificationPublisher).onSessionEnded(any());
 
         monitoringService = new NetconfCapabilityMonitoringService(operationServiceFactoryMock);
-        monitoringService.onCapabilitiesChanged(CAPABILITIES, Collections.emptySet());
+        monitoringService.onCapabilitiesChanged(capabilities, Collections.emptySet());
         monitoringService.setNotificationPublisher(notificationPublisher);
         monitoringService.registerListener(listener);
         capabilitiesSize = monitoringService.getCapabilities().getCapability().size();
@@ -151,9 +153,11 @@ public class NetconfCapabilityMonitoringServiceTest {
     public void testGetSchemaForCapability() throws Exception {
         //test multiple revisions of the same capability
         monitoringService.onCapabilitiesChanged(Collections.singleton(moduleCapability2), Collections.emptySet());
-        final String schema = monitoringService.getSchemaForModuleRevision(TEST_MODULE_NAME, Optional.of(TEST_MODULE_REV));
+        final String schema =
+                monitoringService.getSchemaForModuleRevision(TEST_MODULE_NAME, Optional.of(TEST_MODULE_REV));
         Assert.assertEquals(TEST_MODULE_CONTENT, schema);
-        final String schema2 = monitoringService.getSchemaForModuleRevision(TEST_MODULE_NAME, Optional.of(TEST_MODULE_REV2));
+        final String schema2 =
+                monitoringService.getSchemaForModuleRevision(TEST_MODULE_NAME, Optional.of(TEST_MODULE_REV2));
         Assert.assertEquals(TEST_MODULE_CONTENT2, schema2);
         //remove one revision
         monitoringService.onCapabilitiesChanged(Collections.emptySet(), Collections.singleton(moduleCapability1));
@@ -166,7 +170,7 @@ public class NetconfCapabilityMonitoringServiceTest {
     public void testGetCapabilities() throws Exception {
         Capabilities actual = monitoringService.getCapabilities();
         List<Uri> exp = new ArrayList<>();
-        for (Capability capability : CAPABILITIES) {
+        for (Capability capability : capabilities) {
             exp.add(new Uri(capability.getCapabilityUri()));
         }
         //candidate is added by monitoring service automatically
@@ -188,7 +192,8 @@ public class NetconfCapabilityMonitoringServiceTest {
         final Uri uri = new Uri(capUri);
         final HashSet<Capability> testCaps = new HashSet<>();
         testCaps.add(new BasicCapability(capUri));
-        final ArgumentCaptor<NetconfCapabilityChange> capabilityChangeCaptor = ArgumentCaptor.forClass(NetconfCapabilityChange.class);
+        final ArgumentCaptor<NetconfCapabilityChange> capabilityChangeCaptor =
+                ArgumentCaptor.forClass(NetconfCapabilityChange.class);
         final ArgumentCaptor<Capabilities> monitoringListenerCaptor = ArgumentCaptor.forClass(Capabilities.class);
         //add capability
         monitoringService.onCapabilitiesChanged(testCaps, Collections.emptySet());
