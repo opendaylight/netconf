@@ -50,7 +50,6 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
@@ -58,7 +57,8 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
+import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeMasterActor;
+import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeSlaveActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.messages.AskForMasterMountPoint;
@@ -105,8 +105,6 @@ public class NetconfNodeActorTest {
     private DOMRpcService domRpcService;
     @Mock
     private DOMMountPointService mountPointService;
-    @Mock
-    private DataBroker dataBroker;
 
     @Before
     public void setup() {
@@ -115,8 +113,7 @@ public class NetconfNodeActorTest {
                 new InetSocketAddress(InetAddresses.forString("127.0.0.1"), 9999));
         final NetconfTopologySetup setup = mock(NetconfTopologySetup.class);
 
-        final Props props = NetconfNodeActor.props(setup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY,
-                DEFAULT_SCHEMA_REPOSITORY, TIMEOUT, mountPointService);
+        final Props props = NetconfNodeMasterActor.props(setup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY);
 
         system = ActorSystem.create();
 
@@ -209,7 +206,7 @@ public class NetconfNodeActorTest {
                 Futures.makeChecked(schemaContextFuture, e -> new SchemaResolutionException("fail", e));
         doReturn(checkedFuture).when(schemaContextFactory).createSchemaContext(any());
         final ActorRef slaveRef =
-                system.actorOf(NetconfNodeActor.props(setup, remoteDeviceId, registry, schemaRepository, TIMEOUT,
+                system.actorOf(NetconfNodeSlaveActor.props(setup, remoteDeviceId, registry, schemaRepository, TIMEOUT,
                         mountPointService));
         final List<SourceIdentifier> sources = ImmutableList.of(yang1, yang2);
         slaveRef.tell(new RegisterMountPoint(sources), masterRef);
@@ -228,8 +225,8 @@ public class NetconfNodeActorTest {
     public void testYangTextSchemaSourceRequestMessage() throws Exception {
         final SchemaRepository schemaRepository = mock(SchemaRepository.class);
         final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create("testID", Optional.absent());
-        final Props props = NetconfNodeActor.props(mock(NetconfTopologySetup.class), remoteDeviceId,
-                DEFAULT_SCHEMA_REPOSITORY, schemaRepository, TIMEOUT, mountPointService);
+        final Props props = NetconfNodeMasterActor.props(mock(NetconfTopologySetup.class), remoteDeviceId,
+                schemaRepository);
 
         final ActorRef actorRefSchemaRepo = TestActorRef.create(system, props, "master_mocked_schema_repository");
         final ActorContext actorContext = mock(ActorContext.class);
