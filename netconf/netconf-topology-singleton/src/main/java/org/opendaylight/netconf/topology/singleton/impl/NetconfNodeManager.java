@@ -22,7 +22,7 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService;
-import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
+import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeSlaveActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.AskForMasterMountPoint;
@@ -140,7 +140,7 @@ class NetconfNodeManager
 
     private void createActorRef() {
         if (slaveActorRef == null) {
-            slaveActorRef = setup.getActorSystem().actorOf(NetconfNodeActor.props(setup, id, schemaRegistry,
+            slaveActorRef = setup.getActorSystem().actorOf(NetconfNodeSlaveActor.props(setup, id, schemaRegistry,
                     schemaRepository, actorResponseWaitTime, mountPointService), id.getName());
         }
     }
