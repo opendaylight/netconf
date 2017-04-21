@@ -1,0 +1,763 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_dda52ab6",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/MdsalNetconfOperationService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "line break the whole parameter not just the name",
+      "range": {
+        "startLine": 21,
+        "startChar": 81,
+        "endLine": 22,
+        "endChar": 40
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_3dad569d",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/MdsalNetconfOperationServiceFactory.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "no need to break these, just indent them with 2 tabs",
+      "range": {
+        "startLine": 50,
+        "startChar": 47,
+        "endLine": 55,
+        "endChar": 77
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_5d913a51",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/MdsalNetconfOperationServiceFactory.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "line break the whole parameter, indent with 2 tabs",
+      "range": {
+        "startLine": 92,
+        "startChar": 84,
+        "endLine": 93,
+        "endChar": 85
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_9d9ba271",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/OperationProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "keep this aligned with previous line atleast",
+      "range": {
+        "startLine": 34,
+        "startChar": 29,
+        "endLine": 34,
+        "endChar": 91
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_dd8c0a38",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/DataTreeChangeTracker.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "line break whole parameter",
+      "range": {
+        "startLine": 103,
+        "startChar": 96,
+        "endLine": 104,
+        "endChar": 40
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_5d781a2b",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/EditConfig.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "again",
+      "range": {
+        "startLine": 65,
+        "startChar": 106,
+        "endLine": 66,
+        "endChar": 47
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_fdb74ed6",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/EditConfig.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "why is this here?",
+      "range": {
+        "startLine": 168,
+        "startChar": 12,
+        "endLine": 168,
+        "endChar": 20
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_d8d41849",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/EditOperationStrategyProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "dont line break in the middle of the parameter line break before final and indent",
+      "range": {
+        "startLine": 121,
+        "startChar": 75,
+        "endLine": 122,
+        "endChar": 95
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_38cc44bc",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/EditOperationStrategyProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "again, you can just push the whole parameter to the next line and indent",
+      "range": {
+        "startLine": 138,
+        "startChar": 33,
+        "endLine": 139,
+        "endChar": 56
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_18cfc0b1",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/EditOperationStrategyProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "here it would be preferable to line break at the operator",
+      "range": {
+        "startLine": 153,
+        "startChar": 70,
+        "endLine": 154,
+        "endChar": 52
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_78c52c8d",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/EditOperationStrategyProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "again push the whole param to the next line and indent",
+      "range": {
+        "startLine": 170,
+        "startChar": 75,
+        "endLine": 171,
+        "endChar": 105
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_b8bf94fa",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/EditOperationStrategyProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "here aswell",
+      "range": {
+        "startLine": 187,
+        "startChar": 41,
+        "endLine": 188,
+        "endChar": 44
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_98ba9008",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/EditOperationStrategyProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "break at operator",
+      "range": {
+        "startLine": 202,
+        "startChar": 70,
+        "endLine": 203,
+        "endChar": 52
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_d83b789a",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/EditOperationStrategyProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "keep this one together if possible",
+      "range": {
+        "startLine": 219,
+        "startChar": 75,
+        "endLine": 220,
+        "endChar": 112
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_3843a415",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/EditOperationStrategyProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "break the operator",
+      "range": {
+        "startLine": 245,
+        "startChar": 70,
+        "endLine": 246,
+        "endChar": 52
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_784c0c43",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/RuntimeRpc.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "keep together and indent",
+      "range": {
+        "startLine": 74,
+        "startChar": 107,
+        "endLine": 75,
+        "endChar": 32
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_5847881d",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/RuntimeRpc.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "again",
+      "range": {
+        "startLine": 118,
+        "startChar": 108,
+        "endLine": 119,
+        "endChar": 19
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_b85674d0",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/RuntimeRpc.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "same",
+      "range": {
+        "startLine": 213,
+        "startChar": 99,
+        "endLine": 214,
+        "endChar": 25
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_9851f0da",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "same as before",
+      "range": {
+        "startLine": 75,
+        "startChar": 101,
+        "endLine": 76,
+        "endChar": 39
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_f85f5ce3",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "same as before",
+      "range": {
+        "startLine": 104,
+        "startChar": 104,
+        "endLine": 105,
+        "endChar": 26
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_d86258ac",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "same as before",
+      "range": {
+        "startLine": 121,
+        "startChar": 80,
+        "endLine": 122,
+        "endChar": 20
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_385a84f3",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "pretty sure the ** line should be empty",
+      "range": {
+        "startLine": 131,
+        "startChar": 7,
+        "endLine": 131,
+        "endChar": 108
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_b86dd49a",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "push the whole thing to next line",
+      "range": {
+        "startLine": 196,
+        "startChar": 106,
+        "endLine": 197,
+        "endChar": 40
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_9868d088",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/Get.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "same as before",
+      "range": {
+        "startLine": 39,
+        "startChar": 100,
+        "endLine": 40,
+        "endChar": 47
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_f8063ccd",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/GetConfig.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "same as before",
+      "range": {
+        "startLine": 40,
+        "startChar": 106,
+        "endLine": 41,
+        "endChar": 47
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_d809b8de",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/NetconfMDSalMappingTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 795,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "keep together and move the whole param to next line",
+      "range": {
+        "startLine": 793,
+        "startChar": 93,
+        "endLine": 795,
+        "endChar": 109
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_b804b4c0",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/RuntimeRpcTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "cant we move this to the static block?",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 79,
+        "endChar": 44
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_98ff30aa",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/RuntimeRpcTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "keep together move to next line",
+      "range": {
+        "startLine": 100,
+        "startChar": 112,
+        "endLine": 101,
+        "endChar": 38
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_f82d9c47",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/RuntimeRpcTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "keep together move to next line",
+      "range": {
+        "startLine": 108,
+        "startChar": 98,
+        "endLine": 109,
+        "endChar": 113
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_d83098a0",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/RuntimeRpcTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "keep together move to next line",
+      "range": {
+        "startLine": 117,
+        "startChar": 102,
+        "endLine": 118,
+        "endChar": 38
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_3828c433",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/RuntimeRpcTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "keep together move to next line",
+      "range": {
+        "startLine": 126,
+        "startChar": 98,
+        "endLine": 127,
+        "endChar": 113
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_182b4031",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/RuntimeRpcTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "keep together move to next line",
+      "range": {
+        "startLine": 135,
+        "startChar": 101,
+        "endLine": 136,
+        "endChar": 37
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_7821ac4c",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/RuntimeRpcTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T14:50:18Z",
+      "side": 1,
+      "message": "keep together move to next line",
+      "range": {
+        "startLine": 153,
+        "startChar": 98,
+        "endLine": 154,
+        "endChar": 114
+      },
+      "revId": "cada63bc9f2926685613685a58e16e52f6bcca74",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
