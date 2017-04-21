@@ -114,7 +114,6 @@ class NetconfNodeManager
     }
 
     private void handleSlaveMountPoint(final DataObjectModification<Node> rootNode) {
-        @SuppressWarnings("ConstantConditions")
         final NetconfNode netconfNodeAfter = rootNode.getDataAfter().getAugmentation(NetconfNode.class);
 
         if (NetconfNodeConnectionStatus.ConnectionStatus.Connected.equals(netconfNodeAfter.getConnectionStatus())) {
@@ -123,14 +122,16 @@ class NetconfNodeManager
             final String path = NetconfTopologyUtils.createActorPath(masterAddress,
                     NetconfTopologyUtils.createMasterActorName(id.getName(),
                             netconfNodeAfter.getClusteredConnectionStatus().getNetconfMasterNode()));
+            LOG.debug("Asking for master for {}", id.getName());
             setup.getActorSystem().actorSelection(path).tell(new AskForMasterMountPoint(), slaveActorRef);
-        } else {            ;
+        } else {
             closeActor();
         }
     }
 
     private void createActorRef() {
         if (slaveActorRef == null) {
+            LOG.debug("Creating slave actor for {}", id.getName());
             slaveActorRef = setup.getActorSystem().actorOf(NetconfNodeActor.props(setup, id, schemaRegistry,
                     schemaRepository), id.getName());
         }

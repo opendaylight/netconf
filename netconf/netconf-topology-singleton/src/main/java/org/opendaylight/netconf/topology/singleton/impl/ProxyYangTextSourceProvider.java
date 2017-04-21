@@ -21,10 +21,14 @@ import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSo
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.YangTextSchemaSourceRequest;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
 import scala.concurrent.impl.Promise;
 
 public class ProxyYangTextSourceProvider implements RemoteYangTextSourceProvider {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ProxyYangTextSourceProvider.class);
 
     private final ActorRef masterRef;
     private final ActorContext actorContext;
@@ -43,7 +47,7 @@ public class ProxyYangTextSourceProvider implements RemoteYangTextSourceProvider
     @Override
     public Future<YangTextSchemaSourceSerializationProxy> getYangTextSchemaSource(
             @Nonnull final SourceIdentifier sourceIdentifier) {
-
+        LOG.debug("Trying to get schema source {}", sourceIdentifier);
         final Future<Object> scalaFuture = Patterns.ask(masterRef,
                 new YangTextSchemaSourceRequest(sourceIdentifier), NetconfTopologyUtils.TIMEOUT);
 
@@ -53,13 +57,18 @@ public class ProxyYangTextSourceProvider implements RemoteYangTextSourceProvider
             @Override
             public void onComplete(final Throwable failure, final Object success) throws Throwable {
                 if (failure != null) {
+                    LOG.debug("Failed to get schema source {}", sourceIdentifier);
+                    LOG.debug("Cause: ", failure);
                     promise.failure(failure);
                     return;
                 }
                 if (success instanceof Throwable) {
+                    LOG.debug("Failed to get schema source {}", sourceIdentifier);
+                    LOG.debug("Cause: ", success);
                     promise.failure((Throwable) success);
                     return;
                 }
+                LOG.debug("Successfully got schema source {}", sourceIdentifier);
                 promise.success((YangTextSchemaSourceSerializationProxy) success);
             }
         }, actorContext.dispatcher());
