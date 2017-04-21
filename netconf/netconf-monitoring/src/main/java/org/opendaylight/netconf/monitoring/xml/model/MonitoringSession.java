@@ -21,11 +21,11 @@ final class MonitoringSession {
     @XmlTransient
     private Session managementSession;
 
-    public MonitoringSession(Session managementSession) {
+    MonitoringSession(Session managementSession) {
         this.managementSession = managementSession;
     }
 
-    public MonitoringSession() {
+    MonitoringSession() {
     }
 
     public void setManagementSession(Session managementSession) {
@@ -75,19 +75,20 @@ final class MonitoringSession {
     @XmlElement(name = "transport")
     public String getTransport() {
         try {
-            QName qName = (QName) managementSession.getTransport().getField("QNAME").get(null);
+            QName qualifiedName = (QName) managementSession.getTransport().getField("QNAME").get(null);
             // Add extension prefix if transport type is from extension yang module
-            if (qName.getNamespace().toString().equals(MonitoringConstants.EXTENSION_NAMESPACE)) {
-                return Joiner.on(':').join(MonitoringConstants.EXTENSION_NAMESPACE_PREFIX, qName.getLocalName());
+            if (qualifiedName.getNamespace().toString().equals(MonitoringConstants.EXTENSION_NAMESPACE)) {
+                return Joiner.on(':').join(MonitoringConstants.EXTENSION_NAMESPACE_PREFIX,
+                        qualifiedName.getLocalName());
             } else {
-                return qName.getLocalName();
+                return qualifiedName.getLocalName();
             }
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
             throw new IllegalArgumentException("Unknown transport type " + managementSession.getTransport(), e);
         }
     }
 
-    @XmlElement(name= "session-identifier", namespace = MonitoringConstants.EXTENSION_NAMESPACE)
+    @XmlElement(name = "session-identifier", namespace = MonitoringConstants.EXTENSION_NAMESPACE)
     public String getSessionType() {
         return managementSession.getAugmentation(Session1.class).getSessionIdentifier();
     }

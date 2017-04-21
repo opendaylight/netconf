@@ -9,9 +9,10 @@ package org.opendaylight.netconf.monitoring;
 
 public final class MonitoringConstants {
 
-    private MonitoringConstants(){
+    private MonitoringConstants() {
         // not called - private constructor for utility class
     }
+
     public static final String MODULE_NAME = "ietf-netconf-monitoring";
     public static final String MODULE_REVISION = "2010-10-04";
 

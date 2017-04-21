@@ -43,18 +43,18 @@ public class JaxBSerializerTest {
 
     private static final String IPV4 = "192.168.1.1";
     private static final String IPV6 = "FE80:0000:0000:0000:0202:B3FF:FE1E:8329";
-    private static final String SESSION_XML = "<session>" +
-            "<session-id>1</session-id>" +
-            "<in-bad-rpcs>0</in-bad-rpcs>" +
-            "<in-rpcs>0</in-rpcs>" +
-            "<login-time>2010-10-10T12:32:32Z</login-time>" +
-            "<out-notifications>0</out-notifications>" +
-            "<out-rpc-errors>0</out-rpc-errors>" +
-            "<ncme:session-identifier>client</ncme:session-identifier>" +
-            "<source-host>%s</source-host>" +
-            "<transport>ncme:netconf-tcp</transport>" +
-            "<username>username</username>" +
-            "</session>";
+    private static final String SESSION_XML = "<session>"
+            + "<session-id>1</session-id>"
+            + "<in-bad-rpcs>0</in-bad-rpcs>"
+            + "<in-rpcs>0</in-rpcs>"
+            + "<login-time>2010-10-10T12:32:32Z</login-time>"
+            + "<out-notifications>0</out-notifications>"
+            + "<out-rpc-errors>0</out-rpc-errors>"
+            + "<ncme:session-identifier>client</ncme:session-identifier>"
+            + "<source-host>%s</source-host>"
+            + "<transport>ncme:netconf-tcp</transport>"
+            + "<username>username</username>"
+            + "</session>";
 
     @Mock
     private NetconfMonitoringService monitoringService;
@@ -69,8 +69,8 @@ public class JaxBSerializerTest {
                 getMockIPv6Session(NetconfSsh.class)
         )).build())
                 .when(monitoringService).getSessions();
-        doReturn(new SchemasBuilder().setSchema(Lists.newArrayList(getMockSchema("id", "v1", Yang.class), getMockSchema("id2", "", Yang.class))).build())
-                .when(monitoringService).getSchemas();
+        doReturn(new SchemasBuilder().setSchema(Lists.newArrayList(getMockSchema("id", "v1", Yang.class),
+                getMockSchema("id2", "", Yang.class))).build()).when(monitoringService).getSchemas();
     }
 
     @Test
@@ -79,13 +79,13 @@ public class JaxBSerializerTest {
         final NetconfState model = new NetconfState(monitoringService);
         final String xml = XmlUtil.toString(new JaxBSerializer().toXml(model)).replaceAll("\\s", "");
         assertThat(xml, CoreMatchers.containsString(
-                "<schema>" +
-                "<format>yang</format>" +
-                "<identifier>id</identifier>" +
-                "<location>NETCONF</location>" +
-                "<namespace>localhost</namespace>" +
-                "<version>v1</version>" +
-                "</schema>"));
+                "<schema>"
+                        + "<format>yang</format>"
+                        + "<identifier>id</identifier>"
+                        + "<location>NETCONF</location>"
+                        + "<namespace>localhost</namespace>"
+                        + "<version>v1</version>"
+                        + "</schema>"));
 
         assertThat(xml, CoreMatchers.containsString(
                 String.format(SESSION_XML, IPV4)));

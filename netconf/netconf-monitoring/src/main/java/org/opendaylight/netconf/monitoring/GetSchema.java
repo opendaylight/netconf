@@ -46,7 +46,8 @@ public class GetSchema extends AbstractSingletonNetconfOperation {
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement xml) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement xml)
+            throws DocumentedException {
         final GetSchemaEntry entry;
 
         entry = new GetSchemaEntry(xml);
@@ -83,7 +84,7 @@ public class GetSchema extends AbstractSingletonNetconfOperation {
             try {
                 identifierElement = getSchemaElement.getOnlyChildElementWithSameNamespace(IDENTIFIER);
             } catch (final DocumentedException e) {
-                LOG.trace("Can't get identifier element as only child element with same namespace due to ",e);
+                LOG.trace("Can't get identifier element as only child element with same namespace due to ", e);
                 throw DocumentedException.wrap(e);
             }
             identifier = identifierElement.getTextContent();
