@@ -61,7 +61,7 @@ public class ProxyWriteTransaction implements DOMDataWriteTransaction {
      * @param masterTxActor {@link org.opendaylight.netconf.topology.singleton.impl.actors.WriteTransactionActor} ref
      * @param id            device id
      * @param actorSystem   system
-     * @param askTimeout
+     * @param askTimeout    ask timeout
      */
     public ProxyWriteTransaction(final ActorRef masterTxActor, final RemoteDeviceId id, final ActorSystem actorSystem,
                                  final Timeout askTimeout) {
@@ -74,6 +74,7 @@ public class ProxyWriteTransaction implements DOMDataWriteTransaction {
     @Override
     public boolean cancel() {
         if (!opened.compareAndSet(true, false)) {
+            LOG.error("{} Transaction is already cancelled", id);
             return false;
         }
         final Future<Object> cancelScalaFuture =
@@ -85,6 +86,8 @@ public class ProxyWriteTransaction implements DOMDataWriteTransaction {
             // here must be Await because AsyncWriteTransaction do not return future
             return (boolean) Await.result(cancelScalaFuture, askTimeout.duration());
         } catch (final Exception e) {
+            LOG.error("{} Exception during cancel", id);
+            LOG.error("Cause: ", e);
             return false;
         }
     }
