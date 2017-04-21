@@ -22,7 +22,8 @@ import org.opendaylight.netconf.impl.util.DeserializerExceptionHandler;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.protocol.framework.AbstractDispatcher;
 
-public class NetconfServerDispatcherImpl extends AbstractDispatcher<NetconfServerSession, NetconfServerSessionListener> implements NetconfServerDispatcher {
+public class NetconfServerDispatcherImpl extends AbstractDispatcher<NetconfServerSession,
+        NetconfServerSessionListener> implements NetconfServerDispatcher {
 
     private final ServerChannelInitializer initializer;
 
@@ -44,7 +45,8 @@ public class NetconfServerDispatcherImpl extends AbstractDispatcher<NetconfServe
 
     @Override
     public ChannelFuture createLocalServer(LocalAddress address) {
-        return super.createServer(address, LocalServerChannel.class, new ChannelPipelineInitializer<LocalChannel, NetconfServerSession>() {
+        return super.createServer(address, LocalServerChannel.class, new ChannelPipelineInitializer<LocalChannel,
+                NetconfServerSession>() {
             @Override
             public void initializeChannel(final LocalChannel ch, final Promise<NetconfServerSession> promise) {
                 initializer.initialize(ch, promise);

@@ -43,8 +43,9 @@ public class DefaultCloseSession extends AbstractSingletonNetconfOperation imple
     /**
      * Close netconf operation router associated to this session, which in turn
      * closes NetconfOperationServiceSnapshot with all NetconfOperationService
-     * instances
+     * instances.
      */
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
             throws DocumentedException {
@@ -63,7 +64,7 @@ public class DefaultCloseSession extends AbstractSingletonNetconfOperation imple
     }
 
     @Override
-    public void setNetconfSession(final NetconfServerSession s) {
-        this.session = s;
+    public void setNetconfSession(final NetconfServerSession netconfServerSession) {
+        this.session = netconfServerSession;
     }
 }

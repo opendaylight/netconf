@@ -10,5 +10,5 @@ package org.opendaylight.netconf.impl.mapping.operations;
 import org.opendaylight.netconf.impl.NetconfServerSession;
 
 public interface DefaultNetconfOperation {
-    void setNetconfSession(NetconfServerSession s);
+    void setNetconfSession(NetconfServerSession netconfServerSession);
 }

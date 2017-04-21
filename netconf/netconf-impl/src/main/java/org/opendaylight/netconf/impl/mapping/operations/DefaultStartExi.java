@@ -51,8 +51,10 @@ public class DefaultStartExi extends AbstractSingletonNetconfOperation implement
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
-        final Element getSchemaResult = document.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, XmlNetconfConstants.OK);
+    protected Element handleWithNoSubsequentOperations(final Document document,
+                                                       final XmlElement operationElement) throws DocumentedException {
+        final Element getSchemaResult = document.createElementNS(
+                XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, XmlNetconfConstants.OK);
         LOG.trace("{} operation successful", START_EXI);
         return getSchemaResult;
     }
@@ -68,7 +70,7 @@ public class DefaultStartExi extends AbstractSingletonNetconfOperation implement
     }
 
     @Override
-    public void setNetconfSession(final NetconfServerSession s) {
-        netconfSession = s;
+    public void setNetconfSession(final NetconfServerSession netconfServerSession) {
+        netconfSession = netconfServerSession;
     }
 }

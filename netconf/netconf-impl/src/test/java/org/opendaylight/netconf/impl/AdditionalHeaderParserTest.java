@@ -16,8 +16,8 @@ public class AdditionalHeaderParserTest {
 
     @Test
     public void testParsing() throws Exception {
-        String s = "[netconf;10.12.0.102:48528;ssh;;;;;;]";
-        NetconfHelloMessageAdditionalHeader header = NetconfHelloMessageAdditionalHeader.fromString(s);
+        String message = "[netconf;10.12.0.102:48528;ssh;;;;;;]";
+        NetconfHelloMessageAdditionalHeader header = NetconfHelloMessageAdditionalHeader.fromString(message);
         assertEquals("netconf", header.getUserName());
         assertEquals("10.12.0.102", header.getAddress());
         assertEquals("ssh", header.getTransport());
@@ -25,8 +25,8 @@ public class AdditionalHeaderParserTest {
 
     @Test
     public void testParsing2() throws Exception {
-        String s = "[tomas;10.0.0.0/10000;tcp;1000;1000;;/home/tomas;;]";
-        NetconfHelloMessageAdditionalHeader header = NetconfHelloMessageAdditionalHeader.fromString(s);
+        String message = "[tomas;10.0.0.0/10000;tcp;1000;1000;;/home/tomas;;]";
+        NetconfHelloMessageAdditionalHeader header = NetconfHelloMessageAdditionalHeader.fromString(message);
         assertEquals("tomas", header.getUserName());
         assertEquals("10.0.0.0", header.getAddress());
         assertEquals("tcp", header.getTransport());
@@ -34,7 +34,7 @@ public class AdditionalHeaderParserTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testParsingNoUsername() throws Exception {
-        String s = "[10.12.0.102:48528;ssh;;;;;;]";
-        NetconfHelloMessageAdditionalHeader.fromString(s);
+        String message = "[10.12.0.102:48528;ssh;;;;;;]";
+        NetconfHelloMessageAdditionalHeader.fromString(message);
     }
 }

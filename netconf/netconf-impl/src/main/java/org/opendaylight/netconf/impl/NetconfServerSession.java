@@ -47,20 +47,26 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class NetconfServerSession extends AbstractNetconfSession<NetconfServerSession, NetconfServerSessionListener> implements NetconfManagementSession {
+public final class NetconfServerSession extends AbstractNetconfSession<NetconfServerSession,
+        NetconfServerSessionListener> implements NetconfManagementSession {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSession.class);
-    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+    private static final String DATE_TIME_PATTERN_STRING = DateAndTime.PATTERN_CONSTANTS.get(0);
+    private static final Pattern DATE_TIME_PATTERN = Pattern.compile(DATE_TIME_PATTERN_STRING);
 
     private final NetconfHelloMessageAdditionalHeader header;
     private final NetconfServerSessionListener sessionListener;
 
     private ZonedDateTime loginTime;
-    private long inRpcSuccess, inRpcFail, outRpcError, outNotification;
+    private long inRpcSuccess;
+    private long inRpcFail;
+    private long outRpcError;
+    private long outNotification;
     private volatile boolean delayedClose;
 
-    public NetconfServerSession(final NetconfServerSessionListener sessionListener, final Channel channel, final long sessionId,
-            final NetconfHelloMessageAdditionalHeader header) {
+    public NetconfServerSession(final NetconfServerSessionListener sessionListener, final Channel channel,
+                                final long sessionId, final NetconfHelloMessageAdditionalHeader header) {
         super(sessionListener, channel, sessionId);
         this.header = header;
         this.sessionListener = sessionListener;
@@ -90,7 +96,7 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
             sessionListener.onNotification(this, (NetconfNotification) netconfMessage);
         }
         // delayed close was set, close after the message was sent
-        if(delayedClose) {
+        if (delayedClose) {
             channelFuture.addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(final ChannelFuture future) throws Exception {
@@ -113,9 +119,6 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
         outRpcError++;
     }
 
-    private static final String dateTimePatternString = DateAndTime.PATTERN_CONSTANTS.get(0);
-    private static final Pattern dateTimePattern = Pattern.compile(dateTimePatternString);
-
     @Override
     public Session toManagementSession() {
         SessionBuilder builder = new SessionBuilder();
@@ -131,10 +134,11 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
         builder.setSourceHost(new Host(address));
 
         Preconditions.checkState(DateAndTime.PATTERN_CONSTANTS.size() == 1);
-        String formattedDateTime = dateFormatter.format(loginTime);
+        String formattedDateTime = DATE_FORMATTER.format(loginTime);
 
-        Matcher matcher = dateTimePattern.matcher(formattedDateTime);
-        Preconditions.checkState(matcher.matches(), "Formatted datetime %s does not match pattern %s", formattedDateTime, dateTimePattern);
+        Matcher matcher = DATE_TIME_PATTERN.matcher(formattedDateTime);
+        Preconditions.checkState(matcher.matches(), "Formatted datetime %s does not match pattern %s",
+                formattedDateTime, DATE_TIME_PATTERN);
         builder.setLoginTime(new DateAndTime(formattedDateTime));
 
         builder.setInBadRpcs(new ZeroBasedCounter32(inRpcFail));
@@ -156,13 +160,13 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
     }
 
     private static Class<? extends Transport> getTransportForString(final String transport) {
-        switch(transport) {
-        case "ssh" :
-            return NetconfSsh.class;
-        case "tcp" :
-            return NetconfTcp.class;
-        default:
-            throw new IllegalArgumentException("Unknown transport type " + transport);
+        switch (transport) {
+            case "ssh":
+                return NetconfSsh.class;
+            case "tcp":
+                return NetconfTcp.class;
+            default:
+                throw new IllegalArgumentException("Unknown transport type " + transport);
         }
     }
 
@@ -172,7 +176,8 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
     }
 
     @Override
-    protected void addExiHandlers(final ByteToMessageDecoder decoder, final MessageToByteEncoder<NetconfMessage> encoder) {
+    protected void addExiHandlers(final ByteToMessageDecoder decoder,
+                                  final MessageToByteEncoder<NetconfMessage> encoder) {
         replaceMessageDecoder(decoder);
         replaceMessageEncoderAfterNextMessage(encoder);
     }

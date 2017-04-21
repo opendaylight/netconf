@@ -47,7 +47,8 @@ public class NetconfImplActivatorTest {
         doReturn(refs).when(bundle).getServiceReferences(anyString(), anyString());
         doReturn(Arrays.asList(refs)).when(bundle).getServiceReferences(any(Class.class), anyString());
         doReturn("").when(bundle).getProperty(anyString());
-        doReturn(registration).when(bundle).registerService(any(Class.class), any(AggregatedNetconfOperationServiceFactory.class), any(Dictionary.class));
+        doReturn(registration).when(bundle).registerService(any(Class.class),
+                any(AggregatedNetconfOperationServiceFactory.class), any(Dictionary.class));
         doNothing().when(registration).unregister();
         doNothing().when(bundle).removeServiceListener(any(ServiceListener.class));
     }
@@ -56,7 +57,8 @@ public class NetconfImplActivatorTest {
     public void testStart() throws Exception {
         NetconfImplActivator activator = new NetconfImplActivator();
         activator.start(bundle);
-        verify(bundle).registerService(any(Class.class), any(AggregatedNetconfOperationServiceFactory.class), any(Dictionary.class));
+        verify(bundle).registerService(any(Class.class), any(AggregatedNetconfOperationServiceFactory.class),
+                any(Dictionary.class));
         activator.stop(bundle);
     }
 }

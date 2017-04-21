@@ -28,8 +28,8 @@ import org.w3c.dom.Document;
 public class DefaultStopExiTest {
     @Test
     public void testHandleWithNoSubsequentOperations() throws Exception {
-        DefaultStopExi exi = new DefaultStopExi("");
-        Document doc = XmlUtil.newDocument();
+        final DefaultStopExi exi = new DefaultStopExi("");
+        final Document doc = XmlUtil.newDocument();
         Channel channel = mock(Channel.class);
         doReturn("mockChannel").when(channel).toString();
         ChannelPipeline pipeline = mock(ChannelPipeline.class);
@@ -40,7 +40,8 @@ public class DefaultStopExiTest {
         NetconfServerSession serverSession = new NetconfServerSession(null, channel, 2L, null);
         exi.setNetconfSession(serverSession);
 
-        assertNotNull(exi.handleWithNoSubsequentOperations(doc, XmlElement.fromDomElement(XmlUtil.readXmlToElement("<elem/>"))));
+        assertNotNull(exi.handleWithNoSubsequentOperations(doc,
+                XmlElement.fromDomElement(XmlUtil.readXmlToElement("<elem/>"))));
         verify(pipeline, times(1)).replace(anyString(), anyString(), any(ChannelHandler.class));
     }
 }

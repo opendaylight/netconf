@@ -91,11 +91,11 @@ public class NetconfServerSessionListenerTest {
 
     @Test
     public void testOnMessage() throws Exception {
-        final Document reply = XmlUtil.readXmlToDocument("<rpc-reply message-id=\"101\" " +
-                "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><example/></rpc-reply>");
+        final Document reply = XmlUtil.readXmlToDocument("<rpc-reply message-id=\"101\" "
+                + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><example/></rpc-reply>");
         doReturn(reply).when(router).onNetconfMessage(any(), any());
-        final NetconfMessage msg = new NetconfMessage(XmlUtil.readXmlToDocument("<rpc message-id=\"101\" " +
-                "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><example/></rpc>"));
+        final NetconfMessage msg = new NetconfMessage(XmlUtil.readXmlToDocument("<rpc message-id=\"101\" "
+                + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><example/></rpc>"));
         listener.onMessage(session, msg);
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.IN_RPC_SUCCESS)));
         channel.runPendingTasks();
@@ -108,8 +108,8 @@ public class NetconfServerSessionListenerTest {
     public void testOnMessageRuntimeFail() throws Exception {
         doThrow(new RuntimeException("runtime fail")).when(router).onNetconfMessage(any(), any());
         final Document reply =
-                XmlUtil.readXmlToDocument("<rpc message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">" +
-                        "<example/></rpc>");
+                XmlUtil.readXmlToDocument("<rpc message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
+                        + "<example/></rpc>");
         final NetconfMessage msg = new NetconfMessage(reply);
         try {
             listener.onMessage(session, msg);
@@ -119,22 +119,23 @@ public class NetconfServerSessionListenerTest {
         }
     }
 
+    @SuppressWarnings("checkstyle:RegexpSinglelineJava")
     @Test
     public void testOnMessageDocumentedFail() throws Exception {
         final Document reply =
-                XmlUtil.readXmlToDocument("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
-                        "<rpc-error>\n" +
-                        "<error-type>protocol</error-type>\n" +
-                        "<error-tag>unknown-element</error-tag>\n" +
-                        "<error-severity>error</error-severity>\n" +
-                        "<error-message>Unknown tag bad-rpc in message:\n" +
-                        "&lt;bad-rpc/&gt;\n" +
-                        "</error-message>\n" +
-                        "<error-info>\n" +
-                        "<bad-element>bad-rpc</bad-element>\n" +
-                        "</error-info>\n" +
-                        "</rpc-error>\n" +
-                        "</rpc-reply>");
+                XmlUtil.readXmlToDocument("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                        + "<rpc-error>\n"
+                        + "<error-type>protocol</error-type>\n"
+                        + "<error-tag>unknown-element</error-tag>\n"
+                        + "<error-severity>error</error-severity>\n"
+                        + "<error-message>Unknown tag bad-rpc in message:\n"
+                        + "&lt;bad-rpc/&gt;\n"
+                        + "</error-message>\n"
+                        + "<error-info>\n"
+                        + "<bad-element>bad-rpc</bad-element>\n"
+                        + "</error-info>\n"
+                        + "</rpc-error>\n"
+                        + "</rpc-reply>");
         final NetconfMessage msg = new NetconfMessage(XmlUtil.readXmlToDocument("<bad-rpc/>"));
         listener.onMessage(session, msg);
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.IN_RPC_FAIL)));
