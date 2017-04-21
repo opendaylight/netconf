@@ -32,6 +32,7 @@ public class NetconfListDevicesCommand extends AbstractAction {
         return null;
     }
 
+    @SuppressWarnings("checkstyle:RegexpSinglelineJava")
     private void printDevicesList(@Nonnull final Map<String, Map<String, String>> allDevices) {
         final ShellTable table = new ShellTable();
         table.column(NetconfConsoleConstants.NETCONF_ID).alignLeft();

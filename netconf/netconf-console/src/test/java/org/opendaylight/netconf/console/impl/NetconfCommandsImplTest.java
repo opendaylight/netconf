@@ -104,16 +104,19 @@ public class NetconfCommandsImplTest {
         final ExecutorService listenableFutureExecutor = SpecialExecutors.newBlockingBoundedCachedThreadPool(
                 16, 16, "CommitFutures");
 
-        final ConcurrentDOMDataBroker cDOMDataBroker = new ConcurrentDOMDataBroker(datastores, listenableFutureExecutor);
+        final ConcurrentDOMDataBroker cDOMDataBroker =
+                new ConcurrentDOMDataBroker(datastores, listenableFutureExecutor);
 
         final ClassPool pool = ClassPool.getDefault();
         final DataObjectSerializerGenerator generator = StreamWriterGenerator.create(JavassistUtils.forClassPool(pool));
         final BindingNormalizedNodeCodecRegistry codecRegistry = new BindingNormalizedNodeCodecRegistry(generator);
         final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-        codecRegistry.onBindingRuntimeContextUpdated(BindingRuntimeContext.create(moduleInfoBackedContext, schemaContext));
+        codecRegistry
+                .onBindingRuntimeContextUpdated(BindingRuntimeContext.create(moduleInfoBackedContext, schemaContext));
 
         final GeneratedClassLoadingStrategy loading = GeneratedClassLoadingStrategy.getTCCLClassLoadingStrategy();
-        final BindingToNormalizedNodeCodec bindingToNormalized = new BindingToNormalizedNodeCodec(loading, codecRegistry);
+        final BindingToNormalizedNodeCodec bindingToNormalized =
+                new BindingToNormalizedNodeCodec(loading, codecRegistry);
         bindingToNormalized.onGlobalContextUpdated(schemaContext);
         dataBroker = new BindingDOMDataBrokerAdapter(cDOMDataBroker, bindingToNormalized);
 
@@ -154,9 +157,10 @@ public class NetconfCommandsImplTest {
     }
 
     @Test
-    public void testConnectDisconnectDevice() throws InterruptedException, TimeoutException, TransactionCommitFailedException {
-        final NetconfNode netconfNode = new NetconfNodeBuilder().setPort(new PortNumber(7777)).
-                setHost(HostBuilder.getDefaultInstance("10.10.1.1")).build();
+    public void testConnectDisconnectDevice()
+            throws InterruptedException, TimeoutException, TransactionCommitFailedException {
+        final NetconfNode netconfNode = new NetconfNodeBuilder()
+                .setPort(new PortNumber(7777)).setHost(HostBuilder.getDefaultInstance("10.10.1.1")).build();
 
         createTopology(LogicalDatastoreType.CONFIGURATION);
         netconfCommands.connectDevice(netconfNode, "netconf-ID");
@@ -226,22 +230,23 @@ public class NetconfCommandsImplTest {
         assertEquals(1, nodes.size());
     }
 
-    private void createTopology(LogicalDatastoreType dataStoreType) throws TransactionCommitFailedException, TimeoutException {
+    private void createTopology(LogicalDatastoreType dataStoreType)
+            throws TransactionCommitFailedException, TimeoutException {
         final List<Node> nodes = new ArrayList<>();
         final Node node = getNetconfNode(NODE_ID, IP, PORT, CONN_STATUS, CAP_PREFIX);
         nodes.add(node);
 
-        final Topology topology = new TopologyBuilder().
-                setKey(new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName()))).
-                setTopologyId(new TopologyId(TopologyNetconf.QNAME.getLocalName())).setNode(nodes).build();
+        final Topology topology = new TopologyBuilder()
+                .setKey(new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())))
+                .setTopologyId(new TopologyId(TopologyNetconf.QNAME.getLocalName())).setNode(nodes).build();
 
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeTransaction.put(dataStoreType, NetconfIidFactory.NETCONF_TOPOLOGY_IID, topology);
         writeTransaction.submit().checkedGet(2, TimeUnit.SECONDS);
     }
 
-    private Node getNetconfNode(String nodeIdent, String ip, int portNumber, NetconfNodeConnectionStatus.ConnectionStatus cs,
-                                String notificationCapabilityPrefix) {
+    private Node getNetconfNode(String nodeIdent, String ip, int portNumber,
+                                NetconfNodeConnectionStatus.ConnectionStatus cs, String notificationCapabilityPrefix) {
 
         final Host host = HostBuilder.getDefaultInstance(ip);
         final PortNumber port = new PortNumber(portNumber);
@@ -250,10 +255,11 @@ public class NetconfCommandsImplTest {
         avCapList.add(new AvailableCapabilityBuilder()
                 .setCapabilityOrigin(AvailableCapability.CapabilityOrigin.UserDefined)
                 .setCapability(notificationCapabilityPrefix + "_availableCapabilityString1").build());
-        final AvailableCapabilities avCaps = new AvailableCapabilitiesBuilder().setAvailableCapability(avCapList).build();
+        final AvailableCapabilities avCaps =
+                new AvailableCapabilitiesBuilder().setAvailableCapability(avCapList).build();
 
-        final NetconfNode nn = new NetconfNodeBuilder().setConnectionStatus(cs).setHost(host).setPort(port).
-                setAvailableCapabilities(avCaps).build();
+        final NetconfNode nn = new NetconfNodeBuilder().setConnectionStatus(cs).setHost(host).setPort(port)
+                .setAvailableCapabilities(avCaps).build();
         final NodeId nodeId = new NodeId(nodeIdent);
         final NodeKey nk = new NodeKey(nodeId);
         final NodeBuilder nb = new NodeBuilder();
@@ -324,7 +330,8 @@ public class NetconfCommandsImplTest {
             }
 
             @Override
-            public ListenerRegistration<SchemaContextListener> registerSchemaContextListener(final SchemaContextListener listener) {
+            public ListenerRegistration<SchemaContextListener> registerSchemaContextListener(
+                    final SchemaContextListener listener) {
                 listener.onGlobalContextUpdated(getGlobalContext());
                 return new ListenerRegistration<SchemaContextListener>() {
                     @Override
