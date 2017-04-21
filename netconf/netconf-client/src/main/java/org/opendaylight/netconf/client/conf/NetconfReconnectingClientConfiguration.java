@@ -21,9 +21,12 @@ public final class NetconfReconnectingClientConfiguration extends NetconfClientC
     private final ReconnectStrategyFactory connectStrategyFactory;
 
     NetconfReconnectingClientConfiguration(final NetconfClientProtocol clientProtocol, final InetSocketAddress address,
-            final Long connectionTimeoutMillis, final NetconfHelloMessageAdditionalHeader additionalHeader,
-            final NetconfClientSessionListener sessionListener, final ReconnectStrategy reconnectStrategy,
-            final ReconnectStrategyFactory connectStrategyFactory, final AuthenticationHandler authHandler) {
+                                           final Long connectionTimeoutMillis,
+                                           final NetconfHelloMessageAdditionalHeader additionalHeader,
+                                           final NetconfClientSessionListener sessionListener,
+                                           final ReconnectStrategy reconnectStrategy,
+                                           final ReconnectStrategyFactory connectStrategyFactory,
+                                           final AuthenticationHandler authHandler) {
         super(clientProtocol, address, connectionTimeoutMillis, additionalHeader, sessionListener, reconnectStrategy,
                 authHandler);
         this.connectStrategyFactory = connectStrategyFactory;

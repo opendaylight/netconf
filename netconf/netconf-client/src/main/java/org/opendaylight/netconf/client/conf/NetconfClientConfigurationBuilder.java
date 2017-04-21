@@ -16,7 +16,8 @@ import org.opendaylight.protocol.framework.ReconnectStrategy;
 public class NetconfClientConfigurationBuilder {
 
     public static final int DEFAULT_CONNECTION_TIMEOUT_MILLIS = 5000;
-    public static final NetconfClientConfiguration.NetconfClientProtocol DEFAULT_CLIENT_PROTOCOL = NetconfClientConfiguration.NetconfClientProtocol.TCP;
+    public static final NetconfClientConfiguration.NetconfClientProtocol DEFAULT_CLIENT_PROTOCOL =
+            NetconfClientConfiguration.NetconfClientProtocol.TCP;
 
     private InetSocketAddress address;
     private long connectionTimeoutMillis = DEFAULT_CONNECTION_TIMEOUT_MILLIS;
@@ -43,12 +44,14 @@ public class NetconfClientConfigurationBuilder {
         return this;
     }
 
-    public NetconfClientConfigurationBuilder withProtocol(final NetconfClientConfiguration.NetconfClientProtocol clientProtocol) {
+    public NetconfClientConfigurationBuilder withProtocol(
+            final NetconfClientConfiguration.NetconfClientProtocol clientProtocol) {
         this.clientProtocol = clientProtocol;
         return this;
     }
 
-    public NetconfClientConfigurationBuilder withAdditionalHeader(final NetconfHelloMessageAdditionalHeader additionalHeader) {
+    public NetconfClientConfigurationBuilder withAdditionalHeader(
+            final NetconfHelloMessageAdditionalHeader additionalHeader) {
         this.additionalHeader = additionalHeader;
         return this;
     }
@@ -97,6 +100,7 @@ public class NetconfClientConfigurationBuilder {
     }
 
     public NetconfClientConfiguration build() {
-        return new NetconfClientConfiguration(clientProtocol, address, connectionTimeoutMillis, additionalHeader, sessionListener, reconnectStrategy, authHandler);
+        return new NetconfClientConfiguration(clientProtocol, address, connectionTimeoutMillis, additionalHeader,
+                sessionListener, reconnectStrategy, authHandler);
     }
 }

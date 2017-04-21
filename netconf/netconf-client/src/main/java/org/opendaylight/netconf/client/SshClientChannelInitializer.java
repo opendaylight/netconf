@@ -20,9 +20,9 @@ final class SshClientChannelInitializer extends AbstractChannelInitializer<Netco
     private final NetconfClientSessionNegotiatorFactory negotiatorFactory;
     private final NetconfClientSessionListener sessionListener;
 
-    public SshClientChannelInitializer(final AuthenticationHandler authHandler,
-                                       final NetconfClientSessionNegotiatorFactory negotiatorFactory,
-                                       final NetconfClientSessionListener sessionListener) {
+    SshClientChannelInitializer(final AuthenticationHandler authHandler,
+                                final NetconfClientSessionNegotiatorFactory negotiatorFactory,
+                                final NetconfClientSessionListener sessionListener) {
         this.authenticationHandler = authHandler;
         this.negotiatorFactory = negotiatorFactory;
         this.sessionListener = sessionListener;
@@ -33,7 +33,7 @@ final class SshClientChannelInitializer extends AbstractChannelInitializer<Netco
         try {
             // ssh handler has to be the first handler in pipeline
             ch.pipeline().addFirst(AsyncSshHandler.createForNetconfSubsystem(authenticationHandler, promise));
-            super.initialize(ch,promise);
+            super.initialize(ch, promise);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
@@ -42,7 +42,7 @@ final class SshClientChannelInitializer extends AbstractChannelInitializer<Netco
     @Override
     protected void initializeSessionNegotiator(final Channel ch,
                                                final Promise<NetconfClientSession> promise) {
-        ch.pipeline().addAfter(NETCONF_MESSAGE_DECODER,  AbstractChannelInitializer.NETCONF_SESSION_NEGOTIATOR,
+        ch.pipeline().addAfter(NETCONF_MESSAGE_DECODER, AbstractChannelInitializer.NETCONF_SESSION_NEGOTIATOR,
                 negotiatorFactory.getSessionNegotiator(() -> sessionListener, ch, promise));
     }
 }
