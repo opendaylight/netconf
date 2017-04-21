@@ -35,7 +35,7 @@ import org.opendaylight.protocol.framework.NeverReconnectStrategy;
 
 
 /**
- * Synchronous netconf client suitable for testing
+ * Synchronous netconf client suitable for testing.
  */
 public class TestingNetconfClient implements Closeable {
 
@@ -47,7 +47,8 @@ public class TestingNetconfClient implements Closeable {
     private final long sessionId;
 
     public TestingNetconfClient(String clientLabel,
-                                NetconfClientDispatcher netconfClientDispatcher, final NetconfClientConfiguration config) throws InterruptedException {
+                                NetconfClientDispatcher netconfClientDispatcher,
+                                final NetconfClientConfiguration config) throws InterruptedException {
         this.label = clientLabel;
         sessionListener = config.getSessionListener();
         Future<NetconfClientSession> clientFuture = netconfClientDispatcher.createClient(config);
@@ -66,7 +67,7 @@ public class TestingNetconfClient implements Closeable {
     }
 
     public Future<NetconfMessage> sendRequest(NetconfMessage message) {
-        return ((SimpleNetconfClientSessionListener)sessionListener).sendRequest(message);
+        return ((SimpleNetconfClientSessionListener) sessionListener).sendRequest(message);
     }
 
     public NetconfMessage sendMessage(NetconfMessage message, int attemptMsDelay) throws ExecutionException,
@@ -105,13 +106,16 @@ public class TestingNetconfClient implements Closeable {
     public static void main(String[] args) throws Exception {
         HashedWheelTimer hashedWheelTimer = new HashedWheelTimer();
         NioEventLoopGroup nettyGroup = new NioEventLoopGroup();
-        NetconfClientDispatcherImpl netconfClientDispatcher = new NetconfClientDispatcherImpl(nettyGroup, nettyGroup, hashedWheelTimer);
+        NetconfClientDispatcherImpl netconfClientDispatcher = new NetconfClientDispatcherImpl(nettyGroup, nettyGroup,
+                hashedWheelTimer);
         LoginPassword authHandler = new LoginPassword("admin", "admin");
-        TestingNetconfClient client = new TestingNetconfClient("client", netconfClientDispatcher, getClientConfig("127.0.0.1", 1830, true, Optional.of(authHandler)));
+        TestingNetconfClient client = new TestingNetconfClient("client", netconfClientDispatcher,
+                getClientConfig("127.0.0.1", 1830, true, Optional.of(authHandler)));
         System.console().writer().println(client.getCapabilities());
     }
 
-    private static NetconfClientConfiguration getClientConfig(String host ,int port, boolean ssh, Optional<? extends AuthenticationHandler> maybeAuthHandler) throws UnknownHostException {
+    private static NetconfClientConfiguration getClientConfig(String host, int port, boolean ssh, Optional<? extends
+            AuthenticationHandler> maybeAuthHandler) throws UnknownHostException {
         InetSocketAddress netconfAddress = new InetSocketAddress(InetAddress.getByName(host), port);
         final NetconfClientConfigurationBuilder b = NetconfClientConfigurationBuilder.create();
         b.withAddress(netconfAddress);

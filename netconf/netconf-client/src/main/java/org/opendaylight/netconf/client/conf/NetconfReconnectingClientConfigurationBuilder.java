@@ -26,14 +26,17 @@ public class NetconfReconnectingClientConfigurationBuilder extends NetconfClient
     }
 
 
-    public NetconfReconnectingClientConfigurationBuilder withConnectStrategyFactory(final ReconnectStrategyFactory connectStrategyFactory) {
+    public NetconfReconnectingClientConfigurationBuilder withConnectStrategyFactory(
+            final ReconnectStrategyFactory connectStrategyFactory) {
         this.connectStrategyFactory = connectStrategyFactory;
         return this;
     }
 
     @Override
     public NetconfReconnectingClientConfiguration build() {
-        return new NetconfReconnectingClientConfiguration(getProtocol(), getAddress(), getConnectionTimeoutMillis(), getAdditionalHeader(), getSessionListener(), getReconnectStrategy(), connectStrategyFactory, getAuthHandler());
+        return new NetconfReconnectingClientConfiguration(getProtocol(), getAddress(), getConnectionTimeoutMillis(),
+                getAdditionalHeader(), getSessionListener(), getReconnectStrategy(), connectStrategyFactory,
+                getAuthHandler());
     }
 
     // Override setter methods to return subtype
@@ -44,22 +47,27 @@ public class NetconfReconnectingClientConfigurationBuilder extends NetconfClient
     }
 
     @Override
-    public NetconfReconnectingClientConfigurationBuilder withConnectionTimeoutMillis(final long connectionTimeoutMillis) {
-        return (NetconfReconnectingClientConfigurationBuilder) super.withConnectionTimeoutMillis(connectionTimeoutMillis);
+    public NetconfReconnectingClientConfigurationBuilder withConnectionTimeoutMillis(
+            final long connectionTimeoutMillis) {
+        return (NetconfReconnectingClientConfigurationBuilder)
+                super.withConnectionTimeoutMillis(connectionTimeoutMillis);
     }
 
     @Override
-    public NetconfReconnectingClientConfigurationBuilder withAdditionalHeader(final NetconfHelloMessageAdditionalHeader additionalHeader) {
+    public NetconfReconnectingClientConfigurationBuilder withAdditionalHeader(
+            final NetconfHelloMessageAdditionalHeader additionalHeader) {
         return (NetconfReconnectingClientConfigurationBuilder) super.withAdditionalHeader(additionalHeader);
     }
 
     @Override
-    public NetconfReconnectingClientConfigurationBuilder withSessionListener(final NetconfClientSessionListener sessionListener) {
+    public NetconfReconnectingClientConfigurationBuilder withSessionListener(
+            final NetconfClientSessionListener sessionListener) {
         return (NetconfReconnectingClientConfigurationBuilder) super.withSessionListener(sessionListener);
     }
 
     @Override
-    public NetconfReconnectingClientConfigurationBuilder withReconnectStrategy(final ReconnectStrategy reconnectStrategy) {
+    public NetconfReconnectingClientConfigurationBuilder withReconnectStrategy(
+            final ReconnectStrategy reconnectStrategy) {
         return (NetconfReconnectingClientConfigurationBuilder) super.withReconnectStrategy(reconnectStrategy);
     }
 
@@ -69,7 +77,8 @@ public class NetconfReconnectingClientConfigurationBuilder extends NetconfClient
     }
 
     @Override
-    public NetconfReconnectingClientConfigurationBuilder withProtocol(NetconfClientConfiguration.NetconfClientProtocol clientProtocol) {
+    public NetconfReconnectingClientConfigurationBuilder withProtocol(
+            NetconfClientConfiguration.NetconfClientProtocol clientProtocol) {
         return (NetconfReconnectingClientConfigurationBuilder) super.withProtocol(clientProtocol);
     }
 }

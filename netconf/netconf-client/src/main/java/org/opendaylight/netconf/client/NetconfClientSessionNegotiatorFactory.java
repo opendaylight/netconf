@@ -31,7 +31,8 @@ import org.openexi.proc.common.EXIOptionsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfClientSessionNegotiatorFactory implements SessionNegotiatorFactory<NetconfMessage, NetconfClientSession, NetconfClientSessionListener> {
+public class NetconfClientSessionNegotiatorFactory implements SessionNegotiatorFactory<NetconfMessage,
+        NetconfClientSession, NetconfClientSessionListener> {
 
     public static final Set<String> EXI_CLIENT_CAPABILITIES = ImmutableSet.of(
             XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
@@ -95,7 +96,8 @@ public class NetconfClientSessionNegotiatorFactory implements SessionNegotiatorF
 
     public NetconfClientSessionNegotiatorFactory(final Timer timer,
                                                  final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
-                                                 final long connectionTimeoutMillis, final EXIOptions exiOptions, final Set<String> capabilities) {
+                                                 final long connectionTimeoutMillis, final EXIOptions exiOptions,
+                                                 final Set<String> capabilities) {
         this.timer = Preconditions.checkNotNull(timer);
         this.additionalHeader = additionalHeader;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
@@ -104,21 +106,22 @@ public class NetconfClientSessionNegotiatorFactory implements SessionNegotiatorF
     }
 
     @Override
-    public SessionNegotiator<NetconfClientSession> getSessionNegotiator(final SessionListenerFactory<NetconfClientSessionListener> sessionListenerFactory,
-                                                                        final Channel channel,
-            final Promise<NetconfClientSession> promise) {
+    public SessionNegotiator<NetconfClientSession> getSessionNegotiator(
+            final SessionListenerFactory<NetconfClientSessionListener> sessionListenerFactory,
+            final Channel channel, final Promise<NetconfClientSession> promise) {
 
         NetconfMessage startExiMessage = NetconfStartExiMessage.create(options, START_EXI_MESSAGE_ID);
         NetconfHelloMessage helloMessage = null;
         try {
             helloMessage = NetconfHelloMessage.createClientHello(clientCapabilities, additionalHeader);
         } catch (NetconfDocumentedException e) {
-            LOG.error("Unable to create client hello message with capabilities {} and additional handler {}", clientCapabilities,additionalHeader);
+            LOG.error("Unable to create client hello message with capabilities {} and additional handler {}",
+                    clientCapabilities, additionalHeader);
             throw new IllegalStateException(e);
         }
 
         NetconfClientSessionPreferences proposal = new NetconfClientSessionPreferences(helloMessage, startExiMessage);
         return new NetconfClientSessionNegotiator(proposal, promise, channel, timer,
-                sessionListenerFactory.getSessionListener(),connectionTimeoutMillis);
+                sessionListenerFactory.getSessionListener(), connectionTimeoutMillis);
     }
 }
