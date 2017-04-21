@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_fdeaae0d",
+        "filename": "netconf/messagebus-netconf/src/main/java/org/opendaylight/netconf/messagebus/eventsources/netconf/ConnectionNotificationTopicRegistration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T12:10:18Z",
+      "side": 1,
+      "message": "this should be aligned with the previous parameter",
+      "range": {
+        "startLine": 51,
+        "startChar": 44,
+        "endLine": 51,
+        "endChar": 104
+      },
+      "revId": "34cee42777b361acc526d8bb7213efef1e17df2e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_3df556ee",
+        "filename": "netconf/messagebus-netconf/src/main/java/org/opendaylight/netconf/messagebus/eventsources/netconf/NetconfEventSource.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T12:10:18Z",
+      "side": 1,
+      "message": "dont linebreak after final statement, line break the whole parameter.",
+      "range": {
+        "startLine": 106,
+        "startChar": 97,
+        "endLine": 106,
+        "endChar": 103
+      },
+      "revId": "34cee42777b361acc526d8bb7213efef1e17df2e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_1df852e4",
+        "filename": "netconf/messagebus-netconf/src/main/java/org/opendaylight/netconf/messagebus/eventsources/netconf/NetconfEventSource.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T12:10:18Z",
+      "side": 1,
+      "message": "you dont have to linebreak this, you should be able to just use a double indentation for this",
+      "range": {
+        "startLine": 175,
+        "startChar": 74,
+        "endLine": 176,
+        "endChar": 106
+      },
+      "revId": "34cee42777b361acc526d8bb7213efef1e17df2e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_bde82611",
+        "filename": "netconf/messagebus-netconf/src/main/java/org/opendaylight/netconf/messagebus/eventsources/netconf/StreamNotificationTopicRegistration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T12:10:18Z",
+      "side": 1,
+      "message": "either align this with the params on previous line, or double indentation(double tab) should be enough",
+      "range": {
+        "startLine": 47,
+        "startChar": 40,
+        "endLine": 47,
+        "endChar": 84
+      },
+      "revId": "34cee42777b361acc526d8bb7213efef1e17df2e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
