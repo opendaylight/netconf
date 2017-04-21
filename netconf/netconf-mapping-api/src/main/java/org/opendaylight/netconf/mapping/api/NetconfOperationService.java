@@ -11,7 +11,7 @@ package org.opendaylight.netconf.mapping.api;
 import java.util.Set;
 
 /**
- *
+ * Service of netconf operations.
  */
 public interface NetconfOperationService extends AutoCloseable {
 

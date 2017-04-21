@@ -17,18 +17,20 @@ import org.w3c.dom.Document;
 public interface NetconfOperationChainedExecution {
 
     /**
+     * Check if this is termination point in operation execution.
+     *
      * @return true if this is termination point in operation execution, false
-     *         if there is a subsequent operation present that needs to be
-     *         executed
+     *     if there is a subsequent operation present that needs to be
+     *     executed.
      */
     boolean isExecutionTermination();
 
     /**
-     * Do not execute if this is termination point
+     * Do not execute if this is termination point.
      */
     Document execute(Document requestMessage) throws DocumentedException;
 
-    public static final NetconfOperationChainedExecution EXECUTION_TERMINATION_POINT = new NetconfOperationChainedExecution() {
+    NetconfOperationChainedExecution EXECUTION_TERMINATION_POINT = new NetconfOperationChainedExecution() {
         @Override
         public boolean isExecutionTermination() {
             return true;
@@ -36,7 +38,8 @@ public interface NetconfOperationChainedExecution {
 
         @Override
         public Document execute(Document requestMessage) throws DocumentedException {
-            throw new IllegalStateException("This execution represents the termination point in operation execution and cannot be executed itself");
+            throw new IllegalStateException("This execution represents the termination point in operation execution "
+                    + "and cannot be executed itself");
         }
     };
 

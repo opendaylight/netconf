@@ -32,6 +32,8 @@ public final class HandlingPriority implements Comparable<HandlingPriority> {
     }
 
     /**
+     * Get priority number.
+     *
      * @return priority number or Optional.absent otherwise
      */
     public Optional<Integer> getPriority() {
@@ -39,7 +41,7 @@ public final class HandlingPriority implements Comparable<HandlingPriority> {
     }
 
     public HandlingPriority increasePriority(int priorityIncrease) {
-        Preconditions.checkState(priority!=null, "Unable to increase priority for %s", this);
+        Preconditions.checkState(priority != null, "Unable to increase priority for %s", this);
         Preconditions.checkArgument(priorityIncrease > 0, "Negative increase");
         Preconditions.checkArgument(Long.valueOf(priority) + priorityIncrease < Integer.MAX_VALUE,
                 "Resulting priority cannot be higher than %s", Integer.MAX_VALUE);
@@ -51,42 +53,42 @@ public final class HandlingPriority implements Comparable<HandlingPriority> {
     }
 
     @Override
-    public int compareTo(HandlingPriority o) {
-        if (this == o) {
+    public int compareTo(HandlingPriority priority) {
+        if (this == priority) {
             return 0;
         }
         if (isCannotHandle()) {
             return -1;
         }
-        if (o.isCannotHandle()) {
+        if (priority.isCannotHandle()) {
             return 1;
         }
 
-        if (priority > o.priority){
+        if (this.priority > priority.priority) {
             return 1;
         }
-        if (priority.equals(o.priority)){
+        if (this.priority.equals(priority.priority)) {
             return 0;
         }
-        if (priority < o.priority){
+        if (this.priority < priority.priority) {
             return -1;
         }
 
-        throw new IllegalStateException("Unexpected state comparing " + this + " with " + o);
+        throw new IllegalStateException("Unexpected state comparing " + this + " with " + priority);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o){
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (!(o instanceof HandlingPriority)){
+        if (!(obj instanceof HandlingPriority)) {
             return false;
         }
 
-        HandlingPriority that = (HandlingPriority) o;
+        HandlingPriority that = (HandlingPriority) obj;
 
-        if (priority != null ? !priority.equals(that.priority) : that.priority != null){
+        if (priority != null ? !priority.equals(that.priority) : that.priority != null) {
             return false;
         }
 

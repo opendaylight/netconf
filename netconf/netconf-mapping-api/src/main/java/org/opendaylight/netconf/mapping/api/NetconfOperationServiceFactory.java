@@ -25,7 +25,8 @@ public interface NetconfOperationServiceFactory {
     Set<Capability> getCapabilities();
 
     /**
-     * Supported capabilities may change over time, registering a listener allows for push based information retrieval about current notifications
+     * Supported capabilities may change over time, registering a listener allows for push based information
+     * retrieval about current notifications.
      */
     AutoCloseable registerCapabilityListener(CapabilityListener listener);
 

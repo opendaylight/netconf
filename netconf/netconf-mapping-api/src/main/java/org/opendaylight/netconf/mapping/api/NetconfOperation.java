@@ -17,11 +17,11 @@ import org.w3c.dom.Document;
  * operations are chained (ordered by HandlingPriority returned by canHandle
  * method) and executed.
  *
+ * <p>
  * Operation can be declared as singleton or last in chain (see abstract
  * implementations in netconf-util). If the operation is not singleton or last,
  * it is responsible for the execution of subsequent operation and for merging
  * the results.
- *
  */
 public interface NetconfOperation {
 
@@ -31,7 +31,7 @@ public interface NetconfOperation {
      * HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY.
      *
      * @param message request message
-     * @return
+     * @return {@code handling priority}
      */
     HandlingPriority canHandle(Document message) throws DocumentedException;
 
@@ -42,11 +42,10 @@ public interface NetconfOperation {
      * last/singleton operation, subsequentOperation must indicate termination
      * point.
      *
-     * @param requestMessage
-     * @param subsequentOperation
-     *            execution of subsequent netconf operation
-     * @return
-     * @throws DocumentedException
+     * @param requestMessage request message
+     * @param subsequentOperation execution of subsequent netconf operation
+     * @return {@code document}
+     * @throws DocumentedException if operation fails
      */
     Document handle(Document requestMessage, NetconfOperationChainedExecution subsequentOperation)
             throws DocumentedException;
