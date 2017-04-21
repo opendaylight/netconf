@@ -14,10 +14,10 @@ import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurati
 public interface NetconfClientDispatcher {
 
     /**
+     * Create netconf client. Network communication has to be set up based on network protocol specified in
+     * clientConfiguration
      *
-     * Create netconf client. Network communication has to be set up based on network protocol specified in clientConfiguration
-     *
-     * @param clientConfiguration
+     * @param clientConfiguration Configuration of client
      * @return netconf client based on provided configuration
      */
     Future<NetconfClientSession> createClient(NetconfClientConfiguration clientConfiguration);

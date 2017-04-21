@@ -16,8 +16,12 @@ import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.protocol.framework.ReconnectStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NetconfClientConfiguration {
+
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfClientConfiguration.class);
 
     private final NetconfClientProtocol clientProtocol;
     private final InetSocketAddress address;
@@ -30,7 +34,11 @@ public class NetconfClientConfiguration {
 
     private final AuthenticationHandler authHandler;
 
-    NetconfClientConfiguration(final NetconfClientProtocol protocol, final InetSocketAddress address, final Long connectionTimeoutMillis, final NetconfHelloMessageAdditionalHeader additionalHeader, final NetconfClientSessionListener sessionListener, final ReconnectStrategy reconnectStrategy, final AuthenticationHandler authHandler) {
+    NetconfClientConfiguration(final NetconfClientProtocol protocol, final InetSocketAddress address,
+                               final Long connectionTimeoutMillis,
+                               final NetconfHelloMessageAdditionalHeader additionalHeader,
+                               final NetconfClientSessionListener sessionListener,
+                               final ReconnectStrategy reconnectStrategy, final AuthenticationHandler authHandler) {
         this.address = address;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.additionalHeader = additionalHeader;
@@ -69,14 +77,17 @@ public class NetconfClientConfiguration {
         return clientProtocol;
     }
 
+    @SuppressWarnings("checkstyle:FallThrough")
     private void validateConfiguration() {
         Preconditions.checkNotNull(clientProtocol, " ");
         switch (clientProtocol) {
-        case SSH:
-            validateSshConfiguration();
-            // Fall through intentional (ssh validation is a superset of tcp validation)
-        case TCP:
-            validateTcpConfiguration();
+            case SSH:
+                validateSshConfiguration();
+                // Fall through intentional (ssh validation is a superset of tcp validation)
+            case TCP:
+                validateTcpConfiguration();
+            default:
+                LOG.info("Unexpected value.");
         }
     }
 
@@ -108,7 +119,7 @@ public class NetconfClientConfiguration {
                 .add("authHandler", authHandler);
     }
 
-    public static enum NetconfClientProtocol {
+    public enum NetconfClientProtocol {
         TCP, SSH
     }
 }

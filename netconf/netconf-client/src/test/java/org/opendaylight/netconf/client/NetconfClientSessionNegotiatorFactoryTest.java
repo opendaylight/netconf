@@ -35,7 +35,8 @@ public class NetconfClientSessionNegotiatorFactoryTest {
         NetconfClientSessionNegotiatorFactory negotiatorFactory = new NetconfClientSessionNegotiatorFactory(timer,
                 Optional.<NetconfHelloMessageAdditionalHeader>absent(), 200L);
 
-        SessionNegotiator<?> sessionNegotiator = negotiatorFactory.getSessionNegotiator(listenerFactory, channel, promise);
+        SessionNegotiator<?> sessionNegotiator = negotiatorFactory.getSessionNegotiator(listenerFactory, channel,
+                promise);
         assertNotNull(sessionNegotiator);
     }
 }
