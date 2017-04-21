@@ -57,8 +57,8 @@ public class DefaultCloseSessionTest {
         AutoCloseable res = mock(AutoCloseable.class);
         doNothing().when(res).close();
         DefaultCloseSession close = new DefaultCloseSession("", res);
-        Document doc = XmlUtil.newDocument();
-        XmlElement elem = XmlElement.fromDomElement(XmlUtil.readXmlToElement("<elem/>"));
+        final Document doc = XmlUtil.newDocument();
+        final XmlElement elem = XmlElement.fromDomElement(XmlUtil.readXmlToElement("<elem/>"));
         final Channel channel = mock(Channel.class);
         doReturn("channel").when(channel).toString();
         mockEventLoop(channel);
@@ -77,17 +77,18 @@ public class DefaultCloseSessionTest {
         doReturn(sendFuture).when(channel).writeAndFlush(anyObject());
         doReturn(true).when(sendFuture).isSuccess();
         final NetconfServerSessionListener listener = mock(NetconfServerSessionListener.class);
-        doNothing().when(listener).onSessionTerminated(any(NetconfServerSession.class), any(NetconfTerminationReason.class));
+        doNothing().when(listener).onSessionTerminated(any(NetconfServerSession.class), any(NetconfTerminationReason
+                .class));
         final NetconfServerSession session =
                 new NetconfServerSession(listener, channel, 1L,
                         NetconfHelloMessageAdditionalHeader.fromString("[netconf;10.12.0.102:48528;ssh;;;;;;]"));
         close.setNetconfSession(session);
         close.handleWithNoSubsequentOperations(doc, elem);
         // Fake close response to trigger delayed close
-        session.sendMessage(new NetconfMessage(XmlUtil.readXmlToDocument("<rpc-reply message-id=\"101\"\n" +
-                "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
-                "<ok/>\n" +
-                "</rpc-reply>")));
+        session.sendMessage(new NetconfMessage(XmlUtil.readXmlToDocument("<rpc-reply message-id=\"101\"\n"
+                + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                + "<ok/>\n"
+                + "</rpc-reply>")));
         verify(channel).close();
         verify(listener).onSessionTerminated(any(NetconfServerSession.class), any(NetconfTerminationReason.class));
     }

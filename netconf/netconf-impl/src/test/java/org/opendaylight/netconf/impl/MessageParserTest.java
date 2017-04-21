@@ -71,7 +71,8 @@ public class MessageParserTest {
             if (i == chunkCount) {
                 exptHeaderLength = msgLength - (ChunkedFramingMechanismEncoder.DEFAULT_CHUNK_SIZE * (i - 1));
                 byte[] eom = new byte[NetconfMessageConstants.END_OF_CHUNK.length];
-                recievedOutbound.getBytes(recievedOutbound.readableBytes() - NetconfMessageConstants.END_OF_CHUNK.length,
+                recievedOutbound.getBytes(recievedOutbound.readableBytes() - NetconfMessageConstants.END_OF_CHUNK
+                        .length,
                         eom);
                 assertArrayEquals(NetconfMessageConstants.END_OF_CHUNK, eom);
             }
@@ -100,7 +101,8 @@ public class MessageParserTest {
         ByteBuf recievedOutbound = (ByteBuf) testChunkChannel.readOutbound();
 
         byte[] eom = new byte[NetconfMessageConstants.END_OF_MESSAGE.length];
-        recievedOutbound.getBytes(recievedOutbound.readableBytes() - NetconfMessageConstants.END_OF_MESSAGE.length, eom);
+        recievedOutbound.getBytes(recievedOutbound.readableBytes() - NetconfMessageConstants.END_OF_MESSAGE.length,
+                eom);
         assertArrayEquals(NetconfMessageConstants.END_OF_MESSAGE, eom);
 
         testChunkChannel.writeInbound(recievedOutbound);
@@ -110,8 +112,8 @@ public class MessageParserTest {
     }
 
     private static long getHeaderLength(byte[] bytes) {
-        byte[] HEADER_START = new byte[] { (byte) 0x0a, (byte) 0x23 };
+        byte[] headerStart = new byte[]{(byte) 0x0a, (byte) 0x23};
         return Long.parseLong(StandardCharsets.US_ASCII.decode(
-                ByteBuffer.wrap(bytes, HEADER_START.length, bytes.length - HEADER_START.length - 1)).toString());
+                ByteBuffer.wrap(bytes, headerStart.length, bytes.length - headerStart.length - 1)).toString());
     }
 }

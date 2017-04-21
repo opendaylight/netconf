@@ -31,23 +31,34 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.CapabilitiesBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state
+        .Capabilities;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state
+        .CapabilitiesBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.SchemasBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.SchemaBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.SchemaKey;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.ChangedByBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.changed.by.server.or.user.ServerBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state
+        .SchemasBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state
+        .schemas.Schema;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state
+        .schemas.SchemaBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state
+        .schemas.SchemaKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206
+        .NetconfCapabilityChange;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206
+        .NetconfCapabilityChangeBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms
+        .ChangedByBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms
+        .changed.by.server.or.user.ServerBuilder;
 
 class NetconfCapabilityMonitoringService implements CapabilityListener, AutoCloseable {
 
     private static final Schema.Location NETCONF_LOCATION = new Schema.Location(Schema.Location.Enumeration.NETCONF);
     private static final List<Schema.Location> NETCONF_LOCATIONS = ImmutableList.of(NETCONF_LOCATION);
-    private static final BasicCapability CANDIDATE_CAPABILITY = new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0");
+    private static final BasicCapability CANDIDATE_CAPABILITY =
+            new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0");
     private static final Function<Capability, Uri> CAPABILITY_TO_URI = new Function<Capability, Uri>() {
         @Override
         public Uri apply(final Capability input) {
@@ -68,6 +79,7 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
         netconfOperationProvider.registerCapabilityListener(this);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     synchronized Schemas getSchemas() {
         try {
             return transformSchemas(netconfOperationProvider.getCapabilities());
@@ -81,8 +93,9 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
     synchronized String getSchemaForModuleRevision(final String moduleName, final Optional<String> revision) {
 
         Map<String, String> revisionMapRequest = mappedModulesToRevisionToSchema.get(moduleName);
-        Preconditions.checkState(revisionMapRequest != null, "Capability for module %s not present, " + ""
-                + "available modules : %s", moduleName, Collections2.transform(capabilities.values(), CAPABILITY_TO_URI));
+        Preconditions.checkState(revisionMapRequest != null,
+                "Capability for module %s not present, available modules : %s",
+                moduleName, Collections2.transform(capabilities.values(), CAPABILITY_TO_URI));
 
         if (revision.isPresent()) {
             String schema = revisionMapRequest.get(revision.get());
@@ -103,7 +116,7 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
 
     private void updateCapabilityToSchemaMap(final Set<Capability> added, final Set<Capability> removed) {
         for (final Capability cap : added) {
-            if (!isValidModuleCapability(cap)){
+            if (!isValidModuleCapability(cap)) {
                 continue;
             }
 
@@ -118,7 +131,7 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
             revisionMap.put(currentRevision, cap.getCapabilitySchema().get());
         }
         for (final Capability cap : removed) {
-            if (!isValidModuleCapability(cap)){
+            if (!isValidModuleCapability(cap)) {
                 continue;
             }
             final Map<String, String> revisionMap = mappedModulesToRevisionToSchema.get(cap.getModuleName().get());
@@ -238,9 +251,13 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
 
     private static NetconfCapabilityChange computeDiff(final Set<Capability> added, final Set<Capability> removed) {
         final NetconfCapabilityChangeBuilder netconfCapabilityChangeBuilder = new NetconfCapabilityChangeBuilder();
-        netconfCapabilityChangeBuilder.setChangedBy(new ChangedByBuilder().setServerOrUser(new ServerBuilder().setServer(true).build()).build());
-        netconfCapabilityChangeBuilder.setDeletedCapability(Lists.newArrayList(Collections2.transform(removed, CAPABILITY_TO_URI)));
-        netconfCapabilityChangeBuilder.setAddedCapability(Lists.newArrayList(Collections2.transform(added, CAPABILITY_TO_URI)));
+        netconfCapabilityChangeBuilder
+                .setChangedBy(new ChangedByBuilder().setServerOrUser(new ServerBuilder().setServer(true).build())
+                        .build());
+        netconfCapabilityChangeBuilder.setDeletedCapability(Lists.newArrayList(Collections2
+                .transform(removed, CAPABILITY_TO_URI)));
+        netconfCapabilityChangeBuilder.setAddedCapability(Lists.newArrayList(Collections2
+                .transform(added, CAPABILITY_TO_URI)));
         // TODO modified should be computed ... but why ?
         netconfCapabilityChangeBuilder.setModifiedCapability(Collections.<Uri>emptyList());
         return netconfCapabilityChangeBuilder.build();

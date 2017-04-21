@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.impl;
 
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
@@ -37,7 +36,8 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
     private final NetconfOperationRouter operationRouter;
     private final AutoCloseable onSessionDownCloseable;
 
-    public NetconfServerSessionListener(final NetconfOperationRouter operationRouter, final NetconfMonitoringService monitoringService,
+    public NetconfServerSessionListener(final NetconfOperationRouter operationRouter, final NetconfMonitoringService
+            monitoringService,
                                         final AutoCloseable onSessionDownCloseable) {
         this.operationRouter = operationRouter;
         this.monitoringSessionListener = monitoringService.getSessionListener();
@@ -55,6 +55,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
         onDown(netconfNetconfServerSession);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public void onDown(final NetconfServerSession netconfNetconfServerSession) {
         monitoringSessionListener.onSessionDown(netconfNetconfServerSession);
 
@@ -72,12 +73,13 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
 
     @Override
     public void onSessionTerminated(final NetconfServerSession netconfNetconfServerSession,
-            final NetconfTerminationReason netconfTerminationReason) {
+                                    final NetconfTerminationReason netconfTerminationReason) {
         LOG.debug("Session {} terminated, reason: {}", netconfNetconfServerSession,
                 netconfTerminationReason.getErrorMessage());
         onDown(netconfNetconfServerSession);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void onMessage(final NetconfServerSession session, final NetconfMessage netconfMessage) {
         try {
@@ -96,7 +98,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
             monitoringSessionListener.onSessionEvent(SessionEvent.inRpcFail(session));
             throw new IllegalStateException("Unable to process incoming message " + netconfMessage, e);
         } catch (final DocumentedException e) {
-            LOG.trace("Error occurred while processing message",e);
+            LOG.trace("Error occurred while processing message", e);
             session.onOutgoingRpcError();
             session.onIncommingRpcFail();
             monitoringSessionListener.onSessionEvent(SessionEvent.inRpcFail(session));
@@ -137,7 +139,7 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
             throw new DocumentedException("Unknown tag " + rootNode.getNodeName() + " in message:\n" + netconfMessage,
                     DocumentedException.ErrorType.PROTOCOL, DocumentedException.ErrorTag.UNKNOWN_ELEMENT,
                     DocumentedException.ErrorSeverity.ERROR, ImmutableMap.of("bad-element",
-                            rootNode.getNodeName()));
+                    rootNode.getNodeName()));
         }
     }
 
@@ -145,11 +147,12 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
 
         final NamedNodeMap attributes = rootNode.getAttributes();
 
-        if(attributes.getNamedItemNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, XmlNetconfConstants.MESSAGE_ID)!=null) {
+        if (attributes.getNamedItemNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0,
+                XmlNetconfConstants.MESSAGE_ID) != null) {
             return;
         }
 
-        if(attributes.getNamedItem(XmlNetconfConstants.MESSAGE_ID)!=null) {
+        if (attributes.getNamedItem(XmlNetconfConstants.MESSAGE_ID) != null) {
             return;
         }
 
