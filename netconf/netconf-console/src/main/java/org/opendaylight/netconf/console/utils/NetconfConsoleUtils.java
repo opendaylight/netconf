@@ -32,7 +32,7 @@ public class NetconfConsoleUtils {
     }
 
     /**
-     * Returns a list of NETCONF nodes for the IP
+     * Returns a list of NETCONF nodes for the IP.
      * @param deviceIp :IP address of NETCONF device
      * @param db :An instance of the {@link DataBroker}
      * @return :list on NETCONF nodes
@@ -67,28 +67,30 @@ public class NetconfConsoleUtils {
     }
 
     /**
-     * Returns a list with one NETCONF node for the IP and Port
+     * Returns a list with one NETCONF node for the IP and Port.
      * @param deviceIp :IP address of NETCONF device
      * @param devicePort :Port of NETCONF device
      * @param db :An instance of the {@link DataBroker}
      * @return :NETCONF node instance
      */
-    public static Node getNetconfNodeFromIpAndPort(final String deviceIp, final String devicePort, final DataBroker db) {
+    public static Node getNetconfNodeFromIpAndPort(final String deviceIp, final String devicePort,
+                                                   final DataBroker db) {
         final Topology topology = read(LogicalDatastoreType.OPERATIONAL, NetconfIidFactory.NETCONF_TOPOLOGY_IID, db);
         if (isNetconfNodesPresent(topology)) {
             for (Node node : topology.getNode()) {
                 final NetconfNode netconfNode = node.getAugmentation(NetconfNode.class);
                 if (netconfNode != null
                         && netconfNode.getHost().getIpAddress().getIpv4Address().getValue().equals(deviceIp)
-                        && devicePort.equals(netconfNode.getPort().getValue().toString()))
+                        && devicePort.equals(netconfNode.getPort().getValue().toString())) {
                     return node;
+                }
             }
         }
         return null;
     }
 
     /**
-     * Checks if the NETCONF topology contains nodes
+     * Checks if the NETCONF topology contains nodes.
      * @param topology :NETCONF topology instance
      * @return :<code>true</code> if not empty, else, <code>false</code>
      */
@@ -100,7 +102,7 @@ public class NetconfConsoleUtils {
     }
 
     /**
-     * Wait for datastore to populate NETCONF data
+     * Wait for datastore to populate NETCONF data.
      * @param deviceIp :IP address of NETCONF device
      */
     public static void waitForUpdate(final String deviceIp) {
@@ -112,14 +114,14 @@ public class NetconfConsoleUtils {
     }
 
     /**
-     * Blocking read transaction
+     * Blocking read transaction.
      * @param store :DatastoreType
      * @param path :InstanceIdentifier
      * @param db :An instance of the {@link DataBroker}
      * @return :data read from path
      */
-    public static <D extends org.opendaylight.yangtools.yang.binding.DataObject> D read(final LogicalDatastoreType store,
-            final InstanceIdentifier<D> path, final DataBroker db) {
+    public static <D extends org.opendaylight.yangtools.yang.binding.DataObject> D read(
+            final LogicalDatastoreType store, final InstanceIdentifier<D> path, final DataBroker db) {
         D result = null;
         final ReadOnlyTransaction transaction = db.newReadOnlyTransaction();
         Optional<D> optionalData;

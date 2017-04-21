@@ -35,7 +35,7 @@ public class NetconfCommandsImplCallsTest {
     private NetconfCommands netconfCommands;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         initMocks(this);
     }
 
@@ -55,7 +55,8 @@ public class NetconfCommandsImplCallsTest {
 
     @Test
     public void testDisconnectDeviceCommand() throws Exception {
-        NetconfDisconnectDeviceCommand netconfDisconnectDeviceCommand = new NetconfDisconnectDeviceCommand(netconfCommands);
+        NetconfDisconnectDeviceCommand netconfDisconnectDeviceCommand =
+                new NetconfDisconnectDeviceCommand(netconfCommands);
         netconfDisconnectDeviceCommand.doExecute();
 
         verify(netconfCommands, times(0)).connectDevice(any(), any());
@@ -120,7 +121,8 @@ public class NetconfCommandsImplCallsTest {
 
         netconfUpdateDeviceCommand.doExecute();
 
-        verify(netconfCommands, times(1)).updateDevice(anyString(), anyString(), anyString(), hashMapArgumentCaptor.capture());
+        verify(netconfCommands, times(1)).updateDevice(anyString(), anyString(), anyString(),
+                hashMapArgumentCaptor.capture());
 
         assertTrue(hashMapArgumentCaptor.getValue().containsKey(NetconfConsoleConstants.NETCONF_IP));
         assertEquals("192.168.1.1", hashMapArgumentCaptor.getValue().get(NetconfConsoleConstants.NETCONF_IP));

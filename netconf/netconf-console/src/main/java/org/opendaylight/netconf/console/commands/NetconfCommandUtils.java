@@ -15,10 +15,10 @@ import java.util.regex.Pattern;
 public class NetconfCommandUtils {
 
     private static final Pattern IP_PATTERN = Pattern.compile(
-            "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-                    "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-                    "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-                    "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
+            "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+                    + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+                    + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+                    + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
 
     public static boolean isPortValid(final String devicePort) {
         if (Strings.isNullOrEmpty(devicePort)) {
@@ -28,7 +28,7 @@ public class NetconfCommandUtils {
         try {
             port = Integer.parseInt(devicePort);
         } catch (NumberFormatException e) {
-          return false;
+            return false;
         }
         return port >= 0 && port <= 65535;
     }
