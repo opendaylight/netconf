@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_e235ebf7",
+        "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/CapabilityChangeNotificationProducer.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T11:31:59Z",
+      "side": 1,
+      "message": "dont suppress this, add the default statement and log that we have received unhandled case(and that its intentionally unhandled since we dont care about it). The whole point of turning on checkstyle is to have increase in code quality and suppressing issues like these defeats the whole point, it should only be used as a last resort.",
+      "range": {
+        "startLine": 52,
+        "startChar": 4,
+        "endLine": 52,
+        "endChar": 56
+      },
+      "revId": "e8a09d87e9872c8ed60895342ce4a3d788d2804a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_1d25f2aa",
+        "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/NotificationToMdsalWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T11:31:59Z",
+      "side": 1,
+      "message": "just do all lowercase(avoid)",
+      "range": {
+        "startLine": 56,
+        "startChar": 39,
+        "endLine": 56,
+        "endChar": 49
+      },
+      "revId": "e8a09d87e9872c8ed60895342ce4a3d788d2804a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_dd51aa0f",
+        "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/SessionNotificationProducer.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T11:31:59Z",
+      "side": 1,
+      "message": "again",
+      "range": {
+        "startLine": 49,
+        "startChar": 3,
+        "endLine": 49,
+        "endChar": 56
+      },
+      "revId": "e8a09d87e9872c8ed60895342ce4a3d788d2804a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_7d423e3f",
+        "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/netconf/mdsal/notification/NetconfNotificationOperationServiceFactory.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T11:31:59Z",
+      "side": 1,
+      "message": "reformat so we dont have single word lines.",
+      "range": {
+        "startLine": 38,
+        "startChar": 8,
+        "endLine": 41,
+        "endChar": 25
+      },
+      "revId": "e8a09d87e9872c8ed60895342ce4a3d788d2804a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_fd758e98",
+        "filename": "netconf/mdsal-netconf-notification/src/test/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/SessionNotificationProducerTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T11:31:59Z",
+      "side": 1,
+      "message": "again",
+      "range": {
+        "startLine": 127,
+        "startChar": 3,
+        "endLine": 127,
+        "endChar": 71
+      },
+      "revId": "e8a09d87e9872c8ed60895342ce4a3d788d2804a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
