@@ -51,7 +51,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
+import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeMasterActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.messages.AskForMasterMountPoint;
@@ -99,8 +99,7 @@ public class NetconfNodeActorTest {
                 new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 9999));
         final NetconfTopologySetup setup = mock(NetconfTopologySetup.class);
 
-        final Props props = NetconfNodeActor.props(setup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY,
-                DEFAULT_SCHEMA_REPOSITORY, TIMEOUT);
+        final Props props = NetconfNodeMasterActor.props(remoteDeviceId, setup, DEFAULT_SCHEMA_REPOSITORY);
 
         system = ActorSystem.create();
 
@@ -179,8 +178,8 @@ public class NetconfNodeActorTest {
     public void testYangTextSchemaSourceRequestMessage() throws Exception {
         final SchemaRepository schemaRepository = mock(SchemaRepository.class);
         final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create("testID", Optional.absent());
-        final Props props = NetconfNodeActor.props(mock(NetconfTopologySetup.class), remoteDeviceId,
-                DEFAULT_SCHEMA_REPOSITORY, schemaRepository, TIMEOUT);
+        final Props props = NetconfNodeMasterActor.props(remoteDeviceId, mock(NetconfTopologySetup.class),
+                schemaRepository);
 
         final ActorRef actorRefSchemaRepo = TestActorRef.create(system, props, "master_mocked_schema_repository");
         final ActorContext actorContext = mock(ActorContext.class);
