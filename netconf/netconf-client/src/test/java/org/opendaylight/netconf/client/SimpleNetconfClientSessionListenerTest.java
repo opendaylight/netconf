@@ -73,7 +73,7 @@ public class SimpleNetconfClientSessionListenerTest {
     @Test
     public void testSessionDown() throws Exception {
         SimpleNetconfClientSessionListener simpleListener = new SimpleNetconfClientSessionListener();
-        Future<NetconfMessage> promise = simpleListener.sendRequest(message);
+        final Future<NetconfMessage> promise = simpleListener.sendRequest(message);
         simpleListener.onSessionUp(clientSession);
         verify(channel, times(1)).writeAndFlush(anyObject());
 
@@ -84,7 +84,7 @@ public class SimpleNetconfClientSessionListenerTest {
     @Test
     public void testSendRequest() throws Exception {
         SimpleNetconfClientSessionListener simpleListener = new SimpleNetconfClientSessionListener();
-        Future<NetconfMessage> promise = simpleListener.sendRequest(message);
+        final Future<NetconfMessage> promise = simpleListener.sendRequest(message);
         simpleListener.onSessionUp(clientSession);
         verify(channel, times(1)).writeAndFlush(anyObject());
 
@@ -95,7 +95,7 @@ public class SimpleNetconfClientSessionListenerTest {
     @Test
     public void testOnMessage() throws Exception {
         SimpleNetconfClientSessionListener simpleListener = new SimpleNetconfClientSessionListener();
-        Future<NetconfMessage> promise = simpleListener.sendRequest(message);
+        final Future<NetconfMessage> promise = simpleListener.sendRequest(message);
         simpleListener.onSessionUp(clientSession);
         verify(channel, times(1)).writeAndFlush(anyObject());
 

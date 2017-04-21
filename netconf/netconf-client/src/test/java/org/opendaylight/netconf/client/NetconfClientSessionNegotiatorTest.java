@@ -66,7 +66,8 @@ public class NetconfClientSessionNegotiatorTest {
 
     @Before
     public void setUp() throws Exception {
-        helloMessage = NetconfHelloMessage.createClientHello(Sets.newSet("exi:1.0"), Optional.<NetconfHelloMessageAdditionalHeader>absent());
+        helloMessage = NetconfHelloMessage.createClientHello(Sets.newSet("exi:1.0"), Optional
+                .<NetconfHelloMessageAdditionalHeader>absent());
         pipeline = mockChannelPipeline();
         future = mockChannelFuture();
         channel = mockChannel();
@@ -107,8 +108,10 @@ public class NetconfClientSessionNegotiatorTest {
         doReturn(handler).when(pipeline).replace(anyString(), anyString(), any(ChunkedFramingMechanismEncoder.class));
 
         NetconfXMLToHelloMessageDecoder messageDecoder = new NetconfXMLToHelloMessageDecoder();
-        doReturn(messageDecoder).when(pipeline).replace(anyString(), anyString(), any(NetconfXMLToMessageDecoder.class));
-        doReturn(pipeline).when(pipeline).replace(any(ChannelHandler.class), anyString(), any(NetconfClientSession.class));
+        doReturn(messageDecoder).when(pipeline).replace(anyString(), anyString(), any(NetconfXMLToMessageDecoder
+                .class));
+        doReturn(pipeline).when(pipeline).replace(any(ChannelHandler.class), anyString(), any(NetconfClientSession
+                .class));
         return pipeline;
     }
 
@@ -126,7 +129,8 @@ public class NetconfClientSessionNegotiatorTest {
         }).when(eventLoop).execute(any(Runnable.class));
     }
 
-    private NetconfClientSessionNegotiator createNetconfClientSessionNegotiator(final Promise<NetconfClientSession> promise,
+    private NetconfClientSessionNegotiator createNetconfClientSessionNegotiator(final Promise<NetconfClientSession>
+                                                                                        promise,
                                                                                 final NetconfMessage startExi) {
         ChannelProgressivePromise progressivePromise = mock(ChannelProgressivePromise.class);
         NetconfClientSessionPreferences preferences = new NetconfClientSessionPreferences(helloMessage, startExi);
@@ -203,13 +207,16 @@ public class NetconfClientSessionNegotiatorTest {
         NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
 
-        Set<String> set =  createCapabilities("/helloMessage3.xml");
+        Set<String> set = createCapabilities("/helloMessage3.xml");
 
-        final Set<String> cachedS1 = (Set<String>) negotiator.getSession(sessionListener,channel,createHelloMsg("/helloMessage1.xml")).getServerCapabilities();
+        final Set<String> cachedS1 = (Set<String>) negotiator.getSession(sessionListener, channel,
+                createHelloMsg("/helloMessage1.xml")).getServerCapabilities();
 
         //helloMessage2 and helloMessage3 are the same with different order
-        final Set<String> cachedS2 = (Set<String>) negotiator.getSession(sessionListener,channel,createHelloMsg("/helloMessage2.xml")).getServerCapabilities();
-        final Set<String> cachedS3 = (Set<String>) negotiator.getSession(sessionListener,channel,createHelloMsg("/helloMessage3.xml")).getServerCapabilities();
+        final Set<String> cachedS2 = (Set<String>) negotiator.getSession(sessionListener, channel,
+                createHelloMsg("/helloMessage2.xml")).getServerCapabilities();
+        final Set<String> cachedS3 = (Set<String>) negotiator.getSession(sessionListener, channel,
+                createHelloMsg("/helloMessage3.xml")).getServerCapabilities();
 
         assertEquals(cachedS3, set);
         assertNotEquals(cachedS1, set);

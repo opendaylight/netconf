@@ -34,7 +34,8 @@ public class SshClientChannelInitializerTest {
 
         SessionNegotiator<?> sessionNegotiator = mock(SessionNegotiator.class);
         doReturn("").when(sessionNegotiator).toString();
-        doReturn(sessionNegotiator).when(negotiatorFactory).getSessionNegotiator(any(SessionListenerFactory.class), any(Channel.class), any(Promise.class));
+        doReturn(sessionNegotiator).when(negotiatorFactory).getSessionNegotiator(any(SessionListenerFactory.class),
+                any(Channel.class), any(Promise.class));
         ChannelPipeline pipeline = mock(ChannelPipeline.class);
         doReturn(pipeline).when(pipeline).addAfter(anyString(), anyString(), any(ChannelHandler.class));
         Channel channel = mock(Channel.class);
@@ -46,7 +47,8 @@ public class SshClientChannelInitializerTest {
         Promise<NetconfClientSession> promise = mock(Promise.class);
         doReturn("").when(promise).toString();
 
-        SshClientChannelInitializer initializer = new SshClientChannelInitializer(authenticationHandler, negotiatorFactory,
+        SshClientChannelInitializer initializer = new SshClientChannelInitializer(authenticationHandler,
+                negotiatorFactory,
                 sessionListener);
         initializer.initialize(channel, promise);
         verify(pipeline, times(1)).addFirst(any(ChannelHandler.class));

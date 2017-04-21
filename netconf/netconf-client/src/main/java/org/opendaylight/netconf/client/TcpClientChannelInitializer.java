@@ -41,7 +41,8 @@ class TcpClientChannelInitializer extends AbstractChannelInitializer<NetconfClie
             GenericFutureListener<Future<NetconfClientSession>> negotiationFutureListener;
 
             @Override
-            public void connect(final ChannelHandlerContext ctx, final SocketAddress remoteAddress, final SocketAddress localAddress,
+            public void connect(final ChannelHandlerContext ctx, final SocketAddress remoteAddress,
+                                final SocketAddress localAddress,
                                 final ChannelPromise channelPromise) throws Exception {
                 connectPromise = channelPromise;
                 ChannelPromise tcpConnectFuture = new DefaultChannelPromise(ch);
@@ -53,7 +54,7 @@ class TcpClientChannelInitializer extends AbstractChannelInitializer<NetconfClie
                 };
 
                 tcpConnectFuture.addListener(future -> {
-                    if(future.isSuccess()) {
+                    if (future.isSuccess()) {
                         //complete connection promise with netconf negotiation future
                         negotiationFuture.addListener(negotiationFutureListener);
                     } else {
@@ -65,14 +66,15 @@ class TcpClientChannelInitializer extends AbstractChannelInitializer<NetconfClie
 
             @Override
             public void disconnect(final ChannelHandlerContext ctx, final ChannelPromise promise) throws Exception {
-                // If we have already succeeded and the session was dropped after, we need to fire inactive to notify reconnect logic
-                if(connectPromise.isSuccess()) {
+                // If we have already succeeded and the session was dropped after, we need to fire inactive to notify
+                // reconnect logic
+                if (connectPromise.isSuccess()) {
                     ctx.fireChannelInactive();
                 }
 
                 //If connection promise is not already set, it means negotiation failed
                 //we must set connection promise to failure
-                if(!connectPromise.isDone()) {
+                if (!connectPromise.isDone()) {
                     connectPromise.setFailure(new IllegalStateException("Negotiation failed"));
                 }
 

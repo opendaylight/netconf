@@ -29,9 +29,10 @@ public class TcpClientChannelInitializerTest {
         NetconfClientSessionNegotiatorFactory factory = mock(NetconfClientSessionNegotiatorFactory.class);
         SessionNegotiator<?> sessionNegotiator = mock(SessionNegotiator.class);
         doReturn("").when(sessionNegotiator).toString();
-        doReturn(sessionNegotiator).when(factory).getSessionNegotiator(any(SessionListenerFactory.class), any(Channel.class), any(Promise.class));
+        doReturn(sessionNegotiator).when(factory).getSessionNegotiator(any(SessionListenerFactory.class), any(Channel
+                .class), any(Promise.class));
         NetconfClientSessionListener listener = mock(NetconfClientSessionListener.class);
-        TcpClientChannelInitializer initializer = new TcpClientChannelInitializer(factory, listener);
+        final TcpClientChannelInitializer initializer = new TcpClientChannelInitializer(factory, listener);
         ChannelPipeline pipeline = mock(ChannelPipeline.class);
         doReturn(pipeline).when(pipeline).addAfter(anyString(), anyString(), any(ChannelHandler.class));
         Channel channel = mock(Channel.class);

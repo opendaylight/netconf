@@ -27,13 +27,13 @@ public class NetconfClientSession extends AbstractNetconfSession<NetconfClientSe
     /**
      * Construct a new session.
      *
-     * @param sessionListener
-     * @param channel
-     * @param sessionId
-     * @param capabilities set of advertised capabilities. Expected to be immutable.
+     * @param sessionListener    Netconf client session listener.
+     * @param channel    Channel.
+     * @param sessionId    Session Id.
+     * @param capabilities    Set of advertised capabilities. Expected to be immutable.
      */
-    public NetconfClientSession(final NetconfClientSessionListener sessionListener, final Channel channel, final long sessionId,
-            final Collection<String> capabilities) {
+    public NetconfClientSession(final NetconfClientSessionListener sessionListener, final Channel channel,
+                                final long sessionId, final Collection<String> capabilities) {
         super(sessionListener, channel, sessionId);
         this.capabilities = capabilities;
         LOG.debug("Client Session {} created", this);
@@ -49,7 +49,8 @@ public class NetconfClientSession extends AbstractNetconfSession<NetconfClientSe
     }
 
     @Override
-    protected void addExiHandlers(final ByteToMessageDecoder decoder, final MessageToByteEncoder<NetconfMessage> encoder) {
+    protected void addExiHandlers(final ByteToMessageDecoder decoder, final MessageToByteEncoder<NetconfMessage>
+            encoder) {
         // TODO used only in negotiator, client supports only auto start-exi
         replaceMessageDecoder(decoder);
         replaceMessageEncoder(encoder);

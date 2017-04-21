@@ -25,7 +25,8 @@ public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClien
 
     private final Timer timer;
 
-    public NetconfClientDispatcherImpl(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup, final Timer timer) {
+    public NetconfClientDispatcherImpl(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup,
+                                       final Timer timer) {
         super(bossGroup, workerGroup);
         this.timer = timer;
     }
@@ -34,24 +35,26 @@ public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClien
         return timer;
     }
 
+    @SuppressWarnings("checkstyle:MissingSwitchDefault")
     @Override
     public Future<NetconfClientSession> createClient(final NetconfClientConfiguration clientConfiguration) {
         switch (clientConfiguration.getProtocol()) {
-        case TCP:
-            return createTcpClient(clientConfiguration);
-        case SSH:
-            return createSshClient(clientConfiguration);
+            case TCP:
+                return createTcpClient(clientConfiguration);
+            case SSH:
+                return createSshClient(clientConfiguration);
         }
         throw new IllegalArgumentException("Unknown client protocol " + clientConfiguration.getProtocol());
     }
 
+    @SuppressWarnings("checkstyle:MissingSwitchDefault")
     @Override
     public Future<Void> createReconnectingClient(final NetconfReconnectingClientConfiguration clientConfiguration) {
         switch (clientConfiguration.getProtocol()) {
-        case TCP:
-            return createReconnectingTcpClient(clientConfiguration);
-        case SSH:
-            return createReconnectingSshClient(clientConfiguration);
+            case TCP:
+                return createReconnectingTcpClient(clientConfiguration);
+            case SSH:
+                return createReconnectingSshClient(clientConfiguration);
         }
         throw new IllegalArgumentException("Unknown client protocol " + clientConfiguration.getProtocol());
     }
@@ -59,33 +62,39 @@ public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClien
     private Future<NetconfClientSession> createTcpClient(final NetconfClientConfiguration currentConfiguration) {
         LOG.debug("Creating TCP client with configuration: {}", currentConfiguration);
         return super.createClient(currentConfiguration.getAddress(), currentConfiguration.getReconnectStrategy(),
-                (ch, promise) -> new TcpClientChannelInitializer(getNegotiatorFactory(currentConfiguration), currentConfiguration
-                                .getSessionListener()).initialize(ch, promise));
+            (ch, promise) -> new TcpClientChannelInitializer(getNegotiatorFactory(currentConfiguration),
+                        currentConfiguration
+                        .getSessionListener()).initialize(ch, promise));
     }
 
-    private Future<Void> createReconnectingTcpClient(final NetconfReconnectingClientConfiguration currentConfiguration) {
+    private Future<Void> createReconnectingTcpClient(final NetconfReconnectingClientConfiguration
+                                                             currentConfiguration) {
         LOG.debug("Creating reconnecting TCP client with configuration: {}", currentConfiguration);
-        final TcpClientChannelInitializer init = new TcpClientChannelInitializer(getNegotiatorFactory(currentConfiguration),
+        final TcpClientChannelInitializer init =
+                new TcpClientChannelInitializer(getNegotiatorFactory(currentConfiguration),
                 currentConfiguration.getSessionListener());
 
-        return super.createReconnectingClient(currentConfiguration.getAddress(), currentConfiguration.getConnectStrategyFactory(),
+        return super.createReconnectingClient(currentConfiguration.getAddress(), currentConfiguration
+                .getConnectStrategyFactory(),
                 currentConfiguration.getReconnectStrategy(), init::initialize);
     }
 
     private Future<NetconfClientSession> createSshClient(final NetconfClientConfiguration currentConfiguration) {
         LOG.debug("Creating SSH client with configuration: {}", currentConfiguration);
         return super.createClient(currentConfiguration.getAddress(), currentConfiguration.getReconnectStrategy(),
-                (ch, sessionPromise) -> new SshClientChannelInitializer(currentConfiguration.getAuthHandler(),
+            (ch, sessionPromise) -> new SshClientChannelInitializer(currentConfiguration.getAuthHandler(),
                         getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener())
                         .initialize(ch, sessionPromise));
     }
 
-    private Future<Void> createReconnectingSshClient(final NetconfReconnectingClientConfiguration currentConfiguration) {
+    private Future<Void> createReconnectingSshClient(final NetconfReconnectingClientConfiguration
+                                                             currentConfiguration) {
         LOG.debug("Creating reconnecting SSH client with configuration: {}", currentConfiguration);
         final SshClientChannelInitializer init = new SshClientChannelInitializer(currentConfiguration.getAuthHandler(),
                 getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener());
 
-        return super.createReconnectingClient(currentConfiguration.getAddress(), currentConfiguration.getConnectStrategyFactory(), currentConfiguration.getReconnectStrategy(),
+        return super.createReconnectingClient(currentConfiguration.getAddress(), currentConfiguration
+                .getConnectStrategyFactory(), currentConfiguration.getReconnectStrategy(),
                 init::initialize);
     }
 

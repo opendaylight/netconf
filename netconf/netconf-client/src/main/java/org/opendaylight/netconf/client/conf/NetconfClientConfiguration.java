@@ -30,7 +30,11 @@ public class NetconfClientConfiguration {
 
     private final AuthenticationHandler authHandler;
 
-    NetconfClientConfiguration(final NetconfClientProtocol protocol, final InetSocketAddress address, final Long connectionTimeoutMillis, final NetconfHelloMessageAdditionalHeader additionalHeader, final NetconfClientSessionListener sessionListener, final ReconnectStrategy reconnectStrategy, final AuthenticationHandler authHandler) {
+    NetconfClientConfiguration(final NetconfClientProtocol protocol, final InetSocketAddress address,
+                               final Long connectionTimeoutMillis,
+                               final NetconfHelloMessageAdditionalHeader additionalHeader,
+                               final NetconfClientSessionListener sessionListener,
+                               final ReconnectStrategy reconnectStrategy, final AuthenticationHandler authHandler) {
         this.address = address;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.additionalHeader = additionalHeader;
@@ -69,14 +73,15 @@ public class NetconfClientConfiguration {
         return clientProtocol;
     }
 
+    @SuppressWarnings({"checkstyle:MissingSwitchDefault", "checkstyle:FallThrough"})
     private void validateConfiguration() {
         Preconditions.checkNotNull(clientProtocol, " ");
         switch (clientProtocol) {
-        case SSH:
-            validateSshConfiguration();
-            // Fall through intentional (ssh validation is a superset of tcp validation)
-        case TCP:
-            validateTcpConfiguration();
+            case SSH:
+                validateSshConfiguration();
+                // Fall through intentional (ssh validation is a superset of tcp validation)
+            case TCP:
+                validateTcpConfiguration();
         }
     }
 
@@ -108,7 +113,7 @@ public class NetconfClientConfiguration {
                 .add("authHandler", authHandler);
     }
 
-    public static enum NetconfClientProtocol {
+    public enum NetconfClientProtocol {
         TCP, SSH
     }
 }

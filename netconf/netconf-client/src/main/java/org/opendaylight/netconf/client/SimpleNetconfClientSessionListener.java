@@ -25,7 +25,7 @@ public class SimpleNetconfClientSessionListener implements NetconfClientSessionL
         private final Promise<NetconfMessage> promise;
         private final NetconfMessage request;
 
-        public RequestEntry(Promise<NetconfMessage> future, NetconfMessage request) {
+        RequestEntry(Promise<NetconfMessage> future, NetconfMessage request) {
             this.promise = Preconditions.checkNotNull(future);
             this.request = Preconditions.checkNotNull(request);
         }
@@ -71,14 +71,14 @@ public class SimpleNetconfClientSessionListener implements NetconfClientSessionL
     }
 
     @Override
-    public final void onSessionDown(NetconfClientSession clientSession, Exception e) {
-        LOG.debug("Client Session {} went down unexpectedly", clientSession, e);
-        tearDown(e);
+    public final void onSessionDown(NetconfClientSession clientSession, Exception exception) {
+        LOG.debug("Client Session {} went down unexpectedly", clientSession, exception);
+        tearDown(exception);
     }
 
     @Override
     public final void onSessionTerminated(NetconfClientSession clientSession,
-            NetconfTerminationReason netconfTerminationReason) {
+                                          NetconfTerminationReason netconfTerminationReason) {
         LOG.debug("Client Session {} terminated, reason: {}", clientSession,
                 netconfTerminationReason.getErrorMessage());
         tearDown(new RuntimeException(netconfTerminationReason.getErrorMessage()));
