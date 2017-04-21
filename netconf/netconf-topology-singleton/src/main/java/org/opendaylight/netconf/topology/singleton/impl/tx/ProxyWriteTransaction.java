@@ -34,7 +34,7 @@ public class ProxyWriteTransaction implements DOMDataWriteTransaction {
      * @param masterTxActor {@link org.opendaylight.netconf.topology.singleton.impl.actors.WriteTransactionActor} ref
      * @param id            device id
      * @param actorSystem   system
-     * @param askTimeout
+     * @param askTimeout    ask timeout
      */
     public ProxyWriteTransaction(final ActorRef masterTxActor, final RemoteDeviceId id, final ActorSystem actorSystem,
                                  final Timeout askTimeout) {
