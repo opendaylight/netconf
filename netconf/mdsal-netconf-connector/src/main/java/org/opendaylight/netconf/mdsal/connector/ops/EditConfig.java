@@ -61,14 +61,16 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
     private final CurrentSchemaContext schemaContext;
     private final TransactionProvider transactionProvider;
 
-    public EditConfig(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext, final TransactionProvider transactionProvider) {
+    public EditConfig(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext,
+            final TransactionProvider transactionProvider) {
         super(netconfSessionIdForReporting);
         this.schemaContext = schemaContext;
         this.transactionProvider = transactionProvider;
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
+            throws DocumentedException {
         final Datastore targetDatastore = extractTargetParameter(operationElement);
         if (targetDatastore == Datastore.running) {
             throw new DocumentedException("edit-config on running datastore is not supported",
@@ -86,7 +88,8 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
             final DataSchemaNode schemaNode = getSchemaNodeFromNamespace(ns, element).get();
 
             final DataTreeChangeTracker changeTracker = new DataTreeChangeTracker(defaultAction);
-            final DomToNormalizedNodeParserFactory.BuildingStrategyProvider editOperationStrategyProvider = new EditOperationStrategyProvider(changeTracker);
+            final DomToNormalizedNodeParserFactory.BuildingStrategyProvider editOperationStrategyProvider =
+                    new EditOperationStrategyProvider(changeTracker);
 
             parseIntoNormalizedNode(schemaNode, element, editOperationStrategyProvider);
             executeOperations(changeTracker);
@@ -106,7 +109,8 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         }
     }
 
-    private void executeChange(final DOMDataReadWriteTransaction rwtx, final DataTreeChange change) throws DocumentedException {
+    private static void executeChange(final DOMDataReadWriteTransaction rwtx, final DataTreeChange change)
+            throws DocumentedException {
         final YangInstanceIdentifier path = YangInstanceIdentifier.create(change.getPath());
         final NormalizedNode<?, ?> changeData = change.getChangeRoot();
         switch (change.getAction()) {
@@ -120,7 +124,8 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
             try {
                 final Optional<NormalizedNode<?, ?>> readResult = rwtx.read(LogicalDatastoreType.CONFIGURATION, path).checkedGet();
                 if (readResult.isPresent()) {
-                    throw new DocumentedException("Data already exists, cannot execute CREATE operation", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, ErrorSeverity.ERROR);
+                    throw new DocumentedException("Data already exists, cannot execute CREATE operation",
+                        ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, ErrorSeverity.ERROR);
                 }
                 mergeParentMap(rwtx, path, changeData);
                 rwtx.put(LogicalDatastoreType.CONFIGURATION, path, changeData);
@@ -136,7 +141,8 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
             try {
                 final Optional<NormalizedNode<?, ?>> readResult = rwtx.read(LogicalDatastoreType.CONFIGURATION, path).checkedGet();
                 if (!readResult.isPresent()) {
-                    throw new DocumentedException("Data is missing, cannot execute DELETE operation", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
+                    throw new DocumentedException("Data is missing, cannot execute DELETE operation",
+                        ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
                 }
                 rwtx.delete(LogicalDatastoreType.CONFIGURATION, path);
             } catch (final ReadFailedException e) {
@@ -151,8 +157,8 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         }
     }
 
-    private void mergeParentMap(final DOMDataReadWriteTransaction rwtx, final YangInstanceIdentifier path,
-                                final NormalizedNode change) {
+    private static void mergeParentMap(final DOMDataReadWriteTransaction rwtx, final YangInstanceIdentifier path,
+                                final NormalizedNode<?, ?> change) {
         if (change instanceof MapEntryNode) {
             final YangInstanceIdentifier mapNodeYid = path.getParent();
             //merge empty map
@@ -163,10 +169,8 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         }
     }
 
-    private NormalizedNode parseIntoNormalizedNode(final DataSchemaNode schemaNode, final XmlElement element,
-                                                   final DomToNormalizedNodeParserFactory.BuildingStrategyProvider editOperationStrategyProvider) {
-
-
+    private NormalizedNode<?, ?> parseIntoNormalizedNode(final DataSchemaNode schemaNode, final XmlElement element,
+            final DomToNormalizedNodeParserFactory.BuildingStrategyProvider editOperationStrategyProvider) {
         if (schemaNode instanceof ContainerSchemaNode) {
             return DomToNormalizedNodeParserFactory
                     .getInstance(DomUtils.defaultValueCodecProvider(), schemaContext.getCurrentContext(), editOperationStrategyProvider)
@@ -184,10 +188,12 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         throw new UnsupportedOperationException("implement exception if parse fails");
     }
 
-    private Optional<DataSchemaNode> getSchemaNodeFromNamespace(final String namespace, final XmlElement element) throws DocumentedException{
+    private Optional<DataSchemaNode> getSchemaNodeFromNamespace(final String namespace, final XmlElement element)
+            throws DocumentedException {
         Optional<DataSchemaNode> dataSchemaNode = Optional.absent();
         try {
-            //returns module with newest revision since findModuleByNamespace returns a set of modules and we only need the newest one
+            // returns module with newest revision since findModuleByNamespace returns a set of modules and we only
+            // need the newest one
             final Module module = schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(new URI(namespace), null);
             if (module == null) {
                 // no module is present with this namespace
@@ -211,35 +217,38 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         return dataSchemaNode;
     }
 
-    private Datastore extractTargetParameter(final XmlElement operationElement) throws DocumentedException {
+    private static Datastore extractTargetParameter(final XmlElement operationElement) throws DocumentedException {
         final NodeList elementsByTagName = operationElement.getDomElement().getElementsByTagName(TARGET_KEY);
         // Direct lookup instead of using XmlElement class due to performance
         if (elementsByTagName.getLength() == 0) {
-            final Map<String, String> errorInfo = ImmutableMap.of("bad-attribute", TARGET_KEY, "bad-element", OPERATION_NAME);
-            throw new DocumentedException("Missing target element",
-                    ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE, ErrorSeverity.ERROR, errorInfo);
+            final Map<String, String> errorInfo = ImmutableMap.of("bad-attribute", TARGET_KEY, "bad-element",
+                OPERATION_NAME);
+            throw new DocumentedException("Missing target element", ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE,
+                ErrorSeverity.ERROR, errorInfo);
         } else if (elementsByTagName.getLength() > 1) {
-            throw new DocumentedException("Multiple target elements", ErrorType.RPC, ErrorTag.UNKNOWN_ATTRIBUTE, ErrorSeverity.ERROR);
+            throw new DocumentedException("Multiple target elements", ErrorType.RPC, ErrorTag.UNKNOWN_ATTRIBUTE,
+                ErrorSeverity.ERROR);
         } else {
             final XmlElement targetChildNode = XmlElement.fromDomElement((Element) elementsByTagName.item(0)).getOnlyChildElement();
             return Datastore.valueOf(targetChildNode.getName());
         }
     }
 
-    private ModifyAction getDefaultOperation(final XmlElement operationElement) throws DocumentedException {
+    private static ModifyAction getDefaultOperation(final XmlElement operationElement) throws DocumentedException {
         final NodeList elementsByTagName = operationElement.getDomElement().getElementsByTagName(DEFAULT_OPERATION_KEY);
-        if(elementsByTagName.getLength() == 0) {
+        if (elementsByTagName.getLength() == 0) {
             return ModifyAction.MERGE;
-        } else if(elementsByTagName.getLength() > 1) {
-            throw new DocumentedException("Multiple " + DEFAULT_OPERATION_KEY + " elements",
-                    ErrorType.RPC, ErrorTag.UNKNOWN_ATTRIBUTE, ErrorSeverity.ERROR);
+        } else if (elementsByTagName.getLength() > 1) {
+            throw new DocumentedException("Multiple " + DEFAULT_OPERATION_KEY + " elements", ErrorType.RPC,
+                ErrorTag.UNKNOWN_ATTRIBUTE, ErrorSeverity.ERROR);
         } else {
             return ModifyAction.fromXmlValue(elementsByTagName.item(0).getTextContent());
         }
 
     }
 
-    private XmlElement getElement(final XmlElement operationElement, final String elementName) throws DocumentedException {
+    private static XmlElement getElement(final XmlElement operationElement, final String elementName)
+            throws DocumentedException {
         final Optional<XmlElement> childNode = operationElement.getOnlyChildElementOptionally(elementName);
         if (!childNode.isPresent()) {
             throw new DocumentedException(elementName + " element is missing",
