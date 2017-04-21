@@ -23,19 +23,20 @@ public class NetconfClientConfigurationTest {
     @Test
     public void testNetconfClientConfiguration() throws Exception {
         Long timeout = 200L;
-        NetconfHelloMessageAdditionalHeader header = new NetconfHelloMessageAdditionalHeader("a", "host", "port", "trans", "id");
+        NetconfHelloMessageAdditionalHeader header =
+                new NetconfHelloMessageAdditionalHeader("a", "host", "port", "trans", "id");
         NetconfClientSessionListener listener = new SimpleNetconfClientSessionListener();
         InetSocketAddress address = InetSocketAddress.createUnresolved("host", 830);
         ReconnectStrategy strategy = Mockito.mock(ReconnectStrategy.class);
         AuthenticationHandler handler = Mockito.mock(AuthenticationHandler.class);
-        NetconfClientConfiguration cfg = NetconfClientConfigurationBuilder.create().
-                withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH).
-                withAddress(address).
-                withConnectionTimeoutMillis(timeout).
-                withReconnectStrategy(strategy).
-                withAdditionalHeader(header).
-                withSessionListener(listener).
-                withAuthHandler(handler).build();
+        NetconfClientConfiguration cfg = NetconfClientConfigurationBuilder.create()
+                .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
+                .withAddress(address)
+                .withConnectionTimeoutMillis(timeout)
+                .withReconnectStrategy(strategy)
+                .withAdditionalHeader(header)
+                .withSessionListener(listener)
+                .withAuthHandler(handler).build();
 
         Assert.assertEquals(timeout, cfg.getConnectionTimeoutMillis());
         Assert.assertEquals(Optional.fromNullable(header), cfg.getAdditionalHeader());

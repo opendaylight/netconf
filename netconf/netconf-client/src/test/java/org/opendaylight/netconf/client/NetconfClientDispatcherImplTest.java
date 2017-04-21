@@ -49,7 +49,8 @@ public class NetconfClientDispatcherImplTest {
         doReturn(thr).when(chf).cause();
 
         Long timeout = 200L;
-        NetconfHelloMessageAdditionalHeader header = new NetconfHelloMessageAdditionalHeader("a", "host", "port", "trans", "id");
+        NetconfHelloMessageAdditionalHeader header =
+                new NetconfHelloMessageAdditionalHeader("a", "host", "port", "trans", "id");
         NetconfClientSessionListener listener = new SimpleNetconfClientSessionListener();
         InetSocketAddress address = InetSocketAddress.createUnresolved("host", 830);
         ReconnectStrategyFactory reconnectStrategyFactory = Mockito.mock(ReconnectStrategyFactory.class);
@@ -62,32 +63,32 @@ public class NetconfClientDispatcherImplTest {
         doReturn("").when(reconnectStrategyFactory).toString();
         doReturn(reconnect).when(reconnectStrategyFactory).createReconnectStrategy();
 
-        NetconfReconnectingClientConfiguration cfg = NetconfReconnectingClientConfigurationBuilder.create().
-                withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH).
-                withAddress(address).
-                withConnectionTimeoutMillis(timeout).
-                withReconnectStrategy(reconnect).
-                withAdditionalHeader(header).
-                withSessionListener(listener).
-                withConnectStrategyFactory(reconnectStrategyFactory).
-                withAuthHandler(handler).build();
+        NetconfReconnectingClientConfiguration cfg = NetconfReconnectingClientConfigurationBuilder.create()
+                .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
+                .withAddress(address)
+                .withConnectionTimeoutMillis(timeout)
+                .withReconnectStrategy(reconnect)
+                .withAdditionalHeader(header)
+                .withSessionListener(listener)
+                .withConnectStrategyFactory(reconnectStrategyFactory)
+                .withAuthHandler(handler).build();
 
-        NetconfReconnectingClientConfiguration cfg2 = NetconfReconnectingClientConfigurationBuilder.create().
-                withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP).
-                withAddress(address).
-                withConnectionTimeoutMillis(timeout).
-                withReconnectStrategy(reconnect).
-                withAdditionalHeader(header).
-                withSessionListener(listener).
-                withConnectStrategyFactory(reconnectStrategyFactory).
-                withAuthHandler(handler).build();
+        NetconfReconnectingClientConfiguration cfg2 = NetconfReconnectingClientConfigurationBuilder.create()
+                .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
+                .withAddress(address)
+                .withConnectionTimeoutMillis(timeout)
+                .withReconnectStrategy(reconnect)
+                .withAdditionalHeader(header)
+                .withSessionListener(listener)
+                .withConnectStrategyFactory(reconnectStrategyFactory)
+                .withAuthHandler(handler).build();
 
         NetconfClientDispatcherImpl dispatcher = new NetconfClientDispatcherImpl(bossGroup, workerGroup, timer);
         Future<NetconfClientSession> sshSession = dispatcher.createClient(cfg);
         Future<NetconfClientSession> tcpSession = dispatcher.createClient(cfg2);
 
         Future<Void> sshReconn = dispatcher.createReconnectingClient(cfg);
-        Future<Void> tcpReconn = dispatcher.createReconnectingClient(cfg2);
+        final Future<Void> tcpReconn = dispatcher.createReconnectingClient(cfg2);
 
         assertNotNull(sshSession);
         assertNotNull(tcpSession);
