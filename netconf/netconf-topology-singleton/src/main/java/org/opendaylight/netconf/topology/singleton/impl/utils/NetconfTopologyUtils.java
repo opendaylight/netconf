@@ -13,6 +13,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
+import org.opendaylight.controller.config.util.xml.DocumentedException;
 import java.util.Map;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemasResolverImpl;
@@ -217,5 +218,11 @@ public class NetconfTopologyUtils {
 
     public static InstanceIdentifier<Node> createTopologyNodePath(final String topologyId) {
         return createTopologyListPath(topologyId).child(Node.class);
+    }
+
+    public static DocumentedException createMasterIsDownException(final RemoteDeviceId id) {
+        return new DocumentedException(id + ":Master is down. Please try again.",
+                DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
+                DocumentedException.ErrorSeverity.WARNING);
     }
 }
