@@ -24,7 +24,8 @@ public class NetconfIidFactory {
         throw new IllegalStateException("Instantiating utility class.");
     }
 
-    public static final InstanceIdentifier<Topology> NETCONF_TOPOLOGY_IID = InstanceIdentifier.builder(NetworkTopology.class)
+    public static final InstanceIdentifier<Topology> NETCONF_TOPOLOGY_IID =
+            InstanceIdentifier.builder(NetworkTopology.class)
             .child(Topology.class, new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())))
             .build();
 

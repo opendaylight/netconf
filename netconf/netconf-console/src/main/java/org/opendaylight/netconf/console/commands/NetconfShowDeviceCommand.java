@@ -84,6 +84,7 @@ public class NetconfShowDeviceCommand extends AbstractAction {
         return null;
     }
 
+    @SuppressWarnings("checkstyle:RegexpSinglelineJava")
     private void printDeviceData(@Nonnull final Map<String, Map<String, List<String>>> devices) {
         final ShellTable table = new ShellTable();
         table.column(NetconfConsoleConstants.NETCONF_ID).alignLeft();
@@ -98,13 +99,15 @@ public class NetconfShowDeviceCommand extends AbstractAction {
                     device.get(NetconfConsoleConstants.NETCONF_IP).get(NetconfConsoleConstants.DEFAULT_INDEX),
                     device.get(NetconfConsoleConstants.NETCONF_PORT).get(NetconfConsoleConstants.DEFAULT_INDEX),
                     device.get(NetconfConsoleConstants.STATUS).get(NetconfConsoleConstants.DEFAULT_INDEX),
-                    device.get(NetconfConsoleConstants.AVAILABLE_CAPABILITIES).get(NetconfConsoleConstants.DEFAULT_INDEX));
+                    device.get(NetconfConsoleConstants.AVAILABLE_CAPABILITIES)
+                            .get(NetconfConsoleConstants.DEFAULT_INDEX));
             formatCapabilities(device, table, NetconfConsoleConstants.AVAILABLE_CAPABILITIES);
         }
         table.print(System.out);
     }
 
-    private void formatCapabilities(final Map<String, List<String>> device, final ShellTable table, final String capabilityName) {
+    private void formatCapabilities(final Map<String, List<String>> device, final ShellTable table,
+                                    final String capabilityName) {
         for (final String availableCapability : device.get(capabilityName)) {
             // First row is already added to table with the first available capability
             // Process rows other than the first to only have remaining available capabilities
