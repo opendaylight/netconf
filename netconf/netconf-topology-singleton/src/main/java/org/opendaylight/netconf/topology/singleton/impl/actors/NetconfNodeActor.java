@@ -88,7 +88,7 @@ public class NetconfNodeActor extends UntypedActor {
     }
 
     private NetconfNodeActor(final NetconfTopologySetup setup,
-                             final RemoteDeviceId id, SchemaSourceRegistry schemaRegistry,
+                             final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
                              final SchemaRepository schemaRepository) {
         this.setup = setup;
         this.id = id;
@@ -117,6 +117,7 @@ public class NetconfNodeActor extends UntypedActor {
         } else if (message instanceof AskForMasterMountPoint) { // master
             // only master contains reference to operations processor
             if (operationsProcessor != null) {
+                LOG.debug("Received AskForMasterMountPoint");
                 getSender().tell(new RegisterMountPoint(sourceIdentifiers), getSelf());
             }
 
@@ -127,6 +128,7 @@ public class NetconfNodeActor extends UntypedActor {
         } else if (message instanceof YangTextSchemaSourceRequest) { // master
 
             final YangTextSchemaSourceRequest yangTextSchemaSourceRequest = (YangTextSchemaSourceRequest) message;
+            LOG.debug("Received YangTextSchemaSourceRequest {}" + yangTextSchemaSourceRequest.getSourceIdentifier());
             sendYangTextSchemaSourceProxy(yangTextSchemaSourceRequest.getSourceIdentifier(), sender());
 
         } else if (message instanceof InvokeRpcMessage) {
@@ -135,7 +137,7 @@ public class NetconfNodeActor extends UntypedActor {
             invokeSlaveRpc(invokeRpcMessage.getSchemaPath(), invokeRpcMessage.getNormalizedNodeMessage(), sender());
 
         } else if (message instanceof RegisterMountPoint) { //slaves
-
+            LOG.debug("Received RegisterMountPoint");
             sourceIdentifiers = ((RegisterMountPoint) message).getSourceIndentifiers();
             registerSlaveMountPoint(getSender());
 
@@ -194,14 +196,17 @@ public class NetconfNodeActor extends UntypedActor {
             @Override
             public void onSuccess(final YangTextSchemaSource yangTextSchemaSource) {
                 try {
+                    LOG.debug("Sending schema source for {}", sourceIdentifier);
                     sender.tell(new YangTextSchemaSourceSerializationProxy(yangTextSchemaSource), getSelf());
-                } catch (IOException exception) {
+                } catch (final IOException exception) {
+                    LOG.debug("Failed to read schema source for {}", sourceIdentifier);
                     sender.tell(exception.getCause(), getSelf());
                 }
             }
 
             @Override
             public void onFailure(@Nonnull final Throwable throwable) {
+                LOG.debug("Can't get schema source for {}", sourceIdentifier);
                 sender.tell(throwable, getSelf());
             }
         });
@@ -235,7 +240,7 @@ public class NetconfNodeActor extends UntypedActor {
         });
     }
 
-    private void registerSlaveMountPoint(ActorRef masterReference) {
+    private void registerSlaveMountPoint(final ActorRef masterReference) {
         if (this.slaveSalManager != null) {
             slaveSalManager.close();
         }
@@ -259,24 +264,24 @@ public class NetconfNodeActor extends UntypedActor {
         });
     }
 
-    private DOMRpcService getDOMRpcService(ActorRef masterReference) {
+    private DOMRpcService getDOMRpcService(final ActorRef masterReference) {
         return new ProxyDOMRpcService(setup.getActorSystem(), masterReference, id);
     }
 
-    private CheckedFuture<SchemaContext, SchemaResolutionException> getSchemaContext(ActorRef masterReference) {
+    private CheckedFuture<SchemaContext, SchemaResolutionException> getSchemaContext(final ActorRef masterReference) {
 
         final RemoteYangTextSourceProvider remoteYangTextSourceProvider =
                 new ProxyYangTextSourceProvider(masterReference, getContext());
         final RemoteSchemaProvider remoteProvider = new RemoteSchemaProvider(remoteYangTextSourceProvider,
                 getContext().dispatcher());
-
+        LOG.debug("Registering schema sources");
         sourceIdentifiers.forEach(sourceId ->
                 schemaRegistry.registerSchemaSource(remoteProvider, PotentialSchemaSource.create(sourceId,
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
-
+        LOG.debug("Creating SchemaContextFactory");
         final SchemaContextFactory schemaContextFactory
                 = schemaRepository.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
-
+        LOG.debug("Creating SchemaContext");
         return schemaContextFactory.createSchemaContext(sourceIdentifiers);
     }
 
