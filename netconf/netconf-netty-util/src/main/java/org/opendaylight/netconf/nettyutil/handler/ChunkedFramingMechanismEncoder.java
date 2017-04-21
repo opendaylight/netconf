@@ -27,7 +27,8 @@ public class ChunkedFramingMechanismEncoder extends MessageToByteEncoder<ByteBuf
     }
 
     public ChunkedFramingMechanismEncoder(final int chunkSize) {
-        Preconditions.checkArgument(chunkSize >= MIN_CHUNK_SIZE && chunkSize <= MAX_CHUNK_SIZE, "Unsupported chunk size %s", chunkSize);
+        Preconditions.checkArgument(chunkSize >= MIN_CHUNK_SIZE && chunkSize <= MAX_CHUNK_SIZE, "Unsupported chunk "
+                + "size %s", chunkSize);
         this.chunkSize = chunkSize;
     }
 
@@ -36,7 +37,7 @@ public class ChunkedFramingMechanismEncoder extends MessageToByteEncoder<ByteBuf
     }
 
     @Override
-    protected void encode(final ChannelHandlerContext ctx, final ByteBuf msg, final ByteBuf out)  {
+    protected void encode(final ChannelHandlerContext ctx, final ByteBuf msg, final ByteBuf out) {
         do {
             final int xfer = Math.min(chunkSize, msg.readableBytes());
 
@@ -45,7 +46,8 @@ public class ChunkedFramingMechanismEncoder extends MessageToByteEncoder<ByteBuf
             out.writeByte('\n');
 
             out.writeBytes(msg, xfer);
-        } while (msg.isReadable());
+        }
+        while (msg.isReadable());
 
         out.writeBytes(NetconfMessageConstants.END_OF_CHUNK);
     }

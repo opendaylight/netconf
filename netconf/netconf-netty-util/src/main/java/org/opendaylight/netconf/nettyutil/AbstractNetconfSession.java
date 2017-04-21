@@ -32,7 +32,8 @@ import org.openexi.sax.TransmogrifierException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractNetconfSession<S extends NetconfSession, L extends NetconfSessionListener<S>> extends AbstractProtocolSession<NetconfMessage> implements NetconfSession, NetconfExiSession {
+public abstract class AbstractNetconfSession<S extends NetconfSession, L extends NetconfSessionListener<S>> extends
+        AbstractProtocolSession<NetconfMessage> implements NetconfSession, NetconfExiSession {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfSession.class);
     private final L sessionListener;
     private final long sessionId;
@@ -104,7 +105,8 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
         LOG.debug("Session {} end of input detected while session was in state {}", toString(), isUp() ? "up"
                 : "initialized");
         if (isUp()) {
-            this.sessionListener.onSessionDown(thisInstance(), new IOException("End of input detected. Close the session."));
+            this.sessionListener.onSessionDown(thisInstance(), new IOException("End of input detected. Close the "
+                    + "session."));
         }
     }
 

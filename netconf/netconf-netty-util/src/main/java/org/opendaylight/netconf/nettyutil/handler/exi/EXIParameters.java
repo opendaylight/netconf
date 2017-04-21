@@ -38,29 +38,30 @@ public final class EXIParameters {
         this.options = Preconditions.checkNotNull(options);
     }
 
-
+    @SuppressWarnings("checkstyle:FallThrough")
     public static EXIParameters fromXmlElement(final XmlElement root) throws EXIOptionsException {
-        final EXIOptions options =  new EXIOptions();
+        final EXIOptions options = new EXIOptions();
         final NodeList alignmentElements = root.getElementsByTagName(EXI_PARAMETER_ALIGNMENT);
         if (alignmentElements.getLength() > 0) {
             final Element alignmentElement = (Element) alignmentElements.item(0);
             final String alignmentTextContent = alignmentElement.getTextContent().trim();
 
             switch (alignmentTextContent) {
-            case EXI_PARAMETER_BYTE_ALIGNED:
-                options.setAlignmentType(AlignmentType.byteAligned);
-                break;
-            case EXI_PARAMETER_COMPRESSED:
-                options.setAlignmentType(AlignmentType.compress);
-                break;
-            case EXI_PARAMETER_PRE_COMPRESSION:
-                options.setAlignmentType(AlignmentType.preCompress);
-                break;
-            default:
-                LOG.warn("Unexpected value in alignmentTextContent: {} , using default value", alignmentTextContent);
-            case EXI_PARAMETER_BIT_PACKED:
-                options.setAlignmentType(AlignmentType.bitPacked);
-                break;
+                case EXI_PARAMETER_BYTE_ALIGNED:
+                    options.setAlignmentType(AlignmentType.byteAligned);
+                    break;
+                case EXI_PARAMETER_COMPRESSED:
+                    options.setAlignmentType(AlignmentType.compress);
+                    break;
+                case EXI_PARAMETER_PRE_COMPRESSION:
+                    options.setAlignmentType(AlignmentType.preCompress);
+                    break;
+                default:
+                    LOG.warn("Unexpected value in alignmentTextContent: {} , using default value",
+                            alignmentTextContent);
+                case EXI_PARAMETER_BIT_PACKED:
+                    options.setAlignmentType(AlignmentType.bitPacked);
+                    break;
             }
         } else {
             options.setAlignmentType(AlignmentType.bitPacked);

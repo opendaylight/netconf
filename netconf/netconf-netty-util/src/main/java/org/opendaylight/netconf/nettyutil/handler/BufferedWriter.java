@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.nettyutil.handler;
 
-
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.io.Writer;
@@ -16,10 +15,12 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Custom BufferedWriter optimized for netconf pipeline implemented instead of default BufferedWriter provided by jdk.
+ *
  * <p>
  * The line separator instance field in java.io.BufferedWriter is
  * assigned using AccessController and takes considerable amount of time especially
  * if lots of BufferedWriters are created in the system.
+ *
  * <p>
  * This implementation should only be used if newLine method is not required
  * such as netconf message to XML encoders.
@@ -31,7 +32,7 @@ public final class BufferedWriter extends Writer {
     private static final int DEFAULT_CHAR_BUFFER_SIZE = 8192;
 
     private final Writer writer;
-    private final char buffer[];
+    private final char[] buffer;
     private final int bufferSize;
 
     private int nextChar = 0;
@@ -49,24 +50,27 @@ public final class BufferedWriter extends Writer {
     }
 
     private void flushBuffer() throws IOException {
-        if (nextChar == 0)
+        if (nextChar == 0) {
             return;
+        }
         writer.write(buffer, 0, nextChar);
         nextChar = 0;
     }
 
     @Override
-    public void write(final int c) throws IOException {
-        if (nextChar >= bufferSize)
+    public void write(final int character) throws IOException {
+        if (nextChar >= bufferSize) {
             flushBuffer();
-        buffer[nextChar++] = (char) c;
+        }
+        buffer[nextChar++] = (char) character;
     }
 
     @Override
     public void write(final char[] buffer, final int offset, final int length) throws IOException {
-        if ((offset < 0) || (offset > buffer.length) || (length < 0) ||
-                ((offset + length) > buffer.length) || ((offset + length) < 0)) {
-            throw new IndexOutOfBoundsException(String.format("Buffer size: %d, Offset: %d, Length: %d", buffer.length, offset, length));
+        if ((offset < 0) || (offset > buffer.length) || (length < 0)
+                || ((offset + length) > buffer.length) || ((offset + length) < 0)) {
+            throw new IndexOutOfBoundsException(String.format("Buffer size: %d, Offset: %d, Length: %d", buffer
+                    .length, offset, length));
         } else if (length == 0) {
             return;
         }
@@ -77,29 +81,31 @@ public final class BufferedWriter extends Writer {
             return;
         }
 
-        int b = offset;
+        int bufferOffset = offset;
         final int t = offset + length;
-        while (b < t) {
-            final int d = Math.min(bufferSize - nextChar, t - b);
-            System.arraycopy(buffer, b, this.buffer, nextChar, d);
-            b += d;
+        while (bufferOffset < t) {
+            final int d = Math.min(bufferSize - nextChar, t - bufferOffset);
+            System.arraycopy(buffer, bufferOffset, this.buffer, nextChar, d);
+            bufferOffset += d;
             nextChar += d;
-            if (nextChar >= bufferSize)
+            if (nextChar >= bufferSize) {
                 flushBuffer();
+            }
         }
     }
 
     @Override
     public void write(final String string, final int offset, final int length) throws IOException {
-        int b = offset;
+        int bufferOffset = offset;
         final int t = offset + length;
-        while (b < t) {
-            final int d = Math.min(bufferSize - nextChar, t - b);
-            string.getChars(b, b + d, buffer, nextChar);
-            b += d;
+        while (bufferOffset < t) {
+            final int d = Math.min(bufferSize - nextChar, t - bufferOffset);
+            string.getChars(bufferOffset, bufferOffset + d, buffer, nextChar);
+            bufferOffset += d;
             nextChar += d;
-            if (nextChar >= bufferSize)
+            if (nextChar >= bufferSize) {
                 flushBuffer();
+            }
         }
     }
 

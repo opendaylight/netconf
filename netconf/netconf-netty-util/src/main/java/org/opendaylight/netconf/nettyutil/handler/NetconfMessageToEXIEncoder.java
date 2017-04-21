@@ -39,15 +39,17 @@ public final class NetconfMessageToEXIEncoder extends MessageToByteEncoder<Netco
         this.transmogrifier = Preconditions.checkNotNull(transmogrifier);
     }
 
-    public static NetconfMessageToEXIEncoder create(final NetconfEXICodec codec) throws EXIOptionsException, TransmogrifierException {
+    public static NetconfMessageToEXIEncoder create(final NetconfEXICodec codec) throws EXIOptionsException,
+            TransmogrifierException {
         return new NetconfMessageToEXIEncoder(codec.getTransmogrifier());
     }
 
     @Override
-    protected void encode(final ChannelHandlerContext ctx, final NetconfMessage msg, final ByteBuf out) throws EXIOptionsException, IOException, TransformerException, TransmogrifierException {
+    protected void encode(final ChannelHandlerContext ctx, final NetconfMessage msg, final ByteBuf out) throws
+            EXIOptionsException, IOException, TransformerException, TransmogrifierException {
         LOG.trace("Sent to encode : {}", msg);
 
-        try (final OutputStream os = new ByteBufOutputStream(out)) {
+        try (OutputStream os = new ByteBufOutputStream(out)) {
             transmogrifier.setOutputStream(os);
             final ContentHandler handler = transmogrifier.getSAXTransmogrifier();
             final Transformer transformer = ThreadLocalTransformers.getDefaultTransformer();

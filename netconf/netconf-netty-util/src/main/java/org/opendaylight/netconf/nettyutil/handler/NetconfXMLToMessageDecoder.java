@@ -25,7 +25,8 @@ public final class NetconfXMLToMessageDecoder extends ByteToMessageDecoder {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfXMLToMessageDecoder.class);
 
     @Override
-    public void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) throws IOException, SAXException {
+    public void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) throws IOException,
+            SAXException {
         if (in.isReadable()) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Received to decode: {}", ByteBufUtil.hexDump(in));
@@ -77,10 +78,10 @@ public final class NetconfXMLToMessageDecoder extends ByteToMessageDecoder {
      * Check whether a byte is whitespace/control character. Considered whitespace characters: <br/>
      * SPACE, \t, \n, \v, \r, \f
      *
-     * @param b byte to check
+     * @param byteToCheck byte to check
      * @return true if the byte is a whitespace/control character
      */
-    private static boolean isWhitespace(final byte b) {
-        return b <= 0x0d && b >= 0x09 || b == 0x20;
+    private static boolean isWhitespace(final byte byteToCheck) {
+        return byteToCheck <= 0x0d && byteToCheck >= 0x09 || byteToCheck == 0x20;
     }
 }

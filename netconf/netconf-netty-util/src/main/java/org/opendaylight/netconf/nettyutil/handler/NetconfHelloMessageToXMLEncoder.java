@@ -25,25 +25,29 @@ import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader
  * {@link NetconfHelloMessage}
  * . Used by netconf clients to send information about the user, ip address,
  * protocol etc.
+ *
  * <p>
  * Hello message with header example:
+ *
  * <p>
  *
+ * <p>
  * <pre>
  * {@code
  * [tomas;10.0.0.0/10000;tcp;1000;1000;;/home/tomas;;]
- * <hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
- * <capabilities>
- * <capability>urn:ietf:params:netconf:base:1.0</capability>
- * </capabilities>
- * </hello>
+ * @literal < hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+ * @literal < capabilities>
+ * @literal < capability>urn:ietf:params:netconf:base:1.0< /capability>
+ * @literal < /capabilities>
+ * @literal < /hello>
  * }
  * </pre>
  */
 public final class NetconfHelloMessageToXMLEncoder extends NetconfMessageToXMLEncoder {
     @Override
     @VisibleForTesting
-    public void encode(ChannelHandlerContext ctx, NetconfMessage msg, ByteBuf out) throws IOException, TransformerException {
+    public void encode(ChannelHandlerContext ctx, NetconfMessage msg, ByteBuf out) throws IOException,
+            TransformerException {
         Preconditions.checkState(msg instanceof NetconfHelloMessage, "Netconf message of type %s expected, was %s",
                 NetconfHelloMessage.class, msg.getClass());
         Optional<NetconfHelloMessageAdditionalHeader> headerOptional = ((NetconfHelloMessage) msg)

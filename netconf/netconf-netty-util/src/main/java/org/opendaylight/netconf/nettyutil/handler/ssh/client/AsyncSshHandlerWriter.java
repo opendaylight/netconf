@@ -37,7 +37,8 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
     // TODO implement Limiting mechanism for pending writes
     // But there is a possible issue with limiting:
     // 1. What to do when queue is full ? Immediate Fail for every request ?
-    // 2. At this level we might be dealing with Chunks of messages(not whole messages) and unexpected behavior might occur
+    // 2. At this level we might be dealing with Chunks of messages(not whole messages) and unexpected behavior might
+    // occur
     // when we send/queue 1 chunk and fail the other chunks
 
     private volatile IoOutputStream asyncIn;
@@ -50,7 +51,7 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
     }
 
     public void write(final ChannelHandlerContext ctx,
-            final Object msg, final ChannelPromise promise) {
+                      final Object msg, final ChannelPromise promise) {
         if (asyncIn == null) {
             promise.setFailure(new IllegalStateException("Channel closed"));
             return;
@@ -78,7 +79,8 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
 
     //sending message with pending
     //if resending message not succesfull, then attribute wasPending is true
-    private void writeWithPendingDetection(final ChannelHandlerContext ctx, final ChannelPromise promise, final ByteBuf byteBufMsg, final boolean wasPending) {
+    private void writeWithPendingDetection(final ChannelHandlerContext ctx, final ChannelPromise promise,
+                                           final ByteBuf byteBufMsg, final boolean wasPending) {
         try {
 
             if (LOG.isTraceEnabled()) {
@@ -94,15 +96,18 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
                     // while the pending write was in progress from the write callback
                     synchronized (asyncIn) {
                         if (LOG.isTraceEnabled()) {
-                            LOG.trace("Ssh write request finished on channel: {} with result: {}: and ex:{}, message: {}",
-                                    ctx.channel(), future.isWritten(), future.getException(), byteBufToString(byteBufMsg));
+                            LOG.trace("Ssh write request finished on channel: {} with result: {}: and ex:{}, message:"
+                                    + " {}",
+                                    ctx.channel(), future.isWritten(), future.getException(),
+                                    byteBufToString(byteBufMsg));
                         }
 
                         // Notify success or failure
                         if (future.isWritten()) {
                             promise.setSuccess();
                         } else {
-                            LOG.warn("Ssh write request failed on channel: {} for message: {}", ctx.channel(), byteBufToString(byteBufMsg), future.getException());
+                            LOG.warn("Ssh write request failed on channel: {} for message: {}", ctx.channel(),
+                                    byteBufToString(byteBufMsg), future.getException());
                             promise.setFailure(future.getException());
                         }
 
@@ -117,14 +122,15 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
                     }
 
                     // Check pending queue and schedule next
-                    // At this time we are guaranteed that we are not in pending state anymore so the next request should succeed
+                    // At this time we are guaranteed that we are not in pending state anymore so the next request
+                    // should succeed
                     writePendingIfAny();
                 }
             });
 
         } catch (final WritePendingException e) {
 
-            if(wasPending == false){
+            if (wasPending == false) {
                 queueRequest(ctx, byteBufMsg, promise);
             }
         }
@@ -139,7 +145,8 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
             final PendingWriteRequest pendingWrite = pending.peek();
             final ByteBuf msg = pendingWrite.msg;
             if (LOG.isTraceEnabled()) {
-                LOG.trace("Writing pending request on channel: {}, message: {}", pendingWrite.ctx.channel(), byteBufToString(msg));
+                LOG.trace("Writing pending request on channel: {}, message: {}", pendingWrite.ctx.channel(),
+                        byteBufToString(msg));
             }
 
             writeWithPendingDetection(pendingWrite.ctx, pendingWrite.promise, msg, true);
@@ -160,7 +167,8 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
         }
         new PendingWriteRequest(ctx, msg, promise).pend(pending);
 //        } catch (final Exception ex) {
-//            LOG.warn("Unable to queue write request on channel: {}. Setting fail for the request: {}", ctx.channel(), ex, byteBufToString(msg));
+//            LOG.warn("Unable to queue write request on channel: {}. Setting fail for the request: {}", ctx.channel
+// (), ex, byteBufToString(msg));
 //            msg.release();
 //            promise.setFailure(ex);
 //        }
@@ -184,7 +192,7 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
         private final ByteBuf msg;
         private final ChannelPromise promise;
 
-        public PendingWriteRequest(final ChannelHandlerContext ctx, final ByteBuf msg, final ChannelPromise promise) {
+        PendingWriteRequest(final ChannelHandlerContext ctx, final ByteBuf msg, final ChannelPromise promise) {
             this.ctx = ctx;
             // Reset reader index, last write (failed) attempt moved index to the end
             msg.resetReaderIndex();
@@ -196,7 +204,8 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
             // Preconditions.checkState(pending.size() < MAX_PENDING_WRITES,
             // "Too much pending writes(%s) on channel: %s, remote window is not getting read or is too small",
             // pending.size(), ctx.channel());
-            Preconditions.checkState(pending.offer(this), "Cannot pend another request write (pending count: %s) on channel: %s",
+            Preconditions.checkState(pending.offer(this), "Cannot pend another request write (pending count: %s) on "
+                    + "channel: %s",
                     pending.size(), ctx.channel());
         }
     }

@@ -44,6 +44,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private static final long DEFAULT_TIMEOUT = -1L;
 
     public static final SshClient DEFAULT_CLIENT;
+
     static {
         final Map<String, String> props = new HashMap<>();
         props.put(SshClient.AUTH_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
@@ -71,38 +72,41 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private GenericFutureListener negotiationFutureListener;
 
     public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final SshClient sshClient,
-            final Future<?> negotiationFuture) throws IOException {
+                           final Future<?> negotiationFuture) throws IOException {
         this(authenticationHandler, sshClient);
         this.negotiationFuture = negotiationFuture;
     }
 
     /**
+     * Constructor of {@code AsyncSshHandler}.
      *
-     * @param authenticationHandler
-     * @param sshClient started SshClient
-     * @throws IOException
+     * @param authenticationHandler authentication handler
+     * @param sshClient             started SshClient
+     * @throws IOException          if the I/O operation fails
      */
-    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final SshClient sshClient) throws IOException {
+    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final SshClient sshClient) throws
+            IOException {
         this.authenticationHandler = Preconditions.checkNotNull(authenticationHandler);
         this.sshClient = Preconditions.checkNotNull(sshClient);
     }
 
-    public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler) throws IOException {
+    public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler) throws
+            IOException {
         return new AsyncSshHandler(authenticationHandler, DEFAULT_CLIENT);
     }
 
     /**
-     *
-     * Create AsyncSshHandler for netconf subsystem. Negotiation future has to be set to success after successful netconf
+     * Create AsyncSshHandler for netconf subsystem. Negotiation future has to be set to success after successful
+     * netconf
      * negotiation.
      *
-     * @param authenticationHandler
-     * @param negotiationFuture
-     * @return
-     * @throws IOException
+     * @param authenticationHandler authentication handler
+     * @param negotiationFuture     negotiation future
+     * @return                      {@code AsyncSshHandler}
+     * @throws IOException          if the I/O operation fails
      */
     public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler,
-            final Future<?> negotiationFuture) throws IOException {
+                                                            final Future<?> negotiationFuture) throws IOException {
         return new AsyncSshHandler(authenticationHandler, DEFAULT_CLIENT, negotiationFuture);
     }
 
@@ -135,8 +139,8 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
                         handleSshAuthenticated(session, ctx);
                     } else {
                         // Exception does not have to be set in the future, add simple exception in such case
-                        final Throwable exception = future.getException() == null ?
-                                new IllegalStateException("Authentication failed") :
+                        final Throwable exception = future.getException() == null
+                                ? new IllegalStateException("Authentication failed") :
                                 future.getException();
                         handleSshSetupFailure(ctx, exception);
                     }
@@ -149,14 +153,15 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
     private synchronized void handleSshAuthenticated(final ClientSession session, final ChannelHandlerContext ctx) {
         try {
-            LOG.debug("SSH session authenticated on channel: {}, server version: {}", ctx.channel(), session.getServerVersion());
+            LOG.debug("SSH session authenticated on channel: {}, server version: {}", ctx.channel(), session
+                    .getServerVersion());
 
             channel = session.createSubsystemChannel(SUBSYSTEM);
             channel.setStreaming(ClientChannel.Streaming.Async);
             channel.open().addListener(new SshFutureListener<OpenFuture>() {
                 @Override
                 public void operationComplete(final OpenFuture future) {
-                    if(future.isOpened()) {
+                    if (future.isOpened()) {
                         handleSshChanelOpened(ctx);
                     } else {
                         handleSshSetupFailure(ctx, future.getException());
@@ -173,7 +178,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private synchronized void handleSshChanelOpened(final ChannelHandlerContext ctx) {
         LOG.trace("SSH subsystem channel opened successfully on channel: {}", ctx.channel());
 
-        if(negotiationFuture == null) {
+        if (negotiationFuture == null) {
             connectPromise.setSuccess();
         }
 
@@ -191,19 +196,20 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             }
         }, channel.toString(), channel.getAsyncOut());
 
-        // if readAsyncListener receives immediate close, it will close this handler and closing this handler sets channel variable to null
-        if(channel != null) {
+        // if readAsyncListener receives immediate close, it will close this handler and closing this handler sets
+        // channel variable to null
+        if (channel != null) {
             sshWriteAsyncHandler = new AsyncSshHandlerWriter(channel.getAsyncIn());
             ctx.fireChannelActive();
         }
     }
 
-    private synchronized void handleSshSetupFailure(final ChannelHandlerContext ctx, final Throwable e) {
-        LOG.warn("Unable to setup SSH connection on channel: {}", ctx.channel(), e);
+    private synchronized void handleSshSetupFailure(final ChannelHandlerContext ctx, final Throwable error) {
+        LOG.warn("Unable to setup SSH connection on channel: {}", ctx.channel(), error);
 
         // If the promise is not yet done, we have failed with initial connect and set connectPromise to failure
-        if(!connectPromise.isDone()) {
-            connectPromise.setFailure(e);
+        if (!connectPromise.isDone()) {
+            connectPromise.setFailure(error);
         }
 
         disconnect(ctx, ctx.newPromise());
@@ -215,11 +221,12 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     }
 
     @Override
-    public synchronized void connect(final ChannelHandlerContext ctx, final SocketAddress remoteAddress, final SocketAddress localAddress, final ChannelPromise promise) throws Exception {
+    public synchronized void connect(final ChannelHandlerContext ctx, final SocketAddress remoteAddress,
+                                     final SocketAddress localAddress, final ChannelPromise promise) throws Exception {
         LOG.debug("SSH session connecting on channel {}. promise: {} ", ctx.channel(), connectPromise);
         this.connectPromise = promise;
 
-        if(negotiationFuture != null) {
+        if (negotiationFuture != null) {
 
             negotiationFutureListener = new GenericFutureListener<Future<?>>() {
                 @Override
@@ -240,36 +247,39 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         disconnect(ctx, promise);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public synchronized void disconnect(final ChannelHandlerContext ctx, final ChannelPromise promise) {
-        LOG.trace("Closing SSH session on channel: {} with connect promise in state: {}", ctx.channel(), connectPromise);
+        LOG.trace("Closing SSH session on channel: {} with connect promise in state: {}", ctx.channel(),
+                connectPromise);
 
-        // If we have already succeeded and the session was dropped after, we need to fire inactive to notify reconnect logic
-        if(connectPromise.isSuccess()) {
+        // If we have already succeeded and the session was dropped after, we need to fire inactive to notify
+        // reconnect logic
+        if (connectPromise.isSuccess()) {
             ctx.fireChannelInactive();
         }
 
-        if(sshWriteAsyncHandler != null) {
+        if (sshWriteAsyncHandler != null) {
             sshWriteAsyncHandler.close();
         }
 
-        if(sshReadAsyncListener != null) {
+        if (sshReadAsyncListener != null) {
             sshReadAsyncListener.close();
         }
 
         //If connection promise is not already set, it means negotiation failed
         //we must set connection promise to failure
-        if(!connectPromise.isDone()) {
+        if (!connectPromise.isDone()) {
             connectPromise.setFailure(new IllegalStateException("Negotiation failed"));
         }
 
         //Remove listener from negotiation future, we don't want notifications
         //from negotiation anymore
-        if(negotiationFuture != null) {
+        if (negotiationFuture != null) {
             negotiationFuture.removeListener(negotiationFutureListener);
         }
 
-        if(session!= null && !session.isClosed() && !session.isClosing()) {
+        if (session != null && !session.isClosed() && !session.isClosing()) {
             session.close(false).addListener(new SshFutureListener<CloseFuture>() {
                 @Override
                 public void operationComplete(final CloseFuture future) {
@@ -281,9 +291,11 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             });
         }
 
-        // Super disconnect is necessary in this case since we are using NioSocketChannel and it needs to cleanup its resources
+        // Super disconnect is necessary in this case since we are using NioSocketChannel and it needs to cleanup its
+        // resources
         // e.g. Socket that it tries to open in its constructor (https://bugs.opendaylight.org/show_bug.cgi?id=2430)
-        // TODO better solution would be to implement custom ChannelFactory + Channel that will use mina SSH lib internally: port this to custom channel implementation
+        // TODO better solution would be to implement custom ChannelFactory + Channel that will use mina SSH lib
+        // internally: port this to custom channel implementation
         try {
             // Disconnect has to be closed after inactive channel event was fired, because it interferes with it
             super.disconnect(ctx, ctx.newPromise());

@@ -35,7 +35,8 @@ public final class AsyncSshHandlerReader implements SshFutureListener<IoReadFutu
     private Buffer buf;
     private IoReadFuture currentReadFuture;
 
-    public AsyncSshHandlerReader(final AutoCloseable connectionClosedCallback, final ReadMsgHandler readHandler, final String channelId, final IoInputStream asyncOut) {
+    public AsyncSshHandlerReader(final AutoCloseable connectionClosedCallback, final ReadMsgHandler readHandler,
+                                 final String channelId, final IoInputStream asyncOut) {
         this.connectionClosedCallback = connectionClosedCallback;
         this.readHandler = readHandler;
         this.channelId = channelId;
@@ -46,14 +47,14 @@ public final class AsyncSshHandlerReader implements SshFutureListener<IoReadFutu
 
     @Override
     public synchronized void operationComplete(final IoReadFuture future) {
-        if(future.getException() != null) {
+        if (future.getException() != null) {
 
             //if asyncout is already set to null by close method, do nothing
-            if(asyncOut == null) {
+            if (asyncOut == null) {
                 return;
             }
 
-            if(asyncOut.isClosed() || asyncOut.isClosing()) {
+            if (asyncOut.isClosed() || asyncOut.isClosing()) {
                 // Ssh dropped
                 LOG.debug("Ssh session dropped on channel: {}", channelId, future.getException());
             } else {
@@ -65,8 +66,9 @@ public final class AsyncSshHandlerReader implements SshFutureListener<IoReadFutu
 
         if (future.getRead() > 0) {
             final ByteBuf msg = Unpooled.wrappedBuffer(buf.array(), 0, future.getRead());
-            if(LOG.isTraceEnabled()) {
-                LOG.trace("Reading message on channel: {}, message: {}", channelId, AsyncSshHandlerWriter.byteBufToString(msg));
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Reading message on channel: {}, message: {}", channelId, AsyncSshHandlerWriter
+                        .byteBufToString(msg));
             }
             readHandler.onMessageRead(msg);
 
@@ -77,6 +79,7 @@ public final class AsyncSshHandlerReader implements SshFutureListener<IoReadFutu
         }
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     private void invokeDisconnect() {
         try {
             connectionClosedCallback.close();
@@ -89,7 +92,7 @@ public final class AsyncSshHandlerReader implements SshFutureListener<IoReadFutu
     @Override
     public synchronized void close() {
         // Remove self as listener on close to prevent reading from closed input
-        if(currentReadFuture != null) {
+        if (currentReadFuture != null) {
             currentReadFuture.removeListener(this);
             currentReadFuture = null;
         }
