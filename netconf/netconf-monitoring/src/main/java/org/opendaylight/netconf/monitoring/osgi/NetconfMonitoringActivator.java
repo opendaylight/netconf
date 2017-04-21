@@ -26,14 +26,15 @@ public class NetconfMonitoringActivator implements BundleActivator {
     private NetconfMonitoringServiceTracker monitor;
 
     @Override
-    public void start(final BundleContext context)  {
+    public void start(final BundleContext context) {
         monitor = new NetconfMonitoringServiceTracker(context);
         monitor.open();
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void stop(final BundleContext context) {
-        if(monitor!=null) {
+        if (monitor != null) {
             try {
                 monitor.close();
             } catch (final Exception e) {
@@ -42,7 +43,8 @@ public class NetconfMonitoringActivator implements BundleActivator {
         }
     }
 
-    public static class NetconfMonitoringOperationServiceFactory implements NetconfOperationServiceFactory, AutoCloseable {
+    public static class NetconfMonitoringOperationServiceFactory implements NetconfOperationServiceFactory,
+            AutoCloseable {
 
         private final NetconfMonitoringOperationService operationService;
 
@@ -73,6 +75,7 @@ public class NetconfMonitoringActivator implements BundleActivator {
         }
 
         @Override
-        public void close() {}
+        public void close() {
+        }
     }
 }

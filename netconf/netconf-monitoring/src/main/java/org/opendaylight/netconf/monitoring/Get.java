@@ -36,7 +36,8 @@ public class Get extends AbstractNetconfOperation {
     private Element getPlaceholder(final Document innerResult)
             throws DocumentedException {
         final XmlElement rootElement = XmlElement.fromDomElementWithExpected(
-                innerResult.getDocumentElement(), XmlMappingConstants.RPC_REPLY_KEY, XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
+                innerResult.getDocumentElement(), XmlMappingConstants.RPC_REPLY_KEY, XmlNetconfConstants
+                        .URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
         return rootElement.getOnlyChildElement(XmlNetconfConstants.DATA_KEY).getDomElement();
     }
 
@@ -50,10 +51,11 @@ public class Get extends AbstractNetconfOperation {
         return HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY.increasePriority(1);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public Document handle(final Document requestMessage, final NetconfOperationChainedExecution subsequentOperation)
             throws DocumentedException {
-        if (subsequentOperation.isExecutionTermination()){
+        if (subsequentOperation.isExecutionTermination()) {
             throw new DocumentedException(String.format("Subsequent netconf operation expected by %s", this),
                     DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.OPERATION_FAILED,
@@ -83,7 +85,8 @@ public class Get extends AbstractNetconfOperation {
     }
 
     @Override
-    protected Element handle(final Document document, final XmlElement message, final NetconfOperationChainedExecution subsequentOperation)
+    protected Element handle(final Document document, final XmlElement message, final
+        NetconfOperationChainedExecution subsequentOperation)
             throws DocumentedException {
         throw new UnsupportedOperationException("Never gets called");
     }

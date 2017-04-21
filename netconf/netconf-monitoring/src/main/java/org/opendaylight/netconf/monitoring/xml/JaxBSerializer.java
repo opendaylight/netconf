@@ -38,6 +38,6 @@ public class JaxBSerializer {
         } catch (final JAXBException e) {
             throw new RuntimeException("Unable to serialize netconf state " + monitoringModel, e);
         }
-        return ((Document)res.getNode()).getDocumentElement();
+        return ((Document) res.getNode()).getDocumentElement();
     }
 }

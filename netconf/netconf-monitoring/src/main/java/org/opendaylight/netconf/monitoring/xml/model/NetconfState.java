@@ -32,10 +32,11 @@ public final class NetconfState {
         this.schemas = monitoringService.getSchemas();
     }
 
-    public NetconfState() {}
+    public NetconfState() {
+    }
 
-    @XmlElementWrapper(name="schemas")
-    @XmlElement(name="schema")
+    @XmlElementWrapper(name = "schemas")
+    @XmlElement(name = "schema")
     public Collection<MonitoringSchema> getSchemas() {
         return Collections2.transform(schemas.getSchema(), new Function<Schema, MonitoringSchema>() {
             @Nullable
@@ -46,8 +47,8 @@ public final class NetconfState {
         });
     }
 
-    @XmlElementWrapper(name="sessions")
-    @XmlElement(name="session")
+    @XmlElementWrapper(name = "sessions")
+    @XmlElement(name = "session")
     public Collection<MonitoringSession> getSessions() {
         return Collections2.transform(sessions.getSession(), new Function<Session, MonitoringSession>() {
             @Nullable

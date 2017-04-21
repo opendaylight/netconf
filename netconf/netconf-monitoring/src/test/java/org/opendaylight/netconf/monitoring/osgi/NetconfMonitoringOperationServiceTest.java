@@ -19,7 +19,8 @@ public class NetconfMonitoringOperationServiceTest {
     public void testGetters() throws Exception {
         NetconfMonitoringService monitor = mock(NetconfMonitoringService.class);
         NetconfMonitoringOperationService service = new NetconfMonitoringOperationService(monitor);
-        NetconfMonitoringActivator.NetconfMonitoringOperationServiceFactory serviceFactory = new NetconfMonitoringActivator.NetconfMonitoringOperationServiceFactory(service);
+        NetconfMonitoringActivator.NetconfMonitoringOperationServiceFactory serviceFactory = new
+                NetconfMonitoringActivator.NetconfMonitoringOperationServiceFactory(service);
 
         assertEquals(2, service.getNetconfOperations().size());
 
