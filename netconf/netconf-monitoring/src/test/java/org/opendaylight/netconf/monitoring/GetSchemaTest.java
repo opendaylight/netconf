@@ -35,13 +35,13 @@ public class GetSchemaTest {
     public void setUp() throws Exception {
         cap = mock(NetconfMonitoringService.class);
         doc = XmlUtil.newDocument();
-        getSchema = "<get-schema xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n" +
-                "        <identifier>threadpool-api</identifier>\n" +
-                "        <version>2010-09-24</version>\n" +
-                "        <format\n" +
-                "                xmlns:ncm=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">ncm:yang\n" +
-                "        </format>\n" +
-                "    </get-schema>";
+        getSchema = "<get-schema xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
+                + "        <identifier>threadpool-api</identifier>\n"
+                + "        <version>2010-09-24</version>\n"
+                + "        <format\n"
+                + "                xmlns:ncm=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">ncm:yang\n"
+                + "        </format>\n"
+                + "    </get-schema>";
     }
 
     @Test(expected = DocumentedException.class)
@@ -55,7 +55,8 @@ public class GetSchemaTest {
     public void handleWithNoSubsequentOperations() throws Exception {
         GetSchema schema = new GetSchema(cap);
         doReturn("").when(cap).getSchemaForCapability(anyString(), any(Optional.class));
-        assertNotNull(schema.handleWithNoSubsequentOperations(doc, XmlElement.fromDomElement(XmlUtil.readXmlToElement(getSchema))));
+        assertNotNull(schema.handleWithNoSubsequentOperations(doc,
+                XmlElement.fromDomElement(XmlUtil.readXmlToElement(getSchema))));
     }
 
 }
