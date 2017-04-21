@@ -48,7 +48,7 @@ public class ProxyDOMDataBroker implements DOMDataBroker {
     /**
      * @param actorSystem system
      * @param id          id
-     * @param masterNode  {@link org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor} ref
+     * @param masterNode  {@link org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeMasterActor} ref
      * @param askTimeout ask timeout
      */
     public ProxyDOMDataBroker(final ActorSystem actorSystem, final RemoteDeviceId id,
