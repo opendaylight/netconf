@@ -44,6 +44,7 @@ public class NetconfImplActivator implements BundleActivator {
 
     private BaseNotificationPublisherRegistration listenerReg;
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void start(final BundleContext context) {
         try {
@@ -57,58 +58,67 @@ public class NetconfImplActivator implements BundleActivator {
 
             final NetconfMonitoringServiceImpl monitoringService = startMonitoringService(context, factoriesListener);
 
-            NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new NetconfServerSessionNegotiatorFactoryBuilder()
-                    .setAggregatedOpService(factoriesListener)
-                    .setTimer(timer)
-                    .setIdProvider(idProvider)
-                    .setMonitoringService(monitoringService)
-                    .setConnectionTimeoutMillis(connectionTimeoutMillis)
-                    .build();
+            NetconfServerSessionNegotiatorFactory serverNegotiatorFactory =
+                    new NetconfServerSessionNegotiatorFactoryBuilder()
+                            .setAggregatedOpService(factoriesListener)
+                            .setTimer(timer)
+                            .setIdProvider(idProvider)
+                            .setMonitoringService(monitoringService)
+                            .setConnectionTimeoutMillis(connectionTimeoutMillis)
+                            .build();
 
             eventLoopGroup = new NioEventLoopGroup();
 
             ServerChannelInitializer serverChannelInitializer = new ServerChannelInitializer(
                     serverNegotiatorFactory);
-            NetconfServerDispatcherImpl dispatch = new NetconfServerDispatcherImpl(serverChannelInitializer, eventLoopGroup, eventLoopGroup);
+            NetconfServerDispatcherImpl dispatch = new NetconfServerDispatcherImpl(serverChannelInitializer,
+                    eventLoopGroup, eventLoopGroup);
 
             LocalAddress address = NetconfConfiguration.NETCONF_LOCAL_ADDRESS;
             LOG.trace("Starting local netconf server at {}", address);
             dispatch.createLocalServer(address);
 
-            final ServiceTracker<NetconfNotificationCollector, NetconfNotificationCollector> notificationServiceTracker =
-                    new ServiceTracker<>(context, NetconfNotificationCollector.class, new ServiceTrackerCustomizer<NetconfNotificationCollector, NetconfNotificationCollector>() {
-                        @Override
-                        public NetconfNotificationCollector addingService(ServiceReference<NetconfNotificationCollector> reference) {
-                            Preconditions.checkState(listenerReg == null, "Notification collector service was already added");
-                            listenerReg = context.getService(reference).registerBaseNotificationPublisher();
-                            monitoringService.setNotificationPublisher(listenerReg);
-                            return null;
-                        }
+            final ServiceTracker<NetconfNotificationCollector, NetconfNotificationCollector>
+                    notificationServiceTracker = new ServiceTracker<>(context, NetconfNotificationCollector.class,
+                    new ServiceTrackerCustomizer<NetconfNotificationCollector, NetconfNotificationCollector>() {
+                            @Override
+                            public NetconfNotificationCollector addingService(ServiceReference<
+                                    NetconfNotificationCollector> reference) {
+                                Preconditions.checkState(listenerReg == null,
+                                        "Notification collector service was already added");
+                                listenerReg = context.getService(reference).registerBaseNotificationPublisher();
+                                monitoringService.setNotificationPublisher(listenerReg);
+                                return null;
+                            }
 
-                        @Override
-                        public void modifiedService(ServiceReference<NetconfNotificationCollector> reference, NetconfNotificationCollector service) {
+                            @Override
+                            public void modifiedService(ServiceReference<NetconfNotificationCollector> reference,
+                                            NetconfNotificationCollector service) {
 
-                        }
+                                }
 
-                        @Override
-                        public void removedService(ServiceReference<NetconfNotificationCollector> reference, NetconfNotificationCollector service) {
-                            listenerReg.close();
-                            listenerReg = null;
-                            monitoringService.setNotificationPublisher(listenerReg);
-                        }
-                    });
+                            @Override
+                            public void removedService(ServiceReference<NetconfNotificationCollector> reference,
+                                           NetconfNotificationCollector service) {
+                                listenerReg.close();
+                                listenerReg = null;
+                                monitoringService.setNotificationPublisher(listenerReg);
+                            }
+                        });
             notificationServiceTracker.open();
         } catch (Exception e) {
             LOG.warn("Unable to start NetconfImplActivator", e);
         }
     }
 
-    private void startOperationServiceFactoryTracker(BundleContext context, NetconfOperationServiceFactoryListener factoriesListener) {
+    private void startOperationServiceFactoryTracker(BundleContext context,
+                                                     NetconfOperationServiceFactoryListener factoriesListener) {
         factoriesTracker = new NetconfOperationServiceFactoryTracker(context, factoriesListener);
         factoriesTracker.open();
     }
 
-    private NetconfMonitoringServiceImpl startMonitoringService(BundleContext context, AggregatedNetconfOperationServiceFactory factoriesListener) {
+    private NetconfMonitoringServiceImpl startMonitoringService(BundleContext context,
+                                                        AggregatedNetconfOperationServiceFactory factoriesListener) {
         NetconfMonitoringServiceImpl netconfMonitoringServiceImpl = new NetconfMonitoringServiceImpl(factoriesListener);
         Dictionary<String, ?> dic = new Hashtable<>();
         regMonitoring = context.registerService(NetconfMonitoringService.class, netconfMonitoringServiceImpl, dic);

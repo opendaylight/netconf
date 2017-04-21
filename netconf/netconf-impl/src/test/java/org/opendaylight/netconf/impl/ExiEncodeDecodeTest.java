@@ -13,9 +13,9 @@ import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 
-public class ExiEncodeDecodeTest  {
+public class ExiEncodeDecodeTest {
     @Test
-    public void encodeExi() throws Exception{
+    public void encodeExi() throws Exception {
 
         String startExiString = XmlFileLoader.xmlFileToString("netconfMessages/startExi.xml");
         assertNotNull(startExiString);
@@ -25,7 +25,8 @@ public class ExiEncodeDecodeTest  {
 
         /*
         ExiParameters exiParams = new ExiParameters();
-        exiParams.setParametersFromXmlElement(XmlElement.fromDomElement(startExiMessage.getDocument().getDocumentElement()));
+        exiParams.setParametersFromXmlElement(XmlElement.fromDomElement(startExiMessage.getDocument()
+        .getDocumentElement()));
         assertNotNull(exiParams);
 
         ByteBuf encodedBuf = Unpooled.buffer();

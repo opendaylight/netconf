@@ -31,12 +31,14 @@ public class DefaultStopExi extends AbstractSingletonNetconfOperation implements
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(Document document, XmlElement operationElement) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(Document document,
+                                                       XmlElement operationElement) throws DocumentedException {
         LOG.debug("Received stop-exi message {} ", XmlUtil.toString(operationElement));
 
         netconfSession.stopExiCommunication();
 
-        Element getSchemaResult = document.createElementNS( XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, XmlNetconfConstants.OK);
+        Element getSchemaResult = document.createElementNS(
+                XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, XmlNetconfConstants.OK);
         LOG.trace("{} operation successful", STOP_EXI);
         return getSchemaResult;
     }
@@ -52,7 +54,7 @@ public class DefaultStopExi extends AbstractSingletonNetconfOperation implements
     }
 
     @Override
-    public void setNetconfSession(NetconfServerSession s) {
-        this.netconfSession = s;
+    public void setNetconfSession(NetconfServerSession netconfServerSession) {
+        this.netconfSession = netconfServerSession;
     }
 }

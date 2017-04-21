@@ -34,7 +34,8 @@ public class NetconfDispatcherImplTest {
         SessionIdProvider idProvider = new SessionIdProvider();
         hashedWheelTimer = new HashedWheelTimer();
 
-        NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new NetconfServerSessionNegotiatorFactoryBuilder()
+        NetconfServerSessionNegotiatorFactory serverNegotiatorFactory =
+                new NetconfServerSessionNegotiatorFactoryBuilder()
                 .setAggregatedOpService(factoriesListener)
                 .setTimer(hashedWheelTimer)
                 .setIdProvider(idProvider)
@@ -42,7 +43,8 @@ public class NetconfDispatcherImplTest {
                 .setConnectionTimeoutMillis(5000)
                 .build();
 
-        NetconfServerDispatcherImpl.ServerChannelInitializer serverChannelInitializer = new NetconfServerDispatcherImpl.ServerChannelInitializer(serverNegotiatorFactory);
+        NetconfServerDispatcherImpl.ServerChannelInitializer serverChannelInitializer =
+                new NetconfServerDispatcherImpl.ServerChannelInitializer(serverNegotiatorFactory);
 
         dispatch = new NetconfServerDispatcherImpl(
                 serverChannelInitializer, nettyGroup, nettyGroup);
@@ -57,7 +59,7 @@ public class NetconfDispatcherImplTest {
     @Test
     public void test() throws Exception {
         InetSocketAddress addr = new InetSocketAddress("127.0.0.1", 8333);
-        ChannelFuture s = dispatch.createServer(addr);
-        s.get();
+        ChannelFuture server = dispatch.createServer(addr);
+        server.get();
     }
 }
