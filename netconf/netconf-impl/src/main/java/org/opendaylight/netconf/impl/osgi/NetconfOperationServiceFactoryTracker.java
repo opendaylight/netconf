@@ -19,7 +19,7 @@ class NetconfOperationServiceFactoryTracker extends
     private final NetconfOperationServiceFactoryListener factoriesListener;
 
     NetconfOperationServiceFactoryTracker(BundleContext context,
-            final NetconfOperationServiceFactoryListener factoriesListener) {
+                                          final NetconfOperationServiceFactoryListener factoriesListener) {
         super(context, NetconfOperationServiceFactory.class, null);
         this.factoriesListener = factoriesListener;
     }
@@ -38,7 +38,7 @@ class NetconfOperationServiceFactoryTracker extends
 
     @Override
     public void removedService(ServiceReference<NetconfOperationServiceFactory> reference,
-            NetconfOperationServiceFactory netconfOperationServiceFactory) {
+                               NetconfOperationServiceFactory netconfOperationServiceFactory) {
         if (netconfOperationServiceFactory != null) {
             factoriesListener.onRemoveNetconfOperationServiceFactory(netconfOperationServiceFactory);
         }

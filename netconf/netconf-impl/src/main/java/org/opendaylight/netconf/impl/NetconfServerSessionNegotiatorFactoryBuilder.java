@@ -35,7 +35,8 @@ public class NetconfServerSessionNegotiatorFactoryBuilder {
         return this;
     }
 
-    public NetconfServerSessionNegotiatorFactoryBuilder setAggregatedOpService(final NetconfOperationServiceFactory aggregatedOpService) {
+    public NetconfServerSessionNegotiatorFactoryBuilder setAggregatedOpService(final NetconfOperationServiceFactory
+                                                                                       aggregatedOpService) {
         this.aggregatedOpService = aggregatedOpService;
         return this;
     }
@@ -45,7 +46,8 @@ public class NetconfServerSessionNegotiatorFactoryBuilder {
         return this;
     }
 
-    public NetconfServerSessionNegotiatorFactoryBuilder setMonitoringService(final NetconfMonitoringService monitoringService) {
+    public NetconfServerSessionNegotiatorFactoryBuilder setMonitoringService(final NetconfMonitoringService
+                                                                                     monitoringService) {
         this.monitoringService = monitoringService;
         return this;
     }
@@ -58,7 +60,8 @@ public class NetconfServerSessionNegotiatorFactoryBuilder {
 
     public NetconfServerSessionNegotiatorFactory build() {
         validate();
-        return new NetconfServerSessionNegotiatorFactory(timer, aggregatedOpService, idProvider, connectionTimeoutMillis, monitoringService, baseCapabilities);
+        return new NetconfServerSessionNegotiatorFactory(timer, aggregatedOpService, idProvider,
+                connectionTimeoutMillis, monitoringService, baseCapabilities);
     }
 
 
@@ -69,6 +72,7 @@ public class NetconfServerSessionNegotiatorFactoryBuilder {
         Preconditions.checkArgument(connectionTimeoutMillis > 0, "connection time out <=0");
         Preconditions.checkNotNull(monitoringService, "NetconfMonitoringService not initialized");
 
-        baseCapabilities = (baseCapabilities == null) ? NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES : baseCapabilities;
+        baseCapabilities = (baseCapabilities == null) ? NetconfServerSessionNegotiatorFactory
+                .DEFAULT_BASE_CAPABILITIES : baseCapabilities;
     }
 }
