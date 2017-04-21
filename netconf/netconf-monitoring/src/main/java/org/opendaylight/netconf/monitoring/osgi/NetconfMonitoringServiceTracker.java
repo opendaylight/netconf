@@ -20,7 +20,8 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfMonitoringServiceTracker extends ServiceTracker<NetconfMonitoringService, NetconfMonitoringService> {
+public class NetconfMonitoringServiceTracker extends ServiceTracker<NetconfMonitoringService,
+        NetconfMonitoringService> {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMonitoringServiceTracker.class);
 
@@ -49,17 +50,18 @@ public class NetconfMonitoringServiceTracker extends ServiceTracker<NetconfMonit
         return netconfMonitoringService;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void removedService(final ServiceReference<NetconfMonitoringService> reference,
-            final NetconfMonitoringService netconfMonitoringService) {
-        if(reg!=null) {
+                               final NetconfMonitoringService netconfMonitoringService) {
+        if (reg != null) {
             try {
                 reg.unregister();
             } catch (final Exception e) {
                 LOG.warn("Ignoring exception while unregistering {}", reg, e);
             }
         }
-        if(factory!=null) {
+        if (factory != null) {
             factory.close();
         }
     }

@@ -43,7 +43,8 @@ public class NetconfMonitoringServiceTrackerTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        doReturn(serviceRegistration).when(context).registerService(any(Class.class), any(NetconfOperationServiceFactory.class), any(Hashtable.class));
+        doReturn(serviceRegistration).when(context).registerService(any(Class.class),
+                any(NetconfOperationServiceFactory.class), any(Hashtable.class));
         doNothing().when(serviceRegistration).unregister();
         doReturn(filter).when(context).createFilter(anyString());
         doReturn("").when(reference).toString();
@@ -54,7 +55,8 @@ public class NetconfMonitoringServiceTrackerTest {
     public void testAddingService() throws Exception {
         NetconfMonitoringServiceTracker tracker = new NetconfMonitoringServiceTracker(context);
         tracker.addingService(reference);
-        verify(context, times(1)).registerService(any(Class.class), any(NetconfOperationServiceFactory.class), any(Hashtable.class));
+        verify(context, times(1)).registerService(any(Class.class), any(NetconfOperationServiceFactory.class),
+                any(Hashtable.class));
         tracker.removedService(reference, null);
         verify(serviceRegistration, times(1)).unregister();
     }
