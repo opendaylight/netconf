@@ -62,6 +62,7 @@ public class ProxyWriteAdapter {
 
     public boolean cancel() {
         if (!opened.compareAndSet(true, false)) {
+            LOG.error("{} Transaction is already cancelled", id);
             return false;
         }
         final Future<Object> cancelScalaFuture =
@@ -73,6 +74,8 @@ public class ProxyWriteAdapter {
             // here must be Await because AsyncWriteTransaction do not return future
             return (boolean) Await.result(cancelScalaFuture, askTimeout.duration());
         } catch (final Exception e) {
+            LOG.error("{} Exception during cancel", id);
+            LOG.error("Cause: ", e);
             return false;
         }
     }

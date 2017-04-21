@@ -43,7 +43,27 @@ public class ProxyWriteTransaction implements DOMDataWriteTransaction {
 
     @Override
     public boolean cancel() {
+<<<<<<< 50351b4cb37a1998cfaef53ff584aeb767c25f50
         return proxyWriteAdapter.cancel();
+=======
+        if (!opened.compareAndSet(true, false)) {
+            LOG.error("{} Transaction is already cancelled", id);
+            return false;
+        }
+        final Future<Object> cancelScalaFuture =
+                Patterns.ask(masterTxActor, new CancelRequest(), askTimeout);
+
+        LOG.trace("{}: Cancel {} via NETCONF", id);
+
+        try {
+            // here must be Await because AsyncWriteTransaction do not return future
+            return (boolean) Await.result(cancelScalaFuture, askTimeout.duration());
+        } catch (final Exception e) {
+            LOG.error("{} Exception during cancel", id);
+            LOG.error("Cause: ", e);
+            return false;
+        }
+>>>>>>> Improve logging in ProxyWriteTransaction
     }
 
     @Override
