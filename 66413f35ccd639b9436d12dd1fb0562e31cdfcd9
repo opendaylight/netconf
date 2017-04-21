@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_9db56233",
+        "filename": "netconf/mdsal-netconf-yang-library/src/main/java/org/opendaylight/netconf/mdsal/yang/library/SchemaServiceToMdsalWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-21T11:40:39Z",
+      "side": 1,
+      "message": "dont line break inside of the parenthesis, the natural linebreak point is the next method call so .build()",
+      "range": {
+        "startLine": 107,
+        "startChar": 117,
+        "endLine": 108,
+        "endChar": 9
+      },
+      "revId": "66413f35ccd639b9436d12dd1fb0562e31cdfcd9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
