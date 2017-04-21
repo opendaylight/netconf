@@ -49,7 +49,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMDataBroker;
-import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
+import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeMasterActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.MasterActorDataInitialized;
@@ -92,8 +92,8 @@ public class WriteOnlyTransactionTest {
 
         final NetconfTopologySetup setup = mock(NetconfTopologySetup.class);
         doReturn(Duration.apply(0, TimeUnit.SECONDS)).when(setup).getIdleTimeout();
-        final Props props = NetconfNodeActor.props(setup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY,
-                DEFAULT_SCHEMA_REPOSITORY, TIMEOUT);
+        final Props props = NetconfNodeMasterActor.props(remoteDeviceId, setup,
+                DEFAULT_SCHEMA_REPOSITORY);
 
         masterRef = TestActorRef.create(system, props, "master_read");
 

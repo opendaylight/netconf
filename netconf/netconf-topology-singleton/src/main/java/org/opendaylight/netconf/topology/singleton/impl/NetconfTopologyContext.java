@@ -23,7 +23,7 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonService;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.RemoteDeviceConnector;
-import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
+import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeMasterActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
@@ -78,9 +78,8 @@ class NetconfTopologyContext implements ClusterSingletonService {
 
         if (!finalClose) {
             final String masterAddress = Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
-            masterActorRef = netconfTopologyDeviceSetup.getActorSystem().actorOf(NetconfNodeActor.props(
-                    netconfTopologyDeviceSetup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY,
-                    actorResponseWaitTime),
+            masterActorRef = netconfTopologyDeviceSetup.getActorSystem().actorOf(NetconfNodeMasterActor.props(
+                    remoteDeviceId, netconfTopologyDeviceSetup, DEFAULT_SCHEMA_REPOSITORY),
                     NetconfTopologyUtils.createMasterActorName(remoteDeviceId.getName(), masterAddress));
 
             remoteDeviceConnector.startRemoteDeviceConnection(masterActorRef);
