@@ -22,7 +22,7 @@ final class MonitoringSchema {
 
     private final Schema schema;
 
-    public MonitoringSchema(Schema schema) {
+    MonitoringSchema(Schema schema) {
         this.schema = schema;
     }
 
@@ -54,7 +54,8 @@ final class MonitoringSchema {
 
     @XmlElement(name = "format")
     public String getFormat() {
-        Preconditions.checkState(schema.getFormat() == Yang.class, "Only yang format permitted, but was %s", schema.getFormat());
+        Preconditions.checkState(schema.getFormat() == Yang.class, "Only yang format permitted, but was %s",
+                schema.getFormat());
         return "yang";
     }
 }

@@ -49,10 +49,13 @@ public class GetTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        incorrectSubsequentResult = XmlUtil.readXmlToDocument("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>");
-        correctSubsequentResult = XmlUtil.readXmlToDocument("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><data></data></rpc-reply>");
+        incorrectSubsequentResult = XmlUtil.readXmlToDocument("<rpc-reply "
+                + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>");
+        correctSubsequentResult = XmlUtil.readXmlToDocument("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:"
+                + "1.0\"><data></data></rpc-reply>");
 
-        doReturn(new SessionsBuilder().setSession(Collections.<Session>emptyList()).build()).when(monitor).getSessions();
+        doReturn(new SessionsBuilder().setSession(Collections.<Session>emptyList()).build()).when(monitor)
+                .getSessions();
         doReturn(new SchemasBuilder().setSchema(Collections.<Schema>emptyList()).build()).when(monitor).getSchemas();
         doReturn(false).when(subsequentOperation).isExecutionTermination();
 
@@ -64,7 +67,8 @@ public class GetTest {
         try {
             get.handle(null, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
         } catch (final DocumentedException e) {
-            assertNetconfDocumentedEx(e, DocumentedException.ErrorSeverity.ERROR, DocumentedException.ErrorTag.OPERATION_FAILED, DocumentedException.ErrorType.APPLICATION);
+            assertNetconfDocumentedEx(e, DocumentedException.ErrorSeverity.ERROR,
+                    DocumentedException.ErrorTag.OPERATION_FAILED, DocumentedException.ErrorType.APPLICATION);
             return;
         }
 
@@ -77,7 +81,8 @@ public class GetTest {
         try {
             get.handle(request, subsequentOperation);
         } catch (final DocumentedException e) {
-            assertNetconfDocumentedEx(e, DocumentedException.ErrorSeverity.ERROR, DocumentedException.ErrorTag.INVALID_VALUE, DocumentedException.ErrorType.APPLICATION);
+            assertNetconfDocumentedEx(e, DocumentedException.ErrorSeverity.ERROR,
+                    DocumentedException.ErrorTag.INVALID_VALUE, DocumentedException.ErrorType.APPLICATION);
             return;
         }
 
@@ -90,7 +95,8 @@ public class GetTest {
         try {
             get.handle(request, subsequentOperation);
         } catch (final DocumentedException e) {
-            assertNetconfDocumentedEx(e, DocumentedException.ErrorSeverity.ERROR, DocumentedException.ErrorTag.OPERATION_FAILED, DocumentedException.ErrorType.APPLICATION);
+            assertNetconfDocumentedEx(e, DocumentedException.ErrorSeverity.ERROR,
+                    DocumentedException.ErrorTag.OPERATION_FAILED, DocumentedException.ErrorType.APPLICATION);
             assertEquals(1, e.getErrorInfo().size());
             return;
         }
@@ -101,7 +107,8 @@ public class GetTest {
     @Test
     public void testSuccessHandle() throws Exception {
         doReturn(correctSubsequentResult).when(subsequentOperation).execute(request);
-        assertTrue(get.getHandlingPriority().getPriority().get() > HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY.getPriority().get());
+        assertTrue(get.getHandlingPriority().getPriority().get()
+                > HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY.getPriority().get());
         final Document result = get.handle(request, subsequentOperation);
         assertThat(XmlUtil.toString(result), CoreMatchers.containsString("sessions"));
         assertThat(XmlUtil.toString(result), CoreMatchers.containsString("schemas"));
@@ -114,9 +121,10 @@ public class GetTest {
 
     }
 
-    private void assertNetconfDocumentedEx(final DocumentedException e, final DocumentedException.ErrorSeverity severity, final DocumentedException.ErrorTag errorTag, final DocumentedException.ErrorType type) {
-        assertEquals(severity, e.getErrorSeverity());
-        assertEquals(errorTag, e.getErrorTag());
-        assertEquals(type, e.getErrorType());
+    private void assertNetconfDocumentedEx(final DocumentedException exception, final DocumentedException.ErrorSeverity
+            severity, final DocumentedException.ErrorTag errorTag, final DocumentedException.ErrorType type) {
+        assertEquals(severity, exception.getErrorSeverity());
+        assertEquals(errorTag, exception.getErrorTag());
+        assertEquals(type, exception.getErrorType());
     }
 }

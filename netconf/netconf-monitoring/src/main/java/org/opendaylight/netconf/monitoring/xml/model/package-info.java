@@ -8,7 +8,8 @@
 @XmlSchema(
         elementFormDefault = XmlNsForm.QUALIFIED,
         xmlns = {
-                @XmlNs(namespaceURI = MonitoringConstants.EXTENSION_NAMESPACE, prefix = MonitoringConstants.EXTENSION_NAMESPACE_PREFIX),
+                @XmlNs(namespaceURI = MonitoringConstants.EXTENSION_NAMESPACE, prefix =
+                        MonitoringConstants.EXTENSION_NAMESPACE_PREFIX),
                 @XmlNs(namespaceURI = MonitoringConstants.NAMESPACE, prefix = "")
         },
         namespace = MonitoringConstants.NAMESPACE
