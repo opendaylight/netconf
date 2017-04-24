@@ -292,7 +292,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>odl-netconf-clustered-topology</artifactId>
+                <artifactId>features4-netconf</artifactId>
                 <version>${project.version}</version>
                 <classifier>features</classifier>
                 <type>xml</type>
