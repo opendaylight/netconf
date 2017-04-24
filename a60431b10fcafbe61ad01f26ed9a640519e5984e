@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_8da087a0",
+        "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/CapabilityChangeNotificationProducer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T13:27:10Z",
+      "side": 1,
+      "message": "debug is enough here.",
+      "range": {
+        "startLine": 82,
+        "startChar": 24,
+        "endLine": 82,
+        "endChar": 28
+      },
+      "revId": "a60431b10fcafbe61ad01f26ed9a640519e5984e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_cd89ef27",
+        "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/SessionNotificationProducer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T13:27:10Z",
+      "side": 1,
+      "message": "debug",
+      "range": {
+        "startLine": 73,
+        "startChar": 24,
+        "endLine": 73,
+        "endChar": 28
+      },
+      "revId": "a60431b10fcafbe61ad01f26ed9a640519e5984e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_4d7dff1b",
+        "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/netconf/mdsal/notification/NetconfNotificationOperationServiceFactory.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T13:27:10Z",
+      "side": 1,
+      "message": "move both to next line, and keep the second parameter in the same line",
+      "range": {
+        "startLine": 26,
+        "startChar": 54,
+        "endLine": 28,
+        "endChar": 100
+      },
+      "revId": "a60431b10fcafbe61ad01f26ed9a640519e5984e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_ad8c6b36",
+        "filename": "netconf/mdsal-netconf-notification/src/test/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/SessionNotificationProducerTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T13:27:10Z",
+      "side": 1,
+      "message": "debug",
+      "range": {
+        "startLine": 145,
+        "startChar": 20,
+        "endLine": 145,
+        "endChar": 24
+      },
+      "revId": "a60431b10fcafbe61ad01f26ed9a640519e5984e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
