@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_4214ae43",
+        "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/NetconfDocumentedException.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T10:46:17Z",
+      "side": 1,
+      "message": "move the whole param to the next line",
+      "range": {
+        "startLine": 25,
+        "startChar": 112,
+        "endLine": 26,
+        "endChar": 35
+      },
+      "revId": "348b62ec9572f29754e6ecf6d72f918626d16c5e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_220fea2f",
+        "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/NetconfDocumentedException.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T10:46:17Z",
+      "side": 1,
+      "message": "same",
+      "range": {
+        "startLine": 30,
+        "startChar": 111,
+        "endLine": 31,
+        "endChar": 35
+      },
+      "revId": "348b62ec9572f29754e6ecf6d72f918626d16c5e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_821e9661",
+        "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/NetconfDocumentedException.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T10:46:17Z",
+      "side": 1,
+      "message": "same",
+      "range": {
+        "startLine": 35,
+        "startChar": 110,
+        "endLine": 36,
+        "endChar": 25
+      },
+      "revId": "348b62ec9572f29754e6ecf6d72f918626d16c5e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_c227feb4",
+        "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/NetconfDocumentedException.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T10:46:17Z",
+      "side": 1,
+      "message": "same",
+      "range": {
+        "startLine": 40,
+        "startChar": 110,
+        "endLine": 41,
+        "endChar": 25
+      },
+      "revId": "348b62ec9572f29754e6ecf6d72f918626d16c5e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_6230d2e8",
+        "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/xml/XmlNetconfConstants.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T10:46:17Z",
+      "side": 1,
+      "message": "why did you add this?",
+      "range": {
+        "startLine": 45,
+        "startChar": 53,
+        "endLine": 45,
+        "endChar": 58
+      },
+      "revId": "348b62ec9572f29754e6ecf6d72f918626d16c5e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
