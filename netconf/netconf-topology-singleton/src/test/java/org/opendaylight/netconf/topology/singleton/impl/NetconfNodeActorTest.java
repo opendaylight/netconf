@@ -12,8 +12,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
 
@@ -27,9 +30,11 @@ import akka.testkit.TestActorRef;
 import akka.util.Timeout;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.SettableFuture;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +48,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
@@ -50,6 +56,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
@@ -66,13 +73,19 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
@@ -173,6 +186,39 @@ public class NetconfNodeActorTest {
 
         assertEquals(sourceIdentifiers, success.getSourceIndentifiers());
 
+    }
+
+    @Test
+    public void testReceiveRegisterMountpoint() throws Exception {
+        final NetconfTopologySetup setup = mock(NetconfTopologySetup.class);
+        doReturn(mock(Broker.class)).when(setup).getDomBroker();
+        final RevisionSourceIdentifier yang1 = RevisionSourceIdentifier.create("yang1");
+        final RevisionSourceIdentifier yang2 = RevisionSourceIdentifier.create("yang2");
+        final SchemaSourceRegistry registry = mock(SchemaSourceRegistry.class);
+        final SchemaRepository schemaRepository = mock(SchemaRepository.class);
+        final SchemaSourceRegistration regYang1 = mock(SchemaSourceRegistration.class);
+        final SchemaSourceRegistration regYang2 = mock(SchemaSourceRegistration.class);
+        doReturn(regYang1).when(registry).registerSchemaSource(any(), withSourceId(yang1));
+        doReturn(regYang2).when(registry).registerSchemaSource(any(), withSourceId(yang2));
+        final SchemaContextFactory schemaContextFactory = mock(SchemaContextFactory.class);
+        doReturn(schemaContextFactory).when(schemaRepository).createSchemaContextFactory(any());
+        final SettableFuture<SchemaContext> schemaContextFuture = SettableFuture.create();
+        final CheckedFuture<SchemaContext, SchemaResolutionException> checkedFuture =
+                Futures.makeChecked(schemaContextFuture, e -> new SchemaResolutionException("fail", e));
+        doReturn(checkedFuture).when(schemaContextFactory).createSchemaContext(any());
+        final ActorRef slaveRef =
+                system.actorOf(NetconfNodeActor.props(setup, remoteDeviceId, registry, schemaRepository, TIMEOUT));
+        final List<SourceIdentifier> sources = ImmutableList.of(yang1, yang2);
+        slaveRef.tell(new RegisterMountPoint(sources), masterRef);
+
+        verify(registry, timeout(1000)).registerSchemaSource(any(), withSourceId(yang1));
+        verify(registry, timeout(1000)).registerSchemaSource(any(), withSourceId(yang2));
+        //stop actor
+        final Future<Boolean> stopFuture = Patterns.gracefulStop(slaveRef, TIMEOUT.duration());
+        Await.result(stopFuture, TIMEOUT.duration());
+        //provider should be deregistered
+        verify(regYang1).close();
+        verify(regYang2).close();
     }
 
     @Test
@@ -323,6 +369,16 @@ public class NetconfNodeActorTest {
 
         resultFutureThrowable.checkedGet(2, TimeUnit.SECONDS);
 
+    }
+
+    private PotentialSchemaSource<?> withSourceId(final SourceIdentifier identifier) {
+        return argThat(new ArgumentMatcher<PotentialSchemaSource>() {
+            @Override
+            public boolean matches(final Object argument) {
+                final PotentialSchemaSource potentialSchemaSource = (PotentialSchemaSource) argument;
+                return identifier.equals(potentialSchemaSource.getSourceIdentifier());
+            }
+        });
     }
 
     private String convertStreamToString(java.io.InputStream is) {
