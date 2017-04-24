@@ -25,6 +25,13 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.opendaylight.controller</groupId>
+            <artifactId>odl-config-netty</artifactId>
+            <version>${project.version}</version>
+            <type>xml</type>
+            <classifier>feature</classifier>
+        </dependency>
+        <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>odl-netconf-mapping-api</artifactId>
             <version>${project.version}</version>
