@@ -1,0 +1,234 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_82ba1621",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/NetconfServerSession.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T11:11:10Z",
+      "side": 1,
+      "message": "move the whole parameter to next line, and keep it aligned with the others..",
+      "range": {
+        "startLine": 68,
+        "startChar": 106,
+        "endLine": 69,
+        "endChar": 22
+      },
+      "revId": "6d2c085f3d1b455455be804c4c6204eb792145f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_c2837e54",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/NetconfServerSession.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T11:11:10Z",
+      "side": 1,
+      "message": "whole param together",
+      "range": {
+        "startLine": 180,
+        "startChar": 70,
+        "endLine": 181,
+        "endChar": 19
+      },
+      "revId": "6d2c085f3d1b455455be804c4c6204eb792145f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_027e266b",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/NetconfServerSessionListener.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T11:11:10Z",
+      "side": 1,
+      "message": "keep together and aligned",
+      "range": {
+        "startLine": 39,
+        "startChar": 86,
+        "endLine": 40,
+        "endChar": 30
+      },
+      "revId": "6d2c085f3d1b455455be804c4c6204eb792145f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_8291769b",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/NetconfServerSessionNegotiatorFactoryBuilder.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T11:11:10Z",
+      "side": 1,
+      "message": "keep together",
+      "range": {
+        "startLine": 38,
+        "startChar": 79,
+        "endLine": 39,
+        "endChar": 106
+      },
+      "revId": "6d2c085f3d1b455455be804c4c6204eb792145f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_628c5280",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/NetconfServerSessionNegotiatorFactoryBuilder.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T11:11:10Z",
+      "side": 1,
+      "message": "keep together",
+      "range": {
+        "startLine": 49,
+        "startChar": 77,
+        "endLine": 50,
+        "endChar": 102
+      },
+      "revId": "6d2c085f3d1b455455be804c4c6204eb792145f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_22d9aa83",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfCapabilityMonitoringService.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T11:11:10Z",
+      "side": 1,
+      "message": "I dont think that checkstyle enforces line length for imports so this is not needed.",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 49
+      },
+      "revId": "6d2c085f3d1b455455be804c4c6204eb792145f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_c2389ea2",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfImplActivator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T11:11:10Z",
+      "side": 1,
+      "message": "keep together",
+      "range": {
+        "startLine": 114,
+        "startChar": 75,
+        "endLine": 115,
+        "endChar": 29
+      },
+      "revId": "6d2c085f3d1b455455be804c4c6204eb792145f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_e25cc2ef",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfImplActivator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T11:11:10Z",
+      "side": 1,
+      "message": "keep together",
+      "range": {
+        "startLine": 121,
+        "startChar": 64,
+        "endLine": 122,
+        "endChar": 89
+      },
+      "revId": "6d2c085f3d1b455455be804c4c6204eb792145f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_c206decd",
+        "filename": "netconf/netconf-impl/src/test/java/org/opendaylight/netconf/impl/NetconfDispatcherImplTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T11:11:10Z",
+      "side": 1,
+      "message": "move to next line",
+      "range": {
+        "startLine": 37,
+        "startChar": 72,
+        "endLine": 37,
+        "endChar": 75
+      },
+      "revId": "6d2c085f3d1b455455be804c4c6204eb792145f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_02110605",
+        "filename": "netconf/netconf-impl/src/test/java/org/opendaylight/netconf/impl/NetconfDispatcherImplTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T11:11:10Z",
+      "side": 1,
+      "message": "move to next line",
+      "range": {
+        "startLine": 46,
+        "startChar": 88,
+        "endLine": 46,
+        "endChar": 91
+      },
+      "revId": "6d2c085f3d1b455455be804c4c6204eb792145f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
