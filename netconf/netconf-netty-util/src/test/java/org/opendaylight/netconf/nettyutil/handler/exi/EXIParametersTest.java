@@ -25,22 +25,22 @@ public class EXIParametersTest {
     @Parameterized.Parameters
     public static Iterable<Object[]> data() throws Exception {
         final String noChangeXml =
-                "<start-exi xmlns=\"urn:ietf:params:xml:ns:netconf:exi:1.0\">\n" +
-                "<alignment>bit-packed</alignment>\n" +
-                "</start-exi>\n";
+                "<start-exi xmlns=\"urn:ietf:params:xml:ns:netconf:exi:1.0\">\n"
+                + "<alignment>bit-packed</alignment>\n"
+                + "</start-exi>\n";
 
 
         final String fullOptionsXml =
-                "<start-exi xmlns=\"urn:ietf:params:xml:ns:netconf:exi:1.0\">\n" +
-                "<alignment>byte-aligned</alignment>\n" +
-                "<fidelity>\n" +
-                "<comments/>\n" +
-                "<dtd/>\n" +
-                "<lexical-values/>\n" +
-                "<pis/>\n" +
-                "<prefixes/>\n" +
-                "</fidelity>\n" +
-                "</start-exi>\n";
+                "<start-exi xmlns=\"urn:ietf:params:xml:ns:netconf:exi:1.0\">\n"
+                + "<alignment>byte-aligned</alignment>\n"
+                + "<fidelity>\n"
+                + "<comments/>\n"
+                + "<dtd/>\n"
+                + "<lexical-values/>\n"
+                + "<pis/>\n"
+                + "<prefixes/>\n"
+                + "</fidelity>\n"
+                + "</start-exi>\n";
 
         final EXIOptions fullOptions = new EXIOptions();
         fullOptions.setAlignmentType(AlignmentType.byteAligned);

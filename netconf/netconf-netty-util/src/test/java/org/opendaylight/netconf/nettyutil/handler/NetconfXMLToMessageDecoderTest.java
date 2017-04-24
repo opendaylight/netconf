@@ -39,7 +39,8 @@ public class NetconfXMLToMessageDecoderTest {
          * A leading LF is the case reported in BUG-2838.
          */
         final ArrayList<Object> out = Lists.newArrayList();
-        new NetconfXMLToMessageDecoder().decode(null, Unpooled.wrappedBuffer("\n<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg/>".getBytes()), out);
+        new NetconfXMLToMessageDecoder().decode(null,
+                Unpooled.wrappedBuffer("\n<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg/>".getBytes()), out);
         assertEquals(1, out.size());
     }
 
@@ -51,11 +52,12 @@ public class NetconfXMLToMessageDecoderTest {
          * (eg CSR1000V running IOS 15.4(1)S)
          */
         final ArrayList<Object> out = Lists.newArrayList();
-        new NetconfXMLToMessageDecoder().decode(null, Unpooled.wrappedBuffer("\r\n<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg/>".getBytes()), out);
+        new NetconfXMLToMessageDecoder().decode(null,
+                Unpooled.wrappedBuffer("\r\n<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg/>".getBytes()), out);
         assertEquals(1, out.size());
     }
 
-    @Test(expected=SAXParseException.class)
+    @Test(expected = SAXParseException.class)
     public void testDecodeGibberish() throws Exception {
         /* Test that we reject inputs where we cannot find the xml start '<' character */
         final ArrayList<Object> out = Lists.newArrayList();
@@ -78,7 +80,7 @@ public class NetconfXMLToMessageDecoderTest {
          */
 
         final ArrayList<Object> out = Lists.newArrayList();
-        byte whitespaces[] = {' ', '\t', '\n', '\r', '\f', 0x0b /* vertical tab */};
+        byte[] whitespaces = {' ', '\t', '\n', '\r', '\f', 0x0b /* vertical tab */};
         new NetconfXMLToMessageDecoder().decode(
                 null,
                 Unpooled.copiedBuffer(

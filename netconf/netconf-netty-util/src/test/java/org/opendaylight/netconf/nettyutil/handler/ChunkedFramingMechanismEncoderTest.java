@@ -55,10 +55,10 @@ public class ChunkedFramingMechanismEncoderTest {
 
         byte[] buf = new byte[destination.readableBytes()];
         destination.readBytes(buf);
-        String s = StandardCharsets.US_ASCII.decode(ByteBuffer.wrap(buf)).toString();
+        String string = StandardCharsets.US_ASCII.decode(ByteBuffer.wrap(buf)).toString();
 
-        assertTrue(s.startsWith("\n#256\na"));
-        assertTrue(s.endsWith("\n#20\naaaaaaaaaaaaaaaaaaaa\n##\n"));
+        assertTrue(string.startsWith("\n#256\na"));
+        assertTrue(string.endsWith("\n#20\naaaaaaaaaaaaaaaaaaaa\n##\n"));
     }
 
     private static byte[] getByteArray(final int size) {

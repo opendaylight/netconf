@@ -19,20 +19,20 @@ import org.junit.Test;
 
 public class NetconfChunkAggregatorTest {
 
-    private static final String CHUNKED_MESSAGE = "\n#4\n" +
-            "<rpc" +
-            "\n#18\n" +
-            " message-id=\"102\"\n" +
-            "\n#79\n" +
-            "     xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
-            "  <close-session/>\n" +
-            "</rpc>" +
-            "\n##\n";
+    private static final String CHUNKED_MESSAGE = "\n#4\n"
+            + "<rpc"
+            + "\n#18\n"
+            + " message-id=\"102\"\n"
+            + "\n#79\n"
+            + "     xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+            + "  <close-session/>\n"
+            + "</rpc>"
+            + "\n##\n";
 
-    public static final String EXPECTED_MESSAGE = "<rpc message-id=\"102\"\n" +
-            "     xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
-            "  <close-session/>\n" +
-            "</rpc>";
+    public static final String EXPECTED_MESSAGE = "<rpc message-id=\"102\"\n"
+            + "     xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+            + "  <close-session/>\n"
+            + "</rpc>";
 
     private static final String CHUNKED_MESSAGE_ONE = "\n#101\n" + EXPECTED_MESSAGE + "\n##\n";
 

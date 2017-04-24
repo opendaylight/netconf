@@ -40,7 +40,8 @@ public class NetconfMessageToXMLEncoder extends MessageToByteEncoder<NetconfMess
 
     @Override
     @VisibleForTesting
-    public void encode(final ChannelHandlerContext ctx, final NetconfMessage msg, final ByteBuf out) throws IOException, TransformerException {
+    public void encode(final ChannelHandlerContext ctx, final NetconfMessage msg, final ByteBuf out)
+            throws IOException, TransformerException {
         LOG.trace("Sent to encode : {}", msg);
 
         if (clientId.isPresent()) {
@@ -53,7 +54,8 @@ public class NetconfMessageToXMLEncoder extends MessageToByteEncoder<NetconfMess
 
             // Using custom BufferedWriter that does not provide newLine method as performance improvement
             // see javadoc for BufferedWriter
-            StreamResult result = new StreamResult(new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8)));
+            StreamResult result =
+                    new StreamResult(new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8)));
             DOMSource source = new DOMSource(msg.getDocument());
             ThreadLocalTransformers.getPrettyTransformer().transform(source, result);
         }
