@@ -16,6 +16,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
@@ -58,6 +59,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +74,7 @@ public class NetconfNodeActor extends UntypedActor {
     private final SchemaRepository schemaRepository;
 
     private List<SourceIdentifier> sourceIdentifiers;
+    private List<SchemaSourceRegistration> schemaSourceRegistrations;
     private DOMRpcService deviceRpc;
     private SlaveSalFacade slaveSalManager;
     private DOMDataBroker deviceDataBroker;
@@ -109,7 +112,7 @@ public class NetconfNodeActor extends UntypedActor {
 
             LOG.debug("{}: Master is ready.", id);
 
-        } else if (message instanceof  RefreshSetupMasterActorData) {
+        } else if (message instanceof RefreshSetupMasterActorData) {
             setup = ((RefreshSetupMasterActorData) message).getNetconfTopologyDeviceSetup();
             id = ((RefreshSetupMasterActorData) message).getRemoteDeviceId();
             sender().tell(new MasterActorDataInitialized(), self());
@@ -159,6 +162,13 @@ public class NetconfNodeActor extends UntypedActor {
         }
     }
 
+    @Override
+    public void postStop() throws Exception {
+        super.postStop();
+        if (schemaSourceRegistrations != null) {
+            schemaSourceRegistrations.forEach(SchemaSourceRegistration::close);
+        }
+    }
 
     private void sendYangTextSchemaSourceProxy(final SourceIdentifier sourceIdentifier, final ActorRef sender) {
         final CheckedFuture<YangTextSchemaSource, SchemaSourceException> yangTextSchemaSource =
@@ -247,9 +257,10 @@ public class NetconfNodeActor extends UntypedActor {
         final RemoteSchemaProvider remoteProvider = new RemoteSchemaProvider(remoteYangTextSourceProvider,
                 getContext().dispatcher());
         LOG.debug("Registering schema sources");
-        sourceIdentifiers.forEach(sourceId ->
-                schemaRegistry.registerSchemaSource(remoteProvider, PotentialSchemaSource.create(sourceId,
-                        YangTextSchemaSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
+        schemaSourceRegistrations = sourceIdentifiers.stream()
+                .map(sourceId -> schemaRegistry.registerSchemaSource(remoteProvider, PotentialSchemaSource.create(sourceId,
+                        YangTextSchemaSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue())))
+                .collect(Collectors.toList());
         LOG.debug("Creating SchemaContextFactory");
         final SchemaContextFactory schemaContextFactory
                 = schemaRepository.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
