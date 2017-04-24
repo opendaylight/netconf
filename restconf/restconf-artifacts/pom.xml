@@ -76,7 +76,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>odl-restconf</artifactId>
+                <artifactId>features4-restconf</artifactId>
                 <version>${project.version}</version>
                 <classifier>features</classifier>
                 <type>xml</type>
