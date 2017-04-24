@@ -37,10 +37,12 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfEXIToMessageDecoder.class);
     private static final SAXTransformerFactory FACTORY;
+
     static {
         final TransformerFactory f = SAXTransformerFactory.newInstance();
         if (!f.getFeature(SAXTransformerFactory.FEATURE)) {
-            throw new TransformerFactoryConfigurationError(String.format("Factory %s is not a SAXTransformerFactory", f));
+            throw new TransformerFactoryConfigurationError(
+                    String.format("Factory %s is not a SAXTransformerFactory", f));
         }
 
         FACTORY = (SAXTransformerFactory)f;
@@ -64,7 +66,8 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
     }
 
     @Override
-    protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) throws EXIOptionsException, IOException, SAXException, TransformerConfigurationException  {
+    protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out)
+            throws EXIOptionsException, IOException, SAXException, TransformerConfigurationException  {
         /*
          * Note that we could loop here and process all the messages, but we can't do that.
          * The reason is <stop-exi> operation, which has the contract of immediately stopping
@@ -88,7 +91,7 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
         final DOMResult domResult = new DOMResult(documentBuilder.newDocument());
         handler.setResult(domResult);
 
-        try (final InputStream is = new ByteBufInputStream(in)) {
+        try (InputStream is = new ByteBufInputStream(in)) {
             // Performs internal reset before doing anything
             reader.parse(new InputSource(is));
         }

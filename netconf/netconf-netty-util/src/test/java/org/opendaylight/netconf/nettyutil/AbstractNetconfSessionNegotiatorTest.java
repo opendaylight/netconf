@@ -75,12 +75,15 @@ public class AbstractNetconfSessionNegotiatorTest {
         MockitoAnnotations.initMocks(this);
         channel = new EmbeddedChannel();
         xmlToHello = new NetconfXMLToHelloMessageDecoder();
-        channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER, new ChannelInboundHandlerAdapter());
+        channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
+                new ChannelInboundHandlerAdapter());
         channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER, xmlToHello);
-        channel.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER, FramingMechanismHandlerFactory.createHandler(FramingMechanism.EOM));
+        channel.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER,
+                FramingMechanismHandlerFactory.createHandler(FramingMechanism.EOM));
         channel.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
         hello = NetconfHelloMessage.createClientHello(Collections.emptySet(), Optional.absent());
-        helloBase11 = NetconfHelloMessage.createClientHello(Collections.singleton(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1), Optional.absent());
+        helloBase11 = NetconfHelloMessage.createClientHello(Collections
+                .singleton(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1), Optional.absent());
         prefs = new NetconfSessionPreferences(helloBase11);
         doReturn(promise).when(promise).setFailure(any());
         doReturn(promise).when(promise).setSuccess(any());
@@ -136,7 +139,8 @@ public class AbstractNetconfSessionNegotiatorTest {
         final AbstractNetconfSession session = negotiator.getSessionForHelloMessage(helloBase11);
         Assert.assertNotNull(session);
         Assert.assertTrue(channel.pipeline().get(NETCONF_MESSAGE_AGGREGATOR) instanceof NetconfChunkAggregator);
-        Assert.assertTrue(channel.pipeline().get(NETCONF_MESSAGE_FRAME_ENCODER) instanceof ChunkedFramingMechanismEncoder);
+        Assert.assertTrue(channel.pipeline().get(NETCONF_MESSAGE_FRAME_ENCODER)
+                instanceof ChunkedFramingMechanismEncoder);
     }
 
     @Test
@@ -177,7 +181,7 @@ public class AbstractNetconfSessionNegotiatorTest {
 
         @Override
         protected TestingNetconfSession getSession(final NetconfSessionListener sessionListener, final Channel channel,
-                                                   final NetconfHelloMessage message) throws NetconfDocumentedException {
+                                               final NetconfHelloMessage message) throws NetconfDocumentedException {
             return new TestingNetconfSession(sessionListener, channel, 0L);
         }
 

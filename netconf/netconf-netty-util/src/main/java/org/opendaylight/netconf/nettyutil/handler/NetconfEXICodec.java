@@ -45,12 +45,13 @@ public final class NetconfEXICodec {
      * Since we have a limited number of options we can have, instantiating a weak cache
      * will allow us to reuse instances where possible.
      */
-    private static final LoadingCache<Short, GrammarCache> GRAMMAR_CACHES = CacheBuilder.newBuilder().weakValues().build(new CacheLoader<Short, GrammarCache>() {
-        @Override
-        public GrammarCache load(final Short key) {
-            return new GrammarCache(key);
-        }
-    });
+    private static final LoadingCache<Short, GrammarCache> GRAMMAR_CACHES =
+            CacheBuilder.newBuilder().weakValues().build(new CacheLoader<Short, GrammarCache>() {
+                @Override
+                public GrammarCache load(final Short key) {
+                    return new GrammarCache(key);
+                }
+            });
 
     /**
      * Grammar cache acts as a template and is duplicated by the Transmogrifier and the Reader

@@ -221,7 +221,8 @@ public class AsyncSshHandlerTest {
             @Override
             public void onSuccess(final SshFutureListener<IoReadFuture> result) {
                 doReturn(new IllegalStateException()).when(mockedReadFuture).getException();
-                doReturn(mockedReadFuture).when(mockedReadFuture).removeListener(Matchers.<SshFutureListener<IoReadFuture>>any());
+                doReturn(mockedReadFuture).when(mockedReadFuture)
+                        .removeListener(Matchers.<SshFutureListener<IoReadFuture>>any());
                 doReturn(true).when(asyncOut).isClosing();
                 doReturn(true).when(asyncOut).isClosed();
                 result.operationComplete(mockedReadFuture);
@@ -251,7 +252,8 @@ public class AsyncSshHandlerTest {
             @Override
             public void onSuccess(final SshFutureListener<IoReadFuture> result) {
                 doReturn(new IllegalStateException()).when(mockedReadFuture).getException();
-                doReturn(mockedReadFuture).when(mockedReadFuture).removeListener(Matchers.<SshFutureListener<IoReadFuture>>any());
+                doReturn(mockedReadFuture).when(mockedReadFuture)
+                        .removeListener(Matchers.<SshFutureListener<IoReadFuture>>any());
                 result.operationComplete(mockedReadFuture);
             }
         });
@@ -340,11 +342,14 @@ public class AsyncSshHandlerTest {
 
         final ChannelPromise firstWritePromise = getMockedPromise();
 
-        // intercept listener for first write, so we can invoke successful write later thus simulate pending of the first write
-        final ListenableFuture<SshFutureListener<IoWriteFuture>> firstWriteListenerFuture = stubAddListener(ioWriteFuture);
+        // intercept listener for first write,
+        // so we can invoke successful write later thus simulate pending of the first write
+        final ListenableFuture<SshFutureListener<IoWriteFuture>> firstWriteListenerFuture =
+                stubAddListener(ioWriteFuture);
         asyncSshHandler.write(ctx, Unpooled.copiedBuffer(new byte[]{0,1,2,3,4,5}), firstWritePromise);
         final SshFutureListener<IoWriteFuture> firstWriteListener = firstWriteListenerFuture.get();
-        // intercept second listener, this is the listener for pending write for the pending write to know when pending state ended
+        // intercept second listener,
+        // this is the listener for pending write for the pending write to know when pending state ended
         final ListenableFuture<SshFutureListener<IoWriteFuture>> pendingListener = stubAddListener(ioWriteFuture);
 
         final ChannelPromise secondWritePromise = getMockedPromise();
@@ -386,8 +391,10 @@ public class AsyncSshHandlerTest {
 
         final ChannelPromise firstWritePromise = getMockedPromise();
 
-        // intercept listener for first write, so we can invoke successful write later thus simulate pending of the first write
-        final ListenableFuture<SshFutureListener<IoWriteFuture>> firstWriteListenerFuture = stubAddListener(ioWriteFuture);
+        // intercept listener for first write,
+        // so we can invoke successful write later thus simulate pending of the first write
+        final ListenableFuture<SshFutureListener<IoWriteFuture>> firstWriteListenerFuture =
+                stubAddListener(ioWriteFuture);
         asyncSshHandler.write(ctx, Unpooled.copiedBuffer(new byte[]{0,1,2,3,4,5}), firstWritePromise);
 
         final ChannelPromise secondWritePromise = getMockedPromise();
@@ -464,7 +471,8 @@ public class AsyncSshHandlerTest {
         return sshSession;
     }
 
-    private ChannelSubsystem getMockedSubsystemChannel(final IoInputStream asyncOut, final IoOutputStream asyncIn) throws IOException {
+    private ChannelSubsystem getMockedSubsystemChannel(final IoInputStream asyncOut,
+                                                       final IoOutputStream asyncIn) throws IOException {
         final ChannelSubsystem subsystemChannel = mock(ChannelSubsystem.class);
         doReturn("subsystemChannel").when(subsystemChannel).toString();
 
@@ -597,14 +605,15 @@ public class AsyncSshHandlerTest {
         return spy(new DefaultChannelPromise(channel));
     }
 
-    private static abstract class SuccessFutureListener<T extends SshFuture<T>> implements FutureCallback<SshFutureListener<T>> {
+    private abstract static class SuccessFutureListener<T extends SshFuture<T>>
+            implements FutureCallback<SshFutureListener<T>> {
 
         @Override
-        public abstract void onSuccess(final SshFutureListener<T> result);
+        public abstract void onSuccess(SshFutureListener<T> result);
 
         @Override
-        public void onFailure(final Throwable t) {
-            throw new RuntimeException(t);
+        public void onFailure(final Throwable throwable) {
+            throw new RuntimeException(throwable);
         }
     }
 }
