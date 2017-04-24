@@ -1,0 +1,303 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_3c08b32c",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientDispatcherImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T10:35:35Z",
+      "side": 1,
+      "message": "dont suppress this, just add the default and throw the IllegalArgument from there",
+      "range": {
+        "startLine": 38,
+        "startChar": 4,
+        "endLine": 38,
+        "endChar": 56
+      },
+      "revId": "894007498e9a5118d3326d9be7cb9038881306f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_9c071f1c",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientDispatcherImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T10:35:35Z",
+      "side": 1,
+      "message": "same",
+      "range": {
+        "startLine": 50,
+        "startChar": 4,
+        "endLine": 50,
+        "endChar": 56
+      },
+      "revId": "894007498e9a5118d3326d9be7cb9038881306f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_a703ec0b",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientSession.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T10:35:35Z",
+      "side": 1,
+      "message": "move the whole parameter to the next line",
+      "range": {
+        "startLine": 52,
+        "startChar": 70,
+        "endLine": 53,
+        "endChar": 19
+      },
+      "revId": "894007498e9a5118d3326d9be7cb9038881306f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_e70df438",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientSessionNegotiator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T10:35:35Z",
+      "side": 1,
+      "message": "move whole param to next line",
+      "range": {
+        "startLine": 164,
+        "startChar": 74,
+        "endLine": 165,
+        "endChar": 31
+      },
+      "revId": "894007498e9a5118d3326d9be7cb9038881306f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_6730e4e8",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/SshClientChannelInitializer.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T10:35:35Z",
+      "side": 1,
+      "message": "align these with the previous line",
+      "range": {
+        "startLine": 24,
+        "startChar": 39,
+        "endLine": 25,
+        "endChar": 89
+      },
+      "revId": "894007498e9a5118d3326d9be7cb9038881306f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_a7512c10",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/conf/NetconfClientConfiguration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T10:35:35Z",
+      "side": 1,
+      "message": "dont suppress missing default, just add a log that there was an unexpected value",
+      "range": {
+        "startLine": 76,
+        "startChar": 23,
+        "endLine": 76,
+        "endChar": 57
+      },
+      "revId": "894007498e9a5118d3326d9be7cb9038881306f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_273d3cbc",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/conf/NetconfClientConfigurationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T10:35:35Z",
+      "side": 1,
+      "message": "move whole param to next line",
+      "range": {
+        "startLine": 47,
+        "startChar": 58,
+        "endLine": 48,
+        "endChar": 80
+      },
+      "revId": "894007498e9a5118d3326d9be7cb9038881306f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_6747444c",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/conf/NetconfClientConfigurationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T10:35:35Z",
+      "side": 1,
+      "message": "move whole param to next line",
+      "range": {
+        "startLine": 53,
+        "startChar": 66,
+        "endLine": 54,
+        "endChar": 90
+      },
+      "revId": "894007498e9a5118d3326d9be7cb9038881306f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_476960bd",
+        "filename": "netconf/netconf-client/src/test/java/org/opendaylight/netconf/client/NetconfClientSessionNegotiatorTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T10:35:35Z",
+      "side": 1,
+      "message": "move the whole param to next line",
+      "range": {
+        "startLine": 132,
+        "startChar": 80,
+        "endLine": 133,
+        "endChar": 95
+      },
+      "revId": "894007498e9a5118d3326d9be7cb9038881306f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_672bc494",
+        "filename": "netconf/netconf-client/src/test/java/org/opendaylight/netconf/client/SshClientChannelInitializerTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T10:35:35Z",
+      "side": 1,
+      "message": "move to previous line",
+      "range": {
+        "startLine": 52,
+        "startChar": 16,
+        "endLine": 52,
+        "endChar": 31
+      },
+      "revId": "894007498e9a5118d3326d9be7cb9038881306f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_c719d089",
+        "filename": "netconf/netconf-client/src/test/java/org/opendaylight/netconf/client/TcpClientChannelInitializerTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T10:35:35Z",
+      "side": 1,
+      "message": "line break here",
+      "range": {
+        "startLine": 32,
+        "startChar": 105,
+        "endLine": 33,
+        "endChar": 23
+      },
+      "revId": "894007498e9a5118d3326d9be7cb9038881306f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_a71c8c78",
+        "filename": "netconf/netconf-client/src/test/java/org/opendaylight/netconf/client/TestingNetconfClient.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T10:35:35Z",
+      "side": 1,
+      "message": "move the whole param to the next line",
+      "range": {
+        "startLine": 50,
+        "startChar": 80,
+        "endLine": 51,
+        "endChar": 46
+      },
+      "revId": "894007498e9a5118d3326d9be7cb9038881306f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_0714784c",
+        "filename": "netconf/netconf-client/src/test/java/org/opendaylight/netconf/client/TestingNetconfClient.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-24T10:35:35Z",
+      "side": 1,
+      "message": "move the whole param",
+      "range": {
+        "startLine": 117,
+        "startChar": 97,
+        "endLine": 118,
+        "endChar": 51
+      },
+      "revId": "894007498e9a5118d3326d9be7cb9038881306f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
