@@ -11,23 +11,21 @@ package org.opendaylight.netconf.notifications;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
 
-/**
- *
- */
 public interface NetconfNotificationRegistry {
 
     /**
-     * Add listener for a certain notification type
+     * Add listener for a certain notification type.
      */
-    NotificationListenerRegistration registerNotificationListener(StreamNameType stream, NetconfNotificationListener listener);
+    NotificationListenerRegistration registerNotificationListener(StreamNameType stream,
+                                                                  NetconfNotificationListener listener);
 
     /**
-     * Check stream availability
+     * Check stream availability.
      */
     boolean isStreamAvailable(StreamNameType streamNameType);
 
     /**
-     * Get all the streams available
+     * Get all the streams available.
      */
     Streams getNotificationPublishers();
 

@@ -9,7 +9,7 @@
 package org.opendaylight.netconf.notifications;
 
 /**
- * Manages the registration of a single listener
+ * Manages the registration of a single listener.
  */
 public interface NotificationListenerRegistration extends NotificationRegistration {
 

@@ -21,17 +21,17 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 public interface BaseNetconfNotificationListener {
 
     /**
-     * Callback used to notify about a change in used capabilities
+     * Callback used to notify about a change in used capabilities.
      */
-    void onCapabilityChanged(final NetconfCapabilityChange capabilityChange);
+    void onCapabilityChanged(NetconfCapabilityChange capabilityChange);
 
     /**
-     * Callback used to notify about netconf session start
+     * Callback used to notify about netconf session start.
      */
     void onSessionStarted(NetconfSessionStart start);
 
     /**
-     * Callback used to notify about netconf session end
+     * Callback used to notify about netconf session end.
      */
     void onSessionEnded(NetconfSessionEnd end);
 
