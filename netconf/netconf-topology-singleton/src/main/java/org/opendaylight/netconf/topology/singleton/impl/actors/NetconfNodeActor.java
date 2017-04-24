@@ -16,6 +16,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
@@ -58,6 +59,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +81,7 @@ public class NetconfNodeActor extends UntypedActor {
     private DOMDataBroker deviceDataBroker;
     //readTxActor can be shared
     private ActorRef readTxActor;
+    private List<SchemaSourceRegistration<YangTextSchemaSource>> registeredSchemas;
 
     public static Props props(final NetconfTopologySetup setup,
                               final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
@@ -159,6 +162,11 @@ public class NetconfNodeActor extends UntypedActor {
         }
     }
 
+    @Override
+    public void postStop() throws Exception {
+        super.postStop();
+        closeSchemaSourceRegistrations();
+    }
 
     private void sendYangTextSchemaSourceProxy(final SourceIdentifier sourceIdentifier, final ActorRef sender) {
         final CheckedFuture<YangTextSchemaSource, SchemaSourceException> yangTextSchemaSource =
@@ -213,6 +221,7 @@ public class NetconfNodeActor extends UntypedActor {
         if (this.slaveSalManager != null) {
             slaveSalManager.close();
         }
+        closeSchemaSourceRegistrations();
         slaveSalManager = new SlaveSalFacade(id, setup.getDomBroker(), setup.getActorSystem());
 
         final CheckedFuture<SchemaContext, SchemaResolutionException> remoteSchemaContext =
@@ -244,14 +253,23 @@ public class NetconfNodeActor extends UntypedActor {
         final RemoteSchemaProvider remoteProvider = new RemoteSchemaProvider(remoteYangTextSourceProvider,
                 getContext().dispatcher());
 
-        sourceIdentifiers.forEach(sourceId ->
-                schemaRegistry.registerSchemaSource(remoteProvider, PotentialSchemaSource.create(sourceId,
-                        YangTextSchemaSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
+        registeredSchemas = sourceIdentifiers.stream()
+                .map(sourceId ->
+                        schemaRegistry.registerSchemaSource(remoteProvider, PotentialSchemaSource.create(sourceId,
+                                YangTextSchemaSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue())))
+                .collect(Collectors.toList());
 
         final SchemaContextFactory schemaContextFactory
                 = schemaRepository.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
 
         return schemaContextFactory.createSchemaContext(sourceIdentifiers);
+    }
+
+    private void closeSchemaSourceRegistrations() {
+        if (registeredSchemas != null) {
+            registeredSchemas.forEach(SchemaSourceRegistration::close);
+            registeredSchemas = null;
+        }
     }
 
 }
