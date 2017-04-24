@@ -6,8 +6,9 @@
  terms of the Eclipse Public License v1.0 which accompanies this distribution,
  and is available at http://www.eclipse.org/legal/epl-v10.html
  -->
-<features name="odl-netconf-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.2.0">
+<features name="odl-netconf-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0">
     <feature name="odl-netconf-util" version="${project.version}">
+        <feature version="${project.version}" prerequisite="true" dependency="true">odl-config-netty</feature>
         <configfile finalname="etc/netconf.cfg">
             mvn:org.opendaylight.netconf/netconf-util/${project.version}/cfg/config
         </configfile>
