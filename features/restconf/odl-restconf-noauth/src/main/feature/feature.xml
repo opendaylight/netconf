@@ -6,7 +6,7 @@
  terms of the Eclipse Public License v1.0 which accompanies this distribution,
  and is available at http://www.eclipse.org/legal/epl-v10.html
  -->
-<features name="odl-controller-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.2.0">
+<features name="odl-controller-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0">
     <feature name="odl-restconf-noauth" version="${project.version}">
         <configfile finalname="${config.configfile.directory}/${config.restconf.configfile}">
             mvn:org.opendaylight.netconf/sal-rest-connector-config/${project.version}/xml/config
