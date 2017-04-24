@@ -72,7 +72,22 @@
                 <version>${project.version}</version>
                 <classifier>features</classifier>
                 <type>xml</type>
-                <scope>runtime</scope>
+            </dependency>
+
+            <!-- restconf features -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>features4-restconf</artifactId>
+                <version>${project.version}</version>
+                <classifier>features</classifier>
+                <type>xml</type>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>odl-mdsal-apidocs</artifactId>
+                <version>${project.version}</version>
+                <classifier>features</classifier>
+                <type>xml</type>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -80,7 +95,20 @@
                 <version>${project.version}</version>
                 <classifier>features</classifier>
                 <type>xml</type>
-                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>odl-restconf-all</artifactId>
+                <version>${project.version}</version>
+                <classifier>features</classifier>
+                <type>xml</type>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>odl-restconf-noauth</artifactId>
+                <version>${project.version}</version>
+                <classifier>features</classifier>
+                <type>xml</type>
             </dependency>
         </dependencies>
     </dependencyManagement>
