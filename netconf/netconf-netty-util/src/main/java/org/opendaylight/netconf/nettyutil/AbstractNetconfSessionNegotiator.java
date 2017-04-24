@@ -41,7 +41,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionPreferences, S extends AbstractNetconfSession<S, L>, L extends NetconfSessionListener<S>>
+public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionPreferences,
+        S extends AbstractNetconfSession<S, L>, L extends NetconfSessionListener<S>>
     extends AbstractSessionNegotiator<NetconfHelloMessage, S> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfSessionNegotiator.class);
@@ -54,7 +55,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     private Timeout timeout;
 
     /**
-     * Possible states for Finite State Machine
+     * Possible states for Finite State Machine.
      */
     protected enum State {
         IDLE, OPEN_WAIT, FAILED, ESTABLISHED
@@ -65,8 +66,9 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     private final Timer timer;
     private final long connectionTimeoutMillis;
 
-    protected AbstractNetconfSessionNegotiator(final P sessionPreferences, final Promise<S> promise, final Channel channel, final Timer timer,
-            final L sessionListener, final long connectionTimeoutMillis) {
+    protected AbstractNetconfSessionNegotiator(final P sessionPreferences, final Promise<S> promise,
+                                               final Channel channel, final Timer timer,
+                                               final L sessionListener, final long connectionTimeoutMillis) {
         super(promise, channel);
         this.sessionPreferences = sessionPreferences;
         this.promise = promise;
@@ -95,7 +97,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
 
     private static Optional<SslHandler> getSslHandler(final Channel channel) {
         final SslHandler sslHandler = channel.pipeline().get(SslHandler.class);
-        return sslHandler == null ? Optional.<SslHandler> absent() : Optional.of(sslHandler);
+        return sslHandler == null ? Optional.<SslHandler>absent() : Optional.of(sslHandler);
     }
 
     public P getSessionPreferences() {
@@ -130,7 +132,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
                             channel.close().addListener(new GenericFutureListener<ChannelFuture>() {
                                 @Override
                                 public void operationComplete(final ChannelFuture future) throws Exception {
-                                    if(future.isSuccess()) {
+                                    if (future.isSuccess()) {
                                         LOG.debug("Channel {} closed: success", future.channel());
                                     } else {
                                         LOG.warn("Channel {} closed: fail", future.channel());
@@ -138,7 +140,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
                                 }
                             });
                         }
-                    } else if(channel.isOpen()) {
+                    } else if (channel.isOpen()) {
                         channel.pipeline().remove(NAME_OF_EXCEPTION_HANDLER);
                     }
                 }
@@ -152,12 +154,13 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     }
 
     private void cancelTimeout() {
-        if(timeout!=null) {
+        if (timeout != null) {
             timeout.cancel();
         }
     }
 
-    protected final S getSessionForHelloMessage(final NetconfHelloMessage netconfMessage) throws NetconfDocumentedException {
+    protected final S getSessionForHelloMessage(final NetconfHelloMessage netconfMessage)
+            throws NetconfDocumentedException {
         Preconditions.checkNotNull(netconfMessage, "netconfMessage");
 
         final Document doc = netconfMessage.getDocument();
@@ -171,7 +174,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     }
 
     /**
-     * Insert chunk framing handlers into the pipeline
+     * Insert chunk framing handlers into the pipeline.
      */
     private void insertChunkFramingToPipeline() {
         replaceChannelHandler(channel, AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_ENCODER,
@@ -188,11 +191,13 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     /**
      * Remove special inbound handler for hello message. Insert regular netconf xml message (en|de)coders.
      *
+     * <p>
      * Inbound hello message handler should be kept until negotiation is successful
      * It caches any non-hello messages while negotiation is still in progress
      */
     protected final void replaceHelloMessageInboundHandler(final S session) {
-        ChannelHandler helloMessageHandler = replaceChannelHandler(channel, AbstractChannelInitializer.NETCONF_MESSAGE_DECODER, new NetconfXMLToMessageDecoder());
+        ChannelHandler helloMessageHandler = replaceChannelHandler(channel,
+                AbstractChannelInitializer.NETCONF_MESSAGE_DECODER, new NetconfXMLToMessageDecoder());
 
         Preconditions.checkState(helloMessageHandler instanceof NetconfXMLToHelloMessageDecoder,
                 "Pipeline handlers misplaced on session: %s, pipeline: %s", session, channel.pipeline());
@@ -200,7 +205,8 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
                 ((NetconfXMLToHelloMessageDecoder) helloMessageHandler).getPostHelloNetconfMessages();
 
         // Process messages received during negotiation
-        // The hello message handler does not have to be synchronized, since it is always call from the same thread by netty
+        // The hello message handler does not have to be synchronized,
+        // since it is always call from the same thread by netty.
         // It means, we are now using the thread now
         for (NetconfMessage message : netconfMessagesFromNegotiation) {
             session.handleMessage(message);
@@ -211,19 +217,22 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
      * Remove special outbound handler for hello message. Insert regular netconf xml message (en|de)coders.
      */
     private void replaceHelloMessageOutboundHandler() {
-        replaceChannelHandler(channel, AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER, new NetconfMessageToXMLEncoder());
+        replaceChannelHandler(channel, AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
+                new NetconfMessageToXMLEncoder());
     }
 
-    private static ChannelHandler replaceChannelHandler(final Channel channel, final String handlerKey, final ChannelHandler decoder) {
+    private static ChannelHandler replaceChannelHandler(final Channel channel, final String handlerKey,
+                                                        final ChannelHandler decoder) {
         return channel.pipeline().replace(handlerKey, handlerKey, decoder);
     }
 
-    protected abstract S getSession(L sessionListener, Channel channel, NetconfHelloMessage message) throws NetconfDocumentedException;
+    protected abstract S getSession(L sessionListener, Channel channel, NetconfHelloMessage message)
+            throws NetconfDocumentedException;
 
     private synchronized void changeState(final State newState) {
         LOG.debug("Changing state from : {} to : {} for channel: {}", state, newState, channel);
-        Preconditions.checkState(isStateChangePermitted(state, newState), "Cannot change state from %s to %s for chanel %s", state,
-                newState, channel);
+        Preconditions.checkState(isStateChangePermitted(state, newState),
+                "Cannot change state from %s to %s for chanel %s", state, newState, channel);
         this.state = newState;
     }
 
@@ -252,7 +261,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     }
 
     /**
-     * Handler to catch exceptions in pipeline during negotiation
+     * Handler to catch exceptions in pipeline during negotiation.
      */
     private final class ExceptionHandlingInboundChannelHandler extends ChannelInboundHandlerAdapter {
         @Override

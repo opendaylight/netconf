@@ -36,7 +36,8 @@ public class NetconfHelloMessageToXMLEncoderTest {
 
     @Test
     public void testEncode() throws Exception {
-        final NetconfMessage msg = new NetconfHelloMessage(XmlUtil.readXmlToDocument("<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"),
+        final NetconfMessage msg = new NetconfHelloMessage(XmlUtil.readXmlToDocument(
+                "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"),
                 NetconfHelloMessageAdditionalHeader.fromString("[tomas;10.0.0.0:10000;tcp;client;]"));
         final ByteBuf destination = Unpooled.buffer();
         new NetconfHelloMessageToXMLEncoder().encode(ctx, msg, destination);
@@ -48,7 +49,8 @@ public class NetconfHelloMessageToXMLEncoderTest {
 
     @Test
     public void testEncodeNoHeader() throws Exception {
-        final NetconfMessage msg = new NetconfHelloMessage(XmlUtil.readXmlToDocument("<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"));
+        final NetconfMessage msg = new NetconfHelloMessage(XmlUtil.readXmlToDocument(
+                "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"));
         final ByteBuf destination = Unpooled.buffer();
         new NetconfHelloMessageToXMLEncoder().encode(ctx, msg, destination);
 
@@ -59,7 +61,8 @@ public class NetconfHelloMessageToXMLEncoderTest {
 
     @Test(expected = IllegalStateException.class)
     public void testEncodeNotHello() throws Exception {
-        final NetconfMessage msg = new NetconfMessage(XmlUtil.readXmlToDocument("<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"));
+        final NetconfMessage msg = new NetconfMessage(XmlUtil.readXmlToDocument(
+                "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>"));
         new NetconfHelloMessageToXMLEncoder().encode(ctx, msg, null);
     }
 }

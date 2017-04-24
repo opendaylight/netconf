@@ -66,7 +66,8 @@ public class AbstractNetconfSessionTest {
         doNothing().when(listener).onMessage(any(TestingNetconfSession.class), any(NetconfMessage.class));
         doNothing().when(listener).onSessionUp(any(TestingNetconfSession.class));
         doNothing().when(listener).onSessionDown(any(TestingNetconfSession.class), any(Exception.class));
-        doNothing().when(listener).onSessionTerminated(any(TestingNetconfSession.class), any(NetconfTerminationReason.class));
+        doNothing().when(listener).onSessionTerminated(any(TestingNetconfSession.class),
+                any(NetconfTerminationReason.class));
 
         doReturn(writeFuture).when(writeFuture).addListener(any(GenericFutureListener.class));
 
@@ -88,7 +89,8 @@ public class AbstractNetconfSessionTest {
             }
         }).when(eventLoop).execute(any(Runnable.class));
 
-        clientHello = NetconfHelloMessage.createClientHello(Collections.<String>emptySet(), Optional.<NetconfHelloMessageAdditionalHeader>absent());
+        clientHello = NetconfHelloMessage.createClientHello(Collections.<String>emptySet(),
+                Optional.<NetconfHelloMessageAdditionalHeader>absent());
     }
 
     @Test
@@ -122,14 +124,17 @@ public class AbstractNetconfSessionTest {
         doReturn("handler").when(mock).toString();
 
         testingNetconfSession.replaceMessageDecoder(mock);
-        verify(pipeline).replace(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER, AbstractChannelInitializer.NETCONF_MESSAGE_DECODER, mock);
+        verify(pipeline).replace(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER,
+                AbstractChannelInitializer.NETCONF_MESSAGE_DECODER, mock);
         testingNetconfSession.replaceMessageEncoder(mock);
-        verify(pipeline).replace(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER, AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER, mock);
+        verify(pipeline).replace(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
+                AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER, mock);
         testingNetconfSession.replaceMessageEncoderAfterNextMessage(mock);
         verifyNoMoreInteractions(pipeline);
 
         testingNetconfSession.sendMessage(clientHello);
-        verify(pipeline, times(2)).replace(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER, AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER, mock);
+        verify(pipeline, times(2)).replace(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
+                AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER, mock);
     }
 
     @Test
@@ -154,7 +159,8 @@ public class AbstractNetconfSessionTest {
     @Test
     public void testSendMessage() throws Exception {
         final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, 1L);
-        final NetconfHelloMessage clientHello = NetconfHelloMessage.createClientHello(Collections.<String>emptySet(), Optional.<NetconfHelloMessageAdditionalHeader>absent());
+        final NetconfHelloMessage clientHello = NetconfHelloMessage.createClientHello(Collections.<String>emptySet(),
+                Optional.<NetconfHelloMessageAdditionalHeader>absent());
         testingNetconfSession.sendMessage(clientHello);
         verify(channel).writeAndFlush(clientHello);
     }

@@ -14,9 +14,11 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 
-class TestingNetconfSession extends AbstractNetconfSession<TestingNetconfSession, NetconfSessionListener<TestingNetconfSession>> {
+class TestingNetconfSession
+        extends AbstractNetconfSession<TestingNetconfSession, NetconfSessionListener<TestingNetconfSession>> {
 
-    TestingNetconfSession(final NetconfSessionListener<TestingNetconfSession> sessionListener, final Channel channel, final long sessionId) {
+    TestingNetconfSession(final NetconfSessionListener<TestingNetconfSession> sessionListener,
+                          final Channel channel, final long sessionId) {
         super(sessionListener, channel, sessionId);
     }
 
@@ -26,7 +28,8 @@ class TestingNetconfSession extends AbstractNetconfSession<TestingNetconfSession
     }
 
     @Override
-    protected void addExiHandlers(final ByteToMessageDecoder decoder, final MessageToByteEncoder<NetconfMessage> encoder) {
+    protected void addExiHandlers(final ByteToMessageDecoder decoder,
+                                  final MessageToByteEncoder<NetconfMessage> encoder) {
     }
 
     @Override

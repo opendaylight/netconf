@@ -33,6 +33,7 @@ public final class NetconfStartExiMessage extends NetconfMessage {
     public static final String PIS_KEY = "pis";
     public static final String PREFIXES_KEY = "prefixes";
     private static final Logger LOG = LoggerFactory.getLogger(NetconfStartExiMessage.class);
+
     private NetconfStartExiMessage(final Document doc) {
         super(doc);
     }
@@ -75,37 +76,40 @@ public final class NetconfStartExiMessage extends NetconfMessage {
         }
     }
 
+    @SuppressWarnings("checkstyle:FallThrough")
     private static void addAlignment(final EXIOptions exiOptions, final Document doc, final Element startExiElement) {
         final Element alignmentElement = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_EXI_1_0,
                 ALIGNMENT_KEY);
 
         String alignmentString;
         switch (exiOptions.getAlignmentType()) {
-        case byteAligned: {
-            alignmentString = EXIParameters.EXI_PARAMETER_BYTE_ALIGNED;
-            break;
-        }
-        case compress: {
-            alignmentString = EXIParameters.EXI_PARAMETER_COMPRESSED;
-            break;
-        }
-        case preCompress: {
-            alignmentString = EXIParameters.EXI_PARAMETER_PRE_COMPRESSION;
-            break;
-        }
-        default:
-            LOG.warn("Unexpected value in EXI alignment type: {} , using default value", exiOptions.getAlignmentType());
-        case bitPacked: {
-            alignmentString = EXIParameters.EXI_PARAMETER_BIT_PACKED;
-            break;
-        }
+            case byteAligned: {
+                alignmentString = EXIParameters.EXI_PARAMETER_BYTE_ALIGNED;
+                break;
+            }
+            case compress: {
+                alignmentString = EXIParameters.EXI_PARAMETER_COMPRESSED;
+                break;
+            }
+            case preCompress: {
+                alignmentString = EXIParameters.EXI_PARAMETER_PRE_COMPRESSION;
+                break;
+            }
+            default:
+                LOG.warn("Unexpected value in EXI alignment type: {} , using default value",
+                        exiOptions.getAlignmentType());
+            case bitPacked: {
+                alignmentString = EXIParameters.EXI_PARAMETER_BIT_PACKED;
+                break;
+            }
         }
 
         alignmentElement.setTextContent(alignmentString);
         startExiElement.appendChild(alignmentElement);
     }
 
-    private static void createFidelityElement(final Document doc, final List<Element> fidelityElements, final boolean fidelity, final String fidelityName) {
+    private static void createFidelityElement(final Document doc, final List<Element> fidelityElements,
+                                              final boolean fidelity, final String fidelityName) {
 
         if (fidelity) {
             fidelityElements.add(doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_EXI_1_0,
