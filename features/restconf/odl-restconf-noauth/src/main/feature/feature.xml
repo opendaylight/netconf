@@ -1,18 +1,26 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
- Copyright © 2014, 2017 Cisco Systems, Inc. and others.  All rights reserved.
-
- This program and the accompanying materials are made available under the
- terms of the Eclipse Public License v1.0 which accompanies this distribution,
- and is available at http://www.eclipse.org/legal/epl-v10.html
- -->
-<features name="odl-controller-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.2.0">
-    <feature name="odl-restconf-noauth" version="${project.version}">
-        <configfile finalname="${config.configfile.directory}/${config.restconf.configfile}">
-            mvn:org.opendaylight.netconf/sal-rest-connector-config/${project.version}/xml/config
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-controller-1.5.0-SNAPSHOT">
+    <repository>mvn:org.opendaylight.aaa/odl-aaa-shiro/0.5.0-SNAPSHOT/xml/features</repository>
+    <repository>mvn:org.opendaylight.controller/odl-mdsal-broker/1.5.0-SNAPSHOT/xml/features</repository>
+    <repository>mvn:org.opendaylight.odlparent/odl4-netty-4/1.8.0-SNAPSHOT/xml/features</repository>
+    <repository>mvn:org.opendaylight.odlparent/odl-karaf-feat-jetty/1.8.0-SNAPSHOT/xml/features</repository>
+    <feature name="odl-restconf-noauth" description="OpenDaylight :: Restconf" version="1.5.0.SNAPSHOT">
+        <details>OpenDaylight is leading the transformation to Open Software Defined Networking (SDN). For more information, please see https://www.opendaylight.org</details>
+        <configfile finalname="etc/opendaylight/karaf/10-rest-connector.xml">
+            mvn:org.opendaylight.netconf/sal-rest-connector-config/1.5.0-SNAPSHOT/xml/config
         </configfile>
-        <configfile finalname="${config.configfile.directory}/${config.restconf.service.configfile}">
-            mvn:org.opendaylight.netconf/sal-rest-connector-config/${project.version}/xml/configrestconfservice
+        <configfile finalname="etc/opendaylight/karaf/10-restconf-service.xml">
+            mvn:org.opendaylight.netconf/sal-rest-connector-config/1.5.0-SNAPSHOT/xml/configrestconfservice
         </configfile>
+        <feature version="0.5.0.SNAPSHOT" prerequisite="true" dependency="true">odl-aaa-shiro</feature>
+        <feature version="1.5.0.SNAPSHOT" prerequisite="true" dependency="true">odl-mdsal-broker</feature>
+        <feature version="1.8.0.SNAPSHOT" prerequisite="true" dependency="true">odl4-netty-4</feature>
+        <feature version="1.8.0.SNAPSHOT" prerequisite="true" dependency="true">odl-karaf-feat-jetty</feature>
+        <feature prerequisite="true" dependency="false">wrap</feature>
+        <bundle>mvn:org.opendaylight.netconf/ietf-restconf/1.5.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/ietf-yang-library/1.5.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/ietf-restconf-monitoring/1.5.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/sal-rest-connector/1.5.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.yangtools/yang-model-export/1.1.0-SNAPSHOT</bundle>
     </feature>
 </features>

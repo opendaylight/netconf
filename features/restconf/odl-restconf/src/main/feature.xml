@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-restconf">
+    <repository>mvn:org.opendaylight.netconf/odl-restconf-noauth/1.6.0-SNAPSHOT/xml/features</repository>
+    <feature name="odl-restconf" description="OpenDaylight :: Restconf" version="1.6.0.SNAPSHOT">
+        <details>OpenDaylight is leading the transformation to Open Software Defined Networking (SDN). For more information, please see https://www.opendaylight.org</details>
+        <feature version="1.6.0.SNAPSHOT" prerequisite="true" dependency="true">odl-restconf-noauth</feature>
+        <feature prerequisite="true" dependency="false">wrap</feature>
+        <bundle>mvn:org.opendaylight.aaa/aaa-shiro-act/0.6.0-SNAPSHOT</bundle>
+    </feature>
+</features>

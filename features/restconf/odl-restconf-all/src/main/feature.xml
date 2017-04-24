@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-restconf-all">
+    <repository>mvn:org.opendaylight.netconf/odl-restconf/1.5.0-SNAPSHOT/xml/features</repository>
+    <repository>mvn:org.opendaylight.netconf/odl-mdsal-apidocs/1.5.0-SNAPSHOT/xml/features</repository>
+    <feature name="odl-restconf-all" description="OpenDaylight :: Restconf :: All" version="1.5.0.SNAPSHOT">
+        <details>OpenDaylight is leading the transformation to Open Software Defined Networking (SDN). For more information, please see https://www.opendaylight.org</details>
+        <feature version="1.5.0.SNAPSHOT" prerequisite="true" dependency="true">odl-restconf</feature>
+        <feature version="1.5.0.SNAPSHOT" prerequisite="true" dependency="true">odl-mdsal-apidocs</feature>
+    </feature>
+</features>
