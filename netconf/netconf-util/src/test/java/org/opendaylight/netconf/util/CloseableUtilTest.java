@@ -18,6 +18,7 @@ import org.junit.Test;
 
 public class CloseableUtilTest {
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Test
     public void testCloseAllFail() throws Exception {
         final AutoCloseable failingCloseable = new AutoCloseable() {

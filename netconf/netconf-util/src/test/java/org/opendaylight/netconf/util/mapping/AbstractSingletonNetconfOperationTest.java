@@ -25,7 +25,8 @@ public class AbstractSingletonNetconfOperationTest {
         }
 
         @Override
-        protected Element handleWithNoSubsequentOperations(Document document, XmlElement operationElement) throws DocumentedException{
+        protected Element handleWithNoSubsequentOperations(Document document,
+                                                           XmlElement operationElement) throws DocumentedException {
             return null;
         }
 

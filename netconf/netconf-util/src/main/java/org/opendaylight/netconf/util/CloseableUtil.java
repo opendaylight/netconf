@@ -10,6 +10,7 @@ package org.opendaylight.netconf.util;
 
 public class CloseableUtil {
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public static void closeAll(Iterable<? extends AutoCloseable> autoCloseables) throws Exception {
         Exception lastException = null;
         for (AutoCloseable autoCloseable : autoCloseables) {

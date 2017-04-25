@@ -38,7 +38,7 @@ public final class NetconfMessageUtil {
     }
 
     public static boolean isOKMessage(XmlElement xmlElement) throws NetconfDocumentedException {
-        if(xmlElement.getChildElements().size() != 1) {
+        if (xmlElement.getChildElements().size() != 1) {
             return false;
         }
         try {
@@ -57,7 +57,7 @@ public final class NetconfMessageUtil {
     }
 
     public static boolean isErrorMessage(XmlElement xmlElement) throws NetconfDocumentedException {
-        if(xmlElement.getChildElements().size() != 1) {
+        if (xmlElement.getChildElements().size() != 1) {
             return false;
         }
         try {

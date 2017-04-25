@@ -16,7 +16,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * Custom xmlunit qualifier that doesn't care about order when deeper in the recursion
- * defaults to comparing element name and text content
+ * defaults to comparing element name and text content.
  */
 public class NetconfXmlUnitRecursiveQualifier implements ElementQualifier {
 
@@ -36,6 +36,7 @@ public class NetconfXmlUnitRecursiveQualifier implements ElementQualifier {
         return compareNodes(currentControl, currentTest);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     private boolean compareNodes(Node currentControl, Node currentTest) {
         try {
 
@@ -54,8 +55,8 @@ public class NetconfXmlUnitRecursiveQualifier implements ElementQualifier {
                 return !(currentControl.hasChildNodes() || currentTest.hasChildNodes());
             }
 
-            return (countNodesWithoutConsecutiveTextNodes(controlNodes) == countNodesWithoutConsecutiveTextNodes(testNodes))
-                    && checkChildren(controlNodes, testNodes);
+            return (countNodesWithoutConsecutiveTextNodes(controlNodes)
+                    == countNodesWithoutConsecutiveTextNodes(testNodes)) && checkChildren(controlNodes, testNodes);
 
         } catch (Exception e) {
             return false;
@@ -106,16 +107,16 @@ public class NetconfXmlUnitRecursiveQualifier implements ElementQualifier {
         return builder.toString();
     }
 
-    private static int countNodesWithoutConsecutiveTextNodes(NodeList l) {
+    private static int countNodesWithoutConsecutiveTextNodes(NodeList nodeList) {
         int count = 0;
         boolean lastNodeWasText = false;
-        final int length = l.getLength();
+        final int length = nodeList.getLength();
         for (int i = 0; i < length; i++) {
-            Node n = l.item(i);
-            if (!lastNodeWasText || n.getNodeType() != Node.TEXT_NODE) {
+            Node node = nodeList.item(i);
+            if (!lastNodeWasText || node.getNodeType() != Node.TEXT_NODE) {
                 count++;
             }
-            lastNodeWasText = n.getNodeType() == Node.TEXT_NODE;
+            lastNodeWasText = node.getNodeType() == Node.TEXT_NODE;
         }
         return count;
     }

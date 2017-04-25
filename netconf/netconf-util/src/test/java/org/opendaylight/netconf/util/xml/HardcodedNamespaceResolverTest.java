@@ -10,6 +10,7 @@ package org.opendaylight.netconf.util.xml;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
@@ -18,13 +19,16 @@ public class HardcodedNamespaceResolverTest {
 
     @Test
     public void testResolver() throws Exception {
-        final HardcodedNamespaceResolver hardcodedNamespaceResolver = new HardcodedNamespaceResolver("prefix", "namespace");
+        final HardcodedNamespaceResolver hardcodedNamespaceResolver =
+                new HardcodedNamespaceResolver("prefix", "namespace");
 
         assertEquals("namespace", hardcodedNamespaceResolver.getNamespaceURI("prefix"));
-        try{
+        try {
             hardcodedNamespaceResolver.getNamespaceURI("unknown");
             fail("Unknown namespace lookup should fail");
-        } catch(IllegalStateException e) {}
+        } catch (IllegalStateException e) {
+            assertTrue(e.getMessage().startsWith("Prefix mapping not found for "));
+        }
 
         assertNull(hardcodedNamespaceResolver.getPrefix("any"));
         assertNull(hardcodedNamespaceResolver.getPrefixes("any"));

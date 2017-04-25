@@ -52,18 +52,22 @@ public final class NetconfUtil {
                 + XmlUtil.toString(response));
     }
 
-    public static void writeNormalizedNode(final NormalizedNode<?, ?> normalized, final DOMResult result, final SchemaPath schemaPath, final SchemaContext context)
+    @SuppressWarnings("checkstyle:IllegalCatch")
+    public static void writeNormalizedNode(final NormalizedNode<?, ?> normalized, final DOMResult result,
+                                           final SchemaPath schemaPath, final SchemaContext context)
             throws IOException, XMLStreamException {
         final XMLStreamWriter writer = XML_FACTORY.createXMLStreamWriter(result);
         try (
-             final NormalizedNodeStreamWriter normalizedNodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(writer, context, schemaPath);
-             final NormalizedNodeWriter normalizedNodeWriter =  NormalizedNodeWriter.forStreamWriter(normalizedNodeStreamWriter)
+             NormalizedNodeStreamWriter normalizedNodeStreamWriter =
+                     XMLStreamNormalizedNodeStreamWriter.create(writer, context, schemaPath);
+             NormalizedNodeWriter normalizedNodeWriter =
+                     NormalizedNodeWriter.forStreamWriter(normalizedNodeStreamWriter)
         ) {
             normalizedNodeWriter.write(normalized);
             normalizedNodeWriter.flush();
         } finally {
             try {
-                if(writer != null) {
+                if (writer != null) {
                     writer.close();
                 }
             } catch (final Exception e) {
