@@ -179,7 +179,8 @@ public class ReadWriteTransactionTest {
 
     @Test
     public void testSubmitWithOperation() throws Exception {
-        final CheckedFuture<Void, TransactionCommitFailedException> resultSubmitTx = Futures.immediateCheckedFuture(null);
+        final CheckedFuture<Void, TransactionCommitFailedException> resultSubmitTx =
+                Futures.immediateCheckedFuture(null);
         doReturn(resultSubmitTx).when(readWriteTx).submit();
         // With Tx
         final DOMDataWriteTransaction wTx = slaveDataBroker.newReadWriteTransaction();

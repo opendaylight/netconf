@@ -52,8 +52,8 @@ public class NetconfTopologyUtilTest {
         assertEquals("nodeId", listPath.firstKeyOf(Node.class).getNodeId().getValue());
         assertEquals("topologyId", listPath.firstKeyOf(Topology.class).getTopologyId().getValue());
 
-        assertEquals("topologyId",  NetconfTopologyUtils.createTopologyNodePath("topologyId").
-                firstKeyOf(Topology.class).getTopologyId().getValue());
+        assertEquals("topologyId",  NetconfTopologyUtils.createTopologyNodePath("topologyId")
+                .firstKeyOf(Topology.class).getTopologyId().getValue());
     }
 
 }

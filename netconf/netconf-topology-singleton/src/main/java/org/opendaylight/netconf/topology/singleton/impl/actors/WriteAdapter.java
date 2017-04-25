@@ -27,7 +27,7 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitR
 class WriteAdapter {
     private final DOMDataWriteTransaction tx;
 
-    public WriteAdapter(final DOMDataWriteTransaction tx) {
+    WriteAdapter(final DOMDataWriteTransaction tx) {
         this.tx = tx;
     }
 

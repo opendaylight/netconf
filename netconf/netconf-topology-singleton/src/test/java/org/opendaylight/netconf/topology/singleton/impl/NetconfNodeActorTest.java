@@ -242,7 +242,8 @@ public class NetconfNodeActorTest {
 
         final YangTextSchemaSource yangTextSchemaSource = new YangTextSchemaSource(sourceIdentifier) {
             @Override
-            protected MoreObjects.ToStringHelper addToStringAttributes(final MoreObjects.ToStringHelper toStringHelper) {
+            protected MoreObjects.ToStringHelper addToStringAttributes(
+                    final MoreObjects.ToStringHelper toStringHelper) {
                 return null;
             }
 
@@ -304,7 +305,8 @@ public class NetconfNodeActorTest {
 
         // test if slave get right identifiers from master
 
-        final ProxyDOMRpcService slaveDomRPCService = new ProxyDOMRpcService(system, masterRef, remoteDeviceId, TIMEOUT);
+        final ProxyDOMRpcService slaveDomRPCService =
+                new ProxyDOMRpcService(system, masterRef, remoteDeviceId, TIMEOUT);
 
         final SchemaPath schemaPath = SchemaPath.create(true, QName.create("TestQname"));
         final NormalizedNode<?, ?> outputNode = ImmutableContainerNodeBuilder.create()
@@ -324,8 +326,8 @@ public class NetconfNodeActorTest {
 
         // InvokeRpcMessageReply message
 
-        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(outputNode))).
-                when(domRpcService).invokeRpc(any(), any());
+        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(outputNode)))
+                .when(domRpcService).invokeRpc(any(), any());
 
         final CheckedFuture<DOMRpcResult, DOMRpcException> resultFutureNn =
                 slaveDomRPCService.invokeRpc(schemaPath, outputNode);

@@ -31,16 +31,19 @@ public class ProxyWriteTransaction implements DOMDataWriteTransaction {
     private final ProxyWriteAdapter proxyWriteAdapter;
 
     /**
+     * Constructor for {@code ProxyWriteTransaction}.
+     *
      * @param masterTxActor {@link org.opendaylight.netconf.topology.singleton.impl.actors.WriteTransactionActor} ref
      * @param id            device id
      * @param actorSystem   system
-     * @param askTimeout
+     * @param askTimeout    timeout
      */
     public ProxyWriteTransaction(final ActorRef masterTxActor, final RemoteDeviceId id, final ActorSystem actorSystem,
                                  final Timeout askTimeout) {
         proxyWriteAdapter = new ProxyWriteAdapter(masterTxActor, id, actorSystem, askTimeout);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public boolean cancel() {
         return proxyWriteAdapter.cancel();

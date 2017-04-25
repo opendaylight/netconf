@@ -150,7 +150,7 @@ public class RemoteDeviceConnectorImplTest {
         builder.setNode(node);
 
 
-        final NetconfDeviceCommunicator communicator = mock (NetconfDeviceCommunicator.class);
+        final NetconfDeviceCommunicator communicator = mock(NetconfDeviceCommunicator.class);
         final RemoteDeviceHandler salFacade = mock(RemoteDeviceHandler.class);
 
         final TestingRemoteDeviceConnectorImpl remoteDeviceConnection =

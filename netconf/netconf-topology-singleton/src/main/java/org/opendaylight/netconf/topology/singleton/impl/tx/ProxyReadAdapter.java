@@ -39,7 +39,7 @@ class ProxyReadAdapter {
     private final ActorSystem actorSystem;
     private final Timeout askTimeout;
 
-    public ProxyReadAdapter(final ActorRef masterTxActor, final RemoteDeviceId id, final ActorSystem actorSystem,
+    ProxyReadAdapter(final ActorRef masterTxActor, final RemoteDeviceId id, final ActorSystem actorSystem,
                             final Timeout askTimeout) {
         this.masterTxActor = masterTxActor;
         this.id = id;

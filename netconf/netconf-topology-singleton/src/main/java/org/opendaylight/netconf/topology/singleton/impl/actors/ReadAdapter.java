@@ -28,10 +28,11 @@ class ReadAdapter {
 
     private final DOMDataReadTransaction tx;
 
-    public ReadAdapter(final DOMDataReadTransaction tx) {
+    ReadAdapter(final DOMDataReadTransaction tx) {
         this.tx = tx;
     }
 
+    @SuppressWarnings("checkstyle:IllegalThrows")
     public void handle(final Object message, final ActorRef sender, final ActorRef self) throws Throwable {
         if (message instanceof ReadRequest) {
 

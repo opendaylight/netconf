@@ -180,7 +180,8 @@ public class WriteOnlyTransactionTest {
 
     @Test
     public void testSubmitWithOperation() throws Exception {
-        final CheckedFuture<Void, TransactionCommitFailedException> resultSubmitTx = Futures.immediateCheckedFuture(null);
+        final CheckedFuture<Void, TransactionCommitFailedException> resultSubmitTx =
+                Futures.immediateCheckedFuture(null);
         doReturn(resultSubmitTx).when(writeTx).submit();
         // With Tx
         final DOMDataWriteTransaction wTx = slaveDataBroker.newWriteOnlyTransaction();

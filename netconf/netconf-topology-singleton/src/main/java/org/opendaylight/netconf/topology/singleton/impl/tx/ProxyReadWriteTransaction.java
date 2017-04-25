@@ -34,10 +34,13 @@ public class ProxyReadWriteTransaction implements DOMDataReadWriteTransaction {
     private final ProxyWriteAdapter delegateWrite;
 
     /**
-     * @param masterTxActor {@link org.opendaylight.netconf.topology.singleton.impl.actors.ReadWriteTransactionActor} ref
+     * Constructor for {@code ProxyReadWriteTransaction}.
+     *
+     * @param masterTxActor
+     * {@link org.opendaylight.netconf.topology.singleton.impl.actors.ReadWriteTransactionActor} ref
      * @param id            device id
      * @param actorSystem   system
-     * @param askTimeout
+     * @param askTimeout    timeout
      */
     public ProxyReadWriteTransaction(final ActorRef masterTxActor, final RemoteDeviceId id,
                                      final ActorSystem actorSystem, final Timeout askTimeout) {
