@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_0692b19e",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/SshProxyClientHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-25T14:56:01Z",
+      "side": 1,
+      "message": "align these",
+      "range": {
+        "startLine": 41,
+        "startChar": 26,
+        "endLine": 43,
+        "endChar": 60
+      },
+      "revId": "0e2aef68de0fbc0d3ad6fdad45606adb27315304",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_06c0f17a",
+        "filename": "netconf/netconf-ssh/src/test/java/org/opendaylight/netconf/netty/EchoServer.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-25T14:56:01Z",
+      "side": 1,
+      "message": "extra whitespace",
+      "range": {
+        "startLine": 54,
+        "startChar": 26,
+        "endLine": 54,
+        "endChar": 27
+      },
+      "revId": "0e2aef68de0fbc0d3ad6fdad45606adb27315304",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_c6cee9b3",
+        "filename": "netconf/netconf-ssh/src/test/java/org/opendaylight/netconf/netty/EchoServer.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-25T14:56:01Z",
+      "side": 1,
+      "message": "not needed you can keep it on the previous line.",
+      "range": {
+        "startLine": 83,
+        "startChar": 8,
+        "endLine": 83,
+        "endChar": 21
+      },
+      "revId": "0e2aef68de0fbc0d3ad6fdad45606adb27315304",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
