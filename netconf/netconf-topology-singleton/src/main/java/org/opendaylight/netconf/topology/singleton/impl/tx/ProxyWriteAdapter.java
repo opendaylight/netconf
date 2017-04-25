@@ -60,6 +60,7 @@ public class ProxyWriteAdapter {
         this.askTimeout = askTimeout;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public boolean cancel() {
         if (!opened.compareAndSet(true, false)) {
             return false;

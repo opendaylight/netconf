@@ -14,7 +14,6 @@ import akka.util.Timeout;
 import java.util.Collection;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.binding.api.ClusteredDataTreeChangeListener;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
@@ -81,9 +80,11 @@ class NetconfNodeManager
                     break;
                 case WRITE:
                     if (rootNode.getDataBefore() != null) {
-                        LOG.debug("{}: Operational for node {} rewrited. Trying to register slave mount point", id, nodeId);
+                        LOG.debug("{}: Operational for node {} rewrited. Trying to register slave mount point",
+                                id, nodeId);
                     } else {
-                        LOG.debug("{}: Operational for node {} created. Trying to register slave mount point", id, nodeId);
+                        LOG.debug("{}: Operational for node {} created. Trying to register slave mount point",
+                                id, nodeId);
                     }
                     handleSlaveMountPoint(rootNode);
                     break;

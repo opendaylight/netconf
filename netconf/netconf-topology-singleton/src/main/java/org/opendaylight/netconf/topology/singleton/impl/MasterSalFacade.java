@@ -156,6 +156,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     private void closeGracefully(final AutoCloseable resource) {
         if (resource != null) {
             try {

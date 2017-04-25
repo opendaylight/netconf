@@ -120,6 +120,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         });
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void stopRemoteDeviceConnection() {
         Preconditions.checkNotNull(deviceCommunicatorDTO, remoteDeviceId + ": Device communicator was not created.");
@@ -225,9 +226,9 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         //non-module capabilities should not exist in yang module capabilities
         final NetconfSessionPreferences netconfSessionPreferences = NetconfSessionPreferences.fromStrings(capabilities);
-        Preconditions.checkState(netconfSessionPreferences.getNonModuleCaps().isEmpty(), "List yang-module-capabilities/capability " +
-                "should contain only module based capabilities. Non-module capabilities used: " +
-                netconfSessionPreferences.getNonModuleCaps());
+        Preconditions.checkState(netconfSessionPreferences.getNonModuleCaps().isEmpty(),
+                "List yang-module-capabilities/capability should contain only module based capabilities. "
+                        + "Non-module capabilities used: " + netconfSessionPreferences.getNonModuleCaps());
 
         if (node.getNonModuleCapabilities() != null) {
             capabilities.addAll(node.getNonModuleCapabilities().getCapability());
@@ -271,10 +272,13 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         final AuthenticationHandler authHandler;
         final Credentials credentials = node.getCredentials();
-        if (credentials instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) {
+        if (credentials instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf
+                .node.credentials.credentials.LoginPassword) {
             authHandler = new LoginPassword(
-                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getUsername(),
-                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getPassword());
+                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf
+                            .node.credentials.credentials.LoginPassword) credentials).getUsername(),
+                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf
+                            .node.credentials.credentials.LoginPassword) credentials).getPassword());
         } else {
             throw new IllegalStateException(remoteDeviceId + ": Only login/password authentication is supported");
         }

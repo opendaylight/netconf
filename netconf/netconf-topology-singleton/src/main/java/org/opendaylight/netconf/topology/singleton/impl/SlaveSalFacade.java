@@ -56,6 +56,7 @@ public class SlaveSalFacade {
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public void close() {
         unregisterSlaveMountPoint();
         try {

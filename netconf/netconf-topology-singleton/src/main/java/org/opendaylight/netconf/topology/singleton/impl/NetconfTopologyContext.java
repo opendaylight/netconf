@@ -80,7 +80,8 @@ class NetconfTopologyContext implements ClusterSingletonService {
         }
 
         if (!finalClose) {
-            final String masterAddress = Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
+            final String masterAddress =
+                    Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
             masterActorRef = netconfTopologyDeviceSetup.getActorSystem().actorOf(NetconfNodeActor.props(
                     netconfTopologyDeviceSetup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY,
                     actorResponseWaitTime, mountService),
@@ -129,7 +130,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
     }
 
     /**
-     * If configuration data was changed
+     * Refresh, if configuration data was changed.
      * @param setup new setup
      */
     void refresh(@Nonnull final NetconfTopologySetup setup) {

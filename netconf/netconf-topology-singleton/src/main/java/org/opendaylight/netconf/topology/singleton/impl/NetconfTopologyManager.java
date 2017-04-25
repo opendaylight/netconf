@@ -161,6 +161,7 @@ public class NetconfTopologyManager
         contexts.put(instanceIdentifier, newNetconfTopologyContext);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     private void stopNetconfDeviceContext(final InstanceIdentifier<Node> instanceIdentifier) {
         if (contexts.containsKey(instanceIdentifier)) {
             try {
@@ -174,6 +175,7 @@ public class NetconfTopologyManager
         }
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void close() {
         if (dataChangeListenerRegistration != null) {
@@ -220,7 +222,8 @@ public class NetconfTopologyManager
                         NetconfTopologyUtils.createTopologyListPath(topologyId).child(Node.class)), this);
     }
 
-    private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType, final String topologyId) {
+    private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType,
+                              final String topologyId) {
         final NetworkTopology networkTopology = new NetworkTopologyBuilder().build();
         final InstanceIdentifier<NetworkTopology> networkTopologyId =
                 InstanceIdentifier.builder(NetworkTopology.class).build();
