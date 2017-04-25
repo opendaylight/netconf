@@ -28,7 +28,6 @@ import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
@@ -75,9 +74,11 @@ public class ReadOnlyTransactionTest {
     private DOMDataReadOnlyTransaction readTx;
     @Mock
     private DOMRpcService domRpcService;
+    private YangInstanceIdentifier instanceIdentifier;
+    private LogicalDatastoreType storeType;
 
     @Before
-    public void setup() throws UnknownHostException {
+    public void setup() throws Exception {
         initMocks(this);
 
         system = ActorSystem.create();
@@ -94,12 +95,14 @@ public class ReadOnlyTransactionTest {
         sourceIdentifiers = Lists.newArrayList();
 
         //device read tx
-        readTx = mock(DOMDataReadOnlyTransaction.class);
         doReturn(readTx).when(deviceDataBroker).newReadOnlyTransaction();
 
         // Create slave data broker for testing proxy
         slaveDataBroker =
                 new ProxyDOMDataBroker(system, remoteDeviceId, masterRef, Timeout.apply(5, TimeUnit.SECONDS));
+        initializeDataTest();
+        instanceIdentifier = YangInstanceIdentifier.EMPTY;
+        storeType = LogicalDatastoreType.CONFIGURATION;
     }
 
     @After
@@ -110,39 +113,12 @@ public class ReadOnlyTransactionTest {
 
     @Test
     public void testRead() throws Exception {
-
-        /* Initialize data on master */
-
-        initializeDataTest();
-
-        final YangInstanceIdentifier instanceIdentifier = YangInstanceIdentifier.EMPTY;
-        final LogicalDatastoreType storeType = LogicalDatastoreType.CONFIGURATION;
-
-        // Message: EmptyReadResponse
-
-        final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> resultEmpty =
-                Futures.immediateCheckedFuture(Optional.absent());
-
-        doReturn(resultEmpty).when(readTx).read(storeType, instanceIdentifier);
-
-        final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> resultEmptyResponse =
-                slaveDataBroker.newReadOnlyTransaction().read(storeType,
-                        instanceIdentifier);
-
-        final Optional<NormalizedNode<?, ?>> resultEmptyMessage =
-                resultEmptyResponse.checkedGet(TIMEOUT_SEC, TimeUnit.SECONDS);
-
-        assertEquals(resultEmptyMessage, Optional.absent());
-
         // Message: NormalizedNodeMessage
-
         final NormalizedNode<?, ?> outputNode = ImmutableContainerNodeBuilder.create()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("TestQname")))
                 .withChild(ImmutableNodes.leafNode(QName.create("NodeQname"), "foo")).build();
-
         final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> resultNormalizedNodeMessage =
                 Futures.immediateCheckedFuture(Optional.of(outputNode));
-
         doReturn(resultNormalizedNodeMessage).when(readTx).read(storeType, instanceIdentifier);
 
         final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> resultNodeMessageResponse =
@@ -153,9 +129,28 @@ public class ReadOnlyTransactionTest {
 
         assertTrue(resultNodeMessage.isPresent());
         assertEquals(resultNodeMessage.get(), outputNode);
+    }
 
+    @Test
+    public void testReadEmpty() throws Exception {
+        // Message: EmptyReadResponse
+        final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> resultEmpty =
+                Futures.immediateCheckedFuture(Optional.absent());
+        doReturn(resultEmpty).when(readTx).read(storeType, instanceIdentifier);
+
+        final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> resultEmptyResponse =
+                slaveDataBroker.newReadOnlyTransaction().read(storeType,
+                        instanceIdentifier);
+
+        final Optional<NormalizedNode<?, ?>> resultEmptyMessage =
+                resultEmptyResponse.checkedGet(TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        assertEquals(resultEmptyMessage, Optional.absent());
+    }
+
+    @Test
+    public void testReadFail() throws Exception {
         // Message: Throwable
-
         final ReadFailedException readFailedException = new ReadFailedException("Fail", null);
         final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> resultThrowable =
                 Futures.immediateFailedCheckedFuture(readFailedException);
@@ -167,24 +162,13 @@ public class ReadOnlyTransactionTest {
 
         exception.expect(ReadFailedException.class);
         resultThrowableResponse.checkedGet(TIMEOUT_SEC, TimeUnit.SECONDS);
-
     }
 
     @Test
     public void testExist() throws Exception {
-
-        /* Initialize data on master */
-
-        initializeDataTest();
-
-        final YangInstanceIdentifier instanceIdentifier = YangInstanceIdentifier.EMPTY;
-        final LogicalDatastoreType storeType = LogicalDatastoreType.CONFIGURATION;
-
         // Message: True
-
         final CheckedFuture<Boolean, ReadFailedException> resultTrue =
                 Futures.immediateCheckedFuture(true);
-
         doReturn(resultTrue).when(readTx).exists(storeType, instanceIdentifier);
 
         final CheckedFuture<Boolean, ReadFailedException> trueResponse =
@@ -193,25 +177,12 @@ public class ReadOnlyTransactionTest {
         final Boolean trueMessage = trueResponse.checkedGet(TIMEOUT_SEC, TimeUnit.SECONDS);
 
         assertEquals(true, trueMessage);
+    }
 
-        // Message: False
-
-        final CheckedFuture<Boolean, ReadFailedException> resultFalse = Futures.immediateCheckedFuture(false);
-
-        doReturn(resultFalse).when(readTx).exists(storeType, instanceIdentifier);
-
-        final CheckedFuture<Boolean, ReadFailedException> falseResponse =
-                slaveDataBroker.newReadOnlyTransaction().exists(storeType,
-                        instanceIdentifier);
-
-        final Boolean falseMessage = falseResponse.checkedGet(TIMEOUT_SEC, TimeUnit.SECONDS);
-
-        assertEquals(false, falseMessage);
-
+    @Test
+    public void testExistsNull() throws Exception {
         // Message: False, result null
-
         final CheckedFuture<Boolean, ReadFailedException> resultNull = Futures.immediateCheckedFuture(null);
-
         doReturn(resultNull).when(readTx).exists(storeType, instanceIdentifier);
 
         final CheckedFuture<Boolean, ReadFailedException> nullResponse =
@@ -221,13 +192,29 @@ public class ReadOnlyTransactionTest {
         final Boolean nullFalseMessage = nullResponse.checkedGet(TIMEOUT_SEC, TimeUnit.SECONDS);
 
         assertEquals(false, nullFalseMessage);
+    }
 
+    @Test
+    public void testExistsFalse() throws Exception {
+        // Message: False
+        final CheckedFuture<Boolean, ReadFailedException> resultFalse = Futures.immediateCheckedFuture(false);
+        doReturn(resultFalse).when(readTx).exists(storeType, instanceIdentifier);
+
+        final CheckedFuture<Boolean, ReadFailedException> falseResponse =
+                slaveDataBroker.newReadOnlyTransaction().exists(storeType,
+                        instanceIdentifier);
+
+        final Boolean falseMessage = falseResponse.checkedGet(TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        assertEquals(false, falseMessage);
+    }
+
+    @Test
+    public void testExistsFail() throws Exception {
         // Message: Throwable
-
         final ReadFailedException readFailedException = new ReadFailedException("Fail", null);
         final CheckedFuture<Boolean, ReadFailedException> resultThrowable =
                 Futures.immediateFailedCheckedFuture(readFailedException);
-
         doReturn(resultThrowable).when(readTx).exists(storeType, instanceIdentifier);
 
         final CheckedFuture<Boolean, ReadFailedException> resultThrowableResponse =
@@ -235,7 +222,6 @@ public class ReadOnlyTransactionTest {
 
         exception.expect(ReadFailedException.class);
         resultThrowableResponse.checkedGet(TIMEOUT_SEC, TimeUnit.SECONDS);
-
     }
 
     private void initializeDataTest() throws Exception {
