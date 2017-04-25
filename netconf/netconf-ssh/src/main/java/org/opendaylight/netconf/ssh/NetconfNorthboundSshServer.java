@@ -44,7 +44,8 @@ public class NetconfNorthboundSshServer {
         sshProxyServer = new SshProxyServer(Executors.newScheduledThreadPool(1), workerGroup, eventExecutor);
 
         final InetSocketAddress inetAddress = getInetAddress(bindingAddress, portNumber);
-        final SshProxyServerConfigurationBuilder sshProxyServerConfigurationBuilder = new SshProxyServerConfigurationBuilder();
+        final SshProxyServerConfigurationBuilder sshProxyServerConfigurationBuilder =
+                new SshProxyServerConfigurationBuilder();
         sshProxyServerConfigurationBuilder.setBindingAddress(inetAddress);
         sshProxyServerConfigurationBuilder.setLocalAddress(localAddress);
         sshProxyServerConfigurationBuilder.setAuthenticator(authProvider);
@@ -68,8 +69,9 @@ public class NetconfNorthboundSshServer {
 
     private InetSocketAddress getInetAddress(final String bindingAddress, final String portNumber) {
         try {
-            IpAddress ipAddress= IpAddressBuilder.getDefaultInstance(bindingAddress);
-            final InetAddress inetAd = InetAddress.getByName(ipAddress.getIpv4Address() == null ? ipAddress.getIpv6Address().getValue() : ipAddress.getIpv4Address().getValue());
+            IpAddress ipAddress = IpAddressBuilder.getDefaultInstance(bindingAddress);
+            final InetAddress inetAd = InetAddress.getByName(ipAddress.getIpv4Address() == null
+                    ? ipAddress.getIpv6Address().getValue() : ipAddress.getIpv4Address().getValue());
             return new InetSocketAddress(inetAd, Integer.valueOf(portNumber));
         } catch (final UnknownHostException e) {
             throw new IllegalArgumentException("Unable to bind netconf endpoint to address " + bindingAddress, e);

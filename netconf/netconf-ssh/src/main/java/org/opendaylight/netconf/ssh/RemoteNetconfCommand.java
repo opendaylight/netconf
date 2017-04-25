@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
  * This command handles all netconf related rpc and forwards to delegate server.
  * Uses netty to make a local connection to delegate server.
  *
+ * <p>
  * Command is Apache Mina SSH terminology for objects handling ssh data.
  */
 public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
@@ -105,24 +106,26 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
         final Bootstrap clientBootstrap = new Bootstrap();
         clientBootstrap.group(clientEventGroup).channel(LocalChannel.class);
 
-        clientBootstrap
-                .handler(new ChannelInitializer<LocalChannel>() {
-                    @Override
-                    public void initChannel(final LocalChannel ch) throws Exception {
-                        ch.pipeline().addLast(new SshProxyClientHandler(in, out, netconfHelloMessageAdditionalHeader, callback));
-                    }
-                });
+        clientBootstrap.handler(new ChannelInitializer<LocalChannel>() {
+            @Override
+            public void initChannel(final LocalChannel ch) throws Exception {
+                ch.pipeline()
+                        .addLast(new SshProxyClientHandler(in, out, netconfHelloMessageAdditionalHeader, callback));
+            }
+        });
         clientChannelFuture = clientBootstrap.connect(localAddress);
         clientChannelFuture.addListener(new GenericFutureListener<ChannelFuture>() {
 
             @Override
             public void operationComplete(final ChannelFuture future) throws Exception {
-                if(future.isSuccess()) {
+                if (future.isSuccess()) {
                     clientChannel = clientChannelFuture.channel();
                 } else {
-                    LOG.warn("Unable to establish internal connection to netconf server for client: {}", getClientAddress());
+                    LOG.warn("Unable to establish internal connection to netconf server for client: {}",
+                            getClientAddress());
                     Preconditions.checkNotNull(callback, "Exit callback must be set");
-                    callback.onExit(1, "Unable to establish internal connection to netconf server for client: "+ getClientAddress());
+                    callback.onExit(1, "Unable to establish internal connection to netconf server for client: "
+                            + getClientAddress());
                 }
             }
         });
@@ -134,13 +137,14 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
                 getClientAddress(), clientChannel);
 
         clientChannelFuture.cancel(true);
-        if(clientChannel != null) {
+        if (clientChannel != null) {
             clientChannel.close().addListener(new GenericFutureListener<ChannelFuture>() {
 
                 @Override
                 public void operationComplete(final ChannelFuture future) throws Exception {
                     if (future.isSuccess() == false) {
-                        LOG.warn("Unable to release internal connection to netconf server on channel: {}", clientChannel);
+                        LOG.warn("Unable to release internal connection to netconf server on channel: {}",
+                                clientChannel);
                     }
                 }
             });
@@ -156,7 +160,7 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
         final SocketAddress remoteAddress = session.getIoSession().getRemoteAddress();
         String hostName = "";
         String port = "";
-        if(remoteAddress instanceof InetSocketAddress) {
+        if (remoteAddress instanceof InetSocketAddress) {
             hostName = ((InetSocketAddress) remoteAddress).getAddress().getHostAddress();
             port = Integer.toString(((InetSocketAddress) remoteAddress).getPort());
         }

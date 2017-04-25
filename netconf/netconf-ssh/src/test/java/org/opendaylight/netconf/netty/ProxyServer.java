@@ -30,6 +30,7 @@ public class ProxyServer implements Runnable {
         this.proxyHandlerFactory = proxyHandlerFactory;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public void run() {
         // Configure the server.
         final EventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -50,10 +51,10 @@ public class ProxyServer implements Runnable {
 
             // Start the server.
             InetSocketAddress address = new InetSocketAddress("127.0.0.1", 8080);
-            ChannelFuture f = serverBootstrap.bind(address).sync();
+            ChannelFuture future = serverBootstrap.bind(address).sync();
 
             // Wait until the server socket is closed.
-            f.channel().closeFuture().sync();
+            future.channel().closeFuture().sync();
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -62,7 +63,8 @@ public class ProxyServer implements Runnable {
             workerGroup.shutdownGracefully();
         }
     }
-    public static interface ProxyHandlerFactory {
+
+    public interface ProxyHandlerFactory {
         ChannelHandler create(EventLoopGroup bossGroup, LocalAddress localAddress);
     }
 
