@@ -51,7 +51,8 @@ public final class NotificationsTransformUtil {
 
         final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
         moduleInfoBackedContext.addModuleInfos(Collections.singletonList($YangModuleInfoImpl.getInstance()));
-        moduleInfoBackedContext.addModuleInfos(Collections.singletonList(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.$YangModuleInfoImpl.getInstance()));
+        moduleInfoBackedContext.addModuleInfos(Collections.singletonList(org.opendaylight.yang.gen.v1.urn.ietf.params
+                .xml.ns.yang.ietf.netconf.notifications.rev120206.$YangModuleInfoImpl.getInstance()));
         final Optional<SchemaContext> schemaContextOptional = moduleInfoBackedContext.tryToCreateSchemaContext();
         Preconditions.checkState(schemaContextOptional.isPresent());
         NOTIFICATIONS_SCHEMA_CTX = schemaContextOptional.get();
@@ -62,41 +63,43 @@ public final class NotificationsTransformUtil {
 
         final JavassistUtils javassist = JavassistUtils.forClassPool(ClassPool.getDefault());
         CODEC_REGISTRY = new BindingNormalizedNodeCodecRegistry(StreamWriterGenerator.create(javassist));
-        CODEC_REGISTRY.onBindingRuntimeContextUpdated(BindingRuntimeContext.create(moduleInfoBackedContext, NOTIFICATIONS_SCHEMA_CTX));
+        CODEC_REGISTRY.onBindingRuntimeContextUpdated(BindingRuntimeContext.create(moduleInfoBackedContext,
+                NOTIFICATIONS_SCHEMA_CTX));
     }
 
     private static RpcDefinition findCreateSubscriptionRpc() {
-        return Iterables.getFirst(Collections2.filter(NOTIFICATIONS_SCHEMA_CTX.getOperations(), new Predicate<RpcDefinition>() {
-            @Override
-            public boolean apply(final RpcDefinition input) {
-                return input.getQName().getLocalName().equals(CreateSubscription.CREATE_SUBSCRIPTION);
-            }
-        }), null);
+        return Iterables.getFirst(Collections2.filter(NOTIFICATIONS_SCHEMA_CTX.getOperations(),
+            new Predicate<RpcDefinition>() {
+                @Override
+                public boolean apply(final RpcDefinition input) {
+                    return input.getQName().getLocalName().equals(CreateSubscription.CREATE_SUBSCRIPTION);
+                }
+            }), null);
     }
 
     /**
-     * Transform base notification for capabilities into NetconfNotification
+     * Transform base notification for capabilities into NetconfNotification.
      */
     public static NetconfNotification transform(final Notification notification, SchemaPath path) {
         return transform(notification, Optional.<Date>absent(), path);
     }
 
-    public static NetconfNotification transform(final Notification notification, final Date eventTime, SchemaPath path) {
+    public static NetconfNotification transform(final Notification notification,
+                                                final Date eventTime, SchemaPath path) {
         return transform(notification, Optional.fromNullable(eventTime), path);
     }
 
-    private static NetconfNotification transform(final Notification notification, final Optional<Date> eventTime, SchemaPath path) {
+    private static NetconfNotification transform(final Notification notification,
+                                                 final Optional<Date> eventTime, SchemaPath path) {
         final ContainerNode containerNode = CODEC_REGISTRY.toNormalizedNodeNotification(notification);
         final DOMResult result = new DOMResult(XmlUtil.newDocument());
         try {
             NetconfUtil.writeNormalizedNode(containerNode, result, path, NOTIFICATIONS_SCHEMA_CTX);
-        } catch (final XMLStreamException| IOException e) {
+        } catch (final XMLStreamException | IOException e) {
             throw new IllegalStateException("Unable to serialize " + notification, e);
         }
         final Document node = (Document) result.getNode();
-        return eventTime.isPresent() ?
-                new NetconfNotification(node, eventTime.get()):
-                new NetconfNotification(node);
+        return eventTime.isPresent() ? new NetconfNotification(node, eventTime.get()) : new NetconfNotification(node);
     }
 
 }

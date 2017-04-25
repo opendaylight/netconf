@@ -29,10 +29,11 @@ import org.w3c.dom.Element;
 
 public class CreateSubscriptionTest {
 
-    private static final String CREATE_SUBSCRIPTION_XML = "<create-subscription\n" +
-            "xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\" xmlns:netconf=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
-            "<stream>TESTSTREAM</stream>" +
-            "</create-subscription>";
+    private static final String CREATE_SUBSCRIPTION_XML = "<create-subscription\n"
+            + "xmlns=\"urn:ietf:params:xml:ns:netconf:notification:1.0\" "
+            + "xmlns:netconf=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+            + "<stream>TESTSTREAM</stream>"
+            + "</create-subscription>";
 
     @Mock
     private NetconfNotificationRegistry notificationRegistry;
@@ -41,7 +42,8 @@ public class CreateSubscriptionTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         doReturn(true).when(notificationRegistry).isStreamAvailable(any(StreamNameType.class));
-        doReturn(mock(NotificationListenerRegistration.class)).when(notificationRegistry).registerNotificationListener(any(StreamNameType.class), any(NetconfNotificationListener.class));
+        doReturn(mock(NotificationListenerRegistration.class)).when(notificationRegistry)
+                .registerNotificationListener(any(StreamNameType.class), any(NetconfNotificationListener.class));
     }
 
     @Test
@@ -52,7 +54,8 @@ public class CreateSubscriptionTest {
         final Element e = XmlUtil.readXmlToElement(CREATE_SUBSCRIPTION_XML);
 
         final XmlElement operationElement = XmlElement.fromDomElement(e);
-        final Element element = createSubscription.handleWithNoSubsequentOperations(XmlUtil.newDocument(), operationElement);
+        final Element element =
+                createSubscription.handleWithNoSubsequentOperations(XmlUtil.newDocument(), operationElement);
 
         Assert.assertThat(XmlUtil.toString(element), CoreMatchers.containsString("ok"));
     }
