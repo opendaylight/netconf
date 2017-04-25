@@ -26,6 +26,7 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(EchoServerHandler.class);
     private String fromLastNewLine = "";
     private final Splitter splitter = Splitter.onPattern("\r?\n");
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         LOG.debug("sleep start");

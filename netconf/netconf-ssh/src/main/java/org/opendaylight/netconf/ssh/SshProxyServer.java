@@ -52,10 +52,12 @@ public class SshProxyServer implements AutoCloseable {
     private final EventLoopGroup clientGroup;
     private final IoServiceFactoryFactory nioServiceWithPoolFactoryFactory;
 
-    public SshProxyServer(final ScheduledExecutorService minaTimerExecutor, final EventLoopGroup clientGroup, final ExecutorService nioExecutor) {
+    public SshProxyServer(final ScheduledExecutorService minaTimerExecutor,
+                          final EventLoopGroup clientGroup, final ExecutorService nioExecutor) {
         this.minaTimerExecutor = minaTimerExecutor;
         this.clientGroup = clientGroup;
-        this.nioServiceWithPoolFactoryFactory = new NioServiceWithPoolFactory.NioServiceWithPoolFactoryFactory(nioExecutor);
+        this.nioServiceWithPoolFactoryFactory =
+                new NioServiceWithPoolFactory.NioServiceWithPoolFactoryFactory(nioExecutor);
         this.sshServer = SshServer.setUpDefaultServer();
     }
 
@@ -86,7 +88,8 @@ public class SshProxyServer implements AutoCloseable {
         sshServer.setProperties(getProperties(sshProxyServerConfiguration));
 
         final RemoteNetconfCommand.NetconfCommandFactory netconfCommandFactory =
-                new RemoteNetconfCommand.NetconfCommandFactory(clientGroup, sshProxyServerConfiguration.getLocalAddress());
+                new RemoteNetconfCommand.NetconfCommandFactory(clientGroup,
+                        sshProxyServerConfiguration.getLocalAddress());
         sshServer.setSubsystemFactories(ImmutableList.of(netconfCommandFactory));
         sshServer.start();
     }
@@ -112,14 +115,15 @@ public class SshProxyServer implements AutoCloseable {
     }
 
     /**
-     * Based on Nio2ServiceFactory with one addition: injectable executor
+     * Based on Nio2ServiceFactory with one addition: injectable executor.
      */
-    private static final class NioServiceWithPoolFactory extends CloseableUtils.AbstractCloseable implements IoServiceFactory {
+    private static final class NioServiceWithPoolFactory
+            extends CloseableUtils.AbstractCloseable implements IoServiceFactory {
 
         private final FactoryManager manager;
         private final AsynchronousChannelGroup group;
 
-        public NioServiceWithPoolFactory(final FactoryManager manager, final ExecutorService executor) {
+        NioServiceWithPoolFactory(final FactoryManager manager, final ExecutorService executor) {
             this.manager = manager;
             try {
                 group = AsynchronousChannelGroup.withThreadPool(executor);
@@ -138,6 +142,7 @@ public class SshProxyServer implements AutoCloseable {
             return new Nio2Acceptor(manager, handler, group);
         }
 
+        @SuppressWarnings("checkstyle:IllegalCatch")
         @Override
         protected void doCloseImmediately() {
             try {

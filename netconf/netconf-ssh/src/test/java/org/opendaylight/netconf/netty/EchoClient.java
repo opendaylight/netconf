@@ -45,23 +45,24 @@ public class EchoClient extends Thread {
         this.channelInitializer = channelInitializer;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void run() {
         // Configure the client.
         EventLoopGroup group = new NioEventLoopGroup();
         try {
-            Bootstrap b = new Bootstrap();
+            Bootstrap bootstrap = new Bootstrap();
 
-            b.group(group)
+            bootstrap.group(group)
                     .channel(LocalChannel.class)
                     .handler(channelInitializer);
 
             // Start the client.
             LocalAddress localAddress = new LocalAddress("foo");
-            ChannelFuture f = b.connect(localAddress).sync();
+            ChannelFuture future = bootstrap.connect(localAddress).sync();
 
             // Wait until the connection is closed.
-            f.channel().closeFuture().sync();
+            future.channel().closeFuture().sync();
         } catch (Exception e) {
             LOG.error("Error in client", e);
             throw new RuntimeException("Error in client", e);

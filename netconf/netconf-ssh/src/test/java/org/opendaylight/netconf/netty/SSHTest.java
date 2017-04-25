@@ -73,18 +73,21 @@ public class SSHTest {
 
         final InetSocketAddress addr = new InetSocketAddress("127.0.0.1", 10831);
         final SshProxyServer sshProxyServer = new SshProxyServer(minaTimerEx, nettyGroup, nioExec);
-        sshProxyServer.bind(
-                new SshProxyServerConfigurationBuilder().setBindingAddress(addr).setLocalAddress(NetconfConfiguration.NETCONF_LOCAL_ADDRESS).setAuthenticator(new AuthProvider() {
-                    @Override
-                    public boolean authenticated(final String username, final String password) {
-                        return true;
-                    }
-                }).setKeyPairProvider(new PEMGeneratorHostKeyProvider(sshKeyPair.toPath().toAbsolutePath().toString())).setIdleTimeout(Integer.MAX_VALUE).createSshProxyServerConfiguration());
+        sshProxyServer.bind(new SshProxyServerConfigurationBuilder()
+                .setBindingAddress(addr).setLocalAddress(NetconfConfiguration.NETCONF_LOCAL_ADDRESS)
+                .setAuthenticator(new AuthProvider() {
+                        @Override
+                        public boolean authenticated(final String username, final String password) {
+                            return true;
+                        }
+                })
+                .setKeyPairProvider(new PEMGeneratorHostKeyProvider(sshKeyPair.toPath().toAbsolutePath().toString()))
+                .setIdleTimeout(Integer.MAX_VALUE).createSshProxyServerConfiguration());
 
         final EchoClientHandler echoClientHandler = connectClient(addr);
 
         Stopwatch stopwatch = Stopwatch.createStarted();
-        while(echoClientHandler.isConnected() == false && stopwatch.elapsed(TimeUnit.SECONDS) < 30) {
+        while (echoClientHandler.isConnected() == false && stopwatch.elapsed(TimeUnit.SECONDS) < 30) {
             Thread.sleep(500);
         }
         assertTrue(echoClientHandler.isConnected());
@@ -131,7 +134,7 @@ public class SSHTest {
         final InetSocketAddress address = new InetSocketAddress(12345);
         final EchoClientHandler echoClientHandler = connectClient(address);
         final Stopwatch stopwatch = Stopwatch.createStarted();
-        while(echoClientHandler.getState() == State.CONNECTING && stopwatch.elapsed(TimeUnit.SECONDS) < 5) {
+        while (echoClientHandler.getState() == State.CONNECTING && stopwatch.elapsed(TimeUnit.SECONDS) < 5) {
             Thread.sleep(100);
         }
         assertFalse(echoClientHandler.isConnected());
