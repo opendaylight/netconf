@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_eb0db691",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientDispatcherImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-25T13:41:46Z",
+      "side": 1,
+      "message": "move to next line",
+      "range": {
+        "startLine": 70,
+        "startChar": 53,
+        "endLine": 71,
+        "endChar": 81
+      },
+      "revId": "7f758ea93b0ad56798b34d064c82f7a11fd959f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_cb10b2aa",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientDispatcherImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-25T13:41:46Z",
+      "side": 1,
+      "message": "move to next line",
+      "range": {
+        "startLine": 90,
+        "startChar": 53,
+        "endLine": 91,
+        "endChar": 81
+      },
+      "revId": "7f758ea93b0ad56798b34d064c82f7a11fd959f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_2b27be13",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/conf/NetconfClientConfiguration.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-04-25T13:41:46Z",
+      "side": 1,
+      "message": "warn and log the value and provide some context, Unexptected protocol in netconf client configuration for example.",
+      "range": {
+        "startLine": 90,
+        "startChar": 20,
+        "endLine": 90,
+        "endChar": 25
+      },
+      "revId": "7f758ea93b0ad56798b34d064c82f7a11fd959f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
