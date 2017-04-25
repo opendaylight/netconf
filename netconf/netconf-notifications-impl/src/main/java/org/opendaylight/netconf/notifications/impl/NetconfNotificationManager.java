@@ -44,7 +44,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ThreadSafe
-public class NetconfNotificationManager implements NetconfNotificationCollector, NetconfNotificationRegistry, NetconfNotificationListener, AutoCloseable {
+public class NetconfNotificationManager implements NetconfNotificationCollector, NetconfNotificationRegistry,
+        NetconfNotificationListener, AutoCloseable {
 
     public static final StreamNameType BASE_STREAM_NAME = new StreamNameType("NETCONF");
     public static final Stream BASE_NETCONF_STREAM;
@@ -60,11 +61,14 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNotificationManager.class);
 
-    // TODO excessive synchronization provides thread safety but is most likely not optimal (combination of concurrent collections might improve performance)
-    // And also calling callbacks from a synchronized block is dangerous since the listeners/publishers can block the whole notification processing
+    // TODO excessive synchronization provides thread safety but is most likely not optimal
+    // (combination of concurrent collections might improve performance)
+    // And also calling callbacks from a synchronized block is dangerous
+    // since the listeners/publishers can block the whole notification processing
 
     @GuardedBy("this")
-    private final Multimap<StreamNameType, GenericNotificationListenerReg> notificationListeners = HashMultimap.create();
+    private final Multimap<StreamNameType, GenericNotificationListenerReg> notificationListeners =
+            HashMultimap.create();
 
     @GuardedBy("this")
     private final Set<NetconfNotificationStreamListener> streamListeners = Sets.newHashSet();
@@ -91,13 +95,15 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
     }
 
     @Override
-    public synchronized NotificationListenerRegistration registerNotificationListener(final StreamNameType stream, final NetconfNotificationListener listener) {
+    public synchronized NotificationListenerRegistration registerNotificationListener(final StreamNameType stream,
+                                                                          final NetconfNotificationListener listener) {
         Preconditions.checkNotNull(stream);
         Preconditions.checkNotNull(listener);
 
         LOG.trace("Notification listener registered for stream: {}", stream);
 
-        final GenericNotificationListenerReg genericNotificationListenerReg = new GenericNotificationListenerReg(listener) {
+        final GenericNotificationListenerReg genericNotificationListenerReg =
+                new GenericNotificationListenerReg(listener) {
             @Override
             public void close() {
                 synchronized (NetconfNotificationManager.this) {
@@ -122,7 +128,8 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
     }
 
     @Override
-    public synchronized NotificationRegistration registerStreamListener(final NetconfNotificationStreamListener listener) {
+    public synchronized NotificationRegistration registerStreamListener(
+            final NetconfNotificationStreamListener listener) {
         streamListeners.add(listener);
 
         // Notify about all already available
@@ -169,14 +176,16 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
         }
 
         if (streamMetadata.containsKey(streamName)) {
-            LOG.warn("Notification stream {} already registered as: {}. Will be reused", streamName, streamMetadata.get(streamName));
+            LOG.warn("Notification stream {} already registered as: {}. Will be reused", streamName,
+                    streamMetadata.get(streamName));
         } else {
             streamMetadata.put(streamName, stream);
         }
 
         availableStreams.add(streamName);
 
-        final GenericNotificationPublisherReg genericNotificationPublisherReg = new GenericNotificationPublisherReg(this, streamName) {
+        final GenericNotificationPublisherReg genericNotificationPublisherReg =
+                new GenericNotificationPublisherReg(this, streamName) {
             @Override
             public void close() {
                 synchronized (NetconfNotificationManager.this) {
@@ -191,7 +200,8 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
         return genericNotificationPublisherReg;
     }
 
-    private void unregisterNotificationPublisher(final StreamNameType streamName, final GenericNotificationPublisherReg genericNotificationPublisherReg) {
+    private void unregisterNotificationPublisher(final StreamNameType streamName,
+                                             final GenericNotificationPublisherReg genericNotificationPublisherReg) {
         availableStreams.remove(streamName);
         notificationPublishers.remove(genericNotificationPublisherReg);
 
@@ -219,7 +229,8 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
 
     @Override
     public BaseNotificationPublisherRegistration registerBaseNotificationPublisher() {
-        final NotificationPublisherRegistration notificationPublisherRegistration = registerNotificationPublisher(BASE_NETCONF_STREAM);
+        final NotificationPublisherRegistration notificationPublisherRegistration =
+                registerNotificationPublisher(BASE_NETCONF_STREAM);
         return new BaseNotificationPublisherReg(notificationPublisherRegistration);
     }
 
@@ -227,7 +238,8 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
         private NetconfNotificationManager baseListener;
         private final StreamNameType registeredStream;
 
-        public GenericNotificationPublisherReg(final NetconfNotificationManager baseListener, final StreamNameType registeredStream) {
+        GenericNotificationPublisherReg(final NetconfNotificationManager baseListener,
+                                               final StreamNameType registeredStream) {
             this.baseListener = baseListener;
             this.registeredStream = registeredStream;
         }
@@ -254,7 +266,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
 
         private final NotificationPublisherRegistration baseRegistration;
 
-        public BaseNotificationPublisherReg(final NotificationPublisherRegistration baseRegistration) {
+        BaseNotificationPublisherReg(final NotificationPublisherRegistration baseRegistration) {
             this.baseRegistration = baseRegistration;
         }
 
@@ -269,7 +281,8 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
 
         @Override
         public void onCapabilityChanged(final NetconfCapabilityChange capabilityChange) {
-            baseRegistration.onNotification(BASE_STREAM_NAME, serializeNotification(capabilityChange, CAPABILITY_CHANGE_SCHEMA_PATH));
+            baseRegistration.onNotification(BASE_STREAM_NAME,
+                    serializeNotification(capabilityChange, CAPABILITY_CHANGE_SCHEMA_PATH));
         }
 
         @Override
@@ -286,7 +299,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
     private class GenericNotificationListenerReg implements NotificationListenerRegistration {
         private final NetconfNotificationListener listener;
 
-        public GenericNotificationListenerReg(final NetconfNotificationListener listener) {
+        GenericNotificationListenerReg(final NetconfNotificationListener listener) {
             this.listener = listener;
         }
 

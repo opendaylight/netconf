@@ -37,7 +37,8 @@ import org.w3c.dom.Element;
 public class Get extends AbstractNetconfOperation implements AutoCloseable {
 
     private static final String GET = "get";
-    private static final InstanceIdentifier<Netconf> NETCONF_SUBTREE_INSTANCE_IDENTIFIER = InstanceIdentifier.builder(Netconf.class).build();
+    private static final InstanceIdentifier<Netconf> NETCONF_SUBTREE_INSTANCE_IDENTIFIER =
+            InstanceIdentifier.builder(Netconf.class).build();
 
     private final NetconfNotificationRegistry notificationRegistry;
 
@@ -53,23 +54,33 @@ public class Get extends AbstractNetconfOperation implements AutoCloseable {
     }
 
     @Override
-    public Document handle(final Document requestMessage, final NetconfOperationChainedExecution subsequentOperation) throws DocumentedException {
+    protected Element handle(final Document document, final XmlElement message,
+                             final NetconfOperationChainedExecution subsequentOperation)
+            throws DocumentedException {
+        throw new UnsupportedOperationException("Never gets called");
+    }
+
+    @Override
+    public Document handle(final Document requestMessage, final NetconfOperationChainedExecution subsequentOperation)
+            throws DocumentedException {
         final Document partialResponse = subsequentOperation.execute(requestMessage);
         final Streams availableStreams = notificationRegistry.getNotificationPublishers();
-        if(availableStreams.getStream().isEmpty() == false) {
+        if (availableStreams.getStream().isEmpty() == false) {
             serializeStreamsSubtree(partialResponse, availableStreams);
         }
         return partialResponse;
     }
 
-    static void serializeStreamsSubtree(final Document partialResponse, final Streams availableStreams) throws DocumentedException {
+    static void serializeStreamsSubtree(final Document partialResponse, final Streams availableStreams)
+            throws DocumentedException {
         final Netconf netconfSubtree = new NetconfBuilder().setStreams(availableStreams).build();
         final NormalizedNode<?, ?> normalized = toNormalized(netconfSubtree);
 
         final DOMResult result = new DOMResult(getPlaceholder(partialResponse));
 
         try {
-            NetconfUtil.writeNormalizedNode(normalized, result, SchemaPath.ROOT, NotificationsTransformUtil.NOTIFICATIONS_SCHEMA_CTX);
+            NetconfUtil.writeNormalizedNode(normalized, result, SchemaPath.ROOT,
+                    NotificationsTransformUtil.NOTIFICATIONS_SCHEMA_CTX);
         } catch (final XMLStreamException | IOException e) {
             throw new IllegalStateException("Unable to serialize " + netconfSubtree, e);
         }
@@ -77,19 +88,14 @@ public class Get extends AbstractNetconfOperation implements AutoCloseable {
 
     private static Element getPlaceholder(final Document innerResult)
             throws DocumentedException {
-        final XmlElement rootElement = XmlElement.fromDomElementWithExpected(
-                innerResult.getDocumentElement(), XmlMappingConstants.RPC_REPLY_KEY, XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
+        final XmlElement rootElement = XmlElement.fromDomElementWithExpected(innerResult.getDocumentElement(),
+                XmlMappingConstants.RPC_REPLY_KEY, XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
         return rootElement.getOnlyChildElement(XmlNetconfConstants.DATA_KEY).getDomElement();
     }
 
     private static NormalizedNode<?, ?> toNormalized(final Netconf netconfSubtree) {
-        return NotificationsTransformUtil.CODEC_REGISTRY.toNormalizedNode(NETCONF_SUBTREE_INSTANCE_IDENTIFIER, netconfSubtree).getValue();
-    }
-
-    @Override
-    protected Element handle(final Document document, final XmlElement message, final NetconfOperationChainedExecution subsequentOperation)
-            throws DocumentedException {
-        throw new UnsupportedOperationException("Never gets called");
+        return NotificationsTransformUtil.CODEC_REGISTRY
+                .toNormalizedNode(NETCONF_SUBTREE_INSTANCE_IDENTIFIER, netconfSubtree).getValue();
     }
 
     @Override

@@ -34,10 +34,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Create subscription listens for create subscription requests and registers notification listeners into notification registry.
+ * Create subscription listens for create subscription requests
+ * and registers notification listeners into notification registry.
  * Received notifications are sent to the client right away
  */
-public class CreateSubscription extends AbstractSingletonNetconfOperation implements SessionAwareNetconfOperation, AutoCloseable {
+public class CreateSubscription extends AbstractSingletonNetconfOperation
+        implements SessionAwareNetconfOperation, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(CreateSubscription.class);
 
@@ -47,13 +49,15 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation implem
     private final List<NotificationListenerRegistration> subscriptions = Lists.newArrayList();
     private NetconfSession netconfSession;
 
-    public CreateSubscription(final String netconfSessionIdForReporting, final NetconfNotificationRegistry notifications) {
+    public CreateSubscription(final String netconfSessionIdForReporting,
+                              final NetconfNotificationRegistry notifications) {
         super(netconfSessionIdForReporting);
         this.notifications = notifications;
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document,
+                                                       final XmlElement operationElement) throws DocumentedException {
         operationElement.checkName(CREATE_SUBSCRIPTION);
         operationElement.checkNamespace(CreateSubscriptionInput.QNAME.getNamespace().toString());
         // FIXME reimplement using CODEC_REGISTRY and parse everything into generated class instance
@@ -63,23 +67,26 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation implem
         final Optional<XmlElement> filter = operationElement.getOnlyChildElementWithSameNamespaceOptionally("filter");
 
         // Replay not supported
-        final Optional<XmlElement> startTime = operationElement.getOnlyChildElementWithSameNamespaceOptionally("startTime");
+        final Optional<XmlElement> startTime =
+                operationElement.getOnlyChildElementWithSameNamespaceOptionally("startTime");
         Preconditions.checkArgument(startTime.isPresent() == false, "StartTime element not yet supported");
 
         // Stop time not supported
-        final Optional<XmlElement> stopTime = operationElement.getOnlyChildElementWithSameNamespaceOptionally("stopTime");
+        final Optional<XmlElement> stopTime =
+                operationElement.getOnlyChildElementWithSameNamespaceOptionally("stopTime");
         Preconditions.checkArgument(stopTime.isPresent() == false, "StopTime element not yet supported");
 
         final StreamNameType streamNameType = parseStreamIfPresent(operationElement);
 
         Preconditions.checkNotNull(netconfSession);
         // Premature streams are allowed (meaning listener can register even if no provider is available yet)
-        if(notifications.isStreamAvailable(streamNameType) == false) {
-            LOG.warn("Registering premature stream {}. No publisher available yet for session {}", streamNameType, getNetconfSessionIdForReporting());
+        if (notifications.isStreamAvailable(streamNameType) == false) {
+            LOG.warn("Registering premature stream {}. No publisher available yet for session {}", streamNameType,
+                    getNetconfSessionIdForReporting());
         }
 
-        final NotificationListenerRegistration notificationListenerRegistration =
-                notifications.registerNotificationListener(streamNameType, new NotificationSubscription(netconfSession, filter));
+        final NotificationListenerRegistration notificationListenerRegistration = notifications
+                .registerNotificationListener(streamNameType, new NotificationSubscription(netconfSession, filter));
         subscriptions.add(notificationListenerRegistration);
 
         return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
@@ -87,7 +94,8 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation implem
 
     private static StreamNameType parseStreamIfPresent(final XmlElement operationElement) throws DocumentedException {
         final Optional<XmlElement> stream = operationElement.getOnlyChildElementWithSameNamespaceOptionally("stream");
-        return stream.isPresent() ? new StreamNameType(stream.get().getTextContent()) : NetconfNotificationManager.BASE_STREAM_NAME;
+        return stream.isPresent() ? new StreamNameType(stream.get().getTextContent())
+                : NetconfNotificationManager.BASE_STREAM_NAME;
     }
 
     @Override
@@ -118,7 +126,7 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation implem
         private final NetconfSession currentSession;
         private final Optional<XmlElement> filter;
 
-        public NotificationSubscription(final NetconfSession currentSession, final Optional<XmlElement> filter) {
+        NotificationSubscription(final NetconfSession currentSession, final Optional<XmlElement> filter) {
             this.currentSession = currentSession;
             this.filter = filter;
         }
@@ -127,7 +135,8 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation implem
         public void onNotification(final StreamNameType stream, final NetconfNotification notification) {
             if (filter.isPresent()) {
                 try {
-                    final Optional<Document> filtered = SubtreeFilter.applySubtreeNotificationFilter(this.filter.get(), notification.getDocument());
+                    final Optional<Document> filtered =
+                            SubtreeFilter.applySubtreeNotificationFilter(this.filter.get(), notification.getDocument());
                     if (filtered.isPresent()) {
                         final Date eventTime = notification.getEventTime();
                         currentSession.sendMessage(new NetconfNotification(filtered.get(), eventTime));

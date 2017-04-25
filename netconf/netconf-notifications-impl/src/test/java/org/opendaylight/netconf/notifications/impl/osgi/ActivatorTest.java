@@ -50,10 +50,10 @@ public class ActivatorTest {
         final ServiceRegistration operationaServiceRegistration = mock(ServiceRegistration.class);
 
         // test registering services
-        doReturn(netconfNotificationCollectorServiceRegistration).when(context).
-                registerService(eq(NetconfNotificationCollector.class), any(NetconfNotificationManager.class), any());
-        doReturn(operationaServiceRegistration).when(context).
-                registerService(eq(NetconfOperationServiceFactory.class), any(NetconfOperationServiceFactory.class), any());
+        doReturn(netconfNotificationCollectorServiceRegistration).when(context)
+                .registerService(eq(NetconfNotificationCollector.class), any(NetconfNotificationManager.class), any());
+        doReturn(operationaServiceRegistration).when(context).registerService(eq(NetconfOperationServiceFactory.class),
+                any(NetconfOperationServiceFactory.class), any());
 
         activator.start(context);
 
@@ -72,12 +72,17 @@ public class ActivatorTest {
         // test service factory argument requisites
         final NetconfOperationServiceFactory serviceFactory = serviceFactoryArgumentCaptor.getValue();
 
-        final Set<Capability> capabilities = Collections.singleton(new BasicCapability(NetconfNotification.NOTIFICATION_NAMESPACE));
+        final Set<Capability> capabilities =
+                Collections.singleton(new BasicCapability(NetconfNotification.NOTIFICATION_NAMESPACE));
 
-        assertEquals(capabilities.iterator().next().getCapabilityUri(), serviceFactory.getCapabilities().iterator().next().getCapabilityUri());
-        assertEquals(capabilities.iterator().next().getCapabilitySchema(), serviceFactory.getCapabilities().iterator().next().getCapabilitySchema());
-        assertEquals(capabilities.iterator().next().getModuleNamespace(), serviceFactory.getCapabilities().iterator().next().getModuleNamespace());
-        assertEquals(capabilities.iterator().next().getModuleName(), serviceFactory.getCapabilities().iterator().next().getModuleName());
+        assertEquals(capabilities.iterator().next()
+                .getCapabilityUri(), serviceFactory.getCapabilities().iterator().next().getCapabilityUri());
+        assertEquals(capabilities.iterator().next()
+                .getCapabilitySchema(), serviceFactory.getCapabilities().iterator().next().getCapabilitySchema());
+        assertEquals(capabilities.iterator().next()
+                .getModuleNamespace(), serviceFactory.getCapabilities().iterator().next().getModuleNamespace());
+        assertEquals(capabilities.iterator().next()
+                .getModuleName(), serviceFactory.getCapabilities().iterator().next().getModuleName());
 
         final CapabilityListener listener = mock(CapabilityListener.class);
 
@@ -90,17 +95,18 @@ public class ActivatorTest {
         final NetconfOperationService netconfOperationService = serviceFactory.createService("id");
         final Set<NetconfOperation> netconfOperations = netconfOperationService.getNetconfOperations();
 
-        final CreateSubscription createSubscription = new CreateSubscription("id", activator.getNetconfNotificationManager());
+        final CreateSubscription createSubscription =
+                new CreateSubscription("id", activator.getNetconfNotificationManager());
 
         netconfOperations.forEach(
-                operation -> {
-                    if (operation instanceof CreateSubscription) {
-                        assertEquals(createSubscription.toString(), operation.toString());
-                    }
-                    if (operation instanceof Get) {
-                        assertEquals("id", ((Get) operation).getNetconfSessionIdForReporting());
-                    }
+            operation -> {
+                if (operation instanceof CreateSubscription) {
+                    assertEquals(createSubscription.toString(), operation.toString());
                 }
+                if (operation instanceof Get) {
+                    assertEquals("id", ((Get) operation).getNetconfSessionIdForReporting());
+                }
+            }
         );
 
         // test unregister after stop

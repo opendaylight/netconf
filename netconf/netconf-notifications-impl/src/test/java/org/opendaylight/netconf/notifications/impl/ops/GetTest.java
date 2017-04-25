@@ -37,27 +37,27 @@ public class GetTest {
         final Document response = getBlankResponse();
         Get.serializeStreamsSubtree(response, streams);
         NotificationsTransformUtilTest.compareXml(XmlUtil.toString(response),
-                "<rpc-reply message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
-                        "<data>\n" +
-                        "<netconf xmlns=\"urn:ietf:params:xml:ns:netmod:notification\">\n" +
-                        "<streams>\n" +
-                        "<stream>\n" +
-                        "<name>base</name>\n" +
-                        "<description>description</description>\n" +
-                        "<replaySupport>false</replaySupport>\n" +
-                        "</stream>\n" +
-                        "</streams>\n" +
-                        "</netconf>\n" +
-                        "</data>\n" +
-                        "</rpc-reply>\n");
+                "<rpc-reply message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                        + "<data>\n"
+                        + "<netconf xmlns=\"urn:ietf:params:xml:ns:netmod:notification\">\n"
+                        + "<streams>\n"
+                        + "<stream>\n"
+                        + "<name>base</name>\n"
+                        + "<description>description</description>\n"
+                        + "<replaySupport>false</replaySupport>\n"
+                        + "</stream>\n"
+                        + "</streams>\n"
+                        + "</netconf>\n"
+                        + "</data>\n"
+                        + "</rpc-reply>\n");
     }
 
     private static Document getBlankResponse() throws IOException, SAXException {
 
-        return XmlUtil.readXmlToDocument("<rpc-reply message-id=\"101\"\n" +
-                "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
-                "<data>\n" +
-                "</data>\n" +
-                "</rpc-reply>");
+        return XmlUtil.readXmlToDocument("<rpc-reply message-id=\"101\"\n"
+                + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                + "<data>\n"
+                + "</data>\n"
+                + "</rpc-reply>");
     }
 }

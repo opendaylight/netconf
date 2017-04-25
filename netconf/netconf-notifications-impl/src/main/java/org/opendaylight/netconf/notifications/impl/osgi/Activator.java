@@ -46,11 +46,13 @@ public class Activator implements BundleActivator {
         // Add properties to autowire with netconf-impl instance for cfg subsystem
         final Dictionary<String, String> props = new Hashtable<>();
         props.put(NetconfConstants.SERVICE_NAME, NetconfConstants.NETCONF_NOTIFICATION);
-        netconfNotificationCollectorServiceRegistration = context.registerService(NetconfNotificationCollector.class, netconfNotificationManager, new Hashtable<String, Object>());
+        netconfNotificationCollectorServiceRegistration = context.registerService(NetconfNotificationCollector.class,
+                netconfNotificationManager, new Hashtable<String, Object>());
 
         final NetconfOperationServiceFactory netconfOperationServiceFactory = new NetconfOperationServiceFactory() {
 
-            private final Set<Capability> capabilities = Collections.<Capability>singleton(new BasicCapability(NetconfNotification.NOTIFICATION_NAMESPACE));
+            private final Set<Capability> capabilities =
+                    Collections.<Capability>singleton(new BasicCapability(NetconfNotification.NOTIFICATION_NAMESPACE));
 
             @Override
             public Set<Capability> getCapabilities() {
@@ -72,7 +74,8 @@ public class Activator implements BundleActivator {
             public NetconfOperationService createService(final String netconfSessionIdForReporting) {
                 return new NetconfOperationService() {
 
-                    private final CreateSubscription createSubscription = new CreateSubscription(netconfSessionIdForReporting, netconfNotificationManager);
+                    private final CreateSubscription createSubscription =
+                            new CreateSubscription(netconfSessionIdForReporting, netconfNotificationManager);
 
                     @Override
                     public Set<NetconfOperation> getNetconfOperations() {
@@ -91,12 +94,13 @@ public class Activator implements BundleActivator {
 
         final Dictionary<String, String> properties = new Hashtable<>();
         properties.put(NetconfConstants.SERVICE_NAME, NetconfConstants.NETCONF_MONITORING);
-        operationaServiceRegistration = context.registerService(NetconfOperationServiceFactory.class, netconfOperationServiceFactory, properties);
+        operationaServiceRegistration = context.registerService(NetconfOperationServiceFactory.class,
+                netconfOperationServiceFactory, properties);
     }
 
     @Override
     public void stop(final BundleContext context) throws Exception {
-        if(netconfNotificationCollectorServiceRegistration != null) {
+        if (netconfNotificationCollectorServiceRegistration != null) {
             netconfNotificationCollectorServiceRegistration.unregister();
             netconfNotificationCollectorServiceRegistration = null;
         }
