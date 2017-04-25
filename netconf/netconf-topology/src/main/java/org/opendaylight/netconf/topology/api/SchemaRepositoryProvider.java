@@ -10,7 +10,7 @@ package org.opendaylight.netconf.topology.api;
 
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 
-public interface SchemaRepositoryProvider{
+public interface SchemaRepositoryProvider {
 
     SharedSchemaRepository getSharedSchemaRepository();
 }

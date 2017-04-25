@@ -45,9 +45,6 @@ public class NetconfConnectorFactoryImpl implements NetconfConnectorFactory {
     private static final InstanceIdentifier<Topology> TOPOLOGY_PATH = InstanceIdentifier.create(NetworkTopology.class)
             .child(Topology.class, new TopologyKey(new TopologyId("topology-netconf")));
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Node newInstance(final DataBroker dataBroker,
                             final String instanceName,
@@ -90,8 +87,8 @@ public class NetconfConnectorFactoryImpl implements NetconfConnectorFactory {
             }
 
             @Override
-            public void onFailure(final Throwable t) {
-                LOG.error("Node {} creation failed: {}", instanceName, t);
+            public void onFailure(final Throwable throwable) {
+                LOG.error("Node {} creation failed: {}", instanceName, throwable);
             }
         });
         return node;
