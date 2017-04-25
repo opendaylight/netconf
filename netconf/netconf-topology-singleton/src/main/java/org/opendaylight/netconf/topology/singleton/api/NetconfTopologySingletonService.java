@@ -9,7 +9,7 @@
 package org.opendaylight.netconf.topology.singleton.api;
 
 /**
- * Provides API for advertising services for blue print service
+ * Provides API for advertising services for blue print service.
  */
 public interface NetconfTopologySingletonService {
 }

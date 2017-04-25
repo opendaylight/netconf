@@ -76,13 +76,13 @@ public class ProxyDOMRpcService implements DOMRpcService {
         final CheckedFuture<DOMRpcResult, DOMRpcException> checkedFuture = Futures.makeChecked(settableFuture,
                 new Function<Exception, DOMRpcException>() {
 
-            @Nullable
-            @Override
-            public DOMRpcException apply(@Nullable final Exception exception) {
-                return new ClusteringRpcException(id + ": Exception during remote rpc invocation.",
-                        exception);
-            }
-        });
+                @Nullable
+                @Override
+                public DOMRpcException apply(@Nullable final Exception exception) {
+                    return new ClusteringRpcException(id + ": Exception during remote rpc invocation.",
+                            exception);
+                }
+            });
 
         scalaFuture.onComplete(new OnComplete<Object>() {
             @Override
@@ -103,7 +103,7 @@ public class ProxyDOMRpcService implements DOMRpcService {
                 final NormalizedNodeMessage normalizedNodeMessageResult =
                         ((InvokeRpcMessageReply) success).getNormalizedNodeMessage();
                 final DOMRpcResult result;
-                if (normalizedNodeMessageResult == null ){
+                if (normalizedNodeMessageResult == null) {
                     result = new DefaultDOMRpcResult(errors);
                 } else {
                     if (errors == null) {
