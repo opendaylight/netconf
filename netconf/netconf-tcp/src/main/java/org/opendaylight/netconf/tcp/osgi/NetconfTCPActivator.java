@@ -32,8 +32,8 @@ public class NetconfTCPActivator implements BundleActivator {
         final InetSocketAddress address = netconfConfiguration.getTcpServerAddress();
 
         if (address.getAddress().isAnyLocalAddress()) {
-            LOG.warn("Unprotected netconf TCP address is configured to ANY local address. This is a security risk. " +
-                            "Consider changing tcp-address in netconf.cfg to 127.0.0.1");
+            LOG.warn("Unprotected netconf TCP address is configured to ANY local address. This is a security risk. "
+                    + "Consider changing tcp-address in netconf.cfg to 127.0.0.1");
         }
         LOG.info("Starting TCP netconf server at {}", address);
         proxyServer = new ProxyServer(address, NetconfConfiguration.NETCONF_LOCAL_ADDRESS);
