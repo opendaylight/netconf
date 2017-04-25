@@ -8,8 +8,6 @@
 
 package org.opendaylight.netconf.tcp.netty;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -72,48 +70,3 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
     }
 }
 
-class ProxyClientHandler extends ChannelInboundHandlerAdapter {
-    private static final Logger LOG = LoggerFactory.getLogger(ProxyClientHandler.class);
-
-    private final ChannelHandlerContext remoteCtx;
-    private ChannelHandlerContext localCtx;
-
-    public ProxyClientHandler(ChannelHandlerContext remoteCtx) {
-        this.remoteCtx = remoteCtx;
-    }
-
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) {
-        checkState(this.localCtx == null);
-        LOG.trace("Client channel active");
-        this.localCtx = ctx;
-    }
-
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        LOG.trace("Forwarding message");
-        remoteCtx.write(msg);
-    }
-
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) {
-        LOG.trace("Flushing remote ctx");
-        remoteCtx.flush();
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        // Close the connection when an exception is raised.
-        LOG.warn("Unexpected exception from downstream", cause);
-        checkState(this.localCtx.equals(ctx));
-        ctx.close();
-    }
-
-    // called both when local or remote connection dies
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) {
-        LOG.trace("channelInactive() called, closing remote client ctx");
-        remoteCtx.close();
-    }
-
-}
