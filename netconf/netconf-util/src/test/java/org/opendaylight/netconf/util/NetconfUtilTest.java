@@ -44,8 +44,9 @@ public class NetconfUtilTest {
 
     @Test
     public void testConflictingVersionDetection() throws Exception {
-        final Document document = XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/netconfMessages/conflictingversion/conflictingVersionResponse.xml"));
-        try{
+        final Document document = XmlUtil.readXmlToDocument(getClass()
+                .getResourceAsStream("/netconfMessages/conflictingversion/conflictingVersionResponse.xml"));
+        try {
             NetconfUtil.checkIsMessageOk(document);
             fail();
         } catch (final IllegalStateException e) {
@@ -63,7 +64,8 @@ public class NetconfUtilTest {
                 .withValue("admin")
                 .build();
         final MapEntryNode session1 = Builders.mapEntryBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifierWithPredicates(Session.QNAME, QName.create(Session.QNAME, "session-id"), 1L))
+                .withNodeIdentifier(new YangInstanceIdentifier
+                        .NodeIdentifierWithPredicates(Session.QNAME, QName.create(Session.QNAME, "session-id"), 1L))
                 .withChild(username)
                 .build();
         final MapNode sessionList = Builders.mapBuilder()

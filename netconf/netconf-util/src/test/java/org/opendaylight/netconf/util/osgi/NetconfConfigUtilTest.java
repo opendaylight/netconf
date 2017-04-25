@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.util.osgi;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -66,7 +67,7 @@ public class NetconfConfigUtilTest {
             NetconfConfigUtil.getNetconfConfigurationService(context);
             Assert.fail(IllegalStateException.class + "exception expected");
         } catch (IllegalStateException e) {
-
+            assertTrue(e.getMessage().startsWith("Netconf configuration service not found"));
         }
     }
 

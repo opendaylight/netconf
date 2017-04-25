@@ -43,7 +43,8 @@ public class AbstractNetconfOperationTest {
         }
 
         @Override
-        protected Element handle(Document document, XmlElement message, NetconfOperationChainedExecution subsequentOperation) throws DocumentedException{
+        protected Element handle(Document document, XmlElement message,
+                                 NetconfOperationChainedExecution subsequentOperation) throws DocumentedException {
             this.handleRun = true;
             try {
                 return XmlUtil.readXmlToElement("<element/>");
