@@ -83,9 +83,9 @@ public class NetconfTopologyManager
                                   final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
                                   final BindingAwareBroker bindingAwareBroker,
                                   final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
-                                  final Broker domBroker, final ActorSystemProvider actorSystemProvider, final EventExecutor eventExecutor,
-                                  final NetconfClientDispatcher clientDispatcher, final String topologyId,
-                                  final int writeTxIdleTimeout) {
+                                  final Broker domBroker, final ActorSystemProvider actorSystemProvider,
+                                  final EventExecutor eventExecutor, final NetconfClientDispatcher clientDispatcher,
+                                  final String topologyId, final int writeTxIdleTimeout) {
         this.dataBroker = Preconditions.checkNotNull(dataBroker);
         this.rpcProviderRegistry = Preconditions.checkNotNull(rpcProviderRegistry);
         this.clusterSingletonServiceProvider = Preconditions.checkNotNull(clusterSingletonServiceProvider);
@@ -163,6 +163,7 @@ public class NetconfTopologyManager
         contexts.put(instanceIdentifier, newNetconfTopologyContext);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     private void stopNetconfDeviceContext(final InstanceIdentifier<Node> instanceIdentifier) {
         if (contexts.containsKey(instanceIdentifier)) {
             try {
@@ -176,6 +177,7 @@ public class NetconfTopologyManager
         }
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void close() {
         if (dataChangeListenerRegistration != null) {
@@ -222,7 +224,8 @@ public class NetconfTopologyManager
                                 NetconfTopologyUtils.createTopologyListPath(topologyId).child(Node.class)), this);
     }
 
-    private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType, final String topologyId) {
+    private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType,
+                              final String topologyId) {
         final NetworkTopology networkTopology = new NetworkTopologyBuilder().build();
         final InstanceIdentifier<NetworkTopology> networkTopologyId =
                 InstanceIdentifier.builder(NetworkTopology.class).build();

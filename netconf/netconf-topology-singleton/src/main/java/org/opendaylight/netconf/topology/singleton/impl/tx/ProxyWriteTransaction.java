@@ -58,10 +58,12 @@ public class ProxyWriteTransaction implements DOMDataWriteTransaction {
     private final Timeout askTimeout;
 
     /**
+     * Constructor for {@code ProxyWriteTransaction}.
+     *
      * @param masterTxActor {@link org.opendaylight.netconf.topology.singleton.impl.actors.WriteTransactionActor} ref
      * @param id            device id
      * @param actorSystem   system
-     * @param askTimeout
+     * @param askTimeout    timeout
      */
     public ProxyWriteTransaction(final ActorRef masterTxActor, final RemoteDeviceId id, final ActorSystem actorSystem,
                                  final Timeout askTimeout) {
@@ -71,6 +73,7 @@ public class ProxyWriteTransaction implements DOMDataWriteTransaction {
         this.askTimeout = askTimeout;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public boolean cancel() {
         if (!opened.compareAndSet(true, false)) {

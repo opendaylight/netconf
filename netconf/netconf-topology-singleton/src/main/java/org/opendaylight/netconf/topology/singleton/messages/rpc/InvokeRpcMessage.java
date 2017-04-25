@@ -28,6 +28,7 @@ public class InvokeRpcMessage implements Serializable {
         this.schemaPathMessage = schemaPathMessage;
         this.normalizedNodeMessage = normalizedNodeMessage;
     }
+
     private SchemaPathMessage getSchemaPathMessage() {
         return schemaPathMessage;
     }
@@ -49,7 +50,7 @@ public class InvokeRpcMessage implements Serializable {
 
         private InvokeRpcMessage invokeRpcMessage;
 
-        public Proxy() {
+        Proxy() {
             //due to Externalizable
         }
 

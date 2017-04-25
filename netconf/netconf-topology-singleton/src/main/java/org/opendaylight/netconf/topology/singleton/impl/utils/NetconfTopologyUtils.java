@@ -13,8 +13,8 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
-import org.opendaylight.controller.config.util.xml.DocumentedException;
 import java.util.Map;
+import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemasResolverImpl;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -86,15 +86,15 @@ public class NetconfTopologyUtils {
      * of the schema cache directory, and the value is a corresponding <code>SchemaResourcesDTO</code>.  The
      * <code>SchemaResourcesDTO</code> is essentially a container that allows for the extraction of the
      * <code>SchemaRegistry</code> and <code>SchemaContextFactory</code> which should be used for a particular
-     * Netconf mount.  Access to <code>schemaResourcesDTOs</code> should be surrounded by appropriate
+     * Netconf mount.  Access to <code>SCHEMA_RESOURCES_DTO_MAP</code> should be surrounded by appropriate
      * synchronization locks.
      */
-    private static final Map<String, NetconfDevice.SchemaResourcesDTO> schemaResourcesDTOs = new HashMap<>();
+    private static final Map<String, NetconfDevice.SchemaResourcesDTO> SCHEMA_RESOURCES_DTO_MAP = new HashMap<>();
 
     // Initializes default constant instances for the case when the default schema repository
     // directory cache/schema is used.
     static {
-        schemaResourcesDTOs.put(DEFAULT_CACHE_DIRECTORY,
+        SCHEMA_RESOURCES_DTO_MAP.put(DEFAULT_CACHE_DIRECTORY,
                 new NetconfDevice.SchemaResourcesDTO(DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY,
                         DEFAULT_SCHEMA_CONTEXT_FACTORY, new NetconfStateSchemasResolverImpl()));
         DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(DEFAULT_CACHE);
@@ -117,17 +117,17 @@ public class NetconfTopologyUtils {
             if (!moduleSchemaCacheDirectory.equals(DEFAULT_CACHE_DIRECTORY)) {
                 // Multiple modules may be created at once;  synchronize to avoid issues with data consistency among
                 // threads.
-                synchronized (schemaResourcesDTOs) {
+                synchronized (SCHEMA_RESOURCES_DTO_MAP) {
                     // Look for the cached DTO to reuse SchemaRegistry and SchemaContextFactory variables if
                     // they already exist
-                    schemaResourcesDTO = schemaResourcesDTOs.get(moduleSchemaCacheDirectory);
+                    schemaResourcesDTO = SCHEMA_RESOURCES_DTO_MAP.get(moduleSchemaCacheDirectory);
                     if (schemaResourcesDTO == null) {
                         schemaResourcesDTO = createSchemaResourcesDTO(moduleSchemaCacheDirectory);
                         schemaResourcesDTO.getSchemaRegistry().registerSchemaSourceListener(
                                 TextToASTTransformer.create((SchemaRepository) schemaResourcesDTO.getSchemaRegistry(),
                                         schemaResourcesDTO.getSchemaRegistry())
                         );
-                        schemaResourcesDTOs.put(moduleSchemaCacheDirectory, schemaResourcesDTO);
+                        SCHEMA_RESOURCES_DTO_MAP.put(moduleSchemaCacheDirectory, schemaResourcesDTO);
                     }
                 }
                 LOG.info("{} : netconf connector will use schema cache directory {} instead of {}",
@@ -136,8 +136,8 @@ public class NetconfTopologyUtils {
         }
 
         if (schemaResourcesDTO == null) {
-            synchronized (schemaResourcesDTOs) {
-                schemaResourcesDTO = schemaResourcesDTOs.get(DEFAULT_CACHE_DIRECTORY);
+            synchronized (SCHEMA_RESOURCES_DTO_MAP) {
+                schemaResourcesDTO = SCHEMA_RESOURCES_DTO_MAP.get(DEFAULT_CACHE_DIRECTORY);
             }
             LOG.info("{} : using the default directory {}",
                     deviceId, QUALIFIED_DEFAULT_CACHE_DIRECTORY);

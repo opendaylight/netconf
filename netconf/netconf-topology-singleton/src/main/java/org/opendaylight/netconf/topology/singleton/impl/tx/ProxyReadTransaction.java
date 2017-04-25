@@ -46,10 +46,12 @@ public class ProxyReadTransaction implements DOMDataReadOnlyTransaction {
     private final Timeout askTimeout;
 
     /**
+     * Constructor for {@code ProxyReadTransaction}.
+     *
      * @param masterTxActor {@link org.opendaylight.netconf.topology.singleton.impl.actors.ReadTransactionActor} ref
      * @param id            device id
      * @param actorSystem   system
-     * @param askTimeout
+     * @param askTimeout    timeout
      */
     public ProxyReadTransaction(final ActorRef masterTxActor, final RemoteDeviceId id, final ActorSystem actorSystem,
                                 final Timeout askTimeout) {

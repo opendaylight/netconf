@@ -39,7 +39,7 @@ public class SchemaPathMessage implements Serializable {
 
         private SchemaPathMessage schemaPathMessage;
 
-        public Proxy() {
+        Proxy() {
             //due to Externalizable
         }
 
@@ -51,8 +51,8 @@ public class SchemaPathMessage implements Serializable {
         public void writeExternal(final ObjectOutput out) throws IOException {
             out.writeInt(Iterables.size(schemaPathMessage.getSchemaPath().getPathTowardsRoot()));
 
-            for (final QName qName : schemaPathMessage.getSchemaPath().getPathTowardsRoot()) {
-                out.writeObject(qName);
+            for (final QName qualifiedName : schemaPathMessage.getSchemaPath().getPathTowardsRoot()) {
+                out.writeObject(qualifiedName);
             }
 
             out.writeBoolean(schemaPathMessage.getSchemaPath().isAbsolute());

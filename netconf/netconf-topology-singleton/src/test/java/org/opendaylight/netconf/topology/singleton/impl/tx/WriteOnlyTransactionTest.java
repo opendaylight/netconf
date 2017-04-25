@@ -217,7 +217,8 @@ public class WriteOnlyTransactionTest {
         wTx.delete(LogicalDatastoreType.CONFIGURATION,
                 YangInstanceIdentifier.EMPTY);
 
-        final CheckedFuture<Void, TransactionCommitFailedException> resultSubmitTx = Futures.immediateCheckedFuture(null);
+        final CheckedFuture<Void, TransactionCommitFailedException> resultSubmitTx =
+                Futures.immediateCheckedFuture(null);
         doReturn(resultSubmitTx).when(writeTx).submit();
 
         final CheckedFuture<Void, TransactionCommitFailedException> resultSubmitTxResponse = wTx.submit();
