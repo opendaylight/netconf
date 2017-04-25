@@ -18,9 +18,11 @@ public interface NetconfConnectorFactory {
 
     /**
      * Create a new netconf connector with default values.
+     *
      * <p>
-     * This method will create a {@link Node} and a {@link NetconfNode} that will be added as an augmentation to the
-     * {@link Node}. Afterward, that {@link Node} will be written in the MDSAL datastore under the {@link NetconfTopology}.
+     * This method will create a {@link Node} and a {@link NetconfNode}
+     * that will be added as an augmentation to the {@link Node}.
+     * Afterward, that {@link Node} will be written in the MDSAL datastore under the {@link NetconfTopology}.
      * Listeners of that subtree located within network-topology bundle will setup the session.
      *
      * @param dataBroker Instance of the {@link DataBroker}
@@ -33,12 +35,12 @@ public interface NetconfConnectorFactory {
      * @param reconnectOnSchemaChange Whether to enable ietf-netconf-monitoring and register the NETCONF stream.
      * @return The created {@link Node}
      */
-    Node newInstance(final DataBroker dataBroker,
-                     final String instanceName,
-                     final String address,
-                     final Integer port,
-                     final String username,
-                     final String password,
-                     final Boolean tcpOnly,
-                     final Boolean reconnectOnSchemaChange);
+    Node newInstance(DataBroker dataBroker,
+                     String instanceName,
+                     String address,
+                     Integer port,
+                     String username,
+                     String password,
+                     Boolean tcpOnly,
+                     Boolean reconnectOnSchemaChange);
 }

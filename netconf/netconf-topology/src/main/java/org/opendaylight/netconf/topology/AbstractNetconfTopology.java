@@ -97,17 +97,18 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     private static final String CACHE_DIRECTORY = "cache";
 
     /**
-     * The default cache directory relative to <code>CACHE_DIRECTORY</code>
+     * The default cache directory relative to <code>CACHE_DIRECTORY</code>.
      */
     private static final String DEFAULT_CACHE_DIRECTORY = "schema";
 
     /**
-     * The qualified schema cache directory <code>cache/schema</code>
+     * The qualified schema cache directory <code>cache/schema</code>.
      */
-    private static final String QUALIFIED_DEFAULT_CACHE_DIRECTORY = CACHE_DIRECTORY + File.separator+ DEFAULT_CACHE_DIRECTORY;
+    private static final String QUALIFIED_DEFAULT_CACHE_DIRECTORY =
+            CACHE_DIRECTORY + File.separator + DEFAULT_CACHE_DIRECTORY;
 
     /**
-     * The name for the default schema repository
+     * The name for the default schema repository.
      */
     private static final String DEFAULT_SCHEMA_REPOSITORY_NAME = "sal-netconf-connector";
 
@@ -135,15 +136,15 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
      * of the schema cache directory, and the value is a corresponding <code>SchemaResourcesDTO</code>.  The
      * <code>SchemaResourcesDTO</code> is essentially a container that allows for the extraction of the
      * <code>SchemaRegistry</code> and <code>SchemaContextFactory</code> which should be used for a particular
-     * Netconf mount.  Access to <code>schemaResourcesDTOs</code> should be surrounded by appropriate
+     * Netconf mount.  Access to <code>SCHEMA_RESOURCES_DTO_MAP</code> should be surrounded by appropriate
      * synchronization locks.
      */
-    private static final Map<String, NetconfDevice.SchemaResourcesDTO> schemaResourcesDTOs = new HashMap<>();
+    private static final Map<String, NetconfDevice.SchemaResourcesDTO> SCHEMA_RESOURCES_DTO_MAP = new HashMap<>();
 
     // Initializes default constant instances for the case when the default schema repository
     // directory cache/schema is used.
     static {
-        schemaResourcesDTOs.put(DEFAULT_CACHE_DIRECTORY,
+        SCHEMA_RESOURCES_DTO_MAP.put(DEFAULT_CACHE_DIRECTORY,
                 new NetconfDevice.SchemaResourcesDTO(DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY,
                         DEFAULT_SCHEMA_CONTEXT_FACTORY,
                         new NetconfStateSchemasResolverImpl()));
@@ -171,7 +172,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     protected AbstractNetconfTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                                       final BindingAwareBroker bindingAwareBroker, final Broker domBroker,
                                       final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
-                                      final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
+                                      final ThreadPool processingExecutor,
+                                      final SchemaRepositoryProvider schemaRepositoryProvider,
                                       final DataBroker dataBroker) {
         this.topologyId = topologyId;
         this.clientDispatcher = clientDispatcher;
@@ -202,7 +204,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     public ListenableFuture<Void> disconnectNode(final NodeId nodeId) {
         LOG.debug("Disconnecting RemoteDevice{{}}", nodeId.getValue());
         if (!activeConnectors.containsKey(nodeId)) {
-            return Futures.immediateFailedFuture(new IllegalStateException("Unable to disconnect device that is not connected"));
+            return Futures.immediateFailedFuture(
+                    new IllegalStateException("Unable to disconnect device that is not connected"));
         }
 
         // retrieve connection, and disconnect it
@@ -223,8 +226,10 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         final NetconfConnectorDTO deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode);
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
         final NetconfClientSessionListener netconfClientSessionListener = deviceCommunicatorDTO.getSessionListener();
-        final NetconfReconnectingClientConfiguration clientConfig = getClientConfig(netconfClientSessionListener, netconfNode);
-        final ListenableFuture<NetconfDeviceCapabilities> future = deviceCommunicator.initializeRemoteConnection(clientDispatcher, clientConfig);
+        final NetconfReconnectingClientConfiguration clientConfig =
+                getClientConfig(netconfClientSessionListener, netconfNode);
+        final ListenableFuture<NetconfDeviceCapabilities> future =
+                deviceCommunicator.initializeRemoteConnection(clientDispatcher, clientConfig);
 
         activeConnectors.put(nodeId, deviceCommunicatorDTO);
 
@@ -235,7 +240,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             }
 
             @Override
-            public void onFailure(final Throwable t) {
+            public void onFailure(final Throwable throwable) {
                 LOG.error("Connector for : " + nodeId.getValue() + " failed");
                 // remove this node from active connectors?
             }
@@ -247,13 +252,16 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId,
                                                          final NetconfNode node) {
         //setup default values since default value is not supported in mdsal
-        final Long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null ? DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
-        final Long keepaliveDelay = node.getKeepaliveDelay() == null ? DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay();
-        final Boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null ? DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
+        final Long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null
+                ? DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
+        final Long keepaliveDelay = node.getKeepaliveDelay() == null
+                ? DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay();
+        final Boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null
+                ? DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
 
         final IpAddress ipAddress = node.getHost().getIpAddress();
-        final InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null ?
-                ipAddress.getIpv4Address().getValue() : ipAddress.getIpv6Address().getValue(),
+        final InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null
+                ? ipAddress.getIpv4Address().getValue() : ipAddress.getIpv6Address().getValue(),
                 node.getPort().getValue());
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId(nodeId.getValue(), address);
 
@@ -262,7 +270,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         if (keepaliveDelay > 0) {
             LOG.warn("Adding keepalive facade, for device {}", nodeId);
-            salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade, keepaliveExecutor.getExecutor(), keepaliveDelay, defaultRequestTimeoutMillis);
+            salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade, keepaliveExecutor.getExecutor(),
+                    keepaliveDelay, defaultRequestTimeoutMillis);
         }
 
         // pre register yang library sources as fallback schemas to schema registry
@@ -273,20 +282,21 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             final String yangLigPassword = node.getYangLibrary().getPassword();
 
             final LibraryModulesSchemas libraryModulesSchemas;
-            if(yangLibURL != null) {
-                if(yangLibUsername != null && yangLigPassword != null) {
+            if (yangLibURL != null) {
+                if (yangLibUsername != null && yangLigPassword != null) {
                     libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL, yangLibUsername, yangLigPassword);
                 } else {
                     libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL);
                 }
 
-                for (final Map.Entry<SourceIdentifier, URL> sourceIdentifierURLEntry : libraryModulesSchemas.getAvailableModels().entrySet()) {
-                    registeredYangLibSources.
-                            add(schemaRegistry.registerSchemaSource(
-                                    new YangLibrarySchemaYangSourceProvider(remoteDeviceId, libraryModulesSchemas.getAvailableModels()),
-                                    PotentialSchemaSource
-                                            .create(sourceIdentifierURLEntry.getKey(), YangTextSchemaSource.class,
-                                            PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
+                for (final Map.Entry<SourceIdentifier, URL> sourceIdentifierURLEntry
+                        : libraryModulesSchemas.getAvailableModels().entrySet()) {
+                    registeredYangLibSources
+                        .add(schemaRegistry.registerSchemaSource(
+                                new YangLibrarySchemaYangSourceProvider(remoteDeviceId,
+                                        libraryModulesSchemas.getAvailableModels()),
+                                PotentialSchemaSource.create(sourceIdentifierURLEntry.getKey(),
+                                        YangTextSchemaSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
                 }
             }
         }
@@ -322,22 +332,25 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         // Setup information related to the SchemaRegistry, SchemaResourceFactory, etc.
         NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = null;
         final String moduleSchemaCacheDirectory = node.getSchemaCacheDirectory();
-        // Only checks to ensure the String is not empty or null;  further checks related to directory accessibility and file permissions
-        // are handled during the FilesystemSchemaSourceCache initialization.
+        // Only checks to ensure the String is not empty or null; further checks related to directory
+        // accessibility and file permissionsare handled during the FilesystemSchemaSourceCache initialization.
         if (!Strings.isNullOrEmpty(moduleSchemaCacheDirectory)) {
-            // If a custom schema cache directory is specified, create the backing DTO; otherwise, the SchemaRegistry and
-            // SchemaContextFactory remain the default values.
+            // If a custom schema cache directory is specified, create the backing DTO; otherwise,
+            // the SchemaRegistry and SchemaContextFactory remain the default values.
             if (!moduleSchemaCacheDirectory.equals(DEFAULT_CACHE_DIRECTORY)) {
-                // Multiple modules may be created at once;  synchronize to avoid issues with data consistency among threads.
-                synchronized(schemaResourcesDTOs) {
-                    // Look for the cached DTO to reuse SchemaRegistry and SchemaContextFactory variables if they already exist
-                    schemaResourcesDTO = schemaResourcesDTOs.get(moduleSchemaCacheDirectory);
+                // Multiple modules may be created at once;
+                // synchronize to avoid issues with data consistency among threads.
+                synchronized (SCHEMA_RESOURCES_DTO_MAP) {
+                    // Look for the cached DTO to reuse SchemaRegistry and SchemaContextFactory variables
+                    // if they already exist
+                    schemaResourcesDTO = SCHEMA_RESOURCES_DTO_MAP.get(moduleSchemaCacheDirectory);
                     if (schemaResourcesDTO == null) {
                         schemaResourcesDTO = createSchemaResourcesDTO(moduleSchemaCacheDirectory);
                         schemaResourcesDTO.getSchemaRegistry().registerSchemaSourceListener(
-                                TextToASTTransformer.create((SchemaRepository) schemaResourcesDTO.getSchemaRegistry(), schemaResourcesDTO.getSchemaRegistry())
+                                TextToASTTransformer.create((SchemaRepository) schemaResourcesDTO.getSchemaRegistry(),
+                                        schemaResourcesDTO.getSchemaRegistry())
                         );
-                        schemaResourcesDTOs.put(moduleSchemaCacheDirectory, schemaResourcesDTO);
+                        SCHEMA_RESOURCES_DTO_MAP.put(moduleSchemaCacheDirectory, schemaResourcesDTO);
                     }
                 }
                 LOG.info("Netconf connector for device {} will use schema cache directory {} instead of {}",
@@ -349,8 +362,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
 
         if (schemaResourcesDTO == null) {
-            schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(schemaRegistry, schemaRepository, schemaContextFactory,
-                    new NetconfStateSchemasResolverImpl());
+            schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(schemaRegistry, schemaRepository,
+                    schemaContextFactory, new NetconfStateSchemasResolverImpl());
         }
 
         return schemaResourcesDTO;
@@ -381,17 +394,23 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
      * @param schemaCacheDirectory The custom cache directory relative to "cache"
      * @return A <code>FilesystemSchemaSourceCache</code> for the custom schema cache directory
      */
-    private FilesystemSchemaSourceCache<YangTextSchemaSource> createDeviceFilesystemCache(final String schemaCacheDirectory) {
+    private FilesystemSchemaSourceCache<YangTextSchemaSource> createDeviceFilesystemCache(
+            final String schemaCacheDirectory) {
         final String relativeSchemaCacheDirectory = CACHE_DIRECTORY + File.separator + schemaCacheDirectory;
-        return new FilesystemSchemaSourceCache<>(schemaRegistry, YangTextSchemaSource.class, new File(relativeSchemaCacheDirectory));
+        return new FilesystemSchemaSourceCache<>(schemaRegistry, YangTextSchemaSource.class,
+                new File(relativeSchemaCacheDirectory));
     }
 
-    public NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener, final NetconfNode node) {
+    public NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener,
+                                                                  final NetconfNode node) {
 
         //setup default values since default value is not supported in mdsal
-        final long clientConnectionTimeoutMillis = node.getConnectionTimeoutMillis() == null ? DEFAULT_CONNECTION_TIMEOUT_MILLIS : node.getConnectionTimeoutMillis();
-        final long maxConnectionAttempts = node.getMaxConnectionAttempts() == null ? DEFAULT_MAX_CONNECTION_ATTEMPTS : node.getMaxConnectionAttempts();
-        final int betweenAttemptsTimeoutMillis = node.getBetweenAttemptsTimeoutMillis() == null ? DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS : node.getBetweenAttemptsTimeoutMillis();
+        final long clientConnectionTimeoutMillis = node.getConnectionTimeoutMillis() == null
+                ? DEFAULT_CONNECTION_TIMEOUT_MILLIS : node.getConnectionTimeoutMillis();
+        final long maxConnectionAttempts = node.getMaxConnectionAttempts() == null
+                ? DEFAULT_MAX_CONNECTION_ATTEMPTS : node.getMaxConnectionAttempts();
+        final int betweenAttemptsTimeoutMillis = node.getBetweenAttemptsTimeoutMillis() == null
+                ? DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS : node.getBetweenAttemptsTimeoutMillis();
         final BigDecimal sleepFactor = node.getSleepFactor() == null ? DEFAULT_SLEEP_FACTOR : node.getSleepFactor();
 
         final InetSocketAddress socketAddress = getSocketAddress(node.getHost(), node.getPort().getValue());
@@ -402,10 +421,13 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         final AuthenticationHandler authHandler;
         final Credentials credentials = node.getCredentials();
-        if (credentials instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) {
+        if (credentials instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114
+                .netconf.node.credentials.credentials.LoginPassword) {
             authHandler = new LoginPassword(
-                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getUsername(),
-                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getPassword());
+                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114
+                            .netconf.node.credentials.credentials.LoginPassword) credentials).getUsername(),
+                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114
+                            .netconf.node.credentials.credentials.LoginPassword) credentials).getPassword());
         } else {
             throw new IllegalStateException("Only login/password authentification is supported");
         }
@@ -415,22 +437,23 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 .withConnectionTimeoutMillis(clientConnectionTimeoutMillis)
                 .withReconnectStrategy(strategy)
                 .withAuthHandler(authHandler)
-                .withProtocol(node.isTcpOnly() ?
-                        NetconfClientConfiguration.NetconfClientProtocol.TCP :
+                .withProtocol(node.isTcpOnly() ? NetconfClientConfiguration.NetconfClientProtocol.TCP :
                         NetconfClientConfiguration.NetconfClientProtocol.SSH)
                 .withConnectStrategyFactory(sf)
                 .withSessionListener(listener)
                 .build();
     }
 
-    protected abstract RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id, final Broker domBroker, final BindingAwareBroker bindingBroker);
+    protected abstract RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(
+            RemoteDeviceId id, Broker domBroker, BindingAwareBroker bindingBroker);
 
     private InetSocketAddress getSocketAddress(final Host host, final int port) {
-        if(host.getDomainName() != null) {
+        if (host.getDomainName() != null) {
             return new InetSocketAddress(host.getDomainName().getValue(), port);
         } else {
             final IpAddress ipAddress = host.getIpAddress();
-            final String ip = ipAddress.getIpv4Address() != null ? ipAddress.getIpv4Address().getValue() : ipAddress.getIpv6Address().getValue();
+            final String ip = ipAddress.getIpv4Address() != null
+                    ? ipAddress.getIpv4Address().getValue() : ipAddress.getIpv6Address().getValue();
             return new InetSocketAddress(ip, port);
         }
     }
@@ -452,9 +475,9 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         //non-module capabilities should not exist in yang module capabilities
         final NetconfSessionPreferences netconfSessionPreferences = NetconfSessionPreferences.fromStrings(capabilities);
-        Preconditions.checkState(netconfSessionPreferences.getNonModuleCaps().isEmpty(), "List yang-module-capabilities/capability " +
-                "should contain only module based capabilities. Non-module capabilities used: " +
-                netconfSessionPreferences.getNonModuleCaps());
+        Preconditions.checkState(netconfSessionPreferences.getNonModuleCaps().isEmpty(),
+                "List yang-module-capabilities/capability should contain only module based capabilities. "
+                        + "Non-module capabilities used: " + netconfSessionPreferences.getNonModuleCaps());
 
         boolean overrideNonModuleCaps = false;
         if (node.getNonModuleCapabilities() != null) {
@@ -462,8 +485,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             overrideNonModuleCaps = node.getNonModuleCapabilities().isOverride();
         }
 
-        return Optional.of(new UserPreferences(NetconfSessionPreferences.fromStrings(capabilities, CapabilityOrigin.UserDefined),
-                overrideYangModuleCaps, overrideNonModuleCaps));
+        return Optional.of(new UserPreferences(NetconfSessionPreferences
+            .fromStrings(capabilities, CapabilityOrigin.UserDefined), overrideYangModuleCaps, overrideNonModuleCaps));
     }
 
     private static final class TimedReconnectStrategyFactory implements ReconnectStrategyFactory {
@@ -472,7 +495,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         private final double sleepFactor;
         private final int minSleep;
 
-        TimedReconnectStrategyFactory(final EventExecutor executor, final Long maxConnectionAttempts, final int minSleep, final BigDecimal sleepFactor) {
+        TimedReconnectStrategyFactory(final EventExecutor executor, final Long maxConnectionAttempts,
+                                      final int minSleep, final BigDecimal sleepFactor) {
             if (maxConnectionAttempts != null && maxConnectionAttempts > 0) {
                 connectionAttempts = maxConnectionAttempts;
             } else {
@@ -499,7 +523,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         private final NetconfDeviceCommunicator communicator;
         private final RemoteDeviceHandler<NetconfSessionPreferences> facade;
 
-        public NetconfConnectorDTO(final NetconfDeviceCommunicator communicator, final RemoteDeviceHandler<NetconfSessionPreferences> facade) {
+        public NetconfConnectorDTO(final NetconfDeviceCommunicator communicator,
+                                   final RemoteDeviceHandler<NetconfSessionPreferences> facade) {
             this.communicator = communicator;
             this.facade = facade;
         }
