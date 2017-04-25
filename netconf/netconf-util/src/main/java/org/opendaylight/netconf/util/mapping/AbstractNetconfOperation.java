@@ -41,8 +41,16 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
         return canHandle(operationNameAndNamespace.getOperationName(), operationNameAndNamespace.getNamespace());
     }
 
+    protected HandlingPriority canHandle(final String operationName, final String operationNamespace) {
+        return operationName.equals(getOperationName()) && operationNamespace.equals(getOperationNamespace())
+                ? getHandlingPriority()
+                : HandlingPriority.CANNOT_HANDLE;
+    }
+
     public static final class OperationNameAndNamespace {
-        private final String operationName, namespace;
+        private final String operationName;
+        private final String namespace;
+
         private final XmlElement operationElement;
 
         public OperationNameAndNamespace(final Document message) throws DocumentedException {
@@ -64,17 +72,12 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
         public XmlElement getOperationElement() {
             return operationElement;
         }
+
     }
 
     protected static XmlElement getRequestElementWithCheck(final Document message) throws DocumentedException {
         return XmlElement.fromDomElementWithExpected(message.getDocumentElement(), XmlNetconfConstants.RPC_KEY,
                 XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
-    }
-
-    protected HandlingPriority canHandle(final String operationName, final String operationNamespace) {
-        return operationName.equals(getOperationName()) && operationNamespace.equals(getOperationNamespace())
-                ? getHandlingPriority()
-                : HandlingPriority.CANNOT_HANDLE;
     }
 
     protected HandlingPriority getHandlingPriority() {
@@ -99,14 +102,16 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
         Map<String, Attr> attributes = requestElement.getAttributes();
 
         Element response = handle(document, operationElement, subsequentOperation);
-        Element rpcReply = XmlUtil.createElement(document, XmlMappingConstants.RPC_REPLY_KEY, Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
+        Element rpcReply = XmlUtil.createElement(document, XmlMappingConstants.RPC_REPLY_KEY,
+                Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
 
-        if(XmlElement.fromDomElement(response).hasNamespace()) {
+        if (XmlElement.fromDomElement(response).hasNamespace()) {
             rpcReply.appendChild(response);
         } else {
-            Element responseNS = XmlUtil.createElement(document, response.getNodeName(), Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
+            Element responseNS = XmlUtil.createElement(document, response.getNodeName(),
+                    Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
             NodeList list = response.getChildNodes();
-            while(list.getLength()!=0) {
+            while (list.getLength() != 0) {
                 responseNS.appendChild(list.item(0));
             }
             rpcReply.appendChild(responseNS);
@@ -119,7 +124,8 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
         return document;
     }
 
-    protected abstract Element handle(Document document, XmlElement message, NetconfOperationChainedExecution subsequentOperation)
+    protected abstract Element handle(Document document, XmlElement message,
+                                      NetconfOperationChainedExecution subsequentOperation)
             throws DocumentedException;
 
     @Override
@@ -127,7 +133,7 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
         final StringBuffer sb = new StringBuffer(getClass().getName());
         try {
             sb.append("{name=").append(getOperationName());
-        } catch(UnsupportedOperationException e) {
+        } catch (UnsupportedOperationException e) {
             // no problem
         }
         sb.append(", namespace=").append(getOperationNamespace());

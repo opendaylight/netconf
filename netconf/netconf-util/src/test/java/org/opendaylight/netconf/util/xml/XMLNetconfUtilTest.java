@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.util.xml;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import javax.xml.xpath.XPathConstants;
@@ -25,8 +26,11 @@ public class XMLNetconfUtilTest {
         try {
             XMLNetconfUtil.compileXPath("!@(*&$!");
             fail("Incorrect xpath should fail");
-        } catch (IllegalStateException e) {}
-        final Object value = XmlUtil.evaluateXPath(correctXPath, XmlUtil.readXmlToDocument("<top><innerText>value</innerText></top>"), XPathConstants.NODE);
+        } catch (IllegalStateException e) {
+            assertTrue(e.getMessage().startsWith("Error while compiling xpath expression "));
+        }
+        final Object value = XmlUtil.evaluateXPath(correctXPath,
+                XmlUtil.readXmlToDocument("<top><innerText>value</innerText></top>"), XPathConstants.NODE);
         assertEquals("value", ((Element) value).getTextContent());
     }
 

@@ -47,7 +47,7 @@ public class SubtreeFilterRpcTest {
     }
 
     @Before
-    public void setUp(){
+    public void setUp() {
         XMLUnit.setIgnoreWhitespace(true);
     }
 
@@ -64,7 +64,7 @@ public class SubtreeFilterRpcTest {
     }
 
     public Document getDocument(String fileName) throws SAXException, IOException {
-        return XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/subtree/rpc/" + directoryIndex + "/" +
-                fileName));
+        return XmlUtil.readXmlToDocument(
+                getClass().getResourceAsStream("/subtree/rpc/" + directoryIndex + "/" + fileName));
     }
 }

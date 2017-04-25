@@ -33,7 +33,8 @@ public class AbstractLastNetconfOperationTest {
         }
 
         @Override
-        protected Element handleWithNoSubsequentOperations(Document document, XmlElement operationElement) throws DocumentedException{
+        protected Element handleWithNoSubsequentOperations(Document document,
+                                                           XmlElement operationElement) throws DocumentedException {
             handleWithNoSubsequentOperationsRun = true;
             return null;
         }

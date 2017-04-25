@@ -24,12 +24,14 @@ public class NetconfMessageUtilTest {
         assertTrue(NetconfMessageUtil.isOKMessage(new NetconfMessage(okMessage)));
         assertFalse(NetconfMessageUtil.isErrorMessage(new NetconfMessage(okMessage)));
 
-        Document errorMessage = XmlFileLoader.xmlFileToDocument("netconfMessages/communicationError/testClientSendsRpcReply_expectedResponse.xml");
+        Document errorMessage = XmlFileLoader
+                .xmlFileToDocument("netconfMessages/communicationError/testClientSendsRpcReply_expectedResponse.xml");
         assertTrue(NetconfMessageUtil.isErrorMessage(new NetconfMessage(errorMessage)));
         assertFalse(NetconfMessageUtil.isOKMessage(new NetconfMessage(errorMessage)));
 
         Document helloMessage = XmlFileLoader.xmlFileToDocument("netconfMessages/client_hello.xml");
-        Collection<String> caps = NetconfMessageUtil.extractCapabilitiesFromHello(new NetconfMessage(helloMessage).getDocument());
+        Collection<String> caps =
+                NetconfMessageUtil.extractCapabilitiesFromHello(new NetconfMessage(helloMessage).getDocument());
         assertTrue(caps.contains("urn:ietf:params:netconf:base:1.0"));
         assertTrue(caps.contains("urn:ietf:params:netconf:base:1.1"));
     }

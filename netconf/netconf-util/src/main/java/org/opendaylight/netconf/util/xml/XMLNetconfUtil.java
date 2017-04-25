@@ -24,13 +24,13 @@ public final class XMLNetconfUtil {
         throw new UnsupportedOperationException("Utility class");
     }
 
-    public static XPathExpression compileXPath(final String xPath) {
-        final XPath xpath = FACTORY.newXPath();
-        xpath.setNamespaceContext(NS_CONTEXT);
+    public static XPathExpression compileXPath(final String xpath) {
+        final XPath newXPath = FACTORY.newXPath();
+        newXPath.setNamespaceContext(NS_CONTEXT);
         try {
-            return xpath.compile(xPath);
+            return newXPath.compile(xpath);
         } catch (final XPathExpressionException e) {
-            throw new IllegalStateException("Error while compiling xpath expression " + xPath, e);
+            throw new IllegalStateException("Error while compiling xpath expression " + xpath, e);
         }
     }
 
