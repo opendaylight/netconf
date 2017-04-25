@@ -47,7 +47,7 @@ public class InvokeRpcMessageReply implements Serializable {
 
         private InvokeRpcMessageReply invokeRpcMessageReply;
 
-        public Proxy() {
+        Proxy() {
             //due to Externalizable
         }
 

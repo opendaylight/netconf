@@ -103,6 +103,7 @@ public class NetconfNodeActor extends UntypedActor {
         this.writeTxIdleTimeout = setup.getIdleTimeout();
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void onReceive(final Object message) throws Exception {
         if (message instanceof CreateInitialMasterActorData) { // master

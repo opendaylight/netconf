@@ -46,10 +46,12 @@ public class ProxyDOMDataBroker implements DOMDataBroker {
     private final ActorSystem actorSystem;
 
     /**
+     * Constructor for {@code ProxyDOMDataBroker}.
+     *
      * @param actorSystem system
      * @param id          id
      * @param masterNode  {@link org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor} ref
-     * @param askTimeout ask timeout
+     * @param askTimeout  ask timeout
      */
     public ProxyDOMDataBroker(final ActorSystem actorSystem, final RemoteDeviceId id,
                               final ActorRef masterNode, final Timeout askTimeout) {
@@ -59,6 +61,7 @@ public class ProxyDOMDataBroker implements DOMDataBroker {
         this.askTimeout = askTimeout;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public DOMDataReadOnlyTransaction newReadOnlyTransaction() {
         final Future<Object> txActorFuture = Patterns.ask(masterNode, new NewReadTransactionRequest(), askTimeout);
@@ -80,6 +83,7 @@ public class ProxyDOMDataBroker implements DOMDataBroker {
         return new ReadWriteTx(newReadOnlyTransaction(), newWriteOnlyTransaction());
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public DOMDataWriteTransaction newWriteOnlyTransaction() {
         final Future<Object> txActorFuture = Patterns.ask(masterNode, new NewWriteTransactionRequest(), askTimeout);

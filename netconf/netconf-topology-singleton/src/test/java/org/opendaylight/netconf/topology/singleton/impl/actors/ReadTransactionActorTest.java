@@ -36,8 +36,8 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 
 public class ReadTransactionActorTest {
 
-    private static final YangInstanceIdentifier path = YangInstanceIdentifier.EMPTY;
-    private static final LogicalDatastoreType store = LogicalDatastoreType.CONFIGURATION;
+    private static final YangInstanceIdentifier PATH = YangInstanceIdentifier.EMPTY;
+    private static final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
 
     @Mock
     private DOMDataReadOnlyTransaction deviceReadTx;
@@ -63,43 +63,43 @@ public class ReadTransactionActorTest {
         final ContainerNode node = Builders.containerBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("cont")))
                 .build();
-        when(deviceReadTx.read(store, path)).thenReturn(Futures.immediateCheckedFuture(Optional.of(node)));
-        actorRef.tell(new ReadRequest(store, path), probe.ref());
-        verify(deviceReadTx).read(store, path);
+        when(deviceReadTx.read(STORE, PATH)).thenReturn(Futures.immediateCheckedFuture(Optional.of(node)));
+        actorRef.tell(new ReadRequest(STORE, PATH), probe.ref());
+        verify(deviceReadTx).read(STORE, PATH);
         probe.expectMsgClass(NormalizedNodeMessage.class);
     }
 
     @Test
     public void testReadEmpty() throws Exception {
-        when(deviceReadTx.read(store, path)).thenReturn(Futures.immediateCheckedFuture(Optional.absent()));
-        actorRef.tell(new ReadRequest(store, path), probe.ref());
-        verify(deviceReadTx).read(store, path);
+        when(deviceReadTx.read(STORE, PATH)).thenReturn(Futures.immediateCheckedFuture(Optional.absent()));
+        actorRef.tell(new ReadRequest(STORE, PATH), probe.ref());
+        verify(deviceReadTx).read(STORE, PATH);
         probe.expectMsgClass(EmptyReadResponse.class);
     }
 
     @Test
     public void testReadFailure() throws Exception {
         final ReadFailedException cause = new ReadFailedException("fail");
-        when(deviceReadTx.read(store, path)).thenReturn(Futures.immediateFailedCheckedFuture(cause));
-        actorRef.tell(new ReadRequest(store, path), probe.ref());
-        verify(deviceReadTx).read(store, path);
+        when(deviceReadTx.read(STORE, PATH)).thenReturn(Futures.immediateFailedCheckedFuture(cause));
+        actorRef.tell(new ReadRequest(STORE, PATH), probe.ref());
+        verify(deviceReadTx).read(STORE, PATH);
         probe.expectMsg(cause);
     }
 
     @Test
     public void testExists() throws Exception {
-        when(deviceReadTx.exists(store, path)).thenReturn(Futures.immediateCheckedFuture(true));
-        actorRef.tell(new ExistsRequest(store, path), probe.ref());
-        verify(deviceReadTx).exists(store, path);
+        when(deviceReadTx.exists(STORE, PATH)).thenReturn(Futures.immediateCheckedFuture(true));
+        actorRef.tell(new ExistsRequest(STORE, PATH), probe.ref());
+        verify(deviceReadTx).exists(STORE, PATH);
         probe.expectMsg(true);
     }
 
     @Test
     public void testExistsFailure() throws Exception {
         final ReadFailedException cause = new ReadFailedException("fail");
-        when(deviceReadTx.exists(store, path)).thenReturn(Futures.immediateFailedCheckedFuture(cause));
-        actorRef.tell(new ExistsRequest(store, path), probe.ref());
-        verify(deviceReadTx).exists(store, path);
+        when(deviceReadTx.exists(STORE, PATH)).thenReturn(Futures.immediateFailedCheckedFuture(cause));
+        actorRef.tell(new ExistsRequest(STORE, PATH), probe.ref());
+        verify(deviceReadTx).exists(STORE, PATH);
         probe.expectMsg(cause);
     }
 }
