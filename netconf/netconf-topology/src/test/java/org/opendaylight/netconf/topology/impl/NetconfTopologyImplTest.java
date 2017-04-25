@@ -96,10 +96,12 @@ public class NetconfTopologyImplTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        when(mockedSchemaRepositoryProvider.getSharedSchemaRepository()).thenReturn(new SharedSchemaRepository("testingSharedSchemaRepo"));
+        when(mockedSchemaRepositoryProvider.getSharedSchemaRepository())
+                .thenReturn(new SharedSchemaRepository("testingSharedSchemaRepo"));
         when(mockedProcessingExecutor.getExecutor()).thenReturn(MoreExecutors.newDirectExecutorService());
         final Future future = new SucceededFuture(ImmediateEventExecutor.INSTANCE, new NetconfDeviceCapabilities());
-        when(mockedClientDispatcher.createReconnectingClient(any(NetconfReconnectingClientConfiguration.class))).thenReturn(future);
+        when(mockedClientDispatcher.createReconnectingClient(any(NetconfReconnectingClientConfiguration.class)))
+                .thenReturn(future);
 
         topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher,
                 mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, mockedSchemaRepositoryProvider,
@@ -112,18 +114,22 @@ public class NetconfTopologyImplTest {
     public void testInit() {
         final WriteTransaction wtx = mock(WriteTransaction.class);
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(wtx);
-        doNothing().when(wtx).merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
+        doNothing().when(wtx)
+                .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
         when(wtx.submit()).thenReturn(Futures.<Void, TransactionCommitFailedException>immediateCheckedFuture(null));
         topology.init();
 
         //verify initialization of topology
-        final InstanceIdentifier<NetworkTopology> networkTopologyId = InstanceIdentifier.builder(NetworkTopology.class).build();
+        final InstanceIdentifier<NetworkTopology> networkTopologyId =
+                InstanceIdentifier.builder(NetworkTopology.class).build();
         final Topology topo = new TopologyBuilder().setTopologyId(new TopologyId(TOPOLOGY_ID)).build();
         final NetworkTopology networkTopology = new NetworkTopologyBuilder().build();
         verify(wtx).merge(LogicalDatastoreType.CONFIGURATION, networkTopologyId, networkTopology);
         verify(wtx).merge(LogicalDatastoreType.OPERATIONAL, networkTopologyId, networkTopology);
-        verify(wtx).merge(LogicalDatastoreType.CONFIGURATION, networkTopologyId.child(Topology.class, new TopologyKey(new TopologyId(TOPOLOGY_ID))), topo);
-        verify(wtx).merge(LogicalDatastoreType.OPERATIONAL, networkTopologyId.child(Topology.class, new TopologyKey(new TopologyId(TOPOLOGY_ID))), topo);
+        verify(wtx).merge(LogicalDatastoreType.CONFIGURATION,
+                networkTopologyId.child(Topology.class, new TopologyKey(new TopologyId(TOPOLOGY_ID))), topo);
+        verify(wtx).merge(LogicalDatastoreType.OPERATIONAL,
+                networkTopologyId.child(Topology.class, new TopologyKey(new TopologyId(TOPOLOGY_ID))), topo);
     }
 
     @Test
@@ -134,7 +140,9 @@ public class NetconfTopologyImplTest {
 
         InstanceIdentifier.PathArgument pa = null;
 
-        for (final InstanceIdentifier.PathArgument p : TopologyUtil.createTopologyListPath(TOPOLOGY_ID).child(Node.class, new NodeKey(NODE_ID)).getPathArguments()) {
+        for (final InstanceIdentifier.PathArgument p
+                : TopologyUtil.createTopologyListPath(TOPOLOGY_ID)
+                    .child(Node.class, new NodeKey(NODE_ID)).getPathArguments()) {
             pa = p;
         }
 
@@ -180,10 +188,11 @@ public class NetconfTopologyImplTest {
 
     public static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
 
-        public TestingNetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
-                                          final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
-                                          final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
-                                          final DataBroker dataBroker, final DOMMountPointService mountPointService) {
+        public TestingNetconfTopologyImpl(
+                final String topologyId, final NetconfClientDispatcher clientDispatcher,
+                final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
+                final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
+                final DataBroker dataBroker, final DOMMountPointService mountPointService) {
             super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,
                     processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService);
         }

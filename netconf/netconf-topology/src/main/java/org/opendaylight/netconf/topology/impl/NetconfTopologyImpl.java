@@ -42,7 +42,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfTopologyImpl extends AbstractNetconfTopology implements DataTreeChangeListener<Node>, AutoCloseable {
+public class NetconfTopologyImpl extends AbstractNetconfTopology
+        implements DataTreeChangeListener<Node>, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyImpl.class);
 
@@ -50,7 +51,8 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
 
     public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                                final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
-                               final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
+                               final ThreadPool processingExecutor,
+                               final SchemaRepositoryProvider schemaRepositoryProvider,
                                final DataBroker dataBroker, final DOMMountPointService mountPointService) {
         super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
                 schemaRepositoryProvider, dataBroker, mountPointService);
@@ -76,7 +78,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
     }
 
     /**
-     * Invoke by blueprint
+     * Invoked by blueprint.
      */
     public void init() {
         final WriteTransaction wtx = dataBroker.newWriteOnlyTransaction();
@@ -89,8 +91,8 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
             }
 
             @Override
-            public void onFailure(final Throwable t) {
-                LOG.error("Unable to initialize netconf-topology, {}", t);
+            public void onFailure(final Throwable throwable) {
+                LOG.error("Unable to initialize netconf-topology, {}", throwable);
             }
         });
 
@@ -116,7 +118,8 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
                 case WRITE:
                     LOG.debug("Config for node {} created", TopologyUtil.getNodeId(rootNode.getIdentifier()));
                     if (activeConnectors.containsKey(TopologyUtil.getNodeId(rootNode.getIdentifier()))) {
-                        LOG.warn("RemoteDevice{{}} was already configured, reconfiguring..", TopologyUtil.getNodeId(rootNode.getIdentifier()));
+                        LOG.warn("RemoteDevice{{}} was already configured, reconfiguring..",
+                                TopologyUtil.getNodeId(rootNode.getIdentifier()));
                         disconnectNode(TopologyUtil.getNodeId(rootNode.getIdentifier()));
                     }
                     connectNode(TopologyUtil.getNodeId(rootNode.getIdentifier()), rootNode.getDataAfter());
@@ -125,16 +128,20 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
                     LOG.debug("Config for node {} deleted", TopologyUtil.getNodeId(rootNode.getIdentifier()));
                     disconnectNode(TopologyUtil.getNodeId(rootNode.getIdentifier()));
                     break;
+                default:
+                    LOG.debug("Unsupported modification type: {}.", rootNode.getModificationType());
             }
         }
     }
 
     private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType) {
         final NetworkTopology networkTopology = new NetworkTopologyBuilder().build();
-        final InstanceIdentifier<NetworkTopology> networkTopologyId = InstanceIdentifier.builder(NetworkTopology.class).build();
+        final InstanceIdentifier<NetworkTopology> networkTopologyId =
+                InstanceIdentifier.builder(NetworkTopology.class).build();
         wtx.merge(datastoreType, networkTopologyId, networkTopology);
         final Topology topology = new TopologyBuilder().setTopologyId(new TopologyId(topologyId)).build();
-        wtx.merge(datastoreType, networkTopologyId.child(Topology.class, new TopologyKey(new TopologyId(topologyId))), topology);
+        wtx.merge(datastoreType,
+                networkTopologyId.child(Topology.class, new TopologyKey(new TopologyId(topologyId))), topology);
     }
 
 }
