@@ -29,19 +29,20 @@ import org.xml.sax.SAXException;
 public class NotificationsTransformUtilTest {
 
     private static final Date DATE = new Date();
-    private static final String innerNotification = "<netconf-capability-change xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-notifications\">" +
-            "<deleted-capability>uri4</deleted-capability>" +
-            "<deleted-capability>uri3</deleted-capability>" +
-            "<added-capability>uri1</added-capability>" +
-            "</netconf-capability-change>";
+    private static final String INNER_NOTIFICATION =
+            "<netconf-capability-change xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-notifications\">"
+                    + "<deleted-capability>uri4</deleted-capability>"
+                    + "<deleted-capability>uri3</deleted-capability>"
+                    + "<added-capability>uri1</added-capability>"
+                    + "</netconf-capability-change>";
 
-    private static final String expectedNotification =
+    private static final String EXPECTED_NOTIFICATION =
             "<notification xmlns=\"urn:ietf:params:netconf:capability:notification:1.0\">"
-                    + innerNotification
+                    + INNER_NOTIFICATION
                     + "<eventTime>"
-                        + NetconfNotification.RFC3339_DATE_FORMATTER.apply(DATE)
-                    + "</eventTime>" +
-            "</notification>";
+                    + NetconfNotification.RFC3339_DATE_FORMATTER.apply(DATE)
+                    + "</eventTime>"
+                    + "</notification>";
 
     @Test
     public void testTransform() throws Exception {
@@ -51,11 +52,12 @@ public class NotificationsTransformUtilTest {
         netconfCapabilityChangeBuilder.setDeletedCapability(Lists.newArrayList(new Uri("uri4"), new Uri("uri3")));
 
         final NetconfCapabilityChange capabilityChange = netconfCapabilityChangeBuilder.build();
-        final NetconfNotification transform = NotificationsTransformUtil.transform(capabilityChange, DATE, SchemaPath.create(true, NetconfCapabilityChange.QNAME));
+        final NetconfNotification transform = NotificationsTransformUtil.transform(capabilityChange, DATE,
+                SchemaPath.create(true, NetconfCapabilityChange.QNAME));
 
         final String serialized = XmlUtil.toString(transform.getDocument());
 
-        compareXml(expectedNotification, serialized);
+        compareXml(EXPECTED_NOTIFICATION, serialized);
     }
 
     static void compareXml(final String expected, final String actual) throws SAXException, IOException {
@@ -68,10 +70,11 @@ public class NotificationsTransformUtilTest {
 
     @Test
     public void testTransformFromDOM() throws Exception {
-        final NetconfNotification netconfNotification = new NetconfNotification(XmlUtil.readXmlToDocument(innerNotification), DATE);
+        final NetconfNotification netconfNotification =
+                new NetconfNotification(XmlUtil.readXmlToDocument(INNER_NOTIFICATION), DATE);
 
         XMLUnit.setIgnoreWhitespace(true);
-        compareXml(expectedNotification, netconfNotification.toString());
+        compareXml(EXPECTED_NOTIFICATION, netconfNotification.toString());
     }
 
 }

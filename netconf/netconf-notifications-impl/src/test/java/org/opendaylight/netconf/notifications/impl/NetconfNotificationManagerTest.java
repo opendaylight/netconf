@@ -97,7 +97,8 @@ public class NetconfNotificationManagerTest {
         )) {
             try {
                 final Date apply = NetconfNotification.RFC3339_DATE_PARSER.apply(time);
-                final Date parse = new SimpleDateFormat(RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT).parse(iterator.next());
+                final Date parse =
+                        new SimpleDateFormat(RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT).parse(iterator.next());
                 assertEquals(parse.getTime(), apply.getTime());
                 // Testing that we're consistent from formatting to parsing.
                 final String dateString = NetconfNotification.RFC3339_DATE_FORMATTER.apply(apply);
@@ -147,7 +148,8 @@ public class NetconfNotificationManagerTest {
 
         final NetconfNotificationListener listener = mock(NetconfNotificationListener.class);
         doNothing().when(listener).onNotification(any(StreamNameType.class), any(NetconfNotification.class));
-        final NotificationListenerRegistration notificationListenerRegistration = netconfNotificationManager.registerNotificationListener(NetconfNotificationManager.BASE_NETCONF_STREAM.getName(), listener);
+        final NotificationListenerRegistration notificationListenerRegistration = netconfNotificationManager
+                .registerNotificationListener(NetconfNotificationManager.BASE_NETCONF_STREAM.getName(), listener);
         final NetconfCapabilityChange notification = capabilityChangedBuilder.build();
         baseNotificationPublisherRegistration.onCapabilityChanged(notification);
 
@@ -163,12 +165,14 @@ public class NetconfNotificationManagerTest {
     public void testClose() throws Exception {
         final NetconfNotificationManager netconfNotificationManager = new NetconfNotificationManager();
 
-        final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration = netconfNotificationManager.registerBaseNotificationPublisher();
+        final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration =
+                netconfNotificationManager.registerBaseNotificationPublisher();
 
         final NetconfNotificationListener listener = mock(NetconfNotificationListener.class);
         doNothing().when(listener).onNotification(any(StreamNameType.class), any(NetconfNotification.class));
 
-        netconfNotificationManager.registerNotificationListener(NetconfNotificationManager.BASE_NETCONF_STREAM.getName(), listener);
+        netconfNotificationManager
+                .registerNotificationListener(NetconfNotificationManager.BASE_NETCONF_STREAM.getName(), listener);
 
         final NetconfNotificationCollector.NetconfNotificationStreamListener streamListener =
                 mock(NetconfNotificationCollector.NetconfNotificationStreamListener.class);
@@ -196,7 +200,8 @@ public class NetconfNotificationManagerTest {
     public void testStreamListeners() throws Exception {
         final NetconfNotificationManager netconfNotificationManager = new NetconfNotificationManager();
 
-        final NetconfNotificationCollector.NetconfNotificationStreamListener streamListener = mock(NetconfNotificationCollector.NetconfNotificationStreamListener.class);
+        final NetconfNotificationCollector.NetconfNotificationStreamListener streamListener =
+                mock(NetconfNotificationCollector.NetconfNotificationStreamListener.class);
         doNothing().when(streamListener).onStreamRegistered(any(Stream.class));
         doNothing().when(streamListener).onStreamUnregistered(any(StreamNameType.class));
 
