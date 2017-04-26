@@ -8,6 +8,6 @@
 
 package org.opendaylight.netconf.topology.singleton.messages.transactions;
 
-public class CancelRequest implements TransactionRequest {
+public class CancelRequest implements WriteActorMessage {
     private static final long serialVersionUID = 1L;
 }
