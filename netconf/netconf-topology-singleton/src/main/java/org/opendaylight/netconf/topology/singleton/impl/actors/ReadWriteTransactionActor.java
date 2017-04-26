@@ -11,47 +11,48 @@ package org.opendaylight.netconf.topology.singleton.impl.actors;
 import akka.actor.Props;
 import akka.actor.ReceiveTimeout;
 import akka.actor.UntypedActor;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.ReadActorMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.WriteActorMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.duration.Duration;
 
-/**
- * WriteTransactionActor is an interface to device's {@link DOMDataReadOnlyTransaction} for cluster nodes.
- */
-public class WriteTransactionActor extends UntypedActor {
+public class ReadWriteTransactionActor extends UntypedActor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(WriteTransactionActor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ReadWriteTransactionActor.class);
 
-    private final DOMDataWriteTransaction tx;
+    private final DOMDataReadWriteTransaction tx;
     private final long idleTimeout;
+    private final ReadAdapter readAdapter;
     private final WriteAdapter writeAdapter;
 
-    private WriteTransactionActor(final DOMDataWriteTransaction tx, final Duration idleTimeout) {
+    private ReadWriteTransactionActor(final DOMDataReadWriteTransaction tx, final Duration idleTimeout) {
         this.tx = tx;
         this.idleTimeout = idleTimeout.toSeconds();
         if (this.idleTimeout > 0) {
             context().setReceiveTimeout(idleTimeout);
         }
+        readAdapter = new ReadAdapter(tx);
         writeAdapter = new WriteAdapter(tx);
     }
 
     /**
      * Creates new actor Props.
      *
-     * @param tx          delegate device write transaction
+     * @param tx          delegate device read write transaction
      * @param idleTimeout idle time in seconds, after which transaction is closed automatically
      * @return props
      */
-    static Props props(final DOMDataWriteTransaction tx, final Duration idleTimeout) {
-        return Props.create(WriteTransactionActor.class, () -> new WriteTransactionActor(tx, idleTimeout));
+    static Props props(final DOMDataReadWriteTransaction tx, final Duration idleTimeout) {
+        return Props.create(ReadWriteTransactionActor.class, () -> new ReadWriteTransactionActor(tx, idleTimeout));
     }
 
     @Override
     public void onReceive(final Object message) throws Throwable {
-        if (message instanceof WriteActorMessage) {
+        if (message instanceof ReadActorMessage) {
+            readAdapter.handle(message, sender(), self());
+        } else if (message instanceof WriteActorMessage) {
             writeAdapter.handle(message, sender(), context(), self());
         } else if (message instanceof ReceiveTimeout) {
             LOG.warn("Haven't received any message for {} seconds, cancelling transaction and stopping actor",
@@ -62,6 +63,5 @@ public class WriteTransactionActor extends UntypedActor {
             unhandled(message);
         }
     }
-
 
 }
