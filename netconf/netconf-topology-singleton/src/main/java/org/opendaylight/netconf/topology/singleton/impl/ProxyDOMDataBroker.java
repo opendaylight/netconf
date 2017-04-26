@@ -25,12 +25,14 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
-import org.opendaylight.netconf.sal.connect.netconf.sal.tx.ReadWriteTx;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.tx.ProxyReadTransaction;
+import org.opendaylight.netconf.topology.singleton.impl.tx.ProxyReadWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.tx.ProxyWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadTransactionReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadTransactionRequest;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadWriteTransactionReply;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadWriteTransactionRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewWriteTransactionReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewWriteTransactionRequest;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
@@ -49,7 +51,7 @@ public class ProxyDOMDataBroker implements DOMDataBroker {
      * @param actorSystem system
      * @param id          id
      * @param masterNode  {@link org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor} ref
-     * @param askTimeout ask timeout
+     * @param askTimeout  ask timeout
      */
     public ProxyDOMDataBroker(final ActorSystem actorSystem, final RemoteDeviceId id,
                               final ActorRef masterNode, final Timeout askTimeout) {
@@ -77,7 +79,18 @@ public class ProxyDOMDataBroker implements DOMDataBroker {
 
     @Override
     public DOMDataReadWriteTransaction newReadWriteTransaction() {
-        return new ReadWriteTx(newReadOnlyTransaction(), newWriteOnlyTransaction());
+        final Future<Object> txActorFuture = Patterns.ask(masterNode, new NewReadWriteTransactionRequest(), askTimeout);
+        try {
+            final Object msg = Await.result(txActorFuture, askTimeout.duration());
+            if (msg instanceof Throwable) {
+                throw (Throwable) msg;
+            }
+            Preconditions.checkState(msg instanceof NewReadWriteTransactionReply);
+            final NewReadWriteTransactionReply reply = (NewReadWriteTransactionReply) msg;
+            return new ProxyReadWriteTransaction(reply.getTxActor(), id, actorSystem, askTimeout);
+        } catch (final Throwable t) {
+            throw new IllegalStateException("Can't create ProxyReadWriteTransaction", t);
+        }
     }
 
     @Override
@@ -92,7 +105,7 @@ public class ProxyDOMDataBroker implements DOMDataBroker {
             final NewWriteTransactionReply reply = (NewWriteTransactionReply) msg;
             return new ProxyWriteTransaction(reply.getTxActor(), id, actorSystem, askTimeout);
         } catch (final Throwable t) {
-            throw new IllegalStateException("Can't create ProxyWriteTransaction", t);
+            throw new IllegalStateException("Can't create ProxyReadWriteTransaction", t);
         }
     }
 
