@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Tx implementation for netconf devices that support only writable-running with no candidate
+ * Tx implementation for netconf devices that support only writable-running with no candidate.
  * The sequence goes as:
  * <ol>
  *   <li>Lock running datastore on tx construction
@@ -72,17 +72,19 @@ public class WriteRunningTx extends AbstractWriteTx {
 
     @Override
     public synchronized CheckedFuture<Void, TransactionCommitFailedException> submit() {
-        final ListenableFuture<Void> commmitFutureAsVoid = Futures.transform(commit(), new Function<RpcResult<TransactionStatus>, Void>() {
-            @Override
-            public Void apply(final RpcResult<TransactionStatus> input) {
-                return null;
-            }
-        });
+        final ListenableFuture<Void> commmitFutureAsVoid = Futures.transform(commit(),
+                new Function<RpcResult<TransactionStatus>, Void>() {
+                    @Override
+                    public Void apply(final RpcResult<TransactionStatus> input) {
+                        return null;
+                    }
+                });
 
         return Futures.makeChecked(commmitFutureAsVoid, new Function<Exception, TransactionCommitFailedException>() {
             @Override
             public TransactionCommitFailedException apply(final Exception input) {
-                return new TransactionCommitFailedException("Submit of transaction " + getIdentifier() + " failed", input);
+                return new TransactionCommitFailedException("Submit of transaction " + getIdentifier() + " failed",
+                        input);
             }
         });
     }
@@ -123,7 +125,8 @@ public class WriteRunningTx extends AbstractWriteTx {
                                                        final boolean rollbackSupport) {
             final NetconfRpcFutureCallback editConfigCallback = new NetconfRpcFutureCallback("Edit running", id);
             if (defaultOperation.isPresent()) {
-                return netOps.editConfigRunning(editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport);
+                return netOps.editConfigRunning(
+                        editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport);
             } else {
                 return netOps.editConfigRunning(editConfigCallback, editStructure, rollbackSupport);
             }

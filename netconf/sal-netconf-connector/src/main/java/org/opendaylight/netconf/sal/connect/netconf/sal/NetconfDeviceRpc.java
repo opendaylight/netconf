@@ -37,18 +37,20 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
  */
 public final class NetconfDeviceRpc implements DOMRpcService {
 
-    private static final Function<RpcDefinition, DOMRpcIdentifier> RPC_TO_RPC_IDENTIFIER = new Function<RpcDefinition, DOMRpcIdentifier>() {
-        @Override
-        public DOMRpcIdentifier apply(final RpcDefinition input) {
-            return DOMRpcIdentifier.create(input.getPath());
-        }
-    };
+    private static final Function<RpcDefinition, DOMRpcIdentifier> RPC_TO_RPC_IDENTIFIER =
+        new Function<RpcDefinition, DOMRpcIdentifier>() {
+            @Override
+            public DOMRpcIdentifier apply(final RpcDefinition input) {
+                return DOMRpcIdentifier.create(input.getPath());
+            }
+        };
 
     private final RemoteDeviceCommunicator<NetconfMessage> listener;
     private final MessageTransformer<NetconfMessage> transformer;
     private final Collection<DOMRpcIdentifier> availableRpcs;
 
-    public NetconfDeviceRpc(final SchemaContext schemaContext, final RemoteDeviceCommunicator<NetconfMessage> listener, final MessageTransformer<NetconfMessage> transformer) {
+    public NetconfDeviceRpc(final SchemaContext schemaContext, final RemoteDeviceCommunicator<NetconfMessage> listener,
+                            final MessageTransformer<NetconfMessage> transformer) {
         this.listener = listener;
         this.transformer = transformer;
 
@@ -57,33 +59,37 @@ public final class NetconfDeviceRpc implements DOMRpcService {
 
     @Nonnull
     @Override
-    public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull final SchemaPath type, @Nullable final NormalizedNode<?, ?> input) {
+    public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull final SchemaPath type,
+                                                                  @Nullable final NormalizedNode<?, ?> input) {
         final NetconfMessage message = transformer.toRpcRequest(type, input);
-        final ListenableFuture<RpcResult<NetconfMessage>> delegateFutureWithPureResult = listener.sendRequest(message, type.getLastComponent());
+        final ListenableFuture<RpcResult<NetconfMessage>> delegateFutureWithPureResult =
+                listener.sendRequest(message, type.getLastComponent());
 
-        final ListenableFuture<DOMRpcResult> transformed = Futures.transform(delegateFutureWithPureResult, new Function<RpcResult<NetconfMessage>, DOMRpcResult>() {
-            @Override
-            public DOMRpcResult apply(final RpcResult<NetconfMessage> input) {
-                if (input.isSuccessful()) {
-                    return transformer.toRpcResult(input.getResult(), type);
-                } else {
-                    return new DefaultDOMRpcResult(input.getErrors());
+        final ListenableFuture<DOMRpcResult> transformed =
+            Futures.transform(delegateFutureWithPureResult, new Function<RpcResult<NetconfMessage>, DOMRpcResult>() {
+                @Override
+                public DOMRpcResult apply(final RpcResult<NetconfMessage> input) {
+                    if (input.isSuccessful()) {
+                        return transformer.toRpcResult(input.getResult(), type);
+                    } else {
+                        return new DefaultDOMRpcResult(input.getErrors());
+                    }
                 }
-            }
-        });
+            });
 
         return Futures.makeChecked(transformed, new Function<Exception, DOMRpcException>() {
             @Nullable
             @Override
-            public DOMRpcException apply(@Nullable final Exception e) {
-                return new DOMRpcImplementationNotAvailableException(e, "Unable to invoke rpc %s", type);
+            public DOMRpcException apply(@Nullable final Exception exception) {
+                return new DOMRpcImplementationNotAvailableException(exception, "Unable to invoke rpc %s", type);
             }
         });
     }
 
     @Nonnull
     @Override
-    public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(@Nonnull final T listener) {
+    public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(
+            @Nonnull final T listener) {
 
         listener.onRpcAvailable(availableRpcs);
 

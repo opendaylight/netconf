@@ -74,20 +74,23 @@ public final class NetconfBaseOps {
         Preconditions.checkNotNull(callback);
         Preconditions.checkNotNull(datastore);
 
-        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(toPath(NETCONF_LOCK_QNAME), getLockContent(datastore));
+        final ListenableFuture<DOMRpcResult> future =
+                rpc.invokeRpc(toPath(NETCONF_LOCK_QNAME), getLockContent(datastore));
         Futures.addCallback(future, callback);
         return future;
     }
 
     public ListenableFuture<DOMRpcResult> lockCandidate(final FutureCallback<DOMRpcResult> callback) {
-        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(toPath(NETCONF_LOCK_QNAME), getLockContent(NETCONF_CANDIDATE_QNAME));
+        final ListenableFuture<DOMRpcResult> future =
+                rpc.invokeRpc(toPath(NETCONF_LOCK_QNAME), getLockContent(NETCONF_CANDIDATE_QNAME));
         Futures.addCallback(future, callback);
         return future;
     }
 
 
     public ListenableFuture<DOMRpcResult> lockRunning(final FutureCallback<DOMRpcResult> callback) {
-        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(toPath(NETCONF_LOCK_QNAME), getLockContent(NETCONF_RUNNING_QNAME));
+        final ListenableFuture<DOMRpcResult> future =
+                rpc.invokeRpc(toPath(NETCONF_LOCK_QNAME), getLockContent(NETCONF_RUNNING_QNAME));
         Futures.addCallback(future, callback);
         return future;
     }
@@ -96,19 +99,22 @@ public final class NetconfBaseOps {
         Preconditions.checkNotNull(callback);
         Preconditions.checkNotNull(datastore);
 
-        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(toPath(NETCONF_UNLOCK_QNAME), getUnLockContent(datastore));
+        final ListenableFuture<DOMRpcResult> future =
+                rpc.invokeRpc(toPath(NETCONF_UNLOCK_QNAME), getUnLockContent(datastore));
         Futures.addCallback(future, callback);
         return future;
     }
 
     public ListenableFuture<DOMRpcResult> unlockRunning(final FutureCallback<DOMRpcResult> callback) {
-        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(toPath(NETCONF_UNLOCK_QNAME), getUnLockContent(NETCONF_RUNNING_QNAME));
+        final ListenableFuture<DOMRpcResult> future =
+                rpc.invokeRpc(toPath(NETCONF_UNLOCK_QNAME), getUnLockContent(NETCONF_RUNNING_QNAME));
         Futures.addCallback(future, callback);
         return future;
     }
 
     public ListenableFuture<DOMRpcResult> unlockCandidate(final FutureCallback<DOMRpcResult> callback) {
-        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(toPath(NETCONF_UNLOCK_QNAME), getUnLockContent(NETCONF_CANDIDATE_QNAME));
+        final ListenableFuture<DOMRpcResult> future =
+                rpc.invokeRpc(toPath(NETCONF_UNLOCK_QNAME), getUnLockContent(NETCONF_CANDIDATE_QNAME));
         Futures.addCallback(future, callback);
         return future;
     }
@@ -124,7 +130,8 @@ public final class NetconfBaseOps {
     public ListenableFuture<DOMRpcResult> commit(final FutureCallback<DOMRpcResult> callback) {
         Preconditions.checkNotNull(callback);
 
-        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME), NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
+        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(
+            toPath(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME), NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
         Futures.addCallback(future, callback);
         return future;
     }
@@ -133,7 +140,8 @@ public final class NetconfBaseOps {
         Preconditions.checkNotNull(callback);
         Preconditions.checkNotNull(datastore);
 
-        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_VALIDATE_QNAME), getValidateContent(datastore));
+        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(
+                toPath(NetconfMessageTransformUtil.NETCONF_VALIDATE_QNAME), getValidateContent(datastore));
         Futures.addCallback(future, callback);
         return future;
     }
@@ -147,12 +155,14 @@ public final class NetconfBaseOps {
         return validate(callback, NETCONF_RUNNING_QNAME);
     }
 
-    public ListenableFuture<DOMRpcResult> copyConfig(final FutureCallback<DOMRpcResult> callback, final QName source, final QName target) {
+    public ListenableFuture<DOMRpcResult> copyConfig(final FutureCallback<DOMRpcResult> callback,
+                                                     final QName source, final QName target) {
         Preconditions.checkNotNull(callback);
         Preconditions.checkNotNull(source);
         Preconditions.checkNotNull(target);
 
-        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_COPY_CONFIG_QNAME), getCopyConfigContent(source, target));
+        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(
+                toPath(NetconfMessageTransformUtil.NETCONF_COPY_CONFIG_QNAME), getCopyConfigContent(source, target));
         Futures.addCallback(future, callback);
         return future;
     }
@@ -161,7 +171,8 @@ public final class NetconfBaseOps {
         return copyConfig(callback, NETCONF_RUNNING_QNAME, NETCONF_CANDIDATE_QNAME);
     }
 
-    public ListenableFuture<DOMRpcResult> getConfig(final FutureCallback<DOMRpcResult> callback, final QName datastore, final Optional<YangInstanceIdentifier> filterPath) {
+    public ListenableFuture<DOMRpcResult> getConfig(final FutureCallback<DOMRpcResult> callback, final QName datastore,
+                                                    final Optional<YangInstanceIdentifier> filterPath) {
         Preconditions.checkNotNull(callback);
         Preconditions.checkNotNull(datastore);
 
@@ -179,8 +190,8 @@ public final class NetconfBaseOps {
         return future;
     }
 
-    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfigRunningData(final FutureCallback<DOMRpcResult> callback,
-                                                                                 final Optional<YangInstanceIdentifier> filterPath) {
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfigRunningData(
+            final FutureCallback<DOMRpcResult> callback, final Optional<YangInstanceIdentifier> filterPath) {
         final ListenableFuture<DOMRpcResult> configRunning = getConfigRunning(callback, filterPath);
         return extractData(filterPath, configRunning);
     }
@@ -191,32 +202,38 @@ public final class NetconfBaseOps {
         return extractData(filterPath, configRunning);
     }
 
-    private ListenableFuture<Optional<NormalizedNode<?, ?>>> extractData(final Optional<YangInstanceIdentifier> path,
-                                                                         final ListenableFuture<DOMRpcResult> configRunning) {
+    private ListenableFuture<Optional<NormalizedNode<?, ?>>> extractData(
+            final Optional<YangInstanceIdentifier> path, final ListenableFuture<DOMRpcResult> configRunning) {
         return Futures.transform(configRunning, (Function<DOMRpcResult, Optional<NormalizedNode<?, ?>>>) result -> {
-            Preconditions.checkArgument(result.getErrors().isEmpty(), "Unable to read data: %s, errors: %s", path, result.getErrors());
+            Preconditions.checkArgument(
+                    result.getErrors().isEmpty(), "Unable to read data: %s, errors: %s", path, result.getErrors());
             final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> dataNode =
-                    ((ContainerNode) result.getResult()).getChild(NetconfMessageTransformUtil.toId(NetconfMessageTransformUtil.NETCONF_DATA_QNAME)).get();
+                    ((ContainerNode) result.getResult()).getChild(
+                            NetconfMessageTransformUtil.toId(NetconfMessageTransformUtil.NETCONF_DATA_QNAME)).get();
             return transformer.selectFromDataStructure(dataNode, path.get());
         });
     }
 
-    public ListenableFuture<DOMRpcResult> getConfigRunning(final FutureCallback<DOMRpcResult> callback, final Optional<YangInstanceIdentifier> filterPath) {
+    public ListenableFuture<DOMRpcResult> getConfigRunning(final FutureCallback<DOMRpcResult> callback,
+                                                           final Optional<YangInstanceIdentifier> filterPath) {
         return getConfig(callback, NETCONF_RUNNING_QNAME, filterPath);
     }
 
-    public ListenableFuture<DOMRpcResult> getConfigCandidate(final FutureCallback<DOMRpcResult> callback, final Optional<YangInstanceIdentifier> filterPath) {
+    public ListenableFuture<DOMRpcResult> getConfigCandidate(final FutureCallback<DOMRpcResult> callback,
+                                                             final Optional<YangInstanceIdentifier> filterPath) {
         return getConfig(callback, NETCONF_CANDIDATE_QNAME, filterPath);
     }
 
-    public ListenableFuture<DOMRpcResult> get(final FutureCallback<DOMRpcResult> callback, final Optional<YangInstanceIdentifier> filterPath) {
+    public ListenableFuture<DOMRpcResult> get(final FutureCallback<DOMRpcResult> callback,
+                                              final Optional<YangInstanceIdentifier> filterPath) {
         Preconditions.checkNotNull(callback);
 
         final ListenableFuture<DOMRpcResult> future;
 
-        future = isFilterPresent(filterPath) ?
-                rpc.invokeRpc(toPath(NETCONF_GET_QNAME), NetconfMessageTransformUtil.wrap(NETCONF_GET_QNAME, toFilterStructure(filterPath.get(), schemaContext))) :
-                rpc.invokeRpc(toPath(NETCONF_GET_QNAME), NetconfMessageTransformUtil.GET_RPC_CONTENT);
+        future = isFilterPresent(filterPath)
+                ? rpc.invokeRpc(toPath(NETCONF_GET_QNAME),
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_QNAME, toFilterStructure(filterPath.get(), schemaContext)))
+                : rpc.invokeRpc(toPath(NETCONF_GET_QNAME), NetconfMessageTransformUtil.GET_RPC_CONTENT);
 
         Futures.addCallback(future, callback);
         return future;
@@ -226,40 +243,55 @@ public final class NetconfBaseOps {
         return filterPath.isPresent() && !filterPath.get().isEmpty();
     }
 
-    public ListenableFuture<DOMRpcResult> editConfigCandidate(final FutureCallback<? super DOMRpcResult> callback, final DataContainerChild<?, ?> editStructure, final ModifyAction modifyAction, final boolean rollback) {
+    public ListenableFuture<DOMRpcResult> editConfigCandidate(final FutureCallback<? super DOMRpcResult> callback,
+                                                              final DataContainerChild<?, ?> editStructure,
+                                                              final ModifyAction modifyAction, final boolean rollback) {
         return editConfig(callback, NETCONF_CANDIDATE_QNAME, editStructure, Optional.of(modifyAction), rollback);
     }
 
-    public ListenableFuture<DOMRpcResult> editConfigCandidate(final FutureCallback<? super DOMRpcResult> callback, final DataContainerChild<?, ?> editStructure, final boolean rollback) {
+    public ListenableFuture<DOMRpcResult> editConfigCandidate(final FutureCallback<? super DOMRpcResult> callback,
+                                                              final DataContainerChild<?, ?> editStructure,
+                                                              final boolean rollback) {
         return editConfig(callback, NETCONF_CANDIDATE_QNAME, editStructure, Optional.<ModifyAction>absent(), rollback);
     }
 
-    public ListenableFuture<DOMRpcResult> editConfigRunning(final FutureCallback<? super DOMRpcResult> callback, final DataContainerChild<?, ?> editStructure, final ModifyAction modifyAction, final boolean rollback) {
+    public ListenableFuture<DOMRpcResult> editConfigRunning(final FutureCallback<? super DOMRpcResult> callback,
+                                                            final DataContainerChild<?, ?> editStructure,
+                                                            final ModifyAction modifyAction, final boolean rollback) {
         return editConfig(callback, NETCONF_RUNNING_QNAME, editStructure, Optional.of(modifyAction), rollback);
     }
 
-    public ListenableFuture<DOMRpcResult> editConfigRunning(final FutureCallback<? super DOMRpcResult> callback, final DataContainerChild<?, ?> editStructure, final boolean rollback) {
+    public ListenableFuture<DOMRpcResult> editConfigRunning(final FutureCallback<? super DOMRpcResult> callback,
+                                                            final DataContainerChild<?, ?> editStructure,
+                                                            final boolean rollback) {
         return editConfig(callback, NETCONF_RUNNING_QNAME, editStructure, Optional.<ModifyAction>absent(), rollback);
     }
 
-    public ListenableFuture<DOMRpcResult> editConfig(final FutureCallback<? super DOMRpcResult> callback, final QName datastore, final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> modifyAction, final boolean rollback) {
+    public ListenableFuture<DOMRpcResult> editConfig(
+            final FutureCallback<? super DOMRpcResult> callback, final QName datastore,
+            final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> modifyAction,
+            final boolean rollback) {
         Preconditions.checkNotNull(editStructure);
         Preconditions.checkNotNull(callback);
         Preconditions.checkNotNull(datastore);
 
-        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(toPath(NETCONF_EDIT_CONFIG_QNAME), getEditConfigContent(datastore, editStructure, modifyAction, rollback));
+        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(toPath(NETCONF_EDIT_CONFIG_QNAME),
+                getEditConfigContent(datastore, editStructure, modifyAction, rollback));
 
         Futures.addCallback(future, callback);
         return future;
     }
 
-    public DataContainerChild<?, ?> createEditConfigStrcture(final Optional<NormalizedNode<?, ?>> lastChild, final Optional<ModifyAction> operation, final YangInstanceIdentifier dataPath) {
+    public DataContainerChild<?, ?> createEditConfigStrcture(final Optional<NormalizedNode<?, ?>> lastChild,
+                                                             final Optional<ModifyAction> operation,
+                                                             final YangInstanceIdentifier dataPath) {
         final AnyXmlNode configContent = transformer.createEditConfigStructure(lastChild, dataPath, operation);
         return Builders.choiceBuilder().withNodeIdentifier(toId(EditContent.QNAME)).withChild(configContent).build();
     }
 
-    private static ContainerNode getEditConfigContent(final QName datastore,
-            final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> defaultOperation, final boolean rollback) {
+    private static ContainerNode getEditConfigContent(
+            final QName datastore, final DataContainerChild<?, ?> editStructure,
+            final Optional<ModifyAction> defaultOperation, final boolean rollback) {
         final DataContainerNodeAttrBuilder<YangInstanceIdentifier.NodeIdentifier, ContainerNode> editBuilder =
                 Builders.containerBuilder().withNodeIdentifier(toId(NETCONF_EDIT_CONFIG_QNAME));
 
@@ -267,14 +299,16 @@ public final class NetconfBaseOps {
         editBuilder.withChild(getTargetNode(datastore));
 
         // Default operation
-        if(defaultOperation.isPresent()) {
+        if (defaultOperation.isPresent()) {
             final String opString = defaultOperation.get().name().toLowerCase();
-            editBuilder.withChild(Builders.leafBuilder().withNodeIdentifier(toId(NETCONF_DEFAULT_OPERATION_QNAME)).withValue(opString).build());
+            editBuilder.withChild(Builders.leafBuilder().withNodeIdentifier(toId(NETCONF_DEFAULT_OPERATION_QNAME))
+                    .withValue(opString).build());
         }
 
         // Error option
-        if(rollback) {
-            editBuilder.withChild(Builders.leafBuilder().withNodeIdentifier(toId(NETCONF_ERROR_OPTION_QNAME)).withValue(ROLLBACK_ON_ERROR_OPTION).build());
+        if (rollback) {
+            editBuilder.withChild(Builders.leafBuilder().withNodeIdentifier(toId(NETCONF_ERROR_OPTION_QNAME))
+                    .withValue(ROLLBACK_ON_ERROR_OPTION).build());
         }
 
         // Edit content

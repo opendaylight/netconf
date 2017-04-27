@@ -35,7 +35,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 public class ReadOnlyTxTest {
 
-    private static final YangInstanceIdentifier path = YangInstanceIdentifier.create();
+    private static final YangInstanceIdentifier PATH = YangInstanceIdentifier.create();
 
     @Mock
     private DOMRpcService rpc;
@@ -54,31 +54,39 @@ public class ReadOnlyTxTest {
     public void testRead() throws Exception {
         final NetconfBaseOps netconfOps = new NetconfBaseOps(rpc, mock(SchemaContext.class));
 
-        final ReadOnlyTx readOnlyTx = new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)));
+        final ReadOnlyTx readOnlyTx =
+                new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)));
 
         readOnlyTx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create());
-        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)), any(NormalizedNode.class));
-        readOnlyTx.read(LogicalDatastoreType.OPERATIONAL, path);
-        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(NetconfMessageTransformUtil.NETCONF_GET_QNAME)), any(NormalizedNode.class));
+        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(
+                NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)), any(NormalizedNode.class));
+        readOnlyTx.read(LogicalDatastoreType.OPERATIONAL, PATH);
+        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(
+                NetconfMessageTransformUtil.NETCONF_GET_QNAME)), any(NormalizedNode.class));
     }
 
     @Test
     public void testExists() throws Exception {
         final NetconfBaseOps netconfOps = new NetconfBaseOps(rpc, mock(SchemaContext.class));
 
-        final ReadOnlyTx readOnlyTx = new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)));
+        final ReadOnlyTx readOnlyTx =
+                new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)));
 
         readOnlyTx.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create());
-        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)), any(NormalizedNode.class));
-        readOnlyTx.exists(LogicalDatastoreType.OPERATIONAL, path);
-        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(NetconfMessageTransformUtil.NETCONF_GET_QNAME)), any(NormalizedNode.class));
+        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(
+                NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)), any(NormalizedNode.class));
+        readOnlyTx.exists(LogicalDatastoreType.OPERATIONAL, PATH);
+        verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(
+                NetconfMessageTransformUtil.NETCONF_GET_QNAME)), any(NormalizedNode.class));
     }
 
     @Test
     public void testIdentifier() throws Exception {
         final NetconfBaseOps netconfOps = new NetconfBaseOps(rpc, mock(SchemaContext.class));
-        final ReadOnlyTx tx1 = new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)));
-        final ReadOnlyTx tx2 = new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)));
+        final ReadOnlyTx tx1 =
+                new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)));
+        final ReadOnlyTx tx2 =
+                new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)));
         Assert.assertNotEquals(tx1.getIdentifier(), tx2.getIdentifier());
     }
 }

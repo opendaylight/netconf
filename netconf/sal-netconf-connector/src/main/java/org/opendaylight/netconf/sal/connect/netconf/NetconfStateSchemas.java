@@ -50,7 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Holds QNames for all yang modules reported by ietf-netconf-monitoring/state/schemas
+ * Holds QNames for all yang modules reported by ietf-netconf-monitoring/state/schemas.
  */
 public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
@@ -62,6 +62,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
             YangInstanceIdentifier.builder().node(NetconfState.QNAME).node(Schemas.QNAME).build();
 
     private static final ContainerNode GET_SCHEMAS_RPC;
+
     static {
         final DataContainerChild<?, ?> filter = NetconfMessageTransformUtil.toFilterStructure(STATE_SCHEMAS_IDENTIFIER,
                 BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext());
@@ -81,19 +82,21 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
     @Override
     public Set<QName> getAvailableYangSchemasQNames() {
-        return Sets.newHashSet(Collections2.transform(getAvailableYangSchemas(), new Function<RemoteYangSchema, QName>() {
-            @Override
-            public QName apply(final RemoteYangSchema input) {
-                return input.getQName();
-            }
-        }));
+        return Sets.newHashSet(Collections2.transform(getAvailableYangSchemas(),
+                new Function<RemoteYangSchema, QName>() {
+                    @Override
+                    public QName apply(final RemoteYangSchema input) {
+                        return input.getQName();
+                    }
+                }));
     }
 
     /**
-     * Issue get request to remote device and parse response to find all schemas under netconf-state/schemas
+     * Issue get request to remote device and parse response to find all schemas under netconf-state/schemas.
      */
-    static NetconfStateSchemas create(final DOMRpcService deviceRpc, final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id) {
-        if(remoteSessionCapabilities.isMonitoringSupported() == false) {
+    static NetconfStateSchemas create(final DOMRpcService deviceRpc,
+                                  final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id) {
+        if (remoteSessionCapabilities.isMonitoringSupported() == false) {
             // TODO - need to search for get-schema support, not just ietf-netconf-monitoring support
             // issue might be a deviation to ietf-netconf-monitoring where get-schema is unsupported...
             LOG.warn("{}: Netconf monitoring not supported on device, cannot detect provided schemas", id);
@@ -105,20 +108,22 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
             schemasNodeResult = deviceRpc.invokeRpc(toPath(NETCONF_GET_QNAME), GET_SCHEMAS_RPC).get();
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException(id + ": Interrupted while waiting for response to " + STATE_SCHEMAS_IDENTIFIER, e);
+            throw new RuntimeException(id
+                    + ": Interrupted while waiting for response to " + STATE_SCHEMAS_IDENTIFIER, e);
         } catch (final ExecutionException e) {
             LOG.warn("{}: Unable to detect available schemas, get to {} failed", id, STATE_SCHEMAS_IDENTIFIER, e);
             return EMPTY;
         }
 
-        if(schemasNodeResult.getErrors().isEmpty() == false) {
-            LOG.warn("{}: Unable to detect available schemas, get to {} failed, {}", id, STATE_SCHEMAS_IDENTIFIER, schemasNodeResult.getErrors());
+        if (schemasNodeResult.getErrors().isEmpty() == false) {
+            LOG.warn("{}: Unable to detect available schemas, get to {} failed, {}",
+                    id, STATE_SCHEMAS_IDENTIFIER, schemasNodeResult.getErrors());
             return EMPTY;
         }
 
         final Optional<? extends NormalizedNode<?, ?>> schemasNode = findSchemasNode(schemasNodeResult.getResult());
 
-        if(schemasNode.isPresent()) {
+        if (schemasNode.isPresent()) {
             Preconditions.checkState(schemasNode.get() instanceof ContainerNode,
                     "Expecting container containing schemas, but was %s", schemasNode.get());
             return create(id, (ContainerNode) schemasNode.get());
@@ -128,38 +133,25 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
         }
     }
 
-    private static Optional<? extends NormalizedNode<?, ?>> findSchemasNode(final NormalizedNode<?, ?> result) {
-        if(result == null) {
-            return Optional.absent();
-        }
-        final Optional<DataContainerChild<?, ?>> dataNode = ((DataContainerNode<?>) result).getChild(toId(NETCONF_DATA_QNAME));
-        if(dataNode.isPresent() == false) {
-            return Optional.absent();
-        }
-
-        final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> nStateNode =
-                ((DataContainerNode<?>) dataNode.get()).getChild(toId(NetconfState.QNAME));
-        if(nStateNode.isPresent() == false) {
-            return Optional.absent();
-        }
-
-        return ((DataContainerNode<?>) nStateNode.get()).getChild(toId(Schemas.QNAME));
-    }
-
     /**
-     * Parse response of get(netconf-state/schemas) to find all schemas under netconf-state/schemas
+     * Parse response of get(netconf-state/schemas) to find all schemas under netconf-state/schemas.
      */
     @VisibleForTesting
     protected static NetconfStateSchemas create(final RemoteDeviceId id, final ContainerNode schemasNode) {
         final Set<RemoteYangSchema> availableYangSchemas = Sets.newHashSet();
 
-        final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> child = schemasNode.getChild(toId(Schema.QNAME));
-        Preconditions.checkState(child.isPresent(), "Unable to find list: %s in response: %s", Schema.QNAME.withoutRevision(), schemasNode);
-        Preconditions.checkState(child.get() instanceof MapNode, "Unexpected structure for container: %s in response: %s. Expecting a list", Schema.QNAME.withoutRevision(), schemasNode);
+        final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> child =
+                schemasNode.getChild(toId(Schema.QNAME));
+        Preconditions.checkState(child.isPresent(),
+                "Unable to find list: %s in response: %s", Schema.QNAME.withoutRevision(), schemasNode);
+        Preconditions.checkState(child.get() instanceof MapNode,
+                "Unexpected structure for container: %s in response: %s. Expecting a list",
+                Schema.QNAME.withoutRevision(), schemasNode);
 
         for (final MapEntryNode schemaNode : ((MapNode) child.get()).getValue()) {
-            final Optional<RemoteYangSchema> fromCompositeNode = RemoteYangSchema.createFromNormalizedNode(id, schemaNode);
-            if(fromCompositeNode.isPresent()) {
+            final Optional<RemoteYangSchema> fromCompositeNode =
+                    RemoteYangSchema.createFromNormalizedNode(id, schemaNode);
+            if (fromCompositeNode.isPresent()) {
                 availableYangSchemas.add(fromCompositeNode.get());
             }
         }
@@ -167,7 +159,26 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
         return new NetconfStateSchemas(availableYangSchemas);
     }
 
-    public final static class RemoteYangSchema {
+    private static Optional<? extends NormalizedNode<?, ?>> findSchemasNode(final NormalizedNode<?, ?> result) {
+        if (result == null) {
+            return Optional.absent();
+        }
+        final Optional<DataContainerChild<?, ?>> dataNode =
+                ((DataContainerNode<?>) result).getChild(toId(NETCONF_DATA_QNAME));
+        if (dataNode.isPresent() == false) {
+            return Optional.absent();
+        }
+
+        final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> nStateNode =
+                ((DataContainerNode<?>) dataNode.get()).getChild(toId(NetconfState.QNAME));
+        if (nStateNode.isPresent() == false) {
+            return Optional.absent();
+        }
+
+        return ((DataContainerNode<?>) nStateNode.get()).getChild(toId(Schemas.QNAME));
+    }
+
+    public static final class RemoteYangSchema {
         private final QName qname;
 
         RemoteYangSchema(final QName qname) {
@@ -178,21 +189,23 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
             return qname;
         }
 
-        static Optional<RemoteYangSchema> createFromNormalizedNode(final RemoteDeviceId id, final MapEntryNode schemaNode) {
-            Preconditions.checkArgument(schemaNode.getNodeType().equals(Schema.QNAME), "Wrong QName %s", schemaNode.getNodeType());
+        static Optional<RemoteYangSchema> createFromNormalizedNode(final RemoteDeviceId id,
+                                                                   final MapEntryNode schemaNode) {
+            Preconditions.checkArgument(
+                    schemaNode.getNodeType().equals(Schema.QNAME), "Wrong QName %s", schemaNode.getNodeType());
 
             QName childNode = NetconfMessageTransformUtil.IETF_NETCONF_MONITORING_SCHEMA_FORMAT;
 
             final String formatAsString = getSingleChildNodeValue(schemaNode, childNode).get();
 
-            if(formatAsString.equals(Yang.QNAME.toString()) == false) {
+            if (formatAsString.equals(Yang.QNAME.toString()) == false) {
                 LOG.debug("{}: Ignoring schema due to unsupported format: {}", id, formatAsString);
                 return Optional.absent();
             }
 
             childNode = NetconfMessageTransformUtil.IETF_NETCONF_MONITORING_SCHEMA_LOCATION;
             final Set<String> locationsAsString = getAllChildNodeValues(schemaNode, childNode);
-            if(locationsAsString.contains(Schema.Location.Enumeration.NETCONF.toString()) == false) {
+            if (locationsAsString.contains(Schema.Location.Enumeration.NETCONF.toString()) == false) {
                 LOG.debug("{}: Ignoring schema due to unsupported location: {}", id, locationsAsString);
                 return Optional.absent();
             }
@@ -220,21 +233,26 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
         }
 
         /**
-         * Extracts all values of a leaf-list node as a set of strings
+         * Extracts all values of a leaf-list node as a set of strings.
          */
-        private static Set<String> getAllChildNodeValues(final DataContainerNode<?> schemaNode, final QName childNodeQName) {
+        private static Set<String> getAllChildNodeValues(final DataContainerNode<?> schemaNode,
+                                                         final QName childNodeQName) {
             final Set<String> extractedValues = Sets.newHashSet();
-            final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> child = schemaNode.getChild(toId(childNodeQName));
+            final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> child =
+                    schemaNode.getChild(toId(childNodeQName));
             Preconditions.checkArgument(child.isPresent(), "Child nodes %s not present", childNodeQName);
-            Preconditions.checkArgument(child.get() instanceof LeafSetNode<?>, "Child nodes %s not present", childNodeQName);
+            Preconditions.checkArgument(child.get() instanceof LeafSetNode<?>,
+                    "Child nodes %s not present", childNodeQName);
             for (final LeafSetEntryNode<?> childNode : ((LeafSetNode<?>) child.get()).getValue()) {
                 extractedValues.add(getValueOfSimpleNode(childNode).get());
             }
             return extractedValues;
         }
 
-        private static Optional<String> getSingleChildNodeValue(final DataContainerNode<?> schemaNode, final QName childNode) {
-            final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> node = schemaNode.getChild(toId(childNode));
+        private static Optional<String> getSingleChildNodeValue(final DataContainerNode<?> schemaNode,
+                                                                final QName childNode) {
+            final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> node =
+                    schemaNode.getChild(toId(childNode));
             if (node.isPresent()) {
                 return getValueOfSimpleNode(node.get());
             } else {
@@ -243,21 +261,23 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
             }
         }
 
-        private static Optional<String> getValueOfSimpleNode(final NormalizedNode<? extends YangInstanceIdentifier.PathArgument, ?> node) {
+        private static Optional<String> getValueOfSimpleNode(
+                final NormalizedNode<? extends YangInstanceIdentifier.PathArgument, ?> node) {
             final Object value = node.getValue();
-            return value == null || Strings.isNullOrEmpty(value.toString()) ? Optional.<String>absent() : Optional.of(value.toString().trim());
+            return value == null || Strings.isNullOrEmpty(value.toString())
+                    ? Optional.<String>absent() : Optional.of(value.toString().trim());
         }
 
         @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
+        public boolean equals(final Object obj) {
+            if (this == obj) {
                 return true;
             }
-            if (o == null || getClass() != o.getClass()) {
+            if (obj == null || getClass() != obj.getClass()) {
                 return false;
             }
 
-            final RemoteYangSchema that = (RemoteYangSchema) o;
+            final RemoteYangSchema that = (RemoteYangSchema) obj;
 
             if (!qname.equals(that.qname)) {
                 return false;

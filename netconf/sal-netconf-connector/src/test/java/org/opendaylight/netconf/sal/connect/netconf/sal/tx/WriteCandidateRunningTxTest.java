@@ -49,7 +49,8 @@ public class WriteCandidateRunningTxTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        final SchemaContext schemaContext = YangParserTestUtils.parseYangStreams(getClass().getResourceAsStream("/schemas/test-module.yang"));
+        final SchemaContext schemaContext =
+                YangParserTestUtils.parseYangStreams(getClass().getResourceAsStream("/schemas/test-module.yang"));
         doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult())).when(rpc).invokeRpc(any(), any());
         netconfOps = new NetconfBaseOps(rpc, schemaContext);
         id = new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("0.0.0.0", 17830));
@@ -59,19 +60,25 @@ public class WriteCandidateRunningTxTest {
     public void testSubmit() throws Exception {
         final WriteCandidateRunningTx tx = new WriteCandidateRunningTx(id, netconfOps, true);
         //check, if lock is called
-        final ContainerNode candidateLock = getLockContent(NETCONF_LOCK_QNAME, NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME);
-        final ContainerNode runningLock = getLockContent(NETCONF_LOCK_QNAME, NetconfMessageTransformUtil.NETCONF_CANDIDATE_QNAME);
+        final ContainerNode candidateLock =
+                getLockContent(NETCONF_LOCK_QNAME, NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME);
+        final ContainerNode runningLock =
+                getLockContent(NETCONF_LOCK_QNAME, NetconfMessageTransformUtil.NETCONF_CANDIDATE_QNAME);
         verify(rpc).invokeRpc(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_LOCK_QNAME), runningLock);
         verify(rpc).invokeRpc(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_LOCK_QNAME), candidateLock);
         tx.put(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getContainerId(), TxTestUtils.getContainerNode());
         tx.merge(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId(), TxTestUtils.getLeafNode());
         //check, if both edits are called
-        verify(rpc, times(2)).invokeRpc(eq(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)), any());
+        verify(rpc, times(2)).invokeRpc(
+                eq(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)), any());
         tx.submit().get();
         //check, if unlock is called
-        verify(rpc).invokeRpc(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME), NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
-        final ContainerNode candidateUnlock = getLockContent(NETCONF_UNLOCK_QNAME, NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME);
-        final ContainerNode runningUnlock = getLockContent(NETCONF_UNLOCK_QNAME, NetconfMessageTransformUtil.NETCONF_CANDIDATE_QNAME);
+        verify(rpc).invokeRpc(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME),
+                NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
+        final ContainerNode candidateUnlock = getLockContent(NETCONF_UNLOCK_QNAME,
+                NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME);
+        final ContainerNode runningUnlock = getLockContent(NETCONF_UNLOCK_QNAME,
+                NetconfMessageTransformUtil.NETCONF_CANDIDATE_QNAME);
         verify(rpc).invokeRpc(SchemaPath.create(true, NETCONF_UNLOCK_QNAME), candidateUnlock);
         verify(rpc).invokeRpc(SchemaPath.create(true, NETCONF_UNLOCK_QNAME), runningUnlock);
     }

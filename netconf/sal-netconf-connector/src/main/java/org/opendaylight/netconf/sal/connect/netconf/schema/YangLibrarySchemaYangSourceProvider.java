@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Provides YANG schema sources from yang library
+ * Provides YANG schema sources from yang library.
  */
 public final class YangLibrarySchemaYangSourceProvider implements SchemaSourceProvider<YangTextSchemaSource> {
 
@@ -48,19 +48,21 @@ public final class YangLibrarySchemaYangSourceProvider implements SchemaSourcePr
         return download(sourceIdentifier);
     }
 
-    private CheckedFuture<? extends YangTextSchemaSource, SchemaSourceException> download(final SourceIdentifier sId) {
-        final URL url = availableSources.get(sId);
-        try(final InputStream in = url.openStream()) {
+    private CheckedFuture<? extends YangTextSchemaSource, SchemaSourceException> download(
+            final SourceIdentifier sourceIdentifier) {
+        final URL url = availableSources.get(sourceIdentifier);
+        try (InputStream in = url.openStream()) {
             final String schemaContent = new String(ByteStreams.toByteArray(in));
             final NetconfRemoteSchemaYangSourceProvider.NetconfYangTextSchemaSource yangSource =
-                    new NetconfRemoteSchemaYangSourceProvider.
-                            NetconfYangTextSchemaSource(id, sId, Optional.of(schemaContent));
-            LOG.debug("Source {} downloaded from a yang library's url {}", sId, url);
+                    new NetconfRemoteSchemaYangSourceProvider
+                            .NetconfYangTextSchemaSource(id, sourceIdentifier, Optional.of(schemaContent));
+            LOG.debug("Source {} downloaded from a yang library's url {}", sourceIdentifier, url);
             return Futures.immediateCheckedFuture(yangSource);
         } catch (IOException e) {
-            LOG.warn("Unable to download source {} from a yang library's url {}", sId, url, e);
+            LOG.warn("Unable to download source {} from a yang library's url {}", sourceIdentifier, url, e);
             return Futures.immediateFailedCheckedFuture(
-                    new SchemaSourceException("Unable to download remote schema for " + sId + " from " + url, e));
+                    new SchemaSourceException(
+                            "Unable to download remote schema for " + sourceIdentifier + " from " + url, e));
         }
     }
 }

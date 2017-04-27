@@ -29,26 +29,28 @@ import org.opendaylight.yangtools.yang.model.api.UnknownSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.UsesNode;
 
 /**
- * Simple proxy for container like schema nodes, where user provides a collection of children schema nodes
+ * Simple proxy for container like schema nodes, where user provides a collection of children schema nodes.
  */
 public final class NodeContainerProxy implements ContainerSchemaNode {
 
     private final Map<QName, DataSchemaNode> childNodes;
-    private final QName qName;
+    private final QName qualifiedName;
     private final Set<AugmentationSchema> availableAugmentations;
 
-    public NodeContainerProxy(final QName qName, final Map<QName, DataSchemaNode> childNodes, final Set<AugmentationSchema> availableAugmentations) {
+    public NodeContainerProxy(final QName qualifiedName, final Map<QName, DataSchemaNode> childNodes,
+                              final Set<AugmentationSchema> availableAugmentations) {
         this.availableAugmentations = availableAugmentations;
         this.childNodes = Preconditions.checkNotNull(childNodes, "childNodes");
-        this.qName = qName;
+        this.qualifiedName = qualifiedName;
     }
 
-    public NodeContainerProxy(final QName qName, final Collection<DataSchemaNode> childNodes) {
-        this(qName, asMap(childNodes), Collections.<AugmentationSchema>emptySet());
+    public NodeContainerProxy(final QName qualifiedName, final Collection<DataSchemaNode> childNodes) {
+        this(qualifiedName, asMap(childNodes), Collections.<AugmentationSchema>emptySet());
     }
 
-    public NodeContainerProxy(final QName qName, final Collection<DataSchemaNode> childNodes, final Set<AugmentationSchema> availableAugmentations) {
-        this(qName, asMap(childNodes), availableAugmentations);
+    public NodeContainerProxy(final QName qualifiedName, final Collection<DataSchemaNode> childNodes,
+                              final Set<AugmentationSchema> availableAugmentations) {
+        this(qualifiedName, asMap(childNodes), availableAugmentations);
     }
 
     private static Map<QName, DataSchemaNode> asMap(final Collection<DataSchemaNode> childNodes) {
@@ -76,8 +78,8 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     }
 
     @Override
-    public DataSchemaNode getDataChildByName(final QName qName) {
-        return childNodes.get(qName);
+    public DataSchemaNode getDataChildByName(final QName qualifiedName) {
+        return childNodes.get(qualifiedName);
     }
 
     @Override
@@ -117,7 +119,7 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
 
     @Override
     public QName getQName() {
-        return qName;
+        return qualifiedName;
     }
 
     @Override

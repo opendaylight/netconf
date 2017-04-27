@@ -44,6 +44,6 @@ interface RpcStructureTransformer {
      * @param path path to select
      * @return selected data
      */
-    Optional<NormalizedNode<?, ?>> selectFromDataStructure(DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> data,
-                                                           YangInstanceIdentifier path);
+    Optional<NormalizedNode<?, ?>> selectFromDataStructure(
+            DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> data, YangInstanceIdentifier path);
 }

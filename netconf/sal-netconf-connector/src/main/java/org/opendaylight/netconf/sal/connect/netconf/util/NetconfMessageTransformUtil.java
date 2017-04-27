@@ -72,7 +72,8 @@ public class NetconfMessageTransformUtil {
     public static final String MESSAGE_ID_PREFIX = "m";
     public static final String MESSAGE_ID_ATTR = "message-id";
 
-    public static final QName CREATE_SUBSCRIPTION_RPC_QNAME = QName.create(CreateSubscriptionInput.QNAME, "create-subscription").intern();
+    public static final QName CREATE_SUBSCRIPTION_RPC_QNAME =
+            QName.create(CreateSubscriptionInput.QNAME, "create-subscription").intern();
     private static final String SUBTREE = "subtree";
 
     // Blank document used for creation of new DOM nodes
@@ -81,18 +82,26 @@ public class NetconfMessageTransformUtil {
 
     private NetconfMessageTransformUtil() {}
 
-    public static final QName IETF_NETCONF_MONITORING = QName.create(NetconfState.QNAME, "ietf-netconf-monitoring").intern();
+    public static final QName IETF_NETCONF_MONITORING =
+            QName.create(NetconfState.QNAME, "ietf-netconf-monitoring").intern();
     public static final QName GET_DATA_QNAME = QName.create(IETF_NETCONF_MONITORING, "data").intern();
     public static final QName GET_SCHEMA_QNAME = QName.create(IETF_NETCONF_MONITORING, "get-schema").intern();
-    public static final QName IETF_NETCONF_MONITORING_SCHEMA_FORMAT = QName.create(IETF_NETCONF_MONITORING, "format").intern();
-    public static final QName IETF_NETCONF_MONITORING_SCHEMA_LOCATION = QName.create(IETF_NETCONF_MONITORING, "location").intern();
-    public static final QName IETF_NETCONF_MONITORING_SCHEMA_IDENTIFIER = QName.create(IETF_NETCONF_MONITORING, "identifier").intern();
-    public static final QName IETF_NETCONF_MONITORING_SCHEMA_VERSION = QName.create(IETF_NETCONF_MONITORING, "version").intern();
-    public static final QName IETF_NETCONF_MONITORING_SCHEMA_NAMESPACE = QName.create(IETF_NETCONF_MONITORING, "namespace").intern();
+    public static final QName IETF_NETCONF_MONITORING_SCHEMA_FORMAT =
+            QName.create(IETF_NETCONF_MONITORING, "format").intern();
+    public static final QName IETF_NETCONF_MONITORING_SCHEMA_LOCATION =
+            QName.create(IETF_NETCONF_MONITORING, "location").intern();
+    public static final QName IETF_NETCONF_MONITORING_SCHEMA_IDENTIFIER =
+            QName.create(IETF_NETCONF_MONITORING, "identifier").intern();
+    public static final QName IETF_NETCONF_MONITORING_SCHEMA_VERSION =
+            QName.create(IETF_NETCONF_MONITORING, "version").intern();
+    public static final QName IETF_NETCONF_MONITORING_SCHEMA_NAMESPACE =
+            QName.create(IETF_NETCONF_MONITORING, "namespace").intern();
 
-    public static final QName IETF_NETCONF_NOTIFICATIONS = QName.create(NetconfCapabilityChange.QNAME, "ietf-netconf-notifications").intern();
+    public static final QName IETF_NETCONF_NOTIFICATIONS =
+            QName.create(NetconfCapabilityChange.QNAME, "ietf-netconf-notifications").intern();
 
-    public static final QName NETCONF_QNAME = QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "netconf").intern();
+    public static final QName NETCONF_QNAME =
+            QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "netconf").intern();
     public static final URI NETCONF_URI = NETCONF_QNAME.getNamespace();
 
     public static final QName NETCONF_DATA_QNAME = QName.create(NETCONF_QNAME, "data").intern();
@@ -108,7 +117,8 @@ public class NetconfMessageTransformUtil {
     public static final QName NETCONF_VALIDATE_QNAME = QName.create(NETCONF_QNAME, "validate").intern();
     public static final QName NETCONF_COPY_CONFIG_QNAME = QName.create(NETCONF_QNAME, "copy-config").intern();
     public static final QName NETCONF_OPERATION_QNAME = QName.create(NETCONF_QNAME, "operation").intern();
-    public static final QName NETCONF_DEFAULT_OPERATION_QNAME = QName.create(NETCONF_OPERATION_QNAME, "default-operation").intern();
+    public static final QName NETCONF_DEFAULT_OPERATION_QNAME =
+            QName.create(NETCONF_OPERATION_QNAME, "default-operation").intern();
     public static final QName NETCONF_EDIT_CONFIG_QNAME = QName.create(NETCONF_QNAME, "edit-config").intern();
     public static final QName NETCONF_GET_CONFIG_QNAME = QName.create(NETCONF_QNAME, "get-config");
     public static final QName NETCONF_DISCARD_CHANGES_QNAME = QName.create(NETCONF_QNAME, "discard-changes");
@@ -152,25 +162,32 @@ public class NetconfMessageTransformUtil {
     public static final DataContainerChild<?, ?> EMPTY_FILTER;
 
     static {
-        final NormalizedNodeAttrBuilder<NodeIdentifier, DOMSource, AnyXmlNode> anyXmlBuilder = Builders.anyXmlBuilder().withNodeIdentifier(toId(NETCONF_FILTER_QNAME));
+        final NormalizedNodeAttrBuilder<NodeIdentifier, DOMSource, AnyXmlNode> anyXmlBuilder =
+                Builders.anyXmlBuilder().withNodeIdentifier(toId(NETCONF_FILTER_QNAME));
         anyXmlBuilder.withAttributes(Collections.singletonMap(NETCONF_TYPE_QNAME, SUBTREE));
 
-        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(), Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
-        element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(), "subtree");
+        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
+                Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
+        element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(),
+                NETCONF_TYPE_QNAME.getLocalName(), "subtree");
 
         anyXmlBuilder.withValue(new DOMSource(element));
 
         EMPTY_FILTER = anyXmlBuilder.build();
     }
 
-    public static DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier identifier, final SchemaContext ctx) {
-        final NormalizedNodeAttrBuilder<NodeIdentifier, DOMSource, AnyXmlNode> anyXmlBuilder = Builders.anyXmlBuilder().withNodeIdentifier(toId(NETCONF_FILTER_QNAME));
+    public static DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier identifier,
+                                                             final SchemaContext ctx) {
+        final NormalizedNodeAttrBuilder<NodeIdentifier, DOMSource, AnyXmlNode> anyXmlBuilder =
+                Builders.anyXmlBuilder().withNodeIdentifier(toId(NETCONF_FILTER_QNAME));
         anyXmlBuilder.withAttributes(Collections.singletonMap(NETCONF_TYPE_QNAME, SUBTREE));
 
         final NormalizedNode<?, ?> filterContent = ImmutableNodes.fromInstanceId(ctx, identifier);
 
-        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(), Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
-        element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(), "subtree");
+        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
+                Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
+        element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
+                "subtree");
 
         try {
             NetconfUtil.writeNormalizedNode(filterContent, new DOMResult(element), SchemaPath.ROOT, ctx);
@@ -187,13 +204,13 @@ public class NetconfMessageTransformUtil {
         final String inputMsgId = input.getDocument().getDocumentElement().getAttribute(MESSAGE_ID_ATTR);
         final String outputMsgId = output.getDocument().getDocumentElement().getAttribute(MESSAGE_ID_ATTR);
 
-        if(inputMsgId.equals(outputMsgId) == false) {
-            final Map<String,String> errorInfo = ImmutableMap.<String,String>builder()
-                    .put( "actual-message-id", outputMsgId )
-                    .put( "expected-message-id", inputMsgId )
+        if (inputMsgId.equals(outputMsgId) == false) {
+            final Map<String, String> errorInfo = ImmutableMap.<String, String>builder()
+                    .put("actual-message-id", outputMsgId)
+                    .put("expected-message-id", inputMsgId)
                     .build();
 
-            throw new NetconfDocumentedException( "Response message contained unknown \"message-id\"",
+            throw new NetconfDocumentedException("Response message contained unknown \"message-id\"",
                     null, NetconfDocumentedException.ErrorType.PROTOCOL,
                     NetconfDocumentedException.ErrorTag.BAD_ATTRIBUTE,
                     NetconfDocumentedException.ErrorSeverity.ERROR, errorInfo);
@@ -201,33 +218,32 @@ public class NetconfMessageTransformUtil {
     }
 
     public static void checkSuccessReply(final NetconfMessage output) throws NetconfDocumentedException {
-        if(NetconfMessageUtil.isErrorMessage(output)) {
+        if (NetconfMessageUtil.isErrorMessage(output)) {
             throw NetconfDocumentedException.fromXMLDocument(output.getDocument());
         }
     }
 
-    public static RpcError toRpcError( final NetconfDocumentedException ex ) {
+    public static RpcError toRpcError(final NetconfDocumentedException ex) {
         final StringBuilder infoBuilder = new StringBuilder();
         final Map<String, String> errorInfo = ex.getErrorInfo();
-        if(errorInfo != null) {
-            for( final Entry<String,String> e: errorInfo.entrySet() ) {
-                infoBuilder.append( '<' ).append( e.getKey() ).append( '>' ).append( e.getValue() )
-                .append( "</" ).append( e.getKey() ).append( '>' );
+        if (errorInfo != null) {
+            for (final Entry<String, String> e : errorInfo.entrySet()) {
+                infoBuilder.append('<').append(e.getKey()).append('>').append(e.getValue())
+                        .append("</").append(e.getKey()).append('>');
 
             }
         }
 
-        final ErrorSeverity severity = toRpcErrorSeverity( ex.getErrorSeverity() );
-        return severity == ErrorSeverity.ERROR ?
-                RpcResultBuilder.newError(
-                        toRpcErrorType( ex.getErrorType() ), ex.getErrorTag().getTagValue(),
-                        ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause() ) :
-                            RpcResultBuilder.newWarning(
-                                    toRpcErrorType( ex.getErrorType() ), ex.getErrorTag().getTagValue(),
-                                    ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause() );
+        final ErrorSeverity severity = toRpcErrorSeverity(ex.getErrorSeverity());
+        return severity == ErrorSeverity.ERROR
+                ? RpcResultBuilder.newError(toRpcErrorType(ex.getErrorType()), ex.getErrorTag().getTagValue(),
+                        ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause())
+                : RpcResultBuilder.newWarning(
+                        toRpcErrorType(ex.getErrorType()), ex.getErrorTag().getTagValue(),
+                        ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause());
     }
 
-    private static ErrorSeverity toRpcErrorSeverity( final NetconfDocumentedException.ErrorSeverity severity ) {
+    private static ErrorSeverity toRpcErrorSeverity(final NetconfDocumentedException.ErrorSeverity severity) {
         switch (severity) {
             case WARNING:
                 return RpcError.ErrorSeverity.WARNING;
@@ -239,13 +255,13 @@ public class NetconfMessageTransformUtil {
     private static RpcError.ErrorType toRpcErrorType(final NetconfDocumentedException.ErrorType type) {
         switch (type) {
             case PROTOCOL:
-            return RpcError.ErrorType.PROTOCOL;
+                return RpcError.ErrorType.PROTOCOL;
             case RPC:
-            return RpcError.ErrorType.RPC;
+                return RpcError.ErrorType.RPC;
             case TRANSPORT:
-            return RpcError.ErrorType.TRANSPORT;
-        default:
-            return RpcError.ErrorType.APPLICATION;
+                return RpcError.ErrorType.TRANSPORT;
+            default:
+                return RpcError.ErrorType.APPLICATION;
         }
     }
 
@@ -279,22 +295,27 @@ public class NetconfMessageTransformUtil {
         return Builders.containerBuilder().withNodeIdentifier(toId(name)).withValue(ImmutableList.copyOf(node)).build();
     }
 
-    public static AnyXmlNode createEditConfigAnyxml(final SchemaContext ctx, final YangInstanceIdentifier dataPath,
-                                                                     final Optional<ModifyAction> operation, final Optional<NormalizedNode<?, ?>> lastChildOverride) {
+    public static AnyXmlNode createEditConfigAnyxml(
+            final SchemaContext ctx, final YangInstanceIdentifier dataPath, final Optional<ModifyAction> operation,
+            final Optional<NormalizedNode<?, ?>> lastChildOverride) {
         final NormalizedNode<?, ?> configContent;
 
         if (dataPath.isEmpty()) {
-            Preconditions.checkArgument(lastChildOverride.isPresent(), "Data has to be present when creating structure for top level element");
+            Preconditions.checkArgument(lastChildOverride.isPresent(),
+                    "Data has to be present when creating structure for top level element");
             Preconditions.checkArgument(lastChildOverride.get() instanceof DataContainerChild<?, ?>,
-                    "Data has to be either container or a list node when creating structure for top level element, but was: %s", lastChildOverride.get());
+                    "Data has to be either container or a list node when creating structure for top level element, "
+                            + "but was: %s", lastChildOverride.get());
             configContent = lastChildOverride.get();
         } else {
-            final Entry<QName, ModifyAction> modifyOperation =
-                    operation.isPresent() ? new AbstractMap.SimpleEntry<>(NETCONF_OPERATION_QNAME, operation.get()) : null;
-            configContent = ImmutableNodes.fromInstanceId(ctx, dataPath, lastChildOverride, Optional.fromNullable(modifyOperation));
+            final Entry<QName, ModifyAction> modifyOperation = operation.isPresent()
+                    ? new AbstractMap.SimpleEntry<>(NETCONF_OPERATION_QNAME, operation.get()) : null;
+            configContent = ImmutableNodes
+                    .fromInstanceId(ctx, dataPath, lastChildOverride, Optional.fromNullable(modifyOperation));
         }
 
-        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_CONFIG_QNAME.getLocalName(), Optional.of(NETCONF_CONFIG_QNAME.getNamespace().toString()));
+        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_CONFIG_QNAME.getLocalName(),
+                Optional.of(NETCONF_CONFIG_QNAME.getNamespace().toString()));
         try {
             NetconfUtil.writeNormalizedNode(configContent, new DOMResult(element), SchemaPath.ROOT, ctx);
         } catch (IOException | XMLStreamException e) {
@@ -305,8 +326,9 @@ public class NetconfMessageTransformUtil {
         return Builders.anyXmlBuilder().withNodeIdentifier(toId(NETCONF_CONFIG_QNAME)).withValue(value).build();
     }
 
-    public static DataContainerChild<?, ?> createEditConfigStructure(final SchemaContext ctx, final YangInstanceIdentifier dataPath,
-                                                                     final Optional<ModifyAction> operation, final Optional<NormalizedNode<?, ?>> lastChildOverride) {
+    public static DataContainerChild<?, ?> createEditConfigStructure(
+            final SchemaContext ctx, final YangInstanceIdentifier dataPath, final Optional<ModifyAction> operation,
+            final Optional<NormalizedNode<?, ?>> lastChildOverride) {
         return Builders.choiceBuilder().withNodeIdentifier(toId(EditContent.QNAME))
                 .withChild(createEditConfigAnyxml(ctx, dataPath, operation, lastChildOverride)).build();
     }
@@ -318,8 +340,8 @@ public class NetconfMessageTransformUtil {
     public static Map.Entry<Date, XmlElement> stripNotification(final NetconfMessage message) {
         final XmlElement xmlElement = XmlElement.fromDomDocument(message.getDocument());
         final List<XmlElement> childElements = xmlElement.getChildElements();
-        Preconditions.checkArgument(childElements.size() == 2, "Unable to parse notification %s, unexpected format.\nExpected 2 childElements," +
-                " actual childElements size is %s", message, childElements.size());
+        Preconditions.checkArgument(childElements.size() == 2, "Unable to parse notification %s, unexpected format."
+                + "\nExpected 2 childElements, actual childElements size is %s", message, childElements.size());
 
         final XmlElement eventTimeElement;
         final XmlElement notificationElement;
@@ -327,8 +349,7 @@ public class NetconfMessageTransformUtil {
         if (childElements.get(0).getName().equals(EVENT_TIME)) {
             eventTimeElement = childElements.get(0);
             notificationElement = childElements.get(1);
-        }
-        else if(childElements.get(1).getName().equals(EVENT_TIME)) {
+        } else if (childElements.get(1).getName().equals(EVENT_TIME)) {
             eventTimeElement = childElements.get(1);
             notificationElement = childElements.get(0);
         } else {
@@ -342,7 +363,8 @@ public class NetconfMessageTransformUtil {
         } catch (final DocumentedException e) {
             throw new IllegalArgumentException("Notification payload does not contain " + EVENT_TIME + " " + message);
         } catch (final DateTimeParseException e) {
-            LOG.warn("Unable to parse event time from {}. Setting time to {}", eventTimeElement, NetconfNotification.UNKNOWN_EVENT_TIME, e);
+            LOG.warn("Unable to parse event time from {}. Setting time to {}", eventTimeElement,
+                    NetconfNotification.UNKNOWN_EVENT_TIME, e);
             return new AbstractMap.SimpleEntry<>(NetconfNotification.UNKNOWN_EVENT_TIME, notificationElement);
         }
     }
@@ -359,13 +381,15 @@ public class NetconfMessageTransformUtil {
         return new DOMResult(elementNS);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public static void writeNormalizedRpc(final ContainerNode normalized, final DOMResult result,
-                                          final SchemaPath schemaPath, final SchemaContext baseNetconfCtx) throws IOException, XMLStreamException {
+                                          final SchemaPath schemaPath,
+                                          final SchemaContext baseNetconfCtx) throws IOException, XMLStreamException {
         final XMLStreamWriter writer = NetconfUtil.XML_FACTORY.createXMLStreamWriter(result);
         try {
-            try (final NormalizedNodeStreamWriter normalizedNodeStreamWriter =
+            try (NormalizedNodeStreamWriter normalizedNodeStreamWriter =
                     XMLStreamNormalizedNodeStreamWriter.create(writer, baseNetconfCtx, schemaPath)) {
-                try (final SchemaOrderedNormalizedNodeWriter normalizedNodeWriter =
+                try (SchemaOrderedNormalizedNodeWriter normalizedNodeWriter =
                         new SchemaOrderedNormalizedNodeWriter(normalizedNodeStreamWriter, baseNetconfCtx, schemaPath)) {
                     final Collection<DataContainerChild<?, ?>> value = normalized.getValue();
                     normalizedNodeWriter.write(value);
@@ -376,7 +400,7 @@ public class NetconfMessageTransformUtil {
             try {
                 writer.close();
             } catch (final Exception e) {
-               LOG.warn("Unable to close resource properly", e);
+                LOG.warn("Unable to close resource properly", e);
             }
         }
     }

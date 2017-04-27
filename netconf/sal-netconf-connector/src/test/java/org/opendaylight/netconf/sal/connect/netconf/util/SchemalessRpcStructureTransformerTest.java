@@ -55,14 +55,20 @@ public class SchemalessRpcStructureTransformerTest {
     private final SchemalessRpcStructureTransformer adapter = new SchemalessRpcStructureTransformer();
     private final String testDataset;
 
-    public SchemalessRpcStructureTransformerTest(YangInstanceIdentifier path, String testDataset, Class<? extends Exception> expectedException) throws IOException, SAXException, URISyntaxException {
+    public SchemalessRpcStructureTransformerTest(
+            YangInstanceIdentifier path, String testDataset,
+            Class<? extends Exception> expectedException) throws IOException, SAXException, URISyntaxException {
         this.path = path;
         this.testDataset = testDataset;
         this.expectedException = expectedException;
-        this.source = new DOMSource(XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/schemaless/data/" + testDataset)).getDocumentElement());
-        this.expectedConfig = new String(Files.readAllBytes(Paths.get(getClass().getResource("/schemaless/edit-config/" + testDataset).toURI())));
-        this.expectedFilter = new String(Files.readAllBytes(Paths.get(getClass().getResource("/schemaless/filter/" + testDataset).toURI())));
-        this.getConfigData = new String(Files.readAllBytes(Paths.get(getClass().getResource("/schemaless/get-config/" + testDataset).toURI())));
+        this.source = new DOMSource(XmlUtil.readXmlToDocument(getClass()
+                .getResourceAsStream("/schemaless/data/" + testDataset)).getDocumentElement());
+        this.expectedConfig = new String(Files.readAllBytes(
+                Paths.get(getClass().getResource("/schemaless/edit-config/" + testDataset).toURI())));
+        this.expectedFilter = new String(Files.readAllBytes(
+                Paths.get(getClass().getResource("/schemaless/filter/" + testDataset).toURI())));
+        this.getConfigData = new String(Files.readAllBytes(
+                Paths.get(getClass().getResource("/schemaless/get-config/" + testDataset).toURI())));
     }
 
     @Parameterized.Parameters
@@ -80,7 +86,8 @@ public class SchemalessRpcStructureTransformerTest {
                 {YangInstanceIdentifier.builder()
                         .node(createNodeId("top"))
                         .node(createNodeId("users"))
-                        .node(createListNodeId("user", ImmutableMap.of(QName.create(NAMESPACE, "key1"), "k1", QName.create(NAMESPACE, "key2"), "k2")))
+                        .node(createListNodeId("user", ImmutableMap.of(QName.create(NAMESPACE, "key1"), "k1",
+                                QName.create(NAMESPACE, "key2"), "k2")))
                         .build(), "keyed-list-compound-key.xml", null},
                 {YangInstanceIdentifier.builder()
                         .node(createNodeId("top"))
@@ -98,14 +105,15 @@ public class SchemalessRpcStructureTransformerTest {
 
     @Test
     public void testCreateEditConfigStructure() throws Exception {
-        if(expectedException != null) {
+        if (expectedException != null) {
             thrown.expect(expectedException);
         }
         AnyXmlNode data = Builders.anyXmlBuilder()
                 .withNodeIdentifier(createNodeId(path.getLastPathArgument().getNodeType().getLocalName()))
                 .withValue(source)
                 .build();
-        final AnyXmlNode anyXmlNode = adapter.createEditConfigStructure(Optional.of(data), path, Optional.of(ModifyAction.REPLACE));
+        final AnyXmlNode anyXmlNode =
+                adapter.createEditConfigStructure(Optional.of(data), path, Optional.of(ModifyAction.REPLACE));
         final String s = XmlUtil.toString((Element) anyXmlNode.getValue().getNode());
         Diff diff = new Diff(expectedConfig, s);
         Assert.assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
@@ -137,11 +145,14 @@ public class SchemalessRpcStructureTransformerTest {
         return new YangInstanceIdentifier.NodeIdentifier(QName.create(NAMESPACE, name));
     }
 
-    private static YangInstanceIdentifier.NodeIdentifierWithPredicates createListNodeId(String nodeName, String keyName, String id) {
-        return new YangInstanceIdentifier.NodeIdentifierWithPredicates(QName.create(NAMESPACE, nodeName), QName.create(NAMESPACE, keyName), id);
+    private static YangInstanceIdentifier.NodeIdentifierWithPredicates createListNodeId(
+            String nodeName, String keyName, String id) {
+        return new YangInstanceIdentifier
+                .NodeIdentifierWithPredicates(QName.create(NAMESPACE, nodeName), QName.create(NAMESPACE, keyName), id);
     }
 
-    private static YangInstanceIdentifier.NodeIdentifierWithPredicates createListNodeId(String nodeName, Map<QName, Object> keys) {
+    private static YangInstanceIdentifier.NodeIdentifierWithPredicates createListNodeId(
+            String nodeName, Map<QName, Object> keys) {
         return new YangInstanceIdentifier.NodeIdentifierWithPredicates(QName.create(NAMESPACE, nodeName), keys);
     }
 }
