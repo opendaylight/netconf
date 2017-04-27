@@ -24,7 +24,7 @@ final class AuthProviderTracker implements ServiceTrackerCustomizer<AuthProvider
     private final ServiceTracker<AuthProvider, AuthProvider> listenerTracker;
     private volatile AuthProvider authProvider;
 
-    public AuthProviderTracker(final BundleContext bundleContext) {
+    AuthProviderTracker(final BundleContext bundleContext) {
         this.bundleContext = bundleContext;
         listenerTracker = new ServiceTracker<>(bundleContext, AuthProvider.class, this);
         listenerTracker.open();

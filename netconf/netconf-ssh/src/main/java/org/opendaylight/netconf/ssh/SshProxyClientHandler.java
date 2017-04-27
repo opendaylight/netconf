@@ -22,7 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Netty handler that reads SSH from remote client and writes to delegate server and reads from delegate server and writes to remote client
+ * Netty handler that reads SSH from remote client and writes to delegate server
+ * and reads from delegate server and writes to remote client.
  */
 final class SshProxyClientHandler extends ChannelInboundHandlerAdapter {
 
@@ -37,9 +38,9 @@ final class SshProxyClientHandler extends ChannelInboundHandlerAdapter {
     private final NetconfHelloMessageAdditionalHeader netconfHelloMessageAdditionalHeader;
     private final ExitCallback callback;
 
-    public SshProxyClientHandler(final IoInputStream in, final IoOutputStream out,
-                                 final NetconfHelloMessageAdditionalHeader netconfHelloMessageAdditionalHeader,
-                                 final ExitCallback callback) {
+    SshProxyClientHandler(final IoInputStream in, final IoOutputStream out,
+                          final NetconfHelloMessageAdditionalHeader netconfHelloMessageAdditionalHeader,
+                          final ExitCallback callback) {
         this.in = in;
         this.out = out;
         this.netconfHelloMessageAdditionalHeader = netconfHelloMessageAdditionalHeader;
@@ -64,9 +65,10 @@ final class SshProxyClientHandler extends ChannelInboundHandlerAdapter {
         }, new AsyncSshHandlerReader.ReadMsgHandler() {
             @Override
             public void onMessageRead(final ByteBuf msg) {
-                if(LOG.isTraceEnabled()) {
+                if (LOG.isTraceEnabled()) {
                     LOG.trace("Forwarding message for client: {} on channel: {}, message: {}",
-                            netconfHelloMessageAdditionalHeader.getAddress(), ctx.channel(), AsyncSshHandlerWriter.byteBufToString(msg));
+                            netconfHelloMessageAdditionalHeader.getAddress(), ctx.channel(),
+                            AsyncSshHandlerWriter.byteBufToString(msg));
                 }
                 // Just forward to delegate
                 ctx.writeAndFlush(msg);
@@ -90,8 +92,8 @@ final class SshProxyClientHandler extends ChannelInboundHandlerAdapter {
     public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
         LOG.debug("Internal connection to netconf server was dropped for client: {} on channel: ",
                 netconfHelloMessageAdditionalHeader.getAddress(), ctx.channel());
-        callback.onExit(1, "Internal connection to netconf server was dropped for client: " +
-                netconfHelloMessageAdditionalHeader.getAddress() + " on channel: " + ctx.channel());
+        callback.onExit(1, "Internal connection to netconf server was dropped for client: "
+                + netconfHelloMessageAdditionalHeader.getAddress() + " on channel: " + ctx.channel());
         super.channelInactive(ctx);
     }
 

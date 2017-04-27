@@ -46,8 +46,8 @@ public class NetconfSSHActivator implements BundleActivator {
     public void start(final BundleContext bundleContext) throws IOException, InvalidSyntaxException {
         minaTimerExecutor = Executors.newScheduledThreadPool(POOL_SIZE, new ThreadFactory() {
             @Override
-            public Thread newThread(final Runnable r) {
-                return new Thread(r, "netconf-ssh-server-mina-timers");
+            public Thread newThread(final Runnable runnable) {
+                return new Thread(runnable, "netconf-ssh-server-mina-timers");
             }
         });
         clientGroup = new NioEventLoopGroup();
@@ -61,19 +61,19 @@ public class NetconfSSHActivator implements BundleActivator {
             server.close();
         }
 
-        if(authProviderTracker != null) {
+        if (authProviderTracker != null) {
             authProviderTracker.stop();
         }
 
-        if(nioExecutor!=null) {
+        if (nioExecutor != null) {
             nioExecutor.shutdownNow();
         }
 
-        if(clientGroup != null) {
+        if (clientGroup != null) {
             clientGroup.shutdownGracefully();
         }
 
-        if(minaTimerExecutor != null) {
+        if (minaTimerExecutor != null) {
             minaTimerExecutor.shutdownNow();
         }
     }

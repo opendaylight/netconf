@@ -21,7 +21,8 @@ public final class SshProxyServerConfiguration {
     private final KeyPairProvider keyPairProvider;
     private final int idleTimeout;
 
-    SshProxyServerConfiguration(final InetSocketAddress bindingAddress, final LocalAddress localAddress, final AuthProvider authenticator, final KeyPairProvider keyPairProvider, final int idleTimeout) {
+    SshProxyServerConfiguration(final InetSocketAddress bindingAddress, final LocalAddress localAddress,
+                    final AuthProvider authenticator, final KeyPairProvider keyPairProvider, final int idleTimeout) {
         this.bindingAddress = Preconditions.checkNotNull(bindingAddress);
         this.localAddress = Preconditions.checkNotNull(localAddress);
         this.authenticator = Preconditions.checkNotNull(authenticator);

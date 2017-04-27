@@ -31,13 +31,14 @@ import org.slf4j.LoggerFactory;
 public class EchoServer implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(EchoServer.class);
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public void run() {
         // Configure the server.
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
-            ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGroup, workerGroup)
+            ServerBootstrap bootstrap = new ServerBootstrap();
+            bootstrap.group(bossGroup, workerGroup)
                     .channel(LocalServerChannel.class)
                     .option(ChannelOption.SO_BACKLOG, 100)
                     .handler(new LoggingHandler(LogLevel.INFO))
@@ -50,10 +51,10 @@ public class EchoServer implements Runnable {
 
             // Start the server.
             LocalAddress localAddress = NetconfConfiguration.NETCONF_LOCAL_ADDRESS;
-            ChannelFuture f = b.bind(localAddress).sync();
+            ChannelFuture future = bootstrap.bind(localAddress).sync();
 
             // Wait until the server socket is closed.
-            f.channel().closeFuture().sync();
+            future.channel().closeFuture().sync();
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {

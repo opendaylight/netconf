@@ -46,7 +46,8 @@ public final class SshProxyServerConfigurationBuilder {
     }
 
     public SshProxyServerConfiguration createSshProxyServerConfiguration() {
-        return new SshProxyServerConfiguration(bindingAddress, localAddress, authenticator, keyPairProvider, idleTimeout);
+        return new SshProxyServerConfiguration(bindingAddress, localAddress, authenticator,
+                keyPairProvider, idleTimeout);
     }
 
     public static SshProxyServerConfigurationBuilder create() {
