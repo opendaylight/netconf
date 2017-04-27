@@ -16,10 +16,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.net.InetAddresses;
 import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -39,8 +38,8 @@ public class CallHomeMountSessionContextTest {
     private CallHomeProtocolSessionContext mockProtocol;
 
     @Before
-    public void setup() throws UnknownHostException {
-        someAddressIpv4 = (Inet4Address) InetAddress.getByName("1.2.3.4");
+    public void setup() {
+        someAddressIpv4 = (Inet4Address) InetAddresses.forString("1.2.3.4");
         someSocketAddress = new InetSocketAddress(someAddressIpv4, 123);
 
         mockProtocol = mock(CallHomeProtocolSessionContext.class);
