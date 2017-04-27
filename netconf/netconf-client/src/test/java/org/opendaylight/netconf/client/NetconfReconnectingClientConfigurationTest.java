@@ -25,22 +25,23 @@ public class NetconfReconnectingClientConfigurationTest {
     @Test
     public void testNetconfReconnectingClientConfiguration() throws Exception {
         Long timeout = 200L;
-        NetconfHelloMessageAdditionalHeader header = new NetconfHelloMessageAdditionalHeader("a", "host", "port", "trans", "id");
+        NetconfHelloMessageAdditionalHeader header =
+                new NetconfHelloMessageAdditionalHeader("a", "host", "port", "trans", "id");
         NetconfClientSessionListener listener = new SimpleNetconfClientSessionListener();
         InetSocketAddress address = InetSocketAddress.createUnresolved("host", 830);
         ReconnectStrategyFactory strategy = Mockito.mock(ReconnectStrategyFactory.class);
         AuthenticationHandler handler = Mockito.mock(AuthenticationHandler.class);
         ReconnectStrategy reconnect = Mockito.mock(ReconnectStrategy.class);
 
-        NetconfReconnectingClientConfiguration cfg = NetconfReconnectingClientConfigurationBuilder.create().
-                withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH).
-                withAddress(address).
-                withConnectionTimeoutMillis(timeout).
-                withReconnectStrategy(reconnect).
-                withAdditionalHeader(header).
-                withSessionListener(listener).
-                withConnectStrategyFactory(strategy).
-                withAuthHandler(handler).build();
+        NetconfReconnectingClientConfiguration cfg = NetconfReconnectingClientConfigurationBuilder.create()
+                .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
+                .withAddress(address)
+                .withConnectionTimeoutMillis(timeout)
+                .withReconnectStrategy(reconnect)
+                .withAdditionalHeader(header)
+                .withSessionListener(listener)
+                .withConnectStrategyFactory(strategy)
+                .withAuthHandler(handler).build();
 
         Assert.assertEquals(timeout, cfg.getConnectionTimeoutMillis());
         Assert.assertEquals(Optional.fromNullable(header), cfg.getAdditionalHeader());
