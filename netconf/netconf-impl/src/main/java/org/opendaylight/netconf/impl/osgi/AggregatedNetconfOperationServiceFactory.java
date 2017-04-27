@@ -33,12 +33,14 @@ import org.slf4j.LoggerFactory;
 /**
  * NetconfOperationService aggregator. Makes a collection of operation services accessible as one.
  */
-public class AggregatedNetconfOperationServiceFactory implements NetconfOperationServiceFactory, NetconfOperationServiceFactoryListener, AutoCloseable {
+public class AggregatedNetconfOperationServiceFactory
+        implements NetconfOperationServiceFactory, NetconfOperationServiceFactoryListener, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(AggregatedNetconfOperationServiceFactory.class);
 
     private final Set<NetconfOperationServiceFactory> factories = new ConcurrentSet<>();
-    private final Multimap<NetconfOperationServiceFactory, AutoCloseable> registrations = Multimaps.synchronizedMultimap(HashMultimap.create());
+    private final Multimap<NetconfOperationServiceFactory, AutoCloseable> registrations =
+            Multimaps.synchronizedMultimap(HashMultimap.create());
     private final Set<CapabilityListener> listeners = new ConcurrentSet<>();
 
     public AggregatedNetconfOperationServiceFactory() {
@@ -58,6 +60,7 @@ public class AggregatedNetconfOperationServiceFactory implements NetconfOperatio
         }
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public synchronized void onRemoveNetconfOperationServiceFactory(NetconfOperationServiceFactory service) {
         factories.remove(service);
@@ -125,7 +128,8 @@ public class AggregatedNetconfOperationServiceFactory implements NetconfOperatio
 
         private final Set<NetconfOperationService> services;
 
-        public AggregatedNetconfOperation(final Set<NetconfOperationServiceFactory> factories, final String netconfSessionIdForReporting) {
+        AggregatedNetconfOperation(final Set<NetconfOperationServiceFactory> factories,
+                                   final String netconfSessionIdForReporting) {
             final Builder<NetconfOperationService> b = ImmutableSet.builder();
             for (final NetconfOperationServiceFactory factory : factories) {
                 b.add(factory.createService(netconfSessionIdForReporting));
@@ -142,6 +146,7 @@ public class AggregatedNetconfOperationServiceFactory implements NetconfOperatio
             return operations;
         }
 
+        @SuppressWarnings("checkstyle:IllegalCatch")
         @Override
         public void close() {
             try {

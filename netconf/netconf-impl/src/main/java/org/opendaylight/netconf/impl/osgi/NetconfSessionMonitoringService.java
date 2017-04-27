@@ -30,7 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class implements {@link SessionListener} to receive updates about Netconf sessions. Instance notifies its listeners
+ * This class implements {@link SessionListener} to receive updates about Netconf sessions. Instance notifies its
+ * listeners
  * about session start and end. It also publishes on regular interval list of sessions,
  * where events like rpc or notification happened.
  */
@@ -46,23 +47,28 @@ class NetconfSessionMonitoringService implements SessionListener, AutoCloseable 
     private boolean running;
 
     /**
-     * @param schedulingThreadPool thread pool for scheduling session stats updates. If not present, updates won't be scheduled.
-     * @param updateInterval update interval. If is less than 0, updates won't be scheduled
+     * Constructor for {@code NetconfSessionMonitoringService}.
+     *
+     * @param schedulingThreadPool thread pool for scheduling session stats updates. If not present, updates won't be
+     *                             scheduled.
+     * @param updateInterval       update interval. If is less than 0, updates won't be scheduled
      */
     NetconfSessionMonitoringService(Optional<ScheduledThreadPool> schedulingThreadPool, long updateInterval) {
         this.updateInterval = updateInterval;
         if (schedulingThreadPool.isPresent() && updateInterval > 0) {
-            this.executor =  schedulingThreadPool.get().getExecutor();
+            this.executor = schedulingThreadPool.get().getExecutor();
             LOG.info("/netconf-state/sessions will be updated every {} seconds.", updateInterval);
         } else {
-            LOG.info("Scheduling thread pool is present = {}, update interval {}: /netconf-state/sessions won't be updated.",
+            LOG.info("Scheduling thread pool is present = {}, "
+                    + "update interval {}: /netconf-state/sessions won't be updated.",
                     schedulingThreadPool.isPresent(), updateInterval);
             this.executor = null;
         }
     }
 
     synchronized Sessions getSessions() {
-        final Collection<Session> managementSessions = Collections2.transform(sessions, NetconfManagementSession::toManagementSession);
+        final Collection<Session> managementSessions = Collections2.transform(sessions,
+                NetconfManagementSession::toManagementSession);
         return new SessionsBuilder().setSession(ImmutableList.copyOf(managementSessions)).build();
     }
 

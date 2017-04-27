@@ -26,8 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NetconfServerSessionNegotiator
-        extends
-        AbstractNetconfSessionNegotiator<NetconfServerSessionPreferences, NetconfServerSession, NetconfServerSessionListener> {
+        extends AbstractNetconfSessionNegotiator<NetconfServerSessionPreferences, NetconfServerSession,
+                NetconfServerSessionListener> {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSessionNegotiator.class);
 
@@ -78,9 +78,10 @@ public class NetconfServerSessionNegotiator
     }
 
     /**
-     * @param socketAddress
-     *            type of socket address LocalAddress, or
-     *            InetSocketAddress, for others returns unknown
+     * Get a name of the host.
+     *
+     * @param socketAddress type of socket address LocalAddress, or
+     *                      InetSocketAddress, for others returns unknown
      * @return Two values - port and host of socket address
      */
     protected static Map.Entry<String, String> getHostName(

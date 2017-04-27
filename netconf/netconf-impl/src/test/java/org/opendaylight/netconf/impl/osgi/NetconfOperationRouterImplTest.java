@@ -34,7 +34,8 @@ import org.xml.sax.SAXException;
 
 public class NetconfOperationRouterImplTest {
 
-    private static final String TEST_RPC = "<rpc message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><test/></rpc>\n";
+    private static final String TEST_RPC = "<rpc message-id=\"101\" "
+            + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><test/></rpc>\n";
     private static final String MAX_PRIORITY_REPLY = "<high/>";
     private static final String DEFAULT_PRIORITY_REPLY = "<default/>";
 
@@ -62,10 +63,12 @@ public class NetconfOperationRouterImplTest {
         MockitoAnnotations.initMocks(this);
 
         doReturn(HandlingPriority.HANDLE_WITH_MAX_PRIORITY).when(maxPrioMock).canHandle(any(Document.class));
-        doReturn(XmlUtil.readXmlToDocument(MAX_PRIORITY_REPLY)).when(maxPrioMock).handle(any(Document.class), any(NetconfOperationChainedExecution.class));
+        doReturn(XmlUtil.readXmlToDocument(MAX_PRIORITY_REPLY)).when(maxPrioMock).handle(any(Document.class),
+                any(NetconfOperationChainedExecution.class));
 
         doReturn(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY).when(defaultPrioMock).canHandle(any(Document.class));
-        doReturn(XmlUtil.readXmlToDocument(DEFAULT_PRIORITY_REPLY)).when(defaultPrioMock).handle(any(Document.class), any(NetconfOperationChainedExecution.class));
+        doReturn(XmlUtil.readXmlToDocument(DEFAULT_PRIORITY_REPLY)).when(defaultPrioMock).handle(any(Document.class),
+                any(NetconfOperationChainedExecution.class));
 
         final Set<NetconfOperation> operations = new HashSet<>();
         operations.add(maxPrioMock);
@@ -80,8 +83,10 @@ public class NetconfOperationRouterImplTest {
 
     @Test
     public void testOnNetconfMessage() throws Exception {
-        final ArgumentCaptor<NetconfOperationChainedExecution> highPriorityChainEx = ArgumentCaptor.forClass(NetconfOperationChainedExecution.class);
-        final ArgumentCaptor<NetconfOperationChainedExecution> defaultPriorityChainEx = ArgumentCaptor.forClass(NetconfOperationChainedExecution.class);
+        final ArgumentCaptor<NetconfOperationChainedExecution> highPriorityChainEx =
+                ArgumentCaptor.forClass(NetconfOperationChainedExecution.class);
+        final ArgumentCaptor<NetconfOperationChainedExecution> defaultPriorityChainEx =
+                ArgumentCaptor.forClass(NetconfOperationChainedExecution.class);
 
         final Document document = operationRouter.onNetconfMessage(TEST_RPC_DOC, null);
 
@@ -103,7 +108,7 @@ public class NetconfOperationRouterImplTest {
 
     @Test
     public void testOnNetconfMessageFail() throws Exception {
-        try{
+        try {
             emptyOperationRouter.onNetconfMessage(TEST_RPC_DOC, null);
             Assert.fail("Exception expected");
         } catch (final DocumentedException e) {

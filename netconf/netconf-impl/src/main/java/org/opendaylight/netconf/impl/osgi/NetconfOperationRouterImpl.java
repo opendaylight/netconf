@@ -53,8 +53,10 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
         allNetconfOperations = ImmutableSet.copyOf(ops);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public Document onNetconfMessage(final Document message, final NetconfServerSession session) throws DocumentedException {
+    public Document onNetconfMessage(final Document message, final NetconfServerSession session) throws
+            DocumentedException {
         Preconditions.checkNotNull(allNetconfOperations, "Operation router was not initialized properly");
 
         final NetconfOperationExecution netconfOperationExecution;
@@ -72,10 +74,10 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
             }
 
             throw new DocumentedException(
-                String.format("Unable to handle rpc %s on session %s", messageAsString, session),
+                    String.format("Unable to handle rpc %s on session %s", messageAsString, session),
                     e, DocumentedException.ErrorType.APPLICATION,
                     tag, DocumentedException.ErrorSeverity.ERROR,
-                Collections.singletonMap(tag.toString(), e.getMessage()));
+                    Collections.singletonMap(tag.toString(), e.getMessage()));
         } catch (final RuntimeException e) {
             throw handleUnexpectedEx("Unexpected exception during netconf operation sort", e);
         }
@@ -92,20 +94,22 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
         netconfOperationServiceSnapshot.close();
     }
 
-    private static DocumentedException handleUnexpectedEx(final String s, final Exception e) throws DocumentedException {
-        LOG.error("{}", s, e);
+    private static DocumentedException handleUnexpectedEx(final String message, final Exception exception) throws
+            DocumentedException {
+        LOG.error("{}", message, exception);
         return new DocumentedException("Unexpected error",
                 DocumentedException.ErrorType.APPLICATION,
                 DocumentedException.ErrorTag.OPERATION_FAILED,
                 DocumentedException.ErrorSeverity.ERROR,
-                Collections.singletonMap(DocumentedException.ErrorSeverity.ERROR.toString(), e.toString()));
+                Collections.singletonMap(DocumentedException.ErrorSeverity.ERROR.toString(), exception.toString()));
     }
 
     private Document executeOperationWithHighestPriority(final Document message,
-            final NetconfOperationExecution netconfOperationExecution)
+                                                         final NetconfOperationExecution netconfOperationExecution)
             throws DocumentedException {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Forwarding netconf message {} to {}", XmlUtil.toString(message), netconfOperationExecution.netconfOperation);
+            LOG.debug("Forwarding netconf message {} to {}", XmlUtil.toString(message), netconfOperationExecution
+                    .netconfOperation);
         }
 
         return netconfOperationExecution.execute(message);
@@ -114,19 +118,20 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
     private NetconfOperationExecution getNetconfOperationWithHighestPriority(
             final Document message, final NetconfServerSession session) throws DocumentedException {
 
-        final NavigableMap<HandlingPriority, NetconfOperation> sortedByPriority = getSortedNetconfOperationsWithCanHandle(
+        final NavigableMap<HandlingPriority, NetconfOperation> sortedByPriority =
+                getSortedNetconfOperationsWithCanHandle(
                 message, session);
 
         if (sortedByPriority.isEmpty()) {
             throw new IllegalArgumentException(String.format("No %s available to handle message %s",
-                NetconfOperation.class.getName(), XmlUtil.toString(message)));
+                    NetconfOperation.class.getName(), XmlUtil.toString(message)));
         }
 
         return NetconfOperationExecution.createExecutionChain(sortedByPriority, sortedByPriority.lastKey());
     }
 
-    private TreeMap<HandlingPriority, NetconfOperation> getSortedNetconfOperationsWithCanHandle(final Document message,
-            final NetconfServerSession session) throws DocumentedException {
+    private TreeMap<HandlingPriority, NetconfOperation> getSortedNetconfOperationsWithCanHandle(
+            final Document message, final NetconfServerSession session) throws DocumentedException {
         final TreeMap<HandlingPriority, NetconfOperation> sortedPriority = Maps.newTreeMap();
 
         for (final NetconfOperation netconfOperation : allNetconfOperations) {
@@ -134,14 +139,15 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
             if (netconfOperation instanceof DefaultNetconfOperation) {
                 ((DefaultNetconfOperation) netconfOperation).setNetconfSession(session);
             }
-            if(netconfOperation instanceof SessionAwareNetconfOperation) {
+            if (netconfOperation instanceof SessionAwareNetconfOperation) {
                 ((SessionAwareNetconfOperation) netconfOperation).setSession(session);
             }
             if (!handlingPriority.equals(HandlingPriority.CANNOT_HANDLE)) {
 
                 Preconditions.checkState(!sortedPriority.containsKey(handlingPriority),
                         "Multiple %s available to handle message %s with priority %s, %s and %s",
-                        NetconfOperation.class.getName(), message, handlingPriority, netconfOperation, sortedPriority.get(handlingPriority));
+                        NetconfOperation.class.getName(), message, handlingPriority, netconfOperation, sortedPriority
+                                .get(handlingPriority));
                 sortedPriority.put(handlingPriority, netconfOperation);
             }
         }
@@ -152,7 +158,8 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
         private final NetconfOperation netconfOperation;
         private final NetconfOperationChainedExecution subsequentExecution;
 
-        private NetconfOperationExecution(final NetconfOperation netconfOperation, final NetconfOperationChainedExecution subsequentExecution) {
+        private NetconfOperationExecution(final NetconfOperation netconfOperation,
+                                          final NetconfOperationChainedExecution subsequentExecution) {
             this.netconfOperation = netconfOperation;
             this.subsequentExecution = subsequentExecution;
         }
@@ -168,7 +175,8 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
         }
 
         public static NetconfOperationExecution createExecutionChain(
-                final NavigableMap<HandlingPriority, NetconfOperation> sortedByPriority, final HandlingPriority handlingPriority) {
+                final NavigableMap<HandlingPriority, NetconfOperation> sortedByPriority,
+                final HandlingPriority handlingPriority) {
             final NetconfOperation netconfOperation = sortedByPriority.get(handlingPriority);
             final HandlingPriority subsequentHandlingPriority = sortedByPriority.lowerKey(handlingPriority);
 
