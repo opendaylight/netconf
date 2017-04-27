@@ -18,5 +18,6 @@ public abstract class AuthenticationHandler {
 
     public abstract String getUsername();
 
-    public abstract org.apache.sshd.client.future.AuthFuture authenticate(final ClientSession session) throws IOException;
+    public abstract org.apache.sshd.client.future.AuthFuture authenticate(ClientSession session)
+            throws IOException;
 }

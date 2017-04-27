@@ -27,7 +27,8 @@ public class ChunkedFramingMechanismEncoder extends MessageToByteEncoder<ByteBuf
     }
 
     public ChunkedFramingMechanismEncoder(final int chunkSize) {
-        Preconditions.checkArgument(chunkSize >= MIN_CHUNK_SIZE && chunkSize <= MAX_CHUNK_SIZE, "Unsupported chunk size %s", chunkSize);
+        Preconditions.checkArgument(chunkSize >= MIN_CHUNK_SIZE && chunkSize <= MAX_CHUNK_SIZE,
+                "Unsupported chunk size %s", chunkSize);
         this.chunkSize = chunkSize;
     }
 

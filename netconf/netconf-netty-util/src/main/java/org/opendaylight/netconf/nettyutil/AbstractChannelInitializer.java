@@ -28,7 +28,8 @@ public abstract class AbstractChannelInitializer<S extends NetconfSession> {
     public void initialize(Channel ch, Promise<S> promise) {
         ch.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
         initializeMessageDecoder(ch);
-        ch.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER, FramingMechanismHandlerFactory.createHandler(FramingMechanism.EOM));
+        ch.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER,
+                FramingMechanismHandlerFactory.createHandler(FramingMechanism.EOM));
         initializeMessageEncoder(ch);
 
         initializeSessionNegotiator(ch, promise);
