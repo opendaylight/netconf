@@ -16,7 +16,7 @@ public interface NetconfCommands {
 
     /**
      * Returns a Hashmap with NETCONF ID as outer key and
-     * inner keys representing attributes of a NETCONF device
+     * inner keys representing attributes of a NETCONF device.
      * @return :Hashmap with two keys for all NETCONF devices in topology
      */
     Map<String, Map<String, String>> listDevices();
@@ -40,15 +40,15 @@ public interface NetconfCommands {
     Map<String, Map<String, List<String>>> showDevice(String deviceId);
 
     /**
-     * Add a NETCONF connector
+     * Add a NETCONF connector.
      * @param netconfNode :An instance of {@link NetconfNode} containing
-     * all required information
+     *     all required information
      * @param deviceId :NETCONF node ID
      */
     void connectDevice(NetconfNode netconfNode, String deviceId);
 
     /**
-     * Disconnect a NETCONF connector
+     * Disconnect a NETCONF connector.
      * @param deviceIp :IP address of NETCONF device
      * @param devicePort :Port of NETCONF device
      * @return :Status of disconnect NETCONF connector
@@ -56,14 +56,14 @@ public interface NetconfCommands {
     boolean disconnectDevice(String deviceIp, String devicePort);
 
     /**
-     * Disconnect a NETCONF connector
+     * Disconnect a NETCONF connector.
      * @param deviceId :Node id of NETCONF device
      * @return :Status of disconnect NETCONF connector
      */
     boolean disconnectDevice(String deviceId);
 
     /**
-     * Update the NETCONF device for requested values
+     * Update the NETCONF device for requested values.
      * @param deviceId :NETCONF node ID
      * @param username :Username for NETCONF device
      * @param password :Password for NETCONF device
