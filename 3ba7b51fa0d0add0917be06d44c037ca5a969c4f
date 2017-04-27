@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_adbc5807",
+        "filename": "restconf/sal-rest-connector/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-04-27T07:12:17Z",
+      "side": 1,
+      "message": "Might not be needed running build locally without this.",
+      "range": {
+        "startLine": 175,
+        "startChar": 4,
+        "endLine": 178,
+        "endChar": 17
+      },
+      "revId": "3ba7b51fa0d0add0917be06d44c037ca5a969c4f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
