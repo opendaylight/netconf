@@ -27,11 +27,11 @@ public class HardcodedNamespaceResolver implements NamespaceContext {
     }
 
     /**
-     * This method returns the uri for all prefixes needed. Wherever possible it
-     * uses XMLConstants.
+     * Returns the URI for all prefixes needed. Wherever possible it
+     * uses {@code XMLConstants}.
      *
-     * @param prefix
-     * @return uri
+     * @param prefix    prefix
+     * @return uri      uniform resource identifier
      */
     @Override
     public String getNamespaceURI(String prefix) {

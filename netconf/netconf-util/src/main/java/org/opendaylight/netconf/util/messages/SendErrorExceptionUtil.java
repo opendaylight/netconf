@@ -34,15 +34,15 @@ public final class SendErrorExceptionUtil {
             final DocumentedException sendErrorException) {
         LOG.trace("Sending error {}", sendErrorException.getMessage(), sendErrorException);
         final Document errorDocument = createDocument(sendErrorException);
-        ChannelFuture f = session.sendMessage(new NetconfMessage(errorDocument));
-        f.addListener(new SendErrorVerifyingListener(sendErrorException));
+        ChannelFuture channelFuture = session.sendMessage(new NetconfMessage(errorDocument));
+        channelFuture.addListener(new SendErrorVerifyingListener(sendErrorException));
     }
 
     public static void sendErrorMessage(final Channel channel, final DocumentedException sendErrorException) {
         LOG.trace("Sending error {}", sendErrorException.getMessage(), sendErrorException);
         final Document errorDocument = createDocument(sendErrorException);
-        ChannelFuture f = channel.writeAndFlush(new NetconfMessage(errorDocument));
-        f.addListener(new SendErrorVerifyingListener(sendErrorException));
+        ChannelFuture channelFuture = channel.writeAndFlush(new NetconfMessage(errorDocument));
+        channelFuture.addListener(new SendErrorVerifyingListener(sendErrorException));
     }
 
     public static void sendErrorMessage(final NetconfSession session, final DocumentedException sendErrorException,
@@ -53,20 +53,21 @@ public final class SendErrorExceptionUtil {
         }
 
         tryToCopyAttributes(incommingMessage.getDocument(), errorDocument, sendErrorException);
-        ChannelFuture f = session.sendMessage(new NetconfMessage(errorDocument));
-        f.addListener(new SendErrorVerifyingListener(sendErrorException));
+        ChannelFuture channelFuture = session.sendMessage(new NetconfMessage(errorDocument));
+        channelFuture.addListener(new SendErrorVerifyingListener(sendErrorException));
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     private static void tryToCopyAttributes(final Document incommingDocument, final Document errorDocument,
             final DocumentedException sendErrorException) {
         try {
             final Element incommingRpc = incommingDocument.getDocumentElement();
-            Preconditions.checkState(incommingRpc.getTagName().equals(XmlNetconfConstants.RPC_KEY), "Missing %s element",
-                    XmlNetconfConstants.RPC_KEY);
+            Preconditions.checkState(incommingRpc.getTagName().equals(XmlNetconfConstants.RPC_KEY),
+                    "Missing %s element", XmlNetconfConstants.RPC_KEY);
 
             final Element rpcReply = errorDocument.getDocumentElement();
-            Preconditions.checkState(rpcReply.getTagName().equals(XmlMappingConstants.RPC_REPLY_KEY), "Missing %s element",
-                    XmlMappingConstants.RPC_REPLY_KEY);
+            Preconditions.checkState(rpcReply.getTagName().equals(XmlMappingConstants.RPC_REPLY_KEY),
+                    "Missing %s element", XmlMappingConstants.RPC_REPLY_KEY);
 
             final NamedNodeMap incomingAttributes = incommingRpc.getAttributes();
             for (int i = 0; i < incomingAttributes.getLength(); i++) {
@@ -93,7 +94,7 @@ public final class SendErrorExceptionUtil {
     private static final class SendErrorVerifyingListener implements ChannelFutureListener {
         private final DocumentedException sendErrorException;
 
-        public SendErrorVerifyingListener(final DocumentedException sendErrorException) {
+        SendErrorVerifyingListener(final DocumentedException sendErrorException) {
             this.sendErrorException = sendErrorException;
         }
 

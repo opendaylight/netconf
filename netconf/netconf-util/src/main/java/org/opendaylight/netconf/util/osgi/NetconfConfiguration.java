@@ -55,9 +55,11 @@ public class NetconfConfiguration implements ManagedService {
             LOG.debug("CSS netconf server configuration cannot be updated as passed dictionary is null");
             return;
         }
-        final InetSocketAddress sshServerAddress = new InetSocketAddress((String) dictionaryConfig.get(SSH_ADDRESS_PROP),
-                Integer.parseInt((String) dictionaryConfig.get(SSH_PORT_PROP)));
-        final InetSocketAddress tcpServerAddress = new InetSocketAddress((String) dictionaryConfig.get(TCP_ADDRESS_PROP),
+        final InetSocketAddress sshServerAddress =
+                new InetSocketAddress((String) dictionaryConfig.get(SSH_ADDRESS_PROP),
+                        Integer.parseInt((String) dictionaryConfig.get(SSH_PORT_PROP)));
+        final InetSocketAddress tcpServerAddress =
+                new InetSocketAddress((String) dictionaryConfig.get(TCP_ADDRESS_PROP),
                 Integer.parseInt((String) dictionaryConfig.get(TCP_PORT_PROP)));
 
         netconfConfiguration = new NetconfConfigurationHolder(tcpServerAddress,
@@ -67,11 +69,11 @@ public class NetconfConfiguration implements ManagedService {
         LOG.debug("CSS netconf server configuration was updated: {}", dictionaryConfig.toString());
     }
 
-    public InetSocketAddress getSshServerAddress(){
+    public InetSocketAddress getSshServerAddress() {
         return netconfConfiguration.getSshServerAddress();
     }
 
-    public InetSocketAddress getTcpServerAddress(){
+    public InetSocketAddress getTcpServerAddress() {
         return netconfConfiguration.getTcpServerAddress();
     }
 

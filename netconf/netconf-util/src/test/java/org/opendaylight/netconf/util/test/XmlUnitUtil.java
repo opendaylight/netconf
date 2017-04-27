@@ -26,7 +26,8 @@ public class XmlUnitUtil {
 
     private XmlUnitUtil() {}
 
-    public static void assertContainsElementWithText(final Document doc, final String textToFind) throws NodeTestException {
+    public static void assertContainsElementWithText(final Document doc,
+                                                     final String textToFind) throws NodeTestException {
         NodeTest nt = new NodeTest(doc);
         NodeTester tester = new AbstractNodeTester() {
 
@@ -34,7 +35,7 @@ public class XmlUnitUtil {
 
             @Override
             public void testText(Text text) throws NodeTestException {
-                if(!textFound) {
+                if (!textFound) {
                     if (text.getData().equalsIgnoreCase(textToFind)) {
                         textFound = true;
                     }
@@ -58,7 +59,7 @@ public class XmlUnitUtil {
             @Override
             public void testElement(Element element) throws NodeTestException {
                 if (!elementFound) {
-                    if(element.isEqualNode(testElement)) {
+                    if (element.isEqualNode(testElement)) {
                         elementFound = true;
                     }
                 }
@@ -72,7 +73,8 @@ public class XmlUnitUtil {
         assertNodeTestPasses(nt, tester, new short[]{Node.ELEMENT_NODE}, true);
     }
 
-    public static void assertContainsElementWithName(final Document doc, final String elementName) throws NodeTestException {
+    public static void assertContainsElementWithName(final Document doc,
+                                                     final String elementName) throws NodeTestException {
         NodeTest nt = new NodeTest(doc);
         NodeTester tester = new AbstractNodeTester() {
 

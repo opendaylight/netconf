@@ -50,7 +50,7 @@ public class SubtreeFilterNotificationTest {
     }
 
     @Before
-    public void setUp(){
+    public void setUp() {
         XMLUnit.setIgnoreWhitespace(true);
     }
 
@@ -59,8 +59,9 @@ public class SubtreeFilterNotificationTest {
         XmlElement filter = XmlElement.fromDomDocument(getDocument("filter.xml"));
         Document preFilterDocument = getDocument("pre-filter.xml");
         Document postFilterDocument = getDocument("post-filter.xml");
-        Optional<Document> actualPostFilterDocumentOpt = SubtreeFilter.applySubtreeNotificationFilter(filter, preFilterDocument);
-        if(actualPostFilterDocumentOpt.isPresent()) {
+        Optional<Document> actualPostFilterDocumentOpt =
+                SubtreeFilter.applySubtreeNotificationFilter(filter, preFilterDocument);
+        if (actualPostFilterDocumentOpt.isPresent()) {
             Document actualPostFilterDocument = actualPostFilterDocumentOpt.get();
             LOG.info("Actual document: {}", XmlUtil.toString(actualPostFilterDocument));
             Diff diff = XMLUnit.compareXML(postFilterDocument, actualPostFilterDocument);
@@ -71,7 +72,7 @@ public class SubtreeFilterNotificationTest {
     }
 
     public Document getDocument(String fileName) throws SAXException, IOException {
-        return XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/subtree/notification/" + directoryIndex + "/" +
-                fileName));
+        return XmlUtil.readXmlToDocument(getClass().getResourceAsStream(
+                "/subtree/notification/" + directoryIndex + "/" + fileName));
     }
 }

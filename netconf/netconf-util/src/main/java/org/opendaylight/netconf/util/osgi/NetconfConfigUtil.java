@@ -9,7 +9,6 @@
 package org.opendaylight.netconf.util.osgi;
 
 import java.util.Collection;
-import java.util.Optional;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -30,11 +29,11 @@ public final class NetconfConfigUtil {
         final Collection<ServiceReference<ManagedService>> serviceReferences
                 = bundleContext.getServiceReferences(ManagedService.class, null);
         for (final ServiceReference<ManagedService> serviceReference : serviceReferences) {
-                ManagedService service = bundleContext.getService(serviceReference);
-                if (service instanceof NetconfConfiguration){
-                    LOG.debug("Netconf configuration service found");
-                    return (NetconfConfiguration) service;
-                }
+            ManagedService service = bundleContext.getService(serviceReference);
+            if (service instanceof NetconfConfiguration) {
+                LOG.debug("Netconf configuration service found");
+                return (NetconfConfiguration) service;
+            }
         }
 
         throw new IllegalStateException("Netconf configuration service not found");
