@@ -49,7 +49,8 @@ public class NetconfDeviceSalProviderTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        provider = new NetconfDeviceSalProvider(new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("localhost", 17830)));
+        provider = new NetconfDeviceSalProvider(
+                new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("localhost", 17830)));
         when(session.getService(DOMMountPointService.class)).thenReturn(mountpointService);
         when(context.getSALService(DataBroker.class)).thenReturn(dataBroker);
         when(dataBroker.createTransactionChain(any())).thenReturn(chain);

@@ -39,7 +39,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({NetconfDeviceTopologyAdapter.class, NetconfDeviceSalProvider.MountInstance.class, NetconfSessionPreferences.class})
+@PrepareForTest({NetconfDeviceTopologyAdapter.class, NetconfDeviceSalProvider.MountInstance.class,
+        NetconfSessionPreferences.class})
 public class NetconfDeviceSalFacadeTest {
 
     private NetconfDeviceSalFacade deviceFacade;
@@ -51,7 +52,7 @@ public class NetconfDeviceSalFacadeTest {
     private NetconfDeviceSalProvider salProvider;
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         initMocks(this);
         final InetSocketAddress address = new InetSocketAddress("127.0.0.1", 8000);
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId("test", address);
@@ -64,7 +65,8 @@ public class NetconfDeviceSalFacadeTest {
         mountInstance = PowerMockito.mock(NetconfDeviceSalProvider.MountInstance.class);
 
         doReturn(netconfDeviceTopologyAdapter).when(salProvider).getTopologyDatastoreAdapter();
-        doNothing().when(netconfDeviceTopologyAdapter).updateDeviceData(any(Boolean.class), any(NetconfDeviceCapabilities.class));
+        doNothing().when(netconfDeviceTopologyAdapter)
+                .updateDeviceData(any(Boolean.class), any(NetconfDeviceCapabilities.class));
 
         doReturn(mountInstance).when(salProvider).getMountInstance();
         doNothing().when(mountInstance).onTopologyDeviceDisconnected();
@@ -98,13 +100,16 @@ public class NetconfDeviceSalFacadeTest {
     public void testOnDeviceConnected() {
         final SchemaContext schemaContext = mock(SchemaContext.class);
 
-        final NetconfSessionPreferences netconfSessionPreferences = NetconfSessionPreferences.fromStrings(getCapabilities());
+        final NetconfSessionPreferences netconfSessionPreferences =
+                NetconfSessionPreferences.fromStrings(getCapabilities());
 
         final DOMRpcService deviceRpc = mock(DOMRpcService.class);
         deviceFacade.onDeviceConnected(schemaContext, netconfSessionPreferences, deviceRpc);
 
-        verify(mountInstance, times(1)).onTopologyDeviceConnected(eq(schemaContext), any(DOMDataBroker.class), eq(deviceRpc), any(NetconfDeviceNotificationService.class));
-        verify(netconfDeviceTopologyAdapter, times(1)).updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
+        verify(mountInstance, times(1)).onTopologyDeviceConnected(eq(schemaContext),
+                any(DOMDataBroker.class), eq(deviceRpc), any(NetconfDeviceNotificationService.class));
+        verify(netconfDeviceTopologyAdapter,
+                times(1)).updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
     }
 
     @Test
@@ -114,7 +119,7 @@ public class NetconfDeviceSalFacadeTest {
         verify(mountInstance).publish(domNotification);
     }
 
-   private static List<String> getCapabilities() {
+    private static List<String> getCapabilities() {
         return Arrays.asList(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
     }
 }

@@ -35,12 +35,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Transforms base netconf rpcs
+ * Transforms base netconf RPCs.
  */
 public class BaseRpcSchemalessTransformer implements MessageTransformer<NetconfMessage> {
 
-    private static final Map<QName, RpcDefinition> mappedRpcs = BaseSchema.BASE_NETCONF_CTX.getMappedRpcs();
-    private static final SchemaContext schemaContext = BaseSchema.BASE_NETCONF_CTX.getSchemaContext();
+    private static final Map<QName, RpcDefinition> MAPPED_RPCS = BaseSchema.BASE_NETCONF_CTX.getMappedRpcs();
+    private static final SchemaContext SCHEMA_CONTEXT = BaseSchema.BASE_NETCONF_CTX.getSchemaContext();
 
     private final MessageCounter counter;
 
@@ -58,9 +58,10 @@ public class BaseRpcSchemalessTransformer implements MessageTransformer<NetconfM
         // In case no input for rpc is defined, we can simply construct the payload here
         final QName rpcQName = rpc.getLastComponent();
 
-        Preconditions.checkNotNull(mappedRpcs.get(rpcQName), "Unknown rpc %s, available rpcs: %s", rpcQName, mappedRpcs.keySet());
+        Preconditions.checkNotNull(MAPPED_RPCS.get(rpcQName), "Unknown rpc %s, available rpcs: %s",
+                rpcQName, MAPPED_RPCS.keySet());
         final DOMResult domResult = NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpcQName, counter);
-        if (mappedRpcs.get(rpcQName).getInput().getChildNodes().isEmpty()) {
+        if (MAPPED_RPCS.get(rpcQName).getInput().getChildNodes().isEmpty()) {
             return new NetconfMessage(domResult.getNode().getOwnerDocument());
         }
 
@@ -73,7 +74,8 @@ public class BaseRpcSchemalessTransformer implements MessageTransformer<NetconfM
         final DOMResult result = domResult;
 
         try {
-            NetconfMessageTransformUtil.writeNormalizedRpc(((ContainerNode) payload), result, inputPath, schemaContext);
+            NetconfMessageTransformUtil.writeNormalizedRpc(((ContainerNode) payload), result,
+                    inputPath, SCHEMA_CONTEXT);
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize " + inputPath, e);
         }
@@ -92,12 +94,14 @@ public class BaseRpcSchemalessTransformer implements MessageTransformer<NetconfM
             final Document data = XmlUtil.newDocument();
             data.appendChild(data.importNode(xmlData, true));
             AnyXmlNode xmlDataNode = Builders.anyXmlBuilder()
-                    .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_QNAME))
+                    .withNodeIdentifier(new YangInstanceIdentifier
+                            .NodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_QNAME))
                     .withValue(new DOMSource(data))
                     .build();
 
             normalizedNode = Builders.containerBuilder()
-                    .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME))
+                    .withNodeIdentifier(new YangInstanceIdentifier
+                            .NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME))
                     .withChild(xmlDataNode).build();
         } else {
             //other base rpcs don't have any output, we can simply construct the payload here

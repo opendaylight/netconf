@@ -66,7 +66,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Holds URLs with YANG schema resources for all yang modules reported in
- * ietf-netconf-yang-library/modules-state/modules node
+ * ietf-netconf-yang-library/modules-state/modules node.
  */
 public class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
@@ -76,9 +76,8 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
     static {
         final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-        moduleInfoBackedContext.registerModuleInfo(
-                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.
-                        $YangModuleInfoImpl.getInstance());
+        moduleInfoBackedContext.registerModuleInfo(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang
+                .library.rev160409.$YangModuleInfoImpl.getInstance());
         LIBRARY_CONTEXT = moduleInfoBackedContext.tryToCreateSchemaContext().get();
     }
 
@@ -104,7 +103,7 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
         final Map<SourceIdentifier, URL> result = Maps.newHashMap();
         for (final Map.Entry<QName, URL> entry : availableModels.entrySet()) {
             final SourceIdentifier sId = RevisionSourceIdentifier
-                    .create(entry.getKey().getLocalName(), Optional.fromNullable(entry.getKey().getFormattedRevision()));
+                .create(entry.getKey().getLocalName(), Optional.fromNullable(entry.getKey().getFormattedRevision()));
             result.put(sId, entry.getValue());
         }
 
@@ -123,7 +122,7 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
             final URL urlConnection = new URL(url);
             final URLConnection connection = urlConnection.openConnection();
 
-            if(connection instanceof HttpURLConnection) {
+            if (connection instanceof HttpURLConnection) {
                 connection.setRequestProperty("Accept", "application/xml");
                 final String userpass = username + ":" + password;
                 final String basicAuth = "Basic " + printBase64Binary(userpass.getBytes());
@@ -150,11 +149,12 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
             throw new RuntimeException(deviceId + ": Interrupted while waiting for response to "
                     + MODULES_STATE_MODULE_LIST, e);
         } catch (final ExecutionException e) {
-            LOG.warn("{}: Unable to detect available schemas, get to {} failed", deviceId, MODULES_STATE_MODULE_LIST, e);
+            LOG.warn("{}: Unable to detect available schemas, get to {} failed", deviceId,
+                    MODULES_STATE_MODULE_LIST, e);
             return new LibraryModulesSchemas(Collections.<QName, URL>emptyMap());
         }
 
-        if(moduleListNodeResult.getErrors().isEmpty() == false) {
+        if (moduleListNodeResult.getErrors().isEmpty() == false) {
             LOG.warn("{}: Unable to detect available schemas, get to {} failed, {}",
                     deviceId, MODULES_STATE_MODULE_LIST, moduleListNodeResult.getErrors());
             return new LibraryModulesSchemas(Collections.<QName, URL>emptyMap());
@@ -163,7 +163,7 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
         final Optional<? extends NormalizedNode<?, ?>> modulesStateNode =
                 findModulesStateNode(moduleListNodeResult.getResult());
-        if(modulesStateNode.isPresent()) {
+        if (modulesStateNode.isPresent()) {
             Preconditions.checkState(modulesStateNode.get() instanceof ContainerNode,
                     "Expecting container containing schemas, but was %s", modulesStateNode.get());
             return create(((ContainerNode) modulesStateNode.get()));
@@ -171,18 +171,6 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
             LOG.warn("{}: Unable to detect available schemas, get to {} was empty", deviceId, toId(ModulesState.QNAME));
             return new LibraryModulesSchemas(Collections.<QName, URL>emptyMap());
         }
-    }
-
-    private static Optional<? extends NormalizedNode<?, ?>> findModulesStateNode(final NormalizedNode<?, ?> result) {
-        if(result == null) {
-            return Optional.absent();
-        }
-        final Optional<DataContainerChild<?, ?>> dataNode = ((DataContainerNode<?>) result).getChild(toId(NETCONF_DATA_QNAME));
-        if(dataNode.isPresent() == false) {
-            return Optional.absent();
-        }
-
-       return ((DataContainerNode<?>) dataNode.get()).getChild(toId(ModulesState.QNAME));
     }
 
     private static LibraryModulesSchemas create(final ContainerNode modulesStateNode) {
@@ -207,6 +195,42 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
         return new LibraryModulesSchemas(schemasMapping.build());
     }
 
+    /**
+     * Resolves URLs with YANG schema resources from modules-state.
+     * @param url URL pointing to yang library
+     * @return Resolved URLs with YANG schema resources for all yang modules from yang library
+     */
+    public static LibraryModulesSchemas create(final String url) {
+        Preconditions.checkNotNull(url);
+        try {
+            final URL urlConnection = new URL(url);
+            final URLConnection connection = urlConnection.openConnection();
+
+            if (connection instanceof HttpURLConnection) {
+                connection.setRequestProperty("Accept", "application/xml");
+            }
+
+            return createFromURLConnection(connection);
+
+        } catch (final IOException e) {
+            LOG.warn("Unable to download yang library from {}", url, e);
+            return new LibraryModulesSchemas(Collections.<QName, URL>emptyMap());
+        }
+    }
+
+    private static Optional<? extends NormalizedNode<?, ?>> findModulesStateNode(final NormalizedNode<?, ?> result) {
+        if (result == null) {
+            return Optional.absent();
+        }
+        final Optional<DataContainerChild<?, ?>> dataNode =
+                ((DataContainerNode<?>) result).getChild(toId(NETCONF_DATA_QNAME));
+        if (dataNode.isPresent() == false) {
+            return Optional.absent();
+        }
+
+        return ((DataContainerNode<?>) dataNode.get()).getChild(toId(ModulesState.QNAME));
+    }
+
     private static LibraryModulesSchemas createFromURLConnection(final URLConnection connection) {
 
         String contentType = connection.getContentType();
@@ -219,7 +243,7 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
         Preconditions.checkNotNull(contentType, "Content type unknown");
         Preconditions.checkState(contentType.equals("application/json") || contentType.equals("application/xml"),
                 "Only XML and JSON types are supported.");
-        try (final InputStream in = connection.getInputStream()) {
+        try (InputStream in = connection.getInputStream()) {
             final Optional<NormalizedNode<?, ?>> optionalModulesStateNode =
                     contentType.equals("application/json") ? readJson(in) : readXml(in);
 
@@ -258,33 +282,10 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
         }
     }
 
-    /**
-     * Resolves URLs with YANG schema resources from modules-state
-     * @param url URL pointing to yang library
-     * @return Resolved URLs with YANG schema resources for all yang modules from yang library
-     */
-    public static LibraryModulesSchemas create(final String url) {
-        Preconditions.checkNotNull(url);
-        try {
-            final URL urlConnection = new URL(url);
-            final URLConnection connection = urlConnection.openConnection();
-
-            if(connection instanceof HttpURLConnection) {
-                connection.setRequestProperty("Accept", "application/xml");
-            }
-
-            return createFromURLConnection(connection);
-
-        } catch (final IOException e) {
-            LOG.warn("Unable to download yang library from {}", url, e);
-            return new LibraryModulesSchemas(Collections.<QName, URL>emptyMap());
-        }
-    }
-
     private static boolean guessJsonFromFileName(final String fileName) {
         String extension = "";
         final int i = fileName.lastIndexOf(46);
-        if(i != -1) {
+        if (i != -1) {
             extension = fileName.substring(i).toLowerCase();
         }
 
@@ -300,9 +301,8 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
         jsonParser.parse(reader);
 
-        return resultHolder.isFinished() ?
-                Optional.of(resultHolder.getResult()) :
-                Optional.<NormalizedNode<?, ?>>absent();
+        return resultHolder.isFinished()
+                ? Optional.of(resultHolder.getResult()) : Optional.<NormalizedNode<?, ?>>absent();
     }
 
     private static Optional<NormalizedNode<?, ?>> readXml(final InputStream in) {
@@ -317,7 +317,7 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
                     parserFactory.getContainerNodeParser().parse(Collections.singleton(XmlUtil.readXmlToElement(in)),
                             (ContainerSchemaNode) LIBRARY_CONTEXT.getDataChildByName(ModulesState.QNAME));
             return Optional.of(parsed);
-        } catch (IOException|SAXException e) {
+        } catch (IOException | SAXException e) {
             LOG.warn("Unable to parse yang library xml content", e);
         }
 
@@ -334,8 +334,8 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
         childNodeId = new YangInstanceIdentifier.NodeIdentifier(QName.create(Module.QNAME, "revision"));
         final Optional<String> revision = getSingleChildNodeValue(moduleNode, childNodeId);
-        if(revision.isPresent()) {
-            if(!SourceIdentifier.REVISION_PATTERN.matcher(revision.get()).matches()) {
+        if (revision.isPresent()) {
+            if (!SourceIdentifier.REVISION_PATTERN.matcher(revision.get()).matches()) {
                 LOG.warn("Skipping library schema for {}. Revision {} is in wrong format.", moduleNode, revision.get());
                 return Optional.<Map.Entry<QName, URL>>absent();
             }

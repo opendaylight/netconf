@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Tx implementation for netconf devices that support only candidate datastore and no writable running
+ * Tx implementation for netconf devices that support only candidate datastore and no writable running.
  * The sequence goes as:
  * <ol>
  *   <li>Lock candidate datastore on tx construction
@@ -44,7 +44,8 @@ import org.slf4j.LoggerFactory;
  *   </li>
  *   <li>Edit-config in candidate N times
  *     <ul>
- *       <li>If any issue occurs during edit, datastore is discarded using discard-changes rpc, unlocked and an exception is thrown async</li>
+ *       <li>If any issue occurs during edit,
+ *       datastore is discarded using discard-changes rpc, unlocked and an exception is thrown async</li>
  *     </ul>
  *   </li>
  *   <li>Commit and Unlock candidate datastore async</li>
@@ -78,8 +79,8 @@ public class WriteCandidateTx extends AbstractWriteTx {
             }
 
             @Override
-            public void onFailure(final Throwable t) {
-                LOG.warn("Lock candidate operation failed. {}", t);
+            public void onFailure(final Throwable throwable) {
+                LOG.warn("Lock candidate operation failed. {}", throwable);
                 discardChanges();
             }
         };
@@ -94,24 +95,28 @@ public class WriteCandidateTx extends AbstractWriteTx {
 
     @Override
     public synchronized CheckedFuture<Void, TransactionCommitFailedException> submit() {
-        final ListenableFuture<Void> commitFutureAsVoid = Futures.transform(commit(), new Function<RpcResult<TransactionStatus>, Void>() {
-            @Override
-            public Void apply(final RpcResult<TransactionStatus> input) {
-                Preconditions.checkArgument(input.isSuccessful() && input.getErrors().isEmpty(), "Submit failed with errors: %s", input.getErrors());
-                return null;
-            }
-        });
+        final ListenableFuture<Void> commitFutureAsVoid = Futures.transform(commit(),
+                new Function<RpcResult<TransactionStatus>, Void>() {
+                    @Override
+                    public Void apply(final RpcResult<TransactionStatus> input) {
+                        Preconditions.checkArgument(input.isSuccessful() && input.getErrors().isEmpty(),
+                                "Submit failed with errors: %s", input.getErrors());
+                        return null;
+                    }
+                });
 
         return Futures.makeChecked(commitFutureAsVoid, new Function<Exception, TransactionCommitFailedException>() {
             @Override
             public TransactionCommitFailedException apply(final Exception input) {
-                return new TransactionCommitFailedException("Submit of transaction " + getIdentifier() + " failed", input);
+                return new TransactionCommitFailedException(
+                        "Submit of transaction " + getIdentifier() + " failed", input);
             }
         });
     }
 
     /**
-     * This has to be non blocking since it is called from a callback on commit and its netty threadpool that is really sensitive to blocking calls
+     * This has to be non blocking since it is called from a callback on commit
+     * and its netty threadpool that is really sensitive to blocking calls.
      */
     private void discardChanges() {
         netOps.discardChanges(new NetconfRpcFutureCallback("Discarding candidate", id));
@@ -129,7 +134,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
             }
 
             @Override
-            public void onFailure(final Throwable t) {
+            public void onFailure(final Throwable throwable) {
                 // TODO If lock is cause of this failure cleanup will issue warning log
                 // cleanup is trying to do unlock, but this will fail
                 cleanup();
@@ -161,7 +166,8 @@ public class WriteCandidateTx extends AbstractWriteTx {
     }
 
     /**
-     * This has to be non blocking since it is called from a callback on commit and its netty threadpool that is really sensitive to blocking calls
+     * This has to be non blocking since it is called from a callback on commit
+     * and its netty threadpool that is really sensitive to blocking calls.
      */
     private void unlock() {
         netOps.unlockCandidate(new NetconfRpcFutureCallback("Unlock candidate", id));

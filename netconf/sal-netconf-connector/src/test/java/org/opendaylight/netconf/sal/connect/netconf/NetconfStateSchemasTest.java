@@ -58,16 +58,21 @@ import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.Dom
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class NetconfStateSchemasTest {
 
-    private static final NetconfSessionPreferences CAPS = NetconfSessionPreferences.fromStrings(Collections.singleton("urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04"));
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfStateSchemasTest.class);
+
+    private static final NetconfSessionPreferences CAPS = NetconfSessionPreferences.fromStrings(Collections.singleton(
+        "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04"));
     private final RemoteDeviceId deviceId = new RemoteDeviceId("device", new InetSocketAddress(99));
+    private final int numberOfSchemas = 73;
+    private final int numberOfLegalSchemas = numberOfSchemas - 3;
     private ContainerNode compositeNodeSchemas;
-    private final int NUMBER_OF_SCHEMAS = 73;
-    private final int NUMBER_OF_LEGAL_SCHEMAS = NUMBER_OF_SCHEMAS - 3;
 
     @Mock
     private DOMRpcService rpc;
@@ -79,9 +84,13 @@ public class NetconfStateSchemasTest {
         final DataSchemaNode schemasNode =
                 ((ContainerSchemaNode) schemaContext
                         .getDataChildByName(NetconfState.QNAME)).getDataChildByName(Schemas.QNAME);
-        final Document schemasXml = XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/netconf-state.schemas.payload.xml"));
-        final ToNormalizedNodeParser<Element, ContainerNode, ContainerSchemaNode> containerNodeParser = DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, schemaContext, false).getContainerNodeParser();
-        compositeNodeSchemas = containerNodeParser.parse(Collections.singleton(schemasXml.getDocumentElement()), (ContainerSchemaNode) schemasNode);
+        final Document schemasXml =
+                XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/netconf-state.schemas.payload.xml"));
+        final ToNormalizedNodeParser<Element, ContainerNode, ContainerSchemaNode> containerNodeParser =
+                DomToNormalizedNodeParserFactory
+                    .getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, schemaContext, false).getContainerNodeParser();
+        compositeNodeSchemas = containerNodeParser
+                .parse(Collections.singleton(schemasXml.getDocumentElement()), (ContainerSchemaNode) schemasNode);
 
     }
 
@@ -90,7 +99,7 @@ public class NetconfStateSchemasTest {
         final NetconfStateSchemas schemas = NetconfStateSchemas.create(deviceId, compositeNodeSchemas);
 
         final Set<QName> availableYangSchemasQNames = schemas.getAvailableYangSchemasQNames();
-        assertEquals(NUMBER_OF_LEGAL_SCHEMAS, availableYangSchemasQNames.size());
+        assertEquals(numberOfLegalSchemas, availableYangSchemasQNames.size());
 
         assertThat(availableYangSchemasQNames,
                 hasItem(QName.create("urn:TBD:params:xml:ns:yang:network-topology", "2013-07-12", "network-topology")));
@@ -103,17 +112,20 @@ public class NetconfStateSchemasTest {
                 .withChild(compositeNodeSchemas)
                 .build();
         final ContainerNode data = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_QNAME))
+                .withNodeIdentifier(new YangInstanceIdentifier
+                        .NodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_QNAME))
                 .withChild(netconfState)
                 .build();
         final ContainerNode rpcReply = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME))
+                .withNodeIdentifier(new YangInstanceIdentifier
+                        .NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME))
                 .withChild(data)
                 .build();
-        when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any())).thenReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(rpcReply)));
+        when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any()))
+                .thenReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(rpcReply)));
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
-        assertEquals(NUMBER_OF_LEGAL_SCHEMAS, availableYangSchemasQNames.size());
+        assertEquals(numberOfLegalSchemas, availableYangSchemasQNames.size());
 
         assertThat(availableYangSchemasQNames,
                 hasItem(QName.create("urn:TBD:params:xml:ns:yang:network-topology", "2013-07-12", "network-topology")));
@@ -140,12 +152,14 @@ public class NetconfStateSchemasTest {
     @Test
     public void testCreateRpcError() throws Exception {
         final RpcError rpcError = RpcResultBuilder.newError(RpcError.ErrorType.RPC, "fail", "fail");
-        when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any())).thenReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(rpcError)));
+        when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any()))
+                .thenReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(rpcError)));
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
         Assert.assertTrue(availableYangSchemasQNames.isEmpty());
     }
 
+    @SuppressWarnings("checkstyle:IllegalThrows")
     @Test(expected = RuntimeException.class)
     public void testCreateInterrupted() throws Throwable {
         //NetconfStateSchemas.create calls Thread.currentThread().interrupt(), so it must run in its own thread
@@ -157,7 +171,7 @@ public class NetconfStateSchemasTest {
                 when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any())).thenReturn(checkedFuture);
                 NetconfStateSchemas.create(rpc, CAPS, deviceId);
             } catch (final InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+                LOG.info("Operation failed.", e);
             }
 
         });
@@ -170,9 +184,12 @@ public class NetconfStateSchemasTest {
 
     @Test
     public void testRemoteYangSchemaEquals() throws Exception {
-        final NetconfStateSchemas.RemoteYangSchema schema1 = new NetconfStateSchemas.RemoteYangSchema(NetconfState.QNAME);
-        final NetconfStateSchemas.RemoteYangSchema schema2 = new NetconfStateSchemas.RemoteYangSchema(NetconfState.QNAME);
-        final NetconfStateSchemas.RemoteYangSchema schema3 = new NetconfStateSchemas.RemoteYangSchema(Schemas.QNAME);
+        final NetconfStateSchemas.RemoteYangSchema schema1 =
+                new NetconfStateSchemas.RemoteYangSchema(NetconfState.QNAME);
+        final NetconfStateSchemas.RemoteYangSchema schema2 =
+                new NetconfStateSchemas.RemoteYangSchema(NetconfState.QNAME);
+        final NetconfStateSchemas.RemoteYangSchema schema3 =
+                new NetconfStateSchemas.RemoteYangSchema(Schemas.QNAME);
         Assert.assertEquals(schema1, schema2);
         Assert.assertEquals(schema2, schema1);
         Assert.assertNotEquals(schema1, schema3);
