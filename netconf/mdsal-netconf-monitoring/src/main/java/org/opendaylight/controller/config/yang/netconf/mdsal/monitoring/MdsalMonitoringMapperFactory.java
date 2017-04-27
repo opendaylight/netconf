@@ -27,9 +27,10 @@ public class MdsalMonitoringMapperFactory implements NetconfOperationServiceFact
 
     private static final Set<Capability> CAPABILITIES = Collections.emptySet();
 
-    public MdsalMonitoringMapperFactory(final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
-                                        final NetconfMonitoringService netconfMonitoringService,
-                                        final MonitoringToMdsalWriter monitoringToMdsalWriter) {
+    public MdsalMonitoringMapperFactory(
+            final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
+            final NetconfMonitoringService netconfMonitoringService,
+            final MonitoringToMdsalWriter monitoringToMdsalWriter) {
 
         this.netconfOperationServiceFactoryListener = netconfOperationServiceFactoryListener;
         this.monitoringToMdsalWriter = monitoringToMdsalWriter;
@@ -56,9 +57,9 @@ public class MdsalMonitoringMapperFactory implements NetconfOperationServiceFact
 
     @Override
     public Set<Capability> getCapabilities() {
-        // TODO
-        // No capabilities exposed to prevent clashes with schemas from mdsal-netconf-connector (it exposes all the schemas)
-        // If the schemas exposed by mdsal-netconf-connector are filtered, this class would expose monitoring related models
+        // TODO No capabilities exposed to prevent clashes with schemas from mdsal-netconf-connector (it exposes
+        // all the schemas). If the schemas exposed by mdsal-netconf-connector are filtered, this class would expose
+        // monitoring related models.
         return CAPABILITIES;
     }
 
@@ -68,7 +69,7 @@ public class MdsalMonitoringMapperFactory implements NetconfOperationServiceFact
     }
 
     /**
-     * Invoke using blueprint
+     * Invoked using blueprint.
      */
     @Override
     public void close() {
