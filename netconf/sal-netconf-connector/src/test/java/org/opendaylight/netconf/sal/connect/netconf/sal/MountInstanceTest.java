@@ -30,8 +30,12 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MountInstanceTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MountInstanceTest.class);
 
     private static SchemaContext SCHEMA_CONTEXT;
 
@@ -53,10 +57,10 @@ public class MountInstanceTest {
     private NetconfDeviceSalProvider.MountInstance mountInstance;
 
     @BeforeClass
-    public static void suiteSetUp() throws Exception{
+    public static void suiteSetUp() throws Exception {
         final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-        moduleInfoBackedContext.addModuleInfos(
-                Lists.newArrayList(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl.getInstance()));
+        moduleInfoBackedContext.addModuleInfos(Lists.newArrayList(org.opendaylight.yang.gen
+                .v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl.getInstance()));
         SCHEMA_CONTEXT = moduleInfoBackedContext.tryToCreateSchemaContext().get();
 
     }
@@ -67,7 +71,8 @@ public class MountInstanceTest {
         when(service.createMountPoint(any(YangInstanceIdentifier.class))).thenReturn(mountPointBuilder);
 
         when(mountPointBuilder.register()).thenReturn(registration);
-        mountInstance = new NetconfDeviceSalProvider.MountInstance(service, new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830)));
+        mountInstance = new NetconfDeviceSalProvider.MountInstance(
+                service, new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830)));
     }
 
 
@@ -88,7 +93,7 @@ public class MountInstanceTest {
         try {
             mountInstance.onTopologyDeviceConnected(SCHEMA_CONTEXT, broker, rpcService, notificationService);
         } catch (final IllegalStateException e) {
-            e.printStackTrace();
+            LOG.warn("Operation failed.", e);
             Assert.fail("Topology registration still present after disconnect ");
         }
     }

@@ -51,7 +51,8 @@ public class TxChainTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         when(broker.newReadOnlyTransaction()).thenReturn(readOnlyTx);
-        when(broker.newWriteOnlyTransaction()).thenReturn(writeOnlyTx1).thenReturn(writeOnlyTx2).thenReturn(writeOnlyTx3);
+        when(broker.newWriteOnlyTransaction()).thenReturn(writeOnlyTx1)
+                .thenReturn(writeOnlyTx2).thenReturn(writeOnlyTx3);
         when(writeOnlyTx1.addListener(any())).thenReturn(registration1);
         when(writeOnlyTx2.addListener(any())).thenReturn(registration2);
         when(writeOnlyTx3.addListener(any())).thenReturn(registration3);

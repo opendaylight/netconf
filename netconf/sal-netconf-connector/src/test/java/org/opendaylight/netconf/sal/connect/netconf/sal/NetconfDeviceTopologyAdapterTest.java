@@ -92,15 +92,17 @@ public class NetconfDeviceTopologyAdapterTest {
 
     private DataBroker dataBroker;
 
-    private ConcurrentDOMDataBroker cDOMDataBroker;
+    private ConcurrentDOMDataBroker concurrentDOMDataBroker;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         doReturn(txChain).when(broker).createTransactionChain(any(TransactionChainListener.class));
         doReturn(writeTx).when(txChain).newWriteOnlyTransaction();
-        doNothing().when(writeTx).put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(NetconfNode.class));
-        doNothing().when(writeTx).merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(NetconfNode.class));
+        doNothing().when(writeTx)
+                .put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(NetconfNode.class));
+        doNothing().when(writeTx)
+                .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(NetconfNode.class));
 
         doReturn(txIdent).when(writeTx).getIdentifier();
 
@@ -118,22 +120,25 @@ public class NetconfDeviceTopologyAdapterTest {
         ExecutorService listenableFutureExecutor = SpecialExecutors.newBlockingBoundedCachedThreadPool(
                 16, 16, "CommitFutures");
 
-        cDOMDataBroker = new ConcurrentDOMDataBroker(datastores, listenableFutureExecutor);
+        concurrentDOMDataBroker = new ConcurrentDOMDataBroker(datastores, listenableFutureExecutor);
 
         final ClassPool pool = ClassPool.getDefault();
         final DataObjectSerializerGenerator generator = StreamWriterGenerator.create(JavassistUtils.forClassPool(pool));
         final BindingNormalizedNodeCodecRegistry codecRegistry = new BindingNormalizedNodeCodecRegistry(generator);
         final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-        codecRegistry.onBindingRuntimeContextUpdated(BindingRuntimeContext.create(moduleInfoBackedContext, schemaContext));
+        codecRegistry.onBindingRuntimeContextUpdated(
+                BindingRuntimeContext.create(moduleInfoBackedContext, schemaContext));
 
         final GeneratedClassLoadingStrategy loading = GeneratedClassLoadingStrategy.getTCCLClassLoadingStrategy();
-        final BindingToNormalizedNodeCodec bindingToNormalized = new BindingToNormalizedNodeCodec(loading, codecRegistry);
+        final BindingToNormalizedNodeCodec bindingToNormalized =
+                new BindingToNormalizedNodeCodec(loading, codecRegistry);
         bindingToNormalized.onGlobalContextUpdated(schemaContext);
-        dataBroker = new BindingDOMDataBrokerAdapter(cDOMDataBroker, bindingToNormalized);
+        dataBroker = new BindingDOMDataBrokerAdapter(concurrentDOMDataBroker, bindingToNormalized);
 
         transactionChain = dataBroker.createTransactionChain(new TransactionChainListener() {
             @Override
-            public void onTransactionChainFailed(TransactionChain<?, ?> chain, AsyncTransaction<?, ?> transaction, Throwable cause) {
+            public void onTransactionChainFailed(TransactionChain<?, ?> chain, AsyncTransaction<?, ?> transaction,
+                                                 Throwable cause) {
 
             }
 
@@ -153,16 +158,20 @@ public class NetconfDeviceTopologyAdapterTest {
         adapter.setDeviceAsFailed(null);
 
         verify(txChain, times(2)).newWriteOnlyTransaction();
-        verify(writeTx, times(1)).put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(NetconfNode.class));
+        verify(writeTx, times(1))
+                .put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(NetconfNode.class));
         adapter.close();
 
         adapter = new NetconfDeviceTopologyAdapter(id, transactionChain); //not a mock
         adapter.setDeviceAsFailed(null);
 
-        Optional<NetconfNode> netconfNode = dataBroker.newReadWriteTransaction().read(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath().augmentation(NetconfNode.class)).checkedGet(5, TimeUnit.SECONDS);
+        Optional<NetconfNode> netconfNode = dataBroker.newReadWriteTransaction().read(LogicalDatastoreType.OPERATIONAL,
+                id.getTopologyBindingPath().augmentation(NetconfNode.class)).checkedGet(5, TimeUnit.SECONDS);
 
         assertEquals("Netconf node should be presented.", true, netconfNode.isPresent());
-        assertEquals("Connection status should be failed.", NetconfNodeConnectionStatus.ConnectionStatus.UnableToConnect.getName(), netconfNode.get().getConnectionStatus().getName());
+        assertEquals("Connection status should be failed.",
+                NetconfNodeConnectionStatus.ConnectionStatus.UnableToConnect.getName(),
+                netconfNode.get().getConnectionStatus().getName());
 
     }
 
@@ -174,7 +183,8 @@ public class NetconfDeviceTopologyAdapterTest {
         adapter.updateDeviceData(true, new NetconfDeviceCapabilities());
 
         verify(txChain, times(2)).newWriteOnlyTransaction();
-        verify(writeTx, times(1)).put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(NetconfNode.class));
+        verify(writeTx, times(1))
+                .put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(NetconfNode.class));
         verify(writeTx, times(1)).put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(Node.class));
 
     }
@@ -186,35 +196,43 @@ public class NetconfDeviceTopologyAdapterTest {
 
         NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, transactionChain);
 
-        QName nTestLeafQname = QName.create("urn:TBD:params:xml:ns:yang:network-topology-augment-test", "2016-08-08", "test-id").intern();
+        QName netconfTestLeafQname = QName.create(
+                "urn:TBD:params:xml:ns:yang:network-topology-augment-test", "2016-08-08", "test-id").intern();
 
-        YangInstanceIdentifier pathToAugmentedLeaf = YangInstanceIdentifier.builder().node(NetworkTopology.QNAME).
-                node(Topology.QNAME).nodeWithKey(Topology.QNAME, QName.create(Topology.QNAME, "topology-id"), "topology-netconf").
-                node(Node.QNAME).nodeWithKey(Node.QNAME, QName.create(Node.QNAME, "node-id"), "test").node(nTestLeafQname).build();
+        YangInstanceIdentifier pathToAugmentedLeaf = YangInstanceIdentifier.builder().node(NetworkTopology.QNAME)
+                .node(Topology.QNAME)
+                .nodeWithKey(Topology.QNAME, QName.create(Topology.QNAME, "topology-id"), "topology-netconf")
+                .node(Node.QNAME)
+                .nodeWithKey(Node.QNAME, QName.create(Node.QNAME, "node-id"), "test")
+                .node(netconfTestLeafQname).build();
 
-        NormalizedNode<?, ?> augmentNode = ImmutableLeafNodeBuilder.create().withValue(dataTestId).withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(nTestLeafQname)).build();
+        NormalizedNode<?, ?> augmentNode = ImmutableLeafNodeBuilder.create().withValue(dataTestId)
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(netconfTestLeafQname)).build();
 
-        DOMDataWriteTransaction writeTx =  cDOMDataBroker.newWriteOnlyTransaction();
+        DOMDataWriteTransaction writeTx =  concurrentDOMDataBroker.newWriteOnlyTransaction();
         writeTx.put(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf, augmentNode);
         writeTx.submit();
 
         adapter.updateDeviceData(true, new NetconfDeviceCapabilities());
-        Optional<NormalizedNode<?, ?>> testNode = cDOMDataBroker.newReadOnlyTransaction().read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf).checkedGet(2, TimeUnit.SECONDS);
+        Optional<NormalizedNode<?, ?>> testNode = concurrentDOMDataBroker.newReadOnlyTransaction()
+                .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf).checkedGet(2, TimeUnit.SECONDS);
 
         assertEquals("Augmented node data should be still present after device update.", true, testNode.isPresent());
         assertEquals("Augmented data should be the same as before update node.", dataTestId, testNode.get().getValue());
 
         adapter.setDeviceAsFailed(null);
-        testNode = cDOMDataBroker.newReadOnlyTransaction().read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf).checkedGet(2, TimeUnit.SECONDS);
+        testNode = concurrentDOMDataBroker.newReadOnlyTransaction()
+                .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf).checkedGet(2, TimeUnit.SECONDS);
 
         assertEquals("Augmented node data should be still present after device failed.", true, testNode.isPresent());
-        assertEquals("Augmented data should be the same as before failed device.", dataTestId, testNode.get().getValue());
+        assertEquals("Augmented data should be the same as before failed device.",
+                dataTestId, testNode.get().getValue());
     }
 
     private List<InputStream> getYangSchemas() {
         final List<String> schemaPaths = Arrays.asList("/schemas/network-topology@2013-10-21.yang",
-                "/schemas/ietf-inet-types@2013-07-15.yang", "/schemas/yang-ext.yang", "/schemas/netconf-node-topology.yang",
-                "/schemas/network-topology-augment-test@2016-08-08.yang");
+                "/schemas/ietf-inet-types@2013-07-15.yang", "/schemas/yang-ext.yang",
+                "/schemas/netconf-node-topology.yang", "/schemas/network-topology-augment-test@2016-08-08.yang");
         final List<InputStream> schemas = new ArrayList<>();
 
         for (String schemaPath : schemaPaths) {
@@ -248,7 +266,8 @@ public class NetconfDeviceTopologyAdapterTest {
             }
 
             @Override
-            public ListenerRegistration<SchemaContextListener> registerSchemaContextListener(final SchemaContextListener listener) {
+            public ListenerRegistration<SchemaContextListener> registerSchemaContextListener(
+                    final SchemaContextListener listener) {
                 listener.onGlobalContextUpdated(getGlobalContext());
                 return new ListenerRegistration<SchemaContextListener>() {
                     @Override

@@ -55,8 +55,8 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
     private static final ExceptionMapper<SchemaSourceException> MAPPER = new ExceptionMapper<SchemaSourceException>(
             "schemaDownload", SchemaSourceException.class) {
         @Override
-        protected SchemaSourceException newWithCause(final String s, final Throwable throwable) {
-            return new SchemaSourceException(s, throwable);
+        protected SchemaSourceException newWithCause(final String message, final Throwable throwable) {
+            return new SchemaSourceException(message, throwable);
         }
     };
 
@@ -68,23 +68,31 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
         this.rpc = Preconditions.checkNotNull(rpc);
     }
 
-    private static final NodeIdentifier FORMAT_PATHARG = new NodeIdentifier(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "format").intern());
-    private static final NodeIdentifier GET_SCHEMA_PATHARG = new NodeIdentifier(NetconfMessageTransformUtil.GET_SCHEMA_QNAME);
-    private static final NodeIdentifier IDENTIFIER_PATHARG = new NodeIdentifier(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "identifier").intern());
-    private static final NodeIdentifier VERSION_PATHARG = new NodeIdentifier(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "version").intern());
+    private static final NodeIdentifier FORMAT_PATHARG =
+            new NodeIdentifier(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "format").intern());
+    private static final NodeIdentifier GET_SCHEMA_PATHARG =
+            new NodeIdentifier(NetconfMessageTransformUtil.GET_SCHEMA_QNAME);
+    private static final NodeIdentifier IDENTIFIER_PATHARG =
+            new NodeIdentifier(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "identifier").intern());
+    private static final NodeIdentifier VERSION_PATHARG =
+            new NodeIdentifier(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "version").intern());
 
-    private static final LeafNode<?> FORMAT_LEAF = Builders.leafBuilder().withNodeIdentifier(FORMAT_PATHARG).withValue(Yang.QNAME).build();
+    private static final LeafNode<?> FORMAT_LEAF =
+            Builders.leafBuilder().withNodeIdentifier(FORMAT_PATHARG).withValue(Yang.QNAME).build();
 
-    private static final QName NETCONF_DATA = QName.create(GET_SCHEMA_QNAME, NETCONF_DATA_QNAME.getLocalName()).intern();
+    private static final QName NETCONF_DATA =
+            QName.create(GET_SCHEMA_QNAME, NETCONF_DATA_QNAME.getLocalName()).intern();
     private static final NodeIdentifier NETCONF_DATA_PATHARG = toId(NETCONF_DATA);
 
     public static ContainerNode createGetSchemaRequest(final String moduleName, final Optional<String> revision) {
-        final LeafNode<?> identifier = Builders.leafBuilder().withNodeIdentifier(IDENTIFIER_PATHARG).withValue(moduleName).build();
+        final LeafNode<?> identifier =
+                Builders.leafBuilder().withNodeIdentifier(IDENTIFIER_PATHARG).withValue(moduleName).build();
         final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builder = Builders.containerBuilder()
                 .withNodeIdentifier(GET_SCHEMA_PATHARG).withChild(identifier).withChild(FORMAT_LEAF);
 
         if (revision.isPresent()) {
-            builder.withChild(Builders.leafBuilder().withNodeIdentifier(VERSION_PATHARG).withValue(revision.get()).build());
+            builder.withChild(Builders.leafBuilder()
+                    .withNodeIdentifier(VERSION_PATHARG).withValue(revision.get()).build());
         }
 
         return builder.build();
@@ -95,7 +103,8 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
             return Optional.absent();
         }
 
-        final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> child = ((ContainerNode) result).getChild(NETCONF_DATA_PATHARG);
+        final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> child =
+                ((ContainerNode) result).getChild(NETCONF_DATA_PATHARG);
 
         Preconditions.checkState(child.isPresent() && child.get() instanceof AnyXmlNode,
                 "%s Unexpected response to get-schema, expected response with one child %s, but was %s", id,
@@ -109,7 +118,8 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
     }
 
     @Override
-    public CheckedFuture<YangTextSchemaSource, SchemaSourceException> getSource(final SourceIdentifier sourceIdentifier) {
+    public CheckedFuture<YangTextSchemaSource, SchemaSourceException> getSource(
+            final SourceIdentifier sourceIdentifier) {
         final String moduleName = sourceIdentifier.getName();
 
         // If formatted revision is SourceIdentifier.NOT_PRESENT_FORMATTED_REVISION, we have to omit it from request
@@ -125,13 +135,14 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
                 rpc.invokeRpc(SchemaPath.create(true, NetconfMessageTransformUtil.GET_SCHEMA_QNAME), getSchemaRequest),
                 new ResultToYangSourceTransformer(id, sourceIdentifier, moduleName, revision));
 
-        final CheckedFuture<YangTextSchemaSource, SchemaSourceException> checked = Futures.makeChecked(transformed, MAPPER);
+        final CheckedFuture<YangTextSchemaSource, SchemaSourceException> checked =
+                Futures.makeChecked(transformed, MAPPER);
 
         return checked;
     }
 
     /**
-     * Transform composite node to string schema representation and then to ASTSchemaSource
+     * Transform composite node to string schema representation and then to ASTSchemaSource.
      */
     private static final class ResultToYangSourceTransformer implements
             Function<DOMRpcResult, YangTextSchemaSource> {
@@ -141,7 +152,7 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
         private final String moduleName;
         private final Optional<String> revision;
 
-        public ResultToYangSourceTransformer(final RemoteDeviceId id, final SourceIdentifier sourceIdentifier,
+        ResultToYangSourceTransformer(final RemoteDeviceId id, final SourceIdentifier sourceIdentifier,
                 final String moduleName, final Optional<String> revision) {
             this.id = id;
             this.sourceIdentifier = sourceIdentifier;
@@ -157,7 +168,8 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
                 final Optional<String> schemaString = getSchemaFromRpc(id, input.getResult());
 
                 Preconditions.checkState(schemaString.isPresent(),
-                        "%s: Unexpected response to get-schema, schema not present in message for: %s", id, sourceIdentifier);
+                        "%s: Unexpected response to get-schema, schema not present in message for: %s",
+                        id, sourceIdentifier);
 
                 LOG.debug("{}: YANG Schema successfully retrieved for {}:{}",
                         id, moduleName, revision);
@@ -179,8 +191,9 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
         private final RemoteDeviceId id;
         private final Optional<String> schemaString;
 
-        public NetconfYangTextSchemaSource(final RemoteDeviceId id, final SourceIdentifier sId, final Optional<String> schemaString) {
-            super(sId);
+        NetconfYangTextSchemaSource(final RemoteDeviceId id, final SourceIdentifier sourceIdentifier,
+                                           final Optional<String> schemaString) {
+            super(sourceIdentifier);
             this.id = id;
             this.schemaString = schemaString;
         }

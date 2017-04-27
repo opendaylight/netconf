@@ -78,8 +78,10 @@ public class NetconfDeviceWriteOnlyTxTest {
         final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(SchemaContext.class)),
                 false);
         final MapNode emptyList = ImmutableNodes.mapNodeBuilder(NETCONF_FILTER_QNAME).build();
-        tx.merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(new YangInstanceIdentifier.NodeIdentifier(NETCONF_FILTER_QNAME)), emptyList);
-        tx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(new YangInstanceIdentifier.NodeIdentifier(NETCONF_FILTER_QNAME)), emptyList);
+        tx.merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier
+                .create(new YangInstanceIdentifier.NodeIdentifier(NETCONF_FILTER_QNAME)), emptyList);
+        tx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier
+                .create(new YangInstanceIdentifier.NodeIdentifier(NETCONF_FILTER_QNAME)), emptyList);
 
         verify(rpc, atMost(1)).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
     }
@@ -94,10 +96,14 @@ public class NetconfDeviceWriteOnlyTxTest {
         } catch (final TransactionCommitFailedException e) {
             // verify discard changes was sent
             final InOrder inOrder = inOrder(rpc);
-            inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME), NetconfBaseOps.getLockContent(NETCONF_CANDIDATE_QNAME));
-            inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME), NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
-            inOrder.verify(rpc).invokeRpc(eq(toPath(NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME)), any(NormalizedNode.class));
-            inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME), NetconfBaseOps.getUnLockContent(NETCONF_CANDIDATE_QNAME));
+            inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME),
+                    NetconfBaseOps.getLockContent(NETCONF_CANDIDATE_QNAME));
+            inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME),
+                    NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
+            inOrder.verify(rpc).invokeRpc(eq(toPath(NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME)),
+                    any(NormalizedNode.class));
+            inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME),
+                    NetconfBaseOps.getUnLockContent(NETCONF_CANDIDATE_QNAME));
             return;
         }
 
@@ -106,8 +112,8 @@ public class NetconfDeviceWriteOnlyTxTest {
 
     @Test
     public void testFailedCommit() throws Exception {
-        final CheckedFuture<DefaultDOMRpcResult, Exception> rpcErrorFuture =
-                Futures.immediateCheckedFuture(new DefaultDOMRpcResult(RpcResultBuilder.newError(RpcError.ErrorType.APPLICATION, "a", "m")));
+        final CheckedFuture<DefaultDOMRpcResult, Exception> rpcErrorFuture = Futures.immediateCheckedFuture(
+                new DefaultDOMRpcResult(RpcResultBuilder.newError(RpcError.ErrorType.APPLICATION, "a", "m")));
 
         doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(((NormalizedNode<?, ?>) null))))
         .doReturn(rpcErrorFuture).when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
@@ -131,23 +137,27 @@ public class NetconfDeviceWriteOnlyTxTest {
                 .doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("Failed tx")))
                 .when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
-        final WriteRunningTx tx = new WriteRunningTx(id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext()),
-                false);
+        final WriteRunningTx tx = new WriteRunningTx(
+                id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext()), false);
 
         tx.delete(LogicalDatastoreType.CONFIGURATION, yangIId);
         tx.submit();
         // verify discard changes was sent
         final InOrder inOrder = inOrder(rpc);
-        inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME), NetconfBaseOps.getLockContent(NETCONF_RUNNING_QNAME));
-        inOrder.verify(rpc).invokeRpc(eq(toPath(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)), any(NormalizedNode.class));
-        inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME), NetconfBaseOps.getUnLockContent(NETCONF_RUNNING_QNAME));
+        inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME),
+                NetconfBaseOps.getLockContent(NETCONF_RUNNING_QNAME));
+        inOrder.verify(rpc).invokeRpc(eq(toPath(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)),
+                any(NormalizedNode.class));
+        inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME),
+                NetconfBaseOps.getUnLockContent(NETCONF_RUNNING_QNAME));
     }
 
     @Test
     public void testListenerSuccess() throws Exception {
         doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null)))
                 .when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
-        final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX.getSchemaContext()), false);
+        final WriteCandidateTx tx = new WriteCandidateTx(
+                id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX.getSchemaContext()), false);
         final TxListener listener = mock(TxListener.class);
         tx.addListener(listener);
         tx.delete(LogicalDatastoreType.CONFIGURATION, yangIId);
@@ -162,7 +172,8 @@ public class NetconfDeviceWriteOnlyTxTest {
     public void testListenerCancellation() throws Exception {
         doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null)))
                 .when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
-        final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX.getSchemaContext()), false);
+        final WriteCandidateTx tx = new WriteCandidateTx(
+                id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX.getSchemaContext()), false);
         final TxListener listener = mock(TxListener.class);
         tx.addListener(listener);
         tx.delete(LogicalDatastoreType.CONFIGURATION, yangIId);
@@ -178,7 +189,8 @@ public class NetconfDeviceWriteOnlyTxTest {
         final IllegalStateException cause = new IllegalStateException("Failed tx");
         doReturn(Futures.immediateFailedCheckedFuture(cause))
                 .when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
-        final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX.getSchemaContext()), false);
+        final WriteCandidateTx tx = new WriteCandidateTx(
+                id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX.getSchemaContext()), false);
         final TxListener listener = mock(TxListener.class);
         tx.addListener(listener);
         tx.delete(LogicalDatastoreType.CONFIGURATION, yangIId);

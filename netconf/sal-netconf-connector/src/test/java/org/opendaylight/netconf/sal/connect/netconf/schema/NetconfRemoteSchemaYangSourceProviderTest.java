@@ -59,7 +59,8 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
         CheckedFuture<DOMRpcResult, DOMRpcException> response = Futures.immediateCheckedFuture(value);
         doReturn(response).when(service).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
-        provider = new NetconfRemoteSchemaYangSourceProvider(new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("localhost", 17830)), service);
+        provider = new NetconfRemoteSchemaYangSourceProvider(
+                new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("localhost", 17830)), service);
     }
 
     @Test
@@ -70,7 +71,8 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
         Assert.assertEquals(identifier, source.getIdentifier());
         verify(service).invokeRpc(
                 SchemaPath.create(true, NetconfMessageTransformUtil.GET_SCHEMA_QNAME),
-                NetconfRemoteSchemaYangSourceProvider.createGetSchemaRequest(identifier.getName(), Optional.of(identifier.getRevision()))
+                NetconfRemoteSchemaYangSourceProvider
+                        .createGetSchemaRequest(identifier.getName(), Optional.of(identifier.getRevision()))
         );
     }
 
@@ -85,7 +87,8 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
         Element root = xmlDoc.createElement("data");
         root.setTextContent("module test {}");
         final DOMSource v = new DOMSource(root);
-        DataContainerChild<?, ?> child = ImmutableAnyXmlNodeBuilder.create().withNodeIdentifier(childId).withValue(v).build();
+        DataContainerChild<?, ?> child =
+                ImmutableAnyXmlNodeBuilder.create().withNodeIdentifier(childId).withValue(v).build();
         return ImmutableContainerNodeBuilder.create().withNodeIdentifier(id).withChild(child).build();
     }
 

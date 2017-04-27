@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Tx implementation for netconf devices that support only candidate datastore and writable running
+ * Tx implementation for netconf devices that support only candidate datastore and writable running.
  * The sequence goes exactly as with only candidate supported, with one addition:
  * <ul>
  *     <li>Running datastore is locked as the first thing and this lock has to succeed</li>
@@ -25,7 +25,8 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
 
     private static final Logger LOG  = LoggerFactory.getLogger(WriteCandidateRunningTx.class);
 
-    public WriteCandidateRunningTx(final RemoteDeviceId id, final NetconfBaseOps netOps, final boolean rollbackSupport) {
+    public WriteCandidateRunningTx(final RemoteDeviceId id, final NetconfBaseOps netOps,
+                                   final boolean rollbackSupport) {
         super(id, netOps, rollbackSupport);
     }
 
@@ -46,7 +47,8 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
     }
 
     /**
-     * This has to be non blocking since it is called from a callback on commit and its netty threadpool that is really sensitive to blocking calls
+     * This has to be non blocking since it is called from a callback on commit
+     * and its netty threadpool that is really sensitive to blocking calls.
      */
     private void unlockRunning() {
         netOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));

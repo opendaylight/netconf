@@ -19,15 +19,16 @@ public class NetconfConnectorModuleFactory extends
     @Override
     public Module createModule(final String instanceName, final DependencyResolver dependencyResolver,
             final DynamicMBeanWithInstance old, final BundleContext bundleContext) throws Exception {
-        final NetconfConnectorModule module = (NetconfConnectorModule) super.createModule(instanceName, dependencyResolver,
-                old, bundleContext);
+        final NetconfConnectorModule module =
+                (NetconfConnectorModule) super.createModule(instanceName, dependencyResolver, old, bundleContext);
         return module;
     }
 
     @Override
-    public Module createModule(final String instanceName, final DependencyResolver dependencyResolver, final BundleContext bundleContext) {
-        final NetconfConnectorModule module = (NetconfConnectorModule) super.createModule(instanceName, dependencyResolver,
-                bundleContext);
+    public Module createModule(final String instanceName, final DependencyResolver dependencyResolver,
+                               final BundleContext bundleContext) {
+        final NetconfConnectorModule module =
+                (NetconfConnectorModule) super.createModule(instanceName, dependencyResolver, bundleContext);
         return module;
     }
 }

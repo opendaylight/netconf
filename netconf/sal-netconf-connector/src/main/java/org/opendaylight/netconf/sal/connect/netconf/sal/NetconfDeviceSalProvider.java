@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 public class NetconfDeviceSalProvider implements AutoCloseable {
 
-    private static final Logger logger = LoggerFactory.getLogger(NetconfDeviceSalProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceSalProvider.class);
 
     private final RemoteDeviceId id;
     private final MountInstance mountInstance;
@@ -40,7 +40,7 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
     private final TransactionChainListener transactionChainListener =  new TransactionChainListener() {
         @Override
         public void onTransactionChainFailed(final TransactionChain<?, ?> chain, final AsyncTransaction<?, ?> transaction, final Throwable cause) {
-            logger.error("{}: TransactionChain({}) {} FAILED!", id, chain, transaction.getIdentifier(), cause);
+            LOG.error("{}: TransactionChain({}) {} FAILED!", id, chain, transaction.getIdentifier(), cause);
             chain.close();
             resetTransactionChainForAdapaters();
             throw new IllegalStateException(id + "  TransactionChain(" + chain + ") not committed correctly", cause);
@@ -48,7 +48,7 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
 
         @Override
         public void onTransactionChainSuccessful(final TransactionChain<?, ?> chain) {
-            logger.trace("{}: TransactionChain({}) {} SUCCESSFUL", id, chain);
+            LOG.trace("{}: TransactionChain({}) {} SUCCESSFUL", id, chain);
         }
     };
 
@@ -85,7 +85,7 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
 
         topologyDatastoreAdapter.setTxChain(txChain);
 
-        logger.trace("{}: Resetting TransactionChain {}", id, txChain);
+        LOG.trace("{}: Resetting TransactionChain {}", id, txChain);
 
     }
 
@@ -119,7 +119,8 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
             Preconditions.checkNotNull(mountService, "Closed");
             Preconditions.checkState(topologyRegistration == null, "Already initialized");
 
-            final DOMMountPointService.DOMMountPointBuilder mountBuilder = mountService.createMountPoint(id.getTopologyPath());
+            final DOMMountPointService.DOMMountPointBuilder mountBuilder =
+                    mountService.createMountPoint(id.getTopologyPath());
             mountBuilder.addInitialSchemaContext(initialCtx);
 
             mountBuilder.addService(DOMDataBroker.class, broker);
@@ -128,13 +129,14 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
             this.notificationService = notificationService;
 
             topologyRegistration = mountBuilder.register();
-            logger.debug("{}: TOPOLOGY Mountpoint exposed into MD-SAL {}", id, topologyRegistration);
+            LOG.debug("{}: TOPOLOGY Mountpoint exposed into MD-SAL {}", id, topologyRegistration);
 
         }
 
+        @SuppressWarnings("checkstyle:IllegalCatch")
         public synchronized void onTopologyDeviceDisconnected() {
-            if(topologyRegistration == null) {
-                logger.trace("{}: Not removing TOPOLOGY mountpoint from MD-SAL, mountpoint was not registered yet", id);
+            if (topologyRegistration == null) {
+                LOG.trace("{}: Not removing TOPOLOGY mountpoint from MD-SAL, mountpoint was not registered yet", id);
                 return;
             }
 
@@ -142,9 +144,9 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
                 topologyRegistration.close();
             } catch (final Exception e) {
                 // Only log and ignore
-                logger.warn("Unable to unregister mount instance for {}. Ignoring exception", id.getTopologyPath(), e);
+                LOG.warn("Unable to unregister mount instance for {}. Ignoring exception", id.getTopologyPath(), e);
             } finally {
-                logger.debug("{}: TOPOLOGY Mountpoint removed from MD-SAL {}", id, topologyRegistration);
+                LOG.debug("{}: TOPOLOGY Mountpoint removed from MD-SAL {}", id, topologyRegistration);
                 topologyRegistration = null;
             }
         }
@@ -155,7 +157,8 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
         }
 
         public synchronized void publish(final DOMNotification domNotification) {
-            Preconditions.checkNotNull(notificationService, "Device not set up yet, cannot handle notification {}", domNotification);
+            Preconditions.checkNotNull(notificationService, "Device not set up yet, cannot handle notification {}",
+                    domNotification);
             notificationService.publishNotification(domNotification);
         }
     }

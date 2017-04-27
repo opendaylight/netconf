@@ -33,7 +33,8 @@ public final class RemoteDeviceId {
     private final InstanceIdentifier<Node> bindingPath;
     private final NodeKey key;
     private final org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier topologyPath;
-    private final InstanceIdentifier<org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node> topologyBindingPath;
+    private final InstanceIdentifier<org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang
+            .network.topology.rev131021.network.topology.topology.Node> topologyBindingPath;
     private InetSocketAddress address;
     private Host host;
 
@@ -65,30 +66,41 @@ public final class RemoteDeviceId {
     private static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier createBIPath(final String name) {
         final org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder builder =
                 org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.builder();
-        builder.node(Nodes.QNAME).node(Node.QNAME).nodeWithKey(Node.QNAME, QName.create(Node.QNAME.getNamespace(), Node.QNAME.getRevision(), "id"), name);
+        builder.node(Nodes.QNAME).node(Node.QNAME)
+                .nodeWithKey(Node.QNAME, QName.create(Node.QNAME.getNamespace(), Node.QNAME.getRevision(), "id"), name);
 
         return builder.build();
     }
 
-    private static InstanceIdentifier<org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node> createBindingPathForTopology(final NodeKey key) {
-        final InstanceIdentifier<NetworkTopology> networkTopology = InstanceIdentifier.builder(NetworkTopology.class).build();
-        final KeyedInstanceIdentifier<Topology, TopologyKey> topology = networkTopology.child(Topology.class, new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())));
+    private static InstanceIdentifier<org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network
+            .topology.rev131021.network.topology.topology.Node> createBindingPathForTopology(final NodeKey key) {
+        final InstanceIdentifier<NetworkTopology> networkTopology =
+                InstanceIdentifier.builder(NetworkTopology.class).build();
+        final KeyedInstanceIdentifier<Topology, TopologyKey> topology = networkTopology
+                .child(Topology.class, new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())));
         return topology
-                .child(org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node.class,
-                        new org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey(
-                                new org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId(key.getId().getValue())));
+                .child(org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang
+                        .network.topology.rev131021.network.topology.topology.Node.class,
+                        new org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network
+                                .topology.topology.NodeKey(new org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang
+                                .network.topology.rev131021.NodeId(key.getId().getValue())));
     }
 
-    private static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier createBIPathForTopology(final String name) {
+    private static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier createBIPathForTopology(
+            final String name) {
         final org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder builder =
                 org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.builder();
         builder
                 .node(NetworkTopology.QNAME)
                 .node(Topology.QNAME)
-                .nodeWithKey(Topology.QNAME, QName.create(Topology.QNAME, "topology-id"), TopologyNetconf.QNAME.getLocalName())
-                .node(org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node.QNAME)
-                .nodeWithKey(org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node.QNAME,
-                        QName.create(org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node.QNAME, "node-id"), name);
+                .nodeWithKey(Topology.QNAME, QName.create(Topology.QNAME, "topology-id"),
+                        TopologyNetconf.QNAME.getLocalName())
+                .node(org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang
+                        .network.topology.rev131021.network.topology.topology.Node.QNAME)
+                .nodeWithKey(org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang
+                        .network.topology.rev131021.network.topology.topology.Node.QNAME,
+                        QName.create(org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang
+                                .network.topology.rev131021.network.topology.topology.Node.QNAME, "node-id"), name);
         return builder.build();
     }
 
@@ -112,7 +124,8 @@ public final class RemoteDeviceId {
         return key;
     }
 
-    public InstanceIdentifier<org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node> getTopologyBindingPath() {
+    public InstanceIdentifier<org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang
+            .network.topology.rev131021.network.topology.topology.Node> getTopologyBindingPath() {
         return topologyBindingPath;
     }
 
@@ -130,19 +143,19 @@ public final class RemoteDeviceId {
 
     @Override
     public String toString() {
-        return "RemoteDevice{" + name +'}';
+        return "RemoteDevice{" + name + '}';
     }
 
     @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (!(o instanceof RemoteDeviceId)) {
+        if (!(obj instanceof RemoteDeviceId)) {
             return false;
         }
 
-        final RemoteDeviceId that = (RemoteDeviceId) o;
+        final RemoteDeviceId that = (RemoteDeviceId) obj;
 
         if (!name.equals(that.name)) {
             return false;

@@ -41,7 +41,7 @@ final class NotificationHandler {
     }
 
     synchronized void handleNotification(final NetconfMessage notification) {
-        if(passNotifications) {
+        if (passNotifications) {
             passNotification(transformNotification(notification));
         } else {
             queueNotification(notification);
@@ -50,7 +50,7 @@ final class NotificationHandler {
 
     /**
      * Forward all cached notifications and pass all notifications from this point directly to sal facade.
-     * @param messageTransformer
+     * @param messageTransformer Message transformer
      */
     synchronized void onRemoteSchemaUp(final MessageTransformer<NetconfMessage> messageTransformer) {
         this.messageTransformer = Preconditions.checkNotNull(messageTransformer);
@@ -66,7 +66,8 @@ final class NotificationHandler {
 
     private DOMNotification transformNotification(final NetconfMessage cachedNotification) {
         final DOMNotification parsedNotification = messageTransformer.toNotification(cachedNotification);
-        Preconditions.checkNotNull(parsedNotification, "%s: Unable to parse received notification: %s", id, cachedNotification);
+        Preconditions.checkNotNull(
+                parsedNotification, "%s: Unable to parse received notification: %s", id, cachedNotification);
         return parsedNotification;
     }
 
@@ -74,7 +75,7 @@ final class NotificationHandler {
         Preconditions.checkState(passNotifications == false);
 
         LOG.debug("{}: Caching notification {}, remote schema not yet fully built", id, notification);
-        if(LOG.isTraceEnabled()) {
+        if (LOG.isTraceEnabled()) {
             LOG.trace("{}: Caching notification {}", id, XmlUtil.toString(notification.getDocument()));
         }
 
@@ -84,7 +85,7 @@ final class NotificationHandler {
     private synchronized void passNotification(final DOMNotification parsedNotification) {
         LOG.debug("{}: Forwarding notification {}", id, parsedNotification);
 
-        if(filter == null || filter.filterNotification(parsedNotification).isPresent()) {
+        if (filter == null || filter.filterNotification(parsedNotification).isPresent()) {
             salFacade.onNotification(parsedNotification);
         }
     }
@@ -99,7 +100,7 @@ final class NotificationHandler {
         messageTransformer = null;
     }
 
-    static interface NotificationFilter {
+    interface NotificationFilter {
 
         Optional<DOMNotification> filterNotification(DOMNotification notification);
     }

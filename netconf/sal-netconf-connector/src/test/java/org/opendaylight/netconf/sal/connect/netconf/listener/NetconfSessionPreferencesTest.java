@@ -27,7 +27,8 @@ public class NetconfSessionPreferencesTest {
         final List<String> caps1 = Lists.newArrayList(
                 "namespace:1?module=module1&revision=2012-12-12",
                 "namespace:2?module=module2&amp;revision=2012-12-12",
-                "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04",
+                "urn:ietf:params:xml:ns:yang:"
+                        + "ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04",
                 "urn:ietf:params:netconf:base:1.0",
                 "urn:ietf:params:netconf:capability:rollback-on-error:1.0"
         );
@@ -44,8 +45,8 @@ public class NetconfSessionPreferencesTest {
 
         final NetconfSessionPreferences merged = sessionCaps1.addModuleCaps(sessionCaps2);
         assertCaps(merged, 2, 2 + 1 /*Preserved monitoring*/ + 2 /*already present*/);
-        for (final QName qName : sessionCaps2.getModuleBasedCaps()) {
-            assertThat(merged.getModuleBasedCaps(), hasItem(qName));
+        for (final QName qualifiedName : sessionCaps2.getModuleBasedCaps()) {
+            assertThat(merged.getModuleBasedCaps(), hasItem(qualifiedName));
         }
         assertThat(merged.getModuleBasedCaps(), hasItem(NetconfMessageTransformUtil.IETF_NETCONF_MONITORING));
 
@@ -58,7 +59,8 @@ public class NetconfSessionPreferencesTest {
         final List<String> caps1 = Lists.newArrayList(
                 "namespace:1?module=module1&revision=2012-12-12",
                 "namespace:2?module=module2&amp;revision=2012-12-12",
-                "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04",
+                "urn:ietf:params:xml:ns:yang:"
+                        + "ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04",
                 "urn:ietf:params:netconf:base:1.0",
                 "urn:ietf:params:netconf:capability:rollback-on-error:1.0"
         );
@@ -82,7 +84,8 @@ public class NetconfSessionPreferencesTest {
         final List<String> caps1 = Lists.newArrayList(
                 "namespace:1?module=module1&revision=2012-12-12",
                 "namespace:2?module=module2&amp;revision=2012-12-12",
-                "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04",
+                "urn:ietf:params:xml:ns:yang:"
+                        + "ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04",
                 "urn:ietf:params:netconf:base:1.0",
                 "urn:ietf:params:netconf:capability:rollback-on-error:1.0",
                 "urn:ietf:params:netconf:capability:candidate:1.0"
@@ -103,7 +106,7 @@ public class NetconfSessionPreferencesTest {
 
         final NetconfSessionPreferences merged = sessionCaps1.addNonModuleCaps(sessionCaps2);
 
-        assertCaps(merged, 3+2, 3);
+        assertCaps(merged, 3 + 2, 3);
         for (final String capability : sessionCaps2.getNonModuleCaps()) {
             assertThat(merged.getNonModuleCaps(), hasItem(capability));
         }
@@ -122,7 +125,8 @@ public class NetconfSessionPreferencesTest {
         final List<String> caps1 = Lists.newArrayList(
                 "namespace:1?module=module1&revision=2012-12-12",
                 "namespace:2?module=module2&amp;revision=2012-12-12",
-                "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04",
+                "urn:ietf:params:xml:ns:yang:"
+                        + "ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04",
                 "urn:ietf:params:netconf:base:1.0",
                 "urn:ietf:params:netconf:capability:rollback-on-error:1.0",
                 "urn:ietf:params:netconf:capability:candidate:1.0"

@@ -57,9 +57,10 @@ import org.slf4j.LoggerFactory;
 public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceTopologyAdapter.class);
-    public static final Function<Entry<QName, FailureReason>, UnavailableCapability> UNAVAILABLE_CAPABILITY_TRANSFORMER = input -> new UnavailableCapabilityBuilder()
-            .setCapability(input.getKey().toString())
-            .setFailureReason(input.getValue()).build();
+    public static final Function<Entry<QName, FailureReason>, UnavailableCapability>
+            UNAVAILABLE_CAPABILITY_TRANSFORMER =
+                input -> new UnavailableCapabilityBuilder()
+                        .setCapability(input.getKey().toString()).setFailureReason(input.getValue()).build();
 
     private final RemoteDeviceId id;
     private BindingTransactionChain txChain;
@@ -73,7 +74,8 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         this.txChain = Preconditions.checkNotNull(txChain);
 
         this.networkTopologyPath = InstanceIdentifier.builder(NetworkTopology.class).build();
-        this.topologyListPath = networkTopologyPath.child(Topology.class, new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())));
+        this.topologyListPath = networkTopologyPath
+                .child(Topology.class, new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())));
 
         initDeviceData();
     }
@@ -84,7 +86,7 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         createNetworkTopologyIfNotPresent(writeTx);
 
         final InstanceIdentifier<Node> path = id.getTopologyBindingPath();
-        NodeBuilder nodeBuilder = getNodeIdBuilder(id);
+        final NodeBuilder nodeBuilder = getNodeIdBuilder(id);
         NetconfNodeBuilder netconfNodeBuilder = new NetconfNodeBuilder();
         netconfNodeBuilder.setConnectionStatus(ConnectionStatus.Connecting);
         netconfNodeBuilder.setHost(id.getHost());
@@ -117,7 +119,8 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         LOG.trace(
                 "{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
-        writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath().augmentation(NetconfNode.class), data, true);
+        writeTx.put(LogicalDatastoreType.OPERATIONAL,
+                id.getTopologyBindingPath().augmentation(NetconfNode.class), data, true);
         LOG.trace(
                 "{}: Update device state transaction {} merging operational data ended.",
                 id, writeTx.getIdentifier());
@@ -125,14 +128,16 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         commitTransaction(writeTx, "update");
     }
 
-    public void updateClusteredDeviceData(final boolean up, final String masterAddress, final NetconfDeviceCapabilities capabilities) {
+    public void updateClusteredDeviceData(final boolean up, final String masterAddress,
+                                          final NetconfDeviceCapabilities capabilities) {
         final NetconfNode data = buildDataForNetconfClusteredNode(up, masterAddress, capabilities);
 
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace(
                 "{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
-        writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath().augmentation(NetconfNode.class), data, true);
+        writeTx.put(LogicalDatastoreType.OPERATIONAL,
+                id.getTopologyBindingPath().augmentation(NetconfNode.class), data, true);
         LOG.trace(
                 "{}: Update device state transaction {} merging operational data ended.",
                 id, writeTx.getIdentifier());
@@ -143,13 +148,15 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
     public void setDeviceAsFailed(final Throwable throwable) {
         String reason = (throwable != null && throwable.getMessage() != null) ? throwable.getMessage() : UNKNOWN_REASON;
 
-        final NetconfNode data = new NetconfNodeBuilder().setConnectionStatus(ConnectionStatus.UnableToConnect).setConnectedMessage(reason).build();
+        final NetconfNode data = new NetconfNodeBuilder()
+                .setConnectionStatus(ConnectionStatus.UnableToConnect).setConnectedMessage(reason).build();
 
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace(
                 "{}: Setting device state as failed {} putting operational data started.",
                 id, writeTx.getIdentifier());
-        writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath().augmentation(NetconfNode.class), data, true);
+        writeTx.put(LogicalDatastoreType.OPERATIONAL,
+                id.getTopologyBindingPath().augmentation(NetconfNode.class), data, true);
         LOG.trace(
                 "{}: Setting device state as failed {} putting operational data ended.",
                 id, writeTx.getIdentifier());
@@ -165,8 +172,8 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         final AvailableCapabilitiesBuilder avCapabalitiesBuilder = new AvailableCapabilitiesBuilder();
         avCapabalitiesBuilder.setAvailableCapability(capabilityList);
 
-        final UnavailableCapabilities unavailableCapabilities =
-                new UnavailableCapabilitiesBuilder().setUnavailableCapability(FluentIterable.from(capabilities.getUnresolvedCapabilites().entrySet())
+        final UnavailableCapabilities unavailableCapabilities = new UnavailableCapabilitiesBuilder()
+                .setUnavailableCapability(FluentIterable.from(capabilities.getUnresolvedCapabilites().entrySet())
                         .transform(UNAVAILABLE_CAPABILITY_TRANSFORMER).toList()).build();
 
         final NetconfNodeBuilder netconfNodeBuilder = new NetconfNodeBuilder()
@@ -179,7 +186,8 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         return netconfNodeBuilder.build();
     }
 
-    private NetconfNode buildDataForNetconfClusteredNode(final boolean up, final String masterNodeAddress, final NetconfDeviceCapabilities capabilities) {
+    private NetconfNode buildDataForNetconfClusteredNode(final boolean up, final String masterNodeAddress,
+                                                         final NetconfDeviceCapabilities capabilities) {
         List<AvailableCapability> capabilityList = new ArrayList<>();
         capabilityList.addAll(capabilities.getNonModuleBasedCapabilities());
         capabilityList.addAll(capabilities.getResolvedCapabilities());
@@ -229,7 +237,8 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
                 NetworkTopology.QNAME, writeTx.getIdentifier());
         writeTx.merge(LogicalDatastoreType.OPERATIONAL, networkTopologyPath, networkTopology);
 
-        final Topology topology = new TopologyBuilder().setTopologyId(new TopologyId(TopologyNetconf.QNAME.getLocalName())).build();
+        final Topology topology =
+                new TopologyBuilder().setTopologyId(new TopologyId(TopologyNetconf.QNAME.getLocalName())).build();
         LOG.trace("{}: Merging {} container to ensure its presence", id,
                 Topology.QNAME, writeTx.getIdentifier());
         writeTx.merge(LogicalDatastoreType.OPERATIONAL, topologyListPath, topology);
@@ -248,10 +257,11 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
             }
 
             @Override
-            public void onFailure(final Throwable t) {
+            public void onFailure(final Throwable throwable) {
                 LOG.error("{}: Transaction({}) {} FAILED!", id, txType,
-                        transaction.getIdentifier(), t);
-                throw new IllegalStateException(id + "  Transaction(" + txType + ") not committed correctly", t);
+                        transaction.getIdentifier(), throwable);
+                throw new IllegalStateException(
+                        id + "  Transaction(" + txType + ") not committed correctly", throwable);
             }
         });
 

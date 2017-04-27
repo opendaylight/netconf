@@ -44,14 +44,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Instead of using loopback (controller-config mount point) to create your netconf-connector, you should use the network-topology capability.
+ * Instead of using loopback (controller-config mount point) to create your netconf-connector,
+ * you should use the network-topology capability.
+ *
  * <p>
- * Follow instructions provided in this <a href="https://wiki.opendaylight.org/view/OpenDaylight_Controller:Config:Examples:Netconf#Spawning_netconf_connectors_via_topology_configuration">wiki</a>.
+ * Follow instructions provided in this
+ * <a href="https://wiki.opendaylight.org/view/OpenDaylight_Controller:Config:Examples:Netconf#Spawning_netconf_connectors_via_topology_configuration">wiki</a>.
+ *
  * <p>
  * Deprecation notice in Carbon, removal planned for Nitrogen.
  */
 @Deprecated
-public final class NetconfConnectorModule extends org.opendaylight.controller.config.yang.md.sal.connector.netconf.AbstractNetconfConnectorModule implements BindingAwareConsumer {
+public final class NetconfConnectorModule
+        extends org.opendaylight.controller.config.yang.md.sal.connector.netconf.AbstractNetconfConnectorModule
+        implements BindingAwareConsumer {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfConnectorModule.class);
 
     private static final InstanceIdentifier<Topology> TOPOLOGY_PATH = InstanceIdentifier.create(NetworkTopology.class)
@@ -60,12 +66,15 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
     private InstanceIdentifier<Node> nodePath;
     private DataBroker dataBroker;
 
-    public NetconfConnectorModule(final org.opendaylight.controller.config.api.ModuleIdentifier identifier, final org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
+    public NetconfConnectorModule(final org.opendaylight.controller.config.api.ModuleIdentifier identifier,
+                                  final org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
         super(identifier, dependencyResolver);
         instanceName = identifier.getInstanceName();
     }
 
-    public NetconfConnectorModule(final org.opendaylight.controller.config.api.ModuleIdentifier identifier, final org.opendaylight.controller.config.api.DependencyResolver dependencyResolver, final NetconfConnectorModule oldModule, final java.lang.AutoCloseable oldInstance) {
+    public NetconfConnectorModule(final org.opendaylight.controller.config.api.ModuleIdentifier identifier,
+                                  final org.opendaylight.controller.config.api.DependencyResolver dependencyResolver,
+                                  final NetconfConnectorModule oldModule, final java.lang.AutoCloseable oldInstance) {
         super(identifier, dependencyResolver, oldModule, oldInstance);
         instanceName = identifier.getInstanceName();
     }
@@ -73,7 +82,8 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
     @Override
     protected void customValidation() {
         checkNotNull(getAddress(), addressJmxAttribute);
-        checkCondition(isHostAddressPresent(getAddress()), "Host address not present in " + getAddress(), addressJmxAttribute);
+        checkCondition(isHostAddressPresent(getAddress()), "Host address not present in " + getAddress(),
+                addressJmxAttribute);
         checkNotNull(getPort(), portJmxAttribute);
 
         checkNotNull(getConnectionTimeoutMillis(), connectionTimeoutMillisJmxAttribute);
@@ -93,8 +103,8 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
     }
 
     private static boolean isHostAddressPresent(final Host address) {
-        return address.getDomainName() != null ||
-                address.getIpAddress() != null && (address.getIpAddress().getIpv4Address() != null || address.getIpAddress().getIpv6Address() != null);
+        return address.getDomainName() != null || address.getIpAddress() != null
+                && (address.getIpAddress().getIpv4Address() != null || address.getIpAddress().getIpv6Address() != null);
     }
 
     @Override
@@ -120,8 +130,8 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
             }
 
             @Override
-            public void onFailure(final Throwable t) {
-                LOG.error("Node {} creation failed: {}", instanceName, t);
+            public void onFailure(final Throwable throwable) {
+                LOG.error("Node {} creation failed: {}", instanceName, throwable);
             }
         });
     }
@@ -138,8 +148,8 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
                 }
 
                 @Override
-                public void onFailure(final Throwable t) {
-                    LOG.error("Node {} deletion failed: {}", instanceName, t);
+                public void onFailure(final Throwable throwable) {
+                    LOG.error("Node {} deletion failed: {}", instanceName, throwable);
                 }
             });
 
@@ -161,7 +171,7 @@ public final class NetconfConnectorModule extends org.opendaylight.controller.co
         }
 
         NonModuleCapabilities nonModuleCapabilities = null;
-        if(getNonModuleCapabilities() != null) {
+        if (getNonModuleCapabilities() != null) {
             nonModuleCapabilities = new NonModuleCapabilitiesBuilder()
                     .setOverride(getNonModuleCapabilities().getOverride())
                     .setCapability(getNonModuleCapabilities().getCapability())

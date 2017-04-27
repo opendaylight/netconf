@@ -29,6 +29,7 @@ public class NetconfDeviceNotificationService implements DOMNotificationService 
 
     // Notification publish is very simple and hijacks the thread of the caller
     // TODO shouldnt we reuse the implementation for notification router from sal-broker-impl ?
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public synchronized void publishNotification(final DOMNotification notification) {
         for (final DOMNotificationListener domNotificationListener : listeners.get(notification.getType())) {
             try {
@@ -41,7 +42,8 @@ public class NetconfDeviceNotificationService implements DOMNotificationService 
     }
 
     @Override
-    public synchronized <T extends DOMNotificationListener> ListenerRegistration<T> registerNotificationListener(@Nonnull final T listener, @Nonnull final Collection<SchemaPath> types) {
+    public synchronized <T extends DOMNotificationListener> ListenerRegistration<T> registerNotificationListener(
+            @Nonnull final T listener, @Nonnull final Collection<SchemaPath> types) {
         for (final SchemaPath type : types) {
             listeners.put(type, listener);
         }
@@ -62,7 +64,8 @@ public class NetconfDeviceNotificationService implements DOMNotificationService 
     }
 
     @Override
-    public synchronized <T extends DOMNotificationListener> ListenerRegistration<T> registerNotificationListener(@Nonnull final T listener, final SchemaPath... types) {
+    public synchronized <T extends DOMNotificationListener> ListenerRegistration<T> registerNotificationListener(
+            @Nonnull final T listener, final SchemaPath... types) {
         return registerNotificationListener(listener, Lists.newArrayList(types));
     }
 }

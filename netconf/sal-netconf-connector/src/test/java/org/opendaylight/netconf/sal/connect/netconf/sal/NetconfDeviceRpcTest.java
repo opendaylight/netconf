@@ -61,16 +61,18 @@ public class NetconfDeviceRpcTest {
         schema = getSchema();
         NetconfMessageTransformer transformer = new NetconfMessageTransformer(schema, true);
         final NetconfMessage reply = new NetconfMessage(XmlUtil.readXmlToDocument(
-                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                        "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"101\">\n" +
-                        "<data>\n" +
-                        "</data>\n" +
-                        "</rpc-reply>"));
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
+                        + "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"101\">\n"
+                        + "<data>\n"
+                        + "</data>\n"
+                        + "</rpc-reply>"));
         RpcResult<NetconfMessage> result = RpcResultBuilder.success(reply).build();
-        doReturn(Futures.immediateFuture(result)).when(communicator).sendRequest(any(NetconfMessage.class), any(QName.class));
+        doReturn(Futures.immediateFuture(result))
+                .when(communicator).sendRequest(any(NetconfMessage.class), any(QName.class));
         rpc = new NetconfDeviceRpc(schema, communicator, transformer);
 
-        path = SchemaPath.create(true, QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "get-config"));
+        path = SchemaPath
+                .create(true, QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "get-config"));
         expectedReply = transformer.toRpcResult(reply, path);
     }
 
@@ -100,8 +102,8 @@ public class NetconfDeviceRpcTest {
     }
 
     private static ContainerNode createNode(String namespace, String date, String localName) {
-        return Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(namespace, date, localName))).build();
+        return Builders.containerBuilder().withNodeIdentifier(
+                new YangInstanceIdentifier.NodeIdentifier(QName.create(namespace, date, localName))).build();
     }
 
     private static SchemaContext getSchema() {

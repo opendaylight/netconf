@@ -17,15 +17,18 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yangtools.yang.common.QName;
 
 /**
- * Default implementation resolving schemas QNames from netconf-state or from modules-state
+ * Default implementation resolving schemas QNames from netconf-state or from modules-state.
  */
 public final class NetconfStateSchemasResolverImpl implements NetconfDeviceSchemasResolver {
 
     @Override
-    public NetconfDeviceSchemas resolve(final NetconfDeviceRpc deviceRpc, final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id) {
+    public NetconfDeviceSchemas resolve(final NetconfDeviceRpc deviceRpc,
+                                        final NetconfSessionPreferences remoteSessionCapabilities,
+                                        final RemoteDeviceId id) {
         if (remoteSessionCapabilities.isMonitoringSupported()) {
             return NetconfStateSchemas.create(deviceRpc, remoteSessionCapabilities, id);
-        } else if (remoteSessionCapabilities.containsModuleCapability(QName.create(ModulesState.QNAME, "ietf-yang-library"))) {
+        } else if (remoteSessionCapabilities.containsModuleCapability(QName.create(ModulesState.QNAME,
+                "ietf-yang-library"))) {
             return LibraryModulesSchemas.create(deviceRpc, id);
         }
         return NetconfStateSchemas.EMPTY;

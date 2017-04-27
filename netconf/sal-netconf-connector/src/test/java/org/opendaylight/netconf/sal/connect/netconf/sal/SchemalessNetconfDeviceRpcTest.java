@@ -33,8 +33,12 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SchemalessNetconfDeviceRpcTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SchemalessNetconfDeviceRpcTest.class);
 
     @Mock
     private RemoteDeviceCommunicator<NetconfMessage> listener;
@@ -58,17 +62,17 @@ public class SchemalessNetconfDeviceRpcTest {
     public void testInvokeRpc() throws Exception {
         final QName qName = QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "get-config");
         SchemaPath type = SchemaPath.create(true, qName);
-        DOMSource src = new DOMSource(XmlUtil.readXmlToDocument("<get-config xmlns=\"dd\">\n" +
-                "    <source>\n" +
-                "      <running/>\n" +
-                "    </source>\n" +
-                "    <filter type=\"subtree\">\n" +
-                "      <mainroot xmlns=\"urn:dummy:mod-0\">\n" +
-                "        <maincontent/>\n" +
-                "<choiceList></choiceList>\n" +
-                "      </mainroot>\n" +
-                "    </filter>\n" +
-                "  </get-config>"));
+        DOMSource src = new DOMSource(XmlUtil.readXmlToDocument("<get-config xmlns=\"dd\">\n"
+                + "    <source>\n"
+                + "      <running/>\n"
+                + "    </source>\n"
+                + "    <filter type=\"subtree\">\n"
+                + "      <mainroot xmlns=\"urn:dummy:mod-0\">\n"
+                + "        <maincontent/>\n"
+                + "<choiceList></choiceList>\n"
+                + "      </mainroot>\n"
+                + "    </filter>\n"
+                + "  </get-config>"));
         NormalizedNode<?, ?> input = Builders.anyXmlBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(qName))
                 .withValue(src)
@@ -76,8 +80,8 @@ public class SchemalessNetconfDeviceRpcTest {
 
         deviceRpc.invokeRpc(type, input);
         ArgumentCaptor<NetconfMessage> msgCaptor = ArgumentCaptor.forClass(NetconfMessage.class);
-        ArgumentCaptor<QName> qNameCaptor = ArgumentCaptor.forClass(QName.class);
-        verify(listener).sendRequest(msgCaptor.capture(), qNameCaptor.capture());
-        System.out.println(XmlUtil.toString(msgCaptor.getValue().getDocument()));
+        ArgumentCaptor<QName> qnameCaptor = ArgumentCaptor.forClass(QName.class);
+        verify(listener).sendRequest(msgCaptor.capture(), qnameCaptor.capture());
+        LOG.info(XmlUtil.toString(msgCaptor.getValue().getDocument()));
     }
 }
