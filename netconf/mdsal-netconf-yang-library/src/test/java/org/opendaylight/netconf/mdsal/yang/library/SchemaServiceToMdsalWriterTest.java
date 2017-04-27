@@ -67,17 +67,18 @@ public class SchemaServiceToMdsalWriterTest {
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTransaction);
         doNothing().when(writeTransaction).put(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
         when(writeTransaction.submit()).thenReturn(Futures.immediateCheckedFuture(null));
-        when(schemaService.registerSchemaContextListener(any())).thenReturn(new ListenerRegistration<SchemaContextListener>() {
-            @Override
-            public void close() {
+        when(schemaService.registerSchemaContextListener(any())).thenReturn(
+                new ListenerRegistration<SchemaContextListener>() {
+                    @Override
+                    public void close() {
 
-            }
+                    }
 
-            @Override
-            public SchemaContextListener getInstance() {
-                return null;
-            }
-        });
+                    @Override
+                    public SchemaContextListener getInstance() {
+                        return null;
+                    }
+                });
         schemaServiceToMdsalWriter = new SchemaServiceToMdsalWriter(schemaService, dataBroker);
     }
 
@@ -86,7 +87,8 @@ public class SchemaServiceToMdsalWriterTest {
         schemaServiceToMdsalWriter.start();
 
         schemaServiceToMdsalWriter.onGlobalContextUpdated(getSchema());
-        verify(writeTransaction).put(eq(LogicalDatastoreType.OPERATIONAL), eq(MODULES_STATE_INSTANCE_IDENTIFIER), eq(createTestModuleState()));
+        verify(writeTransaction).put(eq(LogicalDatastoreType.OPERATIONAL),
+                eq(MODULES_STATE_INSTANCE_IDENTIFIER), eq(createTestModuleState()));
     }
 
     private SchemaContext getSchema() throws Exception {
@@ -108,7 +110,7 @@ public class SchemaServiceToMdsalWriterTest {
                 .setSubmodules(new SubmodulesBuilder().setSubmodule(Lists.newArrayList(sub)).build())
                 .setConformanceType(Module.ConformanceType.Implement)
                 .build();
-        return  new ModulesStateBuilder().setModuleSetId("0")
+        return new ModulesStateBuilder().setModuleSetId("0")
                 .setModule(Lists.newArrayList(module)).build();
     }
 }
