@@ -20,8 +20,8 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
+import com.google.common.net.InetAddresses;
 import io.netty.util.concurrent.EventExecutor;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
@@ -99,11 +99,11 @@ public class RemoteDeviceConnectorImplTest {
     private RemoteDeviceId remoteDeviceId;
 
     @Before
-    public void setUp() throws UnknownHostException {
+    public void setUp() {
         initMocks(this);
 
         remoteDeviceId = new RemoteDeviceId(TOPOLOGY_ID,
-                new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 9999));
+                new InetSocketAddress(InetAddresses.forString("127.0.0.1"), 9999));
 
         builder = new NetconfTopologySetup.NetconfTopologySetupBuilder();
         builder.setDataBroker(dataBroker);
@@ -185,7 +185,7 @@ public class RemoteDeviceConnectorImplTest {
     }
 
     @Test
-    public void testKeapAliveFacade() throws UnknownHostException {
+    public void testKeapAliveFacade() {
         final ExecutorService executorService = mock(ExecutorService.class);
         doReturn(executorService).when(processingExecutor).getExecutor();
 
@@ -203,7 +203,7 @@ public class RemoteDeviceConnectorImplTest {
                 .build();
 
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId(TOPOLOGY_ID,
-                new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 9999));
+                new InetSocketAddress(InetAddresses.forString("127.0.0.1"), 9999));
         final Node node = new NodeBuilder().setNodeId(NODE_ID).addAugmentation(NetconfNode.class, netconfNode).build();
         builder.setSchemaResourceDTO(NetconfTopologyUtils.setupSchemaCacheDTO(node));
 
@@ -219,7 +219,7 @@ public class RemoteDeviceConnectorImplTest {
     }
 
     @Test
-    public void testGetClientConfig() throws UnknownHostException {
+    public void testGetClientConfig() {
         final NetconfClientSessionListener listener = mock(NetconfClientSessionListener.class);
         final Host host = new Host(new IpAddress(new Ipv4Address("127.0.0.1")));
         final PortNumber portNumber = new PortNumber(9999);
@@ -241,7 +241,8 @@ public class RemoteDeviceConnectorImplTest {
                 remoteDeviceConnection.getClientConfig(listener, testingNode);
 
         assertEquals(defaultClientConfig.getConnectionTimeoutMillis().longValue(), 1000L);
-        assertEquals(defaultClientConfig.getAddress(), new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 9999));
+        assertEquals(defaultClientConfig.getAddress(), new InetSocketAddress(InetAddresses.forString("127.0.0.1"),
+            9999));
         assertSame(defaultClientConfig.getSessionListener(), listener);
         assertEquals(defaultClientConfig.getAuthHandler().getUsername(), "testuser");
         assertEquals(defaultClientConfig.getProtocol(), NetconfClientConfiguration.NetconfClientProtocol.TCP);

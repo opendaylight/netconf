@@ -16,11 +16,10 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.google.common.net.InetAddresses;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.client.NetconfClientSession;
@@ -89,10 +88,10 @@ public class ContextKeyTest {
     }
 
     @Test
-    public void newContextCanBeCreatedFromASocketAddress() throws UnknownHostException {
+    public void newContextCanBeCreatedFromASocketAddress() {
         // given
-        Inet4Address someAddressIpv4 = (Inet4Address) InetAddress.getByName("1.2.3.4");
-        Inet6Address someAddressIpv6 = (Inet6Address) InetAddress.getByName("::1");
+        Inet4Address someAddressIpv4 = (Inet4Address) InetAddresses.forString("1.2.3.4");
+        Inet6Address someAddressIpv6 = (Inet6Address) InetAddresses.forString("::1");
         // and
         ContextKey key1 = ContextKey.from(new InetSocketAddress(someAddressIpv4, 123));
         ContextKey key2 = ContextKey.from(new InetSocketAddress(someAddressIpv6, 123));

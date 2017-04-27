@@ -14,11 +14,11 @@ import io.netty.util.concurrent.EventExecutor;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.util.concurrent.Executors;
 import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
 import org.opendaylight.netconf.api.NetconfServerDispatcher;
 import org.opendaylight.netconf.auth.AuthProvider;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddressBuilder;
 import org.slf4j.Logger;
@@ -67,15 +67,10 @@ public class NetconfNorthboundSshServer {
         });
     }
 
-    private InetSocketAddress getInetAddress(final String bindingAddress, final String portNumber) {
-        try {
-            IpAddress ipAddress = IpAddressBuilder.getDefaultInstance(bindingAddress);
-            final InetAddress inetAd = InetAddress.getByName(ipAddress.getIpv4Address() == null
-                    ? ipAddress.getIpv6Address().getValue() : ipAddress.getIpv4Address().getValue());
-            return new InetSocketAddress(inetAd, Integer.valueOf(portNumber));
-        } catch (final UnknownHostException e) {
-            throw new IllegalArgumentException("Unable to bind netconf endpoint to address " + bindingAddress, e);
-        }
+    private static InetSocketAddress getInetAddress(final String bindingAddress, final String portNumber) {
+        IpAddress ipAddress= IpAddressBuilder.getDefaultInstance(bindingAddress);
+        final InetAddress inetAd = IetfInetUtil.INSTANCE.inetAddressFor(ipAddress);
+        return new InetSocketAddress(inetAd, Integer.parseInt(portNumber));
     }
 
     public void close() {

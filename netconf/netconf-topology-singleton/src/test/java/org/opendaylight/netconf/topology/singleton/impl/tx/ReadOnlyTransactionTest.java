@@ -24,9 +24,9 @@ import akka.testkit.TestActorRef;
 import akka.util.Timeout;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.google.common.net.InetAddresses;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -84,7 +84,7 @@ public class ReadOnlyTransactionTest {
         system = ActorSystem.create();
 
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId("netconf-topology",
-                new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 9999));
+                new InetSocketAddress(InetAddresses.forString("127.0.0.1"), 9999));
 
         final NetconfTopologySetup setup = mock(NetconfTopologySetup.class);
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY,
