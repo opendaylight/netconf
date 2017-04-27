@@ -38,7 +38,8 @@ public class NetconfHelloMessageAdditionalHeader {
     private final String transport;
     private final String sessionIdentifier;
 
-    public NetconfHelloMessageAdditionalHeader(String userName, String hostAddress, String port, String transport, String sessionIdentifier) {
+    public NetconfHelloMessageAdditionalHeader(String userName, String hostAddress, String port,
+                                               String transport, String sessionIdentifier) {
         this.userName = userName;
         this.hostAddress = hostAddress;
         this.port = port;
@@ -67,7 +68,7 @@ public class NetconfHelloMessageAdditionalHeader {
     }
 
     /**
-     * Format additional header into a string suitable as a prefix for netconf hello message
+     * Format additional header into a string suitable as a prefix for netconf hello message.
      */
     public String toFormattedString() {
         Preconditions.checkNotNull(userName);
@@ -94,10 +95,11 @@ public class NetconfHelloMessageAdditionalHeader {
     private static final Pattern PATTERN = Pattern
             .compile("\\[(?<username>[^;]+);(?<address>.+)[:/](?<port>[0-9]+);(?<transport>[a-z]+)[^\\]]+\\]");
     private static final Pattern CUSTOM_HEADER_PATTERN = Pattern
-            .compile("\\[(?<username>[^;]+);(?<address>.+)[:/](?<port>[0-9]+);(?<transport>[a-z]+);(?<sessionIdentifier>[a-z]+)[^\\]]+\\]");
+            .compile("\\[(?<username>[^;]+);"
+                    + "(?<address>.+)[:/](?<port>[0-9]+);(?<transport>[a-z]+);(?<sessionIdentifier>[a-z]+)[^\\]]+\\]");
 
     /**
-     * Parse additional header from a formatted string
+     * Parse additional header from a formatted string.
      */
     public static NetconfHelloMessageAdditionalHeader fromString(String additionalHeader) {
         String additionalHeaderTrimmed = additionalHeader.trim();

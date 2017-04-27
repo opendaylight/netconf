@@ -19,6 +19,8 @@ public class NetconfSessionPreferences {
     }
 
     /**
+     * Getter for {@code NetconfHelloMessage}.
+     *
      * @return the helloMessage
      */
     public NetconfHelloMessage getHelloMessage() {
