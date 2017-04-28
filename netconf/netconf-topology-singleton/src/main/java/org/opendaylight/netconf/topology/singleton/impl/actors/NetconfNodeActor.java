@@ -25,6 +25,7 @@ import org.opendaylight.controller.cluster.schema.provider.impl.RemoteSchemaProv
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
@@ -48,6 +49,8 @@ import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessage
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyResultResponse;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadTransactionReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadTransactionRequest;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadWriteTransactionReply;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadWriteTransactionRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewWriteTransactionReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewWriteTransactionRequest;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -152,6 +155,14 @@ public class NetconfNodeActor extends UntypedActor {
                 sender().tell(t, self());
             }
 
+        } else if (message instanceof NewReadWriteTransactionRequest) {
+            try {
+                final DOMDataReadWriteTransaction tx = deviceDataBroker.newReadWriteTransaction();
+                final ActorRef txActor = context().actorOf(ReadWriteTransactionActor.props(tx, writeTxIdleTimeout));
+                sender().tell(new NewReadWriteTransactionReply(txActor), self());
+            } catch (final Throwable t) {
+                sender().tell(t, self());
+            }
         } else if (message instanceof InvokeRpcMessage) { // master
 
             final InvokeRpcMessage invokeRpcMessage = ((InvokeRpcMessage) message);

@@ -11,7 +11,7 @@ package org.opendaylight.netconf.topology.singleton.messages.transactions;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
-public class ReadRequest implements TransactionRequest {
+public class ReadRequest implements ReadActorMessage {
     private static final long serialVersionUID = 1L;
 
     private final LogicalDatastoreType store;
