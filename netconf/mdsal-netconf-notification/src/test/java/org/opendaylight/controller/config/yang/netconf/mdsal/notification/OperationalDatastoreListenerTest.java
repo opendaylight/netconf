@@ -37,12 +37,13 @@ public class OperationalDatastoreListenerTest {
     }
 
     @Test
-    public void testDataStoreListener(){
+    public void testDataStoreListener() {
         final InstanceIdentifier<DataObject> instanceIdentifier = InstanceIdentifier.create(DataObject.class);
         final DataTreeIdentifier<DataObject> testId =
                 new DataTreeIdentifier<>(LogicalDatastoreType.OPERATIONAL, instanceIdentifier);
 
-        final OperationalDatastoreListener<DataObject> op = new OperationalDatastoreListener<DataObject>(instanceIdentifier) {
+        final OperationalDatastoreListener<DataObject> op =
+                new OperationalDatastoreListener<DataObject>(instanceIdentifier) {
             @Override
             public void onDataTreeChanged(@Nonnull Collection collection) {
             }
