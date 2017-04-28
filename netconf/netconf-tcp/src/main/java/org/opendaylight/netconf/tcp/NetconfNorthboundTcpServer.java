@@ -44,8 +44,8 @@ public class NetconfNorthboundTcpServer implements AutoCloseable {
     private InetSocketAddress getInetAddress(final String bindingAddress, final String portNumber) {
         try {
             IpAddress ipAddress = IpAddressBuilder.getDefaultInstance(bindingAddress);
-            final InetAddress inetAd = InetAddress.getByName(ipAddress.getIpv4Address() == null ?
-                    ipAddress.getIpv6Address().getValue() : ipAddress.getIpv4Address().getValue());
+            final InetAddress inetAd = InetAddress.getByName(ipAddress.getIpv4Address() == null
+                    ? ipAddress.getIpv6Address().getValue() : ipAddress.getIpv4Address().getValue());
             return new InetSocketAddress(inetAd, Integer.valueOf(portNumber));
         } catch (final UnknownHostException e) {
             throw new IllegalArgumentException("Unable to bind netconf tcp endpoint to address " + bindingAddress, e);
