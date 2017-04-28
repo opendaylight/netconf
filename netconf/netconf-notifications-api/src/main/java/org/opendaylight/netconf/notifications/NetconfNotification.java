@@ -85,7 +85,8 @@ public final class NetconfNotification extends NetconfMessage {
                 while (reminderBuilder.charAt(reminderBuilder.length() - 1) == '0') {
                     reminderBuilder.deleteCharAt(reminderBuilder.length() - 1);
                 }
-                LOG.warn("Fraction of second is cut to three digits. Value that was cut {}", reminderBuilder.toString());
+                LOG.warn("Fraction of second is cut to three digits. Value that was cut {}",
+                        reminderBuilder.toString());
             }
 
             return Date.from(Instant.from(localDateTime));
@@ -104,8 +105,8 @@ public final class NetconfNotification extends NetconfMessage {
      * conversion is applied, replacing the second-of-minute of 60 with 59.
      *
      * @param time {@link String} representation of a time
-     * @return {@code null} if time isn't ISO compliant or if the time doesn't have a leap second
-     * else a {@link Date} as per as the RFC3339_DATE_PARSER.
+     *     @return {@code null} if time isn't ISO compliant or if the time doesn't have a leap second
+     *     else a {@link Date} as per as the RFC3339_DATE_PARSER.
      */
     private static Date handlePotentialLeapSecond(final String time) {
         // Parse the string from offset 0, so we get the whole value.
@@ -127,7 +128,8 @@ public final class NetconfNotification extends NetconfMessage {
             return null;
         }
 
-        LOG.trace("Received time contains leap second, adjusting by replacing the second-of-minute of 60 with 59 {}", time);
+        LOG.trace("Received time contains leap second, adjusting by replacing the second-of-minute of 60 with 59 {}",
+                time);
 
         // Applying simple conversion replacing the second-of-minute of 60 with 59.
 
@@ -147,10 +149,12 @@ public final class NetconfNotification extends NetconfMessage {
     }
 
     /**
+     * Get value asociated with {@code ChronoField}.
+     *
      * @param accessor The {@link TemporalAccessor}
      * @param field The {@link ChronoField} to get
      * @return the value associated with the {@link ChronoField} for the given {@link TemporalAccessor} if present,
-     * else 0.
+     *     else 0.
      */
     private static int getFieldFromTemporalAccessor(final TemporalAccessor accessor, final ChronoField field) {
         return accessor.isSupported(field) ? (int) accessor.getLong(field) : 0;
@@ -159,21 +163,21 @@ public final class NetconfNotification extends NetconfMessage {
     public static final String EVENT_TIME = "eventTime";
 
     /**
-     * Used for unknown/un-parse-able event-times
+     * Used for unknown/un-parse-able event-times.
      */
     public static final Date UNKNOWN_EVENT_TIME = new Date(0);
 
     private final Date eventTime;
 
     /**
-     * Create new notification and capture the timestamp in the constructor
+     * Create new notification and capture the timestamp in the constructor.
      */
     public NetconfNotification(final Document notificationContent) {
         this(notificationContent, new Date());
     }
 
     /**
-     * Create new notification with provided timestamp
+     * Create new notification with provided timestamp.
      */
     public NetconfNotification(final Document notificationContent, final Date eventTime) {
         super(wrapNotification(notificationContent, eventTime));
@@ -181,6 +185,8 @@ public final class NetconfNotification extends NetconfMessage {
     }
 
     /**
+     * Get the time of the event.
+     *
      * @return notification event time
      */
     public Date getEventTime() {

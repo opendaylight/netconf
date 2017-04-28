@@ -9,8 +9,10 @@
 package org.opendaylight.netconf.notifications;
 
 /**
- * Registration for base notification publisher. This registration allows for publishing of base netconf notifications using generated classes
+ * Registration for base notification publisher.
+ * This registration allows for publishing of base netconf notifications using generated classes
  */
-public interface BaseNotificationPublisherRegistration extends NotificationRegistration, BaseNetconfNotificationListener {
+public interface BaseNotificationPublisherRegistration
+        extends NotificationRegistration, BaseNetconfNotificationListener {
 
 }

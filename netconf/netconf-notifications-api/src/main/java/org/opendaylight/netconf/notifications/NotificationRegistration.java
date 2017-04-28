@@ -9,7 +9,7 @@
 package org.opendaylight.netconf.notifications;
 
 /**
- * Generic registration, used as a base for other registration types
+ * Generic registration, used as a base for other registration types.
  */
 public interface NotificationRegistration extends AutoCloseable {
 
