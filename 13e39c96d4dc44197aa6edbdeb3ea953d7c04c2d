@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_9eec13f5",
+        "filename": "features/netconf/odl-netconf-netty-util/src/main/feature/feature.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2017-04-28T13:52:33Z",
+      "side": 1,
+      "message": "Odlparent has this in its list of excluded bundles.",
+      "range": {
+        "startLine": 11,
+        "startChar": 36,
+        "endLine": 11,
+        "endChar": 45
+      },
+      "revId": "13e39c96d4dc44197aa6edbdeb3ea953d7c04c2d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
