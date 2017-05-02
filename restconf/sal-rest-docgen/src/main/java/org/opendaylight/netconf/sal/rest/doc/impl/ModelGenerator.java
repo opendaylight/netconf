@@ -12,9 +12,7 @@ import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolveN
 import com.google.common.base.Optional;
 import com.mifmif.common.regex.Generex;
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -24,6 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Post;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.AnyXmlSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ConstraintDefinition;
@@ -506,21 +505,25 @@ public class ModelGenerator {
     private String processLeafRef(final DataSchemaNode node, final JSONObject property, final SchemaContext schemaContext,
                                   final TypeDefinition<?> leafTypeDef) {
         RevisionAwareXPath xPath = ((LeafrefTypeDefinition) leafTypeDef).getPathStatement();
-        final URI namespace = node.getQName().getNamespace();
-        final Date revision = node.getQName().getRevision();
-        final Module module = schemaContext.findModuleByNamespaceAndRevision(namespace, revision);
         final SchemaNode schemaNode;
 
         final String xPathString = STRIP_PATTERN.matcher(xPath.toString()).replaceAll("");
         xPath = new RevisionAwareXPathImpl(xPathString, xPath.isAbsolute());
 
+        final Module module;
         if (xPath.isAbsolute()) {
+            module = findModule(schemaContext, leafTypeDef.getQName());
             schemaNode = SchemaContextUtil.findDataSchemaNode(schemaContext, module, xPath);
         } else {
+            module = findModule(schemaContext, node.getQName());
             schemaNode = SchemaContextUtil.findDataSchemaNodeForRelativeXPath(schemaContext, module, node, xPath);
         }
 
         return processTypeDef(((TypedSchemaNode) schemaNode).getType(), (DataSchemaNode) schemaNode, property, schemaContext);
+    }
+
+    private static Module findModule(final SchemaContext schemaContext, final QName qName) {
+        return schemaContext.findModuleByNamespaceAndRevision(qName.getNamespace(), qName.getRevision());
     }
 
     private static String processBinaryType(final JSONObject property) throws JSONException {
