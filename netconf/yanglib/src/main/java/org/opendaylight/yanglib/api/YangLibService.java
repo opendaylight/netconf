@@ -20,7 +20,7 @@ import javax.ws.rs.Produces;
 public interface YangLibService {
 
     /**
-     * Get module's source for each module from yang library
+     * Get module's source for each module from yang library.
      * @param name Module's name
      * @param revision Module's revision
      * @return Module's source

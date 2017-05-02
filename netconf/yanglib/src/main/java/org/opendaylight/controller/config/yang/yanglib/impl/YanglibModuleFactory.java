@@ -15,6 +15,7 @@
 * Do not modify this file unless it is present under src/main directory
 */
 package org.opendaylight.controller.config.yang.yanglib.impl;
-public class YanglibModuleFactory extends org.opendaylight.controller.config.yang.yanglib.impl.AbstractYanglibModuleFactory {
+public class YanglibModuleFactory
+        extends org.opendaylight.controller.config.yang.yanglib.impl.AbstractYanglibModuleFactory {
 
 }
