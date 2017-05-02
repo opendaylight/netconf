@@ -20,12 +20,12 @@ public class PutResult {
     private final CheckedFuture<Void, TransactionCommitFailedException> future;
 
     /**
-     * Wrap status and future by constructor - make this immutable
+     * Wrap status and future by constructor - make this immutable.
      *
      * @param status
-     *            - status of operations
+     *            status of operations
      * @param future
-     *            - result of submit of PUT operation
+     *            result of submit of PUT operation
      */
     public PutResult(final Status status, final CheckedFuture<Void, TransactionCommitFailedException> future) {
         this.status = status;
@@ -33,7 +33,7 @@ public class PutResult {
     }
 
     /**
-     * Get status
+     * Get status.
      *
      * @return {@link Status} result
      */

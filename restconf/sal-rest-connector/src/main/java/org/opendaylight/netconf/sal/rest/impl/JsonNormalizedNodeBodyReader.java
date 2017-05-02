@@ -54,9 +54,10 @@ import org.slf4j.LoggerFactory;
 @Provider
 @Consumes({ Draft02.MediaTypes.DATA + RestconfService.JSON, Draft02.MediaTypes.OPERATION + RestconfService.JSON,
         Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, MediaType.APPLICATION_JSON })
-public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsProvider implements MessageBodyReader<NormalizedNodeContext> {
+public class JsonNormalizedNodeBodyReader
+        extends AbstractIdentifierAwareJaxRsProvider implements MessageBodyReader<NormalizedNodeContext> {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JsonNormalizedNodeBodyReader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JsonNormalizedNodeBodyReader.class);
 
     @Override
     public boolean isReadable(final Class<?> type, final Type genericType, final Annotation[] annotations,
@@ -64,6 +65,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPr
         return true;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public NormalizedNodeContext readFrom(final Class<NormalizedNodeContext> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType,
@@ -84,26 +86,9 @@ public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPr
         }
     }
 
-    private static void propagateExceptionAs(final Exception e) throws RestconfDocumentedException {
-        if(e instanceof RestconfDocumentedException) {
-            throw (RestconfDocumentedException)e;
-        }
-
-        if(e instanceof ResultAlreadySetException) {
-            LOG.debug("Error parsing json input:", e);
-
-            throw new RestconfDocumentedException("Error parsing json input: Failed to create new parse result data. " +
-                    "Are you creating multiple resources/subresources in POST request?");
-        }
-
-        LOG.debug("Error parsing json input", e);
-
-        throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                ErrorTag.MALFORMED_MESSAGE, e);
-    }
-
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public static NormalizedNodeContext readFrom(final String uriPath, final InputStream entityStream,
-            final boolean isPost) throws RestconfDocumentedException {
+                                                 final boolean isPost) throws RestconfDocumentedException {
 
         try {
             return readFrom(ControllerContext.getInstance().toInstanceIdentifier(uriPath), entityStream, isPost);
@@ -113,8 +98,9 @@ public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPr
         }
     }
 
-    private static NormalizedNodeContext readFrom(final InstanceIdentifierContext<?> path, final InputStream entityStream,
-            final boolean isPost) throws IOException {
+    private static NormalizedNodeContext readFrom(final InstanceIdentifierContext<?> path,
+                                                  final InputStream entityStream, final boolean isPost)
+            throws IOException {
         if (entityStream.available() < 1) {
             return new NormalizedNodeContext(path, null);
         }
@@ -122,16 +108,17 @@ public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPr
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
         final SchemaNode parentSchema;
-        if(isPost) {
+        if (isPost) {
             // FIXME: We need dispatch for RPC.
             parentSchema = path.getSchemaNode();
-        } else if(path.getSchemaNode() instanceof SchemaContext) {
+        } else if (path.getSchemaNode() instanceof SchemaContext) {
             parentSchema = path.getSchemaContext();
         } else {
             if (SchemaPath.ROOT.equals(path.getSchemaNode().getPath().getParent())) {
                 parentSchema = path.getSchemaContext();
             } else {
-                parentSchema = SchemaContextUtil.findDataSchemaNode(path.getSchemaContext(), path.getSchemaNode().getPath().getParent());
+                parentSchema = SchemaContextUtil
+                        .findDataSchemaNode(path.getSchemaContext(), path.getSchemaNode().getPath().getParent());
             }
         }
 
@@ -171,6 +158,24 @@ public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPr
                 path.getSchemaContext());
 
         return new NormalizedNodeContext(newIIContext, result);
+    }
+
+    private static void propagateExceptionAs(final Exception exception) throws RestconfDocumentedException {
+        if (exception instanceof RestconfDocumentedException) {
+            throw (RestconfDocumentedException)exception;
+        }
+
+        if (exception instanceof ResultAlreadySetException) {
+            LOG.debug("Error parsing json input:", exception);
+
+            throw new RestconfDocumentedException("Error parsing json input: Failed to create new parse result data. "
+                    + "Are you creating multiple resources/subresources in POST request?");
+        }
+
+        LOG.debug("Error parsing json input", exception);
+
+        throw new RestconfDocumentedException("Error parsing input: " + exception.getMessage(), ErrorType.PROTOCOL,
+                ErrorTag.MALFORMED_MESSAGE, exception);
     }
 }
 

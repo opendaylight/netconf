@@ -16,18 +16,15 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
  * sal-rest-connector
  * org.opendaylight.controller.md.sal.rest.common
  *
+ * <p>
  * Utility class is centralizing all needed validation functionality for a Restconf osgi module.
  * All methods have to throw {@link RestconfDocumentedException} only, which is a representation
  * for all error situation followed by restconf-netconf specification.
  * See also <a href="https://tools.ietf.org/html/draft-bierman-netconf-restconf-02">RESTCONF</a>.
- *
- * @author <a href="mailto:vdemcak@cisco.com">Vaclav Demcak</a>
- *
- * Created: Feb 24, 2015
  */
 public class RestconfValidationUtils {
 
-    private RestconfValidationUtils () {
+    private RestconfValidationUtils() {
         throw new UnsupportedOperationException("Utility class");
     }
 
@@ -41,7 +38,7 @@ public class RestconfValidationUtils {
      */
     public static void checkDocumentedError(final boolean condition, final ErrorType type,
             final ErrorTag tag, final String message) {
-        if(!condition) {
+        if (!condition) {
             throw new RestconfDocumentedException(message, type, tag);
         }
     }
@@ -57,7 +54,7 @@ public class RestconfValidationUtils {
      * @return              - T value (same input value)
      */
     public static <T> T checkNotNullDocumented(final T value, final String moduleName) {
-        if(value == null) {
+        if (value == null) {
             final String errMsg = "Module " + moduleName + " was not found.";
             throw new RestconfDocumentedException(errMsg, ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
         }

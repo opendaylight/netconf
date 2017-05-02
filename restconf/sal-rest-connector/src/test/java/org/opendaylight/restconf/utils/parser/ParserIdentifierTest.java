@@ -43,7 +43,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
- * Unit tests for {@link ParserIdentifier}
+ * Unit tests for {@link ParserIdentifier}.
  */
 public class ParserIdentifierTest {
     // mount point identifier
@@ -121,11 +121,12 @@ public class ParserIdentifierTest {
 
         // register mount point with null schema context
         when(this.mockMountPoint.getSchemaContext()).thenReturn(null);
-        when(this.mockMountPointService.getMountPoint(YangInstanceIdentifier.EMPTY)).thenReturn(Optional.of(this.mockMountPoint));
+        when(this.mockMountPointService.getMountPoint(YangInstanceIdentifier.EMPTY))
+                .thenReturn(Optional.of(this.mockMountPoint));
     }
 
     /**
-     * {@link ParserIdentifier#toInstanceIdentifier(String, SchemaContext)} tests
+     * {@link ParserIdentifier#toInstanceIdentifier(String, SchemaContext)} tests.
      */
 
     /**
@@ -222,7 +223,8 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierMountPointInvalidIdentifierNegativeTest() {
         this.thrown.expect(IllegalArgumentException.class);
-        ParserIdentifier.toInstanceIdentifier(INVALID_MOUNT_POINT_IDENT, this.schemaContext, Optional.of(this.mountPointService));
+        ParserIdentifier.toInstanceIdentifier(
+                INVALID_MOUNT_POINT_IDENT, this.schemaContext, Optional.of(this.mountPointService));
     }
 
     /**
@@ -267,7 +269,7 @@ public class ParserIdentifierTest {
     }
 
     /**
-     * {@link ParserIdentifier#makeQNameFromIdentifier(String)} tests
+     * {@link ParserIdentifier#makeQNameFromIdentifier(String)} tests.
      */
 
     /**
@@ -447,7 +449,7 @@ public class ParserIdentifierTest {
     }
 
     /**
-     * {@link ParserIdentifier#toSchemaExportContextFromIdentifier(SchemaContext, String, DOMMountPointService)} tests
+     * {@link ParserIdentifier#toSchemaExportContextFromIdentifier(SchemaContext, String, DOMMountPointService)} tests.
      */
 
     /**
@@ -456,8 +458,8 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toSchemaExportContextFromIdentifierTest() {
-        final SchemaExportContext exportContext = ParserIdentifier.
-                toSchemaExportContextFromIdentifier(this.schemaContext, TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null);
+        final SchemaExportContext exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
+                this.schemaContext, TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null);
 
         assertNotNull("Export context should be parsed", exportContext);
 

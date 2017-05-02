@@ -23,25 +23,26 @@ import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
 import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 abstract class AbstractBodyReaderTest {
 
-    protected final static ControllerContext controllerContext = ControllerContext.getInstance();
+    protected static final ControllerContext CONTROLLER_CONTEXT = ControllerContext.getInstance();
+    protected static final DOMMountPointServiceHandler MOUNT_POINT_SERVICE_HANDLER =
+            mock(DOMMountPointServiceHandler.class);
+
     protected final MediaType mediaType;
-    protected final static DOMMountPointServiceHandler mountPointServiceHandler = mock(
-            DOMMountPointServiceHandler.class);
 
     AbstractBodyReaderTest() throws NoSuchFieldException, IllegalAccessException {
         mediaType = getMediaType();
 
-        final Field mountPointServiceHandlerField = RestConnectorProvider.class.
-                getDeclaredField("mountPointServiceHandler");
+        final Field mountPointServiceHandlerField =
+                RestConnectorProvider.class.getDeclaredField("mountPointServiceHandler");
         mountPointServiceHandlerField.setAccessible(true);
-        mountPointServiceHandlerField.set(RestConnectorProvider.class, mountPointServiceHandler);
+        mountPointServiceHandlerField.set(RestConnectorProvider.class, MOUNT_POINT_SERVICE_HANDLER);
     }
 
     protected abstract MediaType getMediaType();
@@ -87,15 +88,15 @@ abstract class AbstractBodyReaderTest {
         assertNotNull(nnContext.getInstanceIdentifierContext().getSchemaNode());
     }
 
-    protected static void checkPATCHContext(final PATCHContext patchContext) {
+    protected static void checkPatchContext(final PatchContext patchContext) {
         assertNotNull(patchContext.getData());
         assertNotNull(patchContext.getInstanceIdentifierContext().getInstanceIdentifier());
         assertNotNull(patchContext.getInstanceIdentifierContext().getSchemaContext());
         assertNotNull(patchContext.getInstanceIdentifierContext().getSchemaNode());
     }
 
-    protected static void checkPATCHContextMountPoint(final PATCHContext patchContext) {
-        checkPATCHContext(patchContext);
+    protected static void checkPatchContextMountPoint(final PatchContext patchContext) {
+        checkPatchContext(patchContext);
         assertNotNull(patchContext.getInstanceIdentifierContext().getMountPoint());
         assertNotNull(patchContext.getInstanceIdentifierContext().getMountPoint().getSchemaContext());
     }

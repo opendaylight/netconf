@@ -88,8 +88,8 @@ class NormalizedDataPrunner {
 
     private DataContainerChild<?, ?> processAugmentationNode(final NormalizedNode<?, ?> node, final Integer depth) {
         final AugmentationNode augmentationNode = (AugmentationNode) node;
-        DataContainerNodeBuilder<AugmentationIdentifier, ? extends DataContainerChild<?, ?>> newAugmentationBuilder = Builders
-                .augmentationBuilder().withNodeIdentifier(augmentationNode.getIdentifier());
+        DataContainerNodeBuilder<AugmentationIdentifier, ? extends DataContainerChild<?, ?>> newAugmentationBuilder =
+                Builders.augmentationBuilder().withNodeIdentifier(augmentationNode.getIdentifier());
 
         processDataContainerChild((DataContainerNode<?>) node, depth, newAugmentationBuilder);
 
@@ -99,7 +99,8 @@ class NormalizedDataPrunner {
     private void processDataContainerChild(
             final DataContainerNode<?> node,
             final Integer depth,
-            final DataContainerNodeBuilder<? extends YangInstanceIdentifier.PathArgument, ? extends DataContainerNode<?>> newBuilder) {
+            final DataContainerNodeBuilder<? extends YangInstanceIdentifier.PathArgument,
+                    ? extends DataContainerNode<?>> newBuilder) {
 
         for (DataContainerChild<? extends PathArgument, ?> nodeValue : node.getValue()) {
             newBuilder.withChild(pruneDataAtDepth(nodeValue, depth - 1));
@@ -140,8 +141,8 @@ class NormalizedDataPrunner {
             CollectionNodeBuilder<MapEntryNode, ? extends MapNode> newOrderedMapNodeBuilder) {
         if (depth > 1) {
             for (MapEntryNode oldMapEntryNode : ((MapNode) node).getValue()) {
-                DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> newMapEntryNodeBuilder = Builders
-                        .mapEntryBuilder().withNodeIdentifier(oldMapEntryNode.getIdentifier());
+                DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> newMapEntryNodeBuilder =
+                        Builders.mapEntryBuilder().withNodeIdentifier(oldMapEntryNode.getIdentifier());
                 for (DataContainerChild<? extends PathArgument, ?> mapEntryNodeValue : oldMapEntryNode.getValue()) {
                     newMapEntryNodeBuilder.withChild(pruneDataAtDepth(mapEntryNodeValue, depth - 1));
                 }

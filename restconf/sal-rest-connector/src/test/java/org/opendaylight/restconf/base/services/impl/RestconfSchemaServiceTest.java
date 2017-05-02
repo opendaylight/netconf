@@ -42,7 +42,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
- * Unit tests for {@code RestconfSchemaService}
+ * Unit tests for {@code RestconfSchemaService}.
  */
 public class RestconfSchemaServiceTest {
     private static final String MOUNT_POINT = "mount-point-1:cont" + "/" + RestconfConstants.MOUNT + "/";
@@ -166,7 +166,8 @@ public class RestconfSchemaServiceTest {
         when(this.mockContextHandler.get()).thenReturn(this.schemaContextWithMountPoints);
 
         // make test
-        final SchemaExportContext exportContext = this.schemaService.getSchema(MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT);
+        final SchemaExportContext exportContext =
+                this.schemaService.getSchema(MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT);
 
         // verify
         assertNotNull("Export context should not be null", exportContext);
@@ -338,6 +339,7 @@ public class RestconfSchemaServiceTest {
     /**
      * Try to get schema with wrong (not valid) identifier catching <code>RestconfDocumentedException</code>. Error
      * type, error tag and error status code are compared to expected values.
+     *
      * <p>
      * Not valid identifier contains only revision without module name.
      */
@@ -361,6 +363,7 @@ public class RestconfSchemaServiceTest {
      * Try to get schema with wrong (not valid) identifier behind mount point catching
      * <code>RestconfDocumentedException</code>. Error type, error tag and error status code are compared to expected
      * values.
+     *
      * <p>
      * Not valid identifier contains only revision without module name.
      */
@@ -401,7 +404,7 @@ public class RestconfSchemaServiceTest {
         }
     }
 
-    /***
+    /**
      * Try to get schema behind mount point with identifier when does not contain revision catching
      * <code>RestconfDocumentedException</code>. Error type, error tag and error status code are compared to expected
      * values.

@@ -12,14 +12,14 @@ import com.google.common.base.Preconditions;
 import java.util.List;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
-public class PATCHContext {
+public class PatchContext {
 
     private final InstanceIdentifierContext<? extends SchemaNode> context;
-    private final List<PATCHEntity> data;
+    private final List<PatchEntity> data;
     private final String patchId;
 
-    public PATCHContext(final InstanceIdentifierContext<? extends SchemaNode> context,
-                        final List<PATCHEntity> data, final String patchId) {
+    public PatchContext(final InstanceIdentifierContext<? extends SchemaNode> context,
+                        final List<PatchEntity> data, final String patchId) {
         this.context = Preconditions.checkNotNull(context);
         this.data = Preconditions.checkNotNull(data);
         this.patchId = Preconditions.checkNotNull(patchId);
@@ -29,7 +29,7 @@ public class PATCHContext {
         return context;
     }
 
-    public List<PATCHEntity> getData() {
+    public List<PatchEntity> getData() {
         return data;
     }
 

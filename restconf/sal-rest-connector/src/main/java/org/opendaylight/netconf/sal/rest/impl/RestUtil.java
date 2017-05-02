@@ -25,7 +25,7 @@ public final class RestUtil {
     public static final String DQUOTE = "\"";
     private static final Pattern PREDICATE_PATTERN = Pattern.compile("\\[(.*?)\\]");
 
-    public final static TypeDefinition<?> resolveBaseTypeFrom(final TypeDefinition<?> type) {
+    public static TypeDefinition<?> resolveBaseTypeFrom(final TypeDefinition<?> type) {
         TypeDefinition<?> superType = type;
         while (superType.getBaseType() != null) {
             superType = superType.getBaseType();
@@ -68,8 +68,8 @@ public final class RestUtil {
         return predicateStartIndex == -1 ? pathPart : pathPart.substring(0, predicateStartIndex);
     }
 
-    private static IdentityValue toIdentity(final String xPathPart, final PrefixesMaping prefixMap) {
-        final String xPathPartTrimmed = xPathPart.trim();
+    private static IdentityValue toIdentity(final String xpathPart, final PrefixesMaping prefixMap) {
+        final String xPathPartTrimmed = xpathPart.trim();
         if (xPathPartTrimmed.isEmpty()) {
             return null;
         }
@@ -104,7 +104,8 @@ public final class RestUtil {
                     }
                     result.add(new Predicate(null, predicateValue));
                 } else {
-                    final IdentityValue identityValue = toIdentity(predicate.substring(0, indexOfEqualityMark), prefixMap);
+                    final IdentityValue identityValue =
+                            toIdentity(predicate.substring(0, indexOfEqualityMark), prefixMap);
                     if (identityValue == null || predicateValue == null) {
                         return null;
                     }
@@ -125,7 +126,7 @@ public final class RestUtil {
     }
 
     public interface PrefixesMaping {
-        public String getNamespace(String prefix);
+        String getNamespace(String prefix);
     }
 
     public static class PrefixMapingFromXml implements PrefixesMaping {

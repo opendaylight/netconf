@@ -18,6 +18,8 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
+ * Codec for module instance identifiers.
+ *
  * @deprecated This class will be replaced by
  *             {@link org.opendaylight.restconf.jersey.providers.StringModuleInstanceIdentifierCodec}
  */

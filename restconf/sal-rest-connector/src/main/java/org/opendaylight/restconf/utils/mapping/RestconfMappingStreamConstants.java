@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.utils.mapping;
 
 /**
- * Util class for mapping entry stream
+ * Util class for mapping entry stream.
  *
  */
 public final class RestconfMappingStreamConstants {
