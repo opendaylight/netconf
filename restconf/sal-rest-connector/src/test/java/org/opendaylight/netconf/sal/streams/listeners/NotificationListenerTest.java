@@ -48,6 +48,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 public class NotificationListenerTest {
     private static final QNameModule MODULE;
+
     static {
         try {
             MODULE = QNameModule.create(URI.create("notifi:mod"),
@@ -206,7 +207,8 @@ public class NotificationListenerTest {
         return list;
     }
 
-    private static ContainerNode mockCont(final QName contQName, final DataContainerChild<? extends PathArgument, ?> child) {
+    private static ContainerNode mockCont(final QName contQName,
+                                          final DataContainerChild<? extends PathArgument, ?> child) {
         final ContainerNode cont = mock(ContainerNode.class);
         when(cont.getIdentifier()).thenReturn(NodeIdentifier.create(contQName));
         when(cont.getNodeType()).thenReturn(contQName);

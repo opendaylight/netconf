@@ -26,8 +26,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusEntity;
+import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchStatusEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.restconf.Rfc8040;
 import org.opendaylight.restconf.utils.RestconfConstants;
@@ -35,7 +35,7 @@ import org.opendaylight.restconf.utils.RestconfConstants;
 @Provider
 @Produces({Draft02.MediaTypes.PATCH_STATUS + RestconfService.XML,
         Rfc8040.MediaTypes.PATCH_STATUS + RestconfConstants.XML})
-public class PATCHXmlBodyWriter implements MessageBodyWriter<PATCHStatusContext> {
+public class PatchXmlBodyWriter implements MessageBodyWriter<PatchStatusContext> {
 
     private static final XMLOutputFactory XML_FACTORY;
 
@@ -47,23 +47,24 @@ public class PATCHXmlBodyWriter implements MessageBodyWriter<PATCHStatusContext>
     @Override
     public boolean isWriteable(final Class<?> type, final Type genericType,
                                final Annotation[] annotations, final MediaType mediaType) {
-        return type.equals(PATCHStatusContext.class);
+        return type.equals(PatchStatusContext.class);
     }
 
     @Override
-    public long getSize(final PATCHStatusContext patchStatusContext, Class<?> type, final Type genericType,
+    public long getSize(final PatchStatusContext patchStatusContext, Class<?> type, final Type genericType,
                         final Annotation[] annotations, final MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(final PATCHStatusContext patchStatusContext, final Class<?> type, final Type genericType,
+    public void writeTo(final PatchStatusContext patchStatusContext, final Class<?> type, final Type genericType,
                         final Annotation[] annotations, final MediaType mediaType,
                         final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream)
             throws IOException, WebApplicationException {
 
         try {
-            final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
+            final XMLStreamWriter xmlWriter =
+                    XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
             writeDocument(xmlWriter, patchStatusContext);
         } catch (final XMLStreamException e) {
             throw new IllegalStateException(e);
@@ -72,7 +73,7 @@ public class PATCHXmlBodyWriter implements MessageBodyWriter<PATCHStatusContext>
         }
     }
 
-    private static void writeDocument(final XMLStreamWriter writer, final PATCHStatusContext context)
+    private static void writeDocument(final XMLStreamWriter writer, final PatchStatusContext context)
             throws XMLStreamException, IOException {
         writer.writeStartElement("", "yang-patch-status", "urn:ietf:params:xml:ns:yang:ietf-yang-patch");
         writer.writeStartElement("patch-id");
@@ -86,7 +87,7 @@ public class PATCHXmlBodyWriter implements MessageBodyWriter<PATCHStatusContext>
                 reportErrors(context.getGlobalErrors(), writer);
             }
             writer.writeStartElement("edit-status");
-            for (final PATCHStatusEntity patchStatusEntity : context.getEditCollection()) {
+            for (final PatchStatusEntity patchStatusEntity : context.getEditCollection()) {
                 writer.writeStartElement("edit");
                 writer.writeStartElement("edit-id");
                 writer.writeCharacters(patchStatusEntity.getEditId());

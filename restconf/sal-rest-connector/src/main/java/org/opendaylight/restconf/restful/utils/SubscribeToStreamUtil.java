@@ -65,7 +65,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Subscribe to stream util class
+ * Subscribe to stream util class.
  *
  */
 public final class SubscribeToStreamUtil {
@@ -88,16 +88,16 @@ public final class SubscribeToStreamUtil {
     /**
      * Register listeners by streamName in identifier to listen to yang
      * notifications, put or delete info about listener to DS according to
-     * ietf-restconf-monitoring
+     * ietf-restconf-monitoring.
      *
      * @param identifier
-     *            - identifier as stream name
+     *             identifier as stream name
      * @param uriInfo
-     *            - for getting base URI information
+     *             for getting base URI information
      * @param notificationQueryParams
-     *            - query parameters of notification
+     *             query parameters of notification
      * @param handlersHolder
-     *            - holder of handlers for notifications
+     *             holder of handlers for notifications
      * @return location for listening
      */
     @SuppressWarnings("rawtypes")
@@ -129,8 +129,8 @@ public final class SubscribeToStreamUtil {
             listener.setQueryParams(notificationQueryParams.getStart(), notificationQueryParams.getStop(),
                     notificationQueryParams.getFilter(), false);
             listener.setCloseVars(handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
-            final NormalizedNode mapToStreams =
-                    RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(listener.getSchemaPath().getLastComponent(),
+            final NormalizedNode mapToStreams = RestconfMappingNodeUtil
+                    .mapYangNotificationStreamByIetfRestconfMonitoring(listener.getSchemaPath().getLastComponent(),
                             schemaContext.getNotifications(), notificationQueryParams.getStart(),
                             listener.getOutputType(), uri, getMonitoringModule(schemaContext), exist);
             writeDataToDS(schemaContext, listener.getSchemaPath().getLastComponent().getLocalName(), wTx, exist,
@@ -154,10 +154,10 @@ public final class SubscribeToStreamUtil {
     }
 
     /**
-     * Prepare InstanceIdentifierContext for Location leaf
+     * Prepare InstanceIdentifierContext for Location leaf.
      *
      * @param schemaHandler
-     *            - schemaContext handler
+     *             schemaContext handler
      * @return InstanceIdentifier of Location leaf
      */
     public static InstanceIdentifierContext<?> prepareIIDSubsStreamOutput(final SchemaContextHandler schemaHandler) {
@@ -176,16 +176,16 @@ public final class SubscribeToStreamUtil {
     /**
      * Register listener by streamName in identifier to listen to data change
      * notifications, put or delete info about listener to DS according to
-     * ietf-restconf-monitoring
+     * ietf-restconf-monitoring.
      *
      * @param identifier
-     *            - identifier as stream name
+     *             identifier as stream name
      * @param uriInfo
-     *            - for getting base URI information
+     *             for getting base URI information
      * @param notificationQueryParams
-     *            - query parameters of notification
+     *             query parameters of notification
      * @param handlersHolder
-     *            - holder of handlers for notifications
+     *             holder of handlers for notifications
      * @return location for listening
      */
     @SuppressWarnings("rawtypes")
@@ -245,10 +245,10 @@ public final class SubscribeToStreamUtil {
 
     /**
      * Parse input of query parameters - start-time or stop-time - from
-     * {@link DateAndTime} format to {@link Instant} format
+     * {@link DateAndTime} format to {@link Instant} format.
      *
      * @param entry
-     *            - start-time or stop-time as string in {@link DateAndTime}
+     *             start-time or stop-time as string in {@link DateAndTime}
      *            format
      * @return parsed {@link Instant} by entry
      */
@@ -266,31 +266,32 @@ public final class SubscribeToStreamUtil {
     }
 
     @SuppressWarnings("rawtypes")
-    static void writeDataToDS(final SchemaContext schemaContext, final String name,
-            final DOMDataReadWriteTransaction wTx, final boolean exist, final NormalizedNode mapToStreams) {
+    static void writeDataToDS(final SchemaContext schemaContext,
+                              final String name, final DOMDataReadWriteTransaction readWriteTransaction,
+                              final boolean exist, final NormalizedNode mapToStreams) {
         String pathId = "";
         if (exist) {
             pathId = MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name;
         } else {
             pathId = MonitoringModule.PATH_TO_STREAMS;
         }
-        wTx.merge(LogicalDatastoreType.OPERATIONAL, IdentifierCodec.deserialize(pathId, schemaContext),
+        readWriteTransaction.merge(LogicalDatastoreType.OPERATIONAL, IdentifierCodec.deserialize(pathId, schemaContext),
                 mapToStreams);
     }
 
-    static void submitData(final DOMDataReadWriteTransaction wTx) {
+    static void submitData(final DOMDataReadWriteTransaction readWriteTransaction) {
         try {
-            wTx.submit().checkedGet();
+            readWriteTransaction.submit().checkedGet();
         } catch (final TransactionCommitFailedException e) {
             throw new RestconfDocumentedException("Problem while putting data to DS.", e);
         }
     }
 
     /**
-     * Prepare map of values from URI
+     * Prepare map of values from URI.
      *
      * @param identifier
-     *            - URI
+     *             URI
      * @return {@link Map}
      */
     public static Map<String, String> mapValuesFromUri(final String identifier) {
@@ -316,16 +317,16 @@ public final class SubscribeToStreamUtil {
 
     /**
      * Register data change listener in dom data broker and set it to listener
-     * on stream
+     * on stream.
      *
      * @param ds
-     *            - {@link LogicalDatastoreType}
+     *             {@link LogicalDatastoreType}
      * @param scope
-     *            - {@link DataChangeScope}
+     *             {@link DataChangeScope}
      * @param listener
-     *            - listener on specific stream
+     *             listener on specific stream
      * @param domDataBroker
-     *            - data broker for register data change listener
+     *             data broker for register data change listener
      */
     @SuppressWarnings("deprecation")
     private static void registration(final LogicalDatastoreType ds, final DataChangeScope scope,
@@ -357,10 +358,11 @@ public final class SubscribeToStreamUtil {
         return port;
     }
 
-    static boolean checkExist(final SchemaContext schemaContext, final DOMDataReadWriteTransaction wTx) {
+    static boolean checkExist(final SchemaContext schemaContext,
+                              final DOMDataReadWriteTransaction readWriteTransaction) {
         boolean exist;
         try {
-            exist = wTx.exists(LogicalDatastoreType.OPERATIONAL,
+            exist = readWriteTransaction.exists(LogicalDatastoreType.OPERATIONAL,
                     IdentifierCodec.deserialize(MonitoringModule.PATH_TO_STREAMS, schemaContext)).checkedGet();
         } catch (final ReadFailedException e1) {
             throw new RestconfDocumentedException("Problem while checking data if exists", e1);
@@ -382,12 +384,12 @@ public final class SubscribeToStreamUtil {
     }
 
     /**
-     * Parse enum from URI
+     * Parse enum from URI.
      *
      * @param clazz
-     *            - enum type
+     *             enum type
      * @param value
-     *            - string of enum value
+     *             string of enum value
      * @return enum
      */
     private static <T> T parseURIEnum(final Class<T> clazz, final String value) {

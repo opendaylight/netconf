@@ -19,10 +19,10 @@ class EventBusChangeRecorder<T extends BaseListenerInterface> {
     private final T listener;
 
     /**
-     * Event bus change recorder of specific listener of notifications
+     * Event bus change recorder of specific listener of notifications.
      *
      * @param listener
-     *            - specific listener
+     *             specific listener
      */
     EventBusChangeRecorder(final T listener) {
         this.listener = listener;

@@ -56,9 +56,10 @@ import org.w3c.dom.Element;
 
 @Provider
 @Consumes({ Rfc8040.MediaTypes.DATA + RestconfConstants.XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsProvider implements MessageBodyReader<NormalizedNodeContext> {
+public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsProvider
+        implements MessageBodyReader<NormalizedNodeContext> {
 
-    private final static Logger LOG = LoggerFactory.getLogger(XmlNormalizedNodeBodyReader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XmlNormalizedNodeBodyReader.class);
 
     @Override
     public boolean isReadable(final Class<?> type, final Type genericType, final Annotation[] annotations,
@@ -66,6 +67,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
         return true;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public NormalizedNodeContext readFrom(final Class<NormalizedNodeContext> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType,
@@ -81,7 +83,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
 
             final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
             return parse(path,doc);
-        } catch (final RestconfDocumentedException e){
+        } catch (final RestconfDocumentedException e) {
             throw e;
         } catch (final Exception e) {
             LOG.debug("Error parsing xml input", e);
@@ -111,7 +113,6 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
         final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
         InstanceIdentifierContext<? extends SchemaNode> outIIContext;
 
-
         final DomToNormalizedNodeParserFactory parserFactory =
                 DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER,
                     pathContext.getSchemaContext());
@@ -139,7 +140,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
         if (schemaNode instanceof ContainerSchemaNode) {
             parsed = parserFactory.getContainerNodeParser().parse(Collections.singletonList(doc.getDocumentElement()),
                 (ContainerSchemaNode) schemaNode);
-        } else if(schemaNode instanceof ListSchemaNode) {
+        } else if (schemaNode instanceof ListSchemaNode) {
             final ListSchemaNode casted = (ListSchemaNode) schemaNode;
             parsed = parserFactory.getMapEntryNodeParser().parse(elements, casted);
             if (isPost()) {
@@ -201,7 +202,8 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
         return result;
     }
 
-    private static AugmentationSchema findCorrespondingAugment(final DataSchemaNode parent, final DataSchemaNode child) {
+    private static AugmentationSchema findCorrespondingAugment(final DataSchemaNode parent,
+                                                               final DataSchemaNode child) {
         if ((parent instanceof AugmentationTarget) && !(parent instanceof ChoiceSchemaNode)) {
             for (final AugmentationSchema augmentation : ((AugmentationTarget) parent).getAvailableAugmentations()) {
                 final DataSchemaNode childInAugmentation = augmentation.getDataChildByName(child.getQName());

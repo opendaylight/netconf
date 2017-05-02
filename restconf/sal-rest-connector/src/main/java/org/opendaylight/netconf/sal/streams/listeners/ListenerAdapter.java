@@ -19,7 +19,6 @@ import org.json.XML;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataChangeEvent;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
-import org.opendaylight.restconf.parser.builder.YangInstanceIdentifierDeserializer;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -56,14 +55,14 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
 
     /**
      * Creates new {@link ListenerAdapter} listener specified by path and stream
-     * name and register for subscribing
+     * name and register for subscribing.
      *
      * @param path
      *            Path to data in data store.
      * @param streamName
      *            The name of the stream.
      * @param outputType
-     *            - type of output on notification (JSON, XML)
+     *            Type of output on notification (JSON, XML)
      */
     ListenerAdapter(final YangInstanceIdentifier path, final String streamName,
             final NotificationOutputType outputType) {
@@ -111,9 +110,9 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
     }
 
     /**
-     * Prepare data of notification and data to client
+     * Prepare data of notification and data to client.
      *
-     * @param xml
+     * @param xml   data
      */
     private void prepareAndPostData(final String xml) {
         final Event event = new Event(EventType.NOTIFY);
@@ -133,8 +132,6 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
     /**
      * Prepare data in printable form and transform it to String.
      *
-     * @param change
-     *            DataChangeEvent
      * @return Data in printable form.
      */
     private String prepareXml() {
@@ -210,8 +207,8 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
             return;
         }
         for (final Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> entry : data) {
-            if (!ControllerContext.getInstance().isNodeMixin(entry.getKey()) &&
-                                                            (!getLeafNodesOnly() || entry.getValue() instanceof LeafNode)) {
+            if (!ControllerContext.getInstance().isNodeMixin(entry.getKey())
+                    && (!getLeafNodesOnly() || entry.getValue() instanceof LeafNode)) {
                 final Node node = createCreatedChangedDataChangeEventElement(doc, entry, operation, schemaContext,
                         dataSchemaContextTree);
                 element.appendChild(node);
@@ -326,29 +323,29 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
      *            {@link Element}
      * @param textContent
      *            StringBuilder
-     * @param qName
+     * @param qualifiedName
      *            QName
      */
     private static void writeIdentifierWithNamespacePrefix(final Element element, final StringBuilder textContent,
-            final QName qName) {
+            final QName qualifiedName) {
         final Module module = ControllerContext.getInstance().getGlobalSchema()
-                .findModuleByNamespaceAndRevision(qName.getNamespace(), qName.getRevision());
+                .findModuleByNamespaceAndRevision(qualifiedName.getNamespace(), qualifiedName.getRevision());
 
         textContent.append(module.getName());
         textContent.append(":");
-        textContent.append(qName.getLocalName());
+        textContent.append(qualifiedName.getLocalName());
     }
 
     /**
      * Consists of three types {@link Operation#CREATED},
      * {@link Operation#UPDATED} and {@link Operation#DELETED}.
      */
-    private static enum Operation {
+    private enum Operation {
         CREATED("created"), UPDATED("updated"), DELETED("deleted");
 
         private final String value;
 
-        private Operation(final String value) {
+        Operation(final String value) {
             this.value = value;
         }
     }

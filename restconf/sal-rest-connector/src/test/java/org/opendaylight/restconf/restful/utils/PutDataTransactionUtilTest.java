@@ -157,14 +157,16 @@ public class PutDataTransactionUtilTest {
 
     @Test
     public void testValidInputData() throws Exception {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext = new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
+        final InstanceIdentifierContext<DataSchemaNode> iidContext =
+                new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
         PutDataTransactionUtil.validInputData(iidContext.getSchemaNode(), payload);
     }
 
     @Test
     public void testValidTopLevelNodeName() throws Exception {
-        InstanceIdentifierContext<DataSchemaNode> iidContext = new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
+        InstanceIdentifierContext<DataSchemaNode> iidContext =
+                new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
         NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
         PutDataTransactionUtil.validTopLevelNodeName(iidContext.getInstanceIdentifier(), payload);
 
@@ -175,78 +177,89 @@ public class PutDataTransactionUtilTest {
 
     @Test(expected = RestconfDocumentedException.class)
     public void testValidTopLevelNodeNamePathEmpty() throws Exception {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext = new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
+        final InstanceIdentifierContext<DataSchemaNode> iidContext =
+                new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
         PutDataTransactionUtil.validTopLevelNodeName(YangInstanceIdentifier.EMPTY, payload);
     }
 
     @Test(expected = RestconfDocumentedException.class)
     public void testValidTopLevelNodeNameWrongTopIdentifier() throws Exception {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext = new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
+        final InstanceIdentifierContext<DataSchemaNode> iidContext =
+                new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
         PutDataTransactionUtil.validTopLevelNodeName(this.iid.getAncestor(1), payload);
     }
 
     @Test
     public void testValidateListKeysEqualityInPayloadAndUri() throws Exception {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext = new InstanceIdentifierContext<>(this.iid3, this.schemaNode3, null, this.schema);
+        final InstanceIdentifierContext<DataSchemaNode> iidContext =
+                new InstanceIdentifierContext<>(this.iid3, this.schemaNode3, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildListEntry);
         PutDataTransactionUtil.validateListKeysEqualityInPayloadAndUri(payload);
     }
 
     @Test
     public void testPutContainerData() throws Exception {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext = new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
+        final InstanceIdentifierContext<DataSchemaNode> iidContext =
+                new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
         doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
         doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
         doReturn(this.write).when(this.transactionChain).newWriteOnlyTransaction();
-        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(this.read).read(LogicalDatastoreType.CONFIGURATION, this.iid2);
-        doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION, payload.getInstanceIdentifierContext().getInstanceIdentifier(),
-                payload.getData());
+        doReturn(Futures.immediateCheckedFuture(Optional.absent()))
+                .when(this.read).read(LogicalDatastoreType.CONFIGURATION, this.iid2);
+        doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION,
+                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
 
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain), null,
                 null);
-        verify(this.read).read(LogicalDatastoreType.CONFIGURATION, payload.getInstanceIdentifierContext().getInstanceIdentifier());
+        verify(this.read).read(LogicalDatastoreType.CONFIGURATION,
+                payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
     }
 
     @Test
     public void testPutleafData() throws Exception {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext = new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
+        final InstanceIdentifierContext<DataSchemaNode> iidContext =
+                new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
 
         doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
         doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
         doReturn(this.write).when(this.transactionChain).newWriteOnlyTransaction();
-        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(this.read).read(LogicalDatastoreType.CONFIGURATION, this.iid);
-        doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION, payload.getInstanceIdentifierContext().getInstanceIdentifier(),
-                payload.getData());
+        doReturn(Futures.immediateCheckedFuture(Optional.absent()))
+                .when(this.read).read(LogicalDatastoreType.CONFIGURATION, this.iid);
+        doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION,
+                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
 
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain), null,
                 null);
-        verify(this.read).read(LogicalDatastoreType.CONFIGURATION, payload.getInstanceIdentifierContext().getInstanceIdentifier());
+        verify(this.read).read(LogicalDatastoreType.CONFIGURATION,
+                payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
     }
 
     @Test
     public void testPutListData() throws Exception {
-        final InstanceIdentifierContext<DataSchemaNode> iidContext = new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
+        final InstanceIdentifierContext<DataSchemaNode> iidContext =
+                new InstanceIdentifierContext<>(this.iid2, this.schemaNode2, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseContWithList);
 
         doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
         doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
         doReturn(this.write).when(this.transactionChain).newWriteOnlyTransaction();
-        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(this.read).read(LogicalDatastoreType.CONFIGURATION, this.iid2);
-        doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION, payload.getInstanceIdentifierContext().getInstanceIdentifier(),
-                payload.getData());
+        doReturn(Futures.immediateCheckedFuture(Optional.absent()))
+                .when(this.read).read(LogicalDatastoreType.CONFIGURATION, this.iid2);
+        doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION,
+                payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain), null,

@@ -54,8 +54,8 @@ import org.opendaylight.controller.sal.core.api.Broker.ConsumerSession;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.PutResult;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
@@ -96,9 +96,9 @@ public class BrokerFacadeTest {
     @Mock
     private DOMMountPoint mockMountInstance;
     @Mock
-    private DOMDataReadOnlyTransaction rTransaction;
+    private DOMDataReadOnlyTransaction readTransaction;
     @Mock
-    private DOMDataWriteTransaction wTransaction;
+    private DOMDataWriteTransaction writeTransaction;
     @Mock
     private DOMDataReadWriteTransaction rwTransaction;
 
@@ -117,8 +117,8 @@ public class BrokerFacadeTest {
         this.brokerFacade.setDomNotificationService(this.domNotification);
         this.brokerFacade.setRpcService(this.mockRpcService);
         this.brokerFacade.setContext(this.context);
-        when(this.domDataBroker.newReadOnlyTransaction()).thenReturn(this.rTransaction);
-        when(this.domDataBroker.newWriteOnlyTransaction()).thenReturn(this.wTransaction);
+        when(this.domDataBroker.newReadOnlyTransaction()).thenReturn(this.readTransaction);
+        when(this.domDataBroker.newWriteOnlyTransaction()).thenReturn(this.writeTransaction);
         when(this.domDataBroker.newReadWriteTransaction()).thenReturn(this.rwTransaction);
 
         ControllerContext.getInstance().setSchemas(TestUtils.loadSchemaContext("/full-versions/test-module"));
@@ -126,7 +126,7 @@ public class BrokerFacadeTest {
 
     private static CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> wrapDummyNode(
             final NormalizedNode<?, ?> dummyNode) {
-        return Futures.immediateCheckedFuture(Optional.<NormalizedNode<?, ?>> of(dummyNode));
+        return Futures.immediateCheckedFuture(Optional.<NormalizedNode<?, ?>>of(dummyNode));
     }
 
     private static CheckedFuture<Boolean, ReadFailedException> wrapExistence(final Boolean exists) {
@@ -134,7 +134,7 @@ public class BrokerFacadeTest {
     }
 
     /**
-     * Value of this node shouldn't be important for testing purposes
+     * Value of this node shouldn't be important for testing purposes.
      */
     private static NormalizedNode<?, ?> createDummyNode(final String namespace, final String date,
             final String localName) {
@@ -144,7 +144,7 @@ public class BrokerFacadeTest {
 
     @Test
     public void testReadConfigurationData() {
-        when(this.rTransaction.read(any(LogicalDatastoreType.class), any(YangInstanceIdentifier.class))).thenReturn(
+        when(this.readTransaction.read(any(LogicalDatastoreType.class), any(YangInstanceIdentifier.class))).thenReturn(
                 this.dummyNodeInFuture);
 
         final NormalizedNode<?, ?> actualNode = this.brokerFacade.readConfigurationData(this.instanceID);
@@ -154,7 +154,7 @@ public class BrokerFacadeTest {
 
     @Test
     public void testReadOperationalData() {
-        when(this.rTransaction.read(any(LogicalDatastoreType.class), any(YangInstanceIdentifier.class))).thenReturn(
+        when(this.readTransaction.read(any(LogicalDatastoreType.class), any(YangInstanceIdentifier.class))).thenReturn(
                 this.dummyNodeInFuture);
 
         final NormalizedNode<?, ?> actualNode = this.brokerFacade.readOperationalData(this.instanceID);
@@ -177,14 +177,15 @@ public class BrokerFacadeTest {
                 "Master is down. Please try again.");
         final ReadFailedException exception503 = new ReadFailedException("Read from transaction failed", error);
         doReturn(Futures.immediateFailedCheckedFuture(exception503))
-                .when(rTransaction).read(any(LogicalDatastoreType.class), any(YangInstanceIdentifier.class));
+                .when(readTransaction).read(any(LogicalDatastoreType.class), any(YangInstanceIdentifier.class));
         try {
             brokerFacade.readConfigurationData(this.instanceID, "explicit");
             fail("This test should fail.");
         } catch (final RestconfDocumentedException e) {
             assertEquals("getErrorTag", ErrorTag.RESOURCE_DENIED_TRANSPORT, e.getErrors().get(0).getErrorTag());
             assertEquals("getErrorType", ErrorType.TRANSPORT, e.getErrors().get(0).getErrorType());
-            assertEquals("getErrorMessage", "Master is down. Please try again.", e.getErrors().get(0).getErrorMessage());
+            assertEquals("getErrorMessage", "Master is down. Please try again.",
+                    e.getErrors().get(0).getErrorMessage());
         }
     }
 
@@ -319,7 +320,7 @@ public class BrokerFacadeTest {
     /**
      * Prepare conditions to test delete operation. Data to delete exists or does not exist according to value of
      * {@code assumeDataExists} parameter.
-     * @param assumeDataExists
+     * @param assumeDataExists boolean to assume if data exists
      */
     private void prepareDataForDelete(final boolean assumeDataExists) {
         when(this.rwTransaction.exists(LogicalDatastoreType.CONFIGURATION, this.instanceID))
@@ -394,12 +395,12 @@ public class BrokerFacadeTest {
     }
 
     /**
-     * Test PATCH method on the server with no data
+     * Test Patch method on the server with no data.
      */
     @Test
     @SuppressWarnings("unchecked")
     public void testPatchConfigurationDataWithinTransactionServer() throws Exception {
-        final PATCHContext patchContext = mock(PATCHContext.class);
+        final PatchContext patchContext = mock(PatchContext.class);
         final InstanceIdentifierContext identifierContext = mock(InstanceIdentifierContext.class);
         final CheckedFuture<Void, TransactionCommitFailedException> expFuture = Futures.immediateCheckedFuture(null);
 
@@ -411,19 +412,19 @@ public class BrokerFacadeTest {
 
         when(this.rwTransaction.submit()).thenReturn(expFuture);
 
-        final PATCHStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
+        final PatchStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
 
         // assert success
-        assertTrue("PATCH operation should be successful on server", status.isOk());
+        assertTrue("Patch operation should be successful on server", status.isOk());
     }
 
     /**
-     * Test PATCH method on mounted device with no data
+     * Test Patch method on mounted device with no data.
      */
     @Test
     @SuppressWarnings("unchecked")
     public void testPatchConfigurationDataWithinTransactionMount() throws Exception {
-        final PATCHContext patchContext = mock(PATCHContext.class);
+        final PatchContext patchContext = mock(PatchContext.class);
         final InstanceIdentifierContext identifierContext = mock(InstanceIdentifierContext.class);
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
         final DOMDataBroker mountDataBroker = mock(DOMDataBroker.class);
@@ -439,20 +440,20 @@ public class BrokerFacadeTest {
         when(mountDataBroker.newReadWriteTransaction()).thenReturn(transaction);
         when(transaction.submit()).thenReturn(expFuture);
 
-        final PATCHStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
+        final PatchStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
 
         // assert success
-        assertTrue("PATCH operation should be successful on mounted device", status.isOk());
+        assertTrue("Patch operation should be successful on mounted device", status.isOk());
     }
 
     /**
-     * Negative test for PATCH operation when mounted device does not support {@link DOMDataBroker service.
-     * PATCH operation should fail with global error.
+     * Negative test for Patch operation when mounted device does not support {@link DOMDataBroker service.}
+     * Patch operation should fail with global error.
      */
     @Test
     @SuppressWarnings("unchecked")
     public void testPatchConfigurationDataWithinTransactionMountFail() throws Exception {
-        final PATCHContext patchContext = mock(PATCHContext.class);
+        final PatchContext patchContext = mock(PatchContext.class);
         final InstanceIdentifierContext identifierContext = mock(InstanceIdentifierContext.class);
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
         final DOMDataBroker mountDataBroker = mock(DOMDataBroker.class);
@@ -469,7 +470,7 @@ public class BrokerFacadeTest {
         when(mountDataBroker.newReadWriteTransaction()).thenReturn(transaction);
         when(transaction.submit()).thenReturn(expFuture);
 
-        final PATCHStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
+        final PatchStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
 
         // assert not successful operation with error
         assertNotNull(status.getGlobalErrors());
@@ -477,6 +478,6 @@ public class BrokerFacadeTest {
         assertEquals(ErrorType.APPLICATION, status.getGlobalErrors().get(0).getErrorType());
         assertEquals(ErrorTag.OPERATION_FAILED, status.getGlobalErrors().get(0).getErrorTag());
 
-        assertFalse("PATCH operation should fail on mounted device without Broker", status.isOk());
+        assertFalse("Patch operation should fail on mounted device without Broker", status.isOk());
     }
 }

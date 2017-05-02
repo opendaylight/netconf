@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URI;
 import java.text.ParseException;
@@ -38,20 +37,9 @@ import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
-import org.opendaylight.yangtools.yang.parser.spi.source.SourceException;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-/**
- * sal-rest-connector
- * org.opendaylight.controller.sal.rest.impl.test.providers
- *
- *
- *
- * @author <a href="mailto:vdemcak@cisco.com">Vaclav Demcak</a>
- *
- * Created: Mar 11, 2015
- */
+
 public class TestJsonBodyReader extends AbstractBodyReaderTest {
 
     private final JsonNormalizedNodeBodyReader jsonBodyReader;
@@ -69,7 +57,7 @@ public class TestJsonBodyReader extends AbstractBodyReaderTest {
     }
 
 
-    public TestJsonBodyReader () throws NoSuchFieldException, SecurityException {
+    public TestJsonBodyReader() throws NoSuchFieldException, SecurityException {
         super();
         this.jsonBodyReader = new JsonNormalizedNodeBodyReader();
     }
@@ -80,11 +68,12 @@ public class TestJsonBodyReader extends AbstractBodyReaderTest {
     }
 
     @BeforeClass
-    public static void initialization() throws NoSuchFieldException, SecurityException, FileNotFoundException, SourceException, ReactorException {
+    public static void initialization()
+            throws Exception {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
         schemaContext = YangParserTestUtils.parseYangSources(testFiles);
-        controllerContext.setSchemas(schemaContext);
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test
@@ -164,10 +153,10 @@ public class TestJsonBodyReader extends AbstractBodyReaderTest {
         final QName augmentChoice1QName = QName.create(augmentModule.getQNameModule(), "augment-choice1");
         final QName augmentChoice2QName = QName.create(augmentChoice1QName, "augment-choice2");
         final QName containerQName = QName.create(augmentChoice1QName, "case-choice-case-container1");
-        final YangInstanceIdentifier.AugmentationIdentifier augChoice1II = new YangInstanceIdentifier.AugmentationIdentifier(
-                Sets.newHashSet(augmentChoice1QName));
-        final YangInstanceIdentifier.AugmentationIdentifier augChoice2II = new YangInstanceIdentifier.AugmentationIdentifier(
-                Sets.newHashSet(augmentChoice2QName));
+        final YangInstanceIdentifier.AugmentationIdentifier augChoice1II =
+                new YangInstanceIdentifier.AugmentationIdentifier(Sets.newHashSet(augmentChoice1QName));
+        final YangInstanceIdentifier.AugmentationIdentifier augChoice2II =
+                new YangInstanceIdentifier.AugmentationIdentifier(Sets.newHashSet(augmentChoice2QName));
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName())
                 .node(augChoice1II).node(augmentChoice1QName).node(augChoice2II).node(augmentChoice2QName)
                 .node(containerQName);

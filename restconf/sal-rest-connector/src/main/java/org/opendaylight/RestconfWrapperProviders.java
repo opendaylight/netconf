@@ -27,14 +27,13 @@ public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
     private final RestConnectorProvider providerDraft18;
 
     /**
-     * Init both providers:
+     * Init both providers.
      * <ul>
      * <li>draft02 - {@link RestconfProviderImpl}
      * <li>draft18 - {@link RestConnectorProvider}
      * </ul>
      *
-     * @param port
-     *            - port for web sockets in provider for draft02
+     * @param port port for web sockets in provider for draft02
      */
     public RestconfWrapperProviders(final PortNumber port) {
         // Init draft02 provider
@@ -45,14 +44,14 @@ public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
     }
 
     /**
-     * Register both providers, which will use the SAL layer:
+     * Register both providers, which will use the SAL layer.
      * <ul>
      * <li>draft02 - {@link RestconfProviderImpl}
      * <li>draft18 - {@link RestConnectorProvider}
      * </ul>
      *
      * @param broker
-     *            - {@link Broker}
+     *             {@link Broker}
      */
     public void registerProviders(final Broker broker) {
         // Register draft02 provider
@@ -63,10 +62,9 @@ public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
     }
 
     /**
-     * Register runtime beans from restconf draft02 {@link RestconfProviderImpl}
+     * Register runtime beans from restconf draft02 {@link RestconfProviderImpl}.
      *
-     * @param runtimeRegistration
-     *            - for register runtime beans
+     * @param runtimeRegistration for register runtime beans
      * @return {@link RestConnectorRuntimeRegistration}
      */
     public RestConnectorRuntimeRegistration runtimeRegistration(

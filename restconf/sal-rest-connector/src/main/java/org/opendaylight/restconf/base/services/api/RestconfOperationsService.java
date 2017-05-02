@@ -29,27 +29,27 @@ public interface RestconfOperationsService {
      * List of rpc or action operations supported by the server.
      *
      * @param uriInfo
-     *            - URI information
+     *             URI information
      * @return {@link NormalizedNodeContext}
      */
     @GET
     @Path("/operations")
     @Produces({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public NormalizedNodeContext getOperations(@Context UriInfo uriInfo);
+    NormalizedNodeContext getOperations(@Context UriInfo uriInfo);
 
     /**
      * Valid for mount points. List of operations supported by the server.
      *
      * @param identifier
-     *            - path parameter
+     *             path parameter
      * @param uriInfo
-     *            - URI information
+     *             URI information
      * @return {@link NormalizedNodeContext}
      */
     @GET
     @Path("/operations/{identifier:.+}")
     @Produces({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public NormalizedNodeContext getOperations(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
+    NormalizedNodeContext getOperations(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 }

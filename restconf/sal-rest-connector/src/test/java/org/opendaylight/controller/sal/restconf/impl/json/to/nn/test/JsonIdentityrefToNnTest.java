@@ -35,7 +35,7 @@ public class JsonIdentityrefToNnTest extends AbstractBodyReaderTest {
     public static void initialize() {
         schemaContext = schemaContextLoader("/json-to-nn/identityref",
                 schemaContext);
-        controllerContext.setSchemas(schemaContext);
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test

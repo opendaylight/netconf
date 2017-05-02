@@ -20,17 +20,17 @@ import org.opendaylight.yangtools.yang.model.util.type.BaseTypes;
 /**
  * Special case only use by GET restconf/operations (since moment of old Yang
  * parser and old yang model API removal) to build and use fake leaf like child
- * in container
+ * in container.
  */
 final class FakeLeafSchemaNode implements LeafSchemaNode {
 
     private final SchemaPath path;
 
     /**
-     * Base values for fake leaf schema node
+     * Base values for fake leaf schema node.
      *
      * @param qname
-     *            - qname
+     *             qname
      */
     FakeLeafSchemaNode(final QName qname) {
         this.path = FakeContainerSchemaNode.PATH.createChild(qname);

@@ -52,7 +52,7 @@ public class NnToXmlWithDataFromSeveralModulesTest extends
     public static void initialize() {
         schemaContext = schemaContextLoader(
                 "/nn-to-xml/data-of-several-modules/yang", schemaContext);
-        controllerContext.setSchemas(schemaContext);
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test
@@ -124,7 +124,7 @@ public class NnToXmlWithDataFromSeveralModulesTest extends
 
     private static DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> buildContBuilderMod1(
             final String uri, final String rev, final String cont, final String contB, final String lf1,
-            final String lf1_value) {
+            final String lf1Value) {
         final QName contQname = QName.create(uri, rev, cont);
         final QName contBQname = QName.create(uri, rev, contB);
         final QName lf1Qname = QName.create(contQname, lf1);
@@ -143,7 +143,7 @@ public class NnToXmlWithDataFromSeveralModulesTest extends
 
         dataContainerNodeAttrBuilder.withChild(Builders
                 .leafBuilder((LeafSchemaNode) schemaLf1_m1)
-                .withValue(lf1_value).build());
+                .withValue(lf1Value).build());
 
         final DataSchemaNode contBSchemaNode = ((ContainerSchemaNode) contSchemaNode)
                 .getDataChildByName(contBQname);

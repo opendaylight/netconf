@@ -10,6 +10,6 @@ package org.opendaylight.netconf.sal.rest.api;
 
 public interface RestconfConstants {
 
+    String IDENTIFIER = "identifier";
 
-    public static String IDENTIFIER = "identifier";
 }
