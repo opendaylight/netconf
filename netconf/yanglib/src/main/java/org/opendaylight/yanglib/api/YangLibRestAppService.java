@@ -18,7 +18,7 @@ public interface YangLibRestAppService {
 
     /**
      * Get {@link YangLibServiceImpl} via service.
-     * @return
+     * @return YangLibServiceImpl
      */
     YangLibServiceImpl getYangLibService();
 }

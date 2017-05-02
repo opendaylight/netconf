@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Provides schema sources from yang library
+ * Provides schema sources from yang library.
  */
 public class YangLibServiceImpl implements YangLibService {
     private static final Logger LOG = LoggerFactory.getLogger(YangLibServiceImpl.class);
@@ -52,7 +52,7 @@ public class YangLibServiceImpl implements YangLibService {
         try {
             final YangTextSchemaSource source = sourceFuture.checkedGet();
             return new String(ByteStreams.toByteArray(source.openStream()));
-        } catch (SchemaSourceException|IOException e) {
+        } catch (SchemaSourceException | IOException e) {
             throw new IllegalStateException("Unable to get schema" + sourceId, e);
         }
     }
