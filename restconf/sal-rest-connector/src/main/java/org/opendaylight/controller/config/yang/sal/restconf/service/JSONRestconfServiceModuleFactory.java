@@ -15,6 +15,7 @@
 * Do not modify this file unless it is present under src/main directory
 */
 package org.opendaylight.controller.config.yang.sal.restconf.service;
-public class JSONRestconfServiceModuleFactory extends org.opendaylight.controller.config.yang.sal.restconf.service.AbstractJSONRestconfServiceModuleFactory {
+public class JSONRestconfServiceModuleFactory
+        extends org.opendaylight.controller.config.yang.sal.restconf.service.AbstractJSONRestconfServiceModuleFactory {
 
 }

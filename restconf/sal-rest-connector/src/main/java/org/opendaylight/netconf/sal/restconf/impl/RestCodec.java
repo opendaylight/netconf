@@ -85,9 +85,10 @@ public class RestCodec {
                     if (input instanceof IdentityValuesDTO) {
                         return this.identityrefCodec.deserialize(input);
                     }
-                    if(LOG.isDebugEnabled()) {
+                    if (LOG.isDebugEnabled()) {
                         LOG.debug(
-                            "Value is not instance of IdentityrefTypeDefinition but is {}. Therefore NULL is used as translation of  - {}",
+                            "Value is not instance of IdentityrefTypeDefinition but is {}. "
+                                    + "Therefore NULL is used as translation of  - {}",
                             input == null ? "null" : input.getClass(), String.valueOf(input));
                     }
                     return null;
@@ -100,8 +101,8 @@ public class RestCodec {
                         return codec.deserialize((String) input);
                     }
                 } else {
-                    final TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>> typeAwarecodec = TypeDefinitionAwareCodec
-                            .from(this.type);
+                    final TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>> typeAwarecodec =
+                            TypeDefinitionAwareCodec.from(this.type);
                     if (typeAwarecodec != null) {
                         if (input instanceof IdentityValuesDTO) {
                             return typeAwarecodec.deserialize(((IdentityValuesDTO) input).getOriginValue());
@@ -132,12 +133,12 @@ public class RestCodec {
                 } else if (this.type instanceof InstanceIdentifierTypeDefinition) {
                     return this.instanceIdentifier.serialize(input);
                 } else {
-                    final TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>> typeAwarecodec = TypeDefinitionAwareCodec
-                            .from(this.type);
+                    final TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>> typeAwarecodec =
+                            TypeDefinitionAwareCodec.from(this.type);
                     if (typeAwarecodec != null) {
                         return typeAwarecodec.serialize(input);
                     } else {
-                        if(LOG.isDebugEnabled()) {
+                        if (LOG.isDebugEnabled()) {
                             LOG.debug("Codec for type \"" + this.type.getQName().getLocalName()
                                 + "\" is not implemented yet.");
                         }
@@ -212,8 +213,8 @@ public class RestCodec {
             for (final PathArgument pathArgument : data.getPathArguments()) {
                 final IdentityValue identityValue = qNameToIdentityValue(pathArgument.getNodeType());
                 if ((pathArgument instanceof NodeIdentifierWithPredicates) && (identityValue != null)) {
-                    final List<Predicate> predicates = keyValuesToPredicateList(((NodeIdentifierWithPredicates) pathArgument)
-                            .getKeyValues());
+                    final List<Predicate> predicates =
+                            keyValuesToPredicateList(((NodeIdentifierWithPredicates) pathArgument).getKeyValues());
                     identityValue.setPredicates(predicates);
                 } else if ((pathArgument instanceof NodeWithValue) && (identityValue != null)) {
                     final List<Predicate> predicates = new ArrayList<>();
@@ -303,16 +304,16 @@ public class RestCodec {
 
         private static List<Predicate> keyValuesToPredicateList(final Map<QName, Object> keyValues) {
             final List<Predicate> result = new ArrayList<>();
-            for (final QName qName : keyValues.keySet()) {
-                final Object value = keyValues.get(qName);
-                result.add(new Predicate(qNameToIdentityValue(qName), String.valueOf(value)));
+            for (final QName qualifiedName : keyValues.keySet()) {
+                final Object value = keyValues.get(qualifiedName);
+                result.add(new Predicate(qNameToIdentityValue(qualifiedName), String.valueOf(value)));
             }
             return result;
         }
 
-        private static IdentityValue qNameToIdentityValue(final QName qName) {
-            if (qName != null) {
-                return new IdentityValue(qName.getNamespace().toString(), qName.getLocalName());
+        private static IdentityValue qNameToIdentityValue(final QName qualifiedName) {
+            if (qualifiedName != null) {
+                return new IdentityValue(qualifiedName.getNamespace().toString(), qualifiedName.getLocalName());
             }
             return null;
         }

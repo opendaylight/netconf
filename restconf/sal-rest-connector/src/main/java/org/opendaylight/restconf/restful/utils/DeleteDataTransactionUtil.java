@@ -30,7 +30,7 @@ public final class DeleteDataTransactionUtil {
      * Delete data from DS via transaction.
      *
      * @param transactionNode
-     *            - Wrapper for data of transaction
+     *             Wrapper for data of transaction
      * @return {@link Response}
      */
     public static Response deleteData(final TransactionVarsWrapper transactionNode) {
@@ -46,11 +46,11 @@ public final class DeleteDataTransactionUtil {
      * Delete data via transaction. Return error if data to delete does not exist.
      *
      * @param transactionChain
-     *            - transaction chain
+     *             transaction chain
      * @param readWriteTx
-     *            - read and write transaction
+     *             read and write transaction
      * @param path
-     *            - path of data to delete
+     *             path of data to delete
      * @return {@link CheckedFuture}
      */
     private static CheckedFuture<Void, TransactionCommitFailedException> submitData(

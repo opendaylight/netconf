@@ -31,26 +31,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Util class for common methods of transactions
+ * Util class for common methods of transactions.
  *
  */
 public final class TransactionUtil {
 
-    private final static Logger LOG = LoggerFactory.getLogger(TransactionUtil.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TransactionUtil.class);
 
     private TransactionUtil() {
         throw new UnsupportedOperationException("Util class");
     }
 
     /**
-     * Merged parents of data
+     * Merged parents of data.
      *
      * @param path
-     *            - path of data
+     *             path of data
      * @param schemaContext
-     *            - {@link SchemaContext}
+     *             {@link SchemaContext}
      * @param writeTx
-     *            - write transaction
+     *             write transaction
      */
     public static void ensureParentsByMerge(final YangInstanceIdentifier path, final SchemaContext schemaContext,
             final DOMDataWriteTransaction writeTx) {
@@ -85,23 +85,23 @@ public final class TransactionUtil {
      * Check if items already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
      * data does NOT already exists.
      * @param transactionChain Transaction chain
-     * @param rWTransaction Transaction
+     * @param rwTransaction Transaction
      * @param store Datastore
      * @param path Path to be checked
      * @param operationType Type of operation (READ, POST, PUT, DELETE...)
      */
     public static void checkItemExists(final DOMTransactionChain transactionChain,
-                                       final DOMDataReadWriteTransaction rWTransaction,
+                                       final DOMDataReadWriteTransaction rwTransaction,
                                        final LogicalDatastoreType store, final YangInstanceIdentifier path,
                                        final String operationType) {
-        final CheckedFuture<Boolean, ReadFailedException> future = rWTransaction.exists(store, path);
+        final CheckedFuture<Boolean, ReadFailedException> future = rwTransaction.exists(store, path);
         final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
 
         FutureCallbackTx.addCallback(future, operationType, response);
 
         if (!response.result) {
             // close transaction and reset transaction chain
-            rWTransaction.cancel();
+            rwTransaction.cancel();
             RestConnectorProvider.resetTransactionChainForAdapaters(transactionChain);
 
             // throw error
@@ -116,23 +116,23 @@ public final class TransactionUtil {
      * Check if items do NOT already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
      * data already exists.
      * @param transactionChain Transaction chain
-     * @param rWTransaction Transaction
+     * @param rwTransaction Transaction
      * @param store Datastore
      * @param path Path to be checked
      * @param operationType Type of operation (READ, POST, PUT, DELETE...)
      */
     public static void checkItemDoesNotExists(final DOMTransactionChain transactionChain,
-                                              final DOMDataReadWriteTransaction rWTransaction,
+                                              final DOMDataReadWriteTransaction rwTransaction,
                                               final LogicalDatastoreType store, final YangInstanceIdentifier path,
                                               final String operationType) {
-        final CheckedFuture<Boolean, ReadFailedException> future = rWTransaction.exists(store, path);
+        final CheckedFuture<Boolean, ReadFailedException> future = rwTransaction.exists(store, path);
         final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
 
         FutureCallbackTx.addCallback(future, operationType, response);
 
         if (response.result) {
             // close transaction and reset transaction chain
-            rWTransaction.cancel();
+            rwTransaction.cancel();
             RestConnectorProvider.resetTransactionChainForAdapaters(transactionChain);
 
             // throw error

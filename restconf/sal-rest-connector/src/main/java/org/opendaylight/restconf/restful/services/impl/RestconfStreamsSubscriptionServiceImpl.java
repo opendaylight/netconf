@@ -39,7 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link RestconfStreamsSubscriptionService}
+ * Implementation of {@link RestconfStreamsSubscriptionService}.
  *
  */
 public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSubscriptionService {
@@ -52,13 +52,13 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      * Initialize holder of handlers with holders as parameters.
      *
      * @param domDataBrokerHandler
-     *            - handler of {@link DOMDataBroker}
+     *             handler of {@link DOMDataBroker}
      * @param notificationServiceHandler
-     *            - handler of {@link DOMNotificationService}
+     *             handler of {@link DOMNotificationService}
      * @param schemaHandler
-     *            - handler of {@link SchemaContext}
+     *             handler of {@link SchemaContext}
      * @param transactionChainHandler
-     *            - handler of {@link DOMTransactionChain}
+     *             handler of {@link DOMTransactionChain}
      */
     public RestconfStreamsSubscriptionServiceImpl(final DOMDataBrokerHandler domDataBrokerHandler,
             final NotificationServiceHandler notificationServiceHandler, final SchemaContextHandler schemaHandler,
@@ -102,7 +102,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     }
 
     /**
-     * Holder of all handlers for notifications
+     * Holder of all handlers for notifications.
      */
     public final class HandlersHolder {
 
@@ -121,7 +121,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         }
 
         /**
-         * Get {@link DOMDataBrokerHandler}
+         * Get {@link DOMDataBrokerHandler}.
          *
          * @return the domDataBrokerHandler
          */
@@ -130,7 +130,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         }
 
         /**
-         * Get {@link NotificationServiceHandler}
+         * Get {@link NotificationServiceHandler}.
          *
          * @return the notificationServiceHandler
          */
@@ -139,7 +139,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         }
 
         /**
-         * Get {@link TransactionChainHandler}
+         * Get {@link TransactionChainHandler}.
          *
          * @return the transactionChainHandler
          */
@@ -148,7 +148,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         }
 
         /**
-         * Get {@link SchemaContextHandler}
+         * Get {@link SchemaContextHandler}.
          *
          * @return the schemaHandler
          */
@@ -158,7 +158,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     }
 
     /**
-     * Parser and holder of query paramteres from uriInfo for notifications
+     * Parser and holder of query paramteres from uriInfo for notifications.
      *
      */
     public static final class NotificationQueryParams {
@@ -175,33 +175,33 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
         static NotificationQueryParams fromUriInfo(final UriInfo uriInfo) {
             Instant start = null;
-            boolean startTime_used = false;
+            boolean startTimeUsed = false;
             Instant stop = null;
-            boolean stopTime_used = false;
+            boolean stopTimeUsed = false;
             String filter = null;
-            boolean filter_used = false;
+            boolean filterUsed = false;
 
             for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
                 switch (entry.getKey()) {
                     case "start-time":
-                        if (!startTime_used) {
-                            startTime_used = true;
+                        if (!startTimeUsed) {
+                            startTimeUsed = true;
                             start = SubscribeToStreamUtil.parseDateFromQueryParam(entry);
                         } else {
                             throw new RestconfDocumentedException("Start-time parameter can be used only once.");
                         }
                         break;
                     case "stop-time":
-                        if (!stopTime_used) {
-                            stopTime_used = true;
+                        if (!stopTimeUsed) {
+                            stopTimeUsed = true;
                             stop = SubscribeToStreamUtil.parseDateFromQueryParam(entry);
                         } else {
                             throw new RestconfDocumentedException("Stop-time parameter can be used only once.");
                         }
                         break;
                     case "filter":
-                        if (!filter_used) {
-                            filter_used = true;
+                        if (!filterUsed) {
+                            filterUsed = true;
                             filter = entry.getValue().iterator().next();
                         }
                         break;
@@ -210,7 +210,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                                 "Bad parameter used with notifications: " + entry.getKey());
                 }
             }
-            if (!startTime_used && stopTime_used) {
+            if (!startTimeUsed && stopTimeUsed) {
                 throw new RestconfDocumentedException("Stop-time parameter has to be used with start-time parameter.");
             }
 
@@ -218,7 +218,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         }
 
         /**
-         * Get start-time query parameter
+         * Get start-time query parameter.
          *
          * @return start-time
          */
@@ -227,7 +227,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         }
 
         /**
-         * Get stop-time query parameter
+         * Get stop-time query parameter.
          *
          * @return stop-time
          */
@@ -236,7 +236,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         }
 
         /**
-         * Get filter query parameter
+         * Get filter query parameter.
          *
          * @return filter
          */

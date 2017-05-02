@@ -175,7 +175,6 @@ public class DepthAwareNormalizedNodeWriterTest {
 
     /**
      * Test write {@link MapNode} with children and write also all its children.
-     *
      * FIXME
      * Although ordered writer is used leaves are not written in expected order.
      *
@@ -303,7 +302,6 @@ public class DepthAwareNormalizedNodeWriterTest {
 
     /**
      * Test write with {@link MapEntryNode} ordered and write also all its children.
-     *
      * FIXME
      * Although ordered writer is used leaves are not written in expected order.
      *

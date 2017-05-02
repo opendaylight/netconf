@@ -139,21 +139,21 @@ public class ExpressionParserTest {
 
         // FIXME: do not use reflection here
         final Class<?> superclass = listener.getClass().getSuperclass().getSuperclass();
-        Method m = null;
-        for (final Method method : superclass.getDeclaredMethods()) {
-            if (method.getName().equals("parseFilterParam")) {
-                m = method;
+        Method method = null;
+        for (final Method met : superclass.getDeclaredMethods()) {
+            if (met.getName().equals("parseFilterParam")) {
+                method = met;
             }
         }
-        if (m == null) {
+        if (method == null) {
             throw new Exception("Methode parseFilterParam doesn't exist in " + superclass.getName());
         }
-        m.setAccessible(true);
-        return (boolean) m.invoke(listener, readFile(xml));
+        method.setAccessible(true);
+        return (boolean) method.invoke(listener, readFile(xml));
     }
 
     private static String readFile(final File xml) throws IOException {
-        try (final BufferedReader br = new BufferedReader(new FileReader(xml))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(xml))) {
             final StringBuilder sb = new StringBuilder();
             String line = br.readLine();
 

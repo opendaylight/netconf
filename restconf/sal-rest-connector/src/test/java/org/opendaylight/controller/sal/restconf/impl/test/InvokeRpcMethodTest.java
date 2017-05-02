@@ -142,21 +142,25 @@ public class InvokeRpcMethodTest {
         }
         assertNotNull(rpcInputSchemaNode);
 
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> container = Builders.containerBuilder(rpcInputSchemaNode);
+        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> container =
+                Builders.containerBuilder(rpcInputSchemaNode);
 
         final QName contQName = QName.create(rpcModule.getQNameModule(), "cont");
         final DataSchemaNode contSchemaNode = rpcInputSchemaNode.getDataChildByName(contQName);
         assertTrue(contSchemaNode instanceof ContainerSchemaNode);
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> contNode = Builders.containerBuilder((ContainerSchemaNode) contSchemaNode);
+        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> contNode =
+                Builders.containerBuilder((ContainerSchemaNode) contSchemaNode);
 
         final QName lfQName = QName.create(rpcModule.getQNameModule(), "lf");
         final DataSchemaNode lfSchemaNode = ((ContainerSchemaNode) contSchemaNode).getDataChildByName(lfQName);
         assertTrue(lfSchemaNode instanceof LeafSchemaNode);
-        final LeafNode<Object> lfNode = (Builders.leafBuilder((LeafSchemaNode) lfSchemaNode).withValue("any value")).build();
+        final LeafNode<Object> lfNode =
+                (Builders.leafBuilder((LeafSchemaNode) lfSchemaNode).withValue("any value")).build();
         contNode.withChild(lfNode);
         container.withChild(contNode.build());
 
-        return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpcInputSchemaNode, null, schema), container.build());
+        return new NormalizedNodeContext(
+                new InstanceIdentifierContext<>(null, rpcInputSchemaNode, null, schema), container.build());
     }
 
     @Test
@@ -178,16 +182,16 @@ public class InvokeRpcMethodTest {
             fail("Expected an exception to be thrown.");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.APPLICATION, ErrorTag.OPERATION_NOT_SUPPORTED,
-                    Optional.<String> absent(), Optional.<String> absent());
+                    Optional.<String>absent(), Optional.<String>absent());
         }
     }
 
-    void verifyRestconfDocumentedException(final RestconfDocumentedException e, final int index,
+    void verifyRestconfDocumentedException(final RestconfDocumentedException restDocumentedException, final int index,
             final ErrorType expErrorType, final ErrorTag expErrorTag, final Optional<String> expErrorMsg,
             final Optional<String> expAppTag) {
         RestconfError actual = null;
         try {
-            actual = e.getErrors().get(index);
+            actual = restDocumentedException.getErrors().get(index);
         } catch (final ArrayIndexOutOfBoundsException ex) {
             fail("RestconfError not found at index " + index);
         }
@@ -208,9 +212,9 @@ public class InvokeRpcMethodTest {
     @Test
     public void testInvokeRpcWithNoPayloadRpc_FailWithRpcError() {
         final List<RpcError> rpcErrors = Arrays.asList(
-            RpcResultBuilder.newError( RpcError.ErrorType.TRANSPORT, "bogusTag", "foo" ),
-            RpcResultBuilder.newWarning( RpcError.ErrorType.RPC, "in-use", "bar",
-                                         "app-tag", null, null ) );
+                RpcResultBuilder.newError(RpcError.ErrorType.TRANSPORT, "bogusTag", "foo"),
+                RpcResultBuilder.newWarning(RpcError.ErrorType.RPC, "in-use", "bar",
+                        "app-tag", null, null));
 
         final DOMRpcResult resutl = new DefaultDOMRpcResult(rpcErrors);
         final CheckedFuture<DOMRpcResult, DOMRpcException> future = Futures.immediateCheckedFuture(resutl);
@@ -228,7 +232,7 @@ public class InvokeRpcMethodTest {
             fail("Expected an exception to be thrown.");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED, Optional.of("foo"),
-                    Optional.<String> absent());
+                    Optional.<String>absent());
             verifyRestconfDocumentedException(e, 1, ErrorType.RPC, ErrorTag.IN_USE, Optional.of("bar"),
                     Optional.of("app-tag"));
         }
@@ -244,7 +248,7 @@ public class InvokeRpcMethodTest {
         final SchemaPath path = SchemaPath.create(true, qname);
 
         final BrokerFacade brokerFacade = mock(BrokerFacade.class);
-        when(brokerFacade.invokeRpc(eq(path), any (NormalizedNode.class))).thenReturn(future);
+        when(brokerFacade.invokeRpc(eq(path), any(NormalizedNode.class))).thenReturn(future);
 
         this.restconfImpl.setBroker(brokerFacade);
 
@@ -262,7 +266,7 @@ public class InvokeRpcMethodTest {
             fail("Expected an exception");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                    Optional.<String> absent(), Optional.<String> absent());
+                    Optional.<String>absent(), Optional.<String>absent());
         }
     }
 
@@ -273,7 +277,7 @@ public class InvokeRpcMethodTest {
             fail("Expected an exception");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.RPC, ErrorTag.UNKNOWN_ELEMENT,
-                    Optional.<String> absent(), Optional.<String> absent());
+                    Optional.<String>absent(), Optional.<String>absent());
         }
     }
 
@@ -309,7 +313,8 @@ public class InvokeRpcMethodTest {
         final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder =
                 Builders.containerBuilder(rpcInputSchemaNode);
 
-        final NormalizedNodeContext payload = new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpcInputSchemaNode,
+        final NormalizedNodeContext payload =
+                new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpcInputSchemaNode,
                 null, schemaContext), containerBuilder.build());
 
         final BrokerFacade brokerFacade = mock(BrokerFacade.class);
@@ -330,7 +335,7 @@ public class InvokeRpcMethodTest {
             fail("Expected an exception.");
         } catch (final RestconfDocumentedException e) {
             verifyRestconfDocumentedException(e, 0, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                    Optional.<String> absent(), Optional.<String> absent());
+                    Optional.<String>absent(), Optional.<String>absent());
         }
     }
 
@@ -383,10 +388,8 @@ public class InvokeRpcMethodTest {
     }
 
     /**
-     *
      * Tests calling of RestConfImpl method invokeRpc. In the method there is searched rpc in remote schema context.
      * This rpc is then executed.
-     *
      * I wasn't able to simulate calling of rpc on remote device therefore this testing method raise method when rpc is
      * invoked.
      */

@@ -38,11 +38,12 @@ import org.opendaylight.yangtools.yang.model.api.UsesNode;
 /**
  * Special case only use by GET restconf/operations (since moment of old Yang
  * parser and old yang model API removal) to build and use fake module to create
- * new schema context
+ * new schema context.
  */
 final class FakeRestconfModule implements Module {
 
     static final QNameModule QNAME;
+
     static {
         Date date;
         try {
@@ -57,12 +58,12 @@ final class FakeRestconfModule implements Module {
     private final ImmutableSet<ModuleImport> imports;
 
     /**
-     * Instantiate a new fake module
+     * Instantiate a new fake module.
      *
      * @param neededModules needed import statements
      * @param child fake child container
      */
-    public FakeRestconfModule(final Collection<Module> neededModules, final ContainerSchemaNode child) {
+    FakeRestconfModule(final Collection<Module> neededModules, final ContainerSchemaNode child) {
         this.children = ImmutableList.of(child);
         this.imports = ImmutableSet.copyOf(Collections2.transform(neededModules, FakeModuleImport::new));
     }

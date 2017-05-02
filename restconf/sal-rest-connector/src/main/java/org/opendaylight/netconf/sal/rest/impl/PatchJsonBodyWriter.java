@@ -24,8 +24,8 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusEntity;
+import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchStatusEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.restconf.Rfc8040;
 import org.opendaylight.restconf.utils.RestconfConstants;
@@ -35,22 +35,22 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 @Provider
 @Produces({Draft02.MediaTypes.PATCH_STATUS + RestconfService.JSON,
         Rfc8040.MediaTypes.PATCH_STATUS + RestconfConstants.JSON})
-public class PATCHJsonBodyWriter implements MessageBodyWriter<PATCHStatusContext> {
+public class PatchJsonBodyWriter implements MessageBodyWriter<PatchStatusContext> {
 
     @Override
     public boolean isWriteable(final Class<?> type, final Type genericType,
                                final Annotation[] annotations, final MediaType mediaType) {
-        return type.equals(PATCHStatusContext.class);
+        return type.equals(PatchStatusContext.class);
     }
 
     @Override
-    public long getSize(final PATCHStatusContext patchStatusContext, final Class<?> type, final Type genericType,
+    public long getSize(final PatchStatusContext patchStatusContext, final Class<?> type, final Type genericType,
                         final Annotation[] annotations, final MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(final PATCHStatusContext patchStatusContext, final Class<?> type, final Type genericType,
+    public void writeTo(final PatchStatusContext patchStatusContext, final Class<?> type, final Type genericType,
                         final Annotation[] annotations, final MediaType mediaType,
                         final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream)
             throws IOException, WebApplicationException {
@@ -70,7 +70,7 @@ public class PATCHJsonBodyWriter implements MessageBodyWriter<PATCHStatusContext
             jsonWriter.beginObject();
             jsonWriter.name("edit");
             jsonWriter.beginArray();
-            for (final PATCHStatusEntity patchStatusEntity : patchStatusContext.getEditCollection()) {
+            for (final PatchStatusEntity patchStatusEntity : patchStatusContext.getEditCollection()) {
                 jsonWriter.beginObject();
                 jsonWriter.name("edit-id").value(patchStatusEntity.getEditId());
                 if (patchStatusEntity.getEditErrors() != null) {

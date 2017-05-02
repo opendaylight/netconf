@@ -26,7 +26,7 @@ public interface RestconfSchemaService {
      * Get schema of specific module.
      *
      * @param identifier
-     *            - path parameter
+     *             path parameter
      * @return {@link SchemaExportContext}
      */
     @GET

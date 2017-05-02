@@ -42,7 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Util class for streams
+ * Util class for streams.
  *
  * <ul>
  * <li>create stream
@@ -60,10 +60,10 @@ public final class CreateStreamUtil {
     }
 
     /**
-     * Create stream with POST operation via RPC
+     * Create stream with POST operation via RPC.
      *
      * @param payload
-     *            - input of rpc - example in JSON:
+     *             input of rpc - example in JSON:
      *
      *            <pre>
      *            {@code
@@ -78,7 +78,7 @@ public final class CreateStreamUtil {
      *            </pre>
      *
      * @param refSchemaCtx
-     *            - reference to {@link SchemaContext} -
+     *             reference to {@link SchemaContext} -
      *            {@link SchemaContextRef}
      * @return {@link CheckedFuture} with {@link DOMRpcResult} - This mean
      *         output of RPC - example in JSON:
@@ -105,7 +105,7 @@ public final class CreateStreamUtil {
         final QName streamNameQname = QName.create(qname, "stream-name");
 
         final NotificationOutputType outputType = prepareOutputType(data);
-        if(outputType.equals(NotificationOutputType.JSON)){
+        if (outputType.equals(NotificationOutputType.JSON)) {
             streamName = streamName + "/JSON";
         }
 
@@ -120,8 +120,10 @@ public final class CreateStreamUtil {
     }
 
     /**
+     * Prepare {@code NotificationOutputType}.
+     *
      * @param data
-     *            - data of notification
+     *             data of notification
      * @return output type fo notification
      */
     private static NotificationOutputType prepareOutputType(final ContainerNode data) {
@@ -129,7 +131,8 @@ public final class CreateStreamUtil {
         return outputType = outputType == null ? NotificationOutputType.XML : outputType;
     }
 
-    private static String prepareDataChangeNotifiStreamName(final YangInstanceIdentifier path, final SchemaContext schemaContext,
+    private static String prepareDataChangeNotifiStreamName(final YangInstanceIdentifier path,
+                                                            final SchemaContext schemaContext,
             final ContainerNode data) {
         LogicalDatastoreType ds = parseEnum(data, LogicalDatastoreType.class,
                 RestconfStreamsConstants.DATASTORE_PARAM_NAME);
@@ -165,36 +168,36 @@ public final class CreateStreamUtil {
         return ResolveEnumUtil.resolveEnum(clazz, (String) value);
     }
 
-    private static YangInstanceIdentifier preparePath(final ContainerNode data, final QName qName) {
+    private static YangInstanceIdentifier preparePath(final ContainerNode data, final QName qualifiedName) {
         final Optional<DataContainerChild<? extends PathArgument, ?>> path = data
-                .getChild(new YangInstanceIdentifier.NodeIdentifier(QName.create(qName, "path")));
+                .getChild(new YangInstanceIdentifier.NodeIdentifier(QName.create(qualifiedName, "path")));
         Object pathValue = null;
         if (path.isPresent()) {
             pathValue = path.get().getValue();
         }
         if (!(pathValue instanceof YangInstanceIdentifier)) {
             final String errMsg = "Instance identifier was not normalized correctly ";
-            LOG.debug(errMsg + qName);
+            LOG.debug(errMsg + qualifiedName);
             throw new RestconfDocumentedException(errMsg, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
         }
         return (YangInstanceIdentifier) pathValue;
     }
 
     /**
-     * Create stream with POST operation via RPC
+     * Create stream with POST operation via RPC.
      *
      * @param notificatinoDefinition
-     *            - input of RPC
+     *             input of RPC
      * @param refSchemaCtx
-     *            - schemaContext
+     *             schemaContext
      * @param outputType
+     *              output type
      * @return {@link DOMRpcResult}
      */
     public static List<NotificationListenerAdapter> createYangNotifiStream(
             final NotificationDefinition notificatinoDefinition, final SchemaContextRef refSchemaCtx,
             final String outputType) {
         final List<SchemaPath> paths = new ArrayList<>();
-        String streamName = RestconfStreamsConstants.CREATE_NOTIFICATION_STREAM + "/";
         final QName notificatinoDefinitionQName = notificatinoDefinition.getQName();
         final Module module =
                 refSchemaCtx.findModuleByNamespaceAndRevision(notificatinoDefinitionQName.getModule().getNamespace(),
@@ -212,6 +215,7 @@ public final class CreateStreamUtil {
         Preconditions.checkNotNull(notifiDef,
                 "Notification " + notificatinoDefinitionQName + "doesn't exist in module " + moduleName);
         paths.add(notifiDef.getPath());
+        String streamName = RestconfStreamsConstants.CREATE_NOTIFICATION_STREAM + "/";
         streamName = streamName + moduleName + ":" + notificatinoDefinitionQName.getLocalName();
         if (outputType.equals("JSON")) {
             streamName = streamName + "/JSON";

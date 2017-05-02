@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.utils.mapping;
 
 /**
- * Util class for constants of mapping node
+ * Util class for constants of mapping node.
  *
  */
 public final class RestconfMappingNodeConstants {

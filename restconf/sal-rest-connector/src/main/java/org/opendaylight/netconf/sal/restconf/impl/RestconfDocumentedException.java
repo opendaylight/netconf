@@ -25,9 +25,11 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
  * Unchecked exception to communicate error information, as defined in the ietf restcong draft, to be sent to the
  * client.
  *
+ * <p>
+ * See also <a href="https://tools.ietf.org/html/draft-bierman-netconf-restconf-02">RESTCONF</a>
+ *
  * @author Devin Avery
  * @author Thomas Pantelis
- * See also <a href="https://tools.ietf.org/html/draft-bierman-netconf-restconf-02">RESTCONF</a>
  */
 public class RestconfDocumentedException extends WebApplicationException {
 
@@ -124,7 +126,7 @@ public class RestconfDocumentedException extends WebApplicationException {
         // FIXME: We override getMessage so supplied message is lost for any public access
         // this was lost also in original code.
         super(cause);
-        if(!errors.isEmpty()) {
+        if (!errors.isEmpty()) {
             this.errors = ImmutableList.copyOf(errors);
         } else {
             this.errors = ImmutableList.of(new RestconfError(RestconfError.ErrorType.APPLICATION,
@@ -163,7 +165,7 @@ public class RestconfDocumentedException extends WebApplicationException {
 
     private static List<RestconfError> convertToRestconfErrors(final Collection<RpcError> rpcErrors) {
         final List<RestconfError> errorList = Lists.newArrayList();
-        if(rpcErrors != null) {
+        if (rpcErrors != null) {
             for (RpcError rpcError : rpcErrors) {
                 errorList.add(new RestconfError(rpcError));
             }

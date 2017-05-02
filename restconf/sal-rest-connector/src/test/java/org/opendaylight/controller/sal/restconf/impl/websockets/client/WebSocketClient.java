@@ -31,23 +31,19 @@ import org.slf4j.LoggerFactory;
 
 public class WebSocketClient {
 
+    private static final Logger LOG = LoggerFactory.getLogger(WebSocketClient.class);
+
     private final URI uri;
     private final Bootstrap bootstrap = new Bootstrap();
     private final WebSocketClientHandler clientHandler;
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketClient.class);
     private Channel clientChannel;
     private final EventLoopGroup group = new NioEventLoopGroup();
 
     public WebSocketClient(final URI uri, final IClientMessageCallback clientMessageCallback) {
         this.uri = uri;
         clientHandler = new WebSocketClientHandler(WebSocketClientHandshakerFactory.newHandshaker(uri,
-                WebSocketVersion.V13, null, false, null), clientMessageCallback); // last
-                                                                                  // null
-                                                                                  // could
-                                                                                  // be
-                                                                                  // replaced
-                                                                                  // with
-                                                                                  // DefaultHttpHeaders
+                WebSocketVersion.V13, null, false, null), clientMessageCallback);
+        // last null could be replaced with DefaultHttpHeaders
         initialize();
     }
 
@@ -70,7 +66,7 @@ public class WebSocketClient {
     }
 
     public void connect() throws InterruptedException {
-        System.out.println("WebSocket Client connecting");
+        LOG.info("WebSocket Client connecting");
         clientChannel = bootstrap.connect(uri.getHost(), uri.getPort()).sync().channel();
         clientHandler.handshakeFuture().sync();
     }
@@ -112,7 +108,7 @@ public class WebSocketClient {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             String input = br.readLine();
             if (input.equals("q")) {
-                System.out.print("Would you like to close stream? (Y = yes, empty = yes)\n");
+                LOG.info("Would you like to close stream? (Y = yes, empty = yes)\n");
                 input = br.readLine();
                 if (input.equals("yes") || input.isEmpty()) {
                     webSocketClient.close("opendaylight-inventory:nodes");
@@ -126,7 +122,7 @@ public class WebSocketClient {
         @Override
         public void onMessageReceived(final Object message) {
             if (message instanceof TextWebSocketFrame) {
-                logger.info("received message {}" + ((TextWebSocketFrame) message).text());
+                LOG.info("received message {}" + ((TextWebSocketFrame) message).text());
             }
         }
     }

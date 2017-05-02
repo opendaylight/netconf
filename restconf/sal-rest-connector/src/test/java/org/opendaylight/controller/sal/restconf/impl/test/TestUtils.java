@@ -229,9 +229,9 @@ public final class TestUtils {
                 "number of keys argument have to be divisible by 2 (map)");
         final Map<QName, Object> predicate = new HashMap<>();
 
-        int i = 0;
-        while (i < keysAndValues.length) {
-            predicate.put(QName.create(namespace, revision, keysAndValues[i++]), keysAndValues[i++]);
+        int index = 0;
+        while (index < keysAndValues.length) {
+            predicate.put(QName.create(namespace, revision, keysAndValues[index++]), keysAndValues[index++]);
         }
 
         return new NodeIdentifierWithPredicates(QName.create(namespace, revision, localName), predicate);

@@ -29,17 +29,17 @@ public final class SchemaContextRef {
     private final SoftReference<SchemaContext> schemaContextRef;
 
     /**
-     * Create {@link SoftReference} of actual {@link SchemaContext}
+     * Create {@link SoftReference} of actual {@link SchemaContext}.
      *
      * @param schemaContext
-     *            - actual {@link SchemaContext}
+     *             actual {@link SchemaContext}
      */
     public SchemaContextRef(final SchemaContext schemaContext) {
         this.schemaContextRef = new SoftReference<SchemaContext>(schemaContext);
     }
 
     /**
-     * Get {@link SchemaContext} from reference
+     * Get {@link SchemaContext} from reference.
      *
      * @return {@link SchemaContext}
      */
@@ -49,7 +49,7 @@ public final class SchemaContextRef {
 
     /**
      * Get all modules like {@link Set} of {@link Module} from
-     * {@link SchemaContext}
+     * {@link SchemaContext}.
      *
      * @return {@link Set} of {@link Module}
      */
@@ -59,10 +59,10 @@ public final class SchemaContextRef {
 
     /**
      * Get all modules like {@link Set} of {@link Module} from
-     * {@link SchemaContext} of {@link DOMMountPoint}
+     * {@link SchemaContext} of {@link DOMMountPoint}.
      *
      * @param mountPoint
-     *            - mount point
+     *             mount point
      *
      * @return {@link Set} of {@link Module}
      */
@@ -73,7 +73,7 @@ public final class SchemaContextRef {
 
     /**
      * Get {@link Module} by ietf-restconf qname from
-     * {@link Rfc8040.RestconfModule}
+     * {@link Rfc8040.RestconfModule}.
      *
      * @return {@link Module}
      */
@@ -84,12 +84,12 @@ public final class SchemaContextRef {
 
     /**
      * Find {@link Module} in {@link SchemaContext} by {@link URI} and
-     * {@link Date}
+     * {@link Date}.
      *
      * @param namespace
-     *            - namespace of module
+     *             namespace of module
      * @param revision
-     *            - revision of module
+     *             revision of module
      * @return {@link Module}
      */
     public Module findModuleByNamespaceAndRevision(final URI namespace, final Date revision) {
@@ -99,12 +99,12 @@ public final class SchemaContextRef {
 
     /**
      * Find {@link Module} in {@link SchemaContext} of {@link DOMMountPoint} by
-     * {@link QName} of {@link Module}
+     * {@link QName} of {@link Module}.
      *
      * @param mountPoint
-     *            - mount point
+     *             mount point
      * @param moduleQname
-     *            - {@link QName} of module
+     *             {@link QName} of module
      * @return {@link Module}
      */
     public Module findModuleInMountPointByQName(final DOMMountPoint mountPoint, final QName moduleQname) {
@@ -114,10 +114,10 @@ public final class SchemaContextRef {
     }
 
     /**
-     * Find {@link Module} in {@link SchemaContext} by {@link QName}
+     * Find {@link Module} in {@link SchemaContext} by {@link QName}.
      *
      * @param moduleQname
-     *            - {@link QName} of module
+     *             {@link QName} of module
      * @return {@link Module}
      */
     public Module findModuleByQName(final QName moduleQname) {
@@ -129,9 +129,9 @@ public final class SchemaContextRef {
      * and {@link Date} revision.
      *
      * @param localName
-     *            - local name of module
+     *             local name of module
      * @param revision
-     *            - revision of module
+     *             revision of module
      * @return {@link Module}
      */
     public Module findModuleByNameAndRevision(final String localName, final Date revision) {
