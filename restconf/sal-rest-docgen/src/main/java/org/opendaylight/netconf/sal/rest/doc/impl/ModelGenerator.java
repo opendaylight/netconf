@@ -506,8 +506,8 @@ public class ModelGenerator {
     private String processLeafRef(final DataSchemaNode node, final JSONObject property, final SchemaContext schemaContext,
                                   final TypeDefinition<?> leafTypeDef) {
         RevisionAwareXPath xPath = ((LeafrefTypeDefinition) leafTypeDef).getPathStatement();
-        final URI namespace = leafTypeDef.getQName().getNamespace();
-        final Date revision = leafTypeDef.getQName().getRevision();
+        final URI namespace = node.getQName().getNamespace();
+        final Date revision = node.getQName().getRevision();
         final Module module = schemaContext.findModuleByNamespaceAndRevision(namespace, revision);
         final SchemaNode schemaNode;
 
