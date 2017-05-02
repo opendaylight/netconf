@@ -20,16 +20,16 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.netconf.sal.rest.impl.PATCH;
+import org.opendaylight.netconf.sal.rest.impl.Patch;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
 import org.opendaylight.restconf.Rfc8040;
 import org.opendaylight.restconf.utils.RestconfConstants;
 
 /**
  * The "{+restconf}/data" subtree represents the datastore resource type, which
- * is a collection of configuration data and state data nodes
+ * is a collection of configuration data and state data nodes.
  *
  */
 public interface RestconfDataService {
@@ -38,9 +38,9 @@ public interface RestconfDataService {
      * Get target data resource.
      *
      * @param identifier
-     *            - path to target
+     *            path to target
      * @param uriInfo
-     *            - URI info
+     *            URI info
      * @return {@link NormalizedNodeContext}
      */
     @GET
@@ -53,7 +53,7 @@ public interface RestconfDataService {
      * Get target data resource from data root.
      *
      * @param uriInfo
-     *            - URI info
+     *            URI info
      * @return {@link NormalizedNodeContext}
      */
     @GET
@@ -66,9 +66,9 @@ public interface RestconfDataService {
      * Create or replace the target data resource.
      *
      * @param identifier
-     *            - path to target
+     *            path to target
      * @param payload
-     *            - data node for put to config DS
+     *            data node for put to config DS
      * @return {@link Response}
      */
     @PUT
@@ -82,11 +82,11 @@ public interface RestconfDataService {
      * Create a data resource in target.
      *
      * @param identifier
-     *            - path to target
+     *            path to target
      * @param payload
-     *            - new data
+     *            new data
      * @param uriInfo
-     *            - URI info
+     *            URI info
      * @return {@link Response}
      */
     @POST
@@ -100,9 +100,9 @@ public interface RestconfDataService {
      * Create a data resource.
      *
      * @param payload
-     *            - new data
+     *            new data
      * @param uriInfo
-     *            - URI info
+     *            URI info
      * @return {@link Response}
      */
     @POST
@@ -115,7 +115,7 @@ public interface RestconfDataService {
      * Delete the target data resource.
      *
      * @param identifier
-     *            - path to target
+     *            path to target
      * @return {@link Response}
      */
     @DELETE
@@ -127,34 +127,34 @@ public interface RestconfDataService {
      * server.
      *
      * @param identifier
-     *            - path to target
+     *            path to target
      * @param context
-     *            - edits
+     *            edits
      * @param uriInfo
-     *            - URI info
-     * @return {@link PATCHStatusContext}
+     *            URI info
+     * @return {@link PatchStatusContext}
      */
-    @PATCH
+    @Patch
     @Path("/data/{identifier:.+}")
     @Consumes({ Rfc8040.MediaTypes.PATCH + RestconfConstants.JSON, Rfc8040.MediaTypes.PATCH + RestconfConstants.XML })
     @Produces({ Rfc8040.MediaTypes.PATCH_STATUS + RestconfConstants.JSON,
             Rfc8040.MediaTypes.PATCH_STATUS + RestconfConstants.XML })
-    PATCHStatusContext patchData(@Encoded @PathParam("identifier") String identifier, PATCHContext context,
-            @Context UriInfo uriInfo);
+    PatchStatusContext patchData(@Encoded @PathParam("identifier") String identifier, PatchContext context,
+                                 @Context UriInfo uriInfo);
 
     /**
      * Ordered list of edits that are applied to the datastore by the server.
      *
      * @param context
-     *            - edits
+     *            edits
      * @param uriInfo
-     *            - URI info
-     * @return {@link PATCHStatusContext}
+     *            URI info
+     * @return {@link PatchStatusContext}
      */
-    @PATCH
+    @Patch
     @Path("/data")
     @Consumes({ Rfc8040.MediaTypes.PATCH + RestconfConstants.JSON, Rfc8040.MediaTypes.PATCH + RestconfConstants.XML })
     @Produces({ Rfc8040.MediaTypes.PATCH_STATUS + RestconfConstants.JSON,
             Rfc8040.MediaTypes.PATCH_STATUS + RestconfConstants.XML })
-    PATCHStatusContext patchData(PATCHContext context, @Context UriInfo uriInfo);
+    PatchStatusContext patchData(PatchContext context, @Context UriInfo uriInfo);
 }

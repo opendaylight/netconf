@@ -12,7 +12,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
-public class InstanceIdentifierContext <T extends SchemaNode> {
+public class InstanceIdentifierContext<T extends SchemaNode> {
 
     private final YangInstanceIdentifier instanceIdentifier;
     private final T schemaNode;

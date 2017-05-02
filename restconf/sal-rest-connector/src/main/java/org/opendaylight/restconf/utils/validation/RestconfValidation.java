@@ -18,7 +18,7 @@ import org.opendaylight.restconf.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 
 /**
- * Util class for validations
+ * Util class for validations.
  *
  */
 public final class RestconfValidation {
@@ -31,7 +31,7 @@ public final class RestconfValidation {
      * Validation and parsing of revision.
      *
      * @param revisionDate
-     *            - iterator
+     *             iterator
      * @return {@link Date}
      */
     public static Date validateAndGetRevision(final Iterator<String> revisionDate) {
@@ -48,7 +48,7 @@ public final class RestconfValidation {
      * Validation of name.
      *
      * @param moduleName
-     *            - iterator
+     *             iterator
      * @return {@link String}
      */
     public static String validateAndGetModulName(final Iterator<String> moduleName) {

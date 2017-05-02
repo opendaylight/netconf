@@ -19,7 +19,8 @@ package org.opendaylight.controller.config.yang.md.sal.rest.connector;
 import org.opendaylight.controller.config.api.DependencyResolver;
 import org.osgi.framework.BundleContext;
 
-public class RestConnectorModuleFactory extends org.opendaylight.controller.config.yang.md.sal.rest.connector.AbstractRestConnectorModuleFactory {
+public class RestConnectorModuleFactory
+        extends org.opendaylight.controller.config.yang.md.sal.rest.connector.AbstractRestConnectorModuleFactory {
 
     @Override
     public RestConnectorModule instantiateModule(String instanceName, DependencyResolver dependencyResolver,

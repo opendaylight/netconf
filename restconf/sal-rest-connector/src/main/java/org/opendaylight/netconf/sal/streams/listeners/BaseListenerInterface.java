@@ -12,12 +12,12 @@ import java.util.Set;
 
 /**
  * Base interface for both listeners({@link ListenerAdapter},
- * {@link NotificationListenerAdapter})
+ * {@link NotificationListenerAdapter}).
  */
 interface BaseListenerInterface extends AutoCloseable {
 
     /**
-     * Return all subscribers of listener
+     * Return all subscribers of listener.
      *
      * @return set of subscribers
      */
@@ -32,14 +32,14 @@ interface BaseListenerInterface extends AutoCloseable {
     boolean hasSubscribers();
 
     /**
-     * Get name of stream
+     * Get name of stream.
      *
      * @return stream name
      */
     String getStreamName();
 
     /**
-     * Get output type
+     * Get output type.
      *
      * @return outputType
      */

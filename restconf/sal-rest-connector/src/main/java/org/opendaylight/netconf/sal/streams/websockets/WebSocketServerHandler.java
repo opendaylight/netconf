@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketServerHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WebSocketServerHandler.class);
 
     private WebSocketServerHandshaker handshaker;
 
@@ -88,9 +88,9 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
             final ListenerAdapter listener = Notificator.getListenerFor(streamName);
             if (listener != null) {
                 listener.addSubscriber(ctx.channel());
-                logger.debug("Subscriber successfully registered.");
+                LOG.debug("Subscriber successfully registered.");
             } else {
-                logger.error("Listener for stream with name '{}' was not found.", streamName);
+                LOG.error("Listener for stream with name '{}' was not found.", streamName);
                 sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, INTERNAL_SERVER_ERROR));
             }
         } else if (streamName.contains(RestconfImpl.NOTIFICATION_STREAM)) {
@@ -98,16 +98,17 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
             if (!listeners.isEmpty() && (listeners != null)) {
                 for (final NotificationListenerAdapter listener : listeners) {
                     listener.addSubscriber(ctx.channel());
-                    logger.debug("Subscriber successfully registered.");
+                    LOG.debug("Subscriber successfully registered.");
                 }
             } else {
-                logger.error("Listener for stream with name '{}' was not found.", streamName);
+                LOG.error("Listener for stream with name '{}' was not found.", streamName);
                 sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, INTERNAL_SERVER_ERROR));
             }
         }
 
         // Handshake
-        final WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req),
+        final WebSocketServerHandshakerFactory wsFactory =
+                new WebSocketServerHandshakerFactory(getWebSocketLocation(req),
                 null, false);
         this.handshaker = wsFactory.newHandshaker(req);
         if (this.handshaker == null) {
@@ -119,7 +120,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     }
 
     /**
-     * Checks response status, send response and close connection if necessary
+     * Checks response status, send response and close connection if necessary.
      *
      * @param ctx
      *            ChannelHandlerContext
@@ -161,7 +162,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
                 final ListenerAdapter listener = Notificator.getListenerFor(streamName);
                 if (listener != null) {
                     listener.removeSubscriber(ctx.channel());
-                    logger.debug("Subscriber successfully registered.");
+                    LOG.debug("Subscriber successfully registered.");
                 }
                 Notificator.removeListenerIfNoSubscriberExists(listener);
             } else if (streamName.contains(RestconfImpl.NOTIFICATION_STREAM)) {
@@ -182,7 +183,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
         if ((cause instanceof java.nio.channels.ClosedChannelException) == false) {
-            // cause.printStackTrace();
+            LOG.info("Cause '{}' is not instance of ClosedChannelException.", cause.toString());
         }
         ctx.close();
     }

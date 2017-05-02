@@ -12,7 +12,7 @@ import com.google.common.base.Preconditions;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
-public class PATCHEntity {
+public class PatchEntity {
 
     private final String operation;
     private final String editId;
@@ -20,14 +20,14 @@ public class PATCHEntity {
     private final NormalizedNode<?,?> node;
 
     /**
-     * Constructor to create PATCHEntity for PATCH operations which require value leaf representing data to be present.
-     * @param editId Id of PATCH edit
-     * @param operation PATCH edit operation
-     * @param targetNode Target node for PATCH edit operation
+     * Constructor to create PatchEntity for Patch operations which require value leaf representing data to be present.
+     * @param editId Id of Patch edit
+     * @param operation Patch edit operation
+     * @param targetNode Target node for Patch edit operation
      * @param node Data defined by value leaf used by edit operation
      */
-    public PATCHEntity(final String editId, final String operation, final YangInstanceIdentifier targetNode, final
-    NormalizedNode<?, ?> node) {
+    public PatchEntity(final String editId, final String operation, final YangInstanceIdentifier targetNode,
+                       final NormalizedNode<?, ?> node) {
         this.editId = Preconditions.checkNotNull(editId);
         this.operation = Preconditions.checkNotNull(operation);
         this.targetNode = Preconditions.checkNotNull(targetNode);
@@ -35,13 +35,13 @@ public class PATCHEntity {
     }
 
     /**
-     * Constructor to create PATCHEntity for PATCH operations which do not allow value leaf representing data to be
+     * Constructor to create PatchEntity for Patch operations which do not allow value leaf representing data to be
      * present. <code>node</code> is set to <code>null</code> meaning that data are not allowed for edit operation.
-     * @param editId Id of PATCH edit
-     * @param operation PATCH edit operation
-     * @param targetNode Target node for PATCH edit operation
+     * @param editId Id of Patch edit
+     * @param operation Patch edit operation
+     * @param targetNode Target node for Patch edit operation
      */
-    public PATCHEntity(final String editId, final String operation, final YangInstanceIdentifier targetNode) {
+    public PatchEntity(final String editId, final String operation, final YangInstanceIdentifier targetNode) {
         this.editId = Preconditions.checkNotNull(editId);
         this.operation = Preconditions.checkNotNull(operation);
         this.targetNode = Preconditions.checkNotNull(targetNode);

@@ -96,7 +96,7 @@ public class RestPostOperationTest extends JerseyTest {
         // set(TestProperties.RECORD_LOG_LEVEL, Level.ALL.intValue());
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig = resourceConfig.registerInstances(restconfImpl, new XmlNormalizedNodeBodyReader(),
-                new NormalizedNodeXmlBodyWriter(), new JsonNormalizedNodeBodyReader(), new NormalizedNodeJsonBodyWriter());
+            new NormalizedNodeXmlBodyWriter(), new JsonNormalizedNodeBodyReader(), new NormalizedNodeJsonBodyWriter());
         resourceConfig.registerClasses(RestconfDocumentedExceptionMapper.class);
         return resourceConfig;
     }
@@ -133,7 +133,8 @@ public class RestPostOperationTest extends JerseyTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    @Ignore //jenkins has problem with JerseyTest - we expecting problems with singletons ControllerContext as schemaContext holder
+    @Ignore //jenkins has problem with JerseyTest
+    // - we expecting problems with singletons ControllerContext as schemaContext holder
     public void createConfigurationDataTest() throws UnsupportedEncodingException, ParseException {
         initMocking();
         final RpcResult<TransactionStatus> rpcResult = new DummyRpcResult.Builder<TransactionStatus>().result(
@@ -143,7 +144,8 @@ public class RestPostOperationTest extends JerseyTest {
                 any(NormalizedNode.class), null, null))
                 .thenReturn(mock(CheckedFuture.class));
 
-        final ArgumentCaptor<YangInstanceIdentifier> instanceIdCaptor = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
+        final ArgumentCaptor<YangInstanceIdentifier> instanceIdCaptor =
+                ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         @SuppressWarnings("rawtypes")
         final ArgumentCaptor<NormalizedNode> compNodeCaptor = ArgumentCaptor.forClass(NormalizedNode.class);
 
@@ -162,7 +164,8 @@ public class RestPostOperationTest extends JerseyTest {
         verify(brokerFacade, times(1))
                 .commitConfigurationDataPost((SchemaContext) null, instanceIdCaptor.capture(), compNodeCaptor.capture(),
                         null, null);
-//        identifier = "[(urn:ietf:params:xml:ns:yang:test-interface?revision=2014-07-01)interfaces, (urn:ietf:params:xml:ns:yang:test-interface?revision=2014-07-01)block]";
+//        identifier = "[(urn:ietf:params:xml:ns:yang:test-interface?revision=2014-07-01)interfaces," +
+//                "(urn:ietf:params:xml:ns:yang:test-interface?revision=2014-07-01)block]";
         assertEquals(identifier, ImmutableList.copyOf(instanceIdCaptor.getValue().getPathArguments()).toString());
     }
 
@@ -204,13 +207,14 @@ public class RestPostOperationTest extends JerseyTest {
         xmlStream = RestconfImplTest.class
                 .getResourceAsStream("/parts/ietf-interfaces_interfaces_interface_absolute_path.xml");
         xmlDataInterfaceAbsolutePath = TestUtils.getDocumentInPrintableForm(TestUtils.loadDocumentFrom(xmlStream));
-        final String xmlPathRpcInput = RestconfImplTest.class.getResource("/full-versions/test-data2/data-rpc-input.xml")
-                .getPath();
+        final String xmlPathRpcInput =
+                RestconfImplTest.class.getResource("/full-versions/test-data2/data-rpc-input.xml").getPath();
         xmlDataRpcInput = TestUtils.loadTextFile(xmlPathRpcInput);
-        final String xmlPathBlockData = RestconfImplTest.class.getResource("/test-config-data/xml/block-data.xml").getPath();
+        final String xmlPathBlockData =
+                RestconfImplTest.class.getResource("/test-config-data/xml/block-data.xml").getPath();
         xmlBlockData = TestUtils.loadTextFile(xmlPathBlockData);
-        final String xmlPathTestInterface = RestconfImplTest.class.getResource("/test-config-data/xml/test-interface.xml")
-                .getPath();
+        final String xmlPathTestInterface =
+                RestconfImplTest.class.getResource("/test-config-data/xml/test-interface.xml").getPath();
         xmlTestInterface = TestUtils.loadTextFile(xmlPathTestInterface);
 //        cnSnDataOutput = prepareCnSnRpcOutput();
         final String data3Input = RestconfImplTest.class.getResource("/full-versions/test-data2/data3.xml").getPath();

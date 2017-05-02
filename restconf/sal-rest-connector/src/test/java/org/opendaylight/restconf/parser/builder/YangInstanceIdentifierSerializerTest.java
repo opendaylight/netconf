@@ -28,7 +28,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
- * Unit tests for {@link YangInstanceIdentifierSerializer}
+ * Unit tests for {@link YangInstanceIdentifierSerializer}.
  */
 public class YangInstanceIdentifierSerializerTest {
 

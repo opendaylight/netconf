@@ -126,7 +126,7 @@ public class RestGetOperationTest extends JerseyTest {
         // set(TestProperties.RECORD_LOG_LEVEL, Level.ALL.intValue());
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig = resourceConfig.registerInstances(restconfImpl, new NormalizedNodeJsonBodyWriter(),
-                new NormalizedNodeXmlBodyWriter(), new XmlNormalizedNodeBodyReader(), new JsonNormalizedNodeBodyReader());
+            new NormalizedNodeXmlBodyWriter(), new XmlNormalizedNodeBodyReader(), new JsonNormalizedNodeBodyReader());
         resourceConfig.registerClasses(RestconfDocumentedExceptionMapper.class);
         resourceConfig.registerClasses(new RestconfApplication().getClasses());
         return resourceConfig;
@@ -191,14 +191,13 @@ public class RestGetOperationTest extends JerseyTest {
 
     /**
      * MountPoint test. URI represents mount point.
-     *
      * Slashes in URI behind mount point. lst1 element with key GigabitEthernet0%2F0%2F0%2F0 (GigabitEthernet0/0/0/0) is
      * requested via GET HTTP operation. It is tested whether %2F character is replaced with simple / in
      * InstanceIdentifier parameter in method
      * {@link BrokerFacade#readConfigurationData(DOMMountPoint, YangInstanceIdentifier)} which is called in
      * method {@link RestconfImpl#readConfigurationData}
      *
-     * @throws ParseException
+     * @throws ParseException when test fails
      */
     @Test
     public void getDataWithSlashesBehindMountPoint() throws ParseException {
@@ -212,7 +211,8 @@ public class RestGetOperationTest extends JerseyTest {
 
         ControllerContext.getInstance().setMountService(mockMountService);
 
-        final String uri = "/config/ietf-interfaces:interfaces/interface/0/yang-ext:mount/test-module:cont/lst1/GigabitEthernet0%2F0%2F0%2F0";
+        final String uri = "/config/ietf-interfaces:interfaces/interface/0/yang-ext:mount/"
+                + "test-module:cont/lst1/GigabitEthernet0%2F0%2F0%2F0";
         assertEquals(200, get(uri, MediaType.APPLICATION_XML));
     }
 
@@ -265,13 +265,12 @@ public class RestGetOperationTest extends JerseyTest {
         final YangInstanceIdentifier iid = YangInstanceIdentifier.builder().node(newTestModuleQName("modules"))
                 .node(moduleQN).nodeWithKey(moduleQN, keyMap).build();
         @SuppressWarnings("rawtypes")
-        final
-        NormalizedNode data = ImmutableMapNodeBuilder.create().withNodeIdentifier(
+        final NormalizedNode data = ImmutableMapNodeBuilder.create().withNodeIdentifier(
                 new NodeIdentifier(moduleQN)).withChild(ImmutableNodes.mapEntryBuilder()
-                        .withNodeIdentifier(new NodeIdentifierWithPredicates(moduleQN, keyMap))
-                        .withChild(ImmutableNodes.leafNode(newTestModuleQName("type"), newTestModuleQName("test-identity")))
-                        .withChild(ImmutableNodes.leafNode(newTestModuleQName("name"), "foo"))
-                        .withChild(ImmutableNodes.leafNode(newTestModuleQName("data"), "bar")).build()).build();
+                    .withNodeIdentifier(new NodeIdentifierWithPredicates(moduleQN, keyMap))
+                    .withChild(ImmutableNodes.leafNode(newTestModuleQName("type"), newTestModuleQName("test-identity")))
+                    .withChild(ImmutableNodes.leafNode(newTestModuleQName("name"), "foo"))
+                    .withChild(ImmutableNodes.leafNode(newTestModuleQName("data"), "bar")).build()).build();
         when(brokerFacade.readConfigurationData(iid, null)).thenReturn(data);
 
         final String uri = "/config/test-module:modules/module/test-module:test-identity/foo";
@@ -392,6 +391,31 @@ public class RestGetOperationTest extends JerseyTest {
         }
     }
 
+    private static Matcher validateOperationsResponseXml(final String searchIn, final String rpcName,
+                                                         final String namespace) {
+        final StringBuilder regex = new StringBuilder();
+
+        regex.append("^");
+
+        regex.append(".*<operations");
+        regex.append(".*xmlns=\"urn:ietf:params:xml:ns:yang:ietf-restconf\"");
+        regex.append(".*>");
+
+        regex.append(".*<");
+        regex.append(".*" + rpcName);
+        regex.append(".*" + namespace);
+        regex.append(".*/");
+        regex.append(".*>");
+
+        regex.append(".*</operations.*");
+        regex.append(".*>");
+
+        regex.append(".*");
+        regex.append("$");
+        final Pattern ptrn = Pattern.compile(regex.toString(), Pattern.DOTALL);
+        return ptrn.matcher(searchIn);
+    }
+
     // /operations/pathToMountPoint/yang-ext:mount
     @Ignore
     @Test
@@ -417,9 +441,9 @@ public class RestGetOperationTest extends JerseyTest {
         assertEquals(200, response.getStatus());
         final String responseBody = response.readEntity(String.class);
         assertTrue("Json response for /operations/mount_point rpc-behind-module1 is incorrect",
-                validateOperationsResponseJson(responseBody, "rpc-behind-module1", "module1-behind-mount-point").find());
+            validateOperationsResponseJson(responseBody, "rpc-behind-module1", "module1-behind-mount-point").find());
         assertTrue("Json response for /operations/mount_point rpc-behind-module2 is incorrect",
-                validateOperationsResponseJson(responseBody, "rpc-behind-module2", "module2-behind-mount-point").find());
+            validateOperationsResponseJson(responseBody, "rpc-behind-module2", "module2-behind-mount-point").find());
 
     }
 
@@ -430,31 +454,6 @@ public class RestGetOperationTest extends JerseyTest {
         final Pattern ptrn = Pattern.compile(regex.toString(), Pattern.DOTALL);
         return ptrn.matcher(searchIn);
 
-    }
-
-    private static Matcher validateOperationsResponseXml(final String searchIn, final String rpcName,
-            final String namespace) {
-        final StringBuilder regex = new StringBuilder();
-
-        regex.append("^");
-
-        regex.append(".*<operations");
-        regex.append(".*xmlns=\"urn:ietf:params:xml:ns:yang:ietf-restconf\"");
-        regex.append(".*>");
-
-        regex.append(".*<");
-        regex.append(".*" + rpcName);
-        regex.append(".*" + namespace);
-        regex.append(".*/");
-        regex.append(".*>");
-
-        regex.append(".*</operations.*");
-        regex.append(".*>");
-
-        regex.append(".*");
-        regex.append("$");
-        final Pattern ptrn = Pattern.compile(regex.toString(), Pattern.DOTALL);
-        return ptrn.matcher(searchIn);
     }
 
     // /restconf/modules/pathToMountPoint/yang-ext:mount
@@ -502,7 +501,8 @@ public class RestGetOperationTest extends JerseyTest {
 
         ControllerContext.getInstance().setMountService(mockMountService);
 
-        final String uri = "/modules/module/ietf-interfaces:interfaces/interface/0/yang-ext:mount/module1-behind-mount-point/2014-02-03";
+        final String uri = "/modules/module/ietf-interfaces:interfaces/interface/0/yang-ext:mount/"
+                + "module1-behind-mount-point/2014-02-03";
 
         Response response = target(uri).request("application/yang.api+json").get();
         assertEquals(200, response.getStatus());
@@ -537,7 +537,7 @@ public class RestGetOperationTest extends JerseyTest {
 
         final HashSet<QName> foundModules = new HashSet<>();
 
-        for(int i=0;i < moduleNodes.getLength();i++) {
+        for (int i = 0; i < moduleNodes.getLength(); i++) {
             final org.w3c.dom.Node module = moduleNodes.item(i);
 
             final QName name = assertedModuleXmlToModuleQName(module);
@@ -548,9 +548,9 @@ public class RestGetOperationTest extends JerseyTest {
     }
 
     private static void assertAllModules(final Set<QName> foundModules, final SchemaContext schemaContext) {
-        for(final Module module : schemaContext.getModules()) {
-            final QName current = QName.create(module.getQNameModule(),module.getName());
-            assertTrue("Module not found in response.",foundModules.contains(current));
+        for (final Module module : schemaContext.getModules()) {
+            final QName current = QName.create(module.getQNameModule(), module.getName());
+            assertTrue("Module not found in response.", foundModules.contains(current));
         }
 
     }
@@ -565,23 +565,24 @@ public class RestGetOperationTest extends JerseyTest {
 
         final NodeList childNodes = module.getChildNodes();
 
-        for(int i =0;i < childNodes.getLength(); i++) {
+        for (int i = 0; i < childNodes.getLength(); i++) {
             final org.w3c.dom.Node child = childNodes.item(i);
             assertEquals(RESTCONF_NS, child.getNamespaceURI());
 
-            switch(child.getLocalName()) {
+            switch (child.getLocalName()) {
                 case "name":
-                    assertNull("Name element appeared multiple times",name);
+                    assertNull("Name element appeared multiple times", name);
                     name = child.getTextContent().trim();
                     break;
                 case "revision":
-                    assertNull("Revision element appeared multiple times",revision);
+                    assertNull("Revision element appeared multiple times", revision);
                     revision = child.getTextContent().trim();
                     break;
-
                 case "namespace":
-                    assertNull("Namespace element appeared multiple times",namespace);
+                    assertNull("Namespace element appeared multiple times", namespace);
                     namespace = child.getTextContent().trim();
+                    break;
+                default:
                     break;
             }
         }
@@ -641,12 +642,15 @@ public class RestGetOperationTest extends JerseyTest {
     }
 
     /**
-    container cont {
-        container cont1 {
-            leaf lf11 {
-                type string;
-            }
-    */
+     * Container structure.
+     *
+     * <p>
+     * container cont {
+     *   container cont1 {
+     *       leaf lf11 {
+     *           type string;
+     *       }
+     */
     @SuppressWarnings("rawtypes")
     private static NormalizedNode prepareCnDataForMountPointTest(final boolean wrapToCont)
             throws URISyntaxException, ParseException {
@@ -694,9 +698,9 @@ public class RestGetOperationTest extends JerseyTest {
     }
 
     /**
-     * If includeWhiteChars URI parameter is set to false then no white characters can be included in returned output
+     * If includeWhiteChars URI parameter is set to false then no white characters can be included in returned output.
      *
-     * @throws UnsupportedEncodingException
+     * @throws UnsupportedEncodingException when operation fails to get data
      */
     @Test
     public void getDataWithUriIncludeWhiteCharsParameterTest() throws UnsupportedEncodingException {
@@ -727,7 +731,7 @@ public class RestGetOperationTest extends JerseyTest {
     }
 
     /**
-     * Tests behavior when invalid value of depth URI parameter
+     * Tests behavior when invalid value of depth URI parameter.
      */
     @Test
     @Ignore
@@ -753,7 +757,8 @@ public class RestGetOperationTest extends JerseyTest {
         try {
             final QName qNameDepth1Cont = QName.create("urn:nested:module", "2014-06-3", "depth1-cont");
             final YangInstanceIdentifier ii = YangInstanceIdentifier.builder().node(qNameDepth1Cont).build();
-            final NormalizedNode value = (Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(qNameDepth1Cont)).build());
+            final NormalizedNode value =
+                    (Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(qNameDepth1Cont)).build());
             when(brokerFacade.readConfigurationData(eq(ii))).thenReturn(value);
             restconfImpl.readConfigurationData("nested-module:depth1-cont", uriInfo);
             fail("Expected RestconfDocumentedException");
@@ -766,11 +771,7 @@ public class RestGetOperationTest extends JerseyTest {
     @SuppressWarnings("unused")
     private void verifyXMLResponse(final Response response, final NodeData nodeData) {
         final Document doc = response.readEntity(Document.class);
-//        Document doc = TestUtils.loadDocumentFrom((InputStream) response.getEntity());
-//        System.out.println();
         assertNotNull("Could not parse XML document", doc);
-
-        // System.out.println(TestUtils.getDocumentInPrintableForm( doc ));
 
         verifyContainerElement(doc.getDocumentElement(), nodeData);
     }
@@ -782,7 +783,8 @@ public class RestGetOperationTest extends JerseyTest {
 
         final NodeList childNodes = element.getChildNodes();
         if (nodeData.data == null) { // empty container
-            assertTrue("Expected no child elements for \"" + element.getLocalName() + "\"", childNodes.getLength() == 0);
+            assertTrue(
+                    "Expected no child elements for \"" + element.getLocalName() + "\"", childNodes.getLength() == 0);
             return;
         }
 

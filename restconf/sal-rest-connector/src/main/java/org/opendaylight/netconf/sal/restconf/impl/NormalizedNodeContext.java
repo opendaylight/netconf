@@ -66,7 +66,9 @@ public class NormalizedNodeContext {
     }
 
     /**
-     * @return
+     * Return headers of {@code NormalizedNodeContext}.
+     *
+     * @return map of headers
      */
     public Map<String, Object> getNewHeaders() {
         return this.headers;

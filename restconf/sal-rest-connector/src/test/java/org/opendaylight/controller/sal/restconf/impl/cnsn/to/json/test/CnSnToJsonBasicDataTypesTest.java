@@ -26,7 +26,7 @@ import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class CnSnToJsonBasicDataTypesTest extends YangAndXmlAndDataSchemaLoader {
 
-    static abstract class LeafVerifier {
+    abstract static class LeafVerifier {
 
         Object expectedValue;
         JsonToken expectedToken;
@@ -49,7 +49,7 @@ public class CnSnToJsonBasicDataTypesTest extends YangAndXmlAndDataSchemaLoader 
 
     static class BooleanVerifier extends LeafVerifier {
 
-        public BooleanVerifier(final boolean expected) {
+        BooleanVerifier(final boolean expected) {
             super(expected, JsonToken.BOOLEAN);
         }
 
@@ -61,7 +61,7 @@ public class CnSnToJsonBasicDataTypesTest extends YangAndXmlAndDataSchemaLoader 
 
     static class NumberVerifier extends LeafVerifier {
 
-        public NumberVerifier(final Number expected) {
+        NumberVerifier(final Number expected) {
             super(expected, JsonToken.NUMBER);
         }
 
@@ -163,7 +163,8 @@ public class CnSnToJsonBasicDataTypesTest extends YangAndXmlAndDataSchemaLoader 
             reader.endObject();
         }
 
-        void verifyLeaf(final JsonReader reader, final String parent, final String name, final String value) throws IOException {
+        void verifyLeaf(final JsonReader reader, final String parent, final String name,
+                        final String value) throws IOException {
             final String nextName = reader.nextName();
             assertEquals("Json reader child key for " + parent, name, nextName);
             assertEquals("Json token type for key " + parent, JsonToken.STRING, reader.peek());
@@ -195,21 +196,21 @@ public class CnSnToJsonBasicDataTypesTest extends YangAndXmlAndDataSchemaLoader 
         assertNull("Error during reading Json output: " + exception, exception);
     }
 
-    private static void jsonReadCont(final JsonReader jReader) throws IOException {
-        jReader.beginObject();
-        assertNotNull("cont1 is missing.", jReader.hasNext());
+    private static void jsonReadCont(final JsonReader jsonReader) throws IOException {
+        jsonReader.beginObject();
+        assertNotNull("cont1 is missing.", jsonReader.hasNext());
 
         // Cont dataFromJson = new Cont(jReader.nextName());
-        jReader.nextName();
-        jsonReadContElements(jReader);
+        jsonReader.nextName();
+        jsonReadContElements(jsonReader);
 
-        assertFalse("cont shouldn't have other element.", jReader.hasNext());
-        jReader.endObject();
+        assertFalse("cont shouldn't have other element.", jsonReader.hasNext());
+        jsonReader.endObject();
         // return dataFromJson;
     }
 
-    private static void jsonReadContElements(final JsonReader jReader) throws IOException {
-        jReader.beginObject();
+    private static void jsonReadContElements(final JsonReader jsonReader) throws IOException {
+        jsonReader.beginObject();
 
         final Map<String, LeafVerifier> expectedMap = Maps.newHashMap();
         expectedMap.put("lfnint8Min", new NumberVerifier(Integer.valueOf(-128)));
@@ -256,9 +257,9 @@ public class CnSnToJsonBasicDataTypesTest extends YangAndXmlAndDataSchemaLoader 
         expectedMap.put("simple-any", new StringVerifier("simple"));
         expectedMap.put("empty-any", new StringVerifier(""));
 
-        while (jReader.hasNext()) {
-            final String keyName = jReader.nextName();
-            final JsonToken peek = jReader.peek();
+        while (jsonReader.hasNext()) {
+            final String keyName = jsonReader.nextName();
+            final JsonToken peek = jsonReader.peek();
 
             final LeafVerifier verifier = expectedMap.remove(keyName);
             assertNotNull("Found unexpected leaf: " + keyName, verifier);
@@ -268,14 +269,14 @@ public class CnSnToJsonBasicDataTypesTest extends YangAndXmlAndDataSchemaLoader 
                 assertEquals("Json token type for key " + keyName, expToken, peek);
             }
 
-            verifier.verify(jReader, keyName);
+            verifier.verify(jsonReader, keyName);
         }
 
         if (!expectedMap.isEmpty()) {
             fail("Missing leaf nodes in Json output: " + expectedMap.keySet());
         }
 
-        jReader.endObject();
+        jsonReader.endObject();
     }
 
 }

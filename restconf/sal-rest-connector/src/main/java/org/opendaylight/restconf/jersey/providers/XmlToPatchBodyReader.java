@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2015 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.sal.rest.impl;
+package org.opendaylight.restconf.jersey.providers;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
@@ -25,15 +25,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
-import org.opendaylight.netconf.sal.rest.api.Draft02;
-import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHEditOperation;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHEntity;
+import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchEditOperation;
+import org.opendaylight.netconf.sal.restconf.impl.PatchEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.restconf.Rfc8040;
+import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -55,17 +55,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-/**
- * @deprecated This class will be replaced by
- *             {@link org.opendaylight.restconf.jersey.providers.XmlToPATCHBodyReader}
- */
-@Deprecated
 @Provider
-@Consumes({Draft02.MediaTypes.PATCH + RestconfService.XML})
-public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider implements
-        MessageBodyReader<PATCHContext> {
+@Consumes({Rfc8040.MediaTypes.PATCH + RestconfConstants.XML})
+public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider implements
+        MessageBodyReader<PatchContext> {
 
-    private final static Logger LOG = LoggerFactory.getLogger(XmlToPATCHBodyReader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XmlToPatchBodyReader.class);
 
     @Override
     public boolean isReadable(final Class<?> type, final Type genericType,
@@ -73,8 +68,9 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
         return true;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public PATCHContext readFrom(final Class<PATCHContext> type, final Type genericType,
+    public PatchContext readFrom(final Class<PatchContext> type, final Type genericType,
                                  final Annotation[] annotations, final MediaType mediaType,
                                  final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream)
             throws IOException, WebApplicationException {
@@ -84,7 +80,7 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
 
             if (entityStream.available() < 1) {
                 // represent empty nopayload input
-                return new PATCHContext(path, null, null);
+                return new PatchContext(path, null, null);
             }
 
             final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
@@ -99,8 +95,8 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
         }
     }
 
-    private static PATCHContext parse(final InstanceIdentifierContext<?> pathContext, final Document doc) {
-        final List<PATCHEntity> resultCollection = new ArrayList<>();
+    private static PatchContext parse(final InstanceIdentifierContext<?> pathContext, final Document doc) {
+        final List<PatchEntity> resultCollection = new ArrayList<>();
         final String patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
         final NodeList editNodes = doc.getElementsByTagName("edit");
         final DomToNormalizedNodeParserFactory parserFactory =
@@ -117,8 +113,8 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
             final Element firstValueElement = values != null ? values.get(0) : null;
 
             // get namespace according to schema node from path context or value
-            final String namespace = (firstValueElement == null) ?
-                    schemaNode.getQName().getNamespace().toString() : firstValueElement.getNamespaceURI();
+            final String namespace = (firstValueElement == null)
+                    ? schemaNode.getQName().getNamespace().toString() : firstValueElement.getNamespaceURI();
 
             // find module according to namespace
             final Module module = pathContext.getSchemaContext().findModuleByNamespace(
@@ -153,7 +149,7 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                 throw new RestconfDocumentedException("Error parsing input", ErrorType.PROTOCOL,
                         ErrorTag.MALFORMED_MESSAGE);
             } else {
-                if (PATCHEditOperation.isPatchOperationWithValue(operation)) {
+                if (PatchEditOperation.isPatchOperationWithValue(operation)) {
                     NormalizedNode<?, ?> parsed = null;
                     if (schemaNode instanceof ContainerSchemaNode) {
                         parsed = parserFactory.getContainerNodeParser().parse(values, (ContainerSchemaNode) schemaNode);
@@ -166,18 +162,18 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                         targetII = targetII.getParent();
                     }
 
-                    resultCollection.add(new PATCHEntity(editId, operation, targetII, parsed));
+                    resultCollection.add(new PatchEntity(editId, operation, targetII, parsed));
                 } else {
-                    resultCollection.add(new PATCHEntity(editId, operation, targetII));
+                    resultCollection.add(new PatchEntity(editId, operation, targetII));
                 }
             }
         }
 
-        return new PATCHContext(pathContext, ImmutableList.copyOf(resultCollection), patchId);
+        return new PatchContext(pathContext, ImmutableList.copyOf(resultCollection), patchId);
     }
 
     /**
-     * Read value nodes
+     * Read value nodes.
      * @param element Element of current edit operation
      * @param operation Name of current operation
      * @return List of value elements
@@ -185,12 +181,12 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
     private static List<Element> readValueNodes(@Nonnull final Element element, @Nonnull final String operation) {
         final Node valueNode = element.getElementsByTagName("value").item(0);
 
-        if (PATCHEditOperation.isPatchOperationWithValue(operation) && (valueNode == null)) {
+        if (PatchEditOperation.isPatchOperationWithValue(operation) && valueNode == null) {
             throw new RestconfDocumentedException("Error parsing input",
                     ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
 
-        if (!PATCHEditOperation.isPatchOperationWithValue(operation) && (valueNode != null)) {
+        if (!PatchEditOperation.isPatchOperationWithValue(operation) && valueNode != null) {
             throw new RestconfDocumentedException("Error parsing input",
                     ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
@@ -212,7 +208,8 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
 
     /**
      * Prepare non-conditional XPath suitable for deserialization
-     * with {@link StringModuleInstanceIdentifierCodec}
+     * with {@link StringModuleInstanceIdentifierCodec}.
+     *
      * @param schemaNode Top schema node
      * @param target Edit operation target
      * @param value Element with value
@@ -233,12 +230,12 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
             nonCondXpath.append(s);
             childNode = ((DataNodeContainer) childNode).getDataChildByName(QName.create(namespace, revision, s));
 
-            if ((childNode instanceof ListSchemaNode) && args.hasNext()) {
+            if (childNode instanceof ListSchemaNode && args.hasNext()) {
                 appendKeys(nonCondXpath, ((ListSchemaNode) childNode).getKeyDefinition().iterator(), args);
             }
         }
 
-        if ((childNode instanceof ListSchemaNode) && (value != null)) {
+        if (childNode instanceof ListSchemaNode && value != null) {
             final Iterator<String> keyValues = readKeyValues(value,
                     ((ListSchemaNode) childNode).getKeyDefinition().iterator());
             appendKeys(nonCondXpath, ((ListSchemaNode) childNode).getKeyDefinition().iterator(), keyValues);
@@ -248,7 +245,8 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
     }
 
     /**
-     * Read value for every list key
+     * Read value for every list key.
+     *
      * @param value Value element
      * @param keys Iterator of list keys names
      * @return Iterator of list keys values
@@ -264,7 +262,8 @@ public class XmlToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider i
     }
 
     /**
-     * Append key name - key value pairs for every list key to {@code nonCondXpath}
+     * Append key name - key value pairs for every list key to {@code nonCondXpath}.
+     *
      * @param nonCondXpath Builder for creating non-conditional XPath
      * @param keyNames Iterator of list keys names
      * @param keyValues Iterator of list keys values

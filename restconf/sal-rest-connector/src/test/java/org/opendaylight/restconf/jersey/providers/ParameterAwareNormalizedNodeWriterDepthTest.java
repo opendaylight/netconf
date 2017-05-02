@@ -184,8 +184,6 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     /**
      * Test write {@link MapNode} with children and write also all its children.
      * Depth parameter has higher value than maximal children depth.
-     *
-     *
      * FIXME
      * Although ordered writer is used leaves are not written in expected order.
      *
@@ -319,7 +317,6 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     /**
      * Test write with {@link MapEntryNode} ordered and write also all its children.
      * Depth parameter has higher value than maximal children depth.
-     *
      * FIXME
      * Although ordered writer is used leaves are not written in expected order.
      *
