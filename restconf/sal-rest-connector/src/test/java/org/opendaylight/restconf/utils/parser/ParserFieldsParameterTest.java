@@ -36,7 +36,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
- * Unit test for {@link ParserFieldsParameter}
+ * Unit test for {@link ParserFieldsParameter}.
  */
 public class ParserFieldsParameterTest {
 
@@ -101,7 +101,8 @@ public class ParserFieldsParameterTest {
         Mockito.when(this.containerJukebox.getDataChildByName(this.libraryQName)).thenReturn(this.containerLibrary);
 
         Mockito.when(this.augmentedContainerLibrary.getQName()).thenReturn(this.augmentedLibraryQName);
-        Mockito.when(this.containerJukebox.getDataChildByName(this.augmentedLibraryQName)).thenReturn(this.augmentedContainerLibrary);
+        Mockito.when(this.containerJukebox.getDataChildByName(this.augmentedLibraryQName))
+                .thenReturn(this.augmentedContainerLibrary);
 
         Mockito.when(this.containerPlayer.getQName()).thenReturn(this.playerQName);
         Mockito.when(this.containerJukebox.getDataChildByName(this.playerQName)).thenReturn(this.containerPlayer);
@@ -114,7 +115,7 @@ public class ParserFieldsParameterTest {
     }
 
     /**
-     * Test parse fields parameter containing only one child selected
+     * Test parse fields parameter containing only one child selected.
      */
     @Test
     public void parseFieldsParameterSimplePathTest() {
@@ -128,7 +129,7 @@ public class ParserFieldsParameterTest {
     }
 
     /**
-     * Test parse fields parameter containing two child nodes selected
+     * Test parse fields parameter containing two child nodes selected.
      */
     @Test
     public void parseFieldsParameterDoublePathTest() {
@@ -143,7 +144,7 @@ public class ParserFieldsParameterTest {
     }
 
     /**
-     * Test parse fields parameter containing sub-children selected delimited by slash
+     * Test parse fields parameter containing sub-children selected delimited by slash.
      */
     @Test
     public void parseFieldsParameterSubPathTest() {
@@ -164,7 +165,7 @@ public class ParserFieldsParameterTest {
     }
 
     /**
-     * Test parse fields parameter containing sub-children selected delimited by parenthesis
+     * Test parse fields parameter containing sub-children selected delimited by parenthesis.
      */
     @Test
     public void parseFieldsParameterChildrenPathTest() {
@@ -185,7 +186,7 @@ public class ParserFieldsParameterTest {
     }
 
     /**
-     * Test parse fields parameter when augmentation with different namespace is used
+     * Test parse fields parameter when augmentation with different namespace is used.
      */
     @Test
     public void parseFieldsParameterNamespaceTest() {
@@ -200,7 +201,7 @@ public class ParserFieldsParameterTest {
     }
 
     /**
-     * Test parse fields parameter containing not expected character
+     * Test parse fields parameter containing not expected character.
      */
     @Test
     public void parseFieldsParameterNotExpectedCharacterNegativeTest() {
@@ -218,7 +219,7 @@ public class ParserFieldsParameterTest {
     }
 
     /**
-     * Test parse fields parameter with missing closing parenthesis
+     * Test parse fields parameter with missing closing parenthesis.
      */
     @Test
     public void parseFieldsParameterMissingParenthesisNegativeTest() {
@@ -236,7 +237,7 @@ public class ParserFieldsParameterTest {
     }
 
     /**
-     * Test parse fields parameter when not existing child node selected
+     * Test parse fields parameter when not existing child node selected.
      */
     @Test
     public void parseFieldsParameterMissingChildNodeNegativeTest() {
@@ -254,7 +255,7 @@ public class ParserFieldsParameterTest {
     }
 
     /**
-     * Test parse fields parameter with unexpected character after parenthesis
+     * Test parse fields parameter with unexpected character after parenthesis.
      */
     @Test
     public void parseFieldsParameterAfterParenthesisNegativeTest() {
@@ -272,7 +273,7 @@ public class ParserFieldsParameterTest {
     }
 
     /**
-     * Test parse fields parameter with missing semicolon after parenthesis
+     * Test parse fields parameter with missing semicolon after parenthesis.
      */
     @Test
     public void parseFieldsParameterMissingSemicolonNegativeTest() {

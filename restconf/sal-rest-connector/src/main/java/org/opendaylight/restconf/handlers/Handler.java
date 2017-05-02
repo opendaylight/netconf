@@ -9,25 +9,25 @@
 package org.opendaylight.restconf.handlers;
 
 /**
- * Handler for handling object prepared by provider for Restconf services
+ * Handler for handling object prepared by provider for Restconf services.
  *
  * @param <T>
- *            - specific type go object for handling it
+ *             specific type go object for handling it
  */
 interface Handler<T> {
 
     /**
-     * Get prepared object
+     * Get prepared object.
      *
      * @return T
      */
     T get();
 
     /**
-     * Update object
+     * Update object.
      *
      * @param object
-     *            - new object to update old object
+     *             new object to update old object
      */
     default void update(T object) {}
 }

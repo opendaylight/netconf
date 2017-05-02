@@ -10,7 +10,7 @@ package org.opendaylight.restconf.handlers;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 
 /**
- * Implementation of {@link DOMDataBrokerHandler}
+ * Implementation of {@link DOMDataBrokerHandler}.
  *
  */
 public class DOMDataBrokerHandler implements Handler<DOMDataBroker> {

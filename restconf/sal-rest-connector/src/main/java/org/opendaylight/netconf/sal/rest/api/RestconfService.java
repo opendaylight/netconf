@@ -22,13 +22,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.sal.rest.api.Draft02.MediaTypes;
-import org.opendaylight.netconf.sal.rest.impl.PATCH;
+import org.opendaylight.netconf.sal.rest.impl.Patch;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
 import org.opendaylight.restconf.base.services.api.RestconfOperationsService;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
 import org.opendaylight.restconf.restful.services.api.RestconfInvokeOperationsService;
+import org.opendaylight.restconf.restful.services.api.RestconfStreamsSubscriptionService;
 
 /**
  * The URI hierarchy for the RESTCONF resources consists of an entry point
@@ -56,13 +57,17 @@ import org.opendaylight.restconf.restful.services.api.RestconfInvokeOperationsSe
 @Path("/")
 public interface RestconfService {
 
-    public static final String XML = "+xml";
-    public static final String JSON = "+json";
+    String XML = "+xml";
+    String JSON = "+json";
 
     @GET
-    public Object getRoot();
+    Object getRoot();
 
     /**
+     * Get all modules supported by controller.
+     *
+     * @param uriInfo URI info
+     * @return {@link NormalizedNodeContext}
      * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfDataService#readData(UriInfo)}
      */
@@ -71,9 +76,14 @@ public interface RestconfService {
     @Path("/modules")
     @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public NormalizedNodeContext getModules(@Context UriInfo uriInfo);
+    NormalizedNodeContext getModules(@Context UriInfo uriInfo);
 
     /**
+     * Get all modules supported by mount point.
+     *
+     * @param identifier mount point identifier
+     * @param uriInfo URI info
+     * @return {@link NormalizedNodeContext}
      * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfDataService#readData(String, UriInfo)}
      */
@@ -82,9 +92,14 @@ public interface RestconfService {
     @Path("/modules/{identifier:.+}")
     @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public NormalizedNodeContext getModules(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
+    NormalizedNodeContext getModules(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 
     /**
+     * Get module.
+     *
+     * @param identifier path to target
+     * @param uriInfo URI info
+     * @return {@link NormalizedNodeContext}
      * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfDataService#readData(String, UriInfo)}
      */
@@ -93,9 +108,13 @@ public interface RestconfService {
     @Path("/modules/module/{identifier:.+}")
     @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public NormalizedNodeContext getModule(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
+    NormalizedNodeContext getModule(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 
     /**
+     * List of rpc or action operations supported by the server.
+     *
+     * @param uriInfo URI information
+     * @return {@link NormalizedNodeContext}
      * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfOperationsService#getOperations(UriInfo)}
      */
@@ -104,9 +123,14 @@ public interface RestconfService {
     @Path("/operations")
     @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public NormalizedNodeContext getOperations(@Context UriInfo uriInfo);
+    NormalizedNodeContext getOperations(@Context UriInfo uriInfo);
 
     /**
+     * Valid for mount points. List of operations supported by the server.
+     *
+     * @param identifier path parameter
+     * @param uriInfo URI information
+     * @return {@link NormalizedNodeContext}
      * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfOperationsService#getOperations(String, UriInfo)}
      */
@@ -115,9 +139,15 @@ public interface RestconfService {
     @Path("/operations/{identifier:.+}")
     @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public NormalizedNodeContext getOperations(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
+    NormalizedNodeContext getOperations(@PathParam("identifier") String identifier, @Context UriInfo uriInfo);
 
     /**
+     * Invoke RPC operation.
+     *
+     * @param identifier module name and rpc identifier string for the desired operation
+     * @param payload {@link NormalizedNodeContext} - the body of the operation
+     * @param uriInfo URI info
+     * @return {@link NormalizedNodeContext}
      * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfInvokeOperationsService#invokeRpc(String, NormalizedNodeContext, UriInfo)}
      */
@@ -130,19 +160,33 @@ public interface RestconfService {
     @Consumes({ Draft02.MediaTypes.OPERATION + JSON, Draft02.MediaTypes.OPERATION + XML,
             Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public NormalizedNodeContext invokeRpc(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
+    NormalizedNodeContext invokeRpc(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
             @Context UriInfo uriInfo);
 
+    /**
+     * Invoke RPC with default empty payload.
+     *
+     * @param identifier module name and rpc identifier string for the desired operation
+     * @param noPayload the body of the operation
+     * @param uriInfo URI info
+     * @return {@link NormalizedNodeContext}
+     * @deprecated Method is not used and will be removed
+     */
     @POST
     @Path("/operations/{identifier:.+}")
     @Produces({ Draft02.MediaTypes.OPERATION + JSON, Draft02.MediaTypes.OPERATION + XML,
             Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     @Deprecated // method isn't use anywhere
-    public NormalizedNodeContext invokeRpc(@Encoded @PathParam("identifier") String identifier,
+    NormalizedNodeContext invokeRpc(@Encoded @PathParam("identifier") String identifier,
             @DefaultValue("") String noPayload, @Context UriInfo uriInfo);
 
     /**
+     * Get target data resource from config data store.
+     *
+     * @param identifier path to target
+     * @param uriInfo URI info
+     * @return {@link NormalizedNodeContext}
      * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfDataService#readData(String, UriInfo)}
      */
@@ -151,10 +195,15 @@ public interface RestconfService {
     @Path("/config/{identifier:.+}")
     @Produces({ Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public NormalizedNodeContext readConfigurationData(@Encoded @PathParam("identifier") String identifier,
+    NormalizedNodeContext readConfigurationData(@Encoded @PathParam("identifier") String identifier,
             @Context UriInfo uriInfo);
 
     /**
+     * Get target data resource from operational data store.
+     *
+     * @param identifier path to target
+     * @param uriInfo URI info
+     * @return {@link NormalizedNodeContext}
      * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfDataService#readData(String, UriInfo)}
      */
@@ -163,10 +212,15 @@ public interface RestconfService {
     @Path("/operational/{identifier:.+}")
     @Produces({ Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public NormalizedNodeContext readOperationalData(@Encoded @PathParam("identifier") String identifier,
+    NormalizedNodeContext readOperationalData(@Encoded @PathParam("identifier") String identifier,
             @Context UriInfo uriInfo);
 
     /**
+     * Create or replace the target data resource.
+     *
+     * @param identifier path to target
+     * @param payload data node for put to config DS
+     * @return {@link Response}
      * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfDataService#putData(String, NormalizedNodeContext, UriInfo)}
      */
@@ -175,10 +229,16 @@ public interface RestconfService {
     @Path("/config/{identifier:.+}")
     @Consumes({ Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public Response updateConfigurationData(@Encoded @PathParam("identifier") String identifier,
+    Response updateConfigurationData(@Encoded @PathParam("identifier") String identifier,
             NormalizedNodeContext payload, @Context UriInfo uriInfo);
 
     /**
+     * Create a data resource in target.
+     *
+     * @param identifier path to target
+     * @param payload new data
+     * @param uriInfo URI info
+     * @return {@link Response}
      * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfDataService#postData(String, NormalizedNodeContext, UriInfo)}
      */
@@ -187,10 +247,15 @@ public interface RestconfService {
     @Path("/config/{identifier:.+}")
     @Consumes({ Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public Response createConfigurationData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
+    Response createConfigurationData(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
             @Context UriInfo uriInfo);
 
     /**
+     * Create a data resource.
+     *
+     * @param payload new data
+     * @param uriInfo URI info
+     * @return {@link Response}
      * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfDataService#postData(NormalizedNodeContext, UriInfo)}
      */
@@ -199,53 +264,82 @@ public interface RestconfService {
     @Path("/config")
     @Consumes({ Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public Response createConfigurationData(NormalizedNodeContext payload, @Context UriInfo uriInfo);
+    Response createConfigurationData(NormalizedNodeContext payload, @Context UriInfo uriInfo);
 
     /**
+     * Delete the target data resource.
+     *
+     * @param identifier path to target
+     * @return {@link Response}
      * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfDataService#deleteData(String)}
      */
     @Deprecated
     @DELETE
     @Path("/config/{identifier:.+}")
-    public Response deleteConfigurationData(@Encoded @PathParam("identifier") String identifier);
+    Response deleteConfigurationData(@Encoded @PathParam("identifier") String identifier);
 
+    /**
+     * Subscribe to stream.
+     *
+     * @param identifier stream identifier
+     * @param uriInfo URI info
+     * @return {@link NormalizedNodeContext}
+     * @deprecated do not use this method. It will be replaced by
+     *              {@link RestconfStreamsSubscriptionService#subscribeToStream(String, UriInfo)}
+     */
+    @Deprecated
     @GET
     @Path("/streams/stream/{identifier:.+}")
-    public NormalizedNodeContext subscribeToStream(@Encoded @PathParam("identifier") String identifier,
+    NormalizedNodeContext subscribeToStream(@Encoded @PathParam("identifier") String identifier,
             @Context UriInfo uriInfo);
 
     /**
+     * Get list of all streams.
+     *
+     * @param uriInfo URI info
+     * @return {@link NormalizedNodeContext}
      * @deprecated do not use this method. It will be replaced by
      *             {@link RestconfDataService#readData(String, UriInfo)}
-     */
+     **/
     @Deprecated
     @GET
     @Path("/streams")
     @Produces({ Draft02.MediaTypes.API + JSON, Draft02.MediaTypes.API + XML, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public NormalizedNodeContext getAvailableStreams(@Context UriInfo uriInfo);
+    NormalizedNodeContext getAvailableStreams(@Context UriInfo uriInfo);
 
     /**
+     * Ordered list of edits that are applied to the target datastore by the server.
+     *
+     * @param identifier path to target
+     * @param context edits
+     * @param uriInfo URI info
+     * @return {@link PatchStatusContext}
      * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfDataService#patchData(String, PATCHContext, UriInfo)}
+     *             {@link RestconfDataService#patchData(String, PatchContext, UriInfo)}
      */
     @Deprecated
-    @PATCH
+    @Patch
     @Path("/config/{identifier:.+}")
     @Consumes({MediaTypes.PATCH + JSON, MediaTypes.PATCH + XML})
     @Produces({MediaTypes.PATCH_STATUS + JSON, MediaTypes.PATCH_STATUS + XML})
-    PATCHStatusContext patchConfigurationData(@Encoded @PathParam("identifier") String identifier, PATCHContext
+    PatchStatusContext patchConfigurationData(@Encoded @PathParam("identifier") String identifier, PatchContext
             context, @Context UriInfo uriInfo);
 
     /**
+     * Ordered list of edits that are applied to the datastore by the server.
+     *
+     * @param context edits
+     * @param uriInfo URI info
+     * @return {@link PatchStatusContext}
      * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfDataService#patchData(PATCHContext, UriInfo)}
+     *             {@link RestconfDataService#patchData(PatchContext, UriInfo)}
      */
     @Deprecated
-    @PATCH
+    @Patch
     @Path("/config")
     @Consumes({MediaTypes.PATCH + JSON, MediaTypes.PATCH + XML})
     @Produces({MediaTypes.PATCH_STATUS + JSON, MediaTypes.PATCH_STATUS + XML})
-    PATCHStatusContext patchConfigurationData(PATCHContext context, @Context UriInfo uriInfo);
+    PatchStatusContext patchConfigurationData(PatchContext context, @Context UriInfo uriInfo);
 }

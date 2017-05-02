@@ -38,19 +38,17 @@ public class NnToJsonLeafrefType extends AbstractBodyReaderTest {
     public static void initialization() {
         schemaContext = schemaContextLoader("/nn-to-json/leafref",
                 schemaContext);
-        controllerContext.setSchemas(schemaContext);
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test
-    public void leafrefAbsolutePathToExistingLeafTest()
- throws Exception {
+    public void leafrefAbsolutePathToExistingLeafTest() throws Exception {
         final String json = toJson("/nn-to-json/leafref/xml/data_absolut_ref_to_existing_leaf.xml");
         validateJson(".*\"lf3\":\\p{Blank}*\"true\".*", json);
     }
 
     @Test
-    public void leafrefRelativePathToExistingLeafTest()
- throws Exception {
+    public void leafrefRelativePathToExistingLeafTest() throws Exception {
         final String json = toJson("/nn-to-json/leafref/xml/data_relativ_ref_to_existing_leaf.xml");
         validateJson(".*\"lf2\":\\p{Blank}*\"121\".*", json);
     }
@@ -71,9 +69,8 @@ public class NnToJsonLeafrefType extends AbstractBodyReaderTest {
     @Test
     public void leafrefFromLeafListToLeafTest() throws Exception {
         final String json = toJson("/nn-to-json/leafref/xml/data_relativ_ref_from_leaflist_to_existing_leaf.xml");
-        validateJson(
-                ".*\"cont-augment-module\\p{Blank}*:\\p{Blank}*lflst1\":\\p{Blank}*.*\"34[5|6|7]\",*\"34[5|6|7]\",*\"34[5|6|7]\".*",
-                json);
+        validateJson(".*\"cont-augment-module\\p{Blank}*:\\p{Blank}*lflst1\":\\p{Blank}*.*\"34[5|6|7]\",*\"34[5|6|7]\","
+                + "*\"34[5|6|7]\".*", json);
     }
 
     @Test

@@ -24,8 +24,12 @@ import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JsonToNnTest extends AbstractBodyReaderTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractBodyReaderTest.class);
 
     private JsonNormalizedNodeBodyReader jsonBodyReader;
     private SchemaContext schemaContext;
@@ -36,7 +40,7 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
 
     public static void initialize(final String path, SchemaContext schemaContext) {
         schemaContext = schemaContextLoader(path, schemaContext);
-        controllerContext.setSchemas(schemaContext);
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test
@@ -123,7 +127,8 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
         }
         assertNotNull(exception);
         assertEquals(
-                "Error parsing input: Schema node with name cont wasn't found under (urn:ietf:params:xml:ns:netconf:base:1.0)data.",
+                "Error parsing input: Schema node with name cont wasn't found under "
+                        + "(urn:ietf:params:xml:ns:netconf:base:1.0)data.",
                 exception.getErrors().get(0).getErrorMessage());
 
         inputStream = this.getClass().getResourceAsStream(
@@ -138,7 +143,8 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
         }
         assertNotNull(exception);
         assertEquals(
-                "Error parsing input: Schema node with name lst1 wasn't found under (urn:ietf:params:xml:ns:netconf:base:1.0)data.",
+                "Error parsing input: Schema node with name lst1 wasn't found under "
+                        + "(urn:ietf:params:xml:ns:netconf:base:1.0)data.",
                 exception.getErrors().get(0).getErrorMessage());
 
         inputStream = this.getClass().getResourceAsStream(
@@ -153,7 +159,8 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
         }
         assertNotNull(exception);
         assertEquals(
-                "Error parsing input: Schema node with name lf wasn't found under (urn:ietf:params:xml:ns:netconf:base:1.0)data.",
+                "Error parsing input: Schema node with name lf wasn't found under "
+                        + "(urn:ietf:params:xml:ns:netconf:base:1.0)data.",
                 exception.getErrors().get(0).getErrorMessage());
         assertEquals(3, countExceptions);
     }
@@ -224,6 +231,7 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
                     inputStream);
             fail("NormalizedNodeContext should not be create because of different namespace");
         } catch (final RestconfDocumentedException e) {
+            LOG.warn("Read from InputStream failed. Message: {}. Status: {}", e.getMessage(), e.getStatus());
         }
 
         verifyNormaluizedNodeContext(normalizedNodeContext, "lst");
@@ -277,8 +285,7 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
             mockBodyReader(uri, this.jsonBodyReader, false);
         } catch (NoSuchFieldException | SecurityException
                 | IllegalArgumentException | IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.warn("Operation failed due to: {}", e.getMessage());
         }
         final InputStream inputStream = this.getClass().getResourceAsStream(jsonPath);
 
@@ -289,7 +296,6 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
                     this.mediaType, null, inputStream);
         } catch (WebApplicationException | IOException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
         }
 
         return normalizedNodeContext;
@@ -339,7 +345,7 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
         } catch (final RestconfDocumentedException e) {
             exception = e;
         }
-        System.out.println(exception.getErrors().get(0).getErrorMessage());
+        LOG.info(exception.getErrors().get(0).getErrorMessage());
 
         assertTrue(exception.getErrors().get(0).getErrorMessage()
                 .contains("is not a simple type"));

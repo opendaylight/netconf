@@ -58,9 +58,9 @@ public final class YangInstanceIdentifierDeserializer {
      * parsing from data by {@link SchemaContext}.
      *
      * @param schemaContext
-     *            - for validate of parsing path arguments
+     *             for validate of parsing path arguments
      * @param data
-     *            - path to data
+     *             path to data
      * @return {@link Iterable} of {@link PathArgument}
      */
     public static Iterable<PathArgument> create(final SchemaContext schemaContext, final String data) {
@@ -243,7 +243,8 @@ public final class YangInstanceIdentifierDeserializer {
                 "Identifier must start with character from set 'a-zA-Z_'", variables.getData(), variables.getOffset());
         final String preparedPrefix = nextIdentifierFromNextSequence(
                 ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
-        final String prefix, localName;
+        final String prefix;
+        final String localName;
 
         if (allCharsConsumed(variables)) {
             return getQNameOfDataSchemaNode(preparedPrefix, variables);
@@ -263,8 +264,8 @@ public final class YangInstanceIdentifierDeserializer {
                         variables.getOffset());
                 localName = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
 
-                if (!allCharsConsumed(variables) && (currentChar
-                        (variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL)) {
+                if (!allCharsConsumed(variables) && (currentChar(
+                        variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL)) {
                     return getQNameOfDataSchemaNode(localName, variables);
                 } else {
                     final Module module = moduleForPrefix(prefix, variables.getSchemaContext());
@@ -417,7 +418,7 @@ public final class YangInstanceIdentifierDeserializer {
         return variables.getOffset() == variables.getData().length();
     }
 
-    private final static class MainVarsWrapper {
+    private static final class MainVarsWrapper {
         private static final int STARTING_OFFSET = 0;
 
         private final SchemaContext schemaContext;
@@ -426,7 +427,7 @@ public final class YangInstanceIdentifierDeserializer {
         private DataSchemaContextNode<?> current;
         private int offset;
 
-        public MainVarsWrapper(final String data, final DataSchemaContextNode<?> current, final int offset,
+        MainVarsWrapper(final String data, final DataSchemaContextNode<?> current, final int offset,
                 final SchemaContext schemaContext) {
             this.data = data;
             this.current = current;

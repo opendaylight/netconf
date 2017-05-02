@@ -47,7 +47,7 @@ public class RestconfProviderImpl implements Provider, AutoCloseable, RestConnec
         final DOMDataBroker domDataBroker = session.getService(DOMDataBroker.class);
 
         BrokerFacade.getInstance().setContext(session);
-        BrokerFacade.getInstance().setDomDataBroker( domDataBroker);
+        BrokerFacade.getInstance().setDomDataBroker(domDataBroker);
         final SchemaService schemaService = session.getService(SchemaService.class);
         this.listenerRegistration = schemaService.registerSchemaContextListener(ControllerContext.getInstance());
         BrokerFacade.getInstance().setRpcService(session.getService(DOMRpcService.class));

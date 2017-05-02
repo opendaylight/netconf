@@ -24,14 +24,14 @@ class ParametersUtil {
     }
 
     /**
-     * Check if URI does not contain not allowed parameters for specified operation
+     * Check if URI does not contain not allowed parameters for specified operation.
      *
      * @param operationType
-     *            - type of operation (READ, POST, PUT, DELETE...)
+     *             type of operation (READ, POST, PUT, DELETE...)
      * @param usedParameters
-     *            - parameters used in URI request
+     *             parameters used in URI request
      * @param allowedParameters
-     *            - allowed parameters for operation
+     *             allowed parameters for operation
      */
     static void checkParametersTypes(@Nonnull final String operationType,
                                      @Nonnull final Set<String> usedParameters,
@@ -48,12 +48,12 @@ class ParametersUtil {
     }
 
     /**
-     * Check if URI does not contain value for the same parameter more than once
+     * Check if URI does not contain value for the same parameter more than once.
      *
      * @param parameterValues
-     *            - URI parameter values
+     *             URI parameter values
      * @param parameterName
-     *            - URI parameter name
+     *             URI parameter name
      */
     static void checkParameterCount(@Nonnull final List<String> parameterValues, @Nonnull final String parameterName) {
         if (parameterValues.size() > 1) {

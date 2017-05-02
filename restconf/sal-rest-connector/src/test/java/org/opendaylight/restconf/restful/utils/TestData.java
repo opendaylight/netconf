@@ -51,10 +51,12 @@ class TestData {
                 .withValue("content")
                 .build();
         final LeafNode<Object> content2 = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(base, "leaf-content-different")))
+                .withNodeIdentifier(
+                        new YangInstanceIdentifier.NodeIdentifier(QName.create(base, "leaf-content-different")))
                 .withValue("content-different")
                 .build();
-        final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> dataContainer = Builders.leafBuilder()
+        final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> dataContainer =
+                Builders.leafBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(listQname, "identifier")))
                 .withValue("id")
                 .build();

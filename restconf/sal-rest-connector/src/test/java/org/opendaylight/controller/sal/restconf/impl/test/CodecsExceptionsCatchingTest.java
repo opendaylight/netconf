@@ -53,14 +53,14 @@ public class CodecsExceptionsCatchingTest extends JerseyTest {
         // set(TestProperties.RECORD_LOG_LEVEL, Level.ALL.intValue());
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig = resourceConfig.registerInstances(restConf, new NormalizedNodeJsonBodyWriter(),
-                new NormalizedNodeXmlBodyWriter(), new XmlNormalizedNodeBodyReader(), new JsonNormalizedNodeBodyReader());
+            new NormalizedNodeXmlBodyWriter(), new XmlNormalizedNodeBodyReader(), new JsonNormalizedNodeBodyReader());
         resourceConfig.registerClasses(RestconfDocumentedExceptionMapper.class);
         return resourceConfig;
     }
 
     @Test
     @Ignore // TODO RestconfDocumentedExceptionMapper needs be fixed before
-    public void StringToNumberConversionError() {
+    public void stringToNumberConversionError() {
         final Response response = target("/config/number:cont").request(MediaType.APPLICATION_XML).put(
                 Entity.entity("<cont xmlns=\"number\"><lf>3f</lf></cont>", MediaType.APPLICATION_XML));
         final String exceptionMessage = response.readEntity(String.class);

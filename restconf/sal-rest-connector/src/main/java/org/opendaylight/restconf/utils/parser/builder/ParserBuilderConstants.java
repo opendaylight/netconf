@@ -14,7 +14,7 @@ import org.opendaylight.restconf.parser.builder.YangInstanceIdentifierSerializer
 
 /**
  * Util class of constants of {@link YangInstanceIdentifierSerializer}
- * and {@link YangInstanceIdentifierDeserializer}
+ * and {@link YangInstanceIdentifierDeserializer}.
  *
  */
 public final class ParserBuilderConstants {
@@ -24,7 +24,7 @@ public final class ParserBuilderConstants {
     }
 
     /**
-     * Constants for {@link YangInstanceIdentifierSerializer}
+     * Constants for {@link YangInstanceIdentifierSerializer}.
      *
      */
     public static final class Serializer {
@@ -40,7 +40,7 @@ public final class ParserBuilderConstants {
     }
 
     /**
-     * Constants for {@link YangInstanceIdentifierSerializer}
+     * Constants for {@link YangInstanceIdentifierSerializer}.
      *
      */
     public static final class Deserializer {

@@ -16,6 +16,8 @@ import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 
 /**
+ * JAX-RS Provider.
+ *
  * @deprecated This class will be replaced by
  *             {@link org.opendaylight.restconf.jersey.providers.AbstractIdentifierAwareJaxRsProvider}
  */

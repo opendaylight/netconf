@@ -54,11 +54,16 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Unit tests for {@link RestconfMappingNodeUtil}
+ * Unit tests for {@link RestconfMappingNodeUtil}.
  */
 public class RestconfMappingNodeUtilTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfMappingNodeUtilTest.class);
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -142,8 +147,8 @@ public class RestconfMappingNodeUtilTest {
 
     @Test
     public void toStreamEntryNodeTest() throws Exception {
-        final YangInstanceIdentifier path =
-                ParserIdentifier.toInstanceIdentifier("nested-module:depth1-cont/depth2-leaf1", schemaContextMonitoring, null).getInstanceIdentifier();
+        final YangInstanceIdentifier path = ParserIdentifier.toInstanceIdentifier(
+                "nested-module:depth1-cont/depth2-leaf1", schemaContextMonitoring, null).getInstanceIdentifier();
         final Instant start = Instant.now();
         final String outputType = "XML";
         final URI uri = new URI("uri");
@@ -154,8 +159,9 @@ public class RestconfMappingNodeUtilTest {
         final Map<QName, Object> map =
                 prepareMap(path.getLastPathArgument().getNodeType().getLocalName(), uri, start, outputType);
 
-        final NormalizedNode mappedData = RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(path, start, outputType, uri,
-                monitoringModule, exist, schemaContextMonitoring);
+        final NormalizedNode mappedData =
+                RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(
+                        path, start, outputType, uri, monitoringModule, exist, schemaContextMonitoring);
         assertNotNull(mappedData);
         testData(map, mappedData);
     }
@@ -203,10 +209,10 @@ public class RestconfMappingNodeUtilTest {
     }
 
     /**
-     * Verify loaded modules
+     * Verify loaded modules.
      *
      * @param containerNode
-     *            - modules
+     *             modules
      */
     private static void verifyLoadedModules(final ContainerNode containerNode) {
 
@@ -229,6 +235,10 @@ public class RestconfMappingNodeUtilTest {
                                 break;
                             case IetfYangLibrary.SPECIFIC_MODULE_REVISION_LEAF:
                                 revision = String.valueOf(((LeafNode) dataContainerChild).getValue());
+                                break;
+                            default :
+                                LOG.info("Unknown local name '{}' of node.",
+                                        dataContainerChild.getNodeType().getLocalName());
                                 break;
                         }
                     }
