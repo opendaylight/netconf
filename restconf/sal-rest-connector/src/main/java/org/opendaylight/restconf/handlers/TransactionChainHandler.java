@@ -13,7 +13,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 
 
 /**
- * Implementation of {@link TransactionChainHandler}
+ * Implementation of {@link TransactionChainHandler}.
  *
  */
 public class TransactionChainHandler implements Handler<DOMTransactionChain> {
@@ -21,9 +21,9 @@ public class TransactionChainHandler implements Handler<DOMTransactionChain> {
     private DOMTransactionChain transactionChain;
 
     /**
-     * Prepare transaction chain service for Restconf services
+     * Prepare transaction chain service for Restconf services.
      *
-     * @param transactionChain
+     * @param transactionChain Transaction chain
      */
     public TransactionChainHandler(final DOMTransactionChain transactionChain) {
         Preconditions.checkNotNull(transactionChain);

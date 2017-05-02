@@ -11,7 +11,7 @@ import com.google.common.base.Preconditions;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 
 /**
- * Implementation of {@link DOMMountPointServiceHandler}
+ * Implementation of {@link DOMMountPointServiceHandler}.
  *
  */
 public class DOMMountPointServiceHandler implements Handler<DOMMountPointService> {
@@ -19,10 +19,10 @@ public class DOMMountPointServiceHandler implements Handler<DOMMountPointService
     private final DOMMountPointService domMountPointService;
 
     /**
-     * Prepare mount point service for Restconf services
+     * Prepare mount point service for Restconf services.
      *
      * @param domMountPointService
-     *            - mount point service
+     *             mount point service
      */
     public DOMMountPointServiceHandler(final DOMMountPointService domMountPointService) {
         Preconditions.checkNotNull(domMountPointService);

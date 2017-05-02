@@ -15,8 +15,8 @@ import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaRetrievalService;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
 
 public class RestconfCompositeWrapper implements RestconfService, SchemaRetrievalService {
 
@@ -113,13 +113,13 @@ public class RestconfCompositeWrapper implements RestconfService, SchemaRetrieva
     }
 
     @Override
-    public PATCHStatusContext patchConfigurationData(final String identifier, final PATCHContext payload,
-            final UriInfo uriInfo) {
+    public PatchStatusContext patchConfigurationData(final String identifier, final PatchContext payload,
+                                                     final UriInfo uriInfo) {
         return this.restconf.patchConfigurationData(identifier, payload, uriInfo);
     }
 
     @Override
-    public PATCHStatusContext patchConfigurationData(final PATCHContext context, final UriInfo uriInfo) {
+    public PatchStatusContext patchConfigurationData(final PatchContext context, final UriInfo uriInfo) {
         return this.restconf.patchConfigurationData(context, uriInfo);
     }
 

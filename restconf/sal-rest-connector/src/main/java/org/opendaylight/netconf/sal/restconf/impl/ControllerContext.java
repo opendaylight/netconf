@@ -133,10 +133,11 @@ public class ControllerContext implements SchemaContextListener {
         return toIdentifier(restconfInstance, true);
     }
 
-    private InstanceIdentifierContext<?> toIdentifier(final String restconfInstance, final boolean toMountPointIdentifier) {
+    private InstanceIdentifierContext<?> toIdentifier(final String restconfInstance,
+                                                      final boolean toMountPointIdentifier) {
         checkPreconditions();
 
-        if(restconfInstance == null) {
+        if (restconfInstance == null) {
             return new InstanceIdentifierContext<>(YangInstanceIdentifier.EMPTY, this.globalSchema, null,
                     this.globalSchema);
         }
@@ -158,11 +159,12 @@ public class ControllerContext implements SchemaContextListener {
         final Module latestModule = this.globalSchema.findModuleByName(startModule, null);
 
         if (latestModule == null) {
-            throw new RestconfDocumentedException("The module named '" + startModule + "' does not exist.", ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
+            throw new RestconfDocumentedException("The module named '" + startModule + "' does not exist.",
+                    ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
         }
 
-        final InstanceIdentifierContext<?> iiWithSchemaNode = collectPathArguments(builder, pathArgs, latestModule, null,
-                toMountPointIdentifier);
+        final InstanceIdentifierContext<?> iiWithSchemaNode =
+                collectPathArguments(builder, pathArgs, latestModule, null, toMountPointIdentifier);
 
         if (iiWithSchemaNode == null) {
             throw new RestconfDocumentedException("URI has bad format", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -192,6 +194,7 @@ public class ControllerContext implements SchemaContextListener {
 
         return list;
     }
+
     public Module findModuleByName(final String moduleName) {
         checkPreconditions();
         Preconditions.checkArgument((moduleName != null) && !moduleName.isEmpty());
@@ -228,14 +231,16 @@ public class ControllerContext implements SchemaContextListener {
 
     public Module findModuleByNameAndRevision(final QName module) {
         checkPreconditions();
-        Preconditions.checkArgument((module != null) && (module.getLocalName() != null) && (module.getRevision() != null));
+        Preconditions
+                .checkArgument((module != null) && (module.getLocalName() != null) && (module.getRevision() != null));
 
         return this.globalSchema.findModuleByName(module.getLocalName(), module.getRevision());
     }
 
     public Module findModuleByNameAndRevision(final DOMMountPoint mountPoint, final QName module) {
         checkPreconditions();
-        Preconditions.checkArgument((module != null) && (module.getLocalName() != null) && (module.getRevision() != null)
+        Preconditions
+                .checkArgument((module != null) && (module.getLocalName() != null) && (module.getRevision() != null)
                 && (mountPoint != null));
 
         final SchemaContext schemaContext = mountPoint.getSchemaContext();
@@ -284,8 +289,8 @@ public class ControllerContext implements SchemaContextListener {
             if (!(element instanceof AugmentationIdentifier)) {
                 final QName _nodeType = element.getNodeType();
                 final DataSchemaNode potentialNode = childByQName(node, _nodeType);
-                if (!((element instanceof NodeIdentifier) && (potentialNode instanceof ListSchemaNode)) &&
-                        !(potentialNode instanceof ChoiceSchemaNode)) {
+                if (!((element instanceof NodeIdentifier) && (potentialNode instanceof ListSchemaNode))
+                        && !(potentialNode instanceof ChoiceSchemaNode)) {
                     builder.append(convertToRestconfIdentifier(element, potentialNode, mount));
                     if (potentialNode instanceof DataNodeContainer) {
                         node = (DataNodeContainer) potentialNode;
@@ -375,7 +380,7 @@ public class ControllerContext implements SchemaContextListener {
         final Set<GroupingDefinition> groupings = restconfModule.getGroupings();
 
         final Iterable<GroupingDefinition> filteredGroups = Iterables.filter(groupings,
-                g -> RestConfModule.ERRORS_GROUPING_SCHEMA_NODE.equals(g.getQName().getLocalName()));
+            g -> RestConfModule.ERRORS_GROUPING_SCHEMA_NODE.equals(g.getQName().getLocalName()));
 
         final GroupingDefinition restconfGrouping = Iterables.getFirst(filteredGroups, null);
 
@@ -397,7 +402,7 @@ public class ControllerContext implements SchemaContextListener {
 
         final Set<GroupingDefinition> groupings = restconfModule.getGroupings();
         final Iterable<GroupingDefinition> filteredGroups = Iterables.filter(groupings,
-                g -> RestConfModule.RESTCONF_GROUPING_SCHEMA_NODE.equals(g.getQName().getLocalName()));
+            g -> RestConfModule.RESTCONF_GROUPING_SCHEMA_NODE.equals(g.getQName().getLocalName()));
         final GroupingDefinition restconfGrouping = Iterables.getFirst(filteredGroups, null);
 
         final List<DataSchemaNode> instanceDataChildrenByName = findInstanceDataChildrenByName(restconfGrouping,
@@ -470,6 +475,26 @@ public class ControllerContext implements SchemaContextListener {
         return null;
     }
 
+
+    private static DataSchemaNode childByQName(final Object container, final QName name) {
+        if (container instanceof ChoiceCaseNode) {
+            return childByQName((ChoiceCaseNode) container, name);
+        } else if (container instanceof ChoiceSchemaNode) {
+            return childByQName((ChoiceSchemaNode) container, name);
+        } else if (container instanceof ContainerSchemaNode) {
+            return childByQName((ContainerSchemaNode) container, name);
+        } else if (container instanceof ListSchemaNode) {
+            return childByQName((ListSchemaNode) container, name);
+        } else if (container instanceof DataSchemaNode) {
+            return childByQName((DataSchemaNode) container, name);
+        } else if (container instanceof Module) {
+            return childByQName((Module) container, name);
+        } else {
+            throw new IllegalArgumentException("Unhandled parameter types: "
+                    + Arrays.<Object>asList(container, name).toString());
+        }
+    }
+
     private static DataSchemaNode dataNodeChildByQName(final DataNodeContainer container, final QName name) {
         final DataSchemaNode ret = container.getDataChildByName(name);
         if (ret == null) {
@@ -496,7 +521,7 @@ public class ControllerContext implements SchemaContextListener {
     private InstanceIdentifierContext<?> collectPathArguments(final InstanceIdentifierBuilder builder,
             final List<String> strings, final DataNodeContainer parentNode, final DOMMountPoint mountPoint,
             final boolean returnJustMountPoint) {
-        Preconditions.<List<String>> checkNotNull(strings);
+        Preconditions.<List<String>>checkNotNull(strings);
 
         if (parentNode == null) {
             return null;
@@ -552,7 +577,8 @@ public class ControllerContext implements SchemaContextListener {
                             ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
                 }
 
-                final Module moduleBehindMountPoint = mountPointSchema.findModuleByName(moduleNameBehindMountPoint, null);
+                final Module moduleBehindMountPoint =
+                        mountPointSchema.findModuleByName(moduleNameBehindMountPoint, null);
                 if (moduleBehindMountPoint == null) {
                     throw new RestconfDocumentedException("\"" + moduleNameBehindMountPoint
                             + "\" module does not exist in mount point.", ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
@@ -617,9 +643,9 @@ public class ControllerContext implements SchemaContextListener {
 
                 throw new RestconfDocumentedException(
                         "URI has bad format. Node \""
-                                + nodeName
-                                + "\" is added as augment from more than one module. "
-                                + "Therefore the node must have module name and it has to be in format \"moduleName:nodeName\"."
+                                + nodeName + "\" is added as augment from more than one module. "
+                                + "Therefore the node must have module name "
+                                + "and it has to be in format \"moduleName:nodeName\"."
                                 + "\nThe node is added as augment from modules with namespaces:\n"
                                 + strBuilder.toString(), ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
             }
@@ -648,10 +674,10 @@ public class ControllerContext implements SchemaContextListener {
 
             final List<String> uriKeyValues = strings.subList(consumed, consumed + keysSize);
             final HashMap<QName, Object> keyValues = new HashMap<>();
-            int i = 0;
+            int index = 0;
             for (final QName key : listNode.getKeyDefinition()) {
                 {
-                    final String uriKeyValue = uriKeyValues.get(i);
+                    final String uriKeyValue = uriKeyValues.get(index);
                     if (uriKeyValue.equals(NULL_VALUE)) {
                         throw new RestconfDocumentedException("URI has bad format. List \""
                                 + listNode.getQName().getLocalName() + "\" cannot contain \"null\" value as a key.",
@@ -659,11 +685,11 @@ public class ControllerContext implements SchemaContextListener {
                     }
 
                     addKeyValue(keyValues, listNode.getDataChildByName(key), uriKeyValue, mountPoint);
-                    i++;
+                    index++;
                 }
             }
 
-            consumed = consumed + i;
+            consumed = consumed + index;
             builder.nodeWithKey(targetNode.getQName(), keyValues);
         } else {
             builder.node(targetNode.getQName());
@@ -749,7 +775,8 @@ public class ControllerContext implements SchemaContextListener {
         String additionalInfo = "";
         if (decoded == null) {
             if ((typedef instanceof IdentityrefTypeDefinition)) {
-                final SchemaContext schemaContext = mountPoint == null ? this.globalSchema : mountPoint.getSchemaContext();
+                final SchemaContext schemaContext =
+                        mountPoint == null ? this.globalSchema : mountPoint.getSchemaContext();
                 decoded = toQName(schemaContext, urlDecoded, null);
                 additionalInfo =
                         "For key which is of type identityref it should be in format module_name:identity_name.";
@@ -916,25 +943,6 @@ public class ControllerContext implements SchemaContextListener {
         }
 
         return builder.toString();
-    }
-
-    private static DataSchemaNode childByQName(final Object container, final QName name) {
-        if (container instanceof ChoiceCaseNode) {
-            return childByQName((ChoiceCaseNode) container, name);
-        } else if (container instanceof ChoiceSchemaNode) {
-            return childByQName((ChoiceSchemaNode) container, name);
-        } else if (container instanceof ContainerSchemaNode) {
-            return childByQName((ContainerSchemaNode) container, name);
-        } else if (container instanceof ListSchemaNode) {
-            return childByQName((ListSchemaNode) container, name);
-        } else if (container instanceof DataSchemaNode) {
-            return childByQName((DataSchemaNode) container, name);
-        } else if (container instanceof Module) {
-            return childByQName((Module) container, name);
-        } else {
-            throw new IllegalArgumentException("Unhandled parameter types: "
-                    + Arrays.<Object> asList(container, name).toString());
-        }
     }
 
     public YangInstanceIdentifier toNormalized(final YangInstanceIdentifier legacy) {

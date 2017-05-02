@@ -43,7 +43,7 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
 
     private static final Logger LOG = LoggerFactory.getLogger(RestConnectorProvider.class);
 
-    public static final TransactionChainListener transactionListener = new TransactionChainListener() {
+    public static final TransactionChainListener TRANSACTION_CHAIN_LISTENER = new TransactionChainListener() {
         @Override
         public void onTransactionChainFailed(final TransactionChain<?, ?> chain,
                 final AsyncTransaction<?, ?> transaction, final Throwable cause) {
@@ -78,7 +78,7 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         final DOMDataBrokerHandler brokerHandler = new DOMDataBrokerHandler(RestConnectorProvider.dataBroker);
 
         RestConnectorProvider.transactionChainHandler = new TransactionChainHandler(RestConnectorProvider.dataBroker
-                .createTransactionChain(RestConnectorProvider.transactionListener));
+                .createTransactionChain(RestConnectorProvider.TRANSACTION_CHAIN_LISTENER));
 
         this.schemaCtxHandler = new SchemaContextHandler(transactionChainHandler);
         this.listenerRegistration = schemaService.registerSchemaContextListener(this.schemaCtxHandler);
@@ -99,14 +99,14 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
      * After {@link TransactionChain} failed, this updates {@link TransactionChainHandler} with new transaction chain.
      *
      * @param chain
-     *            - old {@link TransactionChain}
+     *             old {@link TransactionChain}
      */
     public static void resetTransactionChainForAdapaters(final TransactionChain<?, ?> chain) {
         LOG.trace("Resetting TransactionChain({})", chain);
         chain.close();
         RestConnectorProvider.transactionChainHandler.update(
                 Preconditions.checkNotNull(RestConnectorProvider.dataBroker).createTransactionChain(
-                        RestConnectorProvider.transactionListener)
+                        RestConnectorProvider.TRANSACTION_CHAIN_LISTENER)
         );
     }
 

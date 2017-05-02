@@ -49,7 +49,8 @@ public class MediaTypesTest extends JerseyTest {
         restconfService = mock(RestconfService.class);
         final String jsonPath = RestconfImplTest.class.getResource("/parts/ietf-interfaces_interfaces.json").getPath();
         jsonData = TestUtils.loadTextFile(jsonPath);
-        final InputStream xmlStream = RestconfImplTest.class.getResourceAsStream("/parts/ietf-interfaces_interfaces.xml");
+        final InputStream xmlStream =
+                RestconfImplTest.class.getResourceAsStream("/parts/ietf-interfaces_interfaces.xml");
         xmlData = TestUtils.getDocumentInPrintableForm(TestUtils.loadDocumentFrom(xmlStream));
     }
 
@@ -62,7 +63,7 @@ public class MediaTypesTest extends JerseyTest {
         // set(TestProperties.RECORD_LOG_LEVEL, Level.ALL.intValue());
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig = resourceConfig.registerInstances(restconfService,  new NormalizedNodeJsonBodyWriter(),
-                new NormalizedNodeXmlBodyWriter(), new XmlNormalizedNodeBodyReader(), new JsonNormalizedNodeBodyReader());
+            new NormalizedNodeXmlBodyWriter(), new XmlNormalizedNodeBodyReader(), new JsonNormalizedNodeBodyReader());
         resourceConfig.registerClasses(RestconfDocumentedExceptionMapper.class);
         return resourceConfig;
     }
@@ -73,7 +74,8 @@ public class MediaTypesTest extends JerseyTest {
         final String uriPrefix = "/operations/";
         final String uriPath = "ietf-interfaces:interfaces";
         final String uri = uriPrefix + uriPath;
-        when(restconfService.invokeRpc(eq(uriPath), any(NormalizedNodeContext.class), any(UriInfo.class))).thenReturn(null);
+        when(restconfService.invokeRpc(eq(uriPath), any(NormalizedNodeContext.class), any(UriInfo.class)))
+                .thenReturn(null);
         post(uri, Draft02.MediaTypes.OPERATION + JSON, Draft02.MediaTypes.OPERATION + JSON, jsonData);
         verify(restconfService, times(1)).invokeRpc(eq(uriPath), any(NormalizedNodeContext.class), any(UriInfo.class));
         post(uri, Draft02.MediaTypes.OPERATION + XML, Draft02.MediaTypes.OPERATION + XML, xmlData);
@@ -236,14 +238,16 @@ public class MediaTypesTest extends JerseyTest {
         return target(uri).request(acceptMediaType).get().getStatus();
     }
 
-    private int put(final String uri, final String acceptMediaType, final String contentTypeMediaType, final String data) {
+    private int put(final String uri, final String acceptMediaType, final String contentTypeMediaType,
+                    final String data) {
         if (acceptMediaType == null) {
             return target(uri).request().put(Entity.entity(data, contentTypeMediaType)).getStatus();
         }
         return target(uri).request(acceptMediaType).put(Entity.entity(data, contentTypeMediaType)).getStatus();
     }
 
-    private int post(final String uri, final String acceptMediaType, final String contentTypeMediaType, final String data) {
+    private int post(final String uri, final String acceptMediaType, final String contentTypeMediaType,
+                     final String data) {
         if (acceptMediaType == null) {
             if ((contentTypeMediaType == null) || (data == null)) {
                 return target(uri).request().post(null).getStatus();

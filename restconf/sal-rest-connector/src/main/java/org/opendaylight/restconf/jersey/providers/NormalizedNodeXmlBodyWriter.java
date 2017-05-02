@@ -64,7 +64,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
     }
 
     @Override
-    public long getSize(final NormalizedNodeContext t,
+    public long getSize(final NormalizedNodeContext context,
                         final Class<?> type,
                         final Type genericType,
                         final Annotation[] annotations,
@@ -73,32 +73,32 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
     }
 
     @Override
-    public void writeTo(final NormalizedNodeContext t,
+    public void writeTo(final NormalizedNodeContext context,
                         final Class<?> type,
                         final Type genericType,
                         final Annotation[] annotations,
                         final MediaType mediaType,
                         final MultivaluedMap<String, Object> httpHeaders,
                         final OutputStream entityStream) throws IOException, WebApplicationException {
-        final InstanceIdentifierContext<?> pathContext = t.getInstanceIdentifierContext();
-        if (t.getData() == null) {
+        final InstanceIdentifierContext<?> pathContext = context.getInstanceIdentifierContext();
+        if (context.getData() == null) {
             return;
         }
 
         XMLStreamWriter xmlWriter;
         try {
             xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
-            if (t.getWriterParameters().isPrettyPrint()) {
+            if (context.getWriterParameters().isPrettyPrint()) {
                 xmlWriter = new IndentingXMLStreamWriter(xmlWriter);
             }
         } catch (final XMLStreamException | FactoryConfigurationError e) {
             throw new IllegalStateException(e);
         }
-        final NormalizedNode<?, ?> data = t.getData();
+        final NormalizedNode<?, ?> data = context.getData();
         final SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
 
-        writeNormalizedNode(xmlWriter, schemaPath, pathContext, data, t.getWriterParameters().getDepth(),
-                t.getWriterParameters().getFields());
+        writeNormalizedNode(xmlWriter, schemaPath, pathContext, data, context.getWriterParameters().getDepth(),
+                context.getWriterParameters().getFields());
     }
 
     private static void writeNormalizedNode(final XMLStreamWriter xmlWriter,

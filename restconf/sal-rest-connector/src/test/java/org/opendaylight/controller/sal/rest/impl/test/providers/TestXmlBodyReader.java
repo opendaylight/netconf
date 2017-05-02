@@ -39,16 +39,6 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-/**
- * sal-rest-connector
- * org.opendaylight.controller.sal.rest.impl.test.providers
- *
- *
- *
- * @author <a href="mailto:vdemcak@cisco.com">Vaclav Demcak</a>
- *
- * Created: Mar 7, 2015
- */
 public class TestXmlBodyReader extends AbstractBodyReaderTest {
 
     private final XmlNormalizedNodeBodyReader xmlBodyReader;
@@ -64,7 +54,7 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
         }
     }
 
-    public TestXmlBodyReader () throws NoSuchFieldException, SecurityException {
+    public TestXmlBodyReader() throws NoSuchFieldException, SecurityException {
         super();
         this.xmlBodyReader = new XmlNormalizedNodeBodyReader();
     }
@@ -79,7 +69,7 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
         schemaContext = YangParserTestUtils.parseYangSources(testFiles);
-        controllerContext.setSchemas(schemaContext);
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test
@@ -158,10 +148,10 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
         final QName augmentChoice1QName = QName.create(augmentModule.getQNameModule(), "augment-choice1");
         final QName augmentChoice2QName = QName.create(augmentChoice1QName, "augment-choice2");
         final QName containerQName = QName.create(augmentChoice1QName, "case-choice-case-container1");
-        final YangInstanceIdentifier.AugmentationIdentifier augChoice1II = new YangInstanceIdentifier.AugmentationIdentifier(
-                Sets.newHashSet(augmentChoice1QName));
-        final YangInstanceIdentifier.AugmentationIdentifier augChoice2II = new YangInstanceIdentifier.AugmentationIdentifier(
-                Sets.newHashSet(augmentChoice2QName));
+        final YangInstanceIdentifier.AugmentationIdentifier augChoice1II =
+                new YangInstanceIdentifier.AugmentationIdentifier(Sets.newHashSet(augmentChoice1QName));
+        final YangInstanceIdentifier.AugmentationIdentifier augChoice2II =
+                new YangInstanceIdentifier.AugmentationIdentifier(Sets.newHashSet(augmentChoice2QName));
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName())
                 .node(augChoice1II).node(augmentChoice1QName).node(augChoice2II).node(augmentChoice2QName)
                 .node(containerQName);
@@ -190,7 +180,8 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
                 .getLastPathArgument());
         assertTrue(contDataNodePotential.isPresent());
         final ContainerNode contDataNode = (ContainerNode) contDataNodePotential.get();
-        final YangInstanceIdentifier yangLeaf = YangInstanceIdentifier.of(QName.create(contDataNode.getNodeType(), "lf"));
+        final YangInstanceIdentifier yangLeaf =
+                YangInstanceIdentifier.of(QName.create(contDataNode.getNodeType(), "lf"));
         final Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode = contDataNode.getChild(yangLeaf
                 .getLastPathArgument());
         assertTrue(leafDataNode.isPresent());

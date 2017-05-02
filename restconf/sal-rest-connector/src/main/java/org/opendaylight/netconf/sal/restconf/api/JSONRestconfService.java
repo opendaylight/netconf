@@ -13,10 +13,10 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 
+@Deprecated
 /**
  * @author Thomas Pantelis
  */
-@Deprecated
 public interface JSONRestconfService {
     /**
      * The data tree root path.

@@ -46,37 +46,40 @@ public class CnSnToXmlAndJsonInstanceIdentifierTest extends YangAndXmlAndDataSch
         XMLEventReader eventReader;
 
         eventReader = xmlInFactory.createXMLEventReader(new ByteArrayInputStream(xml.getBytes()));
-        String aaModulePrefix = null;
-        String aModulePrefix = null;
-        String iiModulePrefix = null;
+        String augmentAugmentModulePrefix = null;
+        String augmentModulePrefix = null;
+        String instanceIdentifierModulePrefix = null;
         while (eventReader.hasNext()) {
             final XMLEvent nextEvent = eventReader.nextEvent();
             if (nextEvent.isStartElement()) {
                 final StartElement startElement = (StartElement) nextEvent;
                 if (startElement.getName().getLocalPart().equals("lf111")) {
-                    final Iterator<?> prefixes = startElement.getNamespaceContext().getPrefixes("augment:augment:module");
+                    final Iterator<?> prefixes =
+                            startElement.getNamespaceContext().getPrefixes("augment:augment:module");
 
-                    while (prefixes.hasNext() && (aaModulePrefix == null)) {
+                    while (prefixes.hasNext() && (augmentAugmentModulePrefix == null)) {
                         final String prefix = (String) prefixes.next();
                         if (!prefix.isEmpty()) {
-                            aaModulePrefix = prefix;
+                            augmentAugmentModulePrefix = prefix;
                         }
                     }
 
-                    aModulePrefix = startElement.getNamespaceContext().getPrefix("augment:module");
-                    iiModulePrefix = startElement.getNamespaceContext().getPrefix("instance:identifier:module");
+                    augmentModulePrefix = startElement.getNamespaceContext().getPrefix("augment:module");
+                    instanceIdentifierModulePrefix =
+                            startElement.getNamespaceContext().getPrefix("instance:identifier:module");
                     break;
                 }
             }
         }
 
-        assertNotNull(aaModulePrefix);
-        assertNotNull(aModulePrefix);
-        assertNotNull(iiModulePrefix);
+        assertNotNull(augmentAugmentModulePrefix);
+        assertNotNull(augmentModulePrefix);
+        assertNotNull(instanceIdentifierModulePrefix);
 
-        final String instanceIdentifierValue = "/" + iiModulePrefix + ":cont/" + iiModulePrefix + ":cont1/" + aModulePrefix
-                + ":lst11[" + aModulePrefix + ":keyvalue111='value1'][" + aModulePrefix + ":keyvalue112='value2']/"
-                + aaModulePrefix + ":lf112";
+        final String instanceIdentifierValue = "/" + instanceIdentifierModulePrefix + ":cont/"
+                + instanceIdentifierModulePrefix + ":cont1/" + augmentModulePrefix + ":lst11[" + augmentModulePrefix
+                + ":keyvalue111='value1'][" + augmentModulePrefix + ":keyvalue112='value2']/"
+                + augmentAugmentModulePrefix + ":lf112";
 
         assertTrue(xml.contains(instanceIdentifierValue));
 
@@ -87,19 +90,20 @@ public class CnSnToXmlAndJsonInstanceIdentifierTest extends YangAndXmlAndDataSch
         XMLEventReader eventReader;
 
         eventReader = xmlInFactory.createXMLEventReader(new ByteArrayInputStream(xml.getBytes()));
-        String aModuleLfLstPrefix = null;
+        String augmentModuleLfLstPrefix = null;
         String iiModulePrefix = null;
         while (eventReader.hasNext()) {
             final XMLEvent nextEvent = eventReader.nextEvent();
             if (nextEvent.isStartElement()) {
                 final StartElement startElement = (StartElement) nextEvent;
                 if (startElement.getName().getLocalPart().equals("lf111")) {
-                    final Iterator<?> prefixes = startElement.getNamespaceContext().getPrefixes("augment:module:leaf:list");
+                    final Iterator<?> prefixes =
+                            startElement.getNamespaceContext().getPrefixes("augment:module:leaf:list");
 
-                    while (prefixes.hasNext() && (aModuleLfLstPrefix == null)) {
+                    while (prefixes.hasNext() && (augmentModuleLfLstPrefix == null)) {
                         final String prefix = (String) prefixes.next();
                         if (!prefix.isEmpty()) {
-                            aModuleLfLstPrefix = prefix;
+                            augmentModuleLfLstPrefix = prefix;
                         }
                     }
                     iiModulePrefix = startElement.getNamespaceContext().getPrefix("instance:identifier:module");
@@ -108,11 +112,11 @@ public class CnSnToXmlAndJsonInstanceIdentifierTest extends YangAndXmlAndDataSch
             }
         }
 
-        assertNotNull(aModuleLfLstPrefix);
+        assertNotNull(augmentModuleLfLstPrefix);
         assertNotNull(iiModulePrefix);
 
         final String instanceIdentifierValue = "/" + iiModulePrefix + ":cont/" + iiModulePrefix + ":cont1/"
-                + aModuleLfLstPrefix + ":lflst11[.='lflst11_1']";
+                + augmentModuleLfLstPrefix + ":lflst11[.='lflst11_1']";
 
         assertTrue(xml.contains(instanceIdentifierValue));
 
@@ -127,7 +131,8 @@ public class CnSnToXmlAndJsonInstanceIdentifierTest extends YangAndXmlAndDataSch
         final Map<QName, Object> keyValues = new HashMap<>();
         keyValues.put(new QName(new URI("augment:module"), "keyvalue111"), "value1");
         keyValues.put(new QName(new URI("augment:module"), "keyvalue112"), "value2");
-        final NodeIdentifierWithPredicates nodeIdentifierWithPredicates = new NodeIdentifierWithPredicates(qName, keyValues);
+        final NodeIdentifierWithPredicates nodeIdentifierWithPredicates =
+                new NodeIdentifierWithPredicates(qName, keyValues);
         pathArguments.add(nodeIdentifierWithPredicates);
 
         pathArguments.add(new NodeIdentifier(new QName(new URI("augment:augment:module"), "lf112")));
