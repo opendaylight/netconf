@@ -14,10 +14,10 @@ public class NotificationServiceHandler implements Handler<DOMNotificationServic
     private final DOMNotificationService notificationService;
 
     /**
-     * Set DOMNotificationService
+     * Set DOMNotificationService.
      *
      * @param notificationService
-     *            - DOMNotificationService
+     *             DOMNotificationService
      */
     public NotificationServiceHandler(final DOMNotificationService notificationService) {
         this.notificationService = notificationService;

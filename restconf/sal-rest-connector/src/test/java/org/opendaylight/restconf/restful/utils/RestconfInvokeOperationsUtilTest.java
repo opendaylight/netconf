@@ -34,7 +34,7 @@ import org.opendaylight.yangtools.yang.common.RpcError;
 
 public class RestconfInvokeOperationsUtilTest {
 
-    private static final TestData data = new TestData();
+    private static final TestData DATA = new TestData();
 
     private RpcServiceHandler serviceHandler;
     @Mock
@@ -50,23 +50,25 @@ public class RestconfInvokeOperationsUtilTest {
 
     @Test
     public void invokeRpcTest() {
-        final DOMRpcResult mockResult = new DefaultDOMRpcResult(data.output, Collections.emptyList());
-        doReturn(Futures.immediateCheckedFuture(mockResult)).when(rpcService).invokeRpc(data.rpc, data.input);
-        final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpc(data.input, data.rpc, serviceHandler);
+        final DOMRpcResult mockResult = new DefaultDOMRpcResult(DATA.output, Collections.emptyList());
+        doReturn(Futures.immediateCheckedFuture(mockResult)).when(rpcService).invokeRpc(DATA.rpc, DATA.input);
+        final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpc(DATA.input, DATA.rpc, serviceHandler);
         Assert.assertTrue(rpcResult.getErrors().isEmpty());
-        assertEquals(data.output, rpcResult.getResult());
+        assertEquals(DATA.output, rpcResult.getResult());
     }
 
     @Test(expected = RestconfDocumentedException.class)
     public void invokeRpcErrorsAndCheckTestTest() {
-        final DOMRpcException exception = new DOMRpcImplementationNotAvailableException("No implementation of RPC " + data.errorRpc.toString() + " availible");
-        doReturn(Futures.immediateFailedCheckedFuture(exception)).when(rpcService).invokeRpc(data.errorRpc, data.input);
-        final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpc(data.input, data.errorRpc, serviceHandler);
+        final DOMRpcException exception = new DOMRpcImplementationNotAvailableException(
+                "No implementation of RPC " + DATA.errorRpc.toString() + " available.");
+        doReturn(Futures.immediateFailedCheckedFuture(exception)).when(rpcService).invokeRpc(DATA.errorRpc, DATA.input);
+        final DOMRpcResult rpcResult =
+                RestconfInvokeOperationsUtil.invokeRpc(DATA.input, DATA.errorRpc, serviceHandler);
         assertNull(rpcResult.getResult());
         final Collection<RpcError> errorList = rpcResult.getErrors();
         assertEquals(1, errorList.size());
         final RpcError actual = errorList.iterator().next();
-        assertEquals("No implementation of RPC " + data.errorRpc.toString() + " availible", actual.getMessage());
+        assertEquals("No implementation of RPC " + DATA.errorRpc.toString() + " available.", actual.getMessage());
         assertEquals("operation-failed", actual.getTag());
         assertEquals(RpcError.ErrorType.RPC, actual.getErrorType());
         RestconfInvokeOperationsUtil.checkResponse(rpcResult);
@@ -75,28 +77,30 @@ public class RestconfInvokeOperationsUtilTest {
     @Test
     public void invokeRpcViaMountPointTest() {
         doReturn(Optional.fromNullable(rpcService)).when(moutPoint).getService(DOMRpcService.class);
-        final DOMRpcResult mockResult = new DefaultDOMRpcResult(data.output, Collections.emptyList());
-        doReturn(Futures.immediateCheckedFuture(mockResult)).when(rpcService).invokeRpc(data.rpc, data.input);
-        final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpcViaMountPoint(moutPoint, data.input, data.rpc);
+        final DOMRpcResult mockResult = new DefaultDOMRpcResult(DATA.output, Collections.emptyList());
+        doReturn(Futures.immediateCheckedFuture(mockResult)).when(rpcService).invokeRpc(DATA.rpc, DATA.input);
+        final DOMRpcResult rpcResult =
+                RestconfInvokeOperationsUtil.invokeRpcViaMountPoint(moutPoint, DATA.input, DATA.rpc);
         Assert.assertTrue(rpcResult.getErrors().isEmpty());
-        assertEquals(data.output, rpcResult.getResult());
+        assertEquals(DATA.output, rpcResult.getResult());
     }
 
     @Test(expected = RestconfDocumentedException.class)
     public void invokeRpcMissingMountPointServiceTest() {
         doReturn(Optional.absent()).when(moutPoint).getService(DOMRpcService.class);
-        final DOMRpcResult mockResult = new DefaultDOMRpcResult(data.output, Collections.emptyList());
-        doReturn(Futures.immediateCheckedFuture(mockResult)).when(rpcService).invokeRpc(data.rpc, data.input);
-        final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpcViaMountPoint(moutPoint, data.input, data.rpc);
+        final DOMRpcResult mockResult = new DefaultDOMRpcResult(DATA.output, Collections.emptyList());
+        doReturn(Futures.immediateCheckedFuture(mockResult)).when(rpcService).invokeRpc(DATA.rpc, DATA.input);
+        final DOMRpcResult rpcResult =
+                RestconfInvokeOperationsUtil.invokeRpcViaMountPoint(moutPoint, DATA.input, DATA.rpc);
     }
 
     @Test
     public void checkResponseTest() {
-        final DOMRpcResult mockResult = new DefaultDOMRpcResult(data.output, Collections.emptyList());
-        doReturn(Futures.immediateCheckedFuture(mockResult)).when(rpcService).invokeRpc(data.rpc, data.input);
-        final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpc(data.input, data.rpc, serviceHandler);
+        final DOMRpcResult mockResult = new DefaultDOMRpcResult(DATA.output, Collections.emptyList());
+        doReturn(Futures.immediateCheckedFuture(mockResult)).when(rpcService).invokeRpc(DATA.rpc, DATA.input);
+        final DOMRpcResult rpcResult = RestconfInvokeOperationsUtil.invokeRpc(DATA.input, DATA.rpc, serviceHandler);
         Assert.assertTrue(rpcResult.getErrors().isEmpty());
-        assertEquals(data.output, rpcResult.getResult());
+        assertEquals(DATA.output, rpcResult.getResult());
         assertNotNull(RestconfInvokeOperationsUtil.checkResponse(rpcResult));
     }
 

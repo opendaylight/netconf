@@ -11,13 +11,12 @@ package org.opendaylight.netconf.sal.restconf.impl;
 import javax.annotation.Nonnull;
 
 /**
- *
  * Each YANG patch edit specifies one edit operation on the target data
  * node.  The set of operations is aligned with the NETCONF edit
  * operations, but also includes some new operations.
  *
  */
-public enum PATCHEditOperation {
+public enum PatchEditOperation {
     CREATE,  //post
     DELETE,  //delete
     INSERT,  //post
@@ -32,7 +31,7 @@ public enum PATCHEditOperation {
      * @return true if operation requires value, false otherwise
      */
     public static final boolean isPatchOperationWithValue(@Nonnull final String operation) {
-        switch (PATCHEditOperation.valueOf(operation.toUpperCase())) {
+        switch (PatchEditOperation.valueOf(operation.toUpperCase())) {
             case CREATE:
                 // fall through
             case MERGE:

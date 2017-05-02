@@ -60,8 +60,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 /**
- * @See {@link InvokeRpcMethodTest}
- *
+ * See {@link InvokeRpcMethodTest}.
  */
 public class RestconfImplTest {
 
@@ -89,8 +88,7 @@ public class RestconfImplTest {
     @Test
     public void testExample() throws FileNotFoundException, ParseException {
         @SuppressWarnings("rawtypes")
-        final
-        NormalizedNode normalizedNodeData = TestUtils.prepareNormalizedNodeWithIetfInterfacesInterfacesData();
+        final NormalizedNode normalizedNodeData = TestUtils.prepareNormalizedNodeWithIetfInterfacesInterfacesData();
         final BrokerFacade brokerFacade = mock(BrokerFacade.class);
         when(brokerFacade.readOperationalData(any(YangInstanceIdentifier.class))).thenReturn(normalizedNodeData);
         assertEquals(normalizedNodeData,
@@ -122,7 +120,7 @@ public class RestconfImplTest {
     }
 
     /**
-     * Create notification stream for toaster module
+     * Create notification stream for toaster module.
      */
     @Test
     public void createNotificationStreamTest() {
@@ -160,7 +158,7 @@ public class RestconfImplTest {
     }
 
     /**
-     * Subscribe for notification stream of toaster module
+     * Subscribe for notification stream of toaster module.
      */
     @Test
     public void subscribeToNotificationStreamTest() throws Exception {

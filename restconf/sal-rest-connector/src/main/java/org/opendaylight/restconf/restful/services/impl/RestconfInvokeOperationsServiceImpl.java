@@ -28,7 +28,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 /**
- * Implementation of {@link RestconfInvokeOperationsService}
+ * Implementation of {@link RestconfInvokeOperationsService}.
  *
  */
 public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperationsService {
@@ -43,7 +43,8 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
     }
 
     @Override
-    public NormalizedNodeContext invokeRpc(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+    public NormalizedNodeContext invokeRpc(final String identifier, final NormalizedNodeContext payload,
+                                           final UriInfo uriInfo) {
         final SchemaContextRef refSchemaCtx = new SchemaContextRef(this.schemaContextHandler.get());
         final SchemaPath schemaPath = payload.getInstanceIdentifierContext().getSchemaNode().getPath();
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();

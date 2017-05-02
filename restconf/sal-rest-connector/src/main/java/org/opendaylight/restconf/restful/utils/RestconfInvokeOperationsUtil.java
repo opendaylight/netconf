@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Util class for rpc
+ * Util class for rpc.
  *
  */
 public class RestconfInvokeOperationsUtil {
@@ -37,14 +37,14 @@ public class RestconfInvokeOperationsUtil {
     }
 
     /**
-     * Invoking rpc via mount point
+     * Invoking rpc via mount point.
      *
      * @param mountPoint
-     *            - mount point
+     *             mount point
      * @param data
-     *            - input data
+     *             input data
      * @param schemaPath
-     *            - schema path of data
+     *             schema path of data
      * @return {@link CheckedFuture}
      */
     public static DOMRpcResult invokeRpcViaMountPoint(final DOMMountPoint mountPoint, final NormalizedNode<?, ?> data,
@@ -61,14 +61,14 @@ public class RestconfInvokeOperationsUtil {
     }
 
     /**
-     * Invoke rpc
+     * Invoke rpc.
      *
      * @param data
-     *            - input data
+     *             input data
      * @param schemaPath
-     *            - schema path of data
+     *             schema path of data
      * @param rpcServiceHandler
-     *            - rpc service handler to invoke rpc
+     *             rpc service handler to invoke rpc
      * @return {@link CheckedFuture}
      */
     public static DOMRpcResult invokeRpc(final NormalizedNode<?, ?> data, final SchemaPath schemaPath,
@@ -83,10 +83,10 @@ public class RestconfInvokeOperationsUtil {
     }
 
     /**
-     * Check the validity of the result
+     * Check the validity of the result.
      *
      * @param response
-     *            - response of rpc
+     *             response of rpc
      * @return {@link DOMRpcResult} result
      */
     public static DOMRpcResult checkResponse(final DOMRpcResult response) {

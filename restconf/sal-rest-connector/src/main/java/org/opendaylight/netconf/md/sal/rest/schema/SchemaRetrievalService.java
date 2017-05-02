@@ -15,6 +15,8 @@ import javax.ws.rs.Produces;
 import org.opendaylight.restconf.base.services.api.RestconfSchemaService;
 
 /**
+ * Deprecated.
+ *
  * @deprecated do not use this api. It is replaced by
  *             {@link RestconfSchemaService}
  */
@@ -22,8 +24,8 @@ import org.opendaylight.restconf.base.services.api.RestconfSchemaService;
 @Beta
 public interface SchemaRetrievalService {
 
-    public static final String YANG_MEDIA_TYPE = "application/yang";
-    public static final String YIN_MEDIA_TYPE = "application/yin+xml";
+    String YANG_MEDIA_TYPE = "application/yang";
+    String YIN_MEDIA_TYPE = "application/yin+xml";
 
     @GET
     @Produces({YIN_MEDIA_TYPE,YANG_MEDIA_TYPE})

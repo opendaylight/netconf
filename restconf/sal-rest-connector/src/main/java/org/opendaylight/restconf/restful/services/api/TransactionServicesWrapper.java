@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.restful.services.api;
 
 /**
- * Wrapper for all transaction services:
+ * Wrapper for all transaction services.
  * <ul>
  * <li>{@link RestconfDataService}
  * <li>{@link RestconfInvokeOperationsService}

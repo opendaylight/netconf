@@ -58,11 +58,11 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      * Set path of listener and stream name, register event bus.
      *
      * @param path
-     *            - path of notification
+     *             path of notification
      * @param streamName
-     *            - stream name of listener
+     *             stream name of listener
      * @param outputType
-     *            - type of output on notification (JSON, XML)
+     *             type of output on notification (JSON, XML)
      */
     NotificationListenerAdapter(final SchemaPath path, final String streamName, final String outputType) {
         super();
@@ -76,7 +76,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     }
 
     /**
-     * Get outputType of listenere
+     * Get outputType of listener.
      *
      * @return the outputType
      */
@@ -97,7 +97,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     }
 
     /**
-     * Get stream name of this listener
+     * Get stream name of this listener.
      *
      * @return {@link String}
      */
@@ -107,7 +107,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     }
 
     /**
-     * Get schema path of notification
+     * Get schema path of notification.
      *
      * @return {@link SchemaPath}
      */
@@ -116,9 +116,9 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     }
 
     /**
-     * Prepare data of notification and data to client
+     * Prepare data of notification and data to client.
      *
-     * @param xml
+     * @param xml   data
      */
     private void prepareAndPostData(final String xml) {
         final Event event = new Event(EventType.NOTIFY);
@@ -131,7 +131,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     }
 
     /**
-     * Prepare json from notification data
+     * Prepare json from notification data.
      *
      * @return json as {@link String}
      */

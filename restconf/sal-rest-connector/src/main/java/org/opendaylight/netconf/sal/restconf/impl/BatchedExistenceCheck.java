@@ -23,8 +23,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 final class BatchedExistenceCheck {
-    private static final AtomicIntegerFieldUpdater<BatchedExistenceCheck> UPDATER = AtomicIntegerFieldUpdater.newUpdater(
-        BatchedExistenceCheck.class, "outstanding");
+    private static final AtomicIntegerFieldUpdater<BatchedExistenceCheck> UPDATER =
+            AtomicIntegerFieldUpdater.newUpdater(BatchedExistenceCheck.class, "outstanding");
 
     private final SettableFuture<Entry<YangInstanceIdentifier, ReadFailedException>> future = SettableFuture.create();
 
@@ -49,12 +49,12 @@ final class BatchedExistenceCheck {
                 }
 
                 @Override
-                public void onFailure(final Throwable t) {
+                public void onFailure(final Throwable throwable) {
                     final Exception e;
-                    if (t instanceof Exception) {
-                        e = (Exception) t;
+                    if (throwable instanceof Exception) {
+                        e = (Exception) throwable;
                     } else {
-                        e = new ExecutionException(t);
+                        e = new ExecutionException(throwable);
                     }
 
                     ret.complete(path, ReadFailedException.MAPPER.apply(e));
