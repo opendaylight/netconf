@@ -14,17 +14,23 @@ import org.opendaylight.controller.config.api.osgi.WaitingServiceTracker;
 import org.osgi.framework.BundleContext;
 
 
-public class RestConnectorModule extends org.opendaylight.controller.config.yang.md.sal.rest.connector.AbstractRestConnectorModule {
+public class RestConnectorModule
+        extends org.opendaylight.controller.config.yang.md.sal.rest.connector.AbstractRestConnectorModule {
 
     private static RestConnectorRuntimeRegistration runtimeRegistration;
 
     private BundleContext bundleContext;
 
-    public RestConnectorModule(final org.opendaylight.controller.config.api.ModuleIdentifier identifier, final org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
+    public RestConnectorModule(final org.opendaylight.controller.config.api.ModuleIdentifier identifier,
+                               final org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
         super(identifier, dependencyResolver);
     }
 
-    public RestConnectorModule(final org.opendaylight.controller.config.api.ModuleIdentifier identifier, final org.opendaylight.controller.config.api.DependencyResolver dependencyResolver, final org.opendaylight.controller.config.yang.md.sal.rest.connector.RestConnectorModule oldModule, final java.lang.AutoCloseable oldInstance) {
+    public RestConnectorModule(
+            final org.opendaylight.controller.config.api.ModuleIdentifier identifier,
+            final org.opendaylight.controller.config.api.DependencyResolver dependencyResolver,
+            final org.opendaylight.controller.config.yang.md.sal.rest.connector.RestConnectorModule oldModule,
+            final java.lang.AutoCloseable oldInstance) {
         super(identifier, dependencyResolver, oldModule, oldInstance);
     }
 
@@ -43,7 +49,7 @@ public class RestConnectorModule extends org.opendaylight.controller.config.yang
         final RestconfWrapperProviders wrapperProviders = new RestconfWrapperProviders(getWebsocketPort());
         wrapperProviders.registerProviders(getDomBrokerDependency());
 
-        if(runtimeRegistration != null){
+        if (runtimeRegistration != null) {
             runtimeRegistration.close();
         }
 

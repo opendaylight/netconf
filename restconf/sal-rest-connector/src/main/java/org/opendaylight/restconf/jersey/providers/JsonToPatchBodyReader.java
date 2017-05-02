@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2015 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.sal.rest.impl;
+package org.opendaylight.restconf.jersey.providers;
 
-import static org.opendaylight.netconf.sal.restconf.impl.PATCHEditOperation.isPatchOperationWithValue;
+import static org.opendaylight.netconf.sal.restconf.impl.PatchEditOperation.isPatchOperationWithValue;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.stream.JsonReader;
@@ -28,15 +28,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
-import org.opendaylight.netconf.sal.rest.api.Draft02;
-import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHEntity;
+import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.restconf.Rfc8040;
+import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -50,17 +50,12 @@ import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @deprecated This class will be replaced by
- *             {@link org.opendaylight.restconf.jersey.providers.JsonToPATCHBodyReader}
- */
-@Deprecated
 @Provider
-@Consumes({Draft02.MediaTypes.PATCH + RestconfService.JSON})
-public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
-        implements MessageBodyReader<PATCHContext> {
+@Consumes({Rfc8040.MediaTypes.PATCH + RestconfConstants.JSON})
+public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
+        implements MessageBodyReader<PatchContext> {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JsonToPATCHBodyReader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JsonToPatchBodyReader.class);
     private String patchId;
 
     @Override
@@ -69,8 +64,9 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
         return true;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public PATCHContext readFrom(final Class<PATCHContext> type, final Type genericType,
+    public PatchContext readFrom(final Class<PatchContext> type, final Type genericType,
                                  final Annotation[] annotations, final MediaType mediaType,
                                  final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream)
             throws IOException, WebApplicationException {
@@ -81,21 +77,21 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
         }
     }
 
-    private static RuntimeException propagateExceptionAs(final Exception e) throws RestconfDocumentedException {
-        if (e instanceof RestconfDocumentedException) {
-            throw (RestconfDocumentedException)e;
+    private PatchContext readFrom(final InstanceIdentifierContext<?> path, final InputStream entityStream)
+            throws IOException {
+        if (entityStream.available() < 1) {
+            return new PatchContext(path, null, null);
         }
 
-        if (e instanceof ResultAlreadySetException) {
-            LOG.debug("Error parsing json input:", e);
-            throw new RestconfDocumentedException("Error parsing json input: Failed to create new parse result data. ");
-        }
+        final JsonReader jsonReader = new JsonReader(new InputStreamReader(entityStream));
+        final List<PatchEntity> resultList = read(jsonReader, path);
+        jsonReader.close();
 
-        throw new RestconfDocumentedException("Error parsing json input: " + e.getMessage(), ErrorType.PROTOCOL,
-                ErrorTag.MALFORMED_MESSAGE, e);
+        return new PatchContext(path, resultList, patchId);
     }
 
-    public PATCHContext readFrom(final String uriPath, final InputStream entityStream) throws
+    @SuppressWarnings("checkstyle:IllegalCatch")
+    public PatchContext readFrom(final String uriPath, final InputStream entityStream) throws
             RestconfDocumentedException {
         try {
             return readFrom(ControllerContext.getInstance().toInstanceIdentifier(uriPath), entityStream);
@@ -105,24 +101,25 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
         }
     }
 
-    private PATCHContext readFrom(final InstanceIdentifierContext<?> path, final InputStream entityStream)
-            throws IOException {
-        if (entityStream.available() < 1) {
-            return new PATCHContext(path, null, null);
+    private static RuntimeException propagateExceptionAs(final Exception exception) throws RestconfDocumentedException {
+        if (exception instanceof RestconfDocumentedException) {
+            throw (RestconfDocumentedException)exception;
         }
 
-        final JsonReader jsonReader = new JsonReader(new InputStreamReader(entityStream));
-        final List<PATCHEntity> resultList = read(jsonReader, path);
-        jsonReader.close();
+        if (exception instanceof ResultAlreadySetException) {
+            LOG.debug("Error parsing json input:", exception);
+            throw new RestconfDocumentedException("Error parsing json input: Failed to create new parse result data. ");
+        }
 
-        return new PATCHContext(path, resultList, this.patchId);
+        throw new RestconfDocumentedException("Error parsing json input: " + exception.getMessage(), ErrorType.PROTOCOL,
+                ErrorTag.MALFORMED_MESSAGE, exception);
     }
 
-    private List<PATCHEntity> read(final JsonReader in, final InstanceIdentifierContext path) throws IOException {
-        final List<PATCHEntity> resultCollection = new ArrayList<>();
+    private List<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext path) throws IOException {
+        final List<PatchEntity> resultCollection = new ArrayList<>();
         final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
                 path.getSchemaContext());
-        final JsonToPATCHBodyReader.PatchEdit edit = new JsonToPATCHBodyReader.PatchEdit();
+        final JsonToPatchBodyReader.PatchEdit edit = new JsonToPatchBodyReader.PatchEdit();
 
         while (in.hasNext()) {
             switch (in.peek()) {
@@ -163,19 +160,20 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
     }
 
     /**
-     * Switch value of parsed JsonToken.NAME and read edit definition or patch id
+     * Switch value of parsed JsonToken.NAME and read edit definition or patch id.
+     *
      * @param name value of token
      * @param edit PatchEdit instance
      * @param in JsonReader reader
      * @param path InstanceIdentifierContext context
-     * @param codec StringModuleInstanceIdentifierCodec codec
+     * @param codec Draft11StringModuleInstanceIdentifierCodec codec
      * @param resultCollection collection of parsed edits
-     * @throws IOException
+     * @throws IOException if operation fails
      */
     private void parseByName(@Nonnull final String name, @Nonnull final PatchEdit edit,
                              @Nonnull final JsonReader in, @Nonnull final InstanceIdentifierContext path,
                              @Nonnull final StringModuleInstanceIdentifierCodec codec,
-                             @Nonnull final List<PATCHEntity> resultCollection) throws IOException {
+                             @Nonnull final List<PatchEntity> resultCollection) throws IOException {
         switch (name) {
             case "edit" :
                 if (in.peek() == JsonToken.BEGIN_ARRAY) {
@@ -204,12 +202,13 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
     }
 
     /**
-     * Read one patch edit object from Json input
+     * Read one patch edit object from Json input.
+     *
      * @param edit PatchEdit instance to be filled with read data
      * @param in JsonReader reader
      * @param path InstanceIdentifierContext path context
-     * @param codec StringModuleInstanceIdentifierCodec codec
-     * @throws IOException
+     * @param codec Draft11StringModuleInstanceIdentifierCodec codec
+     * @throws IOException if operation fails
      */
     private void readEditDefinition(@Nonnull final PatchEdit edit, @Nonnull final JsonReader in,
                                     @Nonnull final InstanceIdentifierContext path,
@@ -253,14 +252,15 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
         in.endObject();
 
         // read saved data to normalized node when target schema is already known
-        edit.setData(readEditData(new JsonReader(new StringReader(value.toString())), edit.getTargetSchemaNode(), path));
+        edit.setData(
+                readEditData(new JsonReader(new StringReader(value.toString())), edit.getTargetSchemaNode(), path));
     }
 
     /**
-     * Parse data defined in value node and saves it to buffer
+     * Parse data defined in value node and saves it to buffer.
      * @param value Buffer to read value node
      * @param in JsonReader reader
-     * @throws IOException
+     * @throws IOException if operation fails
      */
     private void readValueNode(@Nonnull final StringBuffer value, @Nonnull final JsonReader in) throws IOException {
         in.beginObject();
@@ -294,10 +294,10 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
     }
 
     /**
-     * Parse one value object of data and saves it to buffer
+     * Parse one value object of data and saves it to buffer.
      * @param value Buffer to read value object
      * @param in JsonReader reader
-     * @throws IOException
+     * @throws IOException if operation fails
      */
     private void readValueObject(@Nonnull final StringBuffer value, @Nonnull final JsonReader in) throws IOException {
         // read simple leaf value
@@ -348,7 +348,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
     }
 
     /**
-     * Read patch edit data defined in value node to NormalizedNode
+     * Read patch edit data defined in value node to NormalizedNode.
      * @param in reader JsonReader reader
      * @return NormalizedNode representing data
      */
@@ -362,13 +362,13 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
     }
 
     /**
-     * Prepare PATCHEntity from PatchEdit instance when it satisfies conditions, otherwise throws exception
+     * Prepare PatchEntity from PatchEdit instance when it satisfies conditions, otherwise throws exception.
      * @param edit Instance of PatchEdit
-     * @return PATCHEntity
+     * @return PatchEntity Patch entity
      */
-    private static PATCHEntity prepareEditOperation(@Nonnull final PatchEdit edit) {
-        if ((edit.getOperation() != null) && (edit.getTargetSchemaNode() != null)
-                && checkDataPresence(edit.getOperation(), (edit.getData() != null))) {
+    private static PatchEntity prepareEditOperation(@Nonnull final PatchEdit edit) {
+        if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
+                && checkDataPresence(edit.getOperation(), edit.getData() != null)) {
             if (isPatchOperationWithValue(edit.getOperation())) {
                 // for lists allow to manipulate with list items through their parent
                 final YangInstanceIdentifier targetNode;
@@ -378,9 +378,9 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
                     targetNode = edit.getTarget();
                 }
 
-                return new PATCHEntity(edit.getId(), edit.getOperation(), targetNode, edit.getData());
+                return new PatchEntity(edit.getId(), edit.getOperation(), targetNode, edit.getData());
             } else {
-                return new PATCHEntity(edit.getId(), edit.getOperation(), edit.getTarget());
+                return new PatchEntity(edit.getId(), edit.getOperation(), edit.getTarget());
             }
         }
 
@@ -388,11 +388,11 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
     }
 
     /**
-     * Check if data is present when operation requires it and not present when operation data is not allowed
+     * Check if data is present when operation requires it and not present when operation data is not allowed.
      * @param operation Name of operation
      * @param hasData Data in edit are present/not present
      * @return true if data is present when operation requires it or if there are no data when operation does not
-     * allow it, false otherwise
+     *     allow it, false otherwise
      */
     private static boolean checkDataPresence(@Nonnull final String operation, final boolean hasData) {
         if (isPatchOperationWithValue(operation)) {
@@ -403,7 +403,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
     }
 
     /**
-     * Helper class representing one patch edit
+     * Helper class representing one patch edit.
      */
     private static final class PatchEdit {
         private String id;
@@ -413,7 +413,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
         private NormalizedNode data;
 
         public String getId() {
-            return this.id;
+            return id;
         }
 
         public void setId(final String id) {
@@ -421,7 +421,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
         }
 
         public String getOperation() {
-            return this.operation;
+            return operation;
         }
 
         public void setOperation(final String operation) {
@@ -429,7 +429,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
         }
 
         public YangInstanceIdentifier getTarget() {
-            return this.target;
+            return target;
         }
 
         public void setTarget(final YangInstanceIdentifier target) {
@@ -437,7 +437,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
         }
 
         public SchemaNode getTargetSchemaNode() {
-            return this.targetSchemaNode;
+            return targetSchemaNode;
         }
 
         public void setTargetSchemaNode(final SchemaNode targetSchemaNode) {
@@ -445,7 +445,7 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
         }
 
         public NormalizedNode getData() {
-            return this.data;
+            return data;
         }
 
         public void setData(final NormalizedNode data) {
@@ -453,11 +453,11 @@ public class JsonToPATCHBodyReader extends AbstractIdentifierAwareJaxRsProvider
         }
 
         public void clear() {
-            this.id = null;
-            this.operation = null;
-            this.target = null;
-            this.targetSchemaNode = null;
-            this.data = null;
+            id = null;
+            operation = null;
+            target = null;
+            targetSchemaNode = null;
+            data = null;
         }
     }
 }

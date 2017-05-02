@@ -72,8 +72,8 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
         schemaContext = YangParserTestUtils.parseYangSources(testFiles);
-        controllerContext.setSchemas(schemaContext);
-        when(mountPointServiceHandler.get()).thenReturn(mock(DOMMountPointService.class));
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
+        when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mock(DOMMountPointService.class));
     }
 
     @Test
@@ -152,10 +152,10 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final QName augmentChoice1QName = QName.create(augmentModule.getQNameModule(), "augment-choice1");
         final QName augmentChoice2QName = QName.create(augmentChoice1QName, "augment-choice2");
         final QName containerQName = QName.create(augmentChoice1QName, "case-choice-case-container1");
-        final YangInstanceIdentifier.AugmentationIdentifier augChoice1II = new YangInstanceIdentifier.AugmentationIdentifier(
-                Sets.newHashSet(augmentChoice1QName));
-        final YangInstanceIdentifier.AugmentationIdentifier augChoice2II = new YangInstanceIdentifier.AugmentationIdentifier(
-                Sets.newHashSet(augmentChoice2QName));
+        final YangInstanceIdentifier.AugmentationIdentifier augChoice1II =
+                new YangInstanceIdentifier.AugmentationIdentifier(Sets.newHashSet(augmentChoice1QName));
+        final YangInstanceIdentifier.AugmentationIdentifier augChoice2II =
+                new YangInstanceIdentifier.AugmentationIdentifier(Sets.newHashSet(augmentChoice2QName));
         final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.getQName()).node(augChoice1II)
                 .node(augmentChoice1QName).node(augChoice2II).node(augmentChoice2QName).node(containerQName);
         final String uri = "instance-identifier-module:cont";

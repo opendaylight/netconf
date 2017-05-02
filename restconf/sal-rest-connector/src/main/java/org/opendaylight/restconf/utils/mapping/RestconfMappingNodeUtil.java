@@ -50,7 +50,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 /**
- * Util class for mapping nodes
+ * Util class for mapping nodes.
  *
  */
 public final class RestconfMappingNodeUtil {
@@ -60,16 +60,16 @@ public final class RestconfMappingNodeUtil {
     }
 
     /**
-     * Map data from modules to {@link NormalizedNode}
+     * Map data from modules to {@link NormalizedNode}.
      *
      * @param modules
-     *            - modules for mapping
+     *             modules for mapping
      * @param ietfYangLibraryModule
-     *            - ietf-yang-library module
+     *             ietf-yang-library module
      * @param context
-     *            - schema context
+     *             schema context
      * @param moduleSetId
-     *            - module-set-id of actual set
+     *             module-set-id of actual set
      * @return mapped data as {@link NormalizedNode}
      */
     public static NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>>
@@ -95,20 +95,20 @@ public final class RestconfMappingNodeUtil {
     }
 
     /**
-     * Map data by the specific module or submodule
+     * Map data by the specific module or submodule.
      *
      * @param mapBuilder
-     *            - ordered list builder for children
+     *             ordered list builder for children
      * @param moduleSch
-     *            - schema of list for entryMapBuilder
+     *             schema of list for entryMapBuilder
      * @param isSubmodule
-     *            - true if module is specified as submodule, false otherwise
+     *             true if module is specified as submodule, false otherwise
      * @param module
-     *            - specific module or submodule
+     *             specific module or submodule
      * @param ietfYangLibraryModule
-     *            - ietf-yang-library module
+     *             ietf-yang-library module
      * @param context
-     *            - schema context
+     *             schema context
      */
     private static void fillMapByModules(final CollectionNodeBuilder<MapEntryNode, OrderedMapNode> mapBuilder,
             final DataSchemaNode moduleSch, final boolean isSubmodule, final Module module,
@@ -147,16 +147,16 @@ public final class RestconfMappingNodeUtil {
     }
 
     /**
-     * Mapping submodules of specific module
+     * Mapping submodules of specific module.
      *
      * @param module
-     *            - module with submodules
+     *             module with submodules
      * @param mapEntryBuilder
-     *            - mapEntryBuilder of parent for mapping children
+     *             mapEntryBuilder of parent for mapping children
      * @param ietfYangLibraryModule
-     *            - ietf-yang-library module
+     *             ietf-yang-library module
      * @param context
-     *            - schema context
+     *             schema context
      */
     private static void addSubmodules(final Module module,
             final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
@@ -172,16 +172,16 @@ public final class RestconfMappingNodeUtil {
     }
 
     /**
-     * Mapping deviations of specific module
+     * Mapping deviations of specific module.
      *
      * @param module
-     *            - module with deviations
+     *             module with deviations
      * @param mapEntryBuilder
-     *            - mapEntryBuilder of parent for mapping children
+     *             mapEntryBuilder of parent for mapping children
      * @param ietfYangLibraryModule
-     *            - ietf-yang-library module
+     *             ietf-yang-library module
      * @param context
-     *            - schema context
+     *             schema context
      */
     private static void addDeviationList(final Module module,
             final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
@@ -206,16 +206,16 @@ public final class RestconfMappingNodeUtil {
     }
 
     /**
-     * Mapping features of specific module
+     * Mapping features of specific module.
      *
      * @param qnameOfFeaturesLeafList
-     *            - qname of feature leaf-list in ietf-yang-library module
+     *             qname of feature leaf-list in ietf-yang-library module
      * @param mapEntryBuilder
-     *            - mapEntryBuilder of parent for mapping children
+     *             mapEntryBuilder of parent for mapping children
      * @param features
-     *            - features of specific module
+     *             features of specific module
      * @param ietfYangLibraryModule
-     *            - ieat-yang-library module
+     *             ieat-yang-library module
      */
     private static void addFeatureLeafList(final QName qnameOfFeaturesLeafList,
             final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
@@ -233,14 +233,14 @@ public final class RestconfMappingNodeUtil {
 
     /**
      * Mapping common leafs (grouping common-leafs in ietf-yang-library) of
-     * specific module
+     * specific module.
      *
      * @param module
-     *            - specific module for getting name and revision
+     *             specific module for getting name and revision
      * @param mapEntryBuilder
-     *            - mapEntryBuilder of parent for mapping children
+     *             mapEntryBuilder of parent for mapping children
      * @param ietfYangLibraryModule
-     *            - ietf-yang-library module
+     *             ietf-yang-library module
      */
     private static void addCommonLeafs(final Module module,
             final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
@@ -252,16 +252,16 @@ public final class RestconfMappingNodeUtil {
     }
 
     /**
-     * Mapping data child of grouping module-list by ietf-yang-library
+     * Mapping data child of grouping module-list by ietf-yang-library.
      *
      * @param specificQName
-     *            - qname of leaf in module-list grouping
+     *             qname of leaf in module-list grouping
      * @param mapEntryBuilder
-     *            - mapEntryBuilder of parent for mapping children
+     *             mapEntryBuilder of parent for mapping children
      * @param value
-     *            - value of leaf
+     *             value of leaf
      * @param ietfYangLibraryModule
-     *            - ietf-yang-library module
+     *             ietf-yang-library module
      */
     private static void addChildOfModuleBySpecificModuleOfListChild(final QName specificQName,
             final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
@@ -271,12 +271,12 @@ public final class RestconfMappingNodeUtil {
     }
 
     /**
-     * Find specific schema in gourping module-lsit
+     * Find specific schema in gourping module-lsit.
      *
      * @param specificQName
-     *            - qname of schema
+     *             qname of schema
      * @param ietfYangLibraryModule
-     *            - ietf-yang-library module
+     *             ietf-yang-library module
      * @return schemaNode of specific child
      */
     private static DataSchemaNode findSchemaInListOfModulesSchema(final QName specificQName,
@@ -292,16 +292,16 @@ public final class RestconfMappingNodeUtil {
     }
 
     /**
-     * Mapping data child of internal groupings in module-list grouping
+     * Mapping data child of internal groupings in module-list grouping.
      *
      * @param specifiLeafQName
-     *            - qnmae of leaf for mapping
+     *             qnmae of leaf for mapping
      * @param mapEntryBuilder
-     *            - mapEntryBuilder of parent for mapping children
+     *             mapEntryBuilder of parent for mapping children
      * @param value
-     *            - value of leaf
+     *             value of leaf
      * @param ietfYangLibraryModule
-     *            - ietf-yang-library module
+     *             ietf-yang-library module
      */
     private static void addChildOfModuleBySpecificModuleInternal(final QName specifiLeafQName,
             final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
@@ -311,13 +311,13 @@ public final class RestconfMappingNodeUtil {
     }
 
     /**
-     * Find schema node of leaf by qname in internal groupings of module-list
+     * Find schema node of leaf by qname in internal groupings of module-list.
      * grouping
      *
      * @param qnameOfSchema
-     *            - qname of leaf
+     *             qname of leaf
      * @param ietfYangLibraryModule
-     *            - ietf-yang-library module
+     *             ietf-yang-library module
      * @return schema node of specific leaf
      */
     private static DataSchemaNode findNodeInInternGroupings(final QName qnameOfSchema,
@@ -335,16 +335,16 @@ public final class RestconfMappingNodeUtil {
     }
 
     /**
-     * Mapping childrens of list-module
+     * Mapping childrens of list-module.
      *
      * @param specifiLeafQName
-     *            - qname of leaf
+     *             qname of leaf
      * @param mapEntryBuilder
-     *            - maptEntryBuilder of parent for mapping children
+     *             maptEntryBuilder of parent for mapping children
      * @param value
-     *            - valeu of leaf
+     *             valeu of leaf
      * @param ietfYangLibraryModule
-     *            - ietf-yang-library module
+     *             ietf-yang-library module
      */
     private static void addChildOfModuleBySpecificModule(final QName specifiLeafQName,
             final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
@@ -354,12 +354,12 @@ public final class RestconfMappingNodeUtil {
     }
 
     /**
-     * Find schema of specific leaf in list-module grouping
+     * Find schema of specific leaf in list-module grouping.
      *
      * @param qnameOfSchema
-     *            - qname of leaf
+     *             qname of leaf
      * @param ietfYangLibraryModule
-     *            - ietf-yang-library module
+     *             ietf-yang-library module
      * @return schemaNode of specific leaf
      */
     private static DataSchemaNode findNodeInGroupings(final QName qnameOfSchema, final Module ietfYangLibraryModule) {
@@ -372,10 +372,10 @@ public final class RestconfMappingNodeUtil {
     }
 
     /**
-     * Map capabilites by ietf-restconf-monitoring
+     * Map capabilites by ietf-restconf-monitoring.
      *
      * @param monitoringModule
-     *            - ietf-restconf-monitoring module
+     *             ietf-restconf-monitoring module
      * @return mapped capabilites
      */
     public static NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>>
@@ -399,11 +399,12 @@ public final class RestconfMappingNodeUtil {
     }
 
     /**
-     * Map data to leaf-list
+     * Map data to leaf-list.
      *
      * @param builder
-     *            - builder of parent for children
+     *             builder of parent for children
      * @param leafListSchema
+     *             leaf list schema
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static void fillLeafListCapa(final ListNodeBuilder builder, final LeafListSchemaNode leafListSchema) {
@@ -415,12 +416,12 @@ public final class RestconfMappingNodeUtil {
     }
 
     /**
-     * Map value to leaf list entry node
+     * Map value to leaf list entry node.
      *
      * @param leafListSchema
-     *            - leaf list schema of leaf list entry
+     *             leaf list schema of leaf list entry
      * @param value
-     *            - value of leaf entry
+     *             value of leaf entry
      * @return entry node
      */
     @SuppressWarnings("rawtypes")
@@ -429,12 +430,12 @@ public final class RestconfMappingNodeUtil {
     }
 
     /**
-     * Find specific schema node by qname in parent {@link ContainerSchemaNode}
+     * Find specific schema node by qname in parent {@link ContainerSchemaNode}.
      *
      * @param parent
-     *            - schemaNode
+     *             schemaNode
      * @param childQName
-     *            - specific qname of child
+     *             specific qname of child
      * @return schema node of child by qname
      */
     private static DataSchemaNode getChildOfCont(final ContainerSchemaNode parent, final QName childQName) {
@@ -449,24 +450,24 @@ public final class RestconfMappingNodeUtil {
 
     /**
      * Map data of yang notification to normalized node according to
-     * ietf-restconf-monitoring
+     * ietf-restconf-monitoring.
      *
      * @param notifiQName
-     *            - qname of notification from listener
+     *             qname of notification from listener
      * @param notifications
-     *            - list of notifications for find schema of notification by
+     *             list of notifications for find schema of notification by
      *            notifiQName
      * @param start
-     *            - start-time query parameter of notification
+     *             start-time query parameter of notification
      * @param outputType
-     *            - output type of notification
+     *             output type of notification
      * @param uri
-     *            - location of registered listener for sending data of
+     *             location of registered listener for sending data of
      *            notification
      * @param monitoringModule
-     *            - ietf-restconf-monitoring module
+     *             ietf-restconf-monitoring module
      * @param existParent
-     *            - true if data of parent -
+     *             true if data of parent -
      *            ietf-restconf-monitoring:restconf-state/streams - exist in DS
      * @return mapped data of notification - map entry node if parent exists,
      *         container streams with list and map entry node if not
@@ -536,9 +537,11 @@ public final class RestconfMappingNodeUtil {
     }
 
     /**
-     * @param streamEntry
-     * @param dataChildByName
-     * @param localName
+     * Prepare leaf and fill entry builder.
+     *
+     * @param streamEntry   Stream entry
+     * @param leafSchema    Leaf schema
+     * @param value         Value
      */
     private static void prepareLeafAndFillEntryBuilder(
             final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry,
@@ -548,24 +551,24 @@ public final class RestconfMappingNodeUtil {
 
     /**
      * Map data of data change notification to normalized node according to
-     * ietf-restconf-monitoring
+     * ietf-restconf-monitoring.
      *
      * @param path
-     *            - path of data to listen on
+     *             path of data to listen on
      * @param start
-     *            - start-time query parameter of notification
+     *             start-time query parameter of notification
      * @param outputType
-     *            - output type of notification
+     *             output type of notification
      * @param uri
-     *            - location of registered listener for sending data of
+     *             location of registered listener for sending data of
      *            notification
      * @param monitoringModule
-     *            - ietf-restconf-monitoring module
+     *             ietf-restconf-monitoring module
      * @param existParent
-     *            - true if data of parent -
+     *             true if data of parent -
      *            ietf-restconf-monitoring:restconf-state/streams - exist in DS
      * @param schemaContext
-     *            - schemaContext for parsing instance identifier to get schema
+     *             schemaContext for parsing instance identifier to get schema
      *            node of data
      * @return mapped data of notification - map entry node if parent exists,
      *         container streams with list and map entry node if not

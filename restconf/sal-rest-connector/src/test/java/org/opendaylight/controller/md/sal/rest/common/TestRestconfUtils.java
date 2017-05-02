@@ -37,15 +37,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/**
- * sal-rest-connector org.opendaylight.controller.md.sal.rest.common
- *
- *
- *
- * @author <a href="mailto:vdemcak@cisco.com">Vaclav Demcak</a>
- *
- *         Created: Mar 7, 2015
- */
 public class TestRestconfUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestRestconfUtils.class);
@@ -54,6 +45,7 @@ public class TestRestconfUtils {
         throw new UnsupportedOperationException("Test utility class");
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public static SchemaContext loadSchemaContext(final String yangPath, final SchemaContext schemaContext) {
         try {
             Preconditions.checkArgument(yangPath != null, "Path can not be null.");
@@ -73,6 +65,7 @@ public class TestRestconfUtils {
         throw new AbstractMethodError("Not implemented yet");
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public static NormalizedNodeContext loadNormalizedContextFromXmlFile(final String pathToInputFile,
             final String uri) {
         final InstanceIdentifierContext<?> iiContext = ControllerContext.getInstance().toInstanceIdentifier(uri);

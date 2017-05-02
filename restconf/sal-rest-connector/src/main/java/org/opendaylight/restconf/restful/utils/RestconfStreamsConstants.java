@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Constants for streams
+ * Constants for streams.
  *
  */
 public final class RestconfStreamsConstants {

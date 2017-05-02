@@ -15,15 +15,12 @@ import static org.mockito.Mockito.mock;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.util.logging.Level;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
-import org.glassfish.jersey.test.TestProperties;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -68,7 +65,7 @@ public class RestStreamTest extends JerseyTest {
         // set(TestProperties.RECORD_LOG_LEVEL, Level.ALL.intValue());
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig = resourceConfig.registerInstances(restconfImpl, new NormalizedNodeJsonBodyWriter(),
-                new NormalizedNodeXmlBodyWriter(), new XmlNormalizedNodeBodyReader(), new JsonNormalizedNodeBodyReader());
+            new NormalizedNodeXmlBodyWriter(), new XmlNormalizedNodeBodyReader(), new JsonNormalizedNodeBodyReader());
         resourceConfig.registerClasses(RestconfDocumentedExceptionMapper.class);
         return resourceConfig;
     }
@@ -97,13 +94,16 @@ public class RestStreamTest extends JerseyTest {
 
         final Node streamNameElement = outputElement.getFirstChild();
         assertEquals("stream-name",streamNameElement.getLocalName());
-        assertEquals("data-change-event-subscription/ietf-interfaces:interfaces/ietf-interfaces:interface/eth0/datastore=CONFIGURATION/scope=BASE",streamNameElement.getTextContent());
+        assertEquals("data-change-event-subscription/ietf-interfaces:interfaces/ietf-interfaces:interface/eth0/"
+                + "datastore=CONFIGURATION/scope=BASE",streamNameElement.getTextContent());
 
-        uri = "/streams/stream/data-change-event-subscription/ietf-interfaces:interfaces/ietf-interfaces:interface/eth0/datastore=CONFIGURATION/scope=BASE";
+        uri = "/streams/stream/data-change-event-subscription/ietf-interfaces:interfaces/ietf-interfaces:interface/"
+                + "eth0/datastore=CONFIGURATION/scope=BASE";
         final Response responseWithRedirectionUri = get(uri, MediaType.APPLICATION_XML, null);
         final URI websocketServerUri = responseWithRedirectionUri.getLocation();
         assertNotNull(websocketServerUri);
-        assertTrue(websocketServerUri.toString().matches(".*ws://localhost:[\\d]+/data-change-event-subscription/ietf-interfaces:interfaces/ietf-interfaces:interface/eth0.*"));
+        assertTrue(websocketServerUri.toString().matches(".*ws://localhost:[\\d]+/data-change-event-subscription/"
+                + "ietf-interfaces:interfaces/ietf-interfaces:interface/eth0.*"));
     }
 
     private Response post(final String uri, final String mediaType, final String data) {
@@ -121,7 +121,8 @@ public class RestStreamTest extends JerseyTest {
     private static String getRpcInput() {
         final StringBuilder sb = new StringBuilder();
         sb.append("<input xmlns=\"urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote\">");
-        sb.append("<path xmlns:int=\"urn:ietf:params:xml:ns:yang:ietf-interfaces\">/int:interfaces/int:interface[int:name='eth0']</path>");
+        sb.append("<path xmlns:int=\"urn:ietf:params:xml:ns:yang:ietf-interfaces\">/"
+                + "int:interfaces/int:interface[int:name='eth0']</path>");
         sb.append("</input>");
         return sb.toString();
     }

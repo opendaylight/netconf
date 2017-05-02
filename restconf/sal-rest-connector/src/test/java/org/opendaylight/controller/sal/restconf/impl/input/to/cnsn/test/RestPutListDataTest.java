@@ -86,7 +86,7 @@ public class RestPutListDataTest {
 
     /**
      * Tests whether no exception is raised if number and values of keys in URI
-     * and payload are equal
+     * and payload are equal.
      */
     @Test
     @Ignore
@@ -98,6 +98,7 @@ public class RestPutListDataTest {
      * Tests whether an exception is raised if key values in URI and payload are
      * different.
      *
+     * <p>
      * The exception should be raised from validation method
      * {@code RestconfImpl#validateListEqualityOfListInDataAndUri}
      */
@@ -123,6 +124,7 @@ public class RestPutListDataTest {
      * Tests whether an exception is raised if URI contains less key values then
      * payload.
      *
+     * <p>
      * The exception is raised during {@code InstanceIdentifier} instance is
      * built from URI
      */
@@ -141,6 +143,7 @@ public class RestPutListDataTest {
      * Tests whether an exception is raised if URI contains more key values then
      * payload.
      *
+     * <p>
      * The exception should be raised from validation method
      * {@code RestconfImpl#validateListEqualityOfListInDataAndUri}
      */
@@ -157,9 +160,9 @@ public class RestPutListDataTest {
         }
     }
 
-    private static void verifyException(final RestconfDocumentedException e, final ErrorType errorType,
-            final ErrorTag errorTag) {
-        final List<RestconfError> errors = e.getErrors();
+    private static void verifyException(final RestconfDocumentedException restDocumentedException,
+                                        final ErrorType errorType, final ErrorTag errorTag) {
+        final List<RestconfError> errors = restDocumentedException.getErrors();
         assertEquals("getErrors() size", 1, errors.size());
         assertEquals("RestconfError getErrorType()", errorType, errors.get(0).getErrorType());
         assertEquals("RestconfError getErrorTag()", errorTag, errors.get(0).getErrorTag());
@@ -167,7 +170,8 @@ public class RestPutListDataTest {
 
     public void putListDataTest(final String uriKey1, final String uriKey2, final String payloadKey1,
             final Short payloadKey2) {
-        final QName lstWithCompositeKey = QName.create(TEST_MODULE_NS_STRING, TEST_MODULE_REVISION, "lst-with-composite-key");
+        final QName lstWithCompositeKey =
+                QName.create(TEST_MODULE_NS_STRING, TEST_MODULE_REVISION, "lst-with-composite-key");
         final QName key1 = QName.create(TEST_MODULE_NS_STRING, TEST_MODULE_REVISION, "key1");
         final QName key2 = QName.create(TEST_MODULE_NS_STRING, TEST_MODULE_REVISION, "key2");
 

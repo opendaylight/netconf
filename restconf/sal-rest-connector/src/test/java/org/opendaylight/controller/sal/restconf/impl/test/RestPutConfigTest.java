@@ -36,16 +36,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
-/**
- * sal-rest-connector
- * org.opendaylight.controller.sal.restconf.impl.test
- *
- *
- *
- * @author <a href="mailto:vdemcak@cisco.com">Vaclav Demcak</a>
- *
- * Created: May 14, 2015
- */
 @RunWith(MockitoJUnitRunner.class)
 public class RestPutConfigTest {
 
@@ -72,7 +62,8 @@ public class RestPutConfigTest {
         final MapEntryNode data = Mockito.mock(MapEntryNode.class);
         final QName qName = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "interface");
         final QName qNameKey = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "name");
-        final NodeIdentifierWithPredicates identWithPredicates = new NodeIdentifierWithPredicates(qName, qNameKey, "key");
+        final NodeIdentifierWithPredicates identWithPredicates =
+                new NodeIdentifierWithPredicates(qName, qNameKey, "key");
         Mockito.when(data.getNodeType()).thenReturn(qName);
         Mockito.when(data.getIdentifier()).thenReturn(identWithPredicates);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iiCx, data);
@@ -93,7 +84,8 @@ public class RestPutConfigTest {
         final MapEntryNode data = Mockito.mock(MapEntryNode.class);
         final QName qName = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "sub-interface");
         final QName qNameSubKey = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "sub-name");
-        final NodeIdentifierWithPredicates identWithPredicates = new NodeIdentifierWithPredicates(qName, qNameSubKey, "subkey");
+        final NodeIdentifierWithPredicates identWithPredicates =
+                new NodeIdentifierWithPredicates(qName, qNameSubKey, "subkey");
         Mockito.when(data.getNodeType()).thenReturn(qName);
         Mockito.when(data.getIdentifier()).thenReturn(identWithPredicates);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iiCx, data);
@@ -107,20 +99,21 @@ public class RestPutConfigTest {
         this.restconfService.updateConfigurationData(identifier, payload, uriInfo);
     }
 
-    @Test(expected=RestconfDocumentedException.class)
+    @Test(expected = RestconfDocumentedException.class)
     public void testPutConfigDataMissingUriKey() {
         final String identifier = "test-interface:interfaces/interface";
         this.controllerCx.toInstanceIdentifier(identifier);
     }
 
-    @Test(expected=RestconfDocumentedException.class)
+    @Test(expected = RestconfDocumentedException.class)
     public void testPutConfigDataDiferentKey() {
         final String identifier = "test-interface:interfaces/interface/key";
         final InstanceIdentifierContext<?> iiCx = this.controllerCx.toInstanceIdentifier(identifier);
         final MapEntryNode data = Mockito.mock(MapEntryNode.class);
         final QName qName = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "interface");
         final QName qNameKey = QName.create("urn:ietf:params:xml:ns:yang:test-interface", "2014-07-01", "name");
-        final NodeIdentifierWithPredicates identWithPredicates = new NodeIdentifierWithPredicates(qName, qNameKey, "notSameKey");
+        final NodeIdentifierWithPredicates identWithPredicates =
+                new NodeIdentifierWithPredicates(qName, qNameKey, "notSameKey");
         Mockito.when(data.getNodeType()).thenReturn(qName);
         Mockito.when(data.getIdentifier()).thenReturn(identWithPredicates);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iiCx, data);
@@ -136,7 +129,8 @@ public class RestPutConfigTest {
 
     private void mockingBrokerPut(final YangInstanceIdentifier yii, final NormalizedNode<?, ?> data) {
         final PutResult result = Mockito.mock(PutResult.class);
-        final CheckedFuture<Void, TransactionCommitFailedException> checkedFuture = Futures.immediateCheckedFuture(null);
+        final CheckedFuture<Void, TransactionCommitFailedException> checkedFuture =
+                Futures.immediateCheckedFuture(null);
         Mockito.when(this.brokerFacade.commitConfigurationDataPut(this.schemaCx, yii, data, null, null))
                 .thenReturn(result);
         Mockito.when(result.getFutureOfPutData()).thenReturn(checkedFuture);
