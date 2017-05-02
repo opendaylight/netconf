@@ -49,7 +49,7 @@ public class NnToXmlWithChoiceTest extends AbstractBodyReaderTest {
     @BeforeClass
     public static void initialization() {
         schemaContext = schemaContextLoader("/nn-to-xml/choice", schemaContext);
-        controllerContext.setSchemas(schemaContext);
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test

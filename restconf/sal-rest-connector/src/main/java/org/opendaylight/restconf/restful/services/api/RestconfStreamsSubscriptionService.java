@@ -16,18 +16,18 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 
 /**
- * Subscribing to streams
+ * Subscribing to streams.
  *
  */
 public interface RestconfStreamsSubscriptionService {
 
     /**
-     * Subscribing to receive notification from stream support
+     * Subscribing to receive notification from stream support.
      *
      * @param identifier
-     *            - name of stream
+     *             name of stream
      * @param uriInfo
-     *            - URI info
+     *             URI info
      * @return {@link NormalizedNodeContext}
      */
     @GET

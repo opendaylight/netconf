@@ -91,7 +91,7 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
 
         String expTextContent;
 
-        public SimpleErrorInfoVerifier(final String expErrorInfo) {
+        SimpleErrorInfoVerifier(final String expErrorInfo) {
             expTextContent = expErrorInfo;
         }
 
@@ -163,7 +163,7 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
     protected Application configure() {
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig = resourceConfig.registerInstances(mockRestConf, new XmlNormalizedNodeBodyReader(),
-                new JsonNormalizedNodeBodyReader(), new NormalizedNodeJsonBodyWriter(), new NormalizedNodeXmlBodyWriter());
+            new JsonNormalizedNodeBodyReader(), new NormalizedNodeJsonBodyWriter(), new NormalizedNodeXmlBodyWriter());
         resourceConfig.registerClasses(RestconfDocumentedExceptionMapper.class);
         return resourceConfig;
     }
@@ -363,8 +363,9 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
     @Ignore // FIXME : find why it return "error-type" RPC no expected APPLICATION
     public void testToJsonResponseWithMultipleErrors() throws Exception {
 
-        final List<RestconfError> errorList = Arrays.asList(new RestconfError(ErrorType.APPLICATION, ErrorTag.LOCK_DENIED,
-                "mock error1"), new RestconfError(ErrorType.RPC, ErrorTag.ROLLBACK_FAILED, "mock error2"));
+        final List<RestconfError> errorList = Arrays.asList(
+                new RestconfError(ErrorType.APPLICATION, ErrorTag.LOCK_DENIED, "mock error1"),
+                new RestconfError(ErrorType.RPC, ErrorTag.ROLLBACK_FAILED, "mock error2"));
         stageMockEx(new RestconfDocumentedException("mock", null, errorList));
 
         final Response resp = target("/operational/foo").request(MediaType.APPLICATION_JSON).get();
@@ -375,7 +376,8 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
 
         assertEquals("\"error\" Json array element length", 2, arrayElement.size());
 
-        verifyJsonErrorNode(arrayElement.get(0), ErrorType.APPLICATION, ErrorTag.LOCK_DENIED, "mock error1", null, null);
+        verifyJsonErrorNode(
+                arrayElement.get(0), ErrorType.APPLICATION, ErrorTag.LOCK_DENIED, "mock error1", null, null);
 
         verifyJsonErrorNode(arrayElement.get(1), ErrorType.RPC, ErrorTag.ROLLBACK_FAILED, "mock error2", null, null);
     }
@@ -603,8 +605,9 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
     @Ignore // FIXME : find why it return error-type as RPC no APPLICATION
     public void testToXMLResponseWithMultipleErrors() throws Exception {
 
-        final List<RestconfError> errorList = Arrays.asList(new RestconfError(ErrorType.APPLICATION, ErrorTag.LOCK_DENIED,
-                "mock error1"), new RestconfError(ErrorType.RPC, ErrorTag.ROLLBACK_FAILED, "mock error2"));
+        final List<RestconfError> errorList = Arrays.asList(
+                new RestconfError(ErrorType.APPLICATION, ErrorTag.LOCK_DENIED, "mock error1"),
+                new RestconfError(ErrorType.RPC, ErrorTag.ROLLBACK_FAILED, "mock error2"));
         stageMockEx(new RestconfDocumentedException("mock", null, errorList));
 
         final Response resp = target("/operational/foo").request(MediaType.APPLICATION_XML).get();
@@ -669,11 +672,12 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
                 errorInfoVerifier);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     private static JsonArray parseJsonErrorArrayElement(final InputStream stream) throws IOException {
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ByteStreams.copy(stream, bos);
 
-        System.out.println("JSON: " + bos.toString());
+        LOG.info("JSON: " + bos.toString());
 
         final JsonParser parser = new JsonParser();
         JsonElement rootElement;

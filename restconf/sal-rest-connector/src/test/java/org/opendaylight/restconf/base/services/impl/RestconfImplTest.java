@@ -25,7 +25,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 public class RestconfImplTest {
 
     @Test
-    public void RestImplTest() throws Exception {
+    public void restImplTest() throws Exception {
         final SchemaContext schemaContext =
                 YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/restconf/impl"));
 

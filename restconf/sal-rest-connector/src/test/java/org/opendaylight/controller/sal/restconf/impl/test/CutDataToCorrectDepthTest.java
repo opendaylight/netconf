@@ -61,8 +61,12 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuil
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CutDataToCorrectDepthTest extends JerseyTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(JerseyTest.class);
 
     private static NormalizedNode<?, ?> depth1Cont;
     private static NormalizedNode<?, ?> depth2Cont1;
@@ -103,10 +107,12 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
         @PUT
         @Path("/config/{identifier:.+}")
         @Consumes({ "application/json", "application/xml" })
-        public void normalizedData(@Encoded @PathParam("identifier") final String identifier, final NormalizedNodeContext payload) throws InterruptedException {
-            System.out.println(payload);
-            System.out.println(payload.getInstanceIdentifierContext().getInstanceIdentifier());
-            System.out.println(payload.getData());
+        public void normalizedData(@Encoded @PathParam("identifier") final String identifier,
+                                   final NormalizedNodeContext payload) throws InterruptedException {
+            LOG.info("Payload: {}.", payload);
+            LOG.info("Instance identifier of payload: {}.",
+                    payload.getInstanceIdentifierContext().getInstanceIdentifier());
+            LOG.info("Data of payload: {}.", payload.getData());
             CutDataToCorrectDepthTest.this.globalPayload = payload.getData();
         }
 
@@ -129,8 +135,8 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
                 "depth2-cont1",
                 unkeyedEntry("depth2-cont1",
                         container("depth3-cont1",
-                                container("depth4-cont1", leaf("depth5-leaf1", "depth5-leaf1-value")),
-                                leaf("depth4-leaf1", "depth4-leaf1-value")), leaf("depth3-leaf1", "depth3-leaf1-value")));
+                            container("depth4-cont1", leaf("depth5-leaf1", "depth5-leaf1-value")),
+                            leaf("depth4-leaf1", "depth4-leaf1-value")), leaf("depth3-leaf1", "depth3-leaf1-value")));
 
         final MapNode listAsMap = mapNode(
                 "depth2-list2",
@@ -145,8 +151,8 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
                 container(
                         "depth2-cont2",
                         container("depth3-cont2",
-                                container("depth4-cont2", leaf("depth5-leaf2", "depth5-leaf2-value")),
-                                leaf("depth4-leaf2", "depth4-leaf2-value")), leaf("depth3-leaf2", "depth3-leaf2-value")),
+                            container("depth4-cont2", leaf("depth5-leaf2", "depth5-leaf2-value")),
+                            leaf("depth4-leaf2", "depth4-leaf2-value")), leaf("depth3-leaf2", "depth3-leaf2-value")),
                 leaf("depth2-leaf1", "depth2-leaf1-value"));
 
         depth2Cont1 = listAsUnkeyedList;
@@ -204,7 +210,7 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
 
     private void txtDataToNormalizedNode(final Response response, final String mediaType, final String uri) {
         final String responseStr = response.readEntity(String.class);
-        System.out.println(responseStr);
+        LOG.info("Response entity message: {}.", responseStr);
         target(uri).request(mediaType).put(Entity.entity(responseStr, mediaType));
     }
 
@@ -229,7 +235,8 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
     }
 
     private static ContainerNode container(final String localName, final DataContainerChild<?, ?>... children) {
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder = Builders.containerBuilder();
+        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder =
+                Builders.containerBuilder();
         for (final DataContainerChild<?, ?> child : children) {
             containerBuilder.withChild(child);
         }
@@ -251,7 +258,8 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
 
     private static UnkeyedListEntryNode unkeyedEntry(final String localName,
                                                      final DataContainerChild<?, ?>... children) {
-        final DataContainerNodeAttrBuilder<NodeIdentifier, UnkeyedListEntryNode> builder = Builders.unkeyedListEntryBuilder();
+        final DataContainerNodeAttrBuilder<NodeIdentifier, UnkeyedListEntryNode> builder =
+                Builders.unkeyedListEntryBuilder();
         builder.withNodeIdentifier(toIdentifier(localName));
         for (final DataContainerChild<?, ?> child : children) {
             builder.withChild(child);
@@ -270,7 +278,8 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
 
     private static MapEntryNode mapEntryNode(final String localName, final int keysNumber,
                                              final DataContainerChild<?, ?>... children) {
-        final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder = Builders.mapEntryBuilder();
+        final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder =
+                Builders.mapEntryBuilder();
         final Map<QName, Object> keys = new HashMap<>();
         for (int i = 0; i < keysNumber; i++) {
             keys.put(children[i].getNodeType(), children[i].getValue());
@@ -324,13 +333,13 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
                                 leaf("depth3-leaf1", "depth3-leaf1-value"))),
                 mapNode("depth2-list2",
                         mapEntryNode("depth2-list2", 2, leaf("depth3-lf1-key", "depth3-lf1-key-value"),
-                                leaf("depth3-lf2-key", "depth3-lf2-key-value"), leaf("depth3-lf3", "depth3-lf3-value"))),
+                            leaf("depth3-lf2-key", "depth3-lf2-key-value"), leaf("depth3-lf3", "depth3-lf3-value"))),
                 leafList("depth2-lfLst1", "depth2-lflst1-value1", "depth2-lflst1-value2", "depth2-lflst1-value3"),
                 container(
                         "depth2-cont2",
                         container("depth3-cont2",
-                                container("depth4-cont2", leaf("depth5-leaf2", "depth5-leaf2-value")),
-                                leaf("depth4-leaf2", "depth4-leaf2-value")), leaf("depth3-leaf2", "depth3-leaf2-value")),
+                            container("depth4-cont2", leaf("depth5-leaf2", "depth5-leaf2-value")),
+                            leaf("depth4-leaf2", "depth4-leaf2-value")), leaf("depth3-leaf2", "depth3-leaf2-value")),
                 leaf("depth2-leaf1", "depth2-leaf1-value"));
     }
 
@@ -340,25 +349,25 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
                 unkeyedList("depth2-cont1", nodeDataDepth3Operational()),
                 mapNode("depth2-list2",
                         mapEntryNode("depth2-list2", 2, leaf("depth3-lf1-key", "depth3-lf1-key-value"),
-                                leaf("depth3-lf2-key", "depth3-lf2-key-value"), leaf("depth3-lf3", "depth3-lf3-value"))),
+                            leaf("depth3-lf2-key", "depth3-lf2-key-value"), leaf("depth3-lf3", "depth3-lf3-value"))),
                 leafList("depth2-lfLst1", "depth2-lflst1-value1", "depth2-lflst1-value2", "depth2-lflst1-value3"),
                 container(
-                        "depth2-cont2",
-                        container("depth3-cont2", container("depth4-cont2"), leaf("depth4-leaf2", "depth4-leaf2-value")),
-                        leaf("depth3-leaf2", "depth3-leaf2-value")), leaf("depth2-leaf1", "depth2-leaf1-value"));
+                    "depth2-cont2",
+                    container("depth3-cont2", container("depth4-cont2"), leaf("depth4-leaf2", "depth4-leaf2-value")),
+                    leaf("depth3-leaf2", "depth3-leaf2-value")), leaf("depth2-leaf1", "depth2-leaf1-value"));
     }
 
     private static ContainerNode nodeDataDepth3() {
         return container(
-                "depth1-cont",
-                unkeyedList("depth2-cont1",
-                        unkeyedEntry("depth2-cont1", container("depth3-cont1"), leaf("depth3-leaf1", "depth3-leaf1-value"))),
-                mapNode("depth2-list2",
-                        mapEntryNode("depth2-list2", 2, leaf("depth3-lf1-key", "depth3-lf1-key-value"),
-                                leaf("depth3-lf2-key", "depth3-lf2-key-value"), leaf("depth3-lf3", "depth3-lf3-value"))),
-                leafList("depth2-lfLst1", "depth2-lflst1-value1", "depth2-lflst1-value2", "depth2-lflst1-value3"),
-                container("depth2-cont2", container("depth3-cont2"), leaf("depth3-leaf2", "depth3-leaf2-value")),
-                leaf("depth2-leaf1", "depth2-leaf1-value"));
+            "depth1-cont",
+            unkeyedList("depth2-cont1",
+                unkeyedEntry("depth2-cont1", container("depth3-cont1"), leaf("depth3-leaf1", "depth3-leaf1-value"))),
+            mapNode("depth2-list2",
+                    mapEntryNode("depth2-list2", 2, leaf("depth3-lf1-key", "depth3-lf1-key-value"),
+                        leaf("depth3-lf2-key", "depth3-lf2-key-value"), leaf("depth3-lf3", "depth3-lf3-value"))),
+            leafList("depth2-lfLst1", "depth2-lflst1-value1", "depth2-lflst1-value2", "depth2-lflst1-value3"),
+            container("depth2-cont2", container("depth3-cont2"), leaf("depth3-leaf2", "depth3-leaf2-value")),
+            leaf("depth2-leaf1", "depth2-leaf1-value"));
     }
 
     private static ContainerNode nodeDataDepth2() {

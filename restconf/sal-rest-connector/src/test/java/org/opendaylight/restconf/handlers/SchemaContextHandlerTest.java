@@ -23,7 +23,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
- * Tests for handling {@link SchemaContext}
+ * Tests for handling {@link SchemaContext}.
  */
 public class SchemaContextHandlerTest {
 
@@ -52,7 +52,7 @@ public class SchemaContextHandlerTest {
     }
 
     /**
-     * Testing init of {@link SchemaContextHandler}
+     * Testing init of {@link SchemaContextHandler}.
      */
     @Test
     public void schemaContextHandlerImplInitTest() {
@@ -61,6 +61,7 @@ public class SchemaContextHandlerTest {
 
     /**
      * Test getting actual {@link SchemaContext}.
+     *
      * <p>
      * Get <code>SchemaContext</code> from <code>SchemaContextHandler</code> and compare it to actual
      * <code>SchemaContext</code>.
@@ -73,6 +74,7 @@ public class SchemaContextHandlerTest {
 
     /**
      * Test updating of {@link SchemaContext}.
+     *
      * <p>
      * Create new <code>SchemaContext</code>, set it to <code>SchemaContextHandler</code> and check if
      * <code>SchemaContextHandler</code> reference to new <code>SchemaContext</code> instead of old one.

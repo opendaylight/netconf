@@ -23,26 +23,26 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 
 /**
- * Unit test for {@link RestconfValidation}
+ * Unit test for {@link RestconfValidation}.
  */
 public class RestconfValidationTest {
-    private static final List<String> revisions = Arrays.asList("2014-01-01", "2015-01-01", "2016-01-01");
-    private static final List<String> names = Arrays.asList("_module-1", "_module-2", "_module-3");
+    private static final List<String> REVISIONS = Arrays.asList("2014-01-01", "2015-01-01", "2016-01-01");
+    private static final List<String> NAMES = Arrays.asList("_module-1", "_module-2", "_module-3");
 
     /**
      * Test of successful validation of module revision.
      */
     @Test
     public void validateAndGetRevisionTest() {
-        Date revision = RestconfValidation.validateAndGetRevision(revisions.iterator());
+        Date revision = RestconfValidation.validateAndGetRevision(REVISIONS.iterator());
         assertNotNull("Correct module revision should be validated", revision);
 
-        Calendar c = Calendar.getInstance();
-        c.setTime(revision);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(revision);
 
-        assertEquals(2014, c.get(Calendar.YEAR));
-        assertEquals(0, c.get(Calendar.MONTH));
-        assertEquals(1, c.get(Calendar.DAY_OF_MONTH));
+        assertEquals(2014, calendar.get(Calendar.YEAR));
+        assertEquals(0, calendar.get(Calendar.MONTH));
+        assertEquals(1, calendar.get(Calendar.DAY_OF_MONTH));
     }
 
     /**
@@ -80,7 +80,7 @@ public class RestconfValidationTest {
      */
     @Test
     public void validateAndGetModulNameTest() {
-        String moduleName = RestconfValidation.validateAndGetModulName(names.iterator());
+        String moduleName = RestconfValidation.validateAndGetModulName(NAMES.iterator());
         assertNotNull("Correct module name should be validated", moduleName);
         assertEquals("_module-1", moduleName);
     }
@@ -108,15 +108,15 @@ public class RestconfValidationTest {
      */
     @Test
     public void validateAndGetModuleNameNotParsableFirstTest() {
-       try {
-           RestconfValidation.validateAndGetModulName(
-                   Arrays.asList("01-not-parsable-as-name-on-firts-char").iterator());
-           fail("Test should fail due to not parsable module name on the first character");
-       } catch (RestconfDocumentedException e) {
-           assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
-           assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
-           assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
-       }
+        try {
+            RestconfValidation.validateAndGetModulName(
+                    Arrays.asList("01-not-parsable-as-name-on-firts-char").iterator());
+            fail("Test should fail due to not parsable module name on the first character");
+        } catch (RestconfDocumentedException e) {
+            assertEquals(RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
+            assertEquals(RestconfError.ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
+            assertEquals(400, e.getErrors().get(0).getErrorTag().getStatusCode());
+        }
     }
 
     /**

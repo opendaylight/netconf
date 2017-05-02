@@ -69,12 +69,14 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
      * @param writer Back-end writer
      * @return A new instance.
      */
-    public static DepthAwareNormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer, final int maxDepth) {
+    public static DepthAwareNormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
+                                                                 final int maxDepth) {
         return forStreamWriter(writer, true,  maxDepth);
     }
 
     /**
-     * Create a new writer backed by a {@link NormalizedNodeStreamWriter}. Unlike the simple {@link #forStreamWriter(NormalizedNodeStreamWriter, int)}
+     * Create a new writer backed by a {@link NormalizedNodeStreamWriter}.
+     * Unlike the simple {@link #forStreamWriter(NormalizedNodeStreamWriter, int)}
      * method, this allows the caller to switch off RFC6020 XML compliance, providing better
      * throughput. The reason is that the XML mapping rules in RFC6020 require the encoding
      * to emit leaf nodes which participate in a list's key first and in the order in which
@@ -87,8 +89,8 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
      * @param orderKeyLeaves whether the returned instance should be RFC6020 XML compliant.
      * @return A new instance.
      */
-    public static DepthAwareNormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer, final boolean
-            orderKeyLeaves, final int maxDepth) {
+    public static DepthAwareNormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
+                                                                 final boolean orderKeyLeaves, final int maxDepth) {
         if (orderKeyLeaves) {
             return new OrderedDepthAwareNormalizedNodeWriter(writer, maxDepth);
         } else {
@@ -101,7 +103,7 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
      * events to the encapsulated {@link NormalizedNodeStreamWriter}.
      *
      * @param node Node
-     * @return
+     * @return DepthAwareNormalizedNodeWriter
      * @throws IOException when thrown from the backing writer.
      */
     public final DepthAwareNormalizedNodeWriter write(final NormalizedNode<?, ?> node) throws IOException {
@@ -153,8 +155,9 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
             return true;
         } else if (node instanceof LeafNode) {
             final LeafNode<?> nodeAsLeaf = (LeafNode<?>)node;
-            if(writer instanceof NormalizedNodeStreamAttributeWriter) {
-                ((NormalizedNodeStreamAttributeWriter) writer).leafNode(nodeAsLeaf.getIdentifier(), nodeAsLeaf.getValue(), nodeAsLeaf.getAttributes());
+            if (writer instanceof NormalizedNodeStreamAttributeWriter) {
+                ((NormalizedNodeStreamAttributeWriter) writer)
+                        .leafNode(nodeAsLeaf.getIdentifier(), nodeAsLeaf.getValue(), nodeAsLeaf.getAttributes());
             } else {
                 writer.leafNode(nodeAsLeaf.getIdentifier(), nodeAsLeaf.getValue());
             }
@@ -203,7 +206,7 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
     }
 
     protected boolean writeMapEntryNode(final MapEntryNode node) throws IOException {
-        if(writer instanceof NormalizedNodeStreamAttributeWriter) {
+        if (writer instanceof NormalizedNodeStreamAttributeWriter) {
             ((NormalizedNodeStreamAttributeWriter) writer)
                     .startMapEntryNode(node.getIdentifier(), childSizeHint(node.getValue()), node.getAttributes());
         } else {
@@ -219,51 +222,44 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
         boolean processedAsCompositeNode = false;
         if (node instanceof ContainerNode) {
             final ContainerNode n = (ContainerNode) node;
-            if(writer instanceof NormalizedNodeStreamAttributeWriter) {
-                ((NormalizedNodeStreamAttributeWriter) writer).startContainerNode(n.getIdentifier(), childSizeHint(n.getValue()), n.getAttributes());
+            if (writer instanceof NormalizedNodeStreamAttributeWriter) {
+                ((NormalizedNodeStreamAttributeWriter) writer)
+                        .startContainerNode(n.getIdentifier(), childSizeHint(n.getValue()), n.getAttributes());
             } else {
                 writer.startContainerNode(n.getIdentifier(), childSizeHint(n.getValue()));
             }
             currentDepth++;
             processedAsCompositeNode = writeChildren(n.getValue());
             currentDepth--;
-        }
-        else if (node instanceof MapEntryNode) {
-            processedAsCompositeNode =  writeMapEntryNode((MapEntryNode) node);
-        }
-        else if (node instanceof UnkeyedListEntryNode) {
+        } else if (node instanceof MapEntryNode) {
+            processedAsCompositeNode = writeMapEntryNode((MapEntryNode) node);
+        } else if (node instanceof UnkeyedListEntryNode) {
             final UnkeyedListEntryNode n = (UnkeyedListEntryNode) node;
             writer.startUnkeyedListItem(n.getIdentifier(), childSizeHint(n.getValue()));
             currentDepth++;
             processedAsCompositeNode = writeChildren(n.getValue());
             currentDepth--;
-        }
-        else if (node instanceof ChoiceNode) {
+        } else if (node instanceof ChoiceNode) {
             final ChoiceNode n = (ChoiceNode) node;
             writer.startChoiceNode(n.getIdentifier(), childSizeHint(n.getValue()));
             processedAsCompositeNode = writeChildren(n.getValue());
-        }
-        else if (node instanceof AugmentationNode) {
+        } else if (node instanceof AugmentationNode) {
             final AugmentationNode n = (AugmentationNode) node;
             writer.startAugmentationNode(n.getIdentifier());
             processedAsCompositeNode = writeChildren(n.getValue());
-        }
-        else if (node instanceof UnkeyedListNode) {
+        } else if (node instanceof UnkeyedListNode) {
             final UnkeyedListNode n = (UnkeyedListNode) node;
             writer.startUnkeyedList(n.getIdentifier(), childSizeHint(n.getValue()));
             processedAsCompositeNode = writeChildren(n.getValue());
-        }
-        else if (node instanceof OrderedMapNode) {
+        } else if (node instanceof OrderedMapNode) {
             final OrderedMapNode n = (OrderedMapNode) node;
             writer.startOrderedMapNode(n.getIdentifier(), childSizeHint(n.getValue()));
             processedAsCompositeNode = writeChildren(n.getValue());
-        }
-        else if (node instanceof MapNode) {
+        } else if (node instanceof MapNode) {
             final MapNode n = (MapNode) node;
             writer.startMapNode(n.getIdentifier(), childSizeHint(n.getValue()));
             processedAsCompositeNode = writeChildren(n.getValue());
-        }
-        else if (node instanceof LeafSetNode) {
+        } else if (node instanceof LeafSetNode) {
             final LeafSetNode<?> n = (LeafSetNode<?>) node;
             if (node instanceof OrderedLeafSetNode) {
                 writer.startOrderedLeafSet(n.getIdentifier(), childSizeHint(n.getValue()));
@@ -288,8 +284,9 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
         @Override
         protected boolean writeMapEntryNode(final MapEntryNode node) throws IOException {
             final NormalizedNodeStreamWriter writer = getWriter();
-            if(writer instanceof NormalizedNodeStreamAttributeWriter) {
-                ((NormalizedNodeStreamAttributeWriter) writer).startMapEntryNode(node.getIdentifier(), childSizeHint(node.getValue()), node.getAttributes());
+            if (writer instanceof NormalizedNodeStreamAttributeWriter) {
+                ((NormalizedNodeStreamAttributeWriter) writer)
+                        .startMapEntryNode(node.getIdentifier(), childSizeHint(node.getValue()), node.getAttributes());
             } else {
                 writer.startMapEntryNode(node.getIdentifier(), childSizeHint(node.getValue()));
             }

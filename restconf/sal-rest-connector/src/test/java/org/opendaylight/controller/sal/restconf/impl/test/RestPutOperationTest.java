@@ -78,11 +78,14 @@ public class RestPutOperationTest extends JerseyTest {
     }
 
     private static void loadData() throws IOException {
-        final InputStream xmlStream = RestconfImplTest.class.getResourceAsStream("/parts/ietf-interfaces_interfaces.xml");
+        final InputStream xmlStream =
+                RestconfImplTest.class.getResourceAsStream("/parts/ietf-interfaces_interfaces.xml");
         xmlData = TestUtils.getDocumentInPrintableForm(TestUtils.loadDocumentFrom(xmlStream));
-        final InputStream xmlStream2 = RestconfImplTest.class.getResourceAsStream("/full-versions/test-data2/data2.xml");
+        final InputStream xmlStream2 =
+                RestconfImplTest.class.getResourceAsStream("/full-versions/test-data2/data2.xml");
         xmlData2 = TestUtils.getDocumentInPrintableForm(TestUtils.loadDocumentFrom(xmlStream2));
-        final InputStream xmlStream3 = RestconfImplTest.class.getResourceAsStream("/full-versions/test-data2/data7.xml");
+        final InputStream xmlStream3 =
+                RestconfImplTest.class.getResourceAsStream("/full-versions/test-data2/data7.xml");
         xmlData3 = TestUtils.getDocumentInPrintableForm(TestUtils.loadDocumentFrom(xmlStream3));
     }
 
@@ -95,7 +98,7 @@ public class RestPutOperationTest extends JerseyTest {
         // set(TestProperties.RECORD_LOG_LEVEL, Level.ALL.intValue());
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig = resourceConfig.registerInstances(restconfImpl,new XmlNormalizedNodeBodyReader(),
-                new NormalizedNodeXmlBodyWriter(), new JsonNormalizedNodeBodyReader(), new NormalizedNodeJsonBodyWriter());
+            new NormalizedNodeXmlBodyWriter(), new JsonNormalizedNodeBodyReader(), new NormalizedNodeJsonBodyWriter());
         resourceConfig.registerClasses(RestconfDocumentedExceptionMapper.class);
         return resourceConfig;
     }
@@ -174,10 +177,9 @@ public class RestPutOperationTest extends JerseyTest {
 
         final String uri = "/config/ietf-interfaces:interfaces/interface/eth0";
 
-        doThrow(OptimisticLockFailedException.class).
-            when(brokerFacade).commitConfigurationDataPut(
-                        any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), null,
-                        null);
+        doThrow(OptimisticLockFailedException.class)
+                .when(brokerFacade).commitConfigurationDataPut(
+                any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), null, null);
 
         assertEquals(500, put(uri, MediaType.APPLICATION_XML, xmlData));
 
@@ -193,10 +195,9 @@ public class RestPutOperationTest extends JerseyTest {
 
         final String uri = "/config/ietf-interfaces:interfaces/interface/eth0";
 
-        doThrow(TransactionCommitFailedException.class).
-            when(brokerFacade).commitConfigurationDataPut(
-                        any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), null,
-                        null);
+        doThrow(TransactionCommitFailedException.class)
+                .when(brokerFacade).commitConfigurationDataPut(
+                any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class), null, null);
 
         assertEquals(500, put(uri, MediaType.APPLICATION_XML, xmlData));
     }

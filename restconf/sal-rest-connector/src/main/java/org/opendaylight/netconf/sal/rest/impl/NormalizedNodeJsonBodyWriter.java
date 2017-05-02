@@ -45,6 +45,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 /**
+ * Deprecated.
+ *
  * @deprecated This class will be replaced by
  * {@link org.opendaylight.restconf.jersey.providers.NormalizedNodeJsonBodyWriter}
  */
@@ -63,31 +65,32 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
     }
 
     @Override
-    public long getSize(final NormalizedNodeContext t, final Class<?> type, final Type genericType,
+    public long getSize(final NormalizedNodeContext context, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(final NormalizedNodeContext t, final Class<?> type, final Type genericType,
+    public void writeTo(final NormalizedNodeContext context1, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,
             final OutputStream entityStream) throws IOException, WebApplicationException {
-        for (final Entry<String, Object> entry : t.getNewHeaders().entrySet()) {
+        for (final Entry<String, Object> entry : context1.getNewHeaders().entrySet()) {
             httpHeaders.add(entry.getKey(), entry.getValue());
         }
-        final NormalizedNode<?, ?> data = t.getData();
+        final NormalizedNode<?, ?> data = context1.getData();
         if (data == null) {
             return;
         }
 
         @SuppressWarnings("unchecked")
         final InstanceIdentifierContext<SchemaNode> context =
-                (InstanceIdentifierContext<SchemaNode>) t.getInstanceIdentifierContext();
+                (InstanceIdentifierContext<SchemaNode>) context1.getInstanceIdentifierContext();
 
         final SchemaPath path = context.getSchemaNode().getPath();
-        final JsonWriter jsonWriter = createJsonWriter(entityStream, t.getWriterParameters().isPrettyPrint());
+        final JsonWriter jsonWriter = createJsonWriter(entityStream, context1.getWriterParameters().isPrettyPrint());
         jsonWriter.beginObject();
-        writeNormalizedNode(jsonWriter,path,context,data, Optional.fromNullable(t.getWriterParameters().getDepth()));
+        writeNormalizedNode(
+                jsonWriter,path,context,data, Optional.fromNullable(context1.getWriterParameters().getDepth()));
         jsonWriter.endObject();
         jsonWriter.flush();
     }
@@ -117,7 +120,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         } else {
             path = path.getParent();
 
-            if(data instanceof MapEntryNode) {
+            if (data instanceof MapEntryNode) {
                 data = ImmutableNodes.mapNodeBuilder(data.getNodeType()).withChild(((MapEntryNode) data)).build();
             }
             nnWriter = createNormalizedNodeWriter(context,path,jsonWriter, depth);

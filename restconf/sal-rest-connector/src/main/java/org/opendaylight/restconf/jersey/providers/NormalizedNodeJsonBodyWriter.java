@@ -61,7 +61,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
     }
 
     @Override
-    public long getSize(final NormalizedNodeContext t,
+    public long getSize(final NormalizedNodeContext context,
                         final Class<?> type,
                         final Type genericType,
                         final Annotation[] annotations,
@@ -70,28 +70,28 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
     }
 
     @Override
-    public void writeTo(final NormalizedNodeContext t,
+    public void writeTo(final NormalizedNodeContext context,
                         final Class<?> type,
                         final Type genericType,
                         final Annotation[] annotations,
                         final MediaType mediaType,
                         final MultivaluedMap<String, Object> httpHeaders,
                         final OutputStream entityStream) throws IOException, WebApplicationException {
-        final NormalizedNode<?, ?> data = t.getData();
+        final NormalizedNode<?, ?> data = context.getData();
         if (data == null) {
             return;
         }
 
         @SuppressWarnings("unchecked")
-        final InstanceIdentifierContext<SchemaNode> context =
-                (InstanceIdentifierContext<SchemaNode>) t.getInstanceIdentifierContext();
-        final SchemaPath path = context.getSchemaNode().getPath();
+        final InstanceIdentifierContext<SchemaNode> context1 =
+                (InstanceIdentifierContext<SchemaNode>) context.getInstanceIdentifierContext();
+        final SchemaPath path = context1.getSchemaNode().getPath();
         final JsonWriter jsonWriter = createJsonWriter(entityStream,
-                t.getWriterParameters().isPrettyPrint());
+                context.getWriterParameters().isPrettyPrint());
 
         jsonWriter.beginObject();
-        writeNormalizedNode(jsonWriter, path, context, data,
-                t.getWriterParameters().getDepth(), t.getWriterParameters().getFields());
+        writeNormalizedNode(jsonWriter, path, context1, data,
+                context.getWriterParameters().getDepth(), context.getWriterParameters().getFields());
         jsonWriter.endObject();
         jsonWriter.flush();
     }
