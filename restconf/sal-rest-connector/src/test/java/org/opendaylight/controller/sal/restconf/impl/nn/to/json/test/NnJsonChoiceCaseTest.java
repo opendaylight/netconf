@@ -35,7 +35,7 @@ public class NnJsonChoiceCaseTest extends AbstractBodyReaderTest {
     @BeforeClass
     public static void initialization() {
         schemaContext = schemaContextLoader("/nn-to-json/choice", schemaContext);
-        controllerContext.setSchemas(schemaContext);
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     /**
@@ -77,7 +77,7 @@ public class NnJsonChoiceCaseTest extends AbstractBodyReaderTest {
     }
 
     /**
-     * Test when element from no first case is used
+     * Test when element from no first case is used.
      */
     @Test
     public void nodeSchemasNotInFirstCase() throws Exception {
@@ -90,7 +90,7 @@ public class NnJsonChoiceCaseTest extends AbstractBodyReaderTest {
     }
 
     /**
-     * Test when element in case is list
+     * Test when element in case is list.
      */
     @Test
     public void nodeSchemaAsList() throws Exception {
@@ -103,7 +103,7 @@ public class NnJsonChoiceCaseTest extends AbstractBodyReaderTest {
     }
 
     /**
-     * Test when element in case is container
+     * Test when element in case is container.
      */
     @Test
     public void nodeSchemaAsContainer() throws Exception {
@@ -115,7 +115,7 @@ public class NnJsonChoiceCaseTest extends AbstractBodyReaderTest {
     }
 
     /**
-     * Test when element in case is leaflist
+     * Test when element in case is leaflist.
      */
     @Test
     public void nodeSchemaAsLeafList() throws Exception {
@@ -127,9 +127,6 @@ public class NnJsonChoiceCaseTest extends AbstractBodyReaderTest {
         assertTrue(json.contains("\"lflst1d_2 val\""));
     }
 
-    /**
-     *
-     */
     @Test
     public void nodeSchemasInMultipleChoicesTest() throws Exception {
         final String json = getJson("/nn-to-json/choice/xml/data_more_choices_same_level.xml");
@@ -142,7 +139,7 @@ public class NnJsonChoiceCaseTest extends AbstractBodyReaderTest {
 
     /**
      * Test whether is possible to find data schema for node which is specified
-     * as dirrect subnode of choice (case without CASE key word)
+     * as dirrect subnode of choice (case without CASE key word).
      */
     @Test
     public void nodeSchemasInCaseNotDefinedWithCaseKeyword() throws Exception {
@@ -154,7 +151,7 @@ public class NnJsonChoiceCaseTest extends AbstractBodyReaderTest {
     }
 
     /**
-     * Test of multiple use of choices
+     * Test of multiple use of choices.
      */
     @Test
     public void nodeSchemasInThreeChoicesAtSameLevel() throws Exception {

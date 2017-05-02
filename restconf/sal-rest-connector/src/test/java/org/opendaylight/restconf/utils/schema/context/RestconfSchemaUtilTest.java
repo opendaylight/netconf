@@ -20,7 +20,7 @@ import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 /**
- * Unit tests for {@link RestconfSchemaUtil}
+ * Unit tests for {@link RestconfSchemaUtil}.
  */
 public class RestconfSchemaUtilTest {
 

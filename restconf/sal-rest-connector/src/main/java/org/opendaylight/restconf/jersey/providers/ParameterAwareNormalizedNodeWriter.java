@@ -114,7 +114,7 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
      * events to the encapsulated {@link NormalizedNodeStreamWriter}.
      *
      * @param node Node
-     * @return
+     * @return {@code ParameterAwareNormalizedNodeWriter}
      * @throws IOException when thrown from the backing writer.
      */
     public final ParameterAwareNormalizedNodeWriter write(final NormalizedNode<?, ?> node) throws IOException {
@@ -291,43 +291,35 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
                     processedAsCompositeNode = true;
                 }
             }
-        }
-        else if (node instanceof MapEntryNode) {
+        } else if (node instanceof MapEntryNode) {
             processedAsCompositeNode = writeMapEntryNode((MapEntryNode) node);
-        }
-        else if (node instanceof UnkeyedListEntryNode) {
+        } else if (node instanceof UnkeyedListEntryNode) {
             final UnkeyedListEntryNode n = (UnkeyedListEntryNode) node;
             writer.startUnkeyedListItem(n.getIdentifier(), childSizeHint(n.getValue()));
             currentDepth++;
             processedAsCompositeNode = writeChildren(n.getValue(), false);
             currentDepth--;
-        }
-        else if (node instanceof ChoiceNode) {
+        } else if (node instanceof ChoiceNode) {
             final ChoiceNode n = (ChoiceNode) node;
             writer.startChoiceNode(n.getIdentifier(), childSizeHint(n.getValue()));
             processedAsCompositeNode = writeChildren(n.getValue(), true);
-        }
-        else if (node instanceof AugmentationNode) {
+        } else if (node instanceof AugmentationNode) {
             final AugmentationNode n = (AugmentationNode) node;
             writer.startAugmentationNode(n.getIdentifier());
             processedAsCompositeNode = writeChildren(n.getValue(), true);
-        }
-        else if (node instanceof UnkeyedListNode) {
+        } else if (node instanceof UnkeyedListNode) {
             final UnkeyedListNode n = (UnkeyedListNode) node;
             writer.startUnkeyedList(n.getIdentifier(), childSizeHint(n.getValue()));
             processedAsCompositeNode = writeChildren(n.getValue(), false);
-        }
-        else if (node instanceof OrderedMapNode) {
+        } else if (node instanceof OrderedMapNode) {
             final OrderedMapNode n = (OrderedMapNode) node;
             writer.startOrderedMapNode(n.getIdentifier(), childSizeHint(n.getValue()));
             processedAsCompositeNode = writeChildren(n.getValue(), true);
-        }
-        else if (node instanceof MapNode) {
+        } else if (node instanceof MapNode) {
             final MapNode n = (MapNode) node;
             writer.startMapNode(n.getIdentifier(), childSizeHint(n.getValue()));
             processedAsCompositeNode = writeChildren(n.getValue(), true);
-        }
-        else if (node instanceof LeafSetNode) {
+        } else if (node instanceof LeafSetNode) {
             final LeafSetNode<?> n = (LeafSetNode<?>) node;
             if (node instanceof OrderedLeafSetNode) {
                 writer.startOrderedLeafSet(n.getIdentifier(), childSizeHint(n.getValue()));
@@ -377,20 +369,21 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
 
             currentDepth++;
             // Write all the rest
-            final boolean result = writeChildren(Iterables.filter(node.getValue(), new Predicate<NormalizedNode<?, ?>>() {
-                @Override
-                public boolean apply(final NormalizedNode<?, ?> input) {
-                    if (input instanceof AugmentationNode) {
-                        return true;
-                    }
-                    if (!qnames.contains(input.getNodeType())) {
-                        return true;
-                    }
+            final boolean result =
+                    writeChildren(Iterables.filter(node.getValue(), new Predicate<NormalizedNode<?, ?>>() {
+                            @Override
+                            public boolean apply(final NormalizedNode<?, ?> input) {
+                                if (input instanceof AugmentationNode) {
+                                    return true;
+                                }
+                                if (!qnames.contains(input.getNodeType())) {
+                                    return true;
+                                }
 
-                    LOG.debug("Skipping key child {}", input);
-                    return false;
-                }
-            }), false);
+                                LOG.debug("Skipping key child {}", input);
+                                return false;
+                            }
+                        }), false);
             currentDepth--;
             return result;
         }

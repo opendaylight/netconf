@@ -19,12 +19,12 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 
 /**
- * Unit test for {@link ParametersUtil}
+ * Unit test for {@link ParametersUtil}.
  */
 public class ParametersUtilTest {
 
     /**
-     * Test when all parameters are allowed
+     * Test when all parameters are allowed.
      */
     @Test
     public void checkParametersTypesTest() {
@@ -35,7 +35,7 @@ public class ParametersUtilTest {
     }
 
     /**
-     * Test when not allowed parameter type is used
+     * Test when not allowed parameter type is used.
      */
     @Test
     public void checkParametersTypesNegativeTest() {
@@ -54,7 +54,7 @@ public class ParametersUtilTest {
     }
 
     /**
-     * Test when parameter is present at most once
+     * Test when parameter is present at most once.
      */
     @Test
     public void checkParameterCountTest() {
@@ -62,7 +62,7 @@ public class ParametersUtilTest {
     }
 
     /**
-     * Test when parameter is present more than once
+     * Test when parameter is present more than once.
      */
     @Test
     public void checkParameterCountNegativeTest() {

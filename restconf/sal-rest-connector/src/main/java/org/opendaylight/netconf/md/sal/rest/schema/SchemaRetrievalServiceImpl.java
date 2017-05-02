@@ -39,18 +39,18 @@ public class SchemaRetrievalServiceImpl implements SchemaRetrievalService {
         final SchemaContext schemaContext;
         final Iterable<String> pathComponents = SLASH_SPLITTER.split(mountAndModule);
         final Iterator<String> componentIter = pathComponents.iterator();
-        if(!Iterables.contains(pathComponents, MOUNT_ARG)) {
+        if (!Iterables.contains(pathComponents, MOUNT_ARG)) {
             schemaContext = salContext.getGlobalSchema();
         } else {
             final StringBuilder pathBuilder = new StringBuilder();
-            while(componentIter.hasNext()) {
+            while (componentIter.hasNext()) {
                 final String current = componentIter.next();
                 // It is argument, not last element.
-                if(pathBuilder.length() != 0) {
-                        pathBuilder.append("/");
+                if (pathBuilder.length() != 0) {
+                    pathBuilder.append("/");
                 }
                 pathBuilder.append(current);
-                if(MOUNT_ARG.equals(current)) {
+                if (MOUNT_ARG.equals(current)) {
                     // We stop right at mountpoint, last two arguments should
                     // be module name and revision
                     break;
@@ -74,7 +74,8 @@ public class SchemaRetrievalServiceImpl implements SchemaRetrievalService {
         try {
             final Date revision = SimpleDateFormatUtil.getRevisionFormat().parse(revisionStr);
             final Module module = schemaContext.findModuleByName(moduleName, revision);
-            return new SchemaExportContext(schemaContext, RestconfValidationUtils.checkNotNullDocumented(module, moduleName));
+            return new SchemaExportContext(
+                    schemaContext, RestconfValidationUtils.checkNotNullDocumented(module, moduleName));
         } catch (final ParseException e) {
             throw new RestconfDocumentedException("Supplied revision is not in expected date format YYYY-mm-dd", e);
         }

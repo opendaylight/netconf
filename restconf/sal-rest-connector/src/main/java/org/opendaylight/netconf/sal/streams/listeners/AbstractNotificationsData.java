@@ -45,7 +45,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Abstract class for processing and preparing data
+ * Abstract class for processing and preparing data.
  *
  */
 abstract class AbstractNotificationsData {
@@ -57,12 +57,12 @@ abstract class AbstractNotificationsData {
     private String localName;
 
     /**
-     * Transaction chain for delete data in DS on close()
+     * Transaction chain for delete data in DS on close().
      *
      * @param transactionChainHandler
-     *            - creating new write transaction for delete data on close
+     *            creating new write transaction for delete data on close
      * @param schemaHandler
-     *            - for getting schema to deserialize
+     *            for getting schema to deserialize
      *            {@link MonitoringModule#PATH_TO_STREAM_WITHOUT_KEY} to
      *            {@link YangInstanceIdentifier}
      */
@@ -73,7 +73,7 @@ abstract class AbstractNotificationsData {
     }
 
     /**
-     * Delete data in DS
+     * Delete data in DS.
      */
     protected void deleteDataInDS() throws Exception {
         final DOMDataWriteTransaction wTx = this.transactionChainHandler.get().newWriteOnlyTransaction();
@@ -83,10 +83,10 @@ abstract class AbstractNotificationsData {
     }
 
     /**
-     * Set localName of last path element of specific listener
+     * Set localName of last path element of specific listener.
      *
      * @param localName
-     *            - local name
+     *            local name
      */
     protected void setLocalNameOfPath(final String localName) {
         this.localName = localName;
@@ -112,19 +112,19 @@ abstract class AbstractNotificationsData {
     }
 
     /**
-     * Write normalized node to {@link DOMResult}
+     * Write normalized node to {@link DOMResult}.
      *
      * @param normalized
-     *            - data
+     *            data
      * @param context
-     *            - actual schema context
+     *            actual schema context
      * @param schemaPath
-     *            - schema path of data
+     *            schema path of data
      * @return {@link DOMResult}
      */
     protected DOMResult writeNormalizedNode(final NormalizedNode<?, ?> normalized, final SchemaContext context,
             final SchemaPath schemaPath) throws IOException, XMLStreamException {
-        final XMLOutputFactory XML_FACTORY = XMLOutputFactory.newFactory();
+        final XMLOutputFactory xmlFactory = XMLOutputFactory.newFactory();
         final Document doc = XmlDocumentUtils.getDocument();
         final DOMResult result = new DOMResult(doc);
         NormalizedNodeWriter normalizedNodeWriter = null;
@@ -132,7 +132,7 @@ abstract class AbstractNotificationsData {
         XMLStreamWriter writer = null;
 
         try {
-            writer = XML_FACTORY.createXMLStreamWriter(result);
+            writer = xmlFactory.createXMLStreamWriter(result);
             normalizedNodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(writer, context, schemaPath);
             normalizedNodeWriter = NormalizedNodeWriter.forStreamWriter(normalizedNodeStreamWriter);
 
@@ -155,10 +155,10 @@ abstract class AbstractNotificationsData {
     }
 
     /**
-     * Generating base element of every notification
+     * Generating base element of every notification.
      *
      * @param doc
-     *            - base {@link Document}
+     *            base {@link Document}
      * @return element of {@link Document}
      */
     protected Element basePartDoc(final Document doc) {
@@ -175,10 +175,10 @@ abstract class AbstractNotificationsData {
     }
 
     /**
-     * Generating of {@link Document} transforming to string
+     * Generating of {@link Document} transforming to string.
      *
      * @param doc
-     *            - {@link Document} with data
+     *            {@link Document} with data
      * @return - string from {@link Document}
      */
     protected String transformDoc(final Document doc) {

@@ -38,7 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Util class to post data to DS
+ * Util class to post data to DS.
  *
  */
 public final class PostDataTransactionUtil {
@@ -50,18 +50,20 @@ public final class PostDataTransactionUtil {
     }
 
     /**
-     * Check mount point and prepare variables for post data
+     * Check mount point and prepare variables for post data.
      *
      * @param uriInfo
      *
      * @param payload
-     *            - data
+     *             data
      * @param transactionNode
-     *            - wrapper for transaction data
+     *             wrapper for transaction data
      * @param schemaContextRef
-     *            - reference to actual {@link SchemaContext}
+     *             reference to actual {@link SchemaContext}
      * @param point
+     *             point
      * @param insert
+     *             insert
      * @return {@link CheckedFuture}
      */
     public static Response postData(final UriInfo uriInfo, final NormalizedNodeContext payload,
@@ -77,20 +79,20 @@ public final class PostDataTransactionUtil {
     }
 
     /**
-     * Post data by type
+     * Post data by type.
      *
      * @param path
-     *            - path
+     *             path
      * @param data
-     *            - data
+     *             data
      * @param transactionNode
-     *            - wrapper for data to transaction
+     *             wrapper for data to transaction
      * @param schemaContext
-     *            - schema context of data
+     *             schema context of data
      * @param point
-     *            - query parameter
+     *             query parameter
      * @param insert
-     *            - query parameter
+     *             query parameter
      * @return {@link CheckedFuture}
      */
     private static CheckedFuture<Void, TransactionCommitFailedException> submitData(final YangInstanceIdentifier path,
@@ -124,7 +126,8 @@ public final class PostDataTransactionUtil {
                         }
                     } else {
                         final NormalizedNode<?, ?> readData =
-                                PutDataTransactionUtil.readList(path.getParent(), schemaContext, domTransactionChain, schemaNode);
+                                PutDataTransactionUtil
+                                        .readList(path.getParent(), schemaContext, domTransactionChain, schemaNode);
 
                         final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
                         if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
@@ -208,73 +211,73 @@ public final class PostDataTransactionUtil {
         }
     }
 
-    private static void insertWithPointLeafListPost(final DOMDataReadWriteTransaction rWTransaction,
+    private static void insertWithPointLeafListPost(final DOMDataReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext, final String point, final OrderedLeafSetNode<?> readLeafList,
             final boolean before, final DOMTransactionChain domTransactionChain) {
-        rWTransaction.delete(datastore, path.getParent().getParent());
+        rwTransaction.delete(datastore, path.getParent().getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
                 ControllerContext.getInstance().toInstanceIdentifier(point);
-        int p = 0;
+        int index1 = 0;
         for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
             if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
                 break;
             }
-            p++;
+            index1++;
         }
         if (!before) {
-            p++;
+            index1++;
         }
-        int h = 0;
+        int index2 = 0;
         final NormalizedNode<?, ?> emptySubtree =
                 ImmutableNodes.fromInstanceId(schemaContext, path.getParent().getParent());
-        rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+        rwTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
         for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
-            if (h == p) {
-                TransactionUtil.checkItemDoesNotExists(domTransactionChain, rWTransaction, datastore, path,
+            if (index2 == index1) {
+                TransactionUtil.checkItemDoesNotExists(domTransactionChain, rwTransaction, datastore, path,
                         RestconfDataServiceConstant.PostData.POST_TX_TYPE);
-                rWTransaction.put(datastore, path, payload);
+                rwTransaction.put(datastore, path, payload);
             }
             final YangInstanceIdentifier childPath = path.getParent().getParent().node(nodeChild.getIdentifier());
-            TransactionUtil.checkItemDoesNotExists(domTransactionChain, rWTransaction, datastore, childPath,
+            TransactionUtil.checkItemDoesNotExists(domTransactionChain, rwTransaction, datastore, childPath,
                     RestconfDataServiceConstant.PostData.POST_TX_TYPE);
-            rWTransaction.put(datastore, childPath, nodeChild);
-            h++;
+            rwTransaction.put(datastore, childPath, nodeChild);
+            index2++;
         }
     }
 
-    private static void insertWithPointListPost(final DOMDataReadWriteTransaction rWTransaction,
+    private static void insertWithPointListPost(final DOMDataReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext, final String point, final MapNode readList, final boolean before,
             final DOMTransactionChain domTransactionChain) {
-        rWTransaction.delete(datastore, path.getParent().getParent());
+        rwTransaction.delete(datastore, path.getParent().getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
                 ControllerContext.getInstance().toInstanceIdentifier(point);
-        int p = 0;
+        int index1 = 0;
         for (final MapEntryNode mapEntryNode : readList.getValue()) {
             if (mapEntryNode.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
                 break;
             }
-            p++;
+            index1++;
         }
         if (!before) {
-            p++;
+            index1++;
         }
-        int h = 0;
+        int index2 = 0;
         final NormalizedNode<?, ?> emptySubtree =
                 ImmutableNodes.fromInstanceId(schemaContext, path.getParent().getParent());
-        rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+        rwTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
         for (final MapEntryNode mapEntryNode : readList.getValue()) {
-            if (h == p) {
-                TransactionUtil.checkItemDoesNotExists(domTransactionChain, rWTransaction, datastore, path,
+            if (index2 == index1) {
+                TransactionUtil.checkItemDoesNotExists(domTransactionChain, rwTransaction, datastore, path,
                         RestconfDataServiceConstant.PostData.POST_TX_TYPE);
-                rWTransaction.put(datastore, path, payload);
+                rwTransaction.put(datastore, path, payload);
             }
             final YangInstanceIdentifier childPath = path.getParent().getParent().node(mapEntryNode.getIdentifier());
-            TransactionUtil.checkItemDoesNotExists(domTransactionChain, rWTransaction, datastore, childPath,
+            TransactionUtil.checkItemDoesNotExists(domTransactionChain, rwTransaction, datastore, childPath,
                     RestconfDataServiceConstant.PostData.POST_TX_TYPE);
-            rWTransaction.put(datastore, childPath, mapEntryNode);
-            h++;
+            rwTransaction.put(datastore, childPath, mapEntryNode);
+            index2++;
         }
     }
 
@@ -308,14 +311,14 @@ public final class PostDataTransactionUtil {
     }
 
     /**
-     * Get location from {@link YangInstanceIdentifier} and {@link UriInfo}
+     * Get location from {@link YangInstanceIdentifier} and {@link UriInfo}.
      *
      * @param uriInfo
-     *            - uri info
+     *             uri info
      * @param transactionNode
-     *            - wrapper for data of transaction
+     *             wrapper for data of transaction
      * @param schemaContextRef
-     *            -reference to {@link SchemaContext}
+     *            reference to {@link SchemaContext}
      * @return {@link URI}
      */
     private static URI resolveLocation(final UriInfo uriInfo, final TransactionVarsWrapper transactionNode,
@@ -326,18 +329,19 @@ public final class PostDataTransactionUtil {
 
         final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
         uriBuilder.path("data");
-        uriBuilder.path(ParserIdentifier.stringFromYangInstanceIdentifier(transactionNode.getInstanceIdentifier().getInstanceIdentifier(),
+        uriBuilder.path(ParserIdentifier
+                .stringFromYangInstanceIdentifier(transactionNode.getInstanceIdentifier().getInstanceIdentifier(),
                 schemaContextRef.get()));
 
         return uriBuilder.build();
     }
 
-    private static void simplePost(final DOMDataReadWriteTransaction rWTransaction,
+    private static void simplePost(final DOMDataReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext, final DOMTransactionChain transactionChain) {
-        TransactionUtil.checkItemDoesNotExists(transactionChain, rWTransaction, datastore, path,
+        TransactionUtil.checkItemDoesNotExists(transactionChain, rwTransaction, datastore, path,
                 RestconfDataServiceConstant.PostData.POST_TX_TYPE);
-        TransactionUtil.ensureParentsByMerge(path, schemaContext, rWTransaction);
-        rWTransaction.put(datastore, path, payload);
+        TransactionUtil.ensureParentsByMerge(path, schemaContext, rwTransaction);
+        rwTransaction.put(datastore, path, payload);
     }
 }

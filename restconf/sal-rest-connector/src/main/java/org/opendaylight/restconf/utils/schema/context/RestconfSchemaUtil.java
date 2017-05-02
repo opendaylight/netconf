@@ -29,11 +29,11 @@ public final class RestconfSchemaUtil {
      * schema node name.
      *
      * @param <T>
-     *            - child of SchemaNode
+     *             child of SchemaNode
      * @param collection
-     *            - child of node
+     *             child of node
      * @param schemaNodeName
-     *            - schema node name
+     *             schema node name
      * @return {@link SchemaNode}
      */
     public static <T extends SchemaNode> T findSchemaNodeInCollection(final Collection<T> collection,

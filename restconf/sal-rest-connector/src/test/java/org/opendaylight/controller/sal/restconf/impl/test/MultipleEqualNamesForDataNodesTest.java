@@ -10,8 +10,9 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 
 /**
  * If more then one data element with equal name exists where container or leaf schema node should be present the
- * RestconfDocumentedException has to be raised
+ * RestconfDocumentedException has to be raised.
  *
+ * <p>
  * Tests for BUG 1204
  */
 public class MultipleEqualNamesForDataNodesTest {

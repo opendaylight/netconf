@@ -21,18 +21,26 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
  * <b>Note:</b> Enumerations defined within are provided by the ietf restconf draft.
  *
  * @author Devin Avery
- * See also <a href="https://tools.ietf.org/html/draft-bierman-netconf-restconf-02">RESTCONF</a>.
+ *     See also <a href="https://tools.ietf.org/html/draft-bierman-netconf-restconf-02">RESTCONF</a>.
  */
 public class RestconfError {
 
     public enum ErrorType {
-        /** Errors relating to the transport layer */
+        /**
+         * Errors relating to the transport layer.
+         */
         TRANSPORT,
-        /** Errors relating to the RPC or notification layer */
+        /**
+         * Errors relating to the RPC or notification layer.
+         */
         RPC,
-        /** Errors relating to the protocol operation layer. */
+        /**
+         * Errors relating to the protocol operation layer.
+         */
         PROTOCOL,
-        /** Errors relating to the server application layer. */
+        /**
+         * Errors relating to the server application layer.
+         */
         APPLICATION;
 
         public String getErrorTypeTag() {
@@ -104,7 +112,7 @@ public class RestconfError {
     private final YangInstanceIdentifier errorPath;
 
     /**
-     * Constructs a RestConfError
+     * Constructs a RestConfError.
      *
      * @param errorType
      *            The enumerated type indicating the layer where the error occurred.

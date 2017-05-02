@@ -23,15 +23,6 @@ import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-/**
- * sal-rest-connector org.opendaylight.controller.sal.rest.impl.test.providers
- *
- *
- *
- * @author <a href="mailto:vdemcak@cisco.com">Vaclav Demcak</a>
- *
- *         Created: Mar 12, 2015
- */
 public class TestXmlBodyWriter extends AbstractBodyReaderTest {
 
     private final NormalizedNodeXmlBodyWriter xmlBodyWriter;
@@ -52,7 +43,7 @@ public class TestXmlBodyWriter extends AbstractBodyReaderTest {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
         schemaContext = YangParserTestUtils.parseYangSources(testFiles);
-        controllerContext.setSchemas(schemaContext);
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test

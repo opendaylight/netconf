@@ -27,8 +27,8 @@ import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.netconf.sal.restconf.impl.WriterParameters;
@@ -54,7 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link RestconfDataService}
+ * Implementation of {@link RestconfDataService}.
  */
 public class RestconfDataServiceImpl implements RestconfDataService {
 
@@ -88,23 +88,26 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
                 identifier, schemaContextRef.get(), Optional.of(this.mountPointServiceHandler.get()));
 
-        boolean withDefa_used = false;
+        boolean withDefaUsed = false;
         String withDefa = null;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             switch (entry.getKey()) {
                 case "with-defaults":
-                    if (!withDefa_used) {
-                        withDefa_used = true;
+                    if (!withDefaUsed) {
+                        withDefaUsed = true;
                         withDefa = entry.getValue().iterator().next();
                     } else {
                         throw new RestconfDocumentedException("With-defaults parameter can be used only once.");
                     }
                     break;
+                default:
+                    LOG.info("Unknown key : {}.", entry.getKey());
+                    break;
             }
         }
         boolean tagged = false;
-        if (withDefa_used) {
+        if (withDefaUsed) {
             if ("report-all-tagged".equals(withDefa)) {
                 tagged = true;
                 withDefa = null;
@@ -162,24 +165,24 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     public Response putData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
         Preconditions.checkNotNull(payload);
 
-        boolean insert_used = false;
-        boolean point_used = false;
+        boolean insertUsed = false;
+        boolean pointUsed = false;
         String insert = null;
         String point = null;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             switch (entry.getKey()) {
                 case "insert":
-                    if (!insert_used) {
-                        insert_used = true;
+                    if (!insertUsed) {
+                        insertUsed = true;
                         insert = entry.getValue().iterator().next();
                     } else {
                         throw new RestconfDocumentedException("Insert parameter can be used only once.");
                     }
                     break;
                 case "point":
-                    if (!point_used) {
-                        point_used = true;
+                    if (!pointUsed) {
+                        pointUsed = true;
                         point = entry.getValue().iterator().next();
                     } else {
                         throw new RestconfDocumentedException("Point parameter can be used only once.");
@@ -190,7 +193,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             }
         }
 
-        checkQueryParams(insert_used, point_used, insert);
+        checkQueryParams(insertUsed, pointUsed, insert);
 
         final InstanceIdentifierContext<? extends SchemaNode> iid = payload
                 .getInstanceIdentifierContext();
@@ -215,11 +218,11 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         return PutDataTransactionUtil.putData(payload, ref, transactionNode, insert, point);
     }
 
-    private static void checkQueryParams(final boolean insert_used, final boolean point_used, final String insert) {
-        if (point_used && !insert_used) {
+    private static void checkQueryParams(final boolean insertUsed, final boolean pointUsed, final String insert) {
+        if (pointUsed && !insertUsed) {
             throw new RestconfDocumentedException("Point parameter can't be used without Insert parameter.");
         }
-        if (point_used && (insert.equals("first") || insert.equals("last"))) {
+        if (pointUsed && (insert.equals("first") || insert.equals("last"))) {
             throw new RestconfDocumentedException(
                     "Point parameter can be used only with 'after' or 'before' values of Insert parameter.");
         }
@@ -234,24 +237,24 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     public Response postData(final NormalizedNodeContext payload, final UriInfo uriInfo) {
         Preconditions.checkNotNull(payload);
 
-        boolean insert_used = false;
-        boolean point_used = false;
+        boolean insertUsed = false;
+        boolean pointUsed = false;
         String insert = null;
         String point = null;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             switch (entry.getKey()) {
                 case "insert":
-                    if (!insert_used) {
-                        insert_used = true;
+                    if (!insertUsed) {
+                        insertUsed = true;
                         insert = entry.getValue().iterator().next();
                     } else {
                         throw new RestconfDocumentedException("Insert parameter can be used only once.");
                     }
                     break;
                 case "point":
-                    if (!point_used) {
-                        point_used = true;
+                    if (!pointUsed) {
+                        pointUsed = true;
                         point = entry.getValue().iterator().next();
                     } else {
                         throw new RestconfDocumentedException("Point parameter can be used only once.");
@@ -262,7 +265,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             }
         }
 
-        checkQueryParams(insert_used, point_used, insert);
+        checkQueryParams(insertUsed, pointUsed, insert);
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final DOMTransactionChain transactionChain;
@@ -299,12 +302,12 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public PATCHStatusContext patchData(final String identifier, final PATCHContext context, final UriInfo uriInfo) {
+    public PatchStatusContext patchData(final String identifier, final PatchContext context, final UriInfo uriInfo) {
         return patchData(context, uriInfo);
     }
 
     @Override
-    public PATCHStatusContext patchData(final PATCHContext context, final UriInfo uriInfo) {
+    public PatchStatusContext patchData(final PatchContext context, final UriInfo uriInfo) {
         Preconditions.checkNotNull(context);
         final DOMMountPoint mountPoint = context.getInstanceIdentifierContext().getMountPoint();
 
@@ -325,15 +328,15 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     /**
-     * Prepare transaction chain to access data of mount point
+     * Prepare transaction chain to access data of mount point.
      * @param mountPoint
-     *            - mount point reference
+     *            mount point reference
      * @return {@link DOMTransactionChain}
      */
     private static DOMTransactionChain transactionChainOfMountPoint(@Nonnull final DOMMountPoint mountPoint) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
-            return domDataBrokerService.get().createTransactionChain(RestConnectorProvider.transactionListener);
+            return domDataBrokerService.get().createTransactionChain(RestConnectorProvider.TRANSACTION_CHAIN_LISTENER);
         }
 
         final String errMsg = "DOM data broker service isn't available for mount point " + mountPoint.getIdentifier();

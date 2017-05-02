@@ -145,6 +145,7 @@ public class RestconfImpl implements RestconfService {
         NETCONF_BASE_PAYLOAD_NAME).intern();
 
     private static final QNameModule SAL_REMOTE_AUGMENT;
+
     static {
         try {
             SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT,
@@ -215,7 +216,7 @@ public class RestconfImpl implements RestconfService {
     }
 
     /**
-     * Valid only for mount point
+     * Valid only for mount point.
      */
     @Override
     public NormalizedNodeContext getModules(final String identifier, final UriInfo uriInfo) {
@@ -349,9 +350,9 @@ public class RestconfImpl implements RestconfService {
      * implementations of schema nodes and module.
      *
      * @param modules
-     *            - set of modules for get RPCs from every module
+     *            set of modules for get RPCs from every module
      * @param mountPoint
-     *            - mount point, if in use otherwise null
+     *            mount point, if in use otherwise null
      * @return {@link NormalizedNodeContext}
      */
     private static NormalizedNodeContext operationsFromModulesToNormalizedContext(final Set<Module> modules,
@@ -411,7 +412,7 @@ public class RestconfImpl implements RestconfService {
 
         final Splitter splitter = Splitter.on("/").omitEmptyStrings();
         final Iterable<String> split = splitter.split(moduleNameAndRevision);
-        final List<String> pathArgs = Lists.<String> newArrayList(split);
+        final List<String> pathArgs = Lists.<String>newArrayList(split);
         if (pathArgs.size() < 2) {
             LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' " + identifier);
             throw new RestconfDocumentedException(
@@ -480,6 +481,74 @@ public class RestconfImpl implements RestconfService {
         return new NormalizedNodeContext(
                 new InstanceIdentifierContext<>(null, resultNodeSchema, mountPoint, schemaContext),
                 resultData, QueryParametersParser.parseWriterParameters(uriInfo));
+    }
+
+    @Override
+    public NormalizedNodeContext invokeRpc(final String identifier, final String noPayload, final UriInfo uriInfo) {
+        if (noPayload != null && !CharMatcher.WHITESPACE.matchesAllOf(noPayload)) {
+            throw new RestconfDocumentedException("Content must be empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        }
+
+        String identifierEncoded = null;
+        DOMMountPoint mountPoint = null;
+        final SchemaContext schemaContext;
+        if (identifier.contains(ControllerContext.MOUNT)) {
+            // mounted RPC call - look up mount instance.
+            final InstanceIdentifierContext<?> mountPointId = this.controllerContext.toMountPointIdentifier(identifier);
+            mountPoint = mountPointId.getMountPoint();
+            schemaContext = mountPoint.getSchemaContext();
+            final int startOfRemoteRpcName =
+                    identifier.lastIndexOf(ControllerContext.MOUNT) + ControllerContext.MOUNT.length() + 1;
+            final String remoteRpcName = identifier.substring(startOfRemoteRpcName);
+            identifierEncoded = remoteRpcName;
+
+        } else if (identifier.indexOf("/") != CHAR_NOT_FOUND) {
+            final String slashErrorMsg = String.format(
+                    "Identifier %n%s%ncan\'t contain slash "
+                            + "character (/).%nIf slash is part of identifier name then use %%2F placeholder.",
+                    identifier);
+            LOG.debug(slashErrorMsg);
+            throw new RestconfDocumentedException(slashErrorMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        } else {
+            identifierEncoded = identifier;
+            schemaContext = this.controllerContext.getGlobalSchema();
+        }
+
+        final String identifierDecoded = this.controllerContext.urlPathArgDecode(identifierEncoded);
+
+        RpcDefinition rpc = null;
+        if (mountPoint == null) {
+            rpc = this.controllerContext.getRpcDefinition(identifierDecoded, null);
+        } else {
+            rpc = findRpc(mountPoint.getSchemaContext(), identifierDecoded);
+        }
+
+        if (rpc == null) {
+            LOG.debug("RPC " + identifierDecoded + " does not exist.");
+            throw new RestconfDocumentedException("RPC does not exist.", ErrorType.RPC, ErrorTag.UNKNOWN_ELEMENT);
+        }
+
+        if (!rpc.getInput().getChildNodes().isEmpty()) {
+            LOG.debug("RPC " + rpc + " does not need input value.");
+            // FIXME : find a correct Error from specification
+            throw new IllegalStateException("RPC " + rpc + " does'n need input value!");
+        }
+
+        final CheckedFuture<DOMRpcResult, DOMRpcException> response;
+        if (mountPoint != null) {
+            final Optional<DOMRpcService> mountRpcServices = mountPoint.getService(DOMRpcService.class);
+            if (!mountRpcServices.isPresent()) {
+                throw new RestconfDocumentedException("Rpc service is missing.");
+            }
+            response = mountRpcServices.get().invokeRpc(rpc.getPath(), null);
+        } else {
+            response = this.broker.invokeRpc(rpc.getPath(), null);
+        }
+
+        final DOMRpcResult result = checkRpcResponse(response);
+
+        return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpc, mountPoint, schemaContext),
+                result.getResult(), QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
     private static DOMRpcResult checkRpcResponse(final CheckedFuture<DOMRpcResult, DOMRpcException> response) {
@@ -592,74 +661,6 @@ public class RestconfImpl implements RestconfService {
         return Futures.immediateCheckedFuture(defaultDOMRpcResult);
     }
 
-    @Override
-    public NormalizedNodeContext invokeRpc(final String identifier, final String noPayload, final UriInfo uriInfo) {
-        if (noPayload != null && !CharMatcher.WHITESPACE.matchesAllOf(noPayload)) {
-            throw new RestconfDocumentedException("Content must be empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-        }
-
-        String identifierEncoded = null;
-        DOMMountPoint mountPoint = null;
-        final SchemaContext schemaContext;
-        if (identifier.contains(ControllerContext.MOUNT)) {
-            // mounted RPC call - look up mount instance.
-            final InstanceIdentifierContext<?> mountPointId = this.controllerContext.toMountPointIdentifier(identifier);
-            mountPoint = mountPointId.getMountPoint();
-            schemaContext = mountPoint.getSchemaContext();
-            final int startOfRemoteRpcName =
-                    identifier.lastIndexOf(ControllerContext.MOUNT) + ControllerContext.MOUNT.length() + 1;
-            final String remoteRpcName = identifier.substring(startOfRemoteRpcName);
-            identifierEncoded = remoteRpcName;
-
-        } else if (identifier.indexOf("/") != CHAR_NOT_FOUND) {
-            final String slashErrorMsg = String.format(
-                    "Identifier %n%s%ncan\'t contain slash "
-                            + "character (/).%nIf slash is part of identifier name then use %%2F placeholder.",
-                    identifier);
-            LOG.debug(slashErrorMsg);
-            throw new RestconfDocumentedException(slashErrorMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-        } else {
-            identifierEncoded = identifier;
-            schemaContext = this.controllerContext.getGlobalSchema();
-        }
-
-        final String identifierDecoded = this.controllerContext.urlPathArgDecode(identifierEncoded);
-
-        RpcDefinition rpc = null;
-        if (mountPoint == null) {
-            rpc = this.controllerContext.getRpcDefinition(identifierDecoded, null);
-        } else {
-            rpc = findRpc(mountPoint.getSchemaContext(), identifierDecoded);
-        }
-
-        if (rpc == null) {
-            LOG.debug("RPC " + identifierDecoded + " does not exist.");
-            throw new RestconfDocumentedException("RPC does not exist.", ErrorType.RPC, ErrorTag.UNKNOWN_ELEMENT);
-        }
-
-        if (!rpc.getInput().getChildNodes().isEmpty()) {
-            LOG.debug("RPC " + rpc + " does not need input value.");
-            // FIXME : find a correct Error from specification
-            throw new IllegalStateException("RPC " + rpc + " does'n need input value!");
-        }
-
-        final CheckedFuture<DOMRpcResult, DOMRpcException> response;
-        if (mountPoint != null) {
-            final Optional<DOMRpcService> mountRpcServices = mountPoint.getService(DOMRpcService.class);
-            if (!mountRpcServices.isPresent()) {
-                throw new RestconfDocumentedException("Rpc service is missing.");
-            }
-            response = mountRpcServices.get().invokeRpc(rpc.getPath(), null);
-        } else {
-            response = this.broker.invokeRpc(rpc.getPath(), null);
-        }
-
-        final DOMRpcResult result = checkRpcResponse(response);
-
-        return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpc, mountPoint, schemaContext),
-                result.getResult(), QueryParametersParser.parseWriterParameters(uriInfo));
-    }
-
     private static RpcDefinition findRpc(final SchemaContext schemaContext, final String identifierDecoded) {
         final String[] splittedIdentifier = identifierDecoded.split(":");
         if (splittedIdentifier.length != 2) {
@@ -681,23 +682,26 @@ public class RestconfImpl implements RestconfService {
 
     @Override
     public NormalizedNodeContext readConfigurationData(final String identifier, final UriInfo uriInfo) {
-        boolean withDefa_used = false;
+        boolean withDefaUsed = false;
         String withDefa = null;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             switch (entry.getKey()) {
                 case "with-defaults":
-                    if (!withDefa_used) {
-                        withDefa_used = true;
+                    if (!withDefaUsed) {
+                        withDefaUsed = true;
                         withDefa = entry.getValue().iterator().next();
                     } else {
                         throw new RestconfDocumentedException("With-defaults parameter can be used only once.");
                     }
                     break;
+                default:
+                    LOG.info("Unknown key : {}.", entry.getKey());
+                    break;
             }
         }
         boolean tagged = false;
-        if (withDefa_used) {
+        if (withDefaUsed) {
             if (withDefa.equals("report-all-tagged")) {
                 tagged = true;
                 withDefa = null;
@@ -868,7 +872,7 @@ public class RestconfImpl implements RestconfService {
 
     /**
      * Validates whether keys in {@code payload} are equal to values of keys in
-     * {@code iiWithData} for list schema node
+     * {@code iiWithData} for list schema node.
      *
      * @throws RestconfDocumentedException
      *             if key values or key count in payload and URI isn't equal
@@ -915,37 +919,6 @@ public class RestconfImpl implements RestconfService {
     public Response createConfigurationData(final String identifier, final NormalizedNodeContext payload,
             final UriInfo uriInfo) {
         return createConfigurationData(payload, uriInfo);
-    }
-
-    // FIXME create RestconfIdetifierHelper and move this method there
-    private static YangInstanceIdentifier checkConsistencyOfNormalizedNodeContext(final NormalizedNodeContext payload) {
-        Preconditions.checkArgument(payload != null);
-        Preconditions.checkArgument(payload.getData() != null);
-        Preconditions.checkArgument(payload.getData().getNodeType() != null);
-        Preconditions.checkArgument(payload.getInstanceIdentifierContext() != null);
-        Preconditions.checkArgument(payload.getInstanceIdentifierContext().getInstanceIdentifier() != null);
-
-        final QName payloadNodeQname = payload.getData().getNodeType();
-        final YangInstanceIdentifier yangIdent = payload.getInstanceIdentifierContext().getInstanceIdentifier();
-        if (payloadNodeQname.compareTo(yangIdent.getLastPathArgument().getNodeType()) > 0) {
-            return yangIdent;
-        }
-        final InstanceIdentifierContext<?> parentContext = payload.getInstanceIdentifierContext();
-        final SchemaNode parentSchemaNode = parentContext.getSchemaNode();
-        if (parentSchemaNode instanceof DataNodeContainer) {
-            final DataNodeContainer cast = (DataNodeContainer) parentSchemaNode;
-            for (final DataSchemaNode child : cast.getChildNodes()) {
-                if (payloadNodeQname.compareTo(child.getQName()) == 0) {
-                    return YangInstanceIdentifier.builder(yangIdent).node(child.getQName()).build();
-                }
-            }
-        }
-        if (parentSchemaNode instanceof RpcDefinition) {
-            return yangIdent;
-        }
-        final String errMsg = "Error parsing input: DataSchemaNode has not children ";
-        LOG.info(errMsg + yangIdent);
-        throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
     }
 
     @Override
@@ -1022,6 +995,38 @@ public class RestconfImpl implements RestconfService {
         return responseBuilder.build();
     }
 
+    // FIXME create RestconfIdetifierHelper and move this method there
+    private static YangInstanceIdentifier checkConsistencyOfNormalizedNodeContext(final NormalizedNodeContext payload) {
+        Preconditions.checkArgument(payload != null);
+        Preconditions.checkArgument(payload.getData() != null);
+        Preconditions.checkArgument(payload.getData().getNodeType() != null);
+        Preconditions.checkArgument(payload.getInstanceIdentifierContext() != null);
+        Preconditions.checkArgument(payload.getInstanceIdentifierContext().getInstanceIdentifier() != null);
+
+        final QName payloadNodeQname = payload.getData().getNodeType();
+        final YangInstanceIdentifier yangIdent = payload.getInstanceIdentifierContext().getInstanceIdentifier();
+        if (payloadNodeQname.compareTo(yangIdent.getLastPathArgument().getNodeType()) > 0) {
+            return yangIdent;
+        }
+        final InstanceIdentifierContext<?> parentContext = payload.getInstanceIdentifierContext();
+        final SchemaNode parentSchemaNode = parentContext.getSchemaNode();
+        if (parentSchemaNode instanceof DataNodeContainer) {
+            final DataNodeContainer cast = (DataNodeContainer) parentSchemaNode;
+            for (final DataSchemaNode child : cast.getChildNodes()) {
+                if (payloadNodeQname.compareTo(child.getQName()) == 0) {
+                    return YangInstanceIdentifier.builder(yangIdent).node(child.getQName()).build();
+                }
+            }
+        }
+        if (parentSchemaNode instanceof RpcDefinition) {
+            return yangIdent;
+        }
+        final String errMsg = "Error parsing input: DataSchemaNode has not children ";
+        LOG.info(errMsg + yangIdent);
+        throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+    }
+
+    @SuppressWarnings("checkstyle:IllegalCatch")
     private URI resolveLocation(final UriInfo uriInfo, final String uriBehindBase, final DOMMountPoint mountPoint,
             final YangInstanceIdentifier normalizedII) {
         if (uriInfo == null) {
@@ -1075,6 +1080,7 @@ public class RestconfImpl implements RestconfService {
      * Subscribes to some path in schema context (stream) to listen on changes
      * on this stream.
      *
+     * <p>
      * Additional parameters for subscribing to stream are loaded via rpc input
      * parameters:
      * <ul>
@@ -1085,44 +1091,44 @@ public class RestconfImpl implements RestconfService {
      */
     @Override
     public NormalizedNodeContext subscribeToStream(final String identifier, final UriInfo uriInfo) {
-        boolean startTime_used = false;
-        boolean stopTime_used = false;
+        boolean startTimeUsed = false;
+        boolean stopTimeUsed = false;
         Instant start = Instant.now();
         Instant stop = null;
-        boolean filter_used = false;
+        boolean filterUsed = false;
         String filter = null;
-        boolean leafNodesOnly_used = false;
+        boolean leafNodesOnlyUsed = false;
         boolean leafNodesOnly = false;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             switch (entry.getKey()) {
                 case "start-time":
-                    if (!startTime_used) {
-                        startTime_used = true;
+                    if (!startTimeUsed) {
+                        startTimeUsed = true;
                         start = parseDateFromQueryParam(entry);
                     } else {
                         throw new RestconfDocumentedException("Start-time parameter can be used only once.");
                     }
                     break;
                 case "stop-time":
-                    if (!stopTime_used) {
-                        stopTime_used = true;
+                    if (!stopTimeUsed) {
+                        stopTimeUsed = true;
                         stop = parseDateFromQueryParam(entry);
                     } else {
                         throw new RestconfDocumentedException("Stop-time parameter can be used only once.");
                     }
                     break;
                 case "filter":
-                    if (!filter_used) {
-                        filter_used = true;
+                    if (!filterUsed) {
+                        filterUsed = true;
                         filter = entry.getValue().iterator().next();
                     } else {
                         throw new RestconfDocumentedException("Filter parameter can be used only once.");
                     }
                     break;
                 case "odl-leaf-nodes-only":
-                    if (!leafNodesOnly_used) {
-                        leafNodesOnly_used = true;
+                    if (!leafNodesOnlyUsed) {
+                        leafNodesOnlyUsed = true;
                         leafNodesOnly = Boolean.parseBoolean(entry.getValue().iterator().next());
                     } else {
                         throw new RestconfDocumentedException("Odl-leaf-nodes-only parameter can be used only once.");
@@ -1132,7 +1138,7 @@ public class RestconfImpl implements RestconfService {
                     throw new RestconfDocumentedException("Bad parameter used with notifications: " + entry.getKey());
             }
         }
-        if (!startTime_used && stopTime_used) {
+        if (!startTimeUsed && stopTimeUsed) {
             throw new RestconfDocumentedException("Stop-time parameter has to be used with start-time parameter.");
         }
         URI response = null;
@@ -1175,6 +1181,8 @@ public class RestconfImpl implements RestconfService {
     }
 
     /**
+     * Prepare instance identifier.
+     *
      * @return {@link InstanceIdentifierContext} of location leaf for
      *         notification
      */
@@ -1193,18 +1201,18 @@ public class RestconfImpl implements RestconfService {
     }
 
     /**
-     * Register notification listener by stream name
+     * Register notification listener by stream name.
      *
      * @param identifier
-     *            - stream name
+     *            stream name
      * @param uriInfo
-     *            - uriInfo
+     *            uriInfo
      * @param stop
-     *            - stop-time of getting notification
+     *            stop-time of getting notification
      * @param start
-     *            - start-time of getting notification
+     *            start-time of getting notification
      * @param filter
-     *            - indicate which subset of all possible events are of interest
+     *            indicate which subset of all possible events are of interest
      * @return {@link URI} of location
      */
     private URI notifStream(final String identifier, final UriInfo uriInfo, final Instant start,
@@ -1221,7 +1229,8 @@ public class RestconfImpl implements RestconfService {
 
         for (final NotificationListenerAdapter listener : listeners) {
             this.broker.registerToListenNotification(listener);
-            listener.setQueryParams(start, java.util.Optional.ofNullable(stop), java.util.Optional.ofNullable(filter), false);
+            listener.setQueryParams(start,
+                    java.util.Optional.ofNullable(stop), java.util.Optional.ofNullable(filter), false);
         }
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
@@ -1239,18 +1248,18 @@ public class RestconfImpl implements RestconfService {
     }
 
     /**
-     * Register data change listener by stream name
+     * Register data change listener by stream name.
      *
      * @param identifier
-     *            - stream name
+     *            stream name
      * @param uriInfo
-     *            - uri info
+     *            uri info
      * @param stop
-     *            - start-time of getting notification
+     *            start-time of getting notification
      * @param start
-     *            - stop-time of getting notification
+     *            stop-time of getting notification
      * @param filter
-     *            - indicate which subset of all possible events are of interest
+     *            indicate which subset of all possible events are of interest
      * @return {@link URI} of location
      */
     private URI dataSubs(final String identifier, final UriInfo uriInfo, final Instant start, final Instant stop,
@@ -1265,7 +1274,8 @@ public class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException("Stream was not found.", ErrorType.PROTOCOL,
                     ErrorTag.UNKNOWN_ELEMENT);
         }
-        listener.setQueryParams(start, java.util.Optional.ofNullable(stop), java.util.Optional.ofNullable(filter), leafNodesOnly);
+        listener.setQueryParams(start, java.util.Optional.ofNullable(stop),
+                java.util.Optional.ofNullable(filter), leafNodesOnly);
 
         final Map<String, String> paramToValues = resolveValuesFromUri(identifier);
         final LogicalDatastoreType datastore =
@@ -1297,9 +1307,10 @@ public class RestconfImpl implements RestconfService {
         return uriToWebsocketServer;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public PATCHStatusContext patchConfigurationData(final String identifier, final PATCHContext context,
-            final UriInfo uriInfo) {
+    public PatchStatusContext patchConfigurationData(final String identifier, final PatchContext context,
+                                                     final UriInfo uriInfo) {
         if (context == null) {
             throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
@@ -1312,8 +1323,9 @@ public class RestconfImpl implements RestconfService {
         }
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public PATCHStatusContext patchConfigurationData(final PATCHContext context, @Context final UriInfo uriInfo) {
+    public PatchStatusContext patchConfigurationData(final PatchContext context, @Context final UriInfo uriInfo) {
         if (context == null) {
             throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
@@ -1327,7 +1339,7 @@ public class RestconfImpl implements RestconfService {
     }
 
     /**
-     * Load parameter for subscribing to stream from input composite node
+     * Load parameter for subscribing to stream from input composite node.
      *
      * @param value
      *            contains value
@@ -1356,7 +1368,7 @@ public class RestconfImpl implements RestconfService {
 
     /**
      * Checks whether {@code value} is one of the string representation of
-     * enumeration {@code classDescriptor}
+     * enumeration {@code classDescriptor}.
      *
      * @return enum object if string value of {@code classDescriptor}
      *         enumeration is equal to {@code value}. Other cases null.
@@ -1495,10 +1507,10 @@ public class RestconfImpl implements RestconfService {
     }
 
     /**
-     * Prepare stream for notification
+     * Prepare stream for notification.
      *
      * @param payload
-     *            - contains list of qnames of notifications
+     *            contains list of qnames of notifications
      * @return - checked future object
      */
     private static CheckedFuture<DOMRpcResult, DOMRpcException> invokeSalRemoteRpcNotifiStrRPC(

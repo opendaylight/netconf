@@ -248,7 +248,7 @@ public class RestconfImplNotificationSubscribingTest {
         final UriBuilder uriBuilder = UriBuilder.fromPath("http://localhost:8181/" + this.identifier);
         Mockito.when(this.uriInfo.getAbsolutePathBuilder()).thenReturn(uriBuilder);
         final Set<Entry<String, List<String>>> set = new HashSet<>();
-        for(final Entry<String, List<String>> entry : entries){
+        for (final Entry<String, List<String>> entry : entries) {
             set.add(entry);
         }
         Mockito.when(map.entrySet()).thenReturn(set);

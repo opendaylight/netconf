@@ -34,7 +34,7 @@ public class JsonLeafrefToNnTest extends AbstractBodyReaderTest {
     public static void initialize() {
         schemaContext = schemaContextLoader("/json-to-nn/leafref",
                 schemaContext);
-        controllerContext.setSchemas(schemaContext);
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test
