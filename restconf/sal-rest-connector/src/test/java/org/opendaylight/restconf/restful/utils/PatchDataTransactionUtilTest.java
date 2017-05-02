@@ -28,10 +28,10 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHEntity;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusEntity;
+import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchEntity;
+import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchStatusEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
@@ -169,10 +169,10 @@ public class PatchDataTransactionUtilTest {
         doReturn(Futures.immediateCheckedFuture(false)).doReturn(Futures.immediateCheckedFuture(true))
                 .when(this.rWTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeMerge);
 
-        final PATCHEntity entityReplace = new PATCHEntity("edit1", "REPLACE", this.targetNodeMerge, this.buildArtistList);
-        final PATCHEntity entityMerge = new PATCHEntity("edit2", "MERGE", this.targetNodeMerge, this.buildArtistList);
-        final PATCHEntity entityRemove = new PATCHEntity("edit3", "REMOVE", this.targetNodeMerge);
-        final List<PATCHEntity> entities = new ArrayList<>();
+        final PatchEntity entityReplace = new PatchEntity("edit1", "REPLACE", this.targetNodeMerge, this.buildArtistList);
+        final PatchEntity entityMerge = new PatchEntity("edit2", "MERGE", this.targetNodeMerge, this.buildArtistList);
+        final PatchEntity entityRemove = new PatchEntity("edit3", "REMOVE", this.targetNodeMerge);
+        final List<PatchEntity> entities = new ArrayList<>();
 
         entities.add(entityReplace);
         entities.add(entityMerge);
@@ -180,12 +180,12 @@ public class PatchDataTransactionUtilTest {
 
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iIDMerge, null, null, this.refSchemaCtx.get());
-        final PATCHContext patchContext = new PATCHContext(iidContext, entities, "patchRMRm");
+        final PatchContext patchContext = new PatchContext(iidContext, entities, "patchRMRm");
         final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, this.transactionChain);
-        final PATCHStatusContext patchStatusContext =
+        final PatchStatusContext patchStatusContext =
                 PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
 
-        for (final PATCHStatusEntity entity : patchStatusContext.getEditCollection()) {
+        for (final PatchStatusEntity entity : patchStatusContext.getEditCollection()) {
             assertTrue(entity.isOk());
         }
         assertTrue(patchStatusContext.isOk());
@@ -196,22 +196,22 @@ public class PatchDataTransactionUtilTest {
         doReturn(Futures.immediateCheckedFuture(false)).doReturn(Futures.immediateCheckedFuture(true))
                 .when(this.rWTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
 
-        final PATCHEntity entityCreate =
-                new PATCHEntity("edit1", "CREATE", this.targetNodeForCreateAndDelete, this.buildBaseContainerForTests);
-        final PATCHEntity entityDelete =
-                new PATCHEntity("edit2", "DELETE", this.targetNodeForCreateAndDelete);
-        final List<PATCHEntity> entities = new ArrayList<>();
+        final PatchEntity entityCreate =
+                new PatchEntity("edit1", "CREATE", this.targetNodeForCreateAndDelete, this.buildBaseContainerForTests);
+        final PatchEntity entityDelete =
+                new PatchEntity("edit2", "DELETE", this.targetNodeForCreateAndDelete);
+        final List<PatchEntity> entities = new ArrayList<>();
 
         entities.add(entityCreate);
         entities.add(entityDelete);
 
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iIDCreateAndDelete, null, null, this.refSchemaCtx.get());
-        final PATCHContext patchContext = new PATCHContext(iidContext, entities, "patchCD");
+        final PatchContext patchContext = new PatchContext(iidContext, entities, "patchCD");
         final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, this.transactionChain);
-        final PATCHStatusContext patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
+        final PatchStatusContext patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
 
-        for (final PATCHStatusEntity entity : patchStatusContext.getEditCollection()) {
+        for (final PatchStatusEntity entity : patchStatusContext.getEditCollection()) {
             assertTrue(entity.isOk());
         }
         assertTrue(patchStatusContext.isOk());
@@ -222,17 +222,17 @@ public class PatchDataTransactionUtilTest {
         doReturn(Futures.immediateCheckedFuture(false))
                 .when(this.rWTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
 
-        final PATCHEntity entityDelete =
-                new PATCHEntity("edit", "DELETE", this.targetNodeForCreateAndDelete);
-        final List<PATCHEntity> entities = new ArrayList<>();
+        final PatchEntity entityDelete =
+                new PatchEntity("edit", "DELETE", this.targetNodeForCreateAndDelete);
+        final List<PatchEntity> entities = new ArrayList<>();
 
         entities.add(entityDelete);
 
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iIDCreateAndDelete, null, null, this.refSchemaCtx.get());
-        final PATCHContext patchContext = new PATCHContext(iidContext, entities, "patchD");
+        final PatchContext patchContext = new PatchContext(iidContext, entities, "patchD");
         final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, this.transactionChain);
-        final PATCHStatusContext patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
+        final PatchStatusContext patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
 
         assertFalse(patchStatusContext.isOk());
         assertEquals(RestconfError.ErrorType.PROTOCOL,
@@ -246,19 +246,19 @@ public class PatchDataTransactionUtilTest {
         doReturn(Futures.immediateCheckedFuture(false)).doReturn(Futures.immediateCheckedFuture(true))
                 .when(this.rWTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
 
-        final PATCHEntity entityMerge =
-                new PATCHEntity("edit1", "MERGE", this.targetNodeForCreateAndDelete, this.buildBaseContainerForTests);
-        final List<PATCHEntity> entities = new ArrayList<>();
+        final PatchEntity entityMerge =
+                new PatchEntity("edit1", "MERGE", this.targetNodeForCreateAndDelete, this.buildBaseContainerForTests);
+        final List<PatchEntity> entities = new ArrayList<>();
 
         entities.add(entityMerge);
 
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iIDCreateAndDelete, null, null, this.refSchemaCtx.get());
-        final PATCHContext patchContext = new PATCHContext(iidContext, entities, "patchM");
+        final PatchContext patchContext = new PatchContext(iidContext, entities, "patchM");
         final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, this.transactionChain);
-        final PATCHStatusContext patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
+        final PatchStatusContext patchStatusContext = PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
 
-        for (final PATCHStatusEntity entity : patchStatusContext.getEditCollection()) {
+        for (final PatchStatusEntity entity : patchStatusContext.getEditCollection()) {
             assertTrue(entity.isOk());
         }
         assertTrue(patchStatusContext.isOk());

@@ -15,19 +15,19 @@ import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.netconf.sal.rest.impl.XmlToPATCHBodyReader;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
+import org.opendaylight.netconf.sal.rest.impl.XmlToPatchBodyReader;
+import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class TestXmlPATCHBodyReader extends AbstractBodyReaderTest {
 
-    private final XmlToPATCHBodyReader xmlPATCHBodyReader;
+    private final XmlToPatchBodyReader xmlPATCHBodyReader;
     private static SchemaContext schemaContext;
 
     public TestXmlPATCHBodyReader() throws NoSuchFieldException, SecurityException {
         super();
-        xmlPATCHBodyReader = new XmlToPATCHBodyReader();
+        xmlPATCHBodyReader = new XmlToPatchBodyReader();
     }
 
     @Override
@@ -47,13 +47,13 @@ public class TestXmlPATCHBodyReader extends AbstractBodyReaderTest {
         mockBodyReader(uri, xmlPATCHBodyReader, false);
         final InputStream inputStream = TestXmlBodyReader.class
                 .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdata.xml");
-        final PATCHContext returnValue = xmlPATCHBodyReader
+        final PatchContext returnValue = xmlPATCHBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
         checkPATCHContext(returnValue);
     }
 
     /**
-     * Test trying to use PATCH create operation which requires value without value. Error code 400 should be returned.
+     * Test trying to use Patch create operation which requires value without value. Error code 400 should be returned.
      */
     @Test
     public void moduleDataValueMissingNegativeTest() throws Exception {
@@ -70,7 +70,7 @@ public class TestXmlPATCHBodyReader extends AbstractBodyReaderTest {
     }
 
     /**
-     * Test trying to use value with PATCH delete operation which does not support value. Error code 400 should be
+     * Test trying to use value with Patch delete operation which does not support value. Error code 400 should be
      * returned.
      */
     @Test
@@ -88,7 +88,7 @@ public class TestXmlPATCHBodyReader extends AbstractBodyReaderTest {
     }
 
     /**
-     * Test of Yang PATCH with absolute target path.
+     * Test of Yang Patch with absolute target path.
      */
     @Test
     public void moduleDataAbsoluteTargetPathTest() throws Exception {
@@ -96,13 +96,13 @@ public class TestXmlPATCHBodyReader extends AbstractBodyReaderTest {
         mockBodyReader(uri, xmlPATCHBodyReader, false);
         final InputStream inputStream = TestXmlBodyReader.class
                 .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataAbsoluteTargetPath.xml");
-        final PATCHContext returnValue = xmlPATCHBodyReader
+        final PatchContext returnValue = xmlPATCHBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
         checkPATCHContext(returnValue);
     }
 
     /**
-     * Test using PATCH when target is completely specified in request URI and thus target leaf contains only '/' sign.
+     * Test using Patch when target is completely specified in request URI and thus target leaf contains only '/' sign.
      */
     @Test
     public void modulePATCHCompleteTargetInURITest() throws Exception {
@@ -110,13 +110,13 @@ public class TestXmlPATCHBodyReader extends AbstractBodyReaderTest {
         mockBodyReader(uri, xmlPATCHBodyReader, false);
         final InputStream inputStream = TestXmlBodyReader.class
                 .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataCompleteTargetInURI.xml");
-        final PATCHContext returnValue = xmlPATCHBodyReader
+        final PatchContext returnValue = xmlPATCHBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
         checkPATCHContext(returnValue);
     }
 
     /**
-     * Test of Yang PATCH merge operation on list. Test consists of two edit operations - replace and merge.
+     * Test of Yang Patch merge operation on list. Test consists of two edit operations - replace and merge.
      */
     @Test
     public void moduleDataMergeOperationOnListTest() throws Exception {
@@ -124,13 +124,13 @@ public class TestXmlPATCHBodyReader extends AbstractBodyReaderTest {
         mockBodyReader(uri, xmlPATCHBodyReader, false);
         final InputStream inputStream = TestXmlBodyReader.class
                 .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataMergeOperationOnList.xml");
-        final PATCHContext returnValue = xmlPATCHBodyReader
+        final PatchContext returnValue = xmlPATCHBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
         checkPATCHContext(returnValue);
     }
 
     /**
-     * Test of Yang PATCH merge operation on container. Test consists of two edit operations - create and merge.
+     * Test of Yang Patch merge operation on container. Test consists of two edit operations - create and merge.
      */
     @Test
     public void moduleDataMergeOperationOnContainerTest() throws Exception {
@@ -138,7 +138,7 @@ public class TestXmlPATCHBodyReader extends AbstractBodyReaderTest {
         mockBodyReader(uri, xmlPATCHBodyReader, false);
         final InputStream inputStream = TestXmlBodyReader.class
                 .getResourceAsStream("/instanceidentifier/xml/xmlPATCHdataMergeOperationOnContainer.xml");
-        final PATCHContext returnValue = xmlPATCHBodyReader
+        final PatchContext returnValue = xmlPATCHBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
         checkPATCHContext(returnValue);
     }

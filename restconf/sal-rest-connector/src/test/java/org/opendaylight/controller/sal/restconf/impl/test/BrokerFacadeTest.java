@@ -54,8 +54,8 @@ import org.opendaylight.controller.sal.core.api.Broker.ConsumerSession;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.PutResult;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
@@ -394,12 +394,12 @@ public class BrokerFacadeTest {
     }
 
     /**
-     * Test PATCH method on the server with no data
+     * Test Patch method on the server with no data
      */
     @Test
     @SuppressWarnings("unchecked")
     public void testPatchConfigurationDataWithinTransactionServer() throws Exception {
-        final PATCHContext patchContext = mock(PATCHContext.class);
+        final PatchContext patchContext = mock(PatchContext.class);
         final InstanceIdentifierContext identifierContext = mock(InstanceIdentifierContext.class);
         final CheckedFuture<Void, TransactionCommitFailedException> expFuture = Futures.immediateCheckedFuture(null);
 
@@ -411,19 +411,19 @@ public class BrokerFacadeTest {
 
         when(this.rwTransaction.submit()).thenReturn(expFuture);
 
-        final PATCHStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
+        final PatchStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
 
         // assert success
-        assertTrue("PATCH operation should be successful on server", status.isOk());
+        assertTrue("Patch operation should be successful on server", status.isOk());
     }
 
     /**
-     * Test PATCH method on mounted device with no data
+     * Test Patch method on mounted device with no data
      */
     @Test
     @SuppressWarnings("unchecked")
     public void testPatchConfigurationDataWithinTransactionMount() throws Exception {
-        final PATCHContext patchContext = mock(PATCHContext.class);
+        final PatchContext patchContext = mock(PatchContext.class);
         final InstanceIdentifierContext identifierContext = mock(InstanceIdentifierContext.class);
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
         final DOMDataBroker mountDataBroker = mock(DOMDataBroker.class);
@@ -439,20 +439,20 @@ public class BrokerFacadeTest {
         when(mountDataBroker.newReadWriteTransaction()).thenReturn(transaction);
         when(transaction.submit()).thenReturn(expFuture);
 
-        final PATCHStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
+        final PatchStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
 
         // assert success
-        assertTrue("PATCH operation should be successful on mounted device", status.isOk());
+        assertTrue("Patch operation should be successful on mounted device", status.isOk());
     }
 
     /**
-     * Negative test for PATCH operation when mounted device does not support {@link DOMDataBroker service.
-     * PATCH operation should fail with global error.
+     * Negative test for Patch operation when mounted device does not support {@link DOMDataBroker service.
+     * Patch operation should fail with global error.
      */
     @Test
     @SuppressWarnings("unchecked")
     public void testPatchConfigurationDataWithinTransactionMountFail() throws Exception {
-        final PATCHContext patchContext = mock(PATCHContext.class);
+        final PatchContext patchContext = mock(PatchContext.class);
         final InstanceIdentifierContext identifierContext = mock(InstanceIdentifierContext.class);
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
         final DOMDataBroker mountDataBroker = mock(DOMDataBroker.class);
@@ -469,7 +469,7 @@ public class BrokerFacadeTest {
         when(mountDataBroker.newReadWriteTransaction()).thenReturn(transaction);
         when(transaction.submit()).thenReturn(expFuture);
 
-        final PATCHStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
+        final PatchStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
 
         // assert not successful operation with error
         assertNotNull(status.getGlobalErrors());
@@ -477,6 +477,6 @@ public class BrokerFacadeTest {
         assertEquals(ErrorType.APPLICATION, status.getGlobalErrors().get(0).getErrorType());
         assertEquals(ErrorTag.OPERATION_FAILED, status.getGlobalErrors().get(0).getErrorTag());
 
-        assertFalse("PATCH operation should fail on mounted device without Broker", status.isOk());
+        assertFalse("Patch operation should fail on mounted device without Broker", status.isOk());
     }
 }

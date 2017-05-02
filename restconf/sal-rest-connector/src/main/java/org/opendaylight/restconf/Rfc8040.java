@@ -15,7 +15,7 @@ import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 
 /**
- * Base Draft for Restconf project
+ * Base Draft for Restconf project.
  * <ul>
  * <li>Supported {@link MediaTypes}
  * <li>Constants for modules
@@ -33,7 +33,7 @@ public final class Rfc8040 {
 
     /**
      * Set of application specific media types to identify each of the available
-     * resource types
+     * resource types.
      */
     public static final class MediaTypes {
 
@@ -49,7 +49,7 @@ public final class Rfc8040 {
     }
 
     /**
-     * Constants for restconf module
+     * Constants for restconf module.
      *
      */
     public static final class RestconfModule {
@@ -107,7 +107,7 @@ public final class Rfc8040 {
     }
 
     /**
-     * Constants for ietf-yang-library model
+     * Constants for ietf-yang-library model.
      *
      */
     public static final class IetfYangLibrary {
@@ -181,7 +181,7 @@ public final class Rfc8040 {
     }
 
     /**
-     * Constants for ietf-restconf-monitoring module
+     * Constants for ietf-restconf-monitoring module.
      *
      */
     public static final class MonitoringModule {
@@ -255,7 +255,7 @@ public final class Rfc8040 {
                 .intern();
 
         /**
-         * Constants for capabilities
+         * Constants for capabilities.
          */
         public static final class QueryParams {
 

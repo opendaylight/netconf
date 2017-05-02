@@ -64,7 +64,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
     }
 
     @Override
-    public long getSize(final NormalizedNodeContext t,
+    public long getSize(final NormalizedNodeContext context,
                         final Class<?> type,
                         final Type genericType,
                         final Annotation[] annotations,

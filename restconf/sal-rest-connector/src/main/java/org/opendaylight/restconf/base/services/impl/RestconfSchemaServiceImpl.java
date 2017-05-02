@@ -29,9 +29,9 @@ public class RestconfSchemaServiceImpl implements RestconfSchemaService {
      * .
      *
      * @param schemaContextHandler
-     *            - handling schema context
+     *             handling schema context
      * @param domMountPointServiceHandler
-     *            - handling dom mount point service
+     *             handling dom mount point service
      */
     public RestconfSchemaServiceImpl(final SchemaContextHandler schemaContextHandler,
             final DOMMountPointServiceHandler domMountPointServiceHandler) {

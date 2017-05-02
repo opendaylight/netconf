@@ -16,7 +16,8 @@ public final class IdentityValuesDTO {
     private final List<IdentityValue> elementData = new ArrayList<>();
     private final String originValue;
 
-    public IdentityValuesDTO(final String namespace, final String value, final String prefix, final String originValue) {
+    public IdentityValuesDTO(
+            final String namespace, final String value, final String prefix, final String originValue) {
         elementData.add(new IdentityValue(namespace, value));
         this.originValue = originValue;
     }

@@ -20,18 +20,18 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.rest.impl.test.providers.TestJsonBodyReader;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
-public class JsonPATCHBodyReaderTest extends AbstractBodyReaderTest {
+public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
 
-    private final JsonToPATCHBodyReader jsonPATCHBodyReader;
+    private final JsonToPatchBodyReader jsonPATCHBodyReader;
     private static SchemaContext schemaContext;
 
-    public JsonPATCHBodyReaderTest() throws Exception {
+    public JsonPatchBodyReaderTest() throws Exception {
         super();
-        jsonPATCHBodyReader = new JsonToPATCHBodyReader();
+        jsonPATCHBodyReader = new JsonToPatchBodyReader();
     }
 
     @Override
@@ -54,13 +54,13 @@ public class JsonPATCHBodyReaderTest extends AbstractBodyReaderTest {
         final InputStream inputStream = TestJsonBodyReader.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHdata.json");
 
-        final PATCHContext returnValue = jsonPATCHBodyReader
+        final PatchContext returnValue = jsonPATCHBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
         checkPATCHContext(returnValue);
     }
 
     /**
-     * Test of successful PATCH consisting of create and delete PATCH operations.
+     * Test of successful Patch consisting of create and delete Patch operations.
      */
     @Test
     public void modulePATCHCreateAndDeleteTest() throws Exception {
@@ -70,13 +70,13 @@ public class JsonPATCHBodyReaderTest extends AbstractBodyReaderTest {
         final InputStream inputStream = TestJsonBodyReader.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHdataCreateAndDelete.json");
 
-        final PATCHContext returnValue = jsonPATCHBodyReader
+        final PatchContext returnValue = jsonPATCHBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
         checkPATCHContext(returnValue);
     }
 
     /**
-     * Test trying to use PATCH create operation which requires value without value. Test should fail with
+     * Test trying to use Patch create operation which requires value without value. Test should fail with
      * {@link RestconfDocumentedException} with error code 400.
      */
     @Test
@@ -96,7 +96,7 @@ public class JsonPATCHBodyReaderTest extends AbstractBodyReaderTest {
     }
 
     /**
-     * Test trying to use value with PATCH delete operation which does not support value. Test should fail with
+     * Test trying to use value with Patch delete operation which does not support value. Test should fail with
      * {@link RestconfDocumentedException} with error code 400.
      */
     @Test
@@ -116,7 +116,7 @@ public class JsonPATCHBodyReaderTest extends AbstractBodyReaderTest {
     }
 
     /**
-     * Test using PATCH when target is completely specified in request URI and thus target leaf contains only '/' sign.
+     * Test using Patch when target is completely specified in request URI and thus target leaf contains only '/' sign.
      */
     @Test
     public void modulePATCHCompleteTargetInURITest() throws Exception {
@@ -126,13 +126,13 @@ public class JsonPATCHBodyReaderTest extends AbstractBodyReaderTest {
         final InputStream inputStream = TestJsonBodyReader.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHdataCompleteTargetInURI.json");
 
-        final PATCHContext returnValue = jsonPATCHBodyReader
+        final PatchContext returnValue = jsonPATCHBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
         checkPATCHContext(returnValue);
     }
 
     /**
-     * Test of Yang PATCH merge operation on list. Test consists of two edit operations - replace and merge.
+     * Test of Yang Patch merge operation on list. Test consists of two edit operations - replace and merge.
      */
     @Test
     public void modulePATCHMergeOperationOnListTest() throws Exception {
@@ -142,13 +142,13 @@ public class JsonPATCHBodyReaderTest extends AbstractBodyReaderTest {
         final InputStream inputStream = TestJsonBodyReader.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHMergeOperationOnList.json");
 
-        final PATCHContext returnValue = jsonPATCHBodyReader
+        final PatchContext returnValue = jsonPATCHBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
         checkPATCHContext(returnValue);
     }
 
     /**
-     * Test of Yang PATCH merge operation on container. Test consists of two edit operations - create and merge.
+     * Test of Yang Patch merge operation on container. Test consists of two edit operations - create and merge.
      */
     @Test
     public void modulePATCHMergeOperationOnContainerTest() throws Exception {
@@ -158,7 +158,7 @@ public class JsonPATCHBodyReaderTest extends AbstractBodyReaderTest {
         final InputStream inputStream = TestJsonBodyReader.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHMergeOperationOnContainer.json");
 
-        final PATCHContext returnValue = jsonPATCHBodyReader
+        final PatchContext returnValue = jsonPATCHBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
         checkPATCHContext(returnValue);
     }
@@ -174,7 +174,7 @@ public class JsonPATCHBodyReaderTest extends AbstractBodyReaderTest {
         final InputStream inputStream = TestJsonBodyReader.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHSimpleLeafValue.json");
 
-        final PATCHContext returnValue = jsonPATCHBodyReader
+        final PatchContext returnValue = jsonPATCHBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
         checkPATCHContext(returnValue);
     }

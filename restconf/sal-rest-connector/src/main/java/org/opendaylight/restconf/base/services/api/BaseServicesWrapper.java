@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.base.services.api;
 
 /**
- * Wrapper for all base services:
+ * Wrapper for all base services.
  * <ul>
  * <li>{@link RestconfOperationsService}
  * <li>{@link RestconfSchemaService}

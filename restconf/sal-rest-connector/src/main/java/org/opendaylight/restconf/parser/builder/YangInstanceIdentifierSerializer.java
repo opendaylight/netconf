@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.parser.builder;
 
-
 import com.google.common.base.Preconditions;
 import java.net.URI;
 import java.util.Iterator;
@@ -27,8 +26,7 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
- * Serializer for {@link YangInstanceIdentifier} to {@link String} for restconf
- *
+ * Serializer for {@link YangInstanceIdentifier} to {@link String} for restconf.
  */
 public final class YangInstanceIdentifierSerializer {
 
@@ -38,12 +36,12 @@ public final class YangInstanceIdentifierSerializer {
 
     /**
      * Method to create String from {@link Iterable} of {@link PathArgument}
-     * which are parsing from data by {@link SchemaContext}
+     * which are parsing from data by {@link SchemaContext}.
      *
      * @param schemaContext
-     *            - for validate of parsing path arguments
+     *             for validate of parsing path arguments
      * @param data
-     *            - path to data
+     *             path to data
      * @return {@link String}
      */
     public static String create(final SchemaContext schemaContext, final YangInstanceIdentifier data) {
@@ -128,10 +126,10 @@ public final class YangInstanceIdentifierSerializer {
     }
 
     /**
-     * Encode {@link Serializer#DISABLED_CHARS} chars to percent encoded chars
+     * Encode {@link Serializer#DISABLED_CHARS} chars to percent encoded chars.
      *
      * @param valueOf
-     *            - string to encode
+     *             string to encode
      * @return encoded {@link String}
      */
     private static String parsePercentEncodeChars(final String valueOf) {
@@ -151,24 +149,24 @@ public final class YangInstanceIdentifierSerializer {
     }
 
     /**
-     * Add {@link QName} to the serialized string
+     * Add {@link QName} to the serialized string.
      *
      * @param path
-     *            - {@link StringBuilder}
+     *             {@link StringBuilder}
      * @param qname
-     *            - {@link QName} node
+     *             {@link QName} node
      * @return {@link StringBuilder}
      */
-    private final static StringBuilder appendQName(final StringBuilder path, final QName qname) {
+    private static StringBuilder appendQName(final StringBuilder path, final QName qname) {
         path.append(qname.getLocalName());
         return path;
     }
 
     /**
-     * Create prefix of namespace from {@link QName}
+     * Create prefix of namespace from {@link QName}.
      *
      * @param qname
-     *            - {@link QName}
+     *             {@link QName}
      * @return {@link String}
      */
     private static String prefixForNamespace(final QName qname, final SchemaContext schemaContext) {
@@ -182,7 +180,7 @@ public final class YangInstanceIdentifierSerializer {
 
         private DataSchemaContextNode<?> current;
 
-        public MainVarsWrapper(final DataSchemaContextNode<?> current) {
+        MainVarsWrapper(final DataSchemaContextNode<?> current) {
             this.setCurrent(current);
         }
 

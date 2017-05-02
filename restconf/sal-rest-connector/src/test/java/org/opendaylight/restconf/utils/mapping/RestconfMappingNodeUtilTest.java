@@ -206,7 +206,7 @@ public class RestconfMappingNodeUtilTest {
      * Verify loaded modules
      *
      * @param containerNode
-     *            - modules
+     *             modules
      */
     private static void verifyLoadedModules(final ContainerNode containerNode) {
 

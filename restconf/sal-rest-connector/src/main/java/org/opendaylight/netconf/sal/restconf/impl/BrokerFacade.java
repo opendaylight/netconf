@@ -80,9 +80,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BrokerFacade {
-    private final static Logger LOG = LoggerFactory.getLogger(BrokerFacade.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BrokerFacade.class);
 
-    private final static BrokerFacade INSTANCE = new BrokerFacade();
+    private static final BrokerFacade INSTANCE = new BrokerFacade();
     private volatile DOMRpcService rpcService;
     private volatile ConsumerSession context;
     private DOMDataBroker domDataBroker;
@@ -113,10 +113,10 @@ public class BrokerFacade {
     }
 
     /**
-     * Read config data by path
+     * Read config data by path.
      *
      * @param path
-     *            - path of data
+     *            path of data
      * @return read date
      */
     public NormalizedNode<?, ?> readConfigurationData(final YangInstanceIdentifier path) {
@@ -124,12 +124,12 @@ public class BrokerFacade {
     }
 
     /**
-     * Read config data by path
+     * Read config data by path.
      *
      * @param path
-     *            - path of data
+     *            path of data
      * @param withDefa
-     *            - value of with-defaults parameter
+     *            value of with-defaults parameter
      * @return read date
      */
     public NormalizedNode<?, ?> readConfigurationData(final YangInstanceIdentifier path, final String withDefa) {
@@ -143,9 +143,9 @@ public class BrokerFacade {
      * Read config data from mount point by path.
      *
      * @param mountPoint
-     *            - mount point for reading data
+     *            mount point for reading data
      * @param path
-     *            - path of data
+     *            path of data
      * @return read data
      */
     public NormalizedNode<?, ?> readConfigurationData(final DOMMountPoint mountPoint,
@@ -157,11 +157,11 @@ public class BrokerFacade {
      * Read config data from mount point by path.
      *
      * @param mountPoint
-     *            - mount point for reading data
+     *            mount point for reading data
      * @param path
-     *            - path of data
+     *            path of data
      * @param withDefa
-     *            - value of with-defaults parameter
+     *            value of with-defaults parameter
      * @return read data
      */
     public NormalizedNode<?, ?> readConfigurationData(final DOMMountPoint mountPoint, final YangInstanceIdentifier path,
@@ -181,7 +181,7 @@ public class BrokerFacade {
      * Read operational data by path.
      *
      * @param path
-     *            - path of data
+     *            path of data
      * @return read data
      */
     public NormalizedNode<?, ?> readOperationalData(final YangInstanceIdentifier path) {
@@ -196,9 +196,9 @@ public class BrokerFacade {
      * Read operational data from mount point by path.
      *
      * @param mountPoint
-     *            - mount point for reading data
+     *            mount point for reading data
      * @param path
-     *            - path of data
+     *            path of data
      * @return read data
      */
     public NormalizedNode<?, ?> readOperationalData(final DOMMountPoint mountPoint, final YangInstanceIdentifier path) {
@@ -216,15 +216,16 @@ public class BrokerFacade {
     /**
      * <b>PUT configuration data</b>
      *
+     * <p>
      * Prepare result(status) for PUT operation and PUT data via transaction.
      * Return wrapped status and future from PUT.
      *
      * @param globalSchema
-     *            - used by merge parents (if contains list)
+     *            used by merge parents (if contains list)
      * @param path
-     *            - path of node
+     *            path of node
      * @param payload
-     *            - input data
+     *            input data
      * @param point
      * @param insert
      * @return wrapper of status and future of PUT
@@ -249,16 +250,17 @@ public class BrokerFacade {
     /**
      * <b>PUT configuration data (Mount point)</b>
      *
+     * <p>
      * Prepare result(status) for PUT operation and PUT data via transaction.
      * Return wrapped status and future from PUT.
      *
      * @param mountPoint
-     *            - mount point for getting transaction for operation and schema
+     *            mount point for getting transaction for operation and schema
      *            context for merging parents(if contains list)
      * @param path
-     *            - path of node
+     *            path of node
      * @param payload
-     *            - input data
+     *            input data
      * @param point
      * @param insert
      * @return wrapper of status and future of PUT
@@ -272,7 +274,8 @@ public class BrokerFacade {
 
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
-            final DOMDataReadWriteTransaction newReadWriteTransaction = domDataBrokerService.get().newReadWriteTransaction();
+            final DOMDataReadWriteTransaction newReadWriteTransaction =
+                    domDataBrokerService.get().newReadWriteTransaction();
             final Status status = readDataViaTransaction(newReadWriteTransaction, CONFIGURATION, path) != null
                     ? Status.OK : Status.CREATED;
             final CheckedFuture<Void, TransactionCommitFailedException> future = putDataViaTransaction(
@@ -285,7 +288,8 @@ public class BrokerFacade {
         throw new RestconfDocumentedException(errMsg);
     }
 
-    public PATCHStatusContext patchConfigurationDataWithinTransaction(final PATCHContext patchContext) throws Exception {
+    public PatchStatusContext patchConfigurationDataWithinTransaction(final PatchContext patchContext)
+            throws Exception {
         final DOMMountPoint mountPoint = patchContext.getInstanceIdentifierContext().getMountPoint();
 
         // get new transaction and schema context on server or on mounted device
@@ -303,9 +307,9 @@ public class BrokerFacade {
                 patchTransaction = optional.get().newReadWriteTransaction();
             } else {
                 // if mount point does not have broker it is not possible to continue and global error is reported
-                LOG.error("Http PATCH {} has failed - device {} does not support broker service",
+                LOG.error("Http Patch {} has failed - device {} does not support broker service",
                         patchContext.getPatchId(), mountPoint.getIdentifier());
-                return new PATCHStatusContext(
+                return new PatchStatusContext(
                         patchContext.getPatchId(),
                         null,
                         false,
@@ -318,12 +322,12 @@ public class BrokerFacade {
             }
         }
 
-        final List<PATCHStatusEntity> editCollection = new ArrayList<>();
+        final List<PatchStatusEntity> editCollection = new ArrayList<>();
         List<RestconfError> editErrors;
         boolean withoutError = true;
 
-        for (final PATCHEntity patchEntity : patchContext.getData()) {
-            final PATCHEditOperation operation = PATCHEditOperation.valueOf(patchEntity.getOperation().toUpperCase());
+        for (final PatchEntity patchEntity : patchContext.getData()) {
+            final PatchEditOperation operation = PatchEditOperation.valueOf(patchEntity.getOperation().toUpperCase());
 
             switch (operation) {
                 case CREATE:
@@ -331,15 +335,15 @@ public class BrokerFacade {
                         try {
                             postDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity.getTargetNode(),
                                     patchEntity.getNode(), schemaContext);
-                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
-                            LOG.error("Error call http PATCH operation {} on target {}",
+                            LOG.error("Error call http Patch operation {} on target {}",
                                     operation,
                                     patchEntity.getTargetNode().toString());
 
                             editErrors = new ArrayList<>();
                             editErrors.addAll(e.getErrors());
-                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false, editErrors));
                             withoutError = false;
                         }
                     }
@@ -349,15 +353,15 @@ public class BrokerFacade {
                         try {
                             putDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
                                     .getTargetNode(), patchEntity.getNode(), schemaContext);
-                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
-                            LOG.error("Error call http PATCH operation {} on target {}",
+                            LOG.error("Error call http Patch operation {} on target {}",
                                     operation,
                                     patchEntity.getTargetNode().toString());
 
                             editErrors = new ArrayList<>();
                             editErrors.addAll(e.getErrors());
-                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false, editErrors));
                             withoutError = false;
                         }
                     }
@@ -367,15 +371,15 @@ public class BrokerFacade {
                         try {
                             deleteDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
                                     .getTargetNode());
-                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
-                            LOG.error("Error call http PATCH operation {} on target {}",
+                            LOG.error("Error call http Patch operation {} on target {}",
                                     operation,
                                     patchEntity.getTargetNode().toString());
 
                             editErrors = new ArrayList<>();
                             editErrors.addAll(e.getErrors());
-                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false, editErrors));
                             withoutError = false;
                         }
                     }
@@ -385,15 +389,15 @@ public class BrokerFacade {
                         try {
                             deleteDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
                                     .getTargetNode());
-                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
-                            LOG.error("Error call http PATCH operation {} on target {}",
+                            LOG.error("Error call http Patch operation {} on target {}",
                                     operation,
                                     patchEntity.getTargetNode().toString());
 
                             editErrors = new ArrayList<>();
                             editErrors.addAll(e.getErrors());
-                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false, editErrors));
                             withoutError = false;
                         }
                     }
@@ -403,21 +407,21 @@ public class BrokerFacade {
                         try {
                             mergeDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity.getTargetNode(),
                                     patchEntity.getNode(), schemaContext);
-                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
-                            LOG.error("Error call http PATCH operation {} on target {}",
+                            LOG.error("Error call http Patch operation {} on target {}",
                                     operation,
                                     patchEntity.getTargetNode().toString());
 
                             editErrors = new ArrayList<>();
                             editErrors.addAll(e.getErrors());
-                            editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), false, editErrors));
+                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false, editErrors));
                             withoutError = false;
                         }
                     }
                     break;
                 default:
-                    LOG.error("Unsupported http PATCH operation {} on target {}",
+                    LOG.error("Unsupported http Patch operation {} on target {}",
                             operation,
                             patchEntity.getTargetNode().toString());
                     break;
@@ -427,29 +431,29 @@ public class BrokerFacade {
         // if errors then cancel transaction and return error status
         if (!withoutError) {
             patchTransaction.cancel();
-            return new PATCHStatusContext(patchContext.getPatchId(), ImmutableList.copyOf(editCollection), false, null);
+            return new PatchStatusContext(patchContext.getPatchId(), ImmutableList.copyOf(editCollection), false, null);
         }
 
         // if no errors commit transaction
         final CountDownLatch waiter = new CountDownLatch(1);
         final CheckedFuture<Void, TransactionCommitFailedException> future = patchTransaction.submit();
-        final PATCHStatusContextHelper status = new PATCHStatusContextHelper();
+        final PatchStatusContextHelper status = new PatchStatusContextHelper();
 
         Futures.addCallback(future, new FutureCallback<Void>() {
             @Override
             public void onSuccess(@Nullable final Void result) {
-                status.setStatus(new PATCHStatusContext(patchContext.getPatchId(), ImmutableList.copyOf(editCollection),
+                status.setStatus(new PatchStatusContext(patchContext.getPatchId(), ImmutableList.copyOf(editCollection),
                         true, null));
                 waiter.countDown();
             }
 
             @Override
-            public void onFailure(final Throwable t) {
+            public void onFailure(final Throwable throwable) {
                 // if commit failed it is global error
-                LOG.error("Http PATCH {} transaction commit has failed", patchContext.getPatchId());
-                status.setStatus(new PATCHStatusContext(patchContext.getPatchId(), ImmutableList.copyOf(editCollection),
+                LOG.error("Http Patch {} transaction commit has failed", patchContext.getPatchId());
+                status.setStatus(new PatchStatusContext(patchContext.getPatchId(), ImmutableList.copyOf(editCollection),
                         false, ImmutableList.of(
-                        new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, t.getMessage()))));
+                        new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, throwable.getMessage()))));
                 waiter.countDown();
             }
         });
@@ -499,7 +503,8 @@ public class BrokerFacade {
     }
 
     // RPC
-    public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+    public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(final SchemaPath type,
+                                                                  final NormalizedNode<?, ?> input) {
         checkPreconditions();
         if (this.rpcService == null) {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
@@ -582,7 +587,8 @@ public class BrokerFacade {
         return builder.build();
     }
 
-    private void buildMapEntryBuilder(final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder,
+    private void buildMapEntryBuilder(
+            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder,
             final MapEntryNode result, final DataSchemaContextTree baseSchemaCtxTree,
             final YangInstanceIdentifier actualPath, final boolean trim, final List<QName> keys) {
         for (final DataContainerChild<? extends PathArgument, ?> child : result.getValue()) {
@@ -643,7 +649,7 @@ public class BrokerFacade {
         for (final DataContainerChild<? extends PathArgument, ?> child : result.getValue()) {
             final YangInstanceIdentifier path = actualPath.node(child.getIdentifier());
             final DataSchemaNode childSchema = baseSchemaCtxTree.getChild(path).getDataSchemaNode();
-            if(child instanceof ContainerNode){
+            if (child instanceof ContainerNode) {
                 final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builderChild =
                         Builders.containerBuilder((ContainerSchemaNode) childSchema);
                 buildCont(builderChild, result, baseSchemaCtxTree, actualPath, trim);
@@ -675,74 +681,74 @@ public class BrokerFacade {
     }
 
     /**
-     * POST data and submit transaction {@link DOMDataReadWriteTransaction}
+     * POST data and submit transaction {@link DOMDataReadWriteTransaction}.
      */
     private CheckedFuture<Void, TransactionCommitFailedException> postDataViaTransaction(
-            final DOMDataReadWriteTransaction rWTransaction, final LogicalDatastoreType datastore,
+            final DOMDataReadWriteTransaction rwTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
             final String insert, final String point) {
         LOG.trace("POST {} via Restconf: {} with payload {}", datastore.name(), path, payload);
-        postData(rWTransaction, datastore, path, payload, schemaContext, insert, point);
-        return rWTransaction.submit();
+        postData(rwTransaction, datastore, path, payload, schemaContext, insert, point);
+        return rwTransaction.submit();
     }
 
     /**
-     * POST data and do NOT submit transaction {@link DOMDataReadWriteTransaction}
+     * POST data and do NOT submit transaction {@link DOMDataReadWriteTransaction}.
      */
     private void postDataWithinTransaction(
-            final DOMDataReadWriteTransaction rWTransaction, final LogicalDatastoreType datastore,
+            final DOMDataReadWriteTransaction rwTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
-        LOG.trace("POST {} within Restconf PATCH: {} with payload {}", datastore.name(), path, payload);
-        postData(rWTransaction, datastore, path, payload, schemaContext, null, null);
+        LOG.trace("POST {} within Restconf Patch: {} with payload {}", datastore.name(), path, payload);
+        postData(rwTransaction, datastore, path, payload, schemaContext, null, null);
     }
 
-    private void postData(final DOMDataReadWriteTransaction rWTransaction, final LogicalDatastoreType datastore,
+    private void postData(final DOMDataReadWriteTransaction rwTransaction, final LogicalDatastoreType datastore,
                           final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext, final String insert, final String point) {
         if (insert == null) {
-            makeNormalPost(rWTransaction, datastore, path, payload, schemaContext);
+            makeNormalPost(rwTransaction, datastore, path, payload, schemaContext);
             return;
         }
 
         final DataSchemaNode schemaNode = checkListAndOrderedType(schemaContext, path);
-        checkItemDoesNotExists(rWTransaction, datastore, path);
+        checkItemDoesNotExists(rwTransaction, datastore, path);
         switch (insert) {
             case "first":
-                if(schemaNode instanceof ListSchemaNode){
+                if (schemaNode instanceof ListSchemaNode) {
                     final OrderedMapNode readList =
                             (OrderedMapNode) this.readConfigurationData(path.getParent().getParent());
                     if (readList == null || readList.getValue().isEmpty()) {
-                        simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+                        simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
                     } else {
-                        rWTransaction.delete(datastore, path.getParent().getParent());
-                        simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
-                        makeNormalPost(rWTransaction, datastore, path.getParent().getParent(), readList,
+                        rwTransaction.delete(datastore, path.getParent().getParent());
+                        simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
+                        makeNormalPost(rwTransaction, datastore, path.getParent().getParent(), readList,
                             schemaContext);
                     }
                 } else {
                     final OrderedLeafSetNode<?> readLeafList =
                             (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
                     if (readLeafList == null || readLeafList.getValue().isEmpty()) {
-                        simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+                        simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
                     } else {
-                        rWTransaction.delete(datastore, path.getParent());
-                        simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
-                        makeNormalPost(rWTransaction, datastore, path.getParent().getParent(), readLeafList,
+                        rwTransaction.delete(datastore, path.getParent());
+                        simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
+                        makeNormalPost(rwTransaction, datastore, path.getParent().getParent(), readLeafList,
                             schemaContext);
                     }
                 }
                 break;
             case "last":
-                simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+                simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
                 break;
             case "before":
-                if(schemaNode instanceof ListSchemaNode){
+                if (schemaNode instanceof ListSchemaNode) {
                     final OrderedMapNode readList =
                             (OrderedMapNode) this.readConfigurationData(path.getParent().getParent());
                     if (readList == null || readList.getValue().isEmpty()) {
-                        simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+                        simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
                     } else {
-                        insertWithPointListPost(rWTransaction, datastore, path, payload, schemaContext, point,
+                        insertWithPointListPost(rwTransaction, datastore, path, payload, schemaContext, point,
                             readList,
                             true);
                     }
@@ -750,9 +756,9 @@ public class BrokerFacade {
                     final OrderedLeafSetNode<?> readLeafList =
                             (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
                     if (readLeafList == null || readLeafList.getValue().isEmpty()) {
-                        simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+                        simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
                     } else {
-                        insertWithPointLeafListPost(rWTransaction, datastore, path, payload, schemaContext, point,
+                        insertWithPointLeafListPost(rwTransaction, datastore, path, payload, schemaContext, point,
                             readLeafList, true);
                     }
                 }
@@ -762,9 +768,9 @@ public class BrokerFacade {
                     final OrderedMapNode readList =
                             (OrderedMapNode) this.readConfigurationData(path.getParent().getParent());
                     if (readList == null || readList.getValue().isEmpty()) {
-                        simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+                        simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
                     } else {
-                        insertWithPointListPost(rWTransaction, datastore, path, payload, schemaContext, point,
+                        insertWithPointListPost(rwTransaction, datastore, path, payload, schemaContext, point,
                             readList,
                             false);
                     }
@@ -772,9 +778,9 @@ public class BrokerFacade {
                     final OrderedLeafSetNode<?> readLeafList =
                             (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
                     if (readLeafList == null || readLeafList.getValue().isEmpty()) {
-                        simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+                        simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
                     } else {
-                        insertWithPointLeafListPost(rWTransaction, datastore, path, payload, schemaContext, point,
+                        insertWithPointLeafListPost(rwTransaction, datastore, path, payload, schemaContext, point,
                             readLeafList, false);
                     }
                 }
@@ -786,70 +792,70 @@ public class BrokerFacade {
         }
     }
 
-    private static void insertWithPointLeafListPost(final DOMDataReadWriteTransaction rWTransaction,
+    private static void insertWithPointLeafListPost(final DOMDataReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext, final String point, final OrderedLeafSetNode<?> readLeafList,
             final boolean before) {
-        rWTransaction.delete(datastore, path.getParent().getParent());
+        rwTransaction.delete(datastore, path.getParent().getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
                 ControllerContext.getInstance().toInstanceIdentifier(point);
-        int p = 0;
+        int index1 = 0;
         for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
             if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
                 break;
             }
-            p++;
+            index1++;
         }
         if (!before) {
-            p++;
+            index1++;
         }
-        int h = 0;
+        int index2 = 0;
         final NormalizedNode<?, ?> emptySubtree =
                 ImmutableNodes.fromInstanceId(schemaContext, path.getParent().getParent());
-        rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+        rwTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
         for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
-            if (h == p) {
-                checkItemDoesNotExists(rWTransaction, datastore, path);
-                simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+            if (index2 == index1) {
+                checkItemDoesNotExists(rwTransaction, datastore, path);
+                simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
             }
             final YangInstanceIdentifier childPath = path.getParent().getParent().node(nodeChild.getIdentifier());
-            checkItemDoesNotExists(rWTransaction, datastore, childPath);
-            rWTransaction.put(datastore, childPath, nodeChild);
-            h++;
+            checkItemDoesNotExists(rwTransaction, datastore, childPath);
+            rwTransaction.put(datastore, childPath, nodeChild);
+            index2++;
         }
     }
 
-    private static void insertWithPointListPost(final DOMDataReadWriteTransaction rWTransaction,
+    private static void insertWithPointListPost(final DOMDataReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
             final String point, final MapNode readList, final boolean before) {
-        rWTransaction.delete(datastore, path.getParent().getParent());
+        rwTransaction.delete(datastore, path.getParent().getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
                 ControllerContext.getInstance().toInstanceIdentifier(point);
-        int p = 0;
+        int index1 = 0;
         for (final MapEntryNode mapEntryNode : readList.getValue()) {
             if (mapEntryNode.getIdentifier()
                     .equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
                 break;
             }
-            p++;
+            index1++;
         }
         if (!before) {
-            p++;
+            index1++;
         }
-        int h = 0;
+        int index2 = 0;
         final NormalizedNode<?, ?> emptySubtree =
                 ImmutableNodes.fromInstanceId(schemaContext, path.getParent().getParent());
-        rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+        rwTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
         for (final MapEntryNode mapEntryNode : readList.getValue()) {
-            if (h == p) {
-                checkItemDoesNotExists(rWTransaction, datastore, path);
-                simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+            if (index2 == index1) {
+                checkItemDoesNotExists(rwTransaction, datastore, path);
+                simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
             }
             final YangInstanceIdentifier childPath = path.getParent().getParent().node(mapEntryNode.getIdentifier());
-            checkItemDoesNotExists(rWTransaction, datastore, childPath);
-            rWTransaction.put(datastore, childPath, mapEntryNode);
-            h++;
+            checkItemDoesNotExists(rwTransaction, datastore, childPath);
+            rwTransaction.put(datastore, childPath, mapEntryNode);
+            index2++;
         }
     }
 
@@ -859,21 +865,22 @@ public class BrokerFacade {
         final DataSchemaNode dataSchemaNode = node.getDataSchemaNode();
 
         if (dataSchemaNode instanceof ListSchemaNode) {
-            if(!((ListSchemaNode) dataSchemaNode).isUserOrdered()) {
+            if (!((ListSchemaNode) dataSchemaNode).isUserOrdered()) {
                 throw new RestconfDocumentedException("Insert parameter can be used only with ordered-by user list.");
             }
             return dataSchemaNode;
         }
         if (dataSchemaNode instanceof LeafListSchemaNode) {
-            if(!((LeafListSchemaNode) dataSchemaNode).isUserOrdered()) {
-                throw new RestconfDocumentedException("Insert parameter can be used only with ordered-by user leaf-list.");
+            if (!((LeafListSchemaNode) dataSchemaNode).isUserOrdered()) {
+                throw new RestconfDocumentedException(
+                        "Insert parameter can be used only with ordered-by user leaf-list.");
             }
             return dataSchemaNode;
         }
         throw new RestconfDocumentedException("Insert parameter can be used only with list or leaf-list");
     }
 
-    private static void makeNormalPost(final DOMDataReadWriteTransaction rWTransaction,
+    private static void makeNormalPost(final DOMDataReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext) {
         final Collection<? extends NormalizedNode<?, ?>> children;
@@ -882,28 +889,28 @@ public class BrokerFacade {
         } else if (payload instanceof LeafSetNode) {
             children = ((LeafSetNode<?>) payload).getValue();
         } else {
-            simplePostPut(rWTransaction, datastore, path, payload, schemaContext);
+            simplePostPut(rwTransaction, datastore, path, payload, schemaContext);
             return;
         }
 
         final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
         if (children.isEmpty()) {
-            rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-            ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
+            rwTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+            ensureParentsByMerge(datastore, path, rwTransaction, schemaContext);
             return;
         }
 
         // Kick off batch existence check first...
-        final BatchedExistenceCheck check = BatchedExistenceCheck.start(rWTransaction, datastore, path, children);
+        final BatchedExistenceCheck check = BatchedExistenceCheck.start(rwTransaction, datastore, path, children);
 
         // ... now enqueue modifications. This relies on proper ordering of requests, i.e. these will not affect the
         // result of the existence checks...
-        rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-        ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
+        rwTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+        ensureParentsByMerge(datastore, path, rwTransaction, schemaContext);
         for (final NormalizedNode<?, ?> child : children) {
             // FIXME: we really want a create(YangInstanceIdentifier, NormalizedNode) method in the transaction,
             //        as that would allow us to skip the existence checks
-            rWTransaction.put(datastore, path.node(child.getIdentifier()), child);
+            rwTransaction.put(datastore, path.node(child.getIdentifier()), child);
         }
 
         // ... finally collect existence checks and abort the transaction if any of them failed.
@@ -911,12 +918,12 @@ public class BrokerFacade {
         try {
             failure = check.getFailure();
         } catch (InterruptedException e) {
-            rWTransaction.cancel();
+            rwTransaction.cancel();
             throw new RestconfDocumentedException("Could not determine the existence of path " + path, e);
         }
 
         if (failure != null) {
-            rWTransaction.cancel();
+            rwTransaction.cancel();
             final ReadFailedException e = failure.getValue();
             if (e == null) {
                 throw new RestconfDocumentedException("Data already exists for path: " + failure.getKey(),
@@ -928,20 +935,20 @@ public class BrokerFacade {
         }
     }
 
-    private static void simplePostPut(final DOMDataReadWriteTransaction rWTransaction,
+    private static void simplePostPut(final DOMDataReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext) {
-        checkItemDoesNotExists(rWTransaction, datastore, path);
-        ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
-        rWTransaction.put(datastore, path, payload);
+        checkItemDoesNotExists(rwTransaction, datastore, path);
+        ensureParentsByMerge(datastore, path, rwTransaction, schemaContext);
+        rwTransaction.put(datastore, path, payload);
     }
 
-    private static boolean doesItemExist(final DOMDataReadWriteTransaction rWTransaction,
+    private static boolean doesItemExist(final DOMDataReadWriteTransaction rwTransaction,
             final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         try {
-            return rWTransaction.exists(store, path).checkedGet();
+            return rwTransaction.exists(store, path).checkedGet();
         } catch (ReadFailedException e) {
-            rWTransaction.cancel();
+            rwTransaction.cancel();
             throw new RestconfDocumentedException("Could not determine the existence of path " + path,
                     e, e.getErrorList());
         }
@@ -949,16 +956,16 @@ public class BrokerFacade {
 
     /**
      * Check if item already exists. Throws error if it does NOT already exist.
-     * @param rWTransaction Current transaction
+     * @param rwTransaction Current transaction
      * @param store Used datastore
      * @param path Path to item to verify its existence
      */
-    private static void checkItemExists(final DOMDataReadWriteTransaction rWTransaction,
+    private static void checkItemExists(final DOMDataReadWriteTransaction rwTransaction,
             final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        if (!doesItemExist(rWTransaction, store, path)) {
+        if (!doesItemExist(rwTransaction, store, path)) {
             final String errMsg = "Operation via Restconf was not executed because data does not exist";
             LOG.trace("{}:{}", errMsg, path);
-            rWTransaction.cancel();
+            rwTransaction.cancel();
             throw new RestconfDocumentedException("Data does not exist for path: " + path, ErrorType.PROTOCOL,
                     ErrorTag.DATA_MISSING);
         }
@@ -966,23 +973,23 @@ public class BrokerFacade {
 
     /**
      * Check if item does NOT already exist. Throws error if it already exists.
-     * @param rWTransaction Current transaction
+     * @param rwTransaction Current transaction
      * @param store Used datastore
      * @param path Path to item to verify its existence
      */
-    private static void checkItemDoesNotExists(final DOMDataReadWriteTransaction rWTransaction,
+    private static void checkItemDoesNotExists(final DOMDataReadWriteTransaction rwTransaction,
             final LogicalDatastoreType store, final YangInstanceIdentifier path) {
-        if (doesItemExist(rWTransaction, store, path)) {
+        if (doesItemExist(rwTransaction, store, path)) {
             final String errMsg = "Operation via Restconf was not executed because data already exists";
             LOG.trace("{}:{}", errMsg, path);
-            rWTransaction.cancel();
+            rwTransaction.cancel();
             throw new RestconfDocumentedException("Data already exists for path: " + path, ErrorType.PROTOCOL,
                     ErrorTag.DATA_EXISTS);
         }
     }
 
     /**
-     * PUT data and submit {@link DOMDataReadWriteTransaction}
+     * PUT data and submit {@link DOMDataReadWriteTransaction}.
      *
      * @param point
      * @param insert
@@ -997,7 +1004,7 @@ public class BrokerFacade {
     }
 
     /**
-     * PUT data and do NOT submit {@link DOMDataReadWriteTransaction}
+     * PUT data and do NOT submit {@link DOMDataReadWriteTransaction}.
      *
      * @param insert
      * @param point
@@ -1005,66 +1012,66 @@ public class BrokerFacade {
     private void putDataWithinTransaction(
             final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
-        LOG.trace("Put {} within Restconf PATCH: {} with payload {}", datastore.name(), path, payload);
+        LOG.trace("Put {} within Restconf Patch: {} with payload {}", datastore.name(), path, payload);
         putData(writeTransaction, datastore, path, payload, schemaContext, null, null);
     }
 
     // FIXME: This is doing correct put for container and list children, not sure if this will work for choice case
-    private void putData(final DOMDataReadWriteTransaction rWTransaction, final LogicalDatastoreType datastore,
+    private void putData(final DOMDataReadWriteTransaction rwTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
             final String insert, final String point) {
         if (insert == null) {
-            makePut(rWTransaction, datastore, path, payload, schemaContext);
+            makePut(rwTransaction, datastore, path, payload, schemaContext);
             return;
         }
 
         final DataSchemaNode schemaNode = checkListAndOrderedType(schemaContext, path);
-        checkItemDoesNotExists(rWTransaction, datastore, path);
+        checkItemDoesNotExists(rwTransaction, datastore, path);
         switch (insert) {
             case "first":
                 if (schemaNode instanceof ListSchemaNode) {
                     final OrderedMapNode readList =
                             (OrderedMapNode) this.readConfigurationData(path.getParent());
                     if (readList == null || readList.getValue().isEmpty()) {
-                        simplePut(datastore, path, rWTransaction, schemaContext, payload);
+                        simplePut(datastore, path, rwTransaction, schemaContext, payload);
                     } else {
-                        rWTransaction.delete(datastore, path.getParent());
-                        simplePut(datastore, path, rWTransaction, schemaContext, payload);
-                        makePut(rWTransaction, datastore, path.getParent(), readList, schemaContext);
+                        rwTransaction.delete(datastore, path.getParent());
+                        simplePut(datastore, path, rwTransaction, schemaContext, payload);
+                        makePut(rwTransaction, datastore, path.getParent(), readList, schemaContext);
                     }
                 } else {
                     final OrderedLeafSetNode<?> readLeafList =
                             (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
                     if (readLeafList == null || readLeafList.getValue().isEmpty()) {
-                        simplePut(datastore, path, rWTransaction, schemaContext, payload);
+                        simplePut(datastore, path, rwTransaction, schemaContext, payload);
                     } else {
-                        rWTransaction.delete(datastore, path.getParent());
-                        simplePut(datastore, path, rWTransaction, schemaContext, payload);
-                        makePut(rWTransaction, datastore, path.getParent(), readLeafList,
+                        rwTransaction.delete(datastore, path.getParent());
+                        simplePut(datastore, path, rwTransaction, schemaContext, payload);
+                        makePut(rwTransaction, datastore, path.getParent(), readLeafList,
                             schemaContext);
                     }
                 }
                 break;
             case "last":
-                simplePut(datastore, path, rWTransaction, schemaContext, payload);
+                simplePut(datastore, path, rwTransaction, schemaContext, payload);
                 break;
             case "before":
                 if (schemaNode instanceof ListSchemaNode) {
                     final OrderedMapNode readList =
                             (OrderedMapNode) this.readConfigurationData(path.getParent());
                     if (readList == null || readList.getValue().isEmpty()) {
-                        simplePut(datastore, path, rWTransaction, schemaContext, payload);
+                        simplePut(datastore, path, rwTransaction, schemaContext, payload);
                     } else {
-                        insertWithPointListPut(rWTransaction, datastore, path, payload, schemaContext, point,
+                        insertWithPointListPut(rwTransaction, datastore, path, payload, schemaContext, point,
                             readList, true);
                     }
                 } else {
                     final OrderedLeafSetNode<?> readLeafList =
                             (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
                     if (readLeafList == null || readLeafList.getValue().isEmpty()) {
-                        simplePut(datastore, path, rWTransaction, schemaContext, payload);
+                        simplePut(datastore, path, rwTransaction, schemaContext, payload);
                     } else {
-                        insertWithPointLeafListPut(rWTransaction, datastore, path, payload, schemaContext, point,
+                        insertWithPointLeafListPut(rwTransaction, datastore, path, payload, schemaContext, point,
                             readLeafList, true);
                     }
                 }
@@ -1074,18 +1081,18 @@ public class BrokerFacade {
                     final OrderedMapNode readList =
                             (OrderedMapNode) this.readConfigurationData(path.getParent());
                     if (readList == null || readList.getValue().isEmpty()) {
-                        simplePut(datastore, path, rWTransaction, schemaContext, payload);
+                        simplePut(datastore, path, rwTransaction, schemaContext, payload);
                     } else {
-                        insertWithPointListPut(rWTransaction, datastore, path, payload, schemaContext, point,
+                        insertWithPointListPut(rwTransaction, datastore, path, payload, schemaContext, point,
                             readList, false);
                     }
                 } else {
                     final OrderedLeafSetNode<?> readLeafList =
                             (OrderedLeafSetNode<?>) readConfigurationData(path.getParent());
                     if (readLeafList == null || readLeafList.getValue().isEmpty()) {
-                        simplePut(datastore, path, rWTransaction, schemaContext, payload);
+                        simplePut(datastore, path, rwTransaction, schemaContext, payload);
                     } else {
-                        insertWithPointLeafListPut(rWTransaction, datastore, path, payload, schemaContext, point,
+                        insertWithPointLeafListPut(rwTransaction, datastore, path, payload, schemaContext, point,
                             readLeafList, false);
                     }
                 }
@@ -1104,27 +1111,27 @@ public class BrokerFacade {
         tx.delete(datastore, path.getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
                 ControllerContext.getInstance().toInstanceIdentifier(point);
-        int p = 0;
+        int index1 = 0;
         for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
             if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
                 break;
             }
-            p++;
+            index1++;
         }
         if (!before) {
-            p++;
+            index1++;
         }
-        int h = 0;
+        int index2 = 0;
         final NormalizedNode<?, ?> emptySubtree =
                 ImmutableNodes.fromInstanceId(schemaContext, path.getParent());
         tx.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
         for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
-            if (h == p) {
+            if (index2 == index1) {
                 simplePut(datastore, path, tx, schemaContext, payload);
             }
             final YangInstanceIdentifier childPath = path.getParent().node(nodeChild.getIdentifier());
             tx.put(datastore, childPath, nodeChild);
-            h++;
+            index2++;
         }
     }
 
@@ -1134,27 +1141,27 @@ public class BrokerFacade {
         tx.delete(datastore, path.getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
                 ControllerContext.getInstance().toInstanceIdentifier(point);
-        int p = 0;
+        int index1 = 0;
         for (final MapEntryNode mapEntryNode : readList.getValue()) {
             if (mapEntryNode.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
                 break;
             }
-            p++;
+            index1++;
         }
         if (!before) {
-            p++;
+            index1++;
         }
-        int h = 0;
+        int index2 = 0;
         final NormalizedNode<?, ?> emptySubtree =
                 ImmutableNodes.fromInstanceId(schemaContext, path.getParent());
         tx.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
         for (final MapEntryNode mapEntryNode : readList.getValue()) {
-            if (h == p) {
+            if (index2 == index1) {
                 simplePut(datastore, path, tx, schemaContext, payload);
             }
             final YangInstanceIdentifier childPath = path.getParent().node(mapEntryNode.getIdentifier());
             tx.put(datastore, childPath, mapEntryNode);
-            h++;
+            index2++;
         }
     }
 
@@ -1190,14 +1197,14 @@ public class BrokerFacade {
 
     private static void deleteDataWithinTransaction(final DOMDataWriteTransaction tx,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
-        LOG.trace("Delete {} within Restconf PATCH: {}", datastore.name(), path);
+        LOG.trace("Delete {} within Restconf Patch: {}", datastore.name(), path);
         tx.delete(datastore, path);
     }
 
     private static void mergeDataWithinTransaction(final DOMDataWriteTransaction tx,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext) {
-        LOG.trace("Merge {} within Restconf PATCH: {} with payload {}", datastore.name(), path, payload);
+        LOG.trace("Merge {} within Restconf Patch: {} with payload {}", datastore.name(), path, payload);
         ensureParentsByMerge(datastore, path, tx, schemaContext);
 
         // Since YANG Patch provides the option to specify what kind of operation for each edit,
@@ -1253,14 +1260,14 @@ public class BrokerFacade {
         tx.merge(store, rootNormalizedPath, parentStructure);
     }
 
-    private static final class PATCHStatusContextHelper {
-        PATCHStatusContext status;
+    private static final class PatchStatusContextHelper {
+        PatchStatusContext status;
 
-        public PATCHStatusContext getStatus() {
+        public PatchStatusContext getStatus() {
             return this.status;
         }
 
-        public void setStatus(final PATCHStatusContext status) {
+        public void setStatus(final PatchStatusContext status) {
             this.status = status;
         }
     }
