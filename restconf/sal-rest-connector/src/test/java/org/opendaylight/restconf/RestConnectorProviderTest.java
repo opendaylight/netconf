@@ -30,7 +30,7 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 
 /**
- * Unit tests for {@link RestConnectorProvider}
+ * Unit tests for {@link RestConnectorProvider}.
  */
 public class RestConnectorProviderTest {
     // service under test
@@ -61,6 +61,7 @@ public class RestConnectorProviderTest {
     /**
      * Test for successful registration with {@link RestConnectorProvider#onSessionInitiated(Broker.ProviderSession)}
      * when all conditions are satisfied.
+     *
      * <p>
      * Condition 1: <code>Broker.ProviderSession</code> contains <code>SchemaService</code>
      * Condition 2: <code>Broker.ProviderSession</code> contains <code>DOMMountPointService</code>
@@ -87,6 +88,7 @@ public class RestConnectorProviderTest {
     /**
      * Test for successful registration with {@link RestConnectorProvider#onSessionInitiated(Broker.ProviderSession)}
      * without <code>DOMMountPointService</code>.
+     *
      * <p>
      * Condition 1: <code>Broker.ProviderSession</code> contains <code>SchemaService</code>
      * Condition 2: <code>Broker.ProviderSession</code> does not contain <code>DOMMountPointService</code>

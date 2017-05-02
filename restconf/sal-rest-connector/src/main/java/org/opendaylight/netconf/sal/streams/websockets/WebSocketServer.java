@@ -39,7 +39,7 @@ public class WebSocketServer implements Runnable {
     }
 
     /**
-     * Create singleton instance of {@link WebSocketServer}
+     * Create singleton instance of {@link WebSocketServer}.
      *
      * @param port TCP port used for this server
      * @return instance of {@link WebSocketServer}
@@ -53,6 +53,8 @@ public class WebSocketServer implements Runnable {
     }
 
     /**
+     * Get the websocket of TCP port.
+     *
      * @return websocket TCP port
      */
     public int getPort() {
@@ -60,7 +62,7 @@ public class WebSocketServer implements Runnable {
     }
 
     /**
-     * Get instance of {@link WebSocketServer} created by {@link #createInstance(int)}
+     * Get instance of {@link WebSocketServer} created by {@link #createInstance(int)}.
      *
      * @return instance of {@link WebSocketServer}
      */
@@ -70,7 +72,7 @@ public class WebSocketServer implements Runnable {
     }
 
     /**
-     * Destroy the existing instance
+     * Destroy the existing instance.
      */
     public static void destroyInstance() {
         Preconditions.checkState(instance != null, "createInstance() must be called prior to destroyInstance()");

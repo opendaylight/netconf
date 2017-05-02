@@ -16,12 +16,13 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 
 /**
- * Constants for RestconfDataService
+ * Constants for RestconfDataService.
  *
  */
 public final class RestconfDataServiceConstant {
 
     public static final QName NETCONF_BASE_QNAME;
+
     static {
         try {
             NETCONF_BASE_QNAME = QName.create(
@@ -38,7 +39,7 @@ public final class RestconfDataServiceConstant {
     }
 
     /**
-     * Constants for read data
+     * Constants for read data.
      *
      */
     public final class ReadData {
@@ -66,7 +67,7 @@ public final class RestconfDataServiceConstant {
     }
 
     /**
-     * Constants for data to put
+     * Constants for data to put.
      *
      */
     public final class PutData {
@@ -80,7 +81,7 @@ public final class RestconfDataServiceConstant {
     }
 
     /**
-     * Constants for data to post
+     * Constants for data to post.
      *
      */
     public final class PostData {
@@ -92,7 +93,7 @@ public final class RestconfDataServiceConstant {
     }
 
     /**
-     * Constants for data to delete
+     * Constants for data to delete.
      *
      */
     public final class DeleteData {
@@ -104,11 +105,11 @@ public final class RestconfDataServiceConstant {
     }
 
     /**
-     * Constants for data to yang patch
+     * Constants for data to yang patch.
      *
      */
     public final class PatchData {
-        public static final String PATCH_TX_TYPE = "PATCH";
+        public static final String PATCH_TX_TYPE = "Patch";
 
         private PatchData() {
             throw new UnsupportedOperationException("Util class.");

@@ -23,14 +23,14 @@ public class RestconfApplication extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-        return ImmutableSet.<Class<?>> builder()
+        return ImmutableSet.<Class<?>>builder()
                 .add(RestconfDocumentedExceptionMapper.class)
                 .add(XmlNormalizedNodeBodyReader.class)
                 .add(JsonNormalizedNodeBodyReader.class)
-                .add(JsonToPATCHBodyReader.class)
-                .add(XmlToPATCHBodyReader.class)
-                .add(PATCHJsonBodyWriter.class)
-                .add(PATCHXmlBodyWriter.class)
+                .add(JsonToPatchBodyReader.class)
+                .add(XmlToPatchBodyReader.class)
+                .add(PatchJsonBodyWriter.class)
+                .add(PatchXmlBodyWriter.class)
                 .add(NormalizedNodeJsonBodyWriter.class)
                 .add(NormalizedNodeXmlBodyWriter.class)
                 .add(SchemaExportContentYinBodyWriter.class)

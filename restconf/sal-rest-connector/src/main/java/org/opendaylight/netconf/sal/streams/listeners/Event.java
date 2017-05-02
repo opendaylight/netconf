@@ -24,7 +24,7 @@ class Event {
      * @param type
      *            EventType
      */
-    public Event(final EventType type) {
+    Event(final EventType type) {
         this.type = type;
     }
 

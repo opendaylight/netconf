@@ -197,7 +197,7 @@ public class ReadDataTransactionUtilTest {
     }
 
     /**
-     * Test of parsing default parameters from URI request
+     * Test of parsing default parameters from URI request.
      */
     @Test
     public void parseUriParametersDefaultTest() {
@@ -218,7 +218,7 @@ public class ReadDataTransactionUtilTest {
     }
 
     /**
-     * Test of parsing user defined parameters from URI request
+     * Test of parsing user defined parameters from URI request.
      */
     @Test
     public void parseUriParametersUserDefinedTest() {

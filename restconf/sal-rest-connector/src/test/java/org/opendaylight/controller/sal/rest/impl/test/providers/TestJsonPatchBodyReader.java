@@ -16,19 +16,19 @@ import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.netconf.sal.rest.impl.JsonToPATCHBodyReader;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
+import org.opendaylight.netconf.sal.rest.impl.JsonToPatchBodyReader;
+import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
-public class TestJsonPATCHBodyReader extends AbstractBodyReaderTest {
+public class TestJsonPatchBodyReader extends AbstractBodyReaderTest {
 
-    private final JsonToPATCHBodyReader jsonPATCHBodyReader;
+    private final JsonToPatchBodyReader jsonToPatchBodyReader;
     private static SchemaContext schemaContext;
 
-    public TestJsonPATCHBodyReader() throws NoSuchFieldException, SecurityException {
+    public TestJsonPatchBodyReader() throws NoSuchFieldException, SecurityException {
         super();
-        jsonPATCHBodyReader = new JsonToPATCHBodyReader();
+        jsonToPatchBodyReader = new JsonToPatchBodyReader();
     }
 
     @Override
@@ -39,52 +39,52 @@ public class TestJsonPATCHBodyReader extends AbstractBodyReaderTest {
     @BeforeClass
     public static void initialization() {
         schemaContext = schemaContextLoader("/instanceidentifier/yang", schemaContext);
-        controllerContext.setSchemas(schemaContext);
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test
-    public void modulePATCHDataTest() throws Exception {
+    public void modulePatchDataTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1/leaf1";
-        mockBodyReader(uri, jsonPATCHBodyReader, false);
+        mockBodyReader(uri, jsonToPatchBodyReader, false);
 
         final InputStream inputStream = TestJsonBodyReader.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHdata.json");
 
-        final PATCHContext returnValue = jsonPATCHBodyReader
+        final PatchContext returnValue = jsonToPatchBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
-        checkPATCHContext(returnValue);
+        checkPatchContext(returnValue);
     }
 
     /**
-     * Test of successful PATCH consisting of create and delete PATCH operations.
+     * Test of successful Patch consisting of create and delete Patch operations.
      */
     @Test
-    public void modulePATCHCreateAndDeleteTest() throws Exception {
+    public void modulePatchCreateAndDeleteTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1/leaf1";
-        mockBodyReader(uri, jsonPATCHBodyReader, false);
+        mockBodyReader(uri, jsonToPatchBodyReader, false);
 
         final InputStream inputStream = TestJsonBodyReader.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHdataCreateAndDelete.json");
 
-        final PATCHContext returnValue = jsonPATCHBodyReader
+        final PatchContext returnValue = jsonToPatchBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
-        checkPATCHContext(returnValue);
+        checkPatchContext(returnValue);
     }
 
     /**
-     * Test trying to use PATCH create operation which requires value without value. Test should fail with
+     * Test trying to use Patch create operation which requires value without value. Test should fail with
      * {@link RestconfDocumentedException} with error code 400.
      */
     @Test
-    public void modulePATCHValueMissingNegativeTest() throws Exception {
+    public void modulePatchValueMissingNegativeTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1/leaf1";
-        mockBodyReader(uri, jsonPATCHBodyReader, false);
+        mockBodyReader(uri, jsonToPatchBodyReader, false);
 
         final InputStream inputStream = TestJsonBodyReader.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHdataValueMissing.json");
 
         try {
-            jsonPATCHBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+            jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
             fail("Test should return error 400 due to missing value node when attempt to invoke create operation");
         } catch (final RestconfDocumentedException e) {
             assertEquals("Error code 400 expected", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
@@ -92,19 +92,19 @@ public class TestJsonPATCHBodyReader extends AbstractBodyReaderTest {
     }
 
     /**
-     * Test trying to use value with PATCH delete operation which does not support value. Test should fail with
+     * Test trying to use value with Patch delete operation which does not support value. Test should fail with
      * {@link RestconfDocumentedException} with error code 400.
      */
     @Test
-    public void modulePATCHValueNotSupportedNegativeTest() throws Exception {
+    public void modulePatchValueNotSupportedNegativeTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1/leaf1";
-        mockBodyReader(uri, jsonPATCHBodyReader, false);
+        mockBodyReader(uri, jsonToPatchBodyReader, false);
 
         final InputStream inputStream = TestJsonBodyReader.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHdataValueNotSupported.json");
 
         try {
-            jsonPATCHBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+            jsonToPatchBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
             fail("Test should return error 400 due to present value node when attempt to invoke delete operation");
         } catch (final RestconfDocumentedException e) {
             assertEquals("Error code 400 expected", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
@@ -112,66 +112,66 @@ public class TestJsonPATCHBodyReader extends AbstractBodyReaderTest {
     }
 
     /**
-     * Test using PATCH when target is completely specified in request URI and thus target leaf contains only '/' sign.
+     * Test using Patch when target is completely specified in request URI and thus target leaf contains only '/' sign.
      */
     @Test
-    public void modulePATCHCompleteTargetInURITest() throws Exception {
+    public void modulePatchCompleteTargetInURITest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont";
-        mockBodyReader(uri, jsonPATCHBodyReader, false);
+        mockBodyReader(uri, jsonToPatchBodyReader, false);
 
         final InputStream inputStream = TestJsonBodyReader.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHdataCompleteTargetInURI.json");
 
-        final PATCHContext returnValue = jsonPATCHBodyReader
+        final PatchContext returnValue = jsonToPatchBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
-        checkPATCHContext(returnValue);
+        checkPatchContext(returnValue);
     }
 
     /**
-     * Test of Yang PATCH merge operation on list. Test consists of two edit operations - replace and merge.
+     * Test of Yang Patch merge operation on list. Test consists of two edit operations - replace and merge.
      */
     @Test
-    public void modulePATCHMergeOperationOnListTest() throws Exception {
+    public void modulePatchMergeOperationOnListTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1/leaf1";
-        mockBodyReader(uri, jsonPATCHBodyReader, false);
+        mockBodyReader(uri, jsonToPatchBodyReader, false);
 
         final InputStream inputStream = TestJsonBodyReader.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHMergeOperationOnList.json");
 
-        final PATCHContext returnValue = jsonPATCHBodyReader
+        final PatchContext returnValue = jsonToPatchBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
-        checkPATCHContext(returnValue);
+        checkPatchContext(returnValue);
     }
 
     /**
-     * Test of Yang PATCH merge operation on container. Test consists of two edit operations - create and merge.
+     * Test of Yang Patch merge operation on container. Test consists of two edit operations - create and merge.
      */
     @Test
-    public void modulePATCHMergeOperationOnContainerTest() throws Exception {
+    public void modulePatchMergeOperationOnContainerTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont";
-        mockBodyReader(uri, jsonPATCHBodyReader, false);
+        mockBodyReader(uri, jsonToPatchBodyReader, false);
 
         final InputStream inputStream = TestJsonBodyReader.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHMergeOperationOnContainer.json");
 
-        final PATCHContext returnValue = jsonPATCHBodyReader
+        final PatchContext returnValue = jsonToPatchBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
-        checkPATCHContext(returnValue);
+        checkPatchContext(returnValue);
     }
 
     /**
-     * Test reading simple leaf value
+     * Test reading simple leaf value.
      */
     @Test
-    public void modulePATCHSimpleLeafValueTest() throws Exception {
+    public void modulePatchSimpleLeafValueTest() throws Exception {
         final String uri = "instance-identifier-patch-module:patch-cont/my-list1/leaf1";
-        mockBodyReader(uri, jsonPATCHBodyReader, false);
+        mockBodyReader(uri, jsonToPatchBodyReader, false);
 
         final InputStream inputStream = TestJsonBodyReader.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHSimpleLeafValue.json");
 
-        final PATCHContext returnValue = jsonPATCHBodyReader
+        final PatchContext returnValue = jsonToPatchBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
-        checkPATCHContext(returnValue);
+        checkPatchContext(returnValue);
     }
 }
