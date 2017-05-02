@@ -29,11 +29,11 @@ public final class TransactionVarsWrapper {
      * from DS - config + state).
      *
      * @param instanceIdentifier
-     *            - {@link InstanceIdentifierContext} of data for transaction
+     *             {@link InstanceIdentifierContext} of data for transaction
      * @param mountPoint
-     *            - mount point if is present
+     *             mount point if is present
      * @param transactionChain
-     *            - transaction chain for creating specific type of transaction
+     *             transaction chain for creating specific type of transaction
      *            in specific operation
      */
     public TransactionVarsWrapper(final InstanceIdentifierContext<?> instanceIdentifier, final DOMMountPoint mountPoint,
@@ -44,7 +44,7 @@ public final class TransactionVarsWrapper {
     }
 
     /**
-     * Get instance identifier of data
+     * Get instance identifier of data.
      *
      * @return {@link InstanceIdentifierContext}
      */
@@ -53,7 +53,7 @@ public final class TransactionVarsWrapper {
     }
 
     /**
-     * Get mount point
+     * Get mount point.
      *
      * @return {@link DOMMountPoint}
      */
@@ -65,7 +65,7 @@ public final class TransactionVarsWrapper {
      * Set {@link LogicalDatastoreType} of data for transaction.
      *
      * @param configuration
-     *            - {@link LogicalDatastoreType}
+     *             {@link LogicalDatastoreType}
      */
     public void setLogicalDatastoreType(final LogicalDatastoreType configuration) {
         this.configuration = configuration;
@@ -83,7 +83,7 @@ public final class TransactionVarsWrapper {
 
     /**
      * Get transaction chain for creating specific transaction for specific
-     * operation
+     * operation.
      *
      * @return transaction chain
      */

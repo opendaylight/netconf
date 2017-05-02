@@ -37,8 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Util class for parsing identifier
- *
+ * Util class for parsing identifier.
  */
 public final class ParserIdentifier {
 
@@ -81,7 +80,8 @@ public final class ParserIdentifier {
             final String mountPointId = pathsIt.next();
             final YangInstanceIdentifier mountYangInstanceIdentifier = IdentifierCodec.deserialize(
                     mountPointId, schemaContext);
-            final Optional<DOMMountPoint> mountPoint = mountPointService.get().getMountPoint(mountYangInstanceIdentifier);
+            final Optional<DOMMountPoint> mountPoint =
+                    mountPointService.get().getMountPoint(mountYangInstanceIdentifier);
 
             if (!mountPoint.isPresent()) {
                 throw new RestconfDocumentedException(
@@ -113,12 +113,15 @@ public final class ParserIdentifier {
             final YangInstanceIdentifier deserialize = IdentifierCodec.deserialize(identifier, schemaContext);
             final DataSchemaContextNode<?> child = DataSchemaContextTree.from(schemaContext).getChild(deserialize);
 
-            if(child != null){
-                return new InstanceIdentifierContext<SchemaNode>(deserialize, child.getDataSchemaNode(), null, schemaContext);
+            if (child != null) {
+                return new InstanceIdentifierContext<SchemaNode>(
+                            deserialize, child.getDataSchemaNode(), null, schemaContext);
             }
             final QName rpcQName = deserialize.getLastPathArgument().getNodeType();
             RpcDefinition def = null;
-            for (final RpcDefinition rpcDefinition : schemaContext.findModuleByNamespaceAndRevision(rpcQName.getNamespace(), rpcQName.getRevision()).getRpcs()) {
+            for (final RpcDefinition rpcDefinition
+                    : schemaContext.findModuleByNamespaceAndRevision(rpcQName.getNamespace(),
+                        rpcQName.getRevision()).getRpcs()) {
                 if (rpcDefinition.getQName().getLocalName().equals(rpcQName.getLocalName())) {
                     def = rpcDefinition;
                     break;
@@ -129,11 +132,11 @@ public final class ParserIdentifier {
     }
 
     /**
-     * Make {@link String} from {@link YangInstanceIdentifier}
+     * Make {@link String} from {@link YangInstanceIdentifier}.
      *
-     * @param instanceIdentifier
-     * @param schemaContext
-     * @return
+     * @param instanceIdentifier    Instance identifier
+     * @param schemaContext         Schema context
+     * @return                      Yang instance identifier serialized to String
      */
     public static String stringFromYangInstanceIdentifier(final YangInstanceIdentifier instanceIdentifier,
             final SchemaContext schemaContext) {
@@ -141,10 +144,10 @@ public final class ParserIdentifier {
     }
 
     /**
-     * Make a {@link QName} from identifier
+     * Make a {@link QName} from identifier.
      *
      * @param identifier
-     *            - path parameter
+     *             path parameter
      * @return {@link QName}
      */
     public static QName makeQNameFromIdentifier(final String identifier) {
@@ -189,14 +192,14 @@ public final class ParserIdentifier {
     /**
      * Parsing {@link Module} module by {@link String} module name and
      * {@link Date} revision and from the parsed module create
-     * {@link SchemaExportContext}
+     * {@link SchemaExportContext}.
      *
      * @param schemaContext
-     *            - {@link SchemaContext}
+     *             {@link SchemaContext}
      * @param identifier
-     *            - path parameter
+     *             path parameter
      * @param domMountPointService
-     *            - {@link DOMMountPointService}
+     *             {@link DOMMountPointService}
      * @return {@link SchemaExportContext}
      */
     public static SchemaExportContext toSchemaExportContextFromIdentifier(final SchemaContext schemaContext,

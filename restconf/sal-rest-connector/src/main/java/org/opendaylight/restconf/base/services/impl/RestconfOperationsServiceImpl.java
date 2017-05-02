@@ -40,7 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link RestconfOperationsService}
+ * Implementation of {@link RestconfOperationsService}.
  *
  */
 public class RestconfOperationsServiceImpl implements RestconfOperationsService {
@@ -51,12 +51,12 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
     private final DOMMountPointServiceHandler domMountPointServiceHandler;
 
     /**
-     * Set {@link SchemaContextHandler} for getting actual {@link SchemaContext}
+     * Set {@link SchemaContextHandler} for getting actual {@link SchemaContext}.
      *
      * @param schemaContextHandler
-     *            - handling schema context
+     *             handling schema context
      * @param domMountPointServiceHandler
-     *            - handling dom mount point service
+     *             handling dom mount point service
      */
     public RestconfOperationsServiceImpl(final SchemaContextHandler schemaContextHandler,
             final DOMMountPointServiceHandler domMountPointServiceHandler) {
@@ -98,9 +98,9 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
      * of schema nodes and module.
      *
      * @param modules
-     *            - set of modules for get RPCs from every module
+     *             set of modules for get RPCs from every module
      * @param mountPoint
-     *            - mount point, if in use otherwise null
+     *             mount point, if in use otherwise null
      * @return {@link NormalizedNodeContext}
      */
     private static NormalizedNodeContext getOperations(final Set<Module> modules, final DOMMountPoint mountPoint) {

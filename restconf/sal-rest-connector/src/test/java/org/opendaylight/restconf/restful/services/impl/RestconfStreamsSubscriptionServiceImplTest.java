@@ -54,7 +54,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class RestconfStreamsSubscriptionServiceImplTest {
 
-    private static final String uri = "/restconf/18/data/ietf-restconf-monitoring:restconf-state/streams/stream/"
+    private static final String URI = "/restconf/18/data/ietf-restconf-monitoring:restconf-state/streams/stream/"
             + "toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE";
     private static Field listenersByStreamName;
 
@@ -125,7 +125,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
 
     @Test
     public void testSubscribeToStream() throws Exception {
-        final UriBuilder uriBuilder = UriBuilder.fromUri(uri);
+        final UriBuilder uriBuilder = UriBuilder.fromUri(URI);
         final ListenerAdapter createListener = Notificator.createListener(
                 IdentifierCodec.deserialize("toaster:toaster/toasterStatus", this.schemaHandler.get()),
                 "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
@@ -139,13 +139,13 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                         "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
                         this.uriInfo);
         assertEquals(
-                "ws://:8181/data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
-                response.getNewHeaders().get("Location").toString());
+            "ws://:8181/data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
+            response.getNewHeaders().get("Location").toString());
     }
 
     @Test(expected = RestconfDocumentedException.class)
     public void testSubscribeToStreamMissingDatastoreInPath() {
-        final UriBuilder uriBuilder = UriBuilder.fromUri(uri);
+        final UriBuilder uriBuilder = UriBuilder.fromUri(URI);
         doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
@@ -155,7 +155,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
 
     @Test(expected = RestconfDocumentedException.class)
     public void testSubscribeToStreamMissingScopeInPath() {
-        final UriBuilder uriBuilder = UriBuilder.fromUri(uri);
+        final UriBuilder uriBuilder = UriBuilder.fromUri(URI);
         doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,

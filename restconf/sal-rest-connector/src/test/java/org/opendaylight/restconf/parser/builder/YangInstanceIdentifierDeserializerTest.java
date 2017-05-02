@@ -31,7 +31,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
- * Unit tests for {@link YangInstanceIdentifierDeserializer}
+ * Unit tests for {@link YangInstanceIdentifierDeserializer}.
  */
 public class YangInstanceIdentifierDeserializerTest {
 
@@ -49,7 +49,7 @@ public class YangInstanceIdentifierDeserializerTest {
 
     /**
      * Test of deserialization <code>String</code> URI with container to
-     * <code>Iterable<YangInstanceIdentifier.PathArgument></code>.
+     * {@code Iterable<YangInstanceIdentifier.PathArgument>}.
      */
     @Test
     public void deserializeContainerTest() {
@@ -64,7 +64,7 @@ public class YangInstanceIdentifierDeserializerTest {
 
     /**
      * Test of deserialization <code>String</code> URI with container containing leaf to
-     * <code>Iterable<YangInstanceIdentifier.PathArgument></code>.
+     * {@code Iterable<YangInstanceIdentifier.PathArgument>}.
      */
     @Test
     public void deserializeContainerWithLeafTest() {
@@ -84,7 +84,7 @@ public class YangInstanceIdentifierDeserializerTest {
 
     /**
      * Test of deserialization <code>String</code> URI with container containing list with leaf list to
-     * <code>Iterable<YangInstanceIdentifier.PathArgument></code>.
+     * {@code Iterable<YangInstanceIdentifier.PathArgument>}.
      */
     @Test
     public void deserializeContainerWithListWithLeafListTest() {
@@ -122,7 +122,7 @@ public class YangInstanceIdentifierDeserializerTest {
 
     /**
      * Test of deserialization <code>String</code> URI containing list with no keys to
-     * <code>Iterable<YangInstanceIdentifier.PathArgument></code>.
+     * {@code Iterable<YangInstanceIdentifier.PathArgument>}.
      */
     @Test
     public void deserializeListWithNoKeysTest() {
@@ -144,7 +144,7 @@ public class YangInstanceIdentifierDeserializerTest {
 
     /**
      * Test of deserialization <code>String</code> URI containing list with one key to
-     * <code>Iterable<YangInstanceIdentifier.PathArgument></code>.
+     * {@code Iterable<YangInstanceIdentifier.PathArgument>}.
      */
     @Test
     public void deserializeListWithOneKeyTest() {
@@ -166,7 +166,7 @@ public class YangInstanceIdentifierDeserializerTest {
 
     /**
      * Test of deserialization <code>String</code> URI containing list with multiple keys to
-     * <code>Iterable<YangInstanceIdentifier.PathArgument></code>.
+     * {@code Iterable<YangInstanceIdentifier.PathArgument>}.
      */
     @Test
     public void deserializeListWithMultipleKeysTest() {
@@ -193,7 +193,7 @@ public class YangInstanceIdentifierDeserializerTest {
 
     /**
      * Test of deserialization <code>String</code> URI containing leaf list to
-     * <code>Iterable<YangInstanceIdentifier.PathArgument></code>.
+     * {@code Iterable<YangInstanceIdentifier.PathArgument>}.
      */
     @Test
     public void deserializeLeafListTest() {
@@ -360,7 +360,8 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void prepareQnameNotValidListNameNegativeTest() {
         try {
-            YangInstanceIdentifierDeserializer.create(this.schemaContext, "deserializer-test:list-no-key/disabled=false");
+            YangInstanceIdentifierDeserializer
+                    .create(this.schemaContext, "deserializer-test:list-no-key/disabled=false");
             fail("Test should fail due to unknown child node in list");
         } catch (final RestconfDocumentedException e) {
             assertEquals("Not expected error type",
@@ -389,7 +390,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializeKeysEndsWithComaNegativeTest() {
         this.thrown.expect(IllegalArgumentException.class);
-        YangInstanceIdentifierDeserializer.create( this.schemaContext,
+        YangInstanceIdentifierDeserializer.create(this.schemaContext,
                 "deserializer-test:list-multiple-keys=value,100,false,");
     }
 

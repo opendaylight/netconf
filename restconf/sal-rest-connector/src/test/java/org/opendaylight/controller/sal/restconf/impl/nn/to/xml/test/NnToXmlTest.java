@@ -60,7 +60,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     @BeforeClass
     public static void initialization() {
         schemaContext = schemaContextLoader("/nn-to-xml/yang", schemaContext);
-        controllerContext.setSchemas(schemaContext);
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test
@@ -193,10 +193,10 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     public void nnAsYangBitsToXmlTest() throws Exception {
         final BitsTypeDefinition.Bit mockBit1 = Mockito.mock(BitsTypeDefinition.Bit.class);
         Mockito.when(mockBit1.getName()).thenReturn("one");
-        Mockito.when(mockBit1.getPosition()).thenReturn(1l);
+        Mockito.when(mockBit1.getPosition()).thenReturn(1L);
         final BitsTypeDefinition.Bit mockBit2 = Mockito.mock(BitsTypeDefinition.Bit.class);
         Mockito.when(mockBit2.getName()).thenReturn("two");
-        Mockito.when(mockBit2.getPosition()).thenReturn(2l);
+        Mockito.when(mockBit2.getPosition()).thenReturn(2L);
         final BitsTypeBuilder bitsTypeBuilder = BaseTypes.bitsTypeBuilder(Mockito.mock(SchemaPath.class));
         bitsTypeBuilder.addBit(mockBit1);
         bitsTypeBuilder.addBit(mockBit2);
@@ -246,10 +246,10 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     public void nnAsYangUnionToXmlTest() throws Exception {
         final BitsTypeDefinition.Bit mockBit1 = Mockito.mock(BitsTypeDefinition.Bit.class);
         Mockito.when(mockBit1.getName()).thenReturn("first");
-        Mockito.when(mockBit1.getPosition()).thenReturn(1l);
+        Mockito.when(mockBit1.getPosition()).thenReturn(1L);
         final BitsTypeDefinition.Bit mockBit2 = Mockito.mock(BitsTypeDefinition.Bit.class);
         Mockito.when(mockBit2.getName()).thenReturn("second");
-        Mockito.when(mockBit2.getPosition()).thenReturn(2l);
+        Mockito.when(mockBit2.getPosition()).thenReturn(2L);
 
         final BitsTypeBuilder bitsTypeBuilder = BaseTypes.bitsTypeBuilder(Mockito.mock(SchemaPath.class));
         bitsTypeBuilder.addBit(mockBit1);

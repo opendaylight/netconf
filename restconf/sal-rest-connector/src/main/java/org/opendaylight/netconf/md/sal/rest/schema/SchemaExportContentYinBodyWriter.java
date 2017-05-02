@@ -33,18 +33,18 @@ public class SchemaExportContentYinBodyWriter implements MessageBodyWriter<Schem
     }
 
     @Override
-    public long getSize(final SchemaExportContext t, final Class<?> type, final Type genericType,
+    public long getSize(final SchemaExportContext context, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(final SchemaExportContext t, final Class<?> type, final Type genericType,
+    public void writeTo(final SchemaExportContext context, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType,
             final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws IOException,
             WebApplicationException {
         try {
-            YinExportUtils.writeModuleToOutputStream(t.getSchemaContext(), t.getModule(), entityStream);
+            YinExportUtils.writeModuleToOutputStream(context.getSchemaContext(), context.getModule(), entityStream);
         } catch (final XMLStreamException e) {
             throw new IllegalStateException(e);
         }

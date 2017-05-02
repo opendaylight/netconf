@@ -42,15 +42,6 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-/**
- * sal-rest-connector org.opendaylight.controller.sal.rest.impl.test.providers
- *
- *
- *
- * @author <a href="mailto:vdemcak@cisco.com">Vaclav Demcak</a>
- *
- *         Created: Mar 11, 2015
- */
 public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
 
     private final JsonNormalizedNodeBodyReader jsonBodyReader;
@@ -91,7 +82,7 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
                 .thenReturn(Optional.of(mountInstance));
 
         ControllerContext.getInstance().setMountService(mockMountService);
-        controllerContext.setSchemas(schemaContext);
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test
@@ -170,7 +161,7 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
 
     protected void checkExpectValueNormalizeNodeContext(
             final DataSchemaNode dataSchemaNode,
-            final NormalizedNodeContext nnContext, final QName qName) {
+            final NormalizedNodeContext nnContext, final QName qualifiedName) {
         YangInstanceIdentifier dataNodeIdent = YangInstanceIdentifier
                 .of(dataSchemaNode.getQName());
         final DOMMountPoint mountPoint = nnContext
@@ -179,9 +170,9 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
                 .getSchemaContext().getDataChildByName(
                         dataSchemaNode.getQName());
         assertNotNull(mountDataSchemaNode);
-        if ((qName != null) && (dataSchemaNode instanceof DataNodeContainer)) {
+        if ((qualifiedName != null) && (dataSchemaNode instanceof DataNodeContainer)) {
             final DataSchemaNode child = ((DataNodeContainer) dataSchemaNode)
-                    .getDataChildByName(qName);
+                    .getDataChildByName(qualifiedName);
             dataNodeIdent = YangInstanceIdentifier.builder(dataNodeIdent)
                     .node(child.getQName()).build();
             assertTrue(nnContext.getInstanceIdentifierContext().getSchemaNode()

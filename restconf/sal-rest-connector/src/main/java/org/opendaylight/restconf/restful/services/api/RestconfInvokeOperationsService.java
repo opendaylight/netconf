@@ -28,15 +28,15 @@ import org.opendaylight.restconf.utils.RestconfConstants;
 public interface RestconfInvokeOperationsService {
 
     /**
-     * Invoke RPC operation
+     * Invoke RPC operation.
      *
      * @param identifier
-     *            - module name and rpc identifier string for the desired
+     *             module name and rpc identifier string for the desired
      *            operation
      * @param payload
-     *            - {@link NormalizedNodeContext} - the body of the operation
+     *             {@link NormalizedNodeContext} - the body of the operation
      * @param uriInfo
-     *            - URI info
+     *             URI info
      * @return {@link NormalizedNodeContext}
      */
     @POST

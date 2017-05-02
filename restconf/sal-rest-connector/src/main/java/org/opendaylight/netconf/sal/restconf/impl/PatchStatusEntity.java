@@ -10,13 +10,13 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import java.util.List;
 
-public class PATCHStatusEntity {
+public class PatchStatusEntity {
 
     private final String editId;
     private final List<RestconfError> editErrors;
     private final boolean ok;
 
-    public PATCHStatusEntity(final String editId, final boolean ok, final List<RestconfError> editErrors) {
+    public PatchStatusEntity(final String editId, final boolean ok, final List<RestconfError> editErrors) {
         this.editId = editId;
         this.ok = ok;
         this.editErrors = editErrors;

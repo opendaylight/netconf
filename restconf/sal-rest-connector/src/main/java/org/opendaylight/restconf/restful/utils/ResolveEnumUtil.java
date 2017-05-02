@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.restful.utils;
 
 /**
- * Common util class for resolve enum from String
+ * Common util class for resolve enum from String.
  *
  */
 public final class ResolveEnumUtil {
@@ -21,9 +21,9 @@ public final class ResolveEnumUtil {
      * Resolve specific type of enum by value.
      *
      * @param clazz
-     *            - enum
+     *             enum
      * @param value
-     *            - string of enum
+     *             string of enum
      * @return - enum
      */
     public static <T> T resolveEnum(final Class<T> clazz, final String value) {

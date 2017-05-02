@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Features of subscribing part of both notifications
+ * Features of subscribing part of both notifications.
  */
 abstract class AbstractCommonSubscriber extends AbstractQueryParams implements BaseListenerInterface {
 
@@ -33,7 +33,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
     private ListenerRegistration registration;
 
     /**
-     * Creating {@link EventBus}
+     * Creating {@link EventBus}.
      */
     protected AbstractCommonSubscriber() {
         this.eventBus = new AsyncEventBus(Executors.newSingleThreadExecutor());
@@ -78,7 +78,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
      * Creates event of type {@link EventType#DEREGISTER}, sets {@link Channel}
      * subscriber to the event and posts event into event bus.
      *
-     * @param subscriber
+     * @param subscriber subscriber channel
      */
     public void removeSubscriber(final Channel subscriber) {
         LOG.debug("Subscriber {} is removed.", subscriber.remoteAddress());
@@ -109,10 +109,10 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
 
     /**
      * Creating and registering {@link EventBusChangeRecorder} of specific
-     * listener on {@link EventBus}
+     * listener on {@link EventBus}.
      *
      * @param listener
-     *            - specific listener of notifications
+     *            specific listener of notifications
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected <T extends BaseListenerInterface> void register(final T listener) {
@@ -121,10 +121,10 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
     }
 
     /**
-     * Post event to event bus
+     * Post event to event bus.
      *
      * @param event
-     *            - data of incoming notifications
+     *            data of incoming notifications
      */
     protected void post(final Event event) {
         this.eventBus.post(event);
@@ -132,7 +132,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
 
     /**
      * Removes all subscribers and unregisters event bus change recorder form
-     * event bus
+     * event bus.
      */
     protected void unregister() {
         this.subscribers.clear();

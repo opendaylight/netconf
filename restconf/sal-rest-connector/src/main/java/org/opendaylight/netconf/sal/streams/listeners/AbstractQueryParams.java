@@ -23,12 +23,13 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
 /**
- * Features of query parameters part of both notifications
+ * Features of query parameters part of both notifications.
  *
  */
 abstract class AbstractQueryParams extends AbstractNotificationsData {
     // FIXME: BUG-7956: switch to using UntrustedXML
     private static final DocumentBuilderFactory DBF;
+
     static {
         final DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
         f.setCoalescing(true);
@@ -59,18 +60,19 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
     }
 
     /**
-     * Set query parameters for listener
+     * Set query parameters for listener.
      *
      * @param start
-     *            - start-time of getting notification
+     *            start-time of getting notification
      * @param stop
-     *            - stop-time of getting notification
+     *            stop-time of getting notification
      * @param filter
-     *            - indicate which subset of all possible events are of interest
+     *            indicate which subset of all possible events are of interest
      * @param leafNodesOnly
-     *            - if true, notifications will contain changes to leaf nodes only
+     *            if true, notifications will contain changes to leaf nodes only
      */
-    public void setQueryParams(final Instant start, final Optional<Instant> stop, final Optional<String> filter, final boolean leafNodesOnly) {
+    public void setQueryParams(final Instant start, final Optional<Instant> stop, final Optional<String> filter,
+                               final boolean leafNodesOnly) {
         this.start = Preconditions.checkNotNull(start);
         this.stop = stop.orElse(null);
         this.filter = filter.orElse(null);
@@ -78,7 +80,7 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
     }
 
     /**
-     * Check whether this query should only notify about leaf node changes
+     * Check whether this query should only notify about leaf node changes.
      *
      * @return true if this query should only notify about leaf node changes
      */
@@ -87,15 +89,14 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
     }
 
     /**
-     * Checking query parameters on specific notification
+     * Checking query parameters on specific notification.
      *
-     * @param xml
-     *            - data of notification
-     * @param listener
-     *            - listener of notification
+     * @param xml       data of notification
+     * @param listener  listener of notification
      * @return true if notification meets the requirements of query parameters,
      *         false otherwise
      */
+    @SuppressWarnings("checkstyle:IllegalCatch")
     protected <T extends BaseListenerInterface> boolean checkQueryParams(final String xml, final T listener) {
         final Instant now = Instant.now();
         if (this.stop != null) {
@@ -121,11 +122,11 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
     }
 
     /**
-     * Check if is filter used and then prepare and post data do client
+     * Check if is filter used and then prepare and post data do client.
      *
-     * @param change
-     *            - data of notification
+     * @param xml   data of notification
      */
+    @SuppressWarnings("checkstyle:IllegalCatch")
     private boolean checkFilter(final String xml) {
         if (this.filter == null) {
             return true;
@@ -139,11 +140,11 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
     }
 
     /**
-     * Parse and evaluate filter value by xml
+     * Parse and evaluate filter value by xml.
      *
      * @return true or false - depends on filter expression and data of
      *         notifiaction
-     * @throws Exception
+     * @throws Exception if operation fails
      */
     private boolean parseFilterParam(final String xml) throws Exception {
         final Document docOfXml = DBF.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));

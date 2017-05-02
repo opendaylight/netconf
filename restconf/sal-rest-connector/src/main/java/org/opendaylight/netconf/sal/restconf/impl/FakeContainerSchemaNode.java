@@ -31,7 +31,8 @@ import org.opendaylight.yangtools.yang.model.api.UsesNode;
  * module.
  */
 class FakeContainerSchemaNode implements ContainerSchemaNode {
-    static final SchemaPath PATH = SchemaPath.create(true, QName.create(FakeRestconfModule.QNAME, "operations").intern());
+    static final SchemaPath PATH =
+            SchemaPath.create(true, QName.create(FakeRestconfModule.QNAME, "operations").intern());
 
     private final Collection<DataSchemaNode> children;
 

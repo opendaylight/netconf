@@ -90,11 +90,11 @@ public final class ReadDataTransactionUtil {
      *
      *
      * @param identifier
-     *            - {@link InstanceIdentifierContext}
+     *             {@link InstanceIdentifierContext}
      * @param uriInfo
-     *            - URI info
+     *             URI info
      * @param tagged
-     *            - set tagged for {@link WriterParameters}
+     *             set tagged for {@link WriterParameters}
      * @return {@link WriterParameters}
      */
     public static @Nonnull WriterParameters parseUriParameters(@Nonnull final InstanceIdentifierContext<?> identifier,
@@ -107,9 +107,9 @@ public final class ReadDataTransactionUtil {
      *
      *
      * @param identifier
-     *            - {@link InstanceIdentifierContext}
+     *             {@link InstanceIdentifierContext}
      * @param uriInfo
-     *            - URI info
+     *             URI info
      * @return {@link WriterParameters}
      */
     public static @Nonnull WriterParameters parseUriParameters(@Nonnull final InstanceIdentifierContext<?> identifier,
@@ -193,9 +193,9 @@ public final class ReadDataTransactionUtil {
      * Read specific type of data from data store via transaction.
      *
      * @param valueOfContent
-     *            - type of data to read (config, state, all)
+     *             type of data to read (config, state, all)
      * @param transactionNode
-     *            - {@link TransactionVarsWrapper} - wrapper for variables
+     *             {@link TransactionVarsWrapper} - wrapper for variables
      * @return {@link NormalizedNode}
      */
     public static @Nullable NormalizedNode<?, ?> readData(@Nonnull final String valueOfContent,
@@ -207,11 +207,11 @@ public final class ReadDataTransactionUtil {
      * Read specific type of data from data store via transaction.
      *
      * @param valueOfContent
-     *            - type of data to read (config, state, all)
+     *             type of data to read (config, state, all)
      * @param transactionNode
-     *            - {@link TransactionVarsWrapper} - wrapper for variables
+     *             {@link TransactionVarsWrapper} - wrapper for variables
      * @param withDefa
-     *            - vaule of with-defaults parameter
+     *             vaule of with-defaults parameter
      * @return {@link NormalizedNode}
      */
     public static @Nullable NormalizedNode<?, ?> readData(@Nonnull final String valueOfContent,
@@ -238,6 +238,58 @@ public final class ReadDataTransactionUtil {
                                 "Invalid content parameter: " + valueOfContent, null,
                                 "The content parameter value must be either config, nonconfig or all (default)"));
         }
+    }
+
+    /**
+     * Read specific type of data from data store via transaction and if identifier read data from
+     * streams then put streams from actual schema context to datastore.
+     *
+     * @param identifier
+     *             identifier of data to read
+     * @param content
+     *             type of data to read (config, state, all)
+     * @param transactionNode
+     *             {@link TransactionVarsWrapper} - wrapper for variables
+     * @param withDefa
+     *             vaule of with-defaults parameter
+     * @param schemaContextRef
+     *             schema context
+     * @param uriInfo
+     *             uri info
+     * @return {@link NormalizedNode}
+     */
+    public static NormalizedNode<?, ?> readData(final String identifier, final String content,
+                                                final TransactionVarsWrapper transactionNode, final String withDefa,
+                                                final SchemaContextRef schemaContextRef, final UriInfo uriInfo) {
+        if (identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
+            final DOMDataReadWriteTransaction wTx = transactionNode.getTransactionChain().newReadWriteTransaction();
+            final SchemaContext schemaContext = schemaContextRef.get();
+            final boolean exist = SubscribeToStreamUtil.checkExist(schemaContext, wTx);
+
+            for (final NotificationDefinition notificationDefinition : schemaContextRef.get().getNotifications()) {
+                final List<NotificationListenerAdapter> notifiStreamXML =
+                        CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContextRef,
+                                NotificationOutputType.XML.getName());
+                final List<NotificationListenerAdapter> notifiStreamJSON =
+                        CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContextRef,
+                                NotificationOutputType.JSON.getName());
+                notifiStreamJSON.addAll(notifiStreamXML);
+
+                for (final NotificationListenerAdapter listener : notifiStreamJSON) {
+                    final URI uri = SubscribeToStreamUtil.prepareUriByStreamName(uriInfo, listener.getStreamName());
+                    final NormalizedNode mapToStreams =
+                            RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
+                                    listener.getSchemaPath().getLastComponent(), schemaContext.getNotifications(),
+                                    null, listener.getOutputType(), uri,
+                                    SubscribeToStreamUtil.getMonitoringModule(schemaContext), exist);
+                    SubscribeToStreamUtil.writeDataToDS(schemaContext,
+                            listener.getSchemaPath().getLastComponent().getLocalName(), wTx, exist,
+                            mapToStreams);
+                }
+            }
+            SubscribeToStreamUtil.submitData(wTx);
+        }
+        return readData(content, transactionNode, withDefa);
     }
 
     private static NormalizedNode<?, ?> prepareDataByParamWithDef(final NormalizedNode<?, ?> result,
@@ -370,7 +422,7 @@ public final class ReadDataTransactionUtil {
      * don't, we have to read all data from DS (state + config)
      *
      * @param transactionNode
-     *            - {@link TransactionVarsWrapper} - wrapper for variables
+     *             {@link TransactionVarsWrapper} - wrapper for variables
      * @return {@link NormalizedNode}
      */
     private static @Nullable NormalizedNode<?, ?> readDataViaTransaction(
@@ -390,8 +442,8 @@ public final class ReadDataTransactionUtil {
      * Read config and state data, then map them.
      *
      * @param transactionNode
-     *            - {@link TransactionVarsWrapper} - wrapper for variables
-     * @param withDefa
+     *             {@link TransactionVarsWrapper} - wrapper for variables
+     * @param withDefa with-defaults parameter
      * @return {@link NormalizedNode}
      */
     private static @Nullable NormalizedNode<?, ?> readAllData(@Nonnull final TransactionVarsWrapper transactionNode,
@@ -433,9 +485,9 @@ public final class ReadDataTransactionUtil {
      * Map data by type of read node.
      *
      * @param stateDataNode
-     *            - data node of state data
+     *             data node of state data
      * @param configDataNode
-     *            - data node of config data
+     *             data node of config data
      * @return {@link NormalizedNode}
      */
     private static @Nonnull NormalizedNode<?, ?> mapNode(@Nonnull final NormalizedNode<?, ?> stateDataNode,
@@ -452,9 +504,9 @@ public final class ReadDataTransactionUtil {
      * Valid of can be data merged together.
      *
      * @param stateDataNode
-     *            - data node of state data
+     *             data node of state data
      * @param configDataNode
-     *            - data node of config data
+     *             data node of config data
      */
     private static void validPossibilityOfMergeNodes(@Nonnull final NormalizedNode<?, ?> stateDataNode,
                                                      @Nonnull final NormalizedNode<?, ?> configDataNode) {
@@ -466,12 +518,12 @@ public final class ReadDataTransactionUtil {
     }
 
     /**
-     * Prepare and map data for rpc
+     * Prepare and map data for rpc.
      *
      * @param configDataNode
-     *            - data node of config data
+     *             data node of config data
      * @param stateDataNode
-     *            - data node of state data
+     *             data node of state data
      * @return {@link NormalizedNode}
      */
     private static @Nonnull NormalizedNode<?, ?> prepareRpcData(@Nonnull final NormalizedNode<?, ?> configDataNode,
@@ -492,9 +544,9 @@ public final class ReadDataTransactionUtil {
      * Map node to map entry builder.
      *
      * @param dataNode
-     *            - data node
+     *             data node
      * @param mapEntryBuilder
-     *            - builder for mapping data
+     *             builder for mapping data
      */
     private static void mapRpcDataNode(@Nonnull final NormalizedNode<?, ?> dataNode,
                                        @Nonnull final DataContainerNodeBuilder<
@@ -503,12 +555,12 @@ public final class ReadDataTransactionUtil {
     }
 
     /**
-     * Prepare and map all data from DS
+     * Prepare and map all data from DS.
      *
      * @param configDataNode
-     *            - data node of config data
+     *             data node of config data
      * @param stateDataNode
-     *            - data node of state data
+     *             data node of state data
      * @return {@link NormalizedNode}
      */
     private static @Nonnull NormalizedNode<?, ?> prepareData(@Nonnull final NormalizedNode<?, ?> configDataNode,
@@ -541,8 +593,8 @@ public final class ReadDataTransactionUtil {
             final DataContainerNodeBuilder<AugmentationIdentifier, AugmentationNode> builder = Builders
                     .augmentationBuilder().withNodeIdentifier(((AugmentationNode) configDataNode).getIdentifier());
 
-            mapValueToBuilder(
-                    ((AugmentationNode) configDataNode).getValue(), ((AugmentationNode) stateDataNode).getValue(), builder);
+            mapValueToBuilder(((AugmentationNode) configDataNode).getValue(),
+                    ((AugmentationNode) stateDataNode).getValue(), builder);
 
             return builder.build();
         } else if (configDataNode instanceof ChoiceNode) {
@@ -564,11 +616,11 @@ public final class ReadDataTransactionUtil {
      * Map value from container node to builder.
      *
      * @param configData
-     *            - collection of config data nodes
+     *             collection of config data nodes
      * @param stateData
-     *            - collection of state data nodes
+     *             collection of state data nodes
      * @param builder
-     *            - builder
+     *             builder
      */
     private static <T extends NormalizedNode<? extends PathArgument, ?>> void mapValueToBuilder(
             @Nonnull final Collection<T> configData,
@@ -591,9 +643,9 @@ public final class ReadDataTransactionUtil {
      * as childs to parent node.
      *
      * @param configMap
-     *            - map of config data nodes
+     *             map of config data nodes
      * @param stateMap
-     *            - map of state data nodes
+     *             map of state data nodes
      * @param builder
      *           - builder
      */
@@ -602,9 +654,9 @@ public final class ReadDataTransactionUtil {
             @Nonnull final Map<PathArgument, T> stateMap,
             @Nonnull final NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
         configMap.entrySet().stream().filter(x -> !stateMap.containsKey(x.getKey())).forEach(
-                y -> builder.addChild(y.getValue()));
+            y -> builder.addChild(y.getValue()));
         stateMap.entrySet().stream().filter(x -> !configMap.containsKey(x.getKey())).forEach(
-                y -> builder.addChild(y.getValue()));
+            y -> builder.addChild(y.getValue()));
     }
 
     /**
@@ -612,9 +664,9 @@ public final class ReadDataTransactionUtil {
      * go one level down with {@code prepareData} method.
      *
      * @param configMap
-     *            - immutable config data
+     *             immutable config data
      * @param stateMap
-     *            - immutable state data
+     *             immutable state data
      * @param builder
      *           - builder
      */
@@ -625,58 +677,6 @@ public final class ReadDataTransactionUtil {
             @Nonnull final NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
         // it is enough to process only config data because operational contains the same data
         configMap.entrySet().stream().filter(x -> stateMap.containsKey(x.getKey())).forEach(
-                y -> builder.addChild((T) prepareData(y.getValue(), stateMap.get(y.getKey()))));
-    }
-
-    /**
-     * Read specific type of data from data store via transaction and if identifier read data from
-     * streams then put streams from actual schema context to datastore.
-     *
-     * @param identifier
-     *            - identifier of data to read
-     * @param content
-     *            - type of data to read (config, state, all)
-     * @param transactionNode
-     *            - {@link TransactionVarsWrapper} - wrapper for variables
-     * @param withDefa
-     *            - vaule of with-defaults parameter
-     * @param schemaContextRef
-     *            - schema context
-     * @param uriInfo
-     *            - uri info
-     * @return {@link NormalizedNode}
-     */
-    public static NormalizedNode<?, ?> readData(final String identifier, final String content,
-            final TransactionVarsWrapper transactionNode, final String withDefa,
-            final SchemaContextRef schemaContextRef, final UriInfo uriInfo) {
-        if (identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
-            final DOMDataReadWriteTransaction wTx = transactionNode.getTransactionChain().newReadWriteTransaction();
-            final SchemaContext schemaContext = schemaContextRef.get();
-            final boolean exist = SubscribeToStreamUtil.checkExist(schemaContext, wTx);
-
-            for (final NotificationDefinition notificationDefinition : schemaContextRef.get().getNotifications()) {
-                final List<NotificationListenerAdapter> notifiStreamXML =
-                        CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContextRef,
-                                NotificationOutputType.XML.getName());
-                final List<NotificationListenerAdapter> notifiStreamJSON =
-                        CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContextRef,
-                                NotificationOutputType.JSON.getName());
-                notifiStreamJSON.addAll(notifiStreamXML);
-
-                for (final NotificationListenerAdapter listener : notifiStreamJSON) {
-                    final URI uri = SubscribeToStreamUtil.prepareUriByStreamName(uriInfo, listener.getStreamName());
-                    final NormalizedNode mapToStreams =
-                            RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
-                                    listener.getSchemaPath().getLastComponent(), schemaContext.getNotifications(),
-                                    null, listener.getOutputType(), uri,
-                                    SubscribeToStreamUtil.getMonitoringModule(schemaContext), exist);
-                    SubscribeToStreamUtil.writeDataToDS(schemaContext,
-                            listener.getSchemaPath().getLastComponent().getLocalName(), wTx, exist,
-                            mapToStreams);
-                }
-            }
-            SubscribeToStreamUtil.submitData(wTx);
-        }
-        return readData(content, transactionNode, withDefa);
+            y -> builder.addChild((T) prepareData(y.getValue(), stateMap.get(y.getKey()))));
     }
 }

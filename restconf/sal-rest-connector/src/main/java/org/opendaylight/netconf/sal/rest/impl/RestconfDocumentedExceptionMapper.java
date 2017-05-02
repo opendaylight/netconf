@@ -75,7 +75,7 @@ import org.slf4j.LoggerFactory;
 @Provider
 public class RestconfDocumentedExceptionMapper implements ExceptionMapper<RestconfDocumentedException> {
 
-    private final static Logger LOG = LoggerFactory.getLogger(RestconfDocumentedExceptionMapper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfDocumentedExceptionMapper.class);
 
     private static final XMLOutputFactory XML_FACTORY;
 
@@ -133,7 +133,8 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         final List<DataSchemaNode> schemaList = ControllerContext.findInstanceDataChildrenByName(errorsSchemaNode,
                 Draft02.RestConfModule.ERROR_LIST_SCHEMA_NODE);
         final DataSchemaNode errListSchemaNode = Iterables.getFirst(schemaList, null);
-        Preconditions.checkState(errListSchemaNode instanceof ListSchemaNode, "Found Error SchemaNode isn't ListSchemaNode");
+        Preconditions.checkState(
+                errListSchemaNode instanceof ListSchemaNode, "Found Error SchemaNode isn't ListSchemaNode");
         final CollectionNodeBuilder<MapEntryNode, MapNode> listErorsBuilder = Builders
                 .mapBuilder((ListSchemaNode) errListSchemaNode);
 
@@ -193,7 +194,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         errNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) errMsgSchemaNode)
                 .withValue(error.getErrorMessage()).build());
 
-        if(error.getErrorInfo() != null) {
+        if (error.getErrorInfo() != null) {
             // Oddly, error-info is defined as an empty container in the restconf yang. Apparently the
             // intention is for implementors to define their own data content so we'll just treat it as a leaf
             // with string data.
@@ -206,7 +207,8 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         return errNodeValues.build();
     }
 
-    private static Object toJsonResponseBody(final NormalizedNodeContext errorsNode, final DataNodeContainer errorsSchemaNode) {
+    private static Object toJsonResponseBody(final NormalizedNodeContext errorsNode,
+                                             final DataNodeContainer errorsSchemaNode) {
         final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         NormalizedNode<?, ?> data = errorsNode.getData();
         final InstanceIdentifierContext<?> context = errorsNode.getInstanceIdentifierContext();
@@ -247,7 +249,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
             @Override
             public void leafNode(final NodeIdentifier name, final Object value) throws IOException {
-                if(name.getNodeType().equals(Draft02.RestConfModule.ERROR_INFO_QNAME)) {
+                if (name.getNodeType().equals(Draft02.RestConfModule.ERROR_INFO_QNAME)) {
                     jsonWriter.name(Draft02.RestConfModule.ERROR_INFO_QNAME.getLocalName());
                     jsonWriter.value(value.toString());
                 } else {
@@ -276,7 +278,8 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
     }
 
-    private static Object toXMLResponseBody(final NormalizedNodeContext errorsNode, final DataNodeContainer errorsSchemaNode) {
+    private static Object toXMLResponseBody(final NormalizedNodeContext errorsNode,
+                                            final DataNodeContainer errorsSchemaNode) {
         final InstanceIdentifierContext<?> pathContext = errorsNode.getInstanceIdentifierContext();
         final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
@@ -314,7 +317,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
             @Override
             public void leafNode(final NodeIdentifier name, final Object value) throws IOException {
-                if(name.getNodeType().equals(Draft02.RestConfModule.ERROR_INFO_QNAME)) {
+                if (name.getNodeType().equals(Draft02.RestConfModule.ERROR_INFO_QNAME)) {
                     String ns = Draft02.RestConfModule.ERROR_INFO_QNAME.getNamespace().toString();
                     try {
                         xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,
@@ -343,15 +346,15 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
                 nnWriter.write(data);
                 nnWriter.flush();
             }
-        }
-        catch (final IOException e) {
+        } catch (final IOException e) {
             LOG.warn("Error writing error response body.", e);
         }
 
         return outStream.toString();
     }
 
-    private static void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter, final ContainerNode data)
+    private static void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter,
+                                         final ContainerNode data)
             throws IOException {
         try {
             final QName name = SchemaContext.NAME;
@@ -367,7 +370,8 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         }
     }
 
-    private static void writeDataRoot(final OutputStreamWriter outputWriter, final NormalizedNodeWriter nnWriter, final ContainerNode data) throws IOException {
+    private static void writeDataRoot(final OutputStreamWriter outputWriter, final NormalizedNodeWriter nnWriter,
+                                      final ContainerNode data) throws IOException {
         final Iterator<DataContainerChild<? extends PathArgument, ?>> iterator = data.getValue().iterator();
         while (iterator.hasNext()) {
             final DataContainerChild<? extends PathArgument, ?> child = iterator.next();
