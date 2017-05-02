@@ -51,12 +51,12 @@ import org.slf4j.LoggerFactory;
  * along with source identifier to
  * ietf-netconf-yang-library/modules-state/module list.
  */
-public class YangLibProvider implements BindingAwareProvider, AutoCloseable, SchemaSourceListener{
+public class YangLibProvider implements BindingAwareProvider, AutoCloseable, SchemaSourceListener {
     private static final Logger LOG = LoggerFactory.getLogger(YangLibProvider.class);
 
     private static final OptionalRevision NO_REVISION = new OptionalRevision("");
     private static final Predicate<PotentialSchemaSource<?>> YANG_SCHEMA_SOURCE =
-            input -> YangTextSchemaSource.class.isAssignableFrom(input.getRepresentation());
+        input -> YangTextSchemaSource.class.isAssignableFrom(input.getRepresentation());
 
     protected DataBroker dataBroker;
     protected SchemaListenerRegistration schemaListenerRegistration;
@@ -94,7 +94,7 @@ public class YangLibProvider implements BindingAwareProvider, AutoCloseable, Sch
     public void schemaSourceRegistered(final Iterable<PotentialSchemaSource<?>> sources) {
         final List<Module> newModules = new ArrayList<>();
 
-        for(PotentialSchemaSource<?> potentialYangSource : Iterables.filter(sources, YANG_SCHEMA_SOURCE)) {
+        for (PotentialSchemaSource<?> potentialYangSource : Iterables.filter(sources, YANG_SCHEMA_SOURCE)) {
             final YangIdentifier moduleName = new YangIdentifier(potentialYangSource.getSourceIdentifier().getName());
 
             final OptionalRevision moduleRevision = getRevisionForModule(potentialYangSource.getSourceIdentifier());
@@ -108,7 +108,7 @@ public class YangLibProvider implements BindingAwareProvider, AutoCloseable, Sch
             newModules.add(newModule);
         }
 
-        if(newModules.isEmpty()) {
+        if (newModules.isEmpty()) {
             // If no new yang modules then do nothing
             return;
         }
@@ -124,15 +124,15 @@ public class YangLibProvider implements BindingAwareProvider, AutoCloseable, Sch
             }
 
             @Override
-            public void onFailure(final Throwable t) {
-                LOG.warn("Unable to update modules state", t);
+            public void onFailure(final Throwable throwable) {
+                LOG.warn("Unable to update modules state", throwable);
             }
         });
     }
 
     @Override
     public void schemaSourceUnregistered(final PotentialSchemaSource<?> source) {
-        if(!YANG_SCHEMA_SOURCE.apply(source)) {
+        if (!YANG_SCHEMA_SOURCE.apply(source)) {
             // if representation of potential schema source is not yang text schema source do nothing
             // we do not want to delete this module entry from module list
             return;
@@ -153,8 +153,8 @@ public class YangLibProvider implements BindingAwareProvider, AutoCloseable, Sch
             }
 
             @Override
-            public void onFailure(final Throwable t) {
-                LOG.warn("Unable to update modules state", t);
+            public void onFailure(final Throwable throwable) {
+                LOG.warn("Unable to update modules state", throwable);
             }
         });
     }

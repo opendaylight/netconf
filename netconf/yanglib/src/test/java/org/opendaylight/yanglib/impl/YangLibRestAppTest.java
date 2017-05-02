@@ -46,6 +46,7 @@ public class YangLibRestAppTest {
 
         assertTrue(singleton.contains(yangLibRestApp.getYangLibService()));
 
-        then(bundleContext).should(times(1)).registerService(eq(YangLibRestAppService.class.getName()), eq(yangLibRestApp), eq(null));
+        then(bundleContext).should(times(1))
+                .registerService(eq(YangLibRestAppService.class.getName()), eq(yangLibRestApp), eq(null));
     }
 }

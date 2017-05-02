@@ -20,11 +20,15 @@ import org.slf4j.LoggerFactory;
 public class YanglibModule extends org.opendaylight.controller.config.yang.yanglib.impl.AbstractYanglibModule {
     private static final Logger LOG = LoggerFactory.getLogger(YanglibModule.class);
 
-    public YanglibModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier, org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
+    public YanglibModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier,
+                         org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
         super(identifier, dependencyResolver);
     }
 
-    public YanglibModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier, org.opendaylight.controller.config.api.DependencyResolver dependencyResolver, org.opendaylight.controller.config.yang.yanglib.impl.YanglibModule oldModule, java.lang.AutoCloseable oldInstance) {
+    public YanglibModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier,
+                         org.opendaylight.controller.config.api.DependencyResolver dependencyResolver,
+                         org.opendaylight.controller.config.yang.yanglib.impl.YanglibModule oldModule,
+                         java.lang.AutoCloseable oldInstance) {
         super(identifier, dependencyResolver, oldModule, oldInstance);
     }
 

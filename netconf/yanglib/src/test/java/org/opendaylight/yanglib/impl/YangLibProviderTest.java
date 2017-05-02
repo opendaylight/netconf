@@ -216,7 +216,8 @@ public class YangLibProviderTest {
 
     private static class TestingYangLibProvider extends YangLibProvider {
 
-        public TestingYangLibProvider(SharedSchemaRepository schemaRepository, String bindingAddress, long bindingPort) {
+        TestingYangLibProvider(
+                SharedSchemaRepository schemaRepository, String bindingAddress, long bindingPort) {
             super(schemaRepository, bindingAddress, bindingPort);
         }
 
