@@ -58,7 +58,7 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
     public static void initialization() throws URISyntaxException {
         schemaContext = schemaContextLoader("/instanceidentifier/yang",
                 schemaContext);
-        controllerContext.setSchemas(schemaContext);
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test

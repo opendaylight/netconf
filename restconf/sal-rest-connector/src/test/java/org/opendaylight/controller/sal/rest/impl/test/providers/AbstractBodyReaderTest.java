@@ -25,12 +25,12 @@ import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
 import org.opendaylight.netconf.sal.rest.impl.AbstractIdentifierAwareJaxRsProvider;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public abstract class AbstractBodyReaderTest {
 
-    protected final static ControllerContext controllerContext = ControllerContext.getInstance();
+    protected static final ControllerContext CONTROLLER_CONTEXT = ControllerContext.getInstance();
     protected final MediaType mediaType;
     private static Field uriField;
     private static Field requestField;
@@ -53,8 +53,8 @@ public abstract class AbstractBodyReaderTest {
         return TestRestconfUtils.loadSchemaContext(yangPath, schemaContext);
     }
 
-    protected static <T extends AbstractIdentifierAwareJaxRsProvider> void mockBodyReader(final String identifier,
-            final T normalizedNodeProvider, final boolean isPost) throws Exception {
+    protected static <T extends AbstractIdentifierAwareJaxRsProvider> void mockBodyReader(
+            final String identifier, final T normalizedNodeProvider, final boolean isPost) throws Exception {
         final UriInfo uriInfoMock = mock(UriInfo.class);
         final MultivaluedMap<String, String> pathParm = new MultivaluedHashMap<>(1);
 
@@ -94,15 +94,15 @@ public abstract class AbstractBodyReaderTest {
         assertNotNull(nnContext.getInstanceIdentifierContext().getSchemaNode());
     }
 
-    protected static void checkPATCHContext(final PATCHContext patchContext) {
+    protected static void checkPatchContext(final PatchContext patchContext) {
         assertNotNull(patchContext.getData());
         assertNotNull(patchContext.getInstanceIdentifierContext().getInstanceIdentifier());
         assertNotNull(patchContext.getInstanceIdentifierContext().getSchemaContext());
         assertNotNull(patchContext.getInstanceIdentifierContext().getSchemaNode());
     }
 
-    protected static void checkPATCHContextMountPoint(final PATCHContext patchContext) {
-        checkPATCHContext(patchContext);
+    protected static void checkPatchContextMountPoint(final PatchContext patchContext) {
+        checkPatchContext(patchContext);
         assertNotNull(patchContext.getInstanceIdentifierContext().getMountPoint());
         assertNotNull(patchContext.getInstanceIdentifierContext().getMountPoint().getSchemaContext());
     }

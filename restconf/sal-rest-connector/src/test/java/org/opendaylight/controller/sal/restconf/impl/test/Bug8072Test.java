@@ -41,7 +41,7 @@ public class Bug8072Test {
     private static final QName TYPE_QNAME = QName.create("test:module", "2014-01-09", "type");
     private static final QName MODULE_TYPE_QNAME = QName.create("test:module", "2014-01-09", "module-type");
 
-    private static final ControllerContext controllerContext = ControllerContext.getInstance();
+    private static final ControllerContext CONTROLLER_CONTEXT = ControllerContext.getInstance();
 
     @BeforeClass
     public static void init() throws FileNotFoundException, ReactorException {
@@ -49,14 +49,14 @@ public class Bug8072Test {
         assertNull(globalContext.findModuleByName(EXTERNAL_MODULE_NAME, null));
         final Set<Module> allModules = globalContext.getModules();
         assertNotNull(allModules);
-        controllerContext.setSchemas(globalContext);
+        CONTROLLER_CONTEXT.setSchemas(globalContext);
     }
 
     @Test
     public void testIdentityRefFromExternalModule() throws FileNotFoundException, ReactorException {
         initMountService();
-        final InstanceIdentifierContext<?> ctx = controllerContext
-            .toInstanceIdentifier("simple-nodes:users/yang-ext:mount/test-module:modules/module/test-module:module-type/name");
+        final InstanceIdentifierContext<?> ctx = CONTROLLER_CONTEXT.toInstanceIdentifier(
+                "simple-nodes:users/yang-ext:mount/test-module:modules/module/test-module:module-type/name");
 
         final Map<QName, Object> keyValues = new HashMap<>();
         keyValues.put(NAME_QNAME, "name");
@@ -69,11 +69,11 @@ public class Bug8072Test {
 
     private void initMountService() throws FileNotFoundException, ReactorException {
         final DOMMountPointService mountService = mock(DOMMountPointService.class);
-        controllerContext.setMountService(mountService);
+        CONTROLLER_CONTEXT.setMountService(mountService);
         final BrokerFacade brokerFacade = mock(BrokerFacade.class);
         final RestconfImpl restconfImpl = RestconfImpl.getInstance();
         restconfImpl.setBroker(brokerFacade);
-        restconfImpl.setControllerContext(controllerContext);
+        restconfImpl.setControllerContext(CONTROLLER_CONTEXT);
         final SchemaContext mountPointContext = TestUtils.loadSchemaContext("/full-versions/test-module");
         final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         when(mountInstance.getSchemaContext()).thenReturn(mountPointContext);

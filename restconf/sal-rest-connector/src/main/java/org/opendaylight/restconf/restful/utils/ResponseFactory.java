@@ -17,6 +17,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 final class ResponseFactory extends FutureDataFactory<Void> implements Builder<Response> {
 
     private ResponseBuilder responseBuilder;
+
     ResponseFactory(final NormalizedNode<?, ?> readData) {
         final Status status = prepareStatus(readData);
         this.responseBuilder = Response.status(status);

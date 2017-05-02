@@ -10,14 +10,14 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import java.util.List;
 
-public class PATCHStatusContext {
+public class PatchStatusContext {
 
     private final String patchId;
-    private final List<PATCHStatusEntity> editCollection;
+    private final List<PatchStatusEntity> editCollection;
     private boolean ok;
     private List<RestconfError> globalErrors;
 
-    public PATCHStatusContext(final String patchId, final List<PATCHStatusEntity> editCollection,
+    public PatchStatusContext(final String patchId, final List<PatchStatusEntity> editCollection,
                               final boolean ok, final List<RestconfError> globalErrors) {
         this.patchId = patchId;
         this.editCollection = editCollection;
@@ -29,7 +29,7 @@ public class PATCHStatusContext {
         return patchId;
     }
 
-    public List<PATCHStatusEntity> getEditCollection() {
+    public List<PatchStatusEntity> getEditCollection() {
         return editCollection;
     }
 

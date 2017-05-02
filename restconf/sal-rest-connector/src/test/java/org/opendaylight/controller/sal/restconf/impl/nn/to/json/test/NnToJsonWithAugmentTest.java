@@ -38,7 +38,7 @@ public class NnToJsonWithAugmentTest extends AbstractBodyReaderTest {
     public static void initialize() {
         schemaContext = schemaContextLoader("/nn-to-json/augmentation",
                 schemaContext);
-        controllerContext.setSchemas(schemaContext);
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test

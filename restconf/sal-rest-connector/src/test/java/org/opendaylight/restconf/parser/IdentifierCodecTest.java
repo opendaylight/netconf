@@ -19,7 +19,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
- * Unit tests for {@link IdentifierCodec} mostly according to examples from draft-ietf-netconf-restconf-13
+ * Unit tests for {@link IdentifierCodec} mostly according to examples from draft-ietf-netconf-restconf-13.
  */
 public class IdentifierCodecTest {
 
@@ -36,7 +36,7 @@ public class IdentifierCodecTest {
 
     /**
      * Positive test of deserialization URI <code>String</code> to <code>YangInstanceIdentifier</code> and
-     * serialization of <code>YangInstanceIdentifier</code> to <code>String/code> when original <code>String</code>
+     * serialization of <code>YangInstanceIdentifier</code> to <code>String</code> when original <code>String</code>
      * URI contains list identifier and leaf identifier.
      */
     @Test
@@ -51,7 +51,7 @@ public class IdentifierCodecTest {
 
     /**
      * Positive test of deserialization URI <code>String</code> to <code>YangInstanceIdentifier</code> and
-     * serialization of <code>YangInstanceIdentifier</code> to <code>String/code> when original <code>String</code>
+     * serialization of <code>YangInstanceIdentifier</code> to <code>String</code> when original <code>String</code>
      * URI contains leaf list identifier.
      */
     @Test
@@ -70,7 +70,7 @@ public class IdentifierCodecTest {
      * expected to be returned.
      */
     @Test
-    public void codecDeserializeNullTest () {
+    public void codecDeserializeNullTest() {
         final YangInstanceIdentifier dataYangII = IdentifierCodec.deserialize(null, this.schemaContext);
         assertEquals("Failed codec deserialization test", YangInstanceIdentifier.EMPTY, dataYangII);
     }
@@ -80,7 +80,7 @@ public class IdentifierCodecTest {
      * expected to be returned.
      */
     @Test
-    public void codecSerializeEmptyTest () {
+    public void codecSerializeEmptyTest() {
         final String serialized = IdentifierCodec.serialize(YangInstanceIdentifier.EMPTY, this.schemaContext);
         assertTrue("Failed codec serialization test", serialized.isEmpty());
     }

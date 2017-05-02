@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link SchemaContextHandler}
+ * Implementation of {@link SchemaContextHandler}.
  *
  */
 public class SchemaContextHandler implements SchemaContextListenerHandler {
@@ -42,9 +42,9 @@ public class SchemaContextHandler implements SchemaContextListenerHandler {
     private int moduleSetId;
 
     /**
-     * Set module-set-id on initial value - 0
+     * Set module-set-id on initial value - 0.
      *
-     * @param transactionChainHandler
+     * @param transactionChainHandler Transaction chain handler
      */
     public SchemaContextHandler(final TransactionChainHandler transactionChainHandler) {
         this.transactionChainHandler = transactionChainHandler;

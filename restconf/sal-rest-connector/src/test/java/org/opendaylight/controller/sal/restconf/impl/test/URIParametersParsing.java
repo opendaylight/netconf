@@ -102,8 +102,8 @@ public class URIParametersParsing {
 
         when(mockedUriInfo.getQueryParameters(eq(false))).thenReturn(mockedMultivaluedMap);
 
-         final UriBuilder uriBuilder = UriBuilder.fromUri("www.whatever.com");
-         when(mockedUriInfo.getAbsolutePathBuilder()).thenReturn(uriBuilder);
+        final UriBuilder uriBuilder = UriBuilder.fromUri("www.whatever.com");
+        when(mockedUriInfo.getAbsolutePathBuilder()).thenReturn(uriBuilder);
 
         this.restconf.invokeRpc("sal-remote:create-data-change-event-subscription", prepareDomRpcNode(datastore, scope),
                 mockedUriInfo);
@@ -119,13 +119,13 @@ public class URIParametersParsing {
         final Date revDate;
         try {
             revDate = getRevisionFormat().parse("2014-01-14");
-        }
-        catch (final ParseException e) {
+        } catch (final ParseException e) {
             throw new IllegalStateException(e);
         }
         final Module rpcSalRemoteModule = schema.findModuleByName("sal-remote", revDate);
         final Set<RpcDefinition> setRpcs = rpcSalRemoteModule.getRpcs();
-        final QName rpcQName = QName.create(rpcSalRemoteModule.getQNameModule(), "create-data-change-event-subscription");
+        final QName rpcQName =
+                QName.create(rpcSalRemoteModule.getQNameModule(), "create-data-change-event-subscription");
         final QName rpcInputQName =
                 QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "2014-01-14", "input");
         final RpcDefinition rpcDef = Mockito.mock(RpcDefinition.class);

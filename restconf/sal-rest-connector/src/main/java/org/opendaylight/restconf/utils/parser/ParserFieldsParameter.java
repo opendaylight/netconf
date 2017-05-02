@@ -212,16 +212,16 @@ public class ParserFieldsParameter {
      * All nodes expect of not mixin node are added to current level nodes.
      * @param node initial mixin or not-mixin node
      * @param level current nodes level
-     * @param qName qname of initial node
+     * @param qualifiedName qname of initial node
      * @return {@link DataSchemaContextNode}
      */
     private static @Nullable DataSchemaContextNode<?> resolveMixinNode(@Nullable final DataSchemaContextNode<?> node,
                                                                        @Nonnull final Set<QName> level,
-                                                                       @Nonnull final QName qName) {
+                                                                       @Nonnull final QName qualifiedName) {
         DataSchemaContextNode<?> currentNode = node;
         while (currentNode != null && currentNode.isMixin()) {
-            level.add(qName);
-            currentNode = currentNode.getChild(qName);
+            level.add(qualifiedName);
+            currentNode = currentNode.getChild(qualifiedName);
         }
 
         return currentNode;
