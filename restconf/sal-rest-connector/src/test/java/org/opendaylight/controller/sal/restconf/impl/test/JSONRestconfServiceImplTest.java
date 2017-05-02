@@ -97,7 +97,8 @@ public class JSONRestconfServiceImplTest {
 
     static final String TOASTER_MODULE_NS = "http://netconfcentral.org/ns/toaster";
     static final String TOASTER_MODULE_VERSION = "2009-11-20";
-    static final QName TOASTER_DONENESS_QNAME = QName.create(TOASTER_MODULE_NS, TOASTER_MODULE_VERSION, "toasterDoneness");
+    static final QName TOASTER_DONENESS_QNAME =
+            QName.create(TOASTER_MODULE_NS, TOASTER_MODULE_VERSION, "toasterDoneness");
     static final QName TOASTER_TYPE_QNAME = QName.create(TOASTER_MODULE_NS, TOASTER_MODULE_VERSION, "toasterToastType");
     static final QName WHEAT_BREAD_QNAME = QName.create(TOASTER_MODULE_NS, TOASTER_MODULE_VERSION, "wheat-bread");
     static final QName MAKE_TOAST_QNAME = QName.create(TOASTER_MODULE_NS, TOASTER_MODULE_VERSION, "make-toast");
@@ -123,7 +124,8 @@ public class JSONRestconfServiceImplTest {
     }
 
     private static String loadData(final String path) throws IOException {
-        return Resources.asCharSource(JSONRestconfServiceImplTest.class.getResource(path), StandardCharsets.UTF_8).read();
+        return Resources.asCharSource(JSONRestconfServiceImplTest.class.getResource(path),
+                StandardCharsets.UTF_8).read();
     }
 
     @SuppressWarnings("rawtypes")
@@ -144,7 +146,8 @@ public class JSONRestconfServiceImplTest {
         Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
         this.service.put(uriPath, payload, uriInfo);
 
-        final ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
+        final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
+                ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
         verify(brokerFacade).commitConfigurationDataPut(notNull(SchemaContext.class), capturedPath.capture(),
                 capturedNode.capture(), Mockito.anyString(), Mockito.anyString());
@@ -181,7 +184,8 @@ public class JSONRestconfServiceImplTest {
         Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
         this.service.put(uriPath, payload, uriInfo);
 
-        final ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
+        final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
+                ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
         verify(brokerFacade).commitMountPointDataPut(same(mockMountPoint), capturedPath.capture(),
                 capturedNode.capture(), Mockito.anyString(), Mockito.anyString());
@@ -196,6 +200,7 @@ public class JSONRestconfServiceImplTest {
     }
 
     @Test(expected = OperationFailedException.class)
+    @SuppressWarnings("checkstyle:IllegalThrows")
     public void testPutFailure() throws Throwable {
         final PutResult result = mock(PutResult.class);
 
@@ -234,7 +239,8 @@ public class JSONRestconfServiceImplTest {
         Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(uriBuilder);
         this.service.post(uriPath, payload, uriInfo);
 
-        final ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
+        final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
+                ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
         verify(brokerFacade).commitConfigurationDataPost(notNull(SchemaContext.class), capturedPath.capture(),
                 capturedNode.capture(), Mockito.anyString(), Mockito.anyString());
@@ -280,7 +286,8 @@ public class JSONRestconfServiceImplTest {
         Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(uriBuilder);
         this.service.post(uriPath, payload, uriInfo);
 
-        final ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
+        final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
+                ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
         verify(brokerFacade).commitConfigurationDataPost(same(mockMountPoint), capturedPath.capture(),
                 capturedNode.capture(), Mockito.anyString(), Mockito.anyString());
@@ -295,6 +302,7 @@ public class JSONRestconfServiceImplTest {
     }
 
     @Test(expected = TransactionCommitFailedException.class)
+    @SuppressWarnings("checkstyle:IllegalThrows")
     public void testPostFailure() throws Throwable {
         doReturn(Futures.immediateFailedCheckedFuture(new TransactionCommitFailedException("mock"))).when(brokerFacade)
                 .commitConfigurationDataPost(any(SchemaContext.class), any(YangInstanceIdentifier.class),
@@ -327,14 +335,15 @@ public class JSONRestconfServiceImplTest {
 
         this.service.delete(uriPath);
 
-        final ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
+        final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
+                ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         verify(brokerFacade).commitConfigurationDataDelete(capturedPath.capture());
 
         verifyPath(capturedPath.getValue(), INTERFACES_QNAME, INTERFACE_QNAME,
                 new Object[]{INTERFACE_QNAME, NAME_QNAME, "eth0"});
     }
 
-    @Test(expected=OperationFailedException.class)
+    @Test(expected = OperationFailedException.class)
     public void testDeleteFailure() throws Exception {
         final String invalidUriPath = "ietf-interfaces:interfaces/invalid";
 
@@ -363,7 +372,7 @@ public class JSONRestconfServiceImplTest {
         this.service.get(uriPath, LogicalDatastoreType.CONFIGURATION, uriInfo);
     }
 
-    @Test(expected=OperationFailedException.class)
+    @Test(expected = OperationFailedException.class)
     public void testGetFailure() throws Exception {
         final String invalidUriPath = "/ietf-interfaces:interfaces/invalid";
         final UriInfo uriInfo = Mockito.mock(UriInfo.class);
@@ -438,7 +447,7 @@ public class JSONRestconfServiceImplTest {
         verify(brokerFacade).invokeRpc(eq(path), isNull(NormalizedNode.class));
     }
 
-    @Test(expected=OperationFailedException.class)
+    @Test(expected = OperationFailedException.class)
     public void testInvokeRpcFailure() throws Exception {
         final DOMRpcException exception = new DOMRpcImplementationNotAvailableException("testExeption");
         doReturn(Futures.immediateFailedCheckedFuture(exception)).when(brokerFacade).invokeRpc(any(SchemaPath.class),
@@ -457,7 +466,7 @@ public class JSONRestconfServiceImplTest {
                 .withChild(ImmutableNodes.leafNode(DESC_QNAME, "eth interface"))
                 .build();
 
-        if(datastoreType == LogicalDatastoreType.CONFIGURATION) {
+        if (datastoreType == LogicalDatastoreType.CONFIGURATION) {
             doReturn(entryNode).when(brokerFacade).readConfigurationData(notNull(YangInstanceIdentifier.class),
                     Mockito.anyString());
         } else {
@@ -482,7 +491,8 @@ public class JSONRestconfServiceImplTest {
         assertThat("Missing \"enabled\"", jsonResp, containsString("\"enabled\":true"));
         assertThat("Missing \"description\"", jsonResp, containsString("\"description\":\"eth interface\""));
 
-        final ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
+        final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
+                ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         if (datastoreType == LogicalDatastoreType.CONFIGURATION) {
             verify(brokerFacade).readConfigurationData(capturedPath.capture(), Mockito.anyString());
         } else {
@@ -499,7 +509,8 @@ public class JSONRestconfServiceImplTest {
         doReturn(schemaContextTestModule).when(mockMountPoint).getSchemaContext();
 
         final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
-        doReturn(Optional.of(mockMountPoint)).when(mockMountService).getMountPoint(notNull(YangInstanceIdentifier.class));
+        doReturn(Optional.of(mockMountPoint))
+                .when(mockMountService).getMountPoint(notNull(YangInstanceIdentifier.class));
 
         ControllerContext.getInstance().setMountService(mockMountService);
         return mockMountPoint;
@@ -514,25 +525,25 @@ public class JSONRestconfServiceImplTest {
     void verifyPath(final YangInstanceIdentifier path, final Object... expArgs) {
         final List<PathArgument> pathArgs = path.getPathArguments();
         assertEquals("Arg count for actual path " + path, expArgs.length, pathArgs.size());
-        int i = 0;
-        for(final PathArgument actual: pathArgs) {
+        int index = 0;
+        for (final PathArgument actual: pathArgs) {
             QName expNodeType;
-            if(expArgs[i] instanceof Object[]) {
-                final Object[] listEntry = (Object[]) expArgs[i];
+            if (expArgs[index] instanceof Object[]) {
+                final Object[] listEntry = (Object[]) expArgs[index];
                 expNodeType = (QName) listEntry[0];
 
                 assertTrue(actual instanceof NodeIdentifierWithPredicates);
                 final Map<QName, Object> keyValues = ((NodeIdentifierWithPredicates)actual).getKeyValues();
-                assertEquals(String.format("Path arg %d keyValues size", i + 1), 1, keyValues.size());
+                assertEquals(String.format("Path arg %d keyValues size", index + 1), 1, keyValues.size());
                 final QName expKey = (QName) listEntry[1];
-                assertEquals(String.format("Path arg %d keyValue for %s", i + 1, expKey), listEntry[2],
+                assertEquals(String.format("Path arg %d keyValue for %s", index + 1, expKey), listEntry[2],
                         keyValues.get(expKey));
             } else {
-                expNodeType = (QName) expArgs[i];
+                expNodeType = (QName) expArgs[index];
             }
 
-            assertEquals(String.format("Path arg %d node type", i + 1), expNodeType, actual.getNodeType());
-            i++;
+            assertEquals(String.format("Path arg %d node type", index + 1), expNodeType, actual.getNodeType());
+            index++;
         }
 
     }

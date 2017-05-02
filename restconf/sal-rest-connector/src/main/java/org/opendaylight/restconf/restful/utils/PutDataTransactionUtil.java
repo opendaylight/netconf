@@ -47,18 +47,18 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 /**
- * Util class for put data to DS
+ * Util class for put data to DS.
  *
  */
 public final class PutDataTransactionUtil {
 
     /**
-     * Valid input data with {@link SchemaNode}
+     * Valid input data with {@link SchemaNode}.
      *
      * @param schemaNode
-     *            - {@link SchemaNode}
+     *             {@link SchemaNode}
      * @param payload
-     *            - input data
+     *             input data
      */
     public static void validInputData(final SchemaNode schemaNode, final NormalizedNodeContext payload) {
         if ((schemaNode != null) && (payload.getData() == null)) {
@@ -69,12 +69,12 @@ public final class PutDataTransactionUtil {
     }
 
     /**
-     * Valid top level node name
+     * Valid top level node name.
      *
      * @param path
-     *            - path of node
+     *             path of node
      * @param payload
-     *            - data
+     *             data
      */
     public static void validTopLevelNodeName(final YangInstanceIdentifier path, final NormalizedNodeContext payload) {
         final String payloadName = payload.getData().getNodeType().getLocalName();
@@ -96,7 +96,7 @@ public final class PutDataTransactionUtil {
 
     /**
      * Validates whether keys in {@code payload} are equal to values of keys in
-     * {@code iiWithData} for list schema node
+     * {@code iiWithData} for list schema node.
      *
      * @throws RestconfDocumentedException
      *             if key values or key count in payload and URI isn't equal
@@ -137,22 +137,22 @@ public final class PutDataTransactionUtil {
     }
 
     /**
-     * Check mount point and prepare variables for put data to DS
+     * Check mount point and prepare variables for put data to DS.
      *
      * @param payload
-     *            - data to put
+     *             data to put
      * @param schemaCtxRef
-     *            - reference to {@link SchemaContext}
+     *             reference to {@link SchemaContext}
      * @param transactionNode
-     *            - wrapper of variables for transaction
+     *             wrapper of variables for transaction
      * @param point
-     *            - query parameter
+     *             query parameter
      * @param insert
-     *            - query parameter
+     *             query parameter
      * @return {@link CheckedFuture}
      */
-    public static Response putData(final NormalizedNodeContext payload,
-            final SchemaContextRef schemaCtxRef, final TransactionVarsWrapper transactionNode, final String insert, final String point) {
+    public static Response putData(final NormalizedNodeContext payload, final SchemaContextRef schemaCtxRef,
+                               final TransactionVarsWrapper transactionNode, final String insert, final String point) {
         final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
         final ResponseFactory responseFactory = new ResponseFactory(
                 ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.CONFIG, transactionNode));
@@ -163,20 +163,20 @@ public final class PutDataTransactionUtil {
     }
 
     /**
-     * Put data to DS
+     * Put data to DS.
      *
      * @param path
-     *            - path of data
+     *             path of data
      * @param schemaContext
-     *            - {@link SchemaContext}
+     *             {@link SchemaContext}
      * @param domTransactionChain
-     *            - write transaction
+     *             write transaction
      * @param data
-     *            - data
+     *             data
      * @param point
-     *            - query parameter
+     *             query parameter
      * @param insert
-     *            - query parameter
+     *             query parameter
      * @return {@link CheckedFuture}
      */
     private static CheckedFuture<Void, TransactionCommitFailedException> submitData(final YangInstanceIdentifier path,
@@ -197,9 +197,10 @@ public final class PutDataTransactionUtil {
                             return makePut(path, schemaContext, newReadWriteTransaction, data);
                         } else {
                             newReadWriteTransaction.delete(LogicalDatastoreType.CONFIGURATION, path.getParent());
-                            simplePut(LogicalDatastoreType.CONFIGURATION, path, newReadWriteTransaction, schemaContext, data);
-                            listPut(LogicalDatastoreType.CONFIGURATION, path.getParent(), newReadWriteTransaction, schemaContext,
-                                    readList);
+                            simplePut(LogicalDatastoreType.CONFIGURATION, path, newReadWriteTransaction,
+                                    schemaContext, data);
+                            listPut(LogicalDatastoreType.CONFIGURATION, path.getParent(), newReadWriteTransaction,
+                                    schemaContext, readList);
                             return newReadWriteTransaction.submit();
                         }
                     } else {
@@ -211,9 +212,10 @@ public final class PutDataTransactionUtil {
                             return makePut(path, schemaContext, newReadWriteTransaction, data);
                         } else {
                             newReadWriteTransaction.delete(LogicalDatastoreType.CONFIGURATION, path.getParent());
-                            simplePut(LogicalDatastoreType.CONFIGURATION, path, newReadWriteTransaction, schemaContext, data);
-                            listPut(LogicalDatastoreType.CONFIGURATION, path.getParent(), newReadWriteTransaction, schemaContext,
-                                    readLeafList);
+                            simplePut(LogicalDatastoreType.CONFIGURATION, path, newReadWriteTransaction,
+                                    schemaContext, data);
+                            listPut(LogicalDatastoreType.CONFIGURATION, path.getParent(), newReadWriteTransaction,
+                                    schemaContext, readLeafList);
                             return newReadWriteTransaction.submit();
                         }
                     }
@@ -227,8 +229,8 @@ public final class PutDataTransactionUtil {
                         if ((readList == null) || readList.getValue().isEmpty()) {
                             return makePut(path, schemaContext, newReadWriteTransaction, data);
                         } else {
-                            insertWithPointListPut(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION, path, data,
-                                    schemaContext, point, readList, true);
+                            insertWithPointListPut(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION, path,
+                                    data, schemaContext, point, readList, true);
                             return newReadWriteTransaction.submit();
                         }
                     } else {
@@ -239,8 +241,8 @@ public final class PutDataTransactionUtil {
                         if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
                             return makePut(path, schemaContext, newReadWriteTransaction, data);
                         } else {
-                            insertWithPointLeafListPut(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION, path, data,
-                                    schemaContext, point, readLeafList, true);
+                            insertWithPointLeafListPut(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION,
+                                    path, data, schemaContext, point, readLeafList, true);
                             return newReadWriteTransaction.submit();
                         }
                     }
@@ -252,8 +254,8 @@ public final class PutDataTransactionUtil {
                         if ((readList == null) || readList.getValue().isEmpty()) {
                             return makePut(path, schemaContext, newReadWriteTransaction, data);
                         } else {
-                            insertWithPointListPut(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION, path, data,
-                                    schemaContext, point, readList, false);
+                            insertWithPointListPut(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION,
+                                    path, data, schemaContext, point, readList, false);
                             return newReadWriteTransaction.submit();
                         }
                     } else {
@@ -264,8 +266,8 @@ public final class PutDataTransactionUtil {
                         if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
                             return makePut(path, schemaContext, newReadWriteTransaction, data);
                         } else {
-                            insertWithPointLeafListPut(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION, path, data,
-                                    schemaContext, point, readLeafList, true);
+                            insertWithPointLeafListPut(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION,
+                                    path, data, schemaContext, point, readLeafList, true);
                             return newReadWriteTransaction.submit();
                         }
                     }
@@ -288,33 +290,33 @@ public final class PutDataTransactionUtil {
         return readData;
     }
 
-    private static void insertWithPointLeafListPut(final DOMDataReadWriteTransaction rWTransaction,
+    private static void insertWithPointLeafListPut(final DOMDataReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
             final NormalizedNode<?, ?> data, final SchemaContext schemaContext, final String point,
             final OrderedLeafSetNode<?> readLeafList, final boolean before) {
-        rWTransaction.delete(datastore, path.getParent());
+        rwTransaction.delete(datastore, path.getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
                 ControllerContext.getInstance().toInstanceIdentifier(point);
-        int p = 0;
+        int index1 = 0;
         for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
             if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
                 break;
             }
-            p++;
+            index1++;
         }
         if (!before) {
-            p++;
+            index1++;
         }
-        int h = 0;
+        int index2 = 0;
         final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path.getParent());
-        rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+        rwTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
         for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
-            if (h == p) {
-                simplePut(datastore, path, rWTransaction, schemaContext, data);
+            if (index2 == index1) {
+                simplePut(datastore, path, rwTransaction, schemaContext, data);
             }
             final YangInstanceIdentifier childPath = path.getParent().node(nodeChild.getIdentifier());
-            rWTransaction.put(datastore, childPath, nodeChild);
-            h++;
+            rwTransaction.put(datastore, childPath, nodeChild);
+            index2++;
         }
     }
 
@@ -325,26 +327,26 @@ public final class PutDataTransactionUtil {
         writeTx.delete(datastore, path.getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
                 ControllerContext.getInstance().toInstanceIdentifier(point);
-        int p = 0;
+        int index1 = 0;
         for (final MapEntryNode mapEntryNode : readList.getValue()) {
             if (mapEntryNode.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
                 break;
             }
-            p++;
+            index1++;
         }
         if (!before) {
-            p++;
+            index1++;
         }
-        int h = 0;
+        int index2 = 0;
         final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path.getParent());
         writeTx.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
         for (final MapEntryNode mapEntryNode : readList.getValue()) {
-            if (h == p) {
+            if (index2 == index1) {
                 simplePut(datastore, path, writeTx, schemaContext, data);
             }
             final YangInstanceIdentifier childPath = path.getParent().node(mapEntryNode.getIdentifier());
             writeTx.put(datastore, childPath, mapEntryNode);
-            h++;
+            index2++;
         }
     }
 

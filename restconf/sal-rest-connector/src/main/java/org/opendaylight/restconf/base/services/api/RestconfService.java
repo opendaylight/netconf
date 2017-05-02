@@ -16,13 +16,13 @@ import org.opendaylight.restconf.Rfc8040;
 import org.opendaylight.restconf.utils.RestconfConstants;
 
 /**
- * Service for getting yang library version
+ * Service for getting yang library version.
  *
  */
 public interface RestconfService {
 
     /**
-     * Get yang library version
+     * Get yang library version.
      *
      * @return {@link NormalizedNodeContext}
      */
@@ -30,5 +30,5 @@ public interface RestconfService {
     @Path("/yang-library-version")
     @Produces({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, Rfc8040.MediaTypes.DATA, MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public NormalizedNodeContext getLibraryVersion();
+    NormalizedNodeContext getLibraryVersion();
 }

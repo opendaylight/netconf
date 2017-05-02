@@ -44,6 +44,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 /**
+ * Deprecated.
+ *
  * @deprecated This class will be replaced by
  * {@link org.opendaylight.restconf.jersey.providers.NormalizedNodeXmlBodyWriter}
  */
@@ -67,28 +69,28 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
     }
 
     @Override
-    public long getSize(final NormalizedNodeContext t, final Class<?> type, final Type genericType,
+    public long getSize(final NormalizedNodeContext context, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(final NormalizedNodeContext t, final Class<?> type, final Type genericType,
+    public void writeTo(final NormalizedNodeContext context, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType,
             final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws IOException,
             WebApplicationException {
-        for (final Entry<String, Object> entry : t.getNewHeaders().entrySet()) {
+        for (final Entry<String, Object> entry : context.getNewHeaders().entrySet()) {
             httpHeaders.add(entry.getKey(), entry.getValue());
         }
-        final InstanceIdentifierContext<?> pathContext = t.getInstanceIdentifierContext();
-        if (t.getData() == null) {
+        final InstanceIdentifierContext<?> pathContext = context.getInstanceIdentifierContext();
+        if (context.getData() == null) {
             return;
         }
 
         XMLStreamWriter xmlWriter;
         try {
             xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
-            if (t.getWriterParameters().isPrettyPrint()) {
+            if (context.getWriterParameters().isPrettyPrint()) {
                 xmlWriter = new IndentingXMLStreamWriter(xmlWriter);
             }
         } catch (final XMLStreamException e) {
@@ -96,10 +98,11 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
         } catch (final FactoryConfigurationError e) {
             throw new IllegalStateException(e);
         }
-        final NormalizedNode<?, ?> data = t.getData();
+        final NormalizedNode<?, ?> data = context.getData();
         final SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
 
-        writeNormalizedNode(xmlWriter, schemaPath, pathContext, data, Optional.fromNullable(t.getWriterParameters().getDepth()));
+        writeNormalizedNode(xmlWriter, schemaPath, pathContext, data,
+                Optional.fromNullable(context.getWriterParameters().getDepth()));
     }
 
     private static void writeNormalizedNode(final XMLStreamWriter xmlWriter, final SchemaPath schemaPath,
@@ -145,7 +148,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, name.getLocalName(),
                     name.getNamespace().toString());
             xmlWriter.writeDefaultNamespace(name.getNamespace().toString());
-            for(final NormalizedNode<?,?> child : data.getValue()) {
+            for (final NormalizedNode<?,?> child : data.getValue()) {
                 nnWriter.write(child);
             }
             nnWriter.flush();

@@ -37,7 +37,7 @@ public class RestconfErrorTest {
 
         private final String text;
 
-        public Contains(final String text) {
+        Contains(final String text) {
             this.text = text;
         }
 
@@ -110,9 +110,9 @@ public class RestconfErrorTest {
         String expectedMessage = "Message";
         ErrorType expectedErrorType = ErrorType.RPC;
         ErrorTag expectedErrorTag = ErrorTag.IN_USE;
-        RestconfError e = new RestconfError(expectedErrorType, expectedErrorTag, expectedMessage);
+        RestconfError error = new RestconfError(expectedErrorType, expectedErrorTag, expectedMessage);
 
-        validateRestConfError(expectedMessage, expectedErrorType, expectedErrorTag, null, (String) null, e);
+        validateRestConfError(expectedMessage, expectedErrorType, expectedErrorTag, null, (String) null, error);
     }
 
     @Test
@@ -122,10 +122,11 @@ public class RestconfErrorTest {
         ErrorTag expectedErrorTag = ErrorTag.IN_USE;
         String expectedErrorAppTag = "application.tag";
 
-        RestconfError e = new RestconfError(expectedErrorType, expectedErrorTag, expectedMessage, expectedErrorAppTag);
+        RestconfError error =
+                new RestconfError(expectedErrorType, expectedErrorTag, expectedMessage, expectedErrorAppTag);
 
         validateRestConfError(expectedMessage, expectedErrorType, expectedErrorTag, expectedErrorAppTag, (String) null,
-                e);
+                error);
     }
 
     @Test
@@ -136,10 +137,11 @@ public class RestconfErrorTest {
         String expectedErrorAppTag = "application.tag";
         String errorInfo = "<extra><sessionid>session.id</sessionid></extra>";
 
-        RestconfError e = new RestconfError(expectedErrorType, expectedErrorTag, expectedMessage, expectedErrorAppTag,
-                errorInfo);
+        RestconfError error =
+                new RestconfError(expectedErrorType, expectedErrorTag, expectedMessage, expectedErrorAppTag, errorInfo);
 
-        validateRestConfError(expectedMessage, expectedErrorType, expectedErrorTag, expectedErrorAppTag, errorInfo, e);
+        validateRestConfError(expectedMessage, expectedErrorType, expectedErrorTag, expectedErrorAppTag, errorInfo,
+                error);
     }
 
     @Test
@@ -148,7 +150,7 @@ public class RestconfErrorTest {
         // All fields set
         RpcError rpcError = RpcResultBuilder.newError(
                 RpcError.ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE.getTagValue(), "mock error-message",
-                "mock app-tag", "mock error-info", new Exception( "mock cause" ) );
+                "mock app-tag", "mock error-info", new Exception("mock cause"));
 
         validateRestConfError("mock error-message", ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE, "mock app-tag",
                 "mock error-info", new RestconfError(rpcError));
@@ -156,14 +158,14 @@ public class RestconfErrorTest {
         // All fields set except 'info' - expect error-info set to 'cause'
         rpcError = RpcResultBuilder.newError(
                 RpcError.ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE.getTagValue(), "mock error-message",
-                "mock app-tag", null, new Exception( "mock cause" ) );
+                "mock app-tag", null, new Exception("mock cause"));
 
         validateRestConfError("mock error-message", ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE, "mock app-tag",
                 new Contains("mock cause"), new RestconfError(rpcError));
 
         // Some fields set - expect error-info set to ErrorSeverity
         rpcError = RpcResultBuilder.newError(
-                RpcError.ErrorType.RPC, ErrorTag.ACCESS_DENIED.getTagValue(), null, null, null, null );
+                RpcError.ErrorType.RPC, ErrorTag.ACCESS_DENIED.getTagValue(), null, null, null, null);
 
         validateRestConfError(null, ErrorType.RPC, ErrorTag.ACCESS_DENIED, null, "<severity>error</severity>",
                 new RestconfError(rpcError));
@@ -171,36 +173,36 @@ public class RestconfErrorTest {
         // 'tag' field not mapped to ErrorTag - expect error-tag set to
         // OPERATION_FAILED
         rpcError = RpcResultBuilder.newWarning(
-                RpcError.ErrorType.TRANSPORT, "not mapped", null, null, null, null );
+                RpcError.ErrorType.TRANSPORT, "not mapped", null, null, null, null);
 
         validateRestConfError(null, ErrorType.TRANSPORT, ErrorTag.OPERATION_FAILED, null,
                 "<severity>warning</severity>", new RestconfError(rpcError));
 
         // No fields set - edge case
-        rpcError = RpcResultBuilder.newError( null, null, null, null, null, null );
+        rpcError = RpcResultBuilder.newError(null, null, null, null, null, null);
 
-        validateRestConfError( null, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
-                               null, "<severity>error</severity>", new RestconfError( rpcError ) );
+        validateRestConfError(null, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
+                null, "<severity>error</severity>", new RestconfError(rpcError));
     }
 
     private static void validateRestConfError(final String expectedMessage, final ErrorType expectedErrorType,
             final ErrorTag expectedErrorTag, final String expectedErrorAppTag, final String errorInfo,
-            final RestconfError e) {
+            final RestconfError error) {
 
         validateRestConfError(expectedMessage, expectedErrorType, expectedErrorTag, expectedErrorAppTag,
-                equalTo(errorInfo), e);
+                equalTo(errorInfo), error);
     }
 
     private static void validateRestConfError(final String expectedMessage, final ErrorType expectedErrorType,
             final ErrorTag expectedErrorTag, final String expectedErrorAppTag, final Matcher<String> errorInfoMatcher,
-            final RestconfError e) {
+            final RestconfError error) {
 
-        assertEquals("getErrorMessage", expectedMessage, e.getErrorMessage());
-        assertEquals("getErrorType", expectedErrorType, e.getErrorType());
-        assertEquals("getErrorTag", expectedErrorTag, e.getErrorTag());
-        assertEquals("getErrorAppTag", expectedErrorAppTag, e.getErrorAppTag());
-        assertThat("getErrorInfo", e.getErrorInfo(), errorInfoMatcher);
-        e.toString(); // really just checking for NPE etc. Don't care about
+        assertEquals("getErrorMessage", expectedMessage, error.getErrorMessage());
+        assertEquals("getErrorType", expectedErrorType, error.getErrorType());
+        assertEquals("getErrorTag", expectedErrorTag, error.getErrorTag());
+        assertEquals("getErrorAppTag", expectedErrorAppTag, error.getErrorAppTag());
+        assertThat("getErrorInfo", error.getErrorInfo(), errorInfoMatcher);
+        error.toString(); // really just checking for NPE etc. Don't care about
                       // contents.
     }
 }

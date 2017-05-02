@@ -10,7 +10,7 @@ package org.opendaylight.restconf.handlers;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 
 /**
- * Implementation of {@link RpcServiceHandler}
+ * Implementation of {@link RpcServiceHandler}.
  *
  */
 public class RpcServiceHandler implements Handler<DOMRpcService> {

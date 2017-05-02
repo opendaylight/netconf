@@ -10,12 +10,18 @@ package org.opendaylight.controller.config.yang.sal.restconf.service;
 
 import org.opendaylight.netconf.sal.restconf.impl.JSONRestconfServiceImpl;
 
-public class JSONRestconfServiceModule extends org.opendaylight.controller.config.yang.sal.restconf.service.AbstractJSONRestconfServiceModule {
-    public JSONRestconfServiceModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier, org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
+public class JSONRestconfServiceModule
+        extends org.opendaylight.controller.config.yang.sal.restconf.service.AbstractJSONRestconfServiceModule {
+    public JSONRestconfServiceModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier,
+                                     org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
         super(identifier, dependencyResolver);
     }
 
-    public JSONRestconfServiceModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier, org.opendaylight.controller.config.api.DependencyResolver dependencyResolver, org.opendaylight.controller.config.yang.sal.restconf.service.JSONRestconfServiceModule oldModule, java.lang.AutoCloseable oldInstance) {
+    public JSONRestconfServiceModule(
+            org.opendaylight.controller.config.api.ModuleIdentifier identifier,
+            org.opendaylight.controller.config.api.DependencyResolver dependencyResolver,
+            org.opendaylight.controller.config.yang.sal.restconf.service.JSONRestconfServiceModule oldModule,
+            java.lang.AutoCloseable oldInstance) {
         super(identifier, dependencyResolver, oldModule, oldInstance);
     }
 

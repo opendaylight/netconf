@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketClientHandler.class.toString());
+    private static final Logger LOG = LoggerFactory.getLogger(WebSocketClientHandler.class.toString());
     private final WebSocketClientHandshaker handshaker;
     private ChannelPromise handshakeFuture;
     private final IClientMessageCallback messageListener;
@@ -49,7 +49,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        logger.info("WebSocket Client disconnected!");
+        LOG.info("WebSocket Client disconnected!");
     }
 
     @Override
@@ -57,7 +57,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
         Channel ch = ctx.channel();
         if (!handshaker.isHandshakeComplete()) {
             handshaker.finishHandshake(ch, (FullHttpResponse) msg);
-            logger.info("WebSocket Client connected!");
+            LOG.info("WebSocket Client connected!");
             handshakeFuture.setSuccess();
             return;
         }
@@ -72,16 +72,16 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
         WebSocketFrame frame = (WebSocketFrame) msg;
 
         if (frame instanceof PongWebSocketFrame) {
-            logger.info("WebSocket Client received pong");
+            LOG.info("WebSocket Client received pong");
         } else if (frame instanceof CloseWebSocketFrame) {
-            logger.info("WebSocket Client received closing");
+            LOG.info("WebSocket Client received closing");
             ch.close();
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        cause.printStackTrace();
+        LOG.info("Cause: {} .", cause.toString());
 
         if (!handshakeFuture.isDone()) {
             handshakeFuture.setFailure(cause);

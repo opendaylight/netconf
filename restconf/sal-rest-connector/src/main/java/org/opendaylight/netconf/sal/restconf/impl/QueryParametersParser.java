@@ -32,10 +32,14 @@ public class QueryParametersParser {
         return parseParams(info, false);
     }
 
+    public static WriterParameters parseWriterParameters(final UriInfo uriInfo, final boolean tagged) {
+        return parseParams(uriInfo, tagged);
+    }
+
     private static WriterParameters parseParams(final UriInfo info, final boolean tagged) {
         final WriterParameters.WriterParametersBuilder wpBuilder = new WriterParameters.WriterParametersBuilder();
         wpBuilder.setTagged(tagged);
-        if(info == null) {
+        if (info == null) {
             return wpBuilder.build();
         }
 
@@ -44,13 +48,15 @@ public class QueryParametersParser {
             try {
                 final int depth = Integer.valueOf(param);
                 if (depth < 1) {
-                    throw new RestconfDocumentedException(new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
+                    throw new RestconfDocumentedException(
+                            new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
                             "Invalid depth parameter: " + depth, null,
                             "The depth parameter must be an integer > 1 or \"unbounded\""));
                 }
                 wpBuilder.setDepth(depth);
             } catch (final NumberFormatException e) {
-                throw new RestconfDocumentedException(new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
+                throw new RestconfDocumentedException(new RestconfError(
+                        RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
                         "Invalid depth parameter: " + e.getMessage(), null,
                         "The depth parameter must be an integer > 1 or \"unbounded\""));
             }
@@ -58,10 +64,6 @@ public class QueryParametersParser {
         param = info.getQueryParameters(false).getFirst(UriParameters.PRETTY_PRINT.toString());
         wpBuilder.setPrettyPrint("true".equals(param));
         return wpBuilder.build();
-    }
-
-    public static WriterParameters parseWriterParameters(final UriInfo uriInfo, final boolean tagged) {
-        return parseParams(uriInfo, tagged);
     }
 
 }

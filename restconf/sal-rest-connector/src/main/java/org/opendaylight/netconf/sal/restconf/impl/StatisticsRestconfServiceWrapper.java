@@ -89,6 +89,7 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
         return this.delegate.invokeRpc(identifier, noPayload, uriInfo);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public NormalizedNodeContext readConfigurationData(final String identifier, final UriInfo uriInfo) {
         this.configGet.incrementAndGet();
@@ -97,8 +98,7 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
             normalizedNodeContext = this.delegate.readConfigurationData(identifier, uriInfo);
             if (normalizedNodeContext.getData() != null) {
                 this.successGetConfig.incrementAndGet();
-            }
-            else {
+            } else {
                 this.failureGetConfig.incrementAndGet();
             }
         } catch (final Exception e) {
@@ -108,6 +108,7 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
         return normalizedNodeContext;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public NormalizedNodeContext readOperationalData(final String identifier, final UriInfo uriInfo) {
         this.operationalGet.incrementAndGet();
@@ -116,8 +117,7 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
             normalizedNodeContext = this.delegate.readOperationalData(identifier, uriInfo);
             if (normalizedNodeContext.getData() != null) {
                 this.successGetOperational.incrementAndGet();
-            }
-            else {
+            } else {
                 this.failureGetOperational.incrementAndGet();
             }
         } catch (final Exception e) {
@@ -127,6 +127,7 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
         return normalizedNodeContext;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public Response updateConfigurationData(final String identifier, final NormalizedNodeContext payload,
             final UriInfo uriInfo) {
@@ -136,8 +137,7 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
             response = this.delegate.updateConfigurationData(identifier, payload, uriInfo);
             if (response.getStatus() == Status.OK.getStatusCode()) {
                 this.successPut.incrementAndGet();
-            }
-            else {
+            } else {
                 this.failurePut.incrementAndGet();
             }
         } catch (final Exception e) {
@@ -147,6 +147,7 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
         return response;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public Response createConfigurationData(final String identifier, final NormalizedNodeContext payload,
             final UriInfo uriInfo) {
@@ -156,8 +157,7 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
             response = this.delegate.createConfigurationData(identifier, payload, uriInfo);
             if (response.getStatus() == Status.OK.getStatusCode()) {
                 this.successPost.incrementAndGet();
-            }
-            else {
+            } else {
                 this.failurePost.incrementAndGet();
             }
         } catch (final Exception e) {
@@ -167,6 +167,7 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
         return response;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public Response createConfigurationData(final NormalizedNodeContext payload, final UriInfo uriInfo) {
         this.configPost.incrementAndGet();
@@ -175,17 +176,17 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
             response = this.delegate.createConfigurationData(payload, uriInfo);
             if (response.getStatus() == Status.OK.getStatusCode()) {
                 this.successPost.incrementAndGet();
-            }
-            else {
+            } else {
                 this.failurePost.incrementAndGet();
             }
-        }catch (final Exception e) {
+        } catch (final Exception e) {
             this.failurePost.incrementAndGet();
             throw e;
         }
         return response;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public Response deleteConfigurationData(final String identifier) {
         this.configDelete.incrementAndGet();
@@ -194,8 +195,7 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
             response = this.delegate.deleteConfigurationData(identifier);
             if (response.getStatus() == Status.OK.getStatusCode()) {
                 this.successDelete.incrementAndGet();
-            }
-            else {
+            } else {
                 this.failureDelete.incrementAndGet();
             }
         } catch (final Exception e) {
@@ -216,13 +216,13 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
     }
 
     @Override
-    public PATCHStatusContext patchConfigurationData(final String identifier, final PATCHContext payload,
-            final UriInfo uriInfo) {
+    public PatchStatusContext patchConfigurationData(final String identifier, final PatchContext payload,
+                                                     final UriInfo uriInfo) {
         return this.delegate.patchConfigurationData(identifier, payload, uriInfo);
     }
 
     @Override
-    public PATCHStatusContext patchConfigurationData(final PATCHContext payload, final UriInfo uriInfo) {
+    public PatchStatusContext patchConfigurationData(final PatchContext payload, final UriInfo uriInfo) {
         return this.delegate.patchConfigurationData(payload, uriInfo);
     }
 

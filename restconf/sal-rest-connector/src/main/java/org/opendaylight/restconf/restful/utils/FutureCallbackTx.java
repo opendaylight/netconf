@@ -28,31 +28,32 @@ import org.slf4j.LoggerFactory;
  */
 final class FutureCallbackTx {
 
-    private final static Logger LOG = LoggerFactory.getLogger(FutureCallbackTx.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FutureCallbackTx.class);
 
     private FutureCallbackTx() {
         throw new UnsupportedOperationException("Util class");
     }
 
     /**
-     * Add callback to the future object
+     * Add callback to the future object.
      *
      * @param listenableFuture
-     *            - future object
+     *             future object
      * @param txType
-     *            - type of operation (READ, POST, PUT, DELETE)
+     *             type of operation (READ, POST, PUT, DELETE)
      * @param dataFactory
-     *            - factory setting result
+     *             factory setting result
      */
+    @SuppressWarnings("checkstyle:IllegalCatch")
     static <T, X extends Exception> void addCallback(final CheckedFuture<T, X> listenableFuture, final String txType,
             final FutureDataFactory<T> dataFactory) {
         final CountDownLatch responseWaiter = new CountDownLatch(1);
         Futures.addCallback(listenableFuture, new FutureCallback<T>() {
 
             @Override
-            public void onFailure(final Throwable t) {
+            public void onFailure(final Throwable throwable) {
                 responseWaiter.countDown();
-                handlingLoggerAndValues(t, txType, null, dataFactory);
+                handlingLoggerAndValues(throwable, txType, null, dataFactory);
             }
 
             @Override
@@ -72,32 +73,34 @@ final class FutureCallbackTx {
     }
 
     /**
-     * Handling logger and result of callback - on success or on failure
+     * Handling logger and result of callback - on success or on failure.
      * <ul>
      * <li>on success - set result to the factory
      * <li>on failure - throw exception
      * </ul>
      *
-     * @param t
-     *            - exception - if callback is onFailure
+     * @param throwable
+     *             exception - if callback is onFailure
      * @param txType
-     *            - type of operation (READ, POST, PUT, DELETE)
+     *             type of operation (READ, POST, PUT, DELETE)
      * @param result
-     *            - result of future - if callback is on Success
+     *             result of future - if callback is on Success
      * @param dataFactory
-     *            - setter for result - in callback is onSuccess
+     *             setter for result - in callback is onSuccess
      */
-    protected static <T> void handlingLoggerAndValues(@Nullable final Throwable t, final String txType,
+    protected static <T> void handlingLoggerAndValues(@Nullable final Throwable throwable, final String txType,
             final T result, final FutureDataFactory<T> dataFactory) {
-        if (t != null) {
+        if (throwable != null) {
             dataFactory.setFailureStatus();
-            LOG.warn("Transaction({}) FAILED!", txType, t);
-            if (t instanceof DOMRpcException) {
+            LOG.warn("Transaction({}) FAILED!", txType, throwable);
+            if (throwable instanceof DOMRpcException) {
                 final List<RpcError> rpcErrorList = new ArrayList<>();
-                rpcErrorList.add(RpcResultBuilder.newError(RpcError.ErrorType.RPC, "operation-failed", t.getMessage()));
+                rpcErrorList.add(
+                        RpcResultBuilder.newError(RpcError.ErrorType.RPC, "operation-failed", throwable.getMessage()));
                 dataFactory.setResult((T) new DefaultDOMRpcResult(rpcErrorList));
             } else {
-                throw new RestconfDocumentedException("  Transaction(" + txType + ") not committed correctly", t);
+                throw new RestconfDocumentedException(
+                        "Transaction(" + txType + ") not committed correctly", throwable);
             }
         } else {
             LOG.trace("Transaction({}) SUCCESSFUL!", txType);
