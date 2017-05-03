@@ -48,7 +48,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 public class KeepaliveSalFacadeTest {
 
-    private static final RemoteDeviceId REMOTE_DEVICE_ID = new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
+    private static final RemoteDeviceId REMOTE_DEVICE_ID =
+            new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
 
     @Mock
     private RemoteDeviceHandler<NetconfSessionPreferences> underlyingSalFacade;
@@ -85,8 +86,8 @@ public class KeepaliveSalFacadeTest {
                 invocationOnMock.callRealMethod();
                 return currentKeepalive;
             }
-        }).when(executorServiceSpy).schedule(Mockito.<Runnable> any(),
-                Mockito.anyLong(), Matchers.<TimeUnit> any());
+        }).when(executorServiceSpy).schedule(Mockito.<Runnable>any(),
+                Mockito.anyLong(), Matchers.<TimeUnit>any());
 
         Mockito.when(currentKeepalive.isDone()).thenReturn(true);
     }
@@ -101,7 +102,8 @@ public class KeepaliveSalFacadeTest {
         final DOMRpcResult result = new DefaultDOMRpcResult(Builders.containerBuilder().withNodeIdentifier(
                 new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME)).build());
 
-        doReturn(Futures.immediateCheckedFuture(result)).when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+        doReturn(Futures.immediateCheckedFuture(result))
+                .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
         final KeepaliveSalFacade keepaliveSalFacade =
                 new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, executorServiceSpy, 1L, 1L);
@@ -182,7 +184,8 @@ public class KeepaliveSalFacadeTest {
                 proxyRpc = (DOMRpcService) invocationOnMock.getArguments()[2];
                 return null;
             }
-        }).when(underlyingSalFacade).onDeviceConnected(any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
+        }).when(underlyingSalFacade).onDeviceConnected(
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
 
         doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("illegal-state")))
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));

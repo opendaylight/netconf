@@ -72,7 +72,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
 
     @Override
     public synchronized boolean cancel() {
-        if(isFinished()) {
+        if (isFinished()) {
             return false;
         }
         listeners.forEach(listener -> listener.onTransactionCancelled(this));
@@ -91,37 +91,46 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
     }
 
     @Override
-    public synchronized void put(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode<?, ?> data) {
+    public synchronized void put(final LogicalDatastoreType store, final YangInstanceIdentifier path,
+                                 final NormalizedNode<?, ?> data) {
         checkEditable(store);
 
-        // trying to write only mixin nodes (not visible when serialized). Ignoring. Some devices cannot handle empty edit-config rpc
-        if(containsOnlyNonVisibleData(path, data)) {
+        // Trying to write only mixin nodes (not visible when serialized).
+        // Ignoring. Some devices cannot handle empty edit-config rpc
+        if (containsOnlyNonVisibleData(path, data)) {
             LOG.debug("Ignoring put for {} and data {}. Resulting data structure is empty.", path, data);
             return;
         }
 
-        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>fromNullable(data), Optional.of(ModifyAction.REPLACE), path);
+        final DataContainerChild<?, ?> editStructure =
+                netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>fromNullable(data),
+                        Optional.of(ModifyAction.REPLACE), path);
         editConfig(path, Optional.fromNullable(data), editStructure, Optional.of(ModifyAction.NONE), "put");
     }
 
     @Override
-    public synchronized void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path, final NormalizedNode<?, ?> data) {
+    public synchronized void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
+                                   final NormalizedNode<?, ?> data) {
         checkEditable(store);
 
-        // trying to write only mixin nodes (not visible when serialized). Ignoring. Some devices cannot handle empty edit-config rpc
+        // Trying to write only mixin nodes (not visible when serialized).
+        // Ignoring. Some devices cannot handle empty edit-config rpc
         if (containsOnlyNonVisibleData(path, data)) {
             LOG.debug("Ignoring merge for {} and data {}. Resulting data structure is empty.", path, data);
             return;
         }
 
-        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>fromNullable(data), Optional.<ModifyAction>absent(), path);
+        final DataContainerChild<?, ?> editStructure =
+                netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>fromNullable(data),
+                        Optional.<ModifyAction>absent(), path);
         editConfig(path, Optional.fromNullable(data), editStructure, Optional.<ModifyAction>absent(), "merge");
     }
 
     /**
-     * Check whether the data to be written consists only from mixins
+     * Check whether the data to be written consists only from mixins.
      */
-    private static boolean containsOnlyNonVisibleData(final YangInstanceIdentifier path, final NormalizedNode<?, ?> data) {
+    private static boolean containsOnlyNonVisibleData(final YangInstanceIdentifier path,
+                                                      final NormalizedNode<?, ?> data) {
         // There's only one such case:top level list (pathArguments == 1 && data is Mixin)
         // any other mixin nodes are contained by a "regular" node thus visible when serialized
         return path.getPathArguments().size() == 1 && data instanceof MixinNode;
@@ -130,8 +139,11 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
     @Override
     public synchronized void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         checkEditable(store);
-        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>absent(), Optional.of(ModifyAction.DELETE), path);
-        editConfig(path, Optional.<NormalizedNode<?, ?>>absent(), editStructure, Optional.of(ModifyAction.NONE), "delete");
+        final DataContainerChild<?, ?> editStructure =
+                netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>absent(),
+                        Optional.of(ModifyAction.DELETE), path);
+        editConfig(path, Optional.<NormalizedNode<?, ?>>absent(),
+                editStructure, Optional.of(ModifyAction.NONE), "delete");
     }
 
     @Override
@@ -146,14 +158,16 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
                 if (result != null && result.isSuccessful()) {
                     listeners.forEach(txListener -> txListener.onTransactionSuccessful(AbstractWriteTx.this));
                 } else {
-                    final TransactionCommitFailedException cause = new TransactionCommitFailedException("Transaction failed", result.getErrors().toArray(new RpcError[result.getErrors().size()]));
+                    final TransactionCommitFailedException cause =
+                            new TransactionCommitFailedException("Transaction failed",
+                                    result.getErrors().toArray(new RpcError[result.getErrors().size()]));
                     listeners.forEach(listener -> listener.onTransactionFailed(AbstractWriteTx.this, cause));
                 }
             }
 
             @Override
-            public void onFailure(final Throwable t) {
-                listeners.forEach(listener -> listener.onTransactionFailed(AbstractWriteTx.this, t));
+            public void onFailure(final Throwable throwable) {
+                listeners.forEach(listener -> listener.onTransactionFailed(AbstractWriteTx.this, throwable));
             }
         });
         return result;
@@ -163,10 +177,13 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
 
     private void checkEditable(final LogicalDatastoreType store) {
         checkNotFinished();
-        Preconditions.checkArgument(store == LogicalDatastoreType.CONFIGURATION, "Can edit only configuration data, not %s", store);
+        Preconditions.checkArgument(store == LogicalDatastoreType.CONFIGURATION,
+                "Can edit only configuration data, not %s", store);
     }
 
-    protected abstract void editConfig(final YangInstanceIdentifier path, final Optional<NormalizedNode<?, ?>> data, final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> defaultOperation, final String operation);
+    protected abstract void editConfig(YangInstanceIdentifier path, Optional<NormalizedNode<?, ?>> data,
+                                       DataContainerChild<?, ?> editStructure,
+                                       Optional<ModifyAction> defaultOperation, String operation);
 
     protected ListenableFuture<RpcResult<TransactionStatus>> resultsToTxStatus() {
         final SettableFuture<RpcResult<TransactionStatus>> transformed = SettableFuture.create();
@@ -175,7 +192,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
             @Override
             public void onSuccess(final List<DOMRpcResult> domRpcResults) {
                 domRpcResults.forEach(domRpcResult -> {
-                    if(!domRpcResult.getErrors().isEmpty() && !transformed.isDone()) {
+                    if (!domRpcResult.getErrors().isEmpty() && !transformed.isDone()) {
                         final NetconfDocumentedException exception =
                                 new NetconfDocumentedException(id + ":RPC during tx failed",
                                         DocumentedException.ErrorType.APPLICATION,
@@ -185,7 +202,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
                     }
                 });
 
-                if(!transformed.isDone()) {
+                if (!transformed.isDone()) {
                     transformed.set(RpcResultBuilder.success(TransactionStatus.COMMITED).build());
                 }
             }

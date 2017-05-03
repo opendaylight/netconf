@@ -15,11 +15,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MessageCounter {
     final AtomicInteger messageId = new AtomicInteger(0);
 
-    private static final String messageIdBlueprint = "%s-%s";
+    private static final String MESSAGE_ID_BLUEPRINT = "%s-%s";
 
     public String getNewMessageId(final String prefix) {
         Preconditions.checkArgument(Strings.isNullOrEmpty(prefix) == false, "Null or empty prefix");
-        return String.format(messageIdBlueprint, prefix, getNewMessageId());
+        return String.format(MESSAGE_ID_BLUEPRINT, prefix, getNewMessageId());
     }
 
     public String getNewMessageId() {

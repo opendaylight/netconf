@@ -37,25 +37,28 @@ import org.w3c.dom.Document;
 
 public class NetconfToRpcRequestTest {
 
-    private final static String TEST_MODEL_NAMESPACE = "urn:opendaylight:params:xml:ns:yang:controller:md:sal:rpc-test";
-    private final static String REVISION = "2014-07-14";
-    private final static QName INPUT_QNAME = QName.create(TEST_MODEL_NAMESPACE, REVISION, "input");
-    private final static QName STREAM_NAME = QName.create(TEST_MODEL_NAMESPACE, REVISION, "stream-name");
-    private final static QName SUBSCRIBE_RPC_NAME = QName.create(TEST_MODEL_NAMESPACE, REVISION, "subscribe");
+    private static final String TEST_MODEL_NAMESPACE = "urn:opendaylight:params:xml:ns:yang:controller:md:sal:rpc-test";
+    private static final String REVISION = "2014-07-14";
+    private static final QName INPUT_QNAME = QName.create(TEST_MODEL_NAMESPACE, REVISION, "input");
+    private static final QName STREAM_NAME = QName.create(TEST_MODEL_NAMESPACE, REVISION, "stream-name");
+    private static final QName SUBSCRIBE_RPC_NAME = QName.create(TEST_MODEL_NAMESPACE, REVISION, "subscribe");
 
-    private final static String CONFIG_TEST_NAMESPACE = "urn:opendaylight:params:xml:ns:yang:controller:md:sal:test:rpc:config:defs";
-    private final static String CONFIG_TEST_REVISION = "2014-07-21";
-    private final static QName EDIT_CONFIG_QNAME = QName.create(CONFIG_TEST_NAMESPACE, CONFIG_TEST_REVISION, "edit-config");
-    private final static QName GET_QNAME = QName.create(CONFIG_TEST_NAMESPACE, CONFIG_TEST_REVISION, "get");
-    private final static QName GET_CONFIG_QNAME = QName.create(CONFIG_TEST_NAMESPACE, CONFIG_TEST_REVISION, "get-config");
+    private static final String CONFIG_TEST_NAMESPACE =
+            "urn:opendaylight:params:xml:ns:yang:controller:md:sal:test:rpc:config:defs";
+    private static final String CONFIG_TEST_REVISION = "2014-07-21";
+    private static final QName EDIT_CONFIG_QNAME =
+            QName.create(CONFIG_TEST_NAMESPACE, CONFIG_TEST_REVISION, "edit-config");
+    private static final QName GET_QNAME = QName.create(CONFIG_TEST_NAMESPACE, CONFIG_TEST_REVISION, "get");
+    private static final QName GET_CONFIG_QNAME =
+            QName.create(CONFIG_TEST_NAMESPACE, CONFIG_TEST_REVISION, "get-config");
 
     static SchemaContext cfgCtx;
     static NetconfMessageTransformer messageTransformer;
 
     @BeforeClass
     public static void setup() throws Exception {
-        List<InputStream> modelsToParse = Collections
-            .singletonList(NetconfToRpcRequestTest.class.getResourceAsStream("/schemas/rpc-notification-subscription.yang"));
+        List<InputStream> modelsToParse = Collections.singletonList(
+                NetconfToRpcRequestTest.class.getResourceAsStream("/schemas/rpc-notification-subscription.yang"));
         final Set<Module> notifModules = YangParserTestUtils.parseYangStreams(modelsToParse).getModules();
         assertTrue(!notifModules.isEmpty());
 
@@ -72,7 +75,8 @@ public class NetconfToRpcRequestTest {
 
     @Test
     public void testUserDefinedRpcCall() throws Exception {
-        final DataContainerNodeAttrBuilder<YangInstanceIdentifier.NodeIdentifier, ContainerNode> rootBuilder = Builders.containerBuilder();
+        final DataContainerNodeAttrBuilder<YangInstanceIdentifier.NodeIdentifier, ContainerNode> rootBuilder =
+                Builders.containerBuilder();
         rootBuilder.withNodeIdentifier(toId(SUBSCRIBE_RPC_NAME));
 
         rootBuilder.withChild(buildLeaf(STREAM_NAME, "NETCONF"));
@@ -97,11 +101,11 @@ public class NetconfToRpcRequestTest {
     @Test(expected = IllegalArgumentException.class)
     public void testRpcResponse() throws Exception {
         final NetconfMessage response = new NetconfMessage(XmlUtil.readXmlToDocument(
-                "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"m-5\">\n" +
-                "<data xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">" +
-                "module schema" +
-                "</data>\n" +
-                "</rpc-reply>\n"
+                "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"m-5\">\n"
+                        + "<data xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">"
+                        + "module schema"
+                        + "</data>\n"
+                        + "</rpc-reply>\n"
         ));
 
         messageTransformer.toRpcResult(response, toPath(EDIT_CONFIG_QNAME));

@@ -47,7 +47,8 @@ public class NetconfToNotificationTest {
         userNotification = new NetconfMessage(doc);
     }
 
-    static SchemaContext getNotificationSchemaContext(final Class<?> loadClass, final boolean getExceptionTest) throws Exception {
+    static SchemaContext getNotificationSchemaContext(final Class<?> loadClass,
+                                                      final boolean getExceptionTest) throws Exception {
         final List<InputStream> modelsToParse = new ArrayList<>();
 
         if (getExceptionTest) {

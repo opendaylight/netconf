@@ -42,7 +42,8 @@ public final class NetconfDeviceDataBroker implements DOMDataBroker {
     private final boolean candidateSupported;
     private final boolean runningWritable;
 
-    public NetconfDeviceDataBroker(final RemoteDeviceId id, final SchemaContext schemaContext, final DOMRpcService rpc, final NetconfSessionPreferences netconfSessionPreferences) {
+    public NetconfDeviceDataBroker(final RemoteDeviceId id, final SchemaContext schemaContext,
+                                   final DOMRpcService rpc, final NetconfSessionPreferences netconfSessionPreferences) {
         this.id = id;
         this.netconfOps = new NetconfBaseOps(rpc, schemaContext);
         // get specific attributes from netconf preferences and get rid of it
@@ -51,7 +52,8 @@ public final class NetconfDeviceDataBroker implements DOMDataBroker {
         runningWritable = netconfSessionPreferences.isRunningWritable();
         rollbackSupport = netconfSessionPreferences.isRollbackSupported();
         Preconditions.checkArgument(candidateSupported || runningWritable,
-            "Device %s has advertised neither :writable-running nor :candidate capability. At least one of these should be advertised. Failed to establish a session.", id.getName());
+            "Device %s has advertised neither :writable-running nor :candidate capability."
+                    + "At least one of these should be advertised. Failed to establish a session.", id.getName());
     }
 
     @Override
@@ -66,8 +68,8 @@ public final class NetconfDeviceDataBroker implements DOMDataBroker {
 
     @Override
     public DOMDataWriteTransaction newWriteOnlyTransaction() {
-        if(candidateSupported) {
-            if(runningWritable) {
+        if (candidateSupported) {
+            if (runningWritable) {
                 return new WriteCandidateRunningTx(id, netconfOps, rollbackSupport);
             } else {
                 return new WriteCandidateTx(id, netconfOps, rollbackSupport);
@@ -78,7 +80,9 @@ public final class NetconfDeviceDataBroker implements DOMDataBroker {
     }
 
     @Override
-    public ListenerRegistration<DOMDataChangeListener> registerDataChangeListener(final LogicalDatastoreType store, final YangInstanceIdentifier path, final DOMDataChangeListener listener, final DataChangeScope triggeringScope) {
+    public ListenerRegistration<DOMDataChangeListener> registerDataChangeListener(
+            final LogicalDatastoreType store, final YangInstanceIdentifier path, final DOMDataChangeListener listener,
+            final DataChangeScope triggeringScope) {
         throw new UnsupportedOperationException(id + ": Data change listeners not supported for netconf mount point");
     }
 

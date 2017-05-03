@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.sal.connect.api;
 
 /**
- *
+ * Remote device.
  */
 public interface RemoteDevice<PREF, M, LISTENER extends RemoteDeviceCommunicator<M>> {
 

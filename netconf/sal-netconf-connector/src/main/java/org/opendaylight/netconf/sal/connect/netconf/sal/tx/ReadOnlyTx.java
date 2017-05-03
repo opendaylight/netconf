@@ -62,22 +62,28 @@ public final class ReadOnlyTx implements DOMDataReadOnlyTransaction {
     public CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> read(
             final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         switch (store) {
-        case CONFIGURATION: {
-            return readConfigurationData(path);
-        }
-        case OPERATIONAL: {
-            return readOperationalData(path);
-        }
+            case CONFIGURATION: {
+                return readConfigurationData(path);
+            }
+            case OPERATIONAL: {
+                return readOperationalData(path);
+            }
+            default: {
+                LOG.info("Unknown datastore type: {}.", store);
+            }
         }
 
-        throw new IllegalArgumentException(String.format("%s, Cannot read data %s for %s datastore, unknown datastore type", id, path, store));
+        throw new IllegalArgumentException(String.format(
+                "%s, Cannot read data %s for %s datastore, unknown datastore type", id, path, store));
     }
 
     @Override
-    public CheckedFuture<Boolean, ReadFailedException> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+    public CheckedFuture<Boolean, ReadFailedException> exists(final LogicalDatastoreType store,
+                                                              final YangInstanceIdentifier path) {
         final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> data = read(store, path);
         final ListenableFuture<Boolean> result =
-                Futures.transform(data, (Optional<NormalizedNode<?, ?>> a) -> a != null && a.isPresent());
+                Futures.transform(data, (Optional<NormalizedNode<?, ?>> optionalNode) ->
+                        optionalNode != null && optionalNode.isPresent());
         return MappingCheckedFuture.create(result, ReadFailedException.MAPPER);
     }
 

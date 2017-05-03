@@ -10,7 +10,7 @@ package org.opendaylight.netconf.sal.connect.netconf.listener;
 import javax.annotation.Nonnull;
 
 /**
- * DTO with user capabilities to override or merge with device specific capabilities
+ * DTO with user capabilities to override or merge with device specific capabilities.
  */
 public class UserPreferences {
 

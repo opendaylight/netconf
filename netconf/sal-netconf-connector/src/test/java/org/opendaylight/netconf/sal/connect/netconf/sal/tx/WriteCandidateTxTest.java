@@ -56,10 +56,12 @@ public class WriteCandidateTxTest {
         tx.put(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getContainerId(), TxTestUtils.getContainerNode());
         tx.merge(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId(), TxTestUtils.getLeafNode());
         //check, if both edits are called
-        verify(rpc, times(2)).invokeRpc(eq(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)), any());
+        verify(rpc, times(2))
+                .invokeRpc(eq(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)), any());
         tx.submit().get();
         //check, if unlock is called
-        verify(rpc).invokeRpc(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME), NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
+        verify(rpc).invokeRpc(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME),
+                NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
         verify(rpc).invokeRpc(eq(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME)), any());
     }
 

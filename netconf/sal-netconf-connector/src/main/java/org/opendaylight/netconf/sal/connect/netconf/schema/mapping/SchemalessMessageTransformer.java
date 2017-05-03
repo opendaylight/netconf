@@ -55,7 +55,8 @@ public class SchemalessMessageTransformer implements MessageTransformer<NetconfM
             notificationNoRev =
                     QName.create(stripped.getValue().getNamespace(), stripped.getValue().getName()).withoutRevision();
         } catch (final MissingNameSpaceException e) {
-            throw new IllegalArgumentException("Unable to parse notification " + message + ", cannot find namespace", e);
+            throw new IllegalArgumentException("Unable to parse notification "
+                    + message + ", cannot find namespace", e);
         }
 
         final AnyXmlNode notificationPayload = Builders.anyXmlBuilder()
@@ -79,8 +80,8 @@ public class SchemalessMessageTransformer implements MessageTransformer<NetconfM
     }
 
     /**
-     * Transforms reply message to anyXml node. In case, that rpc-reply doesn't contain data and contains only &lt;ok/&gt;
-     * element, returns null.
+     * Transforms reply message to anyXml node.
+     * In case, that rpc-reply doesn't contain data and contains only &lt;ok/&gt; element, returns null.
      * @param rpcReply reply message
      * @return anyxml
      */
@@ -88,7 +89,7 @@ public class SchemalessMessageTransformer implements MessageTransformer<NetconfM
     public DOMRpcResult toRpcResult(final NetconfMessage rpcReply, final SchemaPath rpc) {
         final Document document = rpcReply.getDocument();
         final AnyXmlNode result;
-        if(BaseRpcSchemalessTransformer.isOkPresent(document)) {
+        if (BaseRpcSchemalessTransformer.isOkPresent(document)) {
             result =  null;
         } else {
             result = Builders.anyXmlBuilder()
@@ -102,10 +103,12 @@ public class SchemalessMessageTransformer implements MessageTransformer<NetconfM
     private void wrapPayload(final Document doc) {
         final Element payload = doc.getDocumentElement();
         doc.removeChild(payload);
-        final Element rpcNS = doc.createElementNS(NetconfMessageTransformUtil.NETCONF_RPC_QNAME.getNamespace().toString(),
+        final Element rpcNS =
+                doc.createElementNS(NetconfMessageTransformUtil.NETCONF_RPC_QNAME.getNamespace().toString(),
                 NetconfMessageTransformUtil.NETCONF_RPC_QNAME.getLocalName());
         // set msg id
-        rpcNS.setAttribute(NetconfMessageTransformUtil.MESSAGE_ID_ATTR, counter.getNewMessageId(NetconfMessageTransformUtil.MESSAGE_ID_PREFIX));
+        rpcNS.setAttribute(NetconfMessageTransformUtil.MESSAGE_ID_ATTR,
+                counter.getNewMessageId(NetconfMessageTransformUtil.MESSAGE_ID_PREFIX));
         rpcNS.appendChild(payload);
         doc.appendChild(rpcNS);
     }

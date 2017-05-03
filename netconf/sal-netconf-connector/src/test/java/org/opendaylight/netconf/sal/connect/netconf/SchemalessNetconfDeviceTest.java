@@ -55,7 +55,8 @@ public class SchemalessNetconfDeviceTest {
         final NetconfMessage netconfMessage = mock(NetconfMessage.class);
 
         device.onRemoteSessionUp(sessionCaps, listener);
-        verify(facade).onDeviceConnected(any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
+        verify(facade).onDeviceConnected(
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
 
         device.onNotification(netconfMessage);
         verify(facade).onNotification(any(DOMNotification.class));
@@ -69,14 +70,17 @@ public class SchemalessNetconfDeviceTest {
 
     @SuppressWarnings("unchecked")
     private static RemoteDeviceHandler<NetconfSessionPreferences> getFacade() throws Exception {
-        final RemoteDeviceHandler<NetconfSessionPreferences> remoteDeviceHandler = mockCloseableClass(RemoteDeviceHandler.class);
-        doNothing().when(remoteDeviceHandler).onDeviceConnected(any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class));
+        final RemoteDeviceHandler<NetconfSessionPreferences> remoteDeviceHandler =
+                mockCloseableClass(RemoteDeviceHandler.class);
+        doNothing().when(remoteDeviceHandler).onDeviceConnected(
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class));
         doNothing().when(remoteDeviceHandler).onDeviceDisconnected();
         doNothing().when(remoteDeviceHandler).onNotification(any(DOMNotification.class));
         return remoteDeviceHandler;
     }
 
-    private static <T extends AutoCloseable> T mockCloseableClass(final Class<T> remoteDeviceHandlerClass) throws Exception {
+    private static <T extends AutoCloseable> T mockCloseableClass(
+            final Class<T> remoteDeviceHandlerClass) throws Exception {
         final T mock = mockClass(remoteDeviceHandlerClass);
         doNothing().when(mock).close();
         return mock;
@@ -88,12 +92,13 @@ public class SchemalessNetconfDeviceTest {
         return mock;
     }
 
-    private static NetconfSessionPreferences getSessionCaps(final boolean addMonitor, final Collection<String> additionalCapabilities) {
+    private static NetconfSessionPreferences getSessionCaps(final boolean addMonitor,
+                                                            final Collection<String> additionalCapabilities) {
         final ArrayList<String> capabilities = Lists.newArrayList(
                 XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
                 XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1);
 
-        if(addMonitor) {
+        if (addMonitor) {
             capabilities.add(NetconfMessageTransformUtil.IETF_NETCONF_MONITORING.getNamespace().toString());
         }
 

@@ -104,6 +104,7 @@ public class TxChain implements DOMTransactionChain, TxListener {
         currentTransaction = null;
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     private void removePendingTx(final AbstractWriteTx transaction) {
         try {
             pendingTransactions.remove(transaction).close();

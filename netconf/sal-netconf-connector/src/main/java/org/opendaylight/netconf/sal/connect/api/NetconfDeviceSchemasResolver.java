@@ -13,8 +13,9 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 
 /**
- * Factory for netconf device schemas
+ * Factory for netconf device schemas.
  */
 public interface NetconfDeviceSchemasResolver {
-    NetconfDeviceSchemas resolve(final NetconfDeviceRpc deviceRpc, final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id);
+    NetconfDeviceSchemas resolve(
+            NetconfDeviceRpc deviceRpc, NetconfSessionPreferences remoteSessionCapabilities, RemoteDeviceId id);
 }

@@ -42,7 +42,8 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
     private final SchemalessMessageTransformer schemalessTransformer;
     private final RemoteDeviceId deviceId;
 
-    public SchemalessNetconfDeviceRpc(final RemoteDeviceId deviceId, final RemoteDeviceCommunicator<NetconfMessage> listener,
+    public SchemalessNetconfDeviceRpc(final RemoteDeviceId deviceId,
+                                      final RemoteDeviceCommunicator<NetconfMessage> listener,
                                       final BaseRpcSchemalessTransformer baseRpcTransformer,
                                       final SchemalessMessageTransformer messageTransformer) {
         this.deviceId = deviceId;
@@ -61,30 +62,34 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
         } else if (isBaseRpc(type)) {
             transformer = baseRpcTransformer;
         } else {
-            return Futures.immediateFailedCheckedFuture(new DOMRpcImplementationNotAvailableException("Unable to invoke rpc %s", type));
+            return Futures.immediateFailedCheckedFuture(
+                    new DOMRpcImplementationNotAvailableException("Unable to invoke rpc %s", type));
         }
         return handleRpc(type, input, transformer);
     }
 
-    private CheckedFuture<DOMRpcResult, DOMRpcException> handleRpc(@Nonnull final SchemaPath type,
-                                                                   @Nullable final NormalizedNode<?, ?> input,
-                                                                   final MessageTransformer<NetconfMessage> transformer) {
+    private CheckedFuture<DOMRpcResult, DOMRpcException> handleRpc(
+            @Nonnull final SchemaPath type, @Nullable final NormalizedNode<?, ?> input,
+            final MessageTransformer<NetconfMessage> transformer) {
         final NetconfMessage netconfMessage = transformer.toRpcRequest(type, input);
-        final ListenableFuture<RpcResult<NetconfMessage>> rpcResultListenableFuture = listener.sendRequest(netconfMessage, type.getLastComponent());
+        final ListenableFuture<RpcResult<NetconfMessage>> rpcResultListenableFuture =
+                listener.sendRequest(netconfMessage, type.getLastComponent());
 
-        final ListenableFuture<DOMRpcResult> transformed = Futures.transform(rpcResultListenableFuture, (Function<RpcResult<NetconfMessage>, DOMRpcResult>) input1 -> {
-            if (input1.isSuccessful()) {
-                return transformer.toRpcResult(input1.getResult(), type);
-            } else {
-                return new DefaultDOMRpcResult(input1.getErrors());
-            }
-        });
+        final ListenableFuture<DOMRpcResult> transformed =
+            Futures.transform(rpcResultListenableFuture, (Function<RpcResult<NetconfMessage>, DOMRpcResult>) input1 -> {
+                if (input1.isSuccessful()) {
+                    return transformer.toRpcResult(input1.getResult(), type);
+                } else {
+                    return new DefaultDOMRpcResult(input1.getErrors());
+                }
+            });
 
         return Futures.makeChecked(transformed, new Function<Exception, DOMRpcException>() {
             @Nullable
             @Override
-            public DOMRpcException apply(@Nullable final Exception e) {
-                return new DOMRpcImplementationNotAvailableException(e, "Unable to invoke rpc %s on device %s", type, deviceId);
+            public DOMRpcException apply(@Nullable final Exception exception) {
+                return new DOMRpcImplementationNotAvailableException(
+                        exception, "Unable to invoke rpc %s on device %s", type, deviceId);
             }
         });
     }
@@ -96,7 +101,8 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
 
     @Nonnull
     @Override
-    public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(@Nonnull final T listener) {
+    public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(
+            @Nonnull final T listener) {
         throw new UnsupportedOperationException("Not available for netconf 1.0");
     }
 

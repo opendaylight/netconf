@@ -59,7 +59,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     private static final Function<SchemaNode, QName> QNAME_FUNCTION = rpcDefinition -> rpcDefinition.getQName();
 
-    private static final Function<SchemaNode, QName> QNAME_NOREV_FUNCTION = notification -> QNAME_FUNCTION.apply(notification).withoutRevision();
+    private static final Function<SchemaNode, QName> QNAME_NOREV_FUNCTION =
+        notification -> QNAME_FUNCTION.apply(notification).withoutRevision();
 
     private final SchemaContext schemaContext;
     private final BaseSchema baseSchema;
@@ -72,10 +73,12 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         this(schemaContext, strictParsing, BaseSchema.BASE_NETCONF_CTX);
     }
 
-    public NetconfMessageTransformer(final SchemaContext schemaContext, final boolean strictParsing, final BaseSchema baseSchema) {
+    public NetconfMessageTransformer(final SchemaContext schemaContext, final boolean strictParsing,
+                                     final BaseSchema baseSchema) {
         this.counter = new MessageCounter();
         this.schemaContext = schemaContext;
-        parserFactory = DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, schemaContext, strictParsing);
+        parserFactory = DomToNormalizedNodeParserFactory
+                .getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, schemaContext, strictParsing);
         mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), QNAME_FUNCTION);
         mappedNotifications = Multimaps.index(schemaContext.getNotifications(), QNAME_NOREV_FUNCTION);
         this.baseSchema = baseSchema;
@@ -86,17 +89,21 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         final Map.Entry<Date, XmlElement> stripped = NetconfMessageTransformUtil.stripNotification(message);
         final QName notificationNoRev;
         try {
-            notificationNoRev = QName.create(stripped.getValue().getNamespace(), stripped.getValue().getName()).withoutRevision();
+            notificationNoRev = QName.create(
+                    stripped.getValue().getNamespace(), stripped.getValue().getName()).withoutRevision();
         } catch (final MissingNameSpaceException e) {
-            throw new IllegalArgumentException("Unable to parse notification " + message + ", cannot find namespace", e);
+            throw new IllegalArgumentException(
+                    "Unable to parse notification " + message + ", cannot find namespace", e);
         }
         final Collection<NotificationDefinition> notificationDefinitions = mappedNotifications.get(notificationNoRev);
         Preconditions.checkArgument(notificationDefinitions.size() > 0,
-                "Unable to parse notification %s, unknown notification. Available notifications: %s", notificationDefinitions, mappedNotifications.keySet());
+                "Unable to parse notification %s, unknown notification. Available notifications: %s",
+                notificationDefinitions, mappedNotifications.keySet());
 
         final NotificationDefinition mostRecentNotification = getMostRecentNotification(notificationDefinitions);
 
-        final ContainerSchemaNode notificationAsContainerSchemaNode = NetconfMessageTransformUtil.createSchemaForNotification(mostRecentNotification);
+        final ContainerSchemaNode notificationAsContainerSchemaNode =
+                NetconfMessageTransformUtil.createSchemaForNotification(mostRecentNotification);
 
         final Element element = stripped.getValue().getDomElement();
         final ContainerNode content;
@@ -109,8 +116,10 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         return new NetconfDeviceNotification(content, stripped.getKey());
     }
 
-    private static NotificationDefinition getMostRecentNotification(final Collection<NotificationDefinition> notificationDefinitions) {
-        Comparator<NotificationDefinition> cmp = (o1, o2) -> o1.getQName().getRevision().compareTo(o2.getQName().getRevision());
+    private static NotificationDefinition getMostRecentNotification(
+            final Collection<NotificationDefinition> notificationDefinitions) {
+        Comparator<NotificationDefinition> cmp = (o1, o2) ->
+                o1.getQName().getRevision().compareTo(o2.getQName().getRevision());
 
         return Collections.max(notificationDefinitions, cmp);
     }
@@ -121,16 +130,19 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         final QName rpcQName = rpc.getLastComponent();
         Map<QName, RpcDefinition> currentMappedRpcs = mappedRpcs;
 
-        // Determine whether a base netconf operation is being invoked and also check if the device exposed model for base netconf
+        // Determine whether a base netconf operation is being invoked
+        // and also check if the device exposed model for base netconf.
         // If no, use pre built base netconf operations model
         final boolean needToUseBaseCtx = mappedRpcs.get(rpcQName) == null && isBaseOrNotificationRpc(rpcQName);
-        if(needToUseBaseCtx) {
+        if (needToUseBaseCtx) {
             currentMappedRpcs = baseSchema.getMappedRpcs();
         }
 
-        Preconditions.checkNotNull(currentMappedRpcs.get(rpcQName), "Unknown rpc %s, available rpcs: %s", rpcQName, currentMappedRpcs.keySet());
-        if(currentMappedRpcs.get(rpcQName).getInput().getChildNodes().isEmpty()) {
-            return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpcQName, counter).getNode().getOwnerDocument());
+        Preconditions.checkNotNull(currentMappedRpcs.get(rpcQName),
+                "Unknown rpc %s, available rpcs: %s", rpcQName, currentMappedRpcs.keySet());
+        if (currentMappedRpcs.get(rpcQName).getInput().getChildNodes().isEmpty()) {
+            return new NetconfMessage(NetconfMessageTransformUtil
+                    .prepareDomResultForRpcRequest(rpcQName, counter).getNode().getOwnerDocument());
         }
 
         Preconditions.checkNotNull(payload, "Transforming an rpc with input: %s, payload cannot be null", rpcQName);
@@ -142,7 +154,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpcQName, counter);
 
         try {
-            // If the schema context for netconf device does not contain model for base netconf operations, use default pre build context with just the base model
+            // If the schema context for netconf device does not contain model for base netconf operations,
+            // use default pre build context with just the base model
             // This way operations like lock/unlock are supported even if the source for base model was not provided
             SchemaContext ctx = needToUseBaseCtx ? baseSchema.getSchemaContext() : schemaContext;
             NetconfMessageTransformUtil.writeNormalizedRpc(((ContainerNode) payload), result, rpc, ctx);
@@ -156,9 +169,9 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     private static boolean isBaseOrNotificationRpc(final QName rpc) {
-        return rpc.getNamespace().equals(NETCONF_URI) ||
-                rpc.getNamespace().equals(IETF_NETCONF_NOTIFICATIONS.getNamespace()) ||
-                rpc.getNamespace().equals(NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME.getNamespace());
+        return rpc.getNamespace().equals(NETCONF_URI)
+                || rpc.getNamespace().equals(IETF_NETCONF_NOTIFICATIONS.getNamespace())
+                || rpc.getNamespace().equals(NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME.getNamespace());
     }
 
 
@@ -168,30 +181,36 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         final QName rpcQName = rpc.getLastComponent();
         if (NetconfMessageTransformUtil.isDataRetrievalOperation(rpcQName)) {
             final Element xmlData = NetconfMessageTransformUtil.getDataSubtree(message.getDocument());
-            final ContainerSchemaNode schemaForDataRead = NetconfMessageTransformUtil.createSchemaForDataRead(schemaContext);
+            final ContainerSchemaNode schemaForDataRead =
+                    NetconfMessageTransformUtil.createSchemaForDataRead(schemaContext);
             final ContainerNode dataNode;
 
             try {
-                dataNode = parserFactory.getContainerNodeParser().parse(Collections.singleton(xmlData), schemaForDataRead);
+                dataNode =
+                        parserFactory.getContainerNodeParser().parse(Collections.singleton(xmlData), schemaForDataRead);
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException(String.format("Failed to parse data response %s", xmlData), e);
             }
 
-            normalizedNode = Builders.containerBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME))
+            normalizedNode = Builders.containerBuilder()
+                    .withNodeIdentifier(new YangInstanceIdentifier
+                            .NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME))
                     .withChild(dataNode).build();
         } else {
 
             Map<QName, RpcDefinition> currentMappedRpcs = mappedRpcs;
 
-            // Determine whether a base netconf operation is being invoked and also check if the device exposed model for base netconf
+            // Determine whether a base netconf operation is being invoked
+            // and also check if the device exposed model for base netconf.
             // If no, use pre built base netconf operations model
             final boolean needToUseBaseCtx = mappedRpcs.get(rpcQName) == null && isBaseOrNotificationRpc(rpcQName);
-            if(needToUseBaseCtx) {
+            if (needToUseBaseCtx) {
                 currentMappedRpcs = baseSchema.getMappedRpcs();
             }
 
             final RpcDefinition rpcDefinition = currentMappedRpcs.get(rpcQName);
-            Preconditions.checkArgument(rpcDefinition != null, "Unable to parse response of %s, the rpc is unknown", rpcQName);
+            Preconditions.checkArgument(rpcDefinition != null,
+                    "Unable to parse response of %s, the rpc is unknown", rpcQName);
 
             // In case no input for rpc is defined, we can simply construct the payload here
             if (rpcDefinition.getOutput().getChildNodes().isEmpty()) {

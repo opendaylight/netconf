@@ -34,18 +34,20 @@ public class SchemalessMessageTransformerTest {
         XMLUnit.setIgnoreWhitespace(true);
     }
 
-    private static final String EXP_REQUEST = "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
-            "<test-rpc xmlns=\"test-ns\">\n" +
-            "<input>aaa</input>\n" +
-            "</test-rpc>\n" +
-            "</rpc>";
-    private static final String EXP_REPLY = "<rpc-reply message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
-            "<output xmlns=\"test-ns\">aaa</output>\n" +
-            "</rpc-reply>";
-    private static final String OK_REPLY = "<rpc-reply message-id=\"101\"\n" +
-            "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
-            "<ok/>\n" +
-            "</rpc-reply>\n";
+    private static final String EXP_REQUEST =
+            "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                    + "<test-rpc xmlns=\"test-ns\">\n"
+                    + "<input>aaa</input>\n"
+                    + "</test-rpc>\n"
+                    + "</rpc>";
+    private static final String EXP_REPLY =
+            "<rpc-reply message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                    + "<output xmlns=\"test-ns\">aaa</output>\n"
+                    + "</rpc-reply>";
+    private static final String OK_REPLY = "<rpc-reply message-id=\"101\"\n"
+            + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+            + "<ok/>\n"
+            + "</rpc-reply>\n";
 
     private SchemalessMessageTransformer transformer;
     private static final QName TEST_RPC = QName.create("test-ns", "2016-10-13", "test-rpc");
@@ -61,8 +63,10 @@ public class SchemalessMessageTransformerTest {
         final Document payload = XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/notification-payload.xml"));
         final NetconfMessage netconfMessage = new NetconfMessage(payload);
         final DOMNotification domNotification = transformer.toNotification(netconfMessage);
-        Assert.assertEquals(domNotification.getType().getLastComponent(), SchemalessMessageTransformer.SCHEMALESS_NOTIFICATION_PAYLOAD.getNodeType());
-        final QName qName = QName.create("org:opendaylight:notification:test:ns:yang:user-notification", "user-visited-page");
+        Assert.assertEquals(domNotification.getType().getLastComponent(),
+                SchemalessMessageTransformer.SCHEMALESS_NOTIFICATION_PAYLOAD.getNodeType());
+        final QName qName =
+                QName.create("org:opendaylight:notification:test:ns:yang:user-notification", "user-visited-page");
         final AnyXmlNode dataContainerChild =
                 (AnyXmlNode) domNotification.getBody().getChild(new YangInstanceIdentifier.NodeIdentifier(qName)).get();
         final Diff diff = XMLUnit.compareXML(payload, dataContainerChild.getValue().getNode().getOwnerDocument());
@@ -97,7 +101,8 @@ public class SchemalessMessageTransformerTest {
     @Test
     public void toEmptyRpcResult() throws Exception {
         final Document doc = XmlUtil.readXmlToDocument(OK_REPLY);
-        final DOMRpcResult result = transformer.toRpcResult(new NetconfMessage(doc), SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME));
+        final DOMRpcResult result = transformer.toRpcResult(
+                new NetconfMessage(doc), SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME));
         Assert.assertNull(result.getResult());
     }
 

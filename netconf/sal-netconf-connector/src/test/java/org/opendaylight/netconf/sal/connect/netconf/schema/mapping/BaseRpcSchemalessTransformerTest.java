@@ -41,22 +41,22 @@ public class BaseRpcSchemalessTransformerTest {
         XMLUnit.setIgnoreAttributeOrder(true);
     }
 
-    private static final String EXP_RPC = "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
-            "   <edit-config>\n" +
-            "       <target>\n" +
-            "           <candidate/>\n" +
-            "       </target>\n" +
-            "       <config>\n" +
-            "           <top xmlns=\"http://example.com/schema/1.2/config\">\n" +
-            "               <users xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:operation=\"replace\">\n" +
-            "                   <user>\n" +
-            "                       <name>fred</name>\n" +
-            "                   </user>\n" +
-            "               </users>\n" +
-            "           </top>\n" +
-            "       </config>\n" +
-            "   </edit-config>\n" +
-            "</rpc>\n";
+    private static final String EXP_RPC = "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+            + "   <edit-config>\n"
+            + "       <target>\n"
+            + "           <candidate/>\n"
+            + "       </target>\n"
+            + "       <config>\n"
+            + "           <top xmlns=\"http://example.com/schema/1.2/config\">\n"
+            + "               <users xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:operation=\"replace\">\n"
+            + "                   <user>\n"
+            + "                       <name>fred</name>\n"
+            + "                   </user>\n"
+            + "               </users>\n"
+            + "           </top>\n"
+            + "       </config>\n"
+            + "   </edit-config>\n"
+            + "</rpc>\n";
 
     BaseRpcSchemalessTransformer transformer;
 
@@ -67,50 +67,61 @@ public class BaseRpcSchemalessTransformerTest {
 
     @Test(expected = UnsupportedOperationException.class)
     public void toNotification() throws Exception {
-        transformer.toNotification(new NetconfMessage(XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/notification-payload.xml"))));
+        transformer.toNotification(new NetconfMessage(
+                XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/notification-payload.xml"))));
     }
 
     @Test
     public void toRpcRequest() throws Exception {
-        final Document doc = XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/schemaless/edit-config/container.xml"));
+        final Document doc =
+                XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/schemaless/edit-config/container.xml"));
         final AnyXmlNode xml = Builders.anyXmlBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_CONFIG_QNAME))
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(
+                        NetconfMessageTransformUtil.NETCONF_CONFIG_QNAME))
                 .withValue(new DOMSource(doc.getDocumentElement()))
                 .build();
         final ChoiceNode editContent = Builders.choiceBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(EditContent.QNAME))
                 .withChild(xml)
                 .build();
-        final ChoiceNode candidate = Builders.choiceBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(ConfigTarget.QNAME))
-                .withChild(Builders.leafBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(Candidate.QNAME)).build())
+        final ChoiceNode candidate = Builders.choiceBuilder().withNodeIdentifier(
+                new YangInstanceIdentifier.NodeIdentifier(ConfigTarget.QNAME))
+                .withChild(Builders.leafBuilder().withNodeIdentifier(
+                        new YangInstanceIdentifier.NodeIdentifier(Candidate.QNAME)).build())
                 .build();
         final DataContainerChild<?, ?> target = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_TARGET_QNAME))
+                .withNodeIdentifier(
+                        new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_TARGET_QNAME))
                 .withChild(candidate)
                 .build();
         final ContainerNode editConfig = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME))
+                .withNodeIdentifier(
+                    new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME))
                 .withChild(editContent)
                 .withChild(target)
                 .build();
-        final NetconfMessage msg = transformer.toRpcRequest(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), editConfig);
+        final NetconfMessage msg = transformer.toRpcRequest(
+                SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), editConfig);
         final Diff diff = XMLUnit.compareXML(EXP_RPC, XmlUtil.toString(msg.getDocument()));
         Assert.assertTrue(diff.toString(), diff.similar());
     }
 
     @Test
     public void toRpcResult() throws Exception {
-        final Document doc = XmlUtil.readXmlToDocument("<rpc-reply message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>");
+        final Document doc = XmlUtil.readXmlToDocument(
+                "<rpc-reply message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>");
         final InputStream stream = getClass().getResourceAsStream("/schemaless/get-config/container.xml");
         final Element dataElement = XmlUtil.readXmlToElement(stream);
         final Element element = (Element) doc.importNode(dataElement, true);
         doc.getDocumentElement().appendChild(element);
         final NetconfMessage msg = new NetconfMessage(doc);
-        final DOMRpcResult result = transformer.toRpcResult(msg, SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME));
+        final DOMRpcResult result = transformer.toRpcResult(msg,
+                SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME));
         Assert.assertNotNull(result.getResult());
         final ContainerNode rpcReply = (ContainerNode) result.getResult();
         Assert.assertEquals(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME, rpcReply.getNodeType());
-        final Optional dataOpt = rpcReply.getChild(new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_QNAME));
+        final Optional dataOpt = rpcReply.getChild(
+                new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_QNAME));
         Assert.assertTrue(dataOpt.isPresent());
         final AnyXmlNode data = (AnyXmlNode) dataOpt.get();
         final Diff diff = XMLUnit.compareXML(dataElement.getOwnerDocument(), (Document) data.getValue().getNode());

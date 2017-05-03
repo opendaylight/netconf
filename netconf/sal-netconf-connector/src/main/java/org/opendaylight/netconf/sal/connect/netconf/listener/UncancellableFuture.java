@@ -16,7 +16,7 @@ final class UncancellableFuture<V> extends AbstractFuture<V> {
     @GuardedBy("this")
     private boolean uncancellable = false;
 
-    public UncancellableFuture(final boolean uncancellable) {
+    UncancellableFuture(final boolean uncancellable) {
         this.uncancellable = uncancellable;
     }
 

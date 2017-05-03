@@ -55,12 +55,13 @@ public class NetconfDeviceDataBrokerTest {
         MockitoAnnotations.initMocks(this);
         final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
         moduleInfoBackedContext.addModuleInfos(
-                Lists.newArrayList(
-                        $YangModuleInfoImpl.getInstance(),
-                        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl.getInstance()));
+                Lists.newArrayList($YangModuleInfoImpl.getInstance(),
+                        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns
+                                .netconf.base._1._0.rev110601.$YangModuleInfoImpl.getInstance()));
         schemaContext = moduleInfoBackedContext.tryToCreateSchemaContext().get();
         DOMRpcResult result = new DefaultDOMRpcResult();
-        when(rpcService.invokeRpc(any(SchemaPath.class), any(NormalizedNode.class))).thenReturn(Futures.immediateCheckedFuture(result));
+        when(rpcService.invokeRpc(any(SchemaPath.class), any(NormalizedNode.class)))
+                .thenReturn(Futures.immediateCheckedFuture(result));
 
         dataBroker = getDataBroker(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
     }
@@ -81,7 +82,8 @@ public class NetconfDeviceDataBrokerTest {
 
     @Test
     public void testWritableRunningCandidateWriteTransaction() throws Exception {
-        testWriteTransaction(WriteCandidateRunningTx.class, NetconfMessageTransformUtil.NETCONF_RUNNING_WRITABLE_URI.toString(),
+        testWriteTransaction(
+                WriteCandidateRunningTx.class, NetconfMessageTransformUtil.NETCONF_RUNNING_WRITABLE_URI.toString(),
                 NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
     }
 
@@ -102,7 +104,8 @@ public class NetconfDeviceDataBrokerTest {
 
     private NetconfDeviceDataBroker getDataBroker(String... caps) {
         NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(Arrays.asList(caps));
-        final RemoteDeviceId id = new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
+        final RemoteDeviceId id =
+                new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
         return new NetconfDeviceDataBroker(id, schemaContext, rpcService, prefs);
     }
 
