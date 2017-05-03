@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
@@ -205,11 +206,12 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         }
 
         return new NetconfConnectorDTO(
-                userCapabilities.isPresent()
-                        ? new NetconfDeviceCommunicator(
-                        remoteDeviceId, device, new UserPreferences(userCapabilities.get(),
-                        node.getYangModuleCapabilities().isOverride(), node.getNonModuleCapabilities().isOverride()),
-                        rpcMessageLimit)
+                userCapabilities.isPresent() ? new NetconfDeviceCommunicator(remoteDeviceId, device,
+                        new UserPreferences(userCapabilities.get(),
+                                Objects.isNull(node.getYangModuleCapabilities())
+                                        ? false : node.getYangModuleCapabilities().isOverride(),
+                                Objects.isNull(node.getNonModuleCapabilities())
+                                        ? false : node.getNonModuleCapabilities().isOverride()), rpcMessageLimit)
                         : new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit), salFacade);
     }
 
