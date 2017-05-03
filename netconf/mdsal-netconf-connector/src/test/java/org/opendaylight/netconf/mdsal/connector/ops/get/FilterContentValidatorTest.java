@@ -83,6 +83,7 @@ public class FilterContentValidatorTest {
         final List<InputStream> sources = new ArrayList<>();
         sources.add(getClass().getResourceAsStream("/yang/filter-validator-test-mod-0.yang"));
         sources.add(getClass().getResourceAsStream("/yang/filter-validator-test-augment.yang"));
+        sources.add(getClass().getResourceAsStream("/yang/mdsal-netconf-mapping-test.yang"));
         final SchemaContext context = parseYangSources(sources);
         final CurrentSchemaContext currentContext = mock(CurrentSchemaContext.class);
         doReturn(context).when(currentContext).getCurrentContext();
@@ -107,11 +108,11 @@ public class FilterContentValidatorTest {
         }
     }
 
-    public static SchemaContext parseYangSources(Collection<InputStream> testFiles)
+    public static SchemaContext parseYangSources(final Collection<InputStream> testFiles)
             throws SourceException, ReactorException, FileNotFoundException {
-        CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
+        final CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
                 .newBuild();
-        for (InputStream testFile : testFiles) {
+        for (final InputStream testFile : testFiles) {
             reactor.addSource(new YangStatementSourceImpl(testFile));
         }
         return reactor.buildEffective();
