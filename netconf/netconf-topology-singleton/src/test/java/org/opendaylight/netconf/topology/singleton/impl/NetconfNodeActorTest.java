@@ -32,15 +32,14 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.net.InetAddresses;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
@@ -110,11 +109,11 @@ public class NetconfNodeActorTest {
     private DataBroker dataBroker;
 
     @Before
-    public void setup() throws UnknownHostException {
+    public void setup() {
         initMocks
                 (this);
         remoteDeviceId = new RemoteDeviceId("netconf-topology",
-                new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 9999));
+                new InetSocketAddress(InetAddresses.forString("127.0.0.1"), 9999));
         final NetconfTopologySetup setup = mock(NetconfTopologySetup.class);
 
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY,
@@ -150,7 +149,7 @@ public class NetconfNodeActorTest {
         /* Test refresh master data */
 
         final RemoteDeviceId remoteDeviceId2 = new RemoteDeviceId("netconf-topology2",
-                new InetSocketAddress(InetAddress.getByName("127.0.0.2"), 9999));
+                new InetSocketAddress(InetAddresses.forString("127.0.0.2"), 9999));
 
         final NetconfTopologySetup setup2 = mock(NetconfTopologySetup.class);
 
