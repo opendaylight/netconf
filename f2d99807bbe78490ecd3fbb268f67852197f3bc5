@@ -22,6 +22,30 @@
       "revId": "f2d99807bbe78490ecd3fbb268f67852197f3bc5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba068154_376837f5",
+        "filename": "features/netconf/odl-netconf-netty-util/src/main/feature/feature.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-05-03T08:33:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba068154_179373fb",
+      "range": {
+        "startLine": 11,
+        "startChar": 26,
+        "endLine": 11,
+        "endChar": 31
+      },
+      "revId": "f2d99807bbe78490ecd3fbb268f67852197f3bc5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
