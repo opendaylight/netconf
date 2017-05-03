@@ -11,7 +11,7 @@ package org.opendaylight.netconf.sal.rest.doc.swagger;
  * Implementation of swagger spec (see <a href=
  * "https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md#524-parameter-object"
  * > https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md#524-
- * parameter-object</a>)
+ * parameter-object</a>).
  */
 public class Parameter {
     private String name;

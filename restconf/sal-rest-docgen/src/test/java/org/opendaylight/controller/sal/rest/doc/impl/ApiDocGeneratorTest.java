@@ -64,7 +64,7 @@ public class ApiDocGeneratorTest {
     }
 
     /**
-     * Method: getApiDeclaration(String module, String revision, UriInfo uriInfo)
+     * Method: getApiDeclaration(String module, String revision, UriInfo uriInfo).
      */
     @Test
     public void testGetModuleDoc() throws Exception {
@@ -98,8 +98,8 @@ public class ApiDocGeneratorTest {
         final Api cont1Api = findApi("/config/toaster2:lst/cont1", doc);
         assertNotNull("Api /config/toaster2:lst/cont1 wasn't found", cont1Api);
         assertTrue("POST for cont11 in cont1 is missing",
-                findOperation(cont1Api.getOperations(), "POST", "(config)cont1POST", "toaster2/lst/cont1(config)cont11-TOP",
-                        "toaster2/lst/cont1(config)lst11-TOP"));
+            findOperation(cont1Api.getOperations(), "POST", "(config)cont1POST", "toaster2/lst/cont1(config)cont11-TOP",
+                    "toaster2/lst/cont1(config)lst11-TOP"));
 
         // no POST URI
         final Api cont11Api = findApi("/config/toaster2:lst/cont1/cont11", doc);
@@ -109,7 +109,7 @@ public class ApiDocGeneratorTest {
     }
 
     /**
-     * Tries to find operation with name {@code operationName} and with summary {@code summary}
+     * Tries to find operation with name {@code operationName} and with summary {@code summary}.
      */
     private boolean findOperation(final List<Operation> operations, final String operationName, final String type,
                                   final String... searchedParameters) {
@@ -149,7 +149,7 @@ public class ApiDocGeneratorTest {
     }
 
     /**
-     * Tries to find {@code Api} with path {@code path}
+     * Tries to find {@code Api} with path {@code path}.
      */
     private Api findApi(final String path, final ApiDeclaration doc) {
         for (final Api api : doc.getApis()) {
@@ -246,8 +246,8 @@ public class ApiDocGeneratorTest {
 
                 // testing bugs.opendaylight.org bug 1290. UnionType model type.
                 final String jsonString = doc.getModels().toString();
-                assertTrue(jsonString.contains(
-                        "testUnion\":{\"type\":\"-2147483648\",\"required\":false,\"enum\":[\"-2147483648\",\"Some testUnion\"]}"));
+                assertTrue(jsonString.contains("testUnion\":{\"type\":\"-2147483648\",\"required\":false,"
+                        + "\"enum\":[\"-2147483648\",\"Some testUnion\"]}"));
             }
         }
     }
@@ -265,7 +265,8 @@ public class ApiDocGeneratorTest {
 
                 final JSONObject models = doc.getModels();
                 final JSONObject inputTop = models.getJSONObject("(make-toast)input-TOP");
-                final String testString = "{\"toaster:input\":{\"type\":\"object\",\"items\":{\"$ref\":\"(make-toast)input\"}}}";
+                final String testString =
+                        "{\"toaster:input\":{\"type\":\"object\",\"items\":{\"$ref\":\"(make-toast)input\"}}}";
                 assertEquals(testString, inputTop.getJSONObject("properties").toString());
                 final JSONObject input = models.getJSONObject("(make-toast)input");
                 final JSONObject properties = input.getJSONObject("properties");
@@ -278,17 +279,18 @@ public class ApiDocGeneratorTest {
     /**
      * Tests whether from yang files are generated all required paths for HTTP operations (GET, DELETE, PUT, POST)
      *
+     * <p>
      * If container | list is augmented then in path there should be specified module name followed with collon (e. g.
      * "/config/module1:element1/element2/module2:element3")
      *
-     * @param doc
-     * @throws Exception
+     * @param doc Api declaration
+     * @throws Exception if operation fails
      */
     private void validateToaster(final ApiDeclaration doc) throws Exception {
         final Set<String> expectedUrls = new TreeSet<>(Arrays.asList(new String[]{"/config/toaster2:toaster",
-                "/operational/toaster2:toaster", "/operations/toaster2:cancel-toast",
-                "/operations/toaster2:make-toast", "/operations/toaster2:restock-toaster",
-                "/config/toaster2:toaster/toasterSlot/{slotId}/toaster-augmented:slotInfo"}));
+            "/operational/toaster2:toaster", "/operations/toaster2:cancel-toast",
+            "/operations/toaster2:make-toast", "/operations/toaster2:restock-toaster",
+            "/config/toaster2:toaster/toasterSlot/{slotId}/toaster-augmented:slotInfo"}));
 
         final Set<String> actualUrls = new TreeSet<>();
 

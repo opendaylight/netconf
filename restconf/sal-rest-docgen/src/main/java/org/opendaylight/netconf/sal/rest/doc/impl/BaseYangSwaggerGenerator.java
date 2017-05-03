@@ -174,14 +174,14 @@ public class BaseYangSwaggerGenerator {
         return basePath;
     }
 
-    public ApiDeclaration getSwaggerDocSpec(final Module m, final String basePath, final String context,
-            final SchemaContext schemaContext) {
+    public ApiDeclaration getSwaggerDocSpec(final Module module, final String basePath, final String context,
+                                            final SchemaContext schemaContext) {
         final ApiDeclaration doc = createApiDeclaration(basePath);
 
         final List<Api> apis = new ArrayList<>();
         boolean hasAddRootPostLink = false;
 
-        final Collection<DataSchemaNode> dataSchemaNodes = m.getChildNodes();
+        final Collection<DataSchemaNode> dataSchemaNodes = module.getChildNodes();
         LOG.debug("child nodes size [{}]", dataSchemaNodes.size());
         for (final DataSchemaNode node : dataSchemaNodes) {
             if ((node instanceof ListSchemaNode) || (node instanceof ContainerSchemaNode)) {
@@ -204,22 +204,22 @@ public class BaseYangSwaggerGenerator {
                      * only one root post link is added for this module.
                      */
                     if (!hasAddRootPostLink) {
-                        LOG.debug("Has added root post link for module {}", m.getName());
-                        addRootPostLink(m, (DataNodeContainer) node, pathParams, resourcePath, "config", apis);
+                        LOG.debug("Has added root post link for module {}", module.getName());
+                        addRootPostLink(module, (DataNodeContainer) node, pathParams, resourcePath, "config", apis);
 
                         hasAddRootPostLink = true;
                     }
 
-                    addApis(node, apis, resourcePath, pathParams, schemaContext, true, m.getName(), "config");
+                    addApis(node, apis, resourcePath, pathParams, schemaContext, true, module.getName(), "config");
                 }
                 pathParams = new ArrayList<>();
                 resourcePath = getDataStorePath("operational", context);
 
-                addApis(node, apis, resourcePath, pathParams, schemaContext, false, m.getName(), "operational");
+                addApis(node, apis, resourcePath, pathParams, schemaContext, false, module.getName(), "operational");
             }
         }
 
-        final Set<RpcDefinition> rpcs = m.getRpcs();
+        final Set<RpcDefinition> rpcs = module.getRpcs();
         for (final RpcDefinition rpcDefinition : rpcs) {
             final String resourcePath;
             resourcePath = getDataStorePath("operations", context);
@@ -234,7 +234,7 @@ public class BaseYangSwaggerGenerator {
             JSONObject models = null;
 
             try {
-                models = this.jsonConverter.convertToJsonSchema(m, schemaContext);
+                models = this.jsonConverter.convertToJsonSchema(module, schemaContext);
                 doc.setModels(models);
                 if (LOG.isDebugEnabled()) {
                     LOG.debug(this.mapper.writeValueAsString(doc));
@@ -293,7 +293,7 @@ public class BaseYangSwaggerGenerator {
         LOG.debug("Adding path: [{}]", resourcePath);
         api.setPath(resourcePath.concat(getContent(dataStore)));
 
-        Iterable<DataSchemaNode> childSchemaNodes = Collections.<DataSchemaNode> emptySet();
+        Iterable<DataSchemaNode> childSchemaNodes = Collections.<DataSchemaNode>emptySet();
         if ((node instanceof ListSchemaNode) || (node instanceof ContainerSchemaNode)) {
             final DataNodeContainer dataNodeContainer = (DataNodeContainer) node;
             childSchemaNodes = dataNodeContainer.getChildNodes();

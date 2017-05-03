@@ -14,7 +14,7 @@ import org.json.JSONObject;
  * Implementation of swagger spec (see <a href=
  * "https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md#52-api-declaration"
  * > https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md#52-api-
- * declaration</a>)
+ * declaration</a>).
  */
 public class ApiDeclaration {
     private String apiVersion;
