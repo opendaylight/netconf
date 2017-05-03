@@ -54,8 +54,10 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 public class NetconfEventSourceTest {
 
 
-    private static final SchemaPath notification1Path = SchemaPath.create(true, QName.create("ns1", "1970-01-15", "not1"));
-    private static final SchemaPath notification2Path = SchemaPath.create(true, QName.create("ns2", "1980-02-18", "not2"));
+    private static final SchemaPath NOTIFICATION_1_PATH = SchemaPath.create(true, QName.create("ns1", "1970-01-15",
+            "not1"));
+    private static final SchemaPath NOTIFICATION_2_PATH = SchemaPath.create(true, QName.create("ns2", "1980-02-18",
+            "not2"));
 
     NetconfEventSource netconfEventSource;
 
@@ -72,14 +74,16 @@ public class NetconfEventSourceTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         //init notification mocks
-        doReturn(notification1Path).when(matchnigNotification).getType();
-        doReturn(notification2Path).when(nonMachtingNotification).getType();
-        DataContainerNodeAttrBuilder<YangInstanceIdentifier.NodeIdentifier, ContainerNode> body = Builders.containerBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("ns1", "1970-01-15", "not1data")));
+        doReturn(NOTIFICATION_1_PATH).when(matchnigNotification).getType();
+        doReturn(NOTIFICATION_2_PATH).when(nonMachtingNotification).getType();
+        DataContainerNodeAttrBuilder<YangInstanceIdentifier.NodeIdentifier, ContainerNode> body = Builders
+                .containerBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("ns1",
+                        "1970-01-15", "not1data")));
         doReturn(body.build()).when(matchnigNotification).getBody();
         //init schema context mock
         Set<NotificationDefinition> notifications = new HashSet<>();
-        notifications.add(getNotificationDefinitionMock(notification1Path.getLastComponent()));
-        notifications.add(getNotificationDefinitionMock(notification2Path.getLastComponent()));
+        notifications.add(getNotificationDefinitionMock(NOTIFICATION_1_PATH.getLastComponent()));
+        notifications.add(getNotificationDefinitionMock(NOTIFICATION_2_PATH.getLastComponent()));
         SchemaContext schemaContext = mock(SchemaContext.class);
         doReturn(notifications).when(schemaContext).getNotifications();
         //init mount point mock
@@ -91,11 +95,12 @@ public class NetconfEventSourceTest {
         doReturn(Futures.immediateCheckedFuture(null)).when(mount).invokeCreateSubscription(any(), any());
         doReturn(Futures.immediateCheckedFuture(null)).when(mount).invokeCreateSubscription(any());
         doReturn(mock(ListenerRegistration.class)).when(mount).registerNotificationListener(any(), any());
-        final Node nodeId1 = NetconfTestUtils.getNetconfNode("NodeId1", "node.test.local", ConnectionStatus.Connected, NetconfTestUtils.notification_capability_prefix);
+        final Node nodeId1 = NetconfTestUtils.getNetconfNode("NodeId1", "node.test.local", ConnectionStatus
+                .Connected, NetconfTestUtils.NOTIFICATION_CAPABILITY_PREFIX);
         doReturn(nodeId1).when(mount).getNode();
 
         Map<String, String> streamMap = new HashMap<>();
-        streamMap.put(notification1Path.getLastComponent().getNamespace().toString(), "stream-1");
+        streamMap.put(NOTIFICATION_1_PATH.getLastComponent().getNamespace().toString(), "stream-1");
         netconfEventSource = new NetconfEventSource(
                 streamMap,
                 mount,
@@ -121,7 +126,8 @@ public class NetconfEventSourceTest {
         final TopicDOMNotification value = (TopicDOMNotification) captor.getValue();
         final QName qname = TopicNotification.QNAME;
         final YangInstanceIdentifier.NodeIdentifier topicIdNode =
-                new YangInstanceIdentifier.NodeIdentifier(QName.create(qname.getNamespace().toString(), qname.getFormattedRevision(), "topic-id"));
+                new YangInstanceIdentifier.NodeIdentifier(QName.create(qname.getNamespace().toString(), qname
+                        .getFormattedRevision(), "topic-id"));
         final Object actualTopicId = value.getBody().getChild(topicIdNode).get().getValue();
         Assert.assertEquals(topic1.getTopicId(), actualTopicId);
     }
@@ -152,10 +158,10 @@ public class NetconfEventSourceTest {
                 .build();
     }
 
-    private NotificationDefinition getNotificationDefinitionMock(QName qName) {
+    private NotificationDefinition getNotificationDefinitionMock(QName qualifiedName) {
         NotificationDefinition notification = mock(NotificationDefinition.class);
-        doReturn(qName).when(notification).getQName();
-        doReturn(SchemaPath.create(true, qName)).when(notification).getPath();
+        doReturn(qualifiedName).when(notification).getQName();
+        doReturn(SchemaPath.create(true, qualifiedName)).when(notification).getPath();
         return notification;
     }
 

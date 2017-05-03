@@ -66,11 +66,14 @@ public class NetconfEventSourceMountTest {
         MockitoAnnotations.initMocks(this);
         doReturn(Optional.of(dataBroker)).when(domMountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.of(rpcService)).when(domMountPoint).getService(DOMRpcService.class);
-        doReturn(Optional.of(mock(DOMNotificationService.class))).when(domMountPoint).getService(DOMNotificationService.class);
+        doReturn(Optional.of(mock(DOMNotificationService.class))).when(domMountPoint)
+                .getService(DOMNotificationService.class);
         doReturn(tx).when(dataBroker).newReadOnlyTransaction();
-        final YangInstanceIdentifier path = YangInstanceIdentifier.builder().node(Netconf.QNAME).node(Streams.QNAME).build();
+        final YangInstanceIdentifier path = YangInstanceIdentifier.builder().node(Netconf.QNAME).node(Streams.QNAME)
+                .build();
         final NormalizedNode<?, ?> streamsNode = NetconfTestUtils.getStreamsNode(STREAM_1, STREAM_2);
-        doReturn(Futures.immediateCheckedFuture(Optional.of(streamsNode))).when(tx).read(LogicalDatastoreType.OPERATIONAL, path);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(streamsNode))).when(tx).read(LogicalDatastoreType
+                .OPERATIONAL, path);
         mount = new NetconfEventSourceMount(NetconfTestUtils.getNode("node-1"), domMountPoint);
     }
 
@@ -80,7 +83,8 @@ public class NetconfEventSourceMountTest {
                 .setName(new StreamNameType(STREAM_1))
                 .build();
         mount.invokeCreateSubscription(stream, Optional.absent());
-        final SchemaPath type = SchemaPath.create(true, QName.create(CreateSubscriptionInput.QNAME, "create-subscription"));
+        final SchemaPath type = SchemaPath.create(true, QName.create(CreateSubscriptionInput.QNAME,
+                "create-subscription"));
         ArgumentCaptor<ContainerNode> captor = ArgumentCaptor.forClass(ContainerNode.class);
         verify(rpcService).invokeRpc(eq(type), captor.capture());
         Assert.assertEquals(STREAM_1, getStreamName(captor.getValue()));
@@ -94,11 +98,13 @@ public class NetconfEventSourceMountTest {
                 .build();
         final Date date = new Date();
         mount.invokeCreateSubscription(stream, Optional.of(date));
-        final SchemaPath type = SchemaPath.create(true, QName.create(CreateSubscriptionInput.QNAME, "create-subscription"));
+        final SchemaPath type = SchemaPath.create(true, QName.create(CreateSubscriptionInput.QNAME,
+                "create-subscription"));
         ArgumentCaptor<ContainerNode> captor = ArgumentCaptor.forClass(ContainerNode.class);
         verify(rpcService).invokeRpc(eq(type), captor.capture());
         Assert.assertEquals(STREAM_1, getStreamName(captor.getValue()));
-        final String expDate = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(date.toInstant().atZone(ZoneId.systemDefault()));
+        final String expDate = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(date.toInstant().atZone(ZoneId
+                .systemDefault()));
         final Optional<LeafNode> actual = (Optional<LeafNode>) getDate(captor.getValue());
         Assert.assertTrue(actual.isPresent());
         String actualDate = (String) actual.get().getValue();
@@ -112,7 +118,8 @@ public class NetconfEventSourceMountTest {
                 .setReplaySupport(true)
                 .build();
         mount.invokeCreateSubscription(stream, Optional.absent());
-        final SchemaPath type = SchemaPath.create(true, QName.create(CreateSubscriptionInput.QNAME, "create-subscription"));
+        final SchemaPath type = SchemaPath.create(true, QName.create(CreateSubscriptionInput.QNAME,
+                "create-subscription"));
         ArgumentCaptor<ContainerNode> captor = ArgumentCaptor.forClass(ContainerNode.class);
         verify(rpcService).invokeRpc(eq(type), captor.capture());
         Assert.assertEquals(STREAM_1, getStreamName(captor.getValue()));
@@ -137,12 +144,14 @@ public class NetconfEventSourceMountTest {
     }
 
     private String getStreamName(ContainerNode value) {
-        YangInstanceIdentifier.NodeIdentifier STREAM = new YangInstanceIdentifier.NodeIdentifier(QName.create(CreateSubscriptionInput.QNAME, "stream"));
-        return (String) value.getChild(STREAM).get().getValue();
+        YangInstanceIdentifier.NodeIdentifier stream =
+                new YangInstanceIdentifier.NodeIdentifier(QName.create(CreateSubscriptionInput.QNAME, "stream"));
+        return (String) value.getChild(stream).get().getValue();
     }
 
     private Optional<?> getDate(ContainerNode value) {
-        YangInstanceIdentifier.NodeIdentifier START_TIME = new YangInstanceIdentifier.NodeIdentifier(QName.create(CreateSubscriptionInput.QNAME, "startTime"));
-        return value.getChild(START_TIME);
+        YangInstanceIdentifier.NodeIdentifier startTime =
+                new YangInstanceIdentifier.NodeIdentifier(QName.create(CreateSubscriptionInput.QNAME, "startTime"));
+        return value.getChild(startTime);
     }
 }
