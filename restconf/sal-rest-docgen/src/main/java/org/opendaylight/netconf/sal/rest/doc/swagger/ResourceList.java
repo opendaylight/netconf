@@ -13,7 +13,7 @@ import java.util.List;
  * Implementation of swagger spec (see <a href=
  * "https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md#51-resource-listing"
  * > https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md#51-
- * resource-listing</a>)
+ * resource-listing</a>).
  */
 public class ResourceList {
     private String apiVersion;

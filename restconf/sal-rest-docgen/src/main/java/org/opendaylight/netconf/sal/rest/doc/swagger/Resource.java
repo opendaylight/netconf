@@ -11,7 +11,7 @@ package org.opendaylight.netconf.sal.rest.doc.swagger;
  * Implementation of swagger spec (see <a href=
  * "https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md#512-resource-object"
  * > https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md#512-
- * resource-object</a>)
+ * resource-object</a>).
  */
 public class Resource {
     private String path;

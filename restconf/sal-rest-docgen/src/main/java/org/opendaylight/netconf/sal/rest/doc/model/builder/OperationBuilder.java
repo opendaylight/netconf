@@ -93,7 +93,8 @@ public final class OperationBuilder {
         public static final String METHOD_NAME = "POST";
         private final DataNodeContainer dataNodeContainer;
 
-        public Post(final String nodeName, final String parentName, final String description, final DataNodeContainer dataNodeContainer) {
+        public Post(final String nodeName, final String parentName, final String description,
+                    final DataNodeContainer dataNodeContainer) {
             super(nodeName, description, parentName.replace("_module", ""));
             this.dataNodeContainer = dataNodeContainer;
             spec.setType(CONFIG + nodeName + METHOD_NAME);

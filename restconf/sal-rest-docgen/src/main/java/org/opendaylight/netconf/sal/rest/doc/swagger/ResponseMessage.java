@@ -11,7 +11,7 @@ package org.opendaylight.netconf.sal.rest.doc.swagger;
  * Implementation of swagger spec (see <a href=
  * "https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md#525-response-message-object"
  * > https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md#525-
- * response-message-object</a>)
+ * response-message-object</a>).
  */
 public class ResponseMessage {
     private int code;

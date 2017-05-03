@@ -13,7 +13,7 @@ import java.util.List;
  * Implementation of swagger spec (see <a href=
  * "https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md#523-operation-object"
  * > https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md#523-
- * operation-object</a>)
+ * operation-object</a>).
  */
 public class Operation {
     private String method;

@@ -22,7 +22,7 @@ public class RestDocgenUtil {
     private RestDocgenUtil() {
     }
 
-    private static final Map<URI, Map<Date, Module>> namespaceAndRevisionToModule = new HashMap<>();
+    private static final Map<URI, Map<Date, Module>> NAMESPACE_AND_REVISION_TO_MODULE = new HashMap<>();
 
     /**
      * Resolve path argument name for {@code node}.
@@ -54,10 +54,10 @@ public class RestDocgenUtil {
         final URI namespace = node.getQName().getNamespace();
         final Date revision = node.getQName().getRevision();
 
-        Map<Date, Module> revisionToModule = namespaceAndRevisionToModule.get(namespace);
+        Map<Date, Module> revisionToModule = NAMESPACE_AND_REVISION_TO_MODULE.get(namespace);
         if (revisionToModule == null) {
             revisionToModule = new HashMap<>();
-            namespaceAndRevisionToModule.put(namespace, revisionToModule);
+            NAMESPACE_AND_REVISION_TO_MODULE.put(namespace, revisionToModule);
         }
         Module module = revisionToModule.get(revision);
         if (module == null) {
