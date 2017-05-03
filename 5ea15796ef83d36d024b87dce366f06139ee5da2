@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba068154_5aba42e2",
+        "filename": "features/netconf/odl-netconf-netty-util/src/main/feature/feature.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2017-05-03T09:45:14Z",
+      "side": 1,
+      "message": "${karaf4.version}\nI forgot we still support Karaf 3. :)",
+      "range": {
+        "startLine": 11,
+        "startChar": 26,
+        "endLine": 11,
+        "endChar": 42
+      },
+      "revId": "5ea15796ef83d36d024b87dce366f06139ee5da2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
