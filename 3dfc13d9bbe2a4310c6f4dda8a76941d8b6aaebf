@@ -22,6 +22,30 @@
       "revId": "3dfc13d9bbe2a4310c6f4dda8a76941d8b6aaebf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba068154_c26da406",
+        "filename": "features/netconf/odl-netconf-netty-util/src/main/feature/feature.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-05-04T11:07:20Z",
+      "side": 1,
+      "message": "I\u0027m not really sure. It was dependency\u003dtrue in the previous patch set. I\u0027ve tested both and both have worked, so I went with false, since it is default.",
+      "parentUuid": "ba068154_224bd0b1",
+      "range": {
+        "startLine": 11,
+        "startChar": 9,
+        "endLine": 11,
+        "endChar": 16
+      },
+      "revId": "3dfc13d9bbe2a4310c6f4dda8a76941d8b6aaebf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
