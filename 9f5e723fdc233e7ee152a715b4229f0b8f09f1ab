@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba068154_7c11feab",
+        "filename": "features/netconf/odl-netconf-netty-util/src/main/feature/feature.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2017-05-04T08:17:57Z",
+      "side": 1,
+      "message": "There are the default, so you do not need src/main/feature/feature.xml at all.",
+      "range": {
+        "startLine": 11,
+        "startChar": 45,
+        "endLine": 11,
+        "endChar": 84
+      },
+      "revId": "9f5e723fdc233e7ee152a715b4229f0b8f09f1ab",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
