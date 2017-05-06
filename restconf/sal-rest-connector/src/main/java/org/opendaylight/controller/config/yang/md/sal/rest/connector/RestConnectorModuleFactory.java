@@ -17,13 +17,15 @@
 package org.opendaylight.controller.config.yang.md.sal.rest.connector;
 
 import org.opendaylight.controller.config.api.DependencyResolver;
+import org.opendaylight.controller.config.api.DynamicMBeanWithInstance;
 import org.osgi.framework.BundleContext;
 
-public class RestConnectorModuleFactory extends org.opendaylight.controller.config.yang.md.sal.rest.connector.AbstractRestConnectorModuleFactory {
+public class RestConnectorModuleFactory
+        extends org.opendaylight.controller.config.yang.md.sal.rest.connector.AbstractRestConnectorModuleFactory {
 
     @Override
-    public RestConnectorModule instantiateModule(String instanceName, DependencyResolver dependencyResolver,
-                                                 BundleContext bundleContext) {
+    public RestConnectorModule instantiateModule(final String instanceName, final DependencyResolver dependencyResolver,
+                                                 final BundleContext bundleContext) {
         final RestConnectorModule restConnectorModule = super.instantiateModule(instanceName,
                 dependencyResolver, bundleContext);
         restConnectorModule.setBundleContext(bundleContext);
@@ -31,11 +33,23 @@ public class RestConnectorModuleFactory extends org.opendaylight.controller.conf
     }
 
     @Override
-    public RestConnectorModule instantiateModule(String instanceName, DependencyResolver dependencyResolver,
-                               RestConnectorModule oldModule, AutoCloseable oldInstance, BundleContext bundleContext) {
+    public RestConnectorModule instantiateModule(final String instanceName, final DependencyResolver dependencyResolver,
+                                                 final RestConnectorModule oldModule, final AutoCloseable oldInstance,
+                                                 final BundleContext bundleContext) {
         final RestConnectorModule restConnectorModule = super.instantiateModule(instanceName,
                 dependencyResolver, oldModule, oldInstance, bundleContext);
         restConnectorModule.setBundleContext(bundleContext);
         return restConnectorModule;
+    }
+
+    @Override
+    public RestConnectorModule handleChangedClass(final DependencyResolver dependencyResolver,
+                                                  final DynamicMBeanWithInstance old, final BundleContext bundleContext)
+            throws Exception {
+        //close old restconf instance
+        old.getModule().getInstance().close();
+        final RestConnectorModule restconfModule = super.handleChangedClass(dependencyResolver, old, bundleContext);
+        restconfModule.setBundleContext(bundleContext);
+        return restconfModule;
     }
 }
