@@ -185,6 +185,7 @@ public class NetconfNodeActor extends UntypedActor {
     @Override
     public void postStop() throws Exception {
         super.postStop();
+        LOG.info("{}: Stopping node actor", id);
         closeSchemaSourceRegistrations();
     }
 

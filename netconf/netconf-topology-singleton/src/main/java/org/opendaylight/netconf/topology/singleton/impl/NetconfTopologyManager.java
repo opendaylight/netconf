@@ -166,7 +166,7 @@ public class NetconfTopologyManager
                 clusterRegistrations.get(instanceIdentifier).close();
                 contexts.get(instanceIdentifier).closeFinal();
             } catch (final Exception e) {
-                LOG.warn("Error at closing topology context. InstanceIdentifier: " + instanceIdentifier);
+                LOG.warn("Error at closing topology context. InstanceIdentifier: {}", instanceIdentifier, e);
             }
             contexts.remove(instanceIdentifier);
             clusterRegistrations.remove(instanceIdentifier);
@@ -183,14 +183,14 @@ public class NetconfTopologyManager
             try {
                 netconfTopologyContext.closeFinal();
             } catch (final Exception e) {
-                LOG.error("Error at closing topology context. InstanceIdentifier: " + instanceIdentifier, e);
+                LOG.error("Error at closing topology context. InstanceIdentifier: {}", instanceIdentifier, e);
             }
         });
         clusterRegistrations.forEach((instanceIdentifier, clusterSingletonServiceRegistration) -> {
             try {
                 clusterSingletonServiceRegistration.close();
             } catch (final Exception e) {
-                LOG.error("Error at unregistering from cluster. InstanceIdentifier: " + instanceIdentifier, e);
+                LOG.error("Error at unregistering from cluster. InstanceIdentifier: {}", instanceIdentifier, e);
             }
         });
         contexts.clear();
