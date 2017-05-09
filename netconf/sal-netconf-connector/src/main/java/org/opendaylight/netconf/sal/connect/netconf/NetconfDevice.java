@@ -93,6 +93,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     private final NetconfDeviceSchemasResolver stateSchemasResolver;
     private final NotificationHandler notificationHandler;
     protected final List<SchemaSourceRegistration<? extends SchemaSourceRepresentation>> sourceRegistrations = Lists.newArrayList();
+    private volatile boolean closed = false;
 
     // Message transformer is constructed once the schemas are available
     private MessageTransformer<NetconfMessage> messageTransformer;
@@ -129,6 +130,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
         // Yang models are being downloaded in this method and it would cause a
         // deadlock if we used the netty thread
         // http://netty.io/wiki/thread-model.html
+        closed = false;
         LOG.debug("{}: Session to remote device established with {}", id, remoteSessionCapabilities);
 
         final NetconfDeviceRpc initRpc = getRpcForInitialization(listener, remoteSessionCapabilities.isNotificationsSupported());
@@ -202,6 +204,12 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
     }
 
     void handleSalInitializationSuccess(final SchemaContext result, final NetconfSessionPreferences remoteSessionCapabilities, final DOMRpcService deviceRpc) {
+        //NetconfDevice.SchemaSetup can complete after NetconfDeviceCommunicator was closed. In that case do nothing,
+        //since salFacade.onDeviceDisconnected was already called.
+        if (closed) {
+            LOG.warn("{}: Device communicator was closed before schema setup finished.", id);
+            return;
+        }
         final BaseSchema baseSchema =
                 remoteSessionCapabilities.isNotificationsSupported() ?
                 BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS :
@@ -244,6 +252,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
 
     @Override
     public void onRemoteSessionDown() {
+        closed = true;
         notificationHandler.onRemoteSchemaDown();
 
         salFacade.onDeviceDisconnected();
@@ -255,6 +264,7 @@ public class NetconfDevice implements RemoteDevice<NetconfSessionPreferences, Ne
 
     @Override
     public void onRemoteSessionFailed(final Throwable throwable) {
+        closed = true;
         salFacade.onDeviceFailed(throwable);
     }
 
