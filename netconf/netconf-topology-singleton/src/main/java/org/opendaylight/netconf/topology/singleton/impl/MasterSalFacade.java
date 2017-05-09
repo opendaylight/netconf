@@ -83,8 +83,11 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
                 if (failure == null) {
                     updateDeviceData();
                     return;
+                } else {
+                    LOG.error("Master actor initialization failed.", failure);
+                    salProvider.getMountInstance().close();
+                    throw failure;
                 }
-                throw failure;
             }
         }, actorSystem.dispatcher());
 
