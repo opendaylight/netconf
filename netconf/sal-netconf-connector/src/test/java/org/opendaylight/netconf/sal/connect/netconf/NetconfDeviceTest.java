@@ -12,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyCollectionOf;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -26,6 +27,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.SettableFuture;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -275,9 +277,13 @@ public class NetconfDeviceTest {
     public void testNotificationBeforeSchema() throws Exception {
         final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
-
-        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(
-                getSchemaRegistry(), getSchemaRepository(), getSchemaFactory(), STATE_SCHEMAS_RESOLVER);
+        final SchemaContextFactory schemaContextProviderFactory = mock(SchemaContextFactory.class);
+        final SettableFuture<SchemaContext> schemaFuture = SettableFuture.create();
+        doReturn(Futures.makeChecked(schemaFuture, e -> new SchemaResolutionException("fail")))
+                .when(schemaContextProviderFactory).createSchemaContext(any(Collection.class));
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO =
+                new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), getSchemaRepository(),
+                        schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
                 .setSchemaResourcesDTO(schemaResourcesDTO)
@@ -286,19 +292,16 @@ public class NetconfDeviceTest {
                 .setSalFacade(facade)
                 .build();
 
-        device.onNotification(NOTIFICATION);
-        device.onNotification(NOTIFICATION);
-
-        verify(facade, times(0)).onNotification(any(DOMNotification.class));
-
         final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
                 Lists.newArrayList(TEST_CAPABILITY));
+        device.onRemoteSessionUp(sessionCaps, listener);
 
-        final DOMRpcService deviceRpc = mock(DOMRpcService.class);
+        device.onNotification(NOTIFICATION);
+        device.onNotification(NOTIFICATION);
+        verify(facade, times(0)).onNotification(any(DOMNotification.class));
 
-        device.handleSalInitializationSuccess(
-                NetconfToNotificationTest.getNotificationSchemaContext(getClass(), false), sessionCaps, deviceRpc);
-
+        verify(facade, times(0)).onNotification(any(DOMNotification.class));
+        schemaFuture.set(NetconfToNotificationTest.getNotificationSchemaContext(getClass(), false));
         verify(facade, timeout(10000).times(2)).onNotification(any(DOMNotification.class));
 
         device.onNotification(NOTIFICATION);
@@ -340,6 +343,37 @@ public class NetconfDeviceTest {
     }
 
     @Test
+    public void testNetconfDeviceDisconnectListenerCallCancellation() throws Exception {
+        final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
+        final NetconfDeviceCommunicator listener = getListener();
+        final SchemaContextFactory schemaContextProviderFactory = mock(SchemaContextFactory.class);
+        final SettableFuture<SchemaContext> schemaFuture = SettableFuture.create();
+        doReturn(Futures.makeChecked(schemaFuture, e -> new SchemaResolutionException("fail")))
+                .when(schemaContextProviderFactory).createSchemaContext(any(Collection.class));
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO
+                = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), getSchemaRepository(),
+                schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
+        final NetconfDevice device = new NetconfDeviceBuilder()
+                .setReconnectOnSchemasChange(true)
+                .setSchemaResourcesDTO(schemaResourcesDTO)
+                .setGlobalProcessingExecutor(getExecutor())
+                .setId(getId())
+                .setSalFacade(facade)
+                .build();
+        final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
+                Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
+        //session up, start schema resolution
+        device.onRemoteSessionUp(sessionCaps, listener);
+        //session closed
+        device.onRemoteSessionDown();
+        verify(facade, timeout(5000)).onDeviceDisconnected();
+        //complete schema setup
+        schemaFuture.set(getSchema());
+        //facade.onDeviceDisconnected() was called, so facade.onDeviceConnected() shouldn't be called anymore
+        verify(facade, after(1000).never()).onDeviceConnected(any(), any(), any());
+    }
+
+    @Test
     public void testNetconfDeviceAvailableCapabilitiesBuilding() throws Exception {
         final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
@@ -355,22 +389,22 @@ public class NetconfDeviceTest {
                 .setId(getId())
                 .setSalFacade(facade)
                 .build();
-        NetconfDevice netconfSpy = Mockito.spy(device);
+        final NetconfDevice netconfSpy = Mockito.spy(device);
 
         final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
                 Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
-        Map<QName, AvailableCapability.CapabilityOrigin> moduleBasedCaps = new HashMap<>();
+        final Map<QName, AvailableCapability.CapabilityOrigin> moduleBasedCaps = new HashMap<>();
         moduleBasedCaps.putAll(sessionCaps.getModuleBasedCapsOrigin());
         moduleBasedCaps
                 .put(QName.create("(test:qname:side:loading)test"), AvailableCapability.CapabilityOrigin.UserDefined);
 
         netconfSpy.onRemoteSessionUp(sessionCaps.replaceModuleCaps(moduleBasedCaps), listener);
 
-        ArgumentCaptor argument = ArgumentCaptor.forClass(NetconfSessionPreferences.class);
-        verify(netconfSpy, timeout(5000)).handleSalInitializationSuccess(
-                any(SchemaContext.class), (NetconfSessionPreferences) argument.capture(), any(DOMRpcService.class));
-        NetconfDeviceCapabilities netconfDeviceCaps =
-                ((NetconfSessionPreferences) argument.getValue()).getNetconfDeviceCapabilities();
+        final ArgumentCaptor<NetconfSessionPreferences> argument =
+                ArgumentCaptor.forClass(NetconfSessionPreferences.class);
+        verify(facade, timeout(5000))
+                .onDeviceConnected(any(SchemaContext.class), argument.capture(), any(DOMRpcService.class));
+        final NetconfDeviceCapabilities netconfDeviceCaps = argument.getValue().getNetconfDeviceCapabilities();
 
         netconfDeviceCaps.getResolvedCapabilities()
                 .forEach(entry -> assertEquals("Builded 'AvailableCapability' schemas should match input capabilities.",

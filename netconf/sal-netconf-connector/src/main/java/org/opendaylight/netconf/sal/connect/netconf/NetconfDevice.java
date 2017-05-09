@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
+import javax.annotation.concurrent.GuardedBy;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
@@ -81,7 +82,7 @@ public class NetconfDevice
 
     public static final Function<QName, SourceIdentifier> QNAME_TO_SOURCE_ID_FUNCTION =
         input -> RevisionSourceIdentifier.create(input.getLocalName(),
-                Optional.fromNullable(input.getFormattedRevision()));
+                    Optional.fromNullable(input.getFormattedRevision()));
 
     protected final RemoteDeviceId id;
     private final boolean reconnectOnSchemasChange;
@@ -95,6 +96,8 @@ public class NetconfDevice
     private final NotificationHandler notificationHandler;
     protected final List<SchemaSourceRegistration<? extends SchemaSourceRepresentation>> sourceRegistrations =
             Lists.newArrayList();
+    @GuardedBy("this")
+    private boolean connected = false;
 
     // Message transformer is constructed once the schemas are available
     private MessageTransformer<NetconfMessage> messageTransformer;
@@ -135,6 +138,7 @@ public class NetconfDevice
         // Yang models are being downloaded in this method and it would cause a
         // deadlock if we used the netty thread
         // http://netty.io/wiki/thread-model.html
+        setConnected(true);
         LOG.debug("{}: Session to remote device established with {}", id, remoteSessionCapabilities);
 
         final NetconfDeviceRpc initRpc =
@@ -170,12 +174,12 @@ public class NetconfDevice
 
     private void registerToBaseNetconfStream(final NetconfDeviceRpc deviceRpc,
                                              final NetconfDeviceCommunicator listener) {
-       // TODO check whether the model describing create subscription is present in schema
+        // TODO check whether the model describing create subscription is present in schema
         // Perhaps add a default schema context to support create-subscription if the model was not provided
         // (same as what we do for base netconf operations in transformer)
         final CheckedFuture<DOMRpcResult, DOMRpcException> rpcResultListenableFuture = deviceRpc.invokeRpc(
-            NetconfMessageTransformUtil.toPath(NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME),
-            NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_CONTENT);
+                NetconfMessageTransformUtil.toPath(NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME),
+                NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_CONTENT);
 
         final NotificationHandler.NotificationFilter filter = new NotificationHandler.NotificationFilter() {
             @Override
@@ -216,21 +220,27 @@ public class NetconfDevice
     void handleSalInitializationSuccess(final SchemaContext result,
                                         final NetconfSessionPreferences remoteSessionCapabilities,
                                         final DOMRpcService deviceRpc) {
-        final BaseSchema baseSchema =
+        //NetconfDevice.SchemaSetup can complete after NetconfDeviceCommunicator was closed. In that case do nothing,
+        //since salFacade.onDeviceDisconnected was already called.
+        if (connected) {
+            final BaseSchema baseSchema =
                 remoteSessionCapabilities.isNotificationsSupported()
                         ? BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS : BaseSchema.BASE_NETCONF_CTX;
-        messageTransformer = new NetconfMessageTransformer(result, true, baseSchema);
+            messageTransformer = new NetconfMessageTransformer(result, true, baseSchema);
 
-        updateTransformer(messageTransformer);
-        // salFacade.onDeviceConnected has to be called before the notification handler is initialized
-        salFacade.onDeviceConnected(result, remoteSessionCapabilities, deviceRpc);
-        notificationHandler.onRemoteSchemaUp(messageTransformer);
+            updateTransformer(messageTransformer);
+            // salFacade.onDeviceConnected has to be called before the notification handler is initialized
+            salFacade.onDeviceConnected(result, remoteSessionCapabilities, deviceRpc);
+            notificationHandler.onRemoteSchemaUp(messageTransformer);
 
-        LOG.info("{}: Netconf connector initialized successfully", id);
+            LOG.info("{}: Netconf connector initialized successfully", id);
+        } else {
+            LOG.warn("{}: Device communicator was closed before schema setup finished.", id);
+        }
     }
 
-    void handleSalInitializationFailure(final Throwable throwable,
-                                        final RemoteDeviceCommunicator<NetconfMessage> listener) {
+    private void handleSalInitializationFailure(final Throwable throwable,
+                                                final RemoteDeviceCommunicator<NetconfMessage> listener) {
         LOG.error("{}: Initialization in sal failed, disconnecting from device", id, throwable);
         listener.close();
         onRemoteSessionDown();
@@ -248,6 +258,10 @@ public class NetconfDevice
         messageTransformer = transformer;
     }
 
+    private synchronized void setConnected(final boolean connected) {
+        this.connected = connected;
+    }
+
     private void addProvidedSourcesToSchemaRegistry(final DeviceSources deviceSources) {
         final SchemaSourceProvider<YangTextSchemaSource> yangProvider = deviceSources.getSourceProvider();
         for (final SourceIdentifier sourceId : deviceSources.getProvidedSources()) {
@@ -259,6 +273,7 @@ public class NetconfDevice
 
     @Override
     public void onRemoteSessionDown() {
+        setConnected(false);
         notificationHandler.onRemoteSchemaDown();
 
         salFacade.onDeviceDisconnected();
@@ -271,6 +286,7 @@ public class NetconfDevice
 
     @Override
     public void onRemoteSessionFailed(final Throwable throwable) {
+        setConnected(false);
         salFacade.onDeviceFailed(throwable);
     }
 
