@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba068154_66caf650",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-05-10T11:23:55Z",
+      "side": 1,
+      "message": "You are accessing connected field without appropriate lock you have declared with @GurdedBy annotation",
+      "revId": "cdcc04adb2ed277f0b4b3bb45f6d6f1dd1c2737b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
