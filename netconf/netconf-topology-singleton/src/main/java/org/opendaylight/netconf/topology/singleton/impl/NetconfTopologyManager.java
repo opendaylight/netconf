@@ -138,6 +138,11 @@ public class NetconfTopologyManager
         context.refresh(createSetup(instanceIdentifier, node));
     }
 
+    // ClusterSingletonServiceRegistration registerClusterSingletonService method throws a Runtime exception if there
+    // are problems with registration and client has to deal with it. Only thing we can do if this error occurs is to
+    // retry registration several times and log the error.
+    // TODO change to a specific documented Exception when changed in ClusterSingletonServiceProvider
+    @SuppressWarnings("checkstyle:IllegalCatch")
     private void startNetconfDeviceContext(final InstanceIdentifier<Node> instanceIdentifier, final Node node) {
         final NetconfNode netconfNode = node.getAugmentation(NetconfNode.class);
         Preconditions.checkNotNull(netconfNode);
@@ -154,11 +159,26 @@ public class NetconfTopologyManager
                 new NetconfTopologyContext(createSetup(instanceIdentifier, node), serviceGroupIdent,
                         actorResponseWaitTime, mountPointService);
 
-        final ClusterSingletonServiceRegistration clusterSingletonServiceRegistration =
-                clusterSingletonServiceProvider.registerClusterSingletonService(newNetconfTopologyContext);
+        int tries = 3;
+        while (true) {
+            try {
+                final ClusterSingletonServiceRegistration clusterSingletonServiceRegistration =
+                        clusterSingletonServiceProvider.registerClusterSingletonService(newNetconfTopologyContext);
+                clusterRegistrations.put(instanceIdentifier, clusterSingletonServiceRegistration);
+                contexts.put(instanceIdentifier, newNetconfTopologyContext);
+                break;
+            } catch (final RuntimeException e) {
+                LOG.warn("Unable to register cluster singleton service {}, trying again", newNetconfTopologyContext, e);
 
-        clusterRegistrations.put(instanceIdentifier, clusterSingletonServiceRegistration);
-        contexts.put(instanceIdentifier, newNetconfTopologyContext);
+                if (--tries <= 0) {
+                    LOG.error("Unable to register cluster singleton service {} - done trying, closing topology context",
+                            newNetconfTopologyContext, e);
+                    close();
+                    break;
+                }
+            }
+        }
+
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
