@@ -13,7 +13,7 @@ import java.util.List;
  * Implementation of swagger spec (see <a href=
  * "https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md#522-api-object"
  * > https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md#522-api
- * -object</a>)
+ * -object</a>).
  */
 public class Api {
 

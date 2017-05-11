@@ -40,16 +40,16 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
     private static final String DATASTORES_REVISION = "-";
     private static final String DATASTORES_LABEL = "Datastores";
     private static final String RESTCONF_DRAFT = "18";
+    private static final AtomicReference<MountPointSwagger> SELF_REF = new AtomicReference<>();
 
     private DOMMountPointService mountService;
     private final Map<YangInstanceIdentifier, Long> instanceIdToLongId =
             new TreeMap<>((o1, o2) -> o1.toString().compareToIgnoreCase(o2.toString()));
     private final Map<Long, YangInstanceIdentifier> longIdToInstanceId = new HashMap<>();
+
     private final Object lock = new Object();
 
     private final AtomicLong idKey = new AtomicLong(0);
-
-    private static final AtomicReference<MountPointSwagger> selfRef = new AtomicReference<>();
     private SchemaService globalSchema;
     private static boolean newDraft;
 
@@ -219,20 +219,20 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
     }
 
     public static MountPointSwagger getInstance() {
-        MountPointSwagger swagger = selfRef.get();
+        MountPointSwagger swagger = SELF_REF.get();
         if (swagger == null) {
-            selfRef.compareAndSet(null, new MountPointSwagger());
-            swagger = selfRef.get();
+            SELF_REF.compareAndSet(null, new MountPointSwagger());
+            swagger = SELF_REF.get();
         }
         newDraft = false;
         return swagger;
     }
 
     public static MountPointSwagger getInstanceDraft18() {
-        MountPointSwagger swagger = selfRef.get();
+        MountPointSwagger swagger = SELF_REF.get();
         if (swagger == null) {
-            selfRef.compareAndSet(null, new MountPointSwagger());
-            swagger = selfRef.get();
+            SELF_REF.compareAndSet(null, new MountPointSwagger());
+            swagger = SELF_REF.get();
         }
         newDraft = true;
         return swagger;

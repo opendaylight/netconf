@@ -37,7 +37,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 public class MountPointSwaggerTest {
 
     private static final String HTTP_URL = "http://localhost/path";
-    private static final YangInstanceIdentifier instanceId = YangInstanceIdentifier.builder()
+    private static final YangInstanceIdentifier INSTANCE_ID = YangInstanceIdentifier.builder()
             .node(QName.create("nodes"))
             .node(QName.create("node"))
             .nodeWithKey(QName.create("node"), QName.create("id"), "123").build();
@@ -66,14 +66,14 @@ public class MountPointSwaggerTest {
         final UriInfo mockInfo = setUpSwaggerForDocGeneration();
 
         assertEquals(0, this.swagger.getInstanceIdentifiers().size());
-        this.swagger.onMountPointCreated(instanceId); // add this ID into the list of
+        this.swagger.onMountPointCreated(INSTANCE_ID); // add this ID into the list of
                                                  // mount points
         assertEquals(1, this.swagger.getInstanceIdentifiers().size());
         assertEquals((Long) 1L, this.swagger.getInstanceIdentifiers().entrySet().iterator().next()
                 .getValue());
         assertEquals(INSTANCE_URL, this.swagger.getInstanceIdentifiers().entrySet().iterator().next()
                 .getKey());
-        this.swagger.onMountPointRemoved(instanceId); // remove ID from list of mount
+        this.swagger.onMountPointRemoved(INSTANCE_ID); // remove ID from list of mount
                                                  // points
         assertEquals(0, this.swagger.getInstanceIdentifiers().size());
     }
@@ -81,7 +81,7 @@ public class MountPointSwaggerTest {
     @Test
     public void testGetResourceListGoodId() throws Exception {
         final UriInfo mockInfo = setUpSwaggerForDocGeneration();
-        this.swagger.onMountPointCreated(instanceId); // add this ID into the list of
+        this.swagger.onMountPointCreated(INSTANCE_ID); // add this ID into the list of
                                                  // mount points
         final ResourceList resourceList = this.swagger.getResourceList(mockInfo, 1L);
 
@@ -97,7 +97,7 @@ public class MountPointSwaggerTest {
     @Test
     public void testGetDataStoreApi() throws Exception {
         final UriInfo mockInfo = setUpSwaggerForDocGeneration();
-        this.swagger.onMountPointCreated(instanceId); // add this ID into the list of
+        this.swagger.onMountPointCreated(INSTANCE_ID); // add this ID into the list of
                                                  // mount points
 
         final ApiDeclaration mountPointApi = this.swagger.getMountPointApi(mockInfo, 1L, "Datastores", "-");
@@ -116,9 +116,9 @@ public class MountPointSwaggerTest {
                     .getNotes());
         }
         final Set<String> expectedApis = new TreeSet<>(Arrays.asList(new String[] {
-                "/config" + INSTANCE_URL + "yang-ext:mount",
-                "/operational" + INSTANCE_URL + "yang-ext:mount",
-                "/operations" + INSTANCE_URL + "yang-ext:mount",}));
+            "/config" + INSTANCE_URL + "yang-ext:mount",
+            "/operational" + INSTANCE_URL + "yang-ext:mount",
+            "/operations" + INSTANCE_URL + "yang-ext:mount",}));
         assertEquals(expectedApis, actualApis);
     }
 
@@ -134,7 +134,7 @@ public class MountPointSwaggerTest {
         when(mountPoint.getSchemaContext()).thenReturn(context);
 
         final DOMMountPointService service = mock(DOMMountPointService.class);
-        when(service.getMountPoint(instanceId)).thenReturn(Optional.of(mountPoint));
+        when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
         this.swagger.setMountService(service);
         this.swagger.setGlobalSchema(schemaService);
 

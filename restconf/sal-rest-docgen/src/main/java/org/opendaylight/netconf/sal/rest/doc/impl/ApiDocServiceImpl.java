@@ -81,6 +81,7 @@ public class ApiDocServiceImpl implements ApiDocService {
         return Response.seeOther(uriInfo.getBaseUriBuilder().path("../explorer/index.html").build()).build();
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public synchronized Response getListOfMounts(final UriInfo uriInfo) {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
