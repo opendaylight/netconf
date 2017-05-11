@@ -167,12 +167,12 @@ public class NetconfTopologyManager
                 contexts.put(instanceIdentifier, newNetconfTopologyContext);
                 break;
             } catch (final RuntimeException e) {
-                LOG.warn("Unable to register cluster singleton service {}, trying again", newNetconfTopologyContext, e);
+                LOG.warn("{}: Unable to register cluster singleton service {}, trying again", instanceIdentifier, e);
 
                 if (--tries <= 0) {
-                    LOG.error("Unable to register cluster singleton service {} - done trying, closing topology context",
-                            newNetconfTopologyContext, e);
-                    close();
+                    //Registration failed, this node can't be master, probably other nodes will succeed
+                    LOG.warn("{}: Unable to register cluster singleton service after 3 tries",
+                            instanceIdentifier);
                     break;
                 }
             }
