@@ -1,0 +1,216 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba068154_09485a2c",
+        "filename": "features/netconf/features-netconf/src/main/features/features.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-05-11T01:19:25Z",
+      "side": 1,
+      "message": "should probably replace with a feature in aaa... fine for now but we will figure out an appropriate change in AAA ex post facto.",
+      "range": {
+        "startLine": 83,
+        "startChar": 4,
+        "endLine": 86,
+        "endChar": 77
+      },
+      "revId": "a173217aaf81d48423db2db0d913336ec4c61b49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba068154_6955a6c5",
+        "filename": "features/netconf/odl-netconf-netty-util/pom.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-05-11T01:19:25Z",
+      "side": 1,
+      "message": "in master... this should be 0.6.0-SNAPSHOT",
+      "range": {
+        "startLine": 81,
+        "startChar": 12,
+        "endLine": 81,
+        "endChar": 45
+      },
+      "revId": "a173217aaf81d48423db2db0d913336ec4c61b49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba068154_495262de",
+        "filename": "netconf/netconf-netty-util/pom.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-05-11T01:19:25Z",
+      "side": 1,
+      "message": "0.6.0-SNAPSHOT",
+      "range": {
+        "startLine": 114,
+        "startChar": 11,
+        "endLine": 115,
+        "endChar": 19
+      },
+      "revId": "a173217aaf81d48423db2db0d913336ec4c61b49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba068154_a95e6ee7",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/authentication/LoginPassword.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-05-11T01:19:25Z",
+      "side": 1,
+      "message": "Why expose this variation of the constructor?  can the callers be modified to pass null as third argument?  cleaner that way IMO",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 5
+      },
+      "revId": "a173217aaf81d48423db2db0d913336ec4c61b49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba068154_8963aab0",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-05-11T01:19:25Z",
+      "side": 1,
+      "message": "remove this space.",
+      "revId": "a173217aaf81d48423db2db0d913336ec4c61b49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba068154_e95876fc",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImpl.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-05-11T01:19:25Z",
+      "side": 1,
+      "message": "I wrote this code as a POC... doesn\u0027t need to be blocking.  I would prefer to see this as non-blocking.",
+      "range": {
+        "startLine": 144,
+        "startChar": 20,
+        "endLine": 144,
+        "endChar": 40
+      },
+      "revId": "a173217aaf81d48423db2db0d913336ec4c61b49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba068154_c95db2eb",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-05-11T01:19:25Z",
+      "side": 1,
+      "message": "remove this space.  im not a stickler but most are ;)",
+      "revId": "a173217aaf81d48423db2db0d913336ec4c61b49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba068154_096fba93",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-05-11T01:19:25Z",
+      "side": 1,
+      "message": "the fact that this code is copy and paste (my fault originally in POC) begs the question of whether this can be stuffed in just one place (super or util class).",
+      "range": {
+        "startLine": 231,
+        "startChar": 4,
+        "endLine": 231,
+        "endChar": 86
+      },
+      "revId": "a173217aaf81d48423db2db0d913336ec4c61b49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba068154_696c869d",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/impl/NetconfTopologyImpl.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-05-11T01:19:25Z",
+      "side": 1,
+      "message": "dead space",
+      "revId": "a173217aaf81d48423db2db0d913336ec4c61b49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba068154_893c4a95",
+        "filename": "netconf/netconf-topology/src/test/java/org/opendaylight/netconf/topology/impl/NetconfTopologyImplTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-05-11T01:19:25Z",
+      "side": 1,
+      "message": "dead space.",
+      "range": {
+        "startLine": 199,
+        "startChar": 90,
+        "endLine": 199,
+        "endChar": 91
+      },
+      "revId": "a173217aaf81d48423db2db0d913336ec4c61b49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
