@@ -29,7 +29,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 
 public class YangLibServiceImplTest {
 
-    private final static String TEST_OUTPUT_STRING = "hello world";
+    private static final String TEST_OUTPUT_STRING = "hello world";
 
     @Test
     public void testSchema() throws SchemaSourceException {
