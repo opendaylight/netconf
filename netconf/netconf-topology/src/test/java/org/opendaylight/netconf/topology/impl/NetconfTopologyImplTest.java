@@ -196,7 +196,7 @@ public class NetconfTopologyImplTest {
                 final String topologyId, final NetconfClientDispatcher clientDispatcher,
                 final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
                 final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
-                final DataBroker dataBroker, final DOMMountPointService mountPointService, 
+                final DataBroker dataBroker, final DOMMountPointService mountPointService,
                 final AAAEncryptionService encryptionService) {
             super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,
                     processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService, encryptionService);

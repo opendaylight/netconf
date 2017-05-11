@@ -86,7 +86,8 @@ public class NetconfTopologyManager
                                   final ActorSystemProvider actorSystemProvider,
                                   final EventExecutor eventExecutor, final NetconfClientDispatcher clientDispatcher,
                                   final String topologyId, final Config config,
-                                  final DOMMountPointService mountPointService, final AAAEncryptionService encryptionService) {
+                                  final DOMMountPointService mountPointService,
+                                  final AAAEncryptionService encryptionService) {
 
         this.dataBroker = Preconditions.checkNotNull(dataBroker);
         this.rpcProviderRegistry = Preconditions.checkNotNull(rpcProviderRegistry);
@@ -271,7 +272,7 @@ public class NetconfTopologyManager
                 .setTopologyId(topologyId)
                 .setNetconfClientDispatcher(clientDispatcher)
                 .setSchemaResourceDTO(NetconfTopologyUtils.setupSchemaCacheDTO(node))
-                .setIdleTimeout(writeTxIdleTimeout);
+                .setIdleTimeout(writeTxIdleTimeout)
                 .setEncryptionService(encryptionService);
 
         return builder.build();
