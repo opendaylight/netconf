@@ -1,0 +1,7 @@
+Code-Review+2: Jakub Morvay <jmorvay@cisco.com>
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Submitted-by: Thanh Ha <thanh.ha@linuxfoundation.org>
+Submitted-at: Thu, 11 May 2017 14:23:35 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/56836
+Project: netconf
+Branch: refs/heads/stable/carbon
