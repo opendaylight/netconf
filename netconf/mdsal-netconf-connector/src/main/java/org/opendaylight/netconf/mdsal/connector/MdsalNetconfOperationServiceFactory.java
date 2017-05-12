@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import org.opendaylight.controller.config.util.capability.BasicCapability;
 import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.controller.config.util.capability.YangModuleCapability;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
@@ -41,6 +42,9 @@ import org.slf4j.LoggerFactory;
 public class MdsalNetconfOperationServiceFactory implements NetconfOperationServiceFactory, Consumer, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MdsalNetconfOperationServiceFactory.class);
+
+    private static final BasicCapability VALIDATE_CAPABILITY_1_0 = new BasicCapability("urn:ietf:params:netconf:capability:validate:1.0");
+    private static final BasicCapability VALIDATE_CAPABILITY_1_1 = new BasicCapability("urn:ietf:params:netconf:capability:validate:1.1");
 
     private ConsumerSession session = null;
     private DOMDataBroker dataBroker = null;
@@ -70,7 +74,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
     }
 
     static Set<Capability> transformCapabilities(final SchemaContext currentContext, final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency) {
-        final Set<Capability> capabilities = new HashSet<>();
+        final Set<Capability> capabilities = createDefaultAdvertisedCapabilities();
 
         // Added by netconf-impl by default
 //        capabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0"));
@@ -88,7 +92,13 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
                 }
             }
         }
+        return capabilities;
+    }
 
+    private static Set<Capability> createDefaultAdvertisedCapabilities() {
+        Set<Capability> capabilities = new HashSet<>();
+        capabilities.add(VALIDATE_CAPABILITY_1_0);
+        capabilities.add(VALIDATE_CAPABILITY_1_1);
         return capabilities;
     }
 
