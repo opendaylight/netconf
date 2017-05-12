@@ -13,13 +13,14 @@ import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
+import org.opendaylight.netconf.mdsal.connector.ops.parser.MdsalNetconfOperation;
+import org.opendaylight.netconf.mdsal.connector.ops.parser.MdsalNetconfParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class Unlock extends AbstractSingletonNetconfOperation {
+public class Unlock extends MdsalNetconfOperation {
 
     private static final Logger LOG = LoggerFactory.getLogger(Unlock.class);
 
@@ -31,13 +32,13 @@ public class Unlock extends AbstractSingletonNetconfOperation {
 
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
-        final Datastore targetDatastore = Lock.extractTargetParameter(operationElement);
-        if (targetDatastore == Datastore.candidate) {
+        final MdsalNetconfParameter inputParameter = extractTargetParameter(operationElement);
+        if (inputParameter.getDatastore() == Datastore.candidate) {
             LOG.debug("Unlocking candidate datastore on session: {}", getNetconfSessionIdForReporting());
             return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
         }
 
-        throw new DocumentedException("Unable to unlock " + targetDatastore + " datastore", DocumentedException.ErrorType.application,
+        throw new DocumentedException("Unable to unlock " + inputParameter.getDatastore() + " datastore", DocumentedException.ErrorType.application,
                 DocumentedException.ErrorTag.operation_not_supported, DocumentedException.ErrorSeverity.error);
     }
 
