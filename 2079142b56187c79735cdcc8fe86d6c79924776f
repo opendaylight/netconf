@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba068154_5e132f66",
+        "filename": "netconf/netconf-netty-util/pom.xml",
+        "patchSetId": 23
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-05-12T12:27:35Z",
+      "side": 1,
+      "message": "When 0.9.7 will be released, it should work well with karaf. 0.9.7 is already OSGi compliant, so no Embed-Dependency instructions for maven-bundle-plugin are needed.",
+      "range": {
+        "startLine": 46,
+        "startChar": 17,
+        "endLine": 46,
+        "endChar": 31
+      },
+      "revId": "2079142b56187c79735cdcc8fe86d6c79924776f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
