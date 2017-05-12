@@ -13,18 +13,18 @@ import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
+import org.opendaylight.netconf.mdsal.connector.ops.parser.MdsalNetconfOperation;
+import org.opendaylight.netconf.mdsal.connector.ops.parser.MdsalNetconfParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class Lock extends AbstractSingletonNetconfOperation {
+public class Lock extends MdsalNetconfOperation {
 
     private static final Logger LOG = LoggerFactory.getLogger(Lock.class);
 
     private static final String OPERATION_NAME = "lock";
-    private static final String TARGET_KEY = "target";
 
     public Lock(final String netconfSessionIdForReporting) {
         super(netconfSessionIdForReporting);
@@ -32,20 +32,15 @@ public class Lock extends AbstractSingletonNetconfOperation {
 
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
-        final Datastore targetDatastore = extractTargetParameter(operationElement);
-        if (targetDatastore == Datastore.candidate) {
+        final MdsalNetconfParameter inputParameter = extractTargetParameter(operationElement);
+
+        if (inputParameter.getDatastore() == Datastore.candidate) {
             LOG.debug("Locking candidate datastore on session: {}", getNetconfSessionIdForReporting());
             return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
         }
 
-        throw new DocumentedException("Unable to lock " + targetDatastore + " datastore", DocumentedException.ErrorType.application,
+        throw new DocumentedException("Unable to lock " + inputParameter.getDatastore() + " datastore", DocumentedException.ErrorType.application,
                 DocumentedException.ErrorTag.operation_not_supported, DocumentedException.ErrorSeverity.error);
-    }
-
-    static Datastore extractTargetParameter(final XmlElement operationElement) throws DocumentedException {
-        final XmlElement targetElement = operationElement.getOnlyChildElementWithSameNamespace(TARGET_KEY);
-        final XmlElement targetChildNode = targetElement.getOnlyChildElementWithSameNamespace();
-        return Datastore.valueOf(targetChildNode.getName());
     }
 
     @Override
