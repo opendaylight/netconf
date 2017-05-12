@@ -19,6 +19,7 @@ import org.opendaylight.netconf.mdsal.connector.ops.EditConfig;
 import org.opendaylight.netconf.mdsal.connector.ops.Lock;
 import org.opendaylight.netconf.mdsal.connector.ops.RuntimeRpc;
 import org.opendaylight.netconf.mdsal.connector.ops.Unlock;
+import org.opendaylight.netconf.mdsal.connector.ops.Validate;
 import org.opendaylight.netconf.mdsal.connector.ops.get.Get;
 import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
 
@@ -48,7 +49,9 @@ final class OperationProvider {
                 new GetConfig(netconfSessionIdForReporting, schemaContext, transactionProvider),
                 new Lock(netconfSessionIdForReporting),
                 new Unlock(netconfSessionIdForReporting),
-                new RuntimeRpc(netconfSessionIdForReporting, schemaContext, rpcService)
+                new RuntimeRpc(netconfSessionIdForReporting, schemaContext, rpcService),
+                new Validate(netconfSessionIdForReporting, schemaContext)
+
         );
     }
 

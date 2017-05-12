@@ -36,6 +36,7 @@ import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -236,6 +237,103 @@ public class NetconfMDSalMappingTest {
 
         deleteDatastore();
 
+    }
+
+    @Test
+    public void testEditWithTestOnly() throws Exception {
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_test_only.xml"), RPC_REPLY_OK);
+        assertEmptyDatastore(getConfigCandidate());
+    }
+
+    @Test
+    public void testValidateCandidate() throws Exception {
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_n1.xml"), RPC_REPLY_OK);
+        verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument("messages/mapping/editConfigs/editConfig_merge_n1_control.xml"));
+
+        verifyResponse(validate("messages/mapping/validate/validate_candidate.xml"), RPC_REPLY_OK);
+
+    }
+
+    @Test
+    public void testValidateRunning() throws Exception {
+        try {
+            validate("messages/mapping/validate/validate_running.xml");
+            fail("Should have failed, this is an incorrect request");
+        } catch (DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
+            assertTrue(e.getErrorTag() == ErrorTag.operation_not_supported);
+            assertTrue(e.getErrorType() == ErrorType.protocol);
+        }
+    }
+
+    @Test
+    public void testIncorrectValidate() throws Exception {
+        try {
+            validate("messages/mapping/validate/validate_empty.xml");
+            fail("Should have failed, this is an incorrect request");
+        } catch (DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
+            assertTrue(e.getErrorTag() == ErrorTag.missing_element);
+            assertTrue(e.getErrorType() == ErrorType.rpc);
+        }
+
+        try {
+            validate("messages/mapping/validate/validate_datasource_and_config_element.xml");
+            fail("Should have failed, this is an incorrect request");
+        } catch (DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
+            assertTrue(e.getErrorTag() == ErrorTag.operation_not_supported);
+            assertTrue(e.getErrorType() == ErrorType.rpc);
+        }
+    }
+
+    @Test
+    public void testValidateEmptyTransaction() throws Exception {
+        verifyResponse(validate("messages/mapping/validate/validate_candidate.xml"), RPC_REPLY_OK);
+    }
+
+
+    @Test
+    public void testValidateConfigElement() throws Exception {
+        verifyResponse(validate("messages/mapping/validate/validate_config_element_correct.xml"), RPC_REPLY_OK);
+    }
+
+    @Test
+    public void testValidateIncorrectConfigElement() throws Exception {
+        // test incorrect module
+        try {
+            validate("messages/mapping/validate/validate_config_element_incorrect_module.xml");
+            fail("Should have failed, this is an incorrect request");
+        } catch (DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
+            assertTrue(e.getErrorTag() == ErrorTag.operation_failed);
+            assertTrue(e.getErrorType() == ErrorType.application);
+        }
+
+        // test incorrect element in module
+        try {
+            validate("messages/mapping/validate/validate_config_element_incorrect_element.xml");
+            fail("Should have failed, this is an incorrect request");
+        } catch (DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
+            assertTrue(e.getErrorTag() == ErrorTag.operation_failed);
+            assertTrue(e.getErrorType() == ErrorType.application);
+        }
+    }
+
+    // Validation can't detect whether the value of the element is correct
+    @Test
+    @Ignore
+    public void testValidateIncorrectElementValueConfigElement() throws Exception {
+        // test incorrect element value
+        try {
+            validate("messages/mapping/validate/validate_config_element_incorrect_value.xml");
+            fail("Should have failed, this is an incorrect request");
+        } catch (DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
+            assertTrue(e.getErrorTag() == ErrorTag.operation_failed);
+            assertTrue(e.getErrorType() == ErrorType.application);
+        }
     }
 
     @Test
@@ -665,6 +763,11 @@ public class NetconfMDSalMappingTest {
     private Document unlockCandidate() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
         Unlock unlock = new Unlock(sessionIdForReporting);
         return executeOperation(unlock, "messages/mapping/unlock_candidate.xml");
+    }
+
+    private Document validate(String resource) throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+        Validate validate = new Validate(sessionIdForReporting, currentSchemaContext);
+        return executeOperation(validate, resource);
     }
 
     private Document executeOperation(NetconfOperation op, String filename) throws ParserConfigurationException, SAXException, IOException, DocumentedException {
