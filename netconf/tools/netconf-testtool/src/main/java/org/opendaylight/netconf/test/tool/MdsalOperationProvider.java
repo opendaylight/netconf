@@ -37,6 +37,7 @@ import org.opendaylight.netconf.mdsal.connector.ops.DiscardChanges;
 import org.opendaylight.netconf.mdsal.connector.ops.EditConfig;
 import org.opendaylight.netconf.mdsal.connector.ops.Lock;
 import org.opendaylight.netconf.mdsal.connector.ops.Unlock;
+import org.opendaylight.netconf.mdsal.connector.ops.Validate;
 import org.opendaylight.netconf.mdsal.connector.ops.get.Get;
 import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
@@ -150,9 +151,10 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             final Lock lock = new Lock(String.valueOf(currentSessionId));
             final Unlock unLock = new Unlock(String.valueOf(currentSessionId));
             final DiscardChanges discardChanges = new DiscardChanges(String.valueOf(currentSessionId), transactionProvider);
+            final Validate validate = new Validate(String.valueOf(currentSessionId), currentSchemaContext);
 
             return Sets.<NetconfOperation>newHashSet(get, getConfig,
-                    editConfig, commit, lock, unLock, discardChanges);
+                    editConfig, commit, lock, unLock, discardChanges, validate);
         }
 
         @Override

@@ -9,13 +9,9 @@
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
+import org.opendaylight.controller.config.facade.xml.TestOption;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeverity;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
@@ -25,52 +21,43 @@ import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.mdsal.connector.ops.DataTreeChangeTracker.DataTreeChange;
-import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
-import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.netconf.mdsal.connector.ops.parser.MdsalNetconfParameter;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.DomUtils;
-import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class EditConfig extends AbstractSingletonNetconfOperation {
+public class EditConfig extends ValidateNetconfOperation {
 
     private static final Logger LOG = LoggerFactory.getLogger(EditConfig.class);
 
     private static final String OPERATION_NAME = "edit-config";
+    private static final String TEST_OPTION_KEY = "test-option";
     private static final String CONFIG_KEY = "config";
-    private static final String TARGET_KEY = "target";
     private static final String DEFAULT_OPERATION_KEY = "default-operation";
-    private final CurrentSchemaContext schemaContext;
     private final TransactionProvider transactionProvider;
 
     public EditConfig(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext, final TransactionProvider transactionProvider) {
-        super(netconfSessionIdForReporting);
-        this.schemaContext = schemaContext;
+        super(netconfSessionIdForReporting, schemaContext);
         this.transactionProvider = transactionProvider;
     }
 
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
-        final Datastore targetDatastore = extractTargetParameter(operationElement);
-        if (targetDatastore == Datastore.running) {
+        final MdsalNetconfParameter inputParameter = extractTargetParameter(operationElement);
+
+        if (inputParameter.getDatastore() == Datastore.running) {
             throw new DocumentedException("edit-config on running datastore is not supported",
                     ErrorType.protocol,
                     ErrorTag.operation_not_supported,
@@ -78,21 +65,32 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         }
 
         final ModifyAction defaultAction = getDefaultOperation(operationElement);
-
+        final TestOption testOption = extractTestOption(operationElement);
         final XmlElement configElement = getElement(operationElement, CONFIG_KEY);
 
         for (final XmlElement element : configElement.getChildElements()) {
-            final String ns = element.getNamespace();
-            final DataSchemaNode schemaNode = getSchemaNodeFromNamespace(ns, element).get();
-
-            final DataTreeChangeTracker changeTracker = new DataTreeChangeTracker(defaultAction);
-            final DomToNormalizedNodeParserFactory.BuildingStrategyProvider editOperationStrategyProvider = new EditOperationStrategyProvider(changeTracker);
-
-            parseIntoNormalizedNode(schemaNode, element, editOperationStrategyProvider);
-            executeOperations(changeTracker);
+            final DataTreeChangeTracker changeTracker = createDataTreeChecker(defaultAction, element);
+            if (testOption != TestOption.testOnly) {
+                executeOperations(changeTracker);
+            }
         }
 
         return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
+    }
+
+    /**
+     * Extract value of test-option.
+     * @param operationElement
+     * @return
+     * @throws DocumentedException
+     */
+    public static TestOption extractTestOption(XmlElement operationElement) throws DocumentedException {
+        Optional<XmlElement> testOptionElementOpt = operationElement.getOnlyChildElementWithSameNamespaceOptionally(TEST_OPTION_KEY);
+        if (testOptionElementOpt.isPresent()) {
+            String testOptionValue = testOptionElementOpt.get().getTextContent();
+            return TestOption.getFromXmlName(testOptionValue);
+        }
+        return TestOption.getDefault();
     }
 
     private void executeOperations(final DataTreeChangeTracker changeTracker) throws DocumentedException {
@@ -160,69 +158,6 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
                     .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(mapNodeYid.getLastPathArgument().getNodeType()))
                     .build();
             rwtx.merge(LogicalDatastoreType.CONFIGURATION, mapNodeYid, mixinNode);
-        }
-    }
-
-    private NormalizedNode parseIntoNormalizedNode(final DataSchemaNode schemaNode, final XmlElement element,
-                                                   final DomToNormalizedNodeParserFactory.BuildingStrategyProvider editOperationStrategyProvider) {
-
-
-        if (schemaNode instanceof ContainerSchemaNode) {
-            return DomToNormalizedNodeParserFactory
-                    .getInstance(DomUtils.defaultValueCodecProvider(), schemaContext.getCurrentContext(), editOperationStrategyProvider)
-                    .getContainerNodeParser()
-                    .parse(Collections.singletonList(element.getDomElement()), (ContainerSchemaNode) schemaNode);
-        } else if (schemaNode instanceof ListSchemaNode) {
-            return DomToNormalizedNodeParserFactory
-                    .getInstance(DomUtils.defaultValueCodecProvider(), schemaContext.getCurrentContext(), editOperationStrategyProvider)
-                    .getMapNodeParser()
-                    .parse(Collections.singletonList(element.getDomElement()), (ListSchemaNode) schemaNode);
-        } else {
-            //this should never happen since edit-config on any other node type should not be possible nor makes sense
-            LOG.debug("DataNode from module is not ContainerSchemaNode nor ListSchemaNode, aborting..");
-        }
-        throw new UnsupportedOperationException("implement exception if parse fails");
-    }
-
-    private Optional<DataSchemaNode> getSchemaNodeFromNamespace(final String namespace, final XmlElement element) throws DocumentedException{
-        Optional<DataSchemaNode> dataSchemaNode = Optional.absent();
-        try {
-            //returns module with newest revision since findModuleByNamespace returns a set of modules and we only need the newest one
-            final Module module = schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(new URI(namespace), null);
-            if (module == null) {
-                // no module is present with this namespace
-                throw new NetconfDocumentedException("Unable to find module by namespace: " + namespace,
-                        ErrorType.application, ErrorTag.unknown_namespace, ErrorSeverity.error);
-            }
-            final DataSchemaNode schemaNode =
-                    module.getDataChildByName(QName.create(module.getQNameModule(), element.getName()));
-            if (schemaNode != null) {
-                dataSchemaNode = Optional.of(schemaNode);
-            } else {
-                throw new DocumentedException("Unable to find node with namespace: " + namespace + "in module: " + module.toString(),
-                        ErrorType.application,
-                        ErrorTag.unknown_namespace,
-                        ErrorSeverity.error);
-            }
-        } catch (final URISyntaxException e) {
-            LOG.debug("Unable to create URI for namespace : {}", namespace);
-        }
-
-        return dataSchemaNode;
-    }
-
-    private Datastore extractTargetParameter(final XmlElement operationElement) throws DocumentedException {
-        final NodeList elementsByTagName = operationElement.getDomElement().getElementsByTagName(TARGET_KEY);
-        // Direct lookup instead of using XmlElement class due to performance
-        if (elementsByTagName.getLength() == 0) {
-            final Map<String, String> errorInfo = ImmutableMap.of("bad-attribute", TARGET_KEY, "bad-element", OPERATION_NAME);
-            throw new DocumentedException("Missing target element",
-                    ErrorType.protocol, ErrorTag.missing_attribute, ErrorSeverity.error, errorInfo);
-        } else if (elementsByTagName.getLength() > 1) {
-            throw new DocumentedException("Multiple target elements", ErrorType.rpc, ErrorTag.unknown_attribute, ErrorSeverity.error);
-        } else {
-            final XmlElement targetChildNode = XmlElement.fromDomElement((Element) elementsByTagName.item(0)).getOnlyChildElement();
-            return Datastore.valueOf(targetChildNode.getName());
         }
     }
 
