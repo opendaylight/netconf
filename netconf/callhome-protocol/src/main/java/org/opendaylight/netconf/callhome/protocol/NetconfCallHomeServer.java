@@ -78,14 +78,14 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
         return new SessionListener() {
             @Override
             public void sessionEvent(Session session, Event event) {
-                ClientSession cSession = (ClientSession) session;
+                ClientSession clientSession = (ClientSession) session;
                 LOG.debug("SSH session {} event {}", session, event);
                 switch (event) {
                     case KeyEstablished:
-                        doAuth(cSession);
+                        doAuth(clientSession);
                         break;
                     case Authenticated:
-                        doPostAuth(cSession);
+                        doPostAuth(clientSession);
                         break;
                     default:
                         break;
@@ -108,20 +108,20 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
         };
     }
 
-    private void doPostAuth(final ClientSession cSession) {
-        CallHomeSessionContext.getFrom(cSession).openNetconfChannel();
+    private void doPostAuth(final ClientSession session) {
+        CallHomeSessionContext.getFrom(session).openNetconfChannel();
     }
 
-    private void doAuth(final ClientSession cSession) {
+    private void doAuth(final ClientSession session) {
         try {
-            final AuthFuture authFuture = CallHomeSessionContext.getFrom(cSession).authorize();
-            authFuture.addListener(newAuthSshFutureListener(cSession));
+            final AuthFuture authFuture = CallHomeSessionContext.getFrom(session).authorize();
+            authFuture.addListener(newAuthSshFutureListener(session));
         } catch (IOException e) {
-            LOG.error("Failed to authorize session {}", cSession, e);
+            LOG.error("Failed to authorize session {}", session, e);
         }
     }
 
-    private SshFutureListener<AuthFuture> newAuthSshFutureListener(final ClientSession cSession) {
+    private SshFutureListener<AuthFuture> newAuthSshFutureListener(final ClientSession session) {
         return new SshFutureListener<AuthFuture>() {
             @Override
             public void operationComplete(AuthFuture authFuture) {
@@ -140,19 +140,19 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
             }
 
             private void onFailure(Throwable throwable) {
-                ClientSessionImpl impl = (ClientSessionImpl) cSession;
-                LOG.error("Authorize failed for session {}", cSession, throwable);
+                ClientSessionImpl impl = (ClientSessionImpl) session;
+                LOG.error("Authorize failed for session {}", session, throwable);
 
                 KeyExchange kex = impl.getKex();
                 PublicKey key = kex.getServerKey();
                 recorder.reportFailedAuth(key);
 
-                cSession.close(true);
+                session.close(true);
             }
 
             private void onCanceled() {
                 LOG.warn("Authorize cancelled");
-                cSession.close(true);
+                session.close(true);
             }
         };
     }
@@ -165,13 +165,15 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
             LOG.info("Incoming session {} was rejected by Authorization Provider.", sshClientSession);
             return false;
         }
-        CallHomeSessionContext session = sessionFactory.createIfNotExists(sshClientSession, authorization, remoteAddress);
+        CallHomeSessionContext session = sessionFactory.createIfNotExists(
+            sshClientSession, authorization, remoteAddress);
         // Session was created, session with same name does not exists
         if (session != null) {
             return true;
         }
         // Session was not created, session with same name exists
-        LOG.info("Incoming session {} was rejected. Session with same name {} is already active.", sshClientSession, authorization.getSessionName());
+        LOG.info("Incoming session {} was rejected. Session with same name {} is already active.",
+            sshClientSession, authorization.getSessionName());
         return false;
     }
 
