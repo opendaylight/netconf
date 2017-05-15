@@ -33,6 +33,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.mdsal.connector.ops.Commit;
+import org.opendaylight.netconf.mdsal.connector.ops.DeleteConfig;
 import org.opendaylight.netconf.mdsal.connector.ops.DiscardChanges;
 import org.opendaylight.netconf.mdsal.connector.ops.EditConfig;
 import org.opendaylight.netconf.mdsal.connector.ops.Lock;
@@ -152,9 +153,10 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             final Unlock unLock = new Unlock(String.valueOf(currentSessionId));
             final DiscardChanges discardChanges = new DiscardChanges(String.valueOf(currentSessionId), transactionProvider);
             final Validate validate = new Validate(String.valueOf(currentSessionId), currentSchemaContext);
+            final DeleteConfig deleteConfig = new DeleteConfig(String.valueOf(currentSessionId), transactionProvider);
 
             return Sets.<NetconfOperation>newHashSet(get, getConfig,
-                    editConfig, commit, lock, unLock, discardChanges, validate);
+                    editConfig, commit, lock, unLock, discardChanges, validate, deleteConfig);
         }
 
         @Override
