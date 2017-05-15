@@ -75,10 +75,10 @@ public class Parameters {
 
         parser.addArgument("--destination")
                 .type(String.class)
-                .setDefault("/restconf/config/network-topology:network-topology/topology/topology-netconf/node/" +
-                        "{DEVICE_PORT}-sim-device/yang-ext:mount/cisco-vpp:vpp/bridge-domains/bridge-domain/a")
-                .help("Destination to send the requests to after the ip:port part of the uri. " +
-                        "Use {DEVICE_PORT} tag to use the device-port-range-start argument")
+                .setDefault("/restconf/config/network-topology:network-topology/topology/topology-netconf/node/"
+                        + "{DEVICE_PORT}-sim-device/yang-ext:mount/cisco-vpp:vpp/bridge-domains/bridge-domain/a")
+                .help("Destination to send the requests to after the ip:port part of the uri. "
+                        + "Use {DEVICE_PORT} tag to use the device-port-range-start argument")
                 .dest("destination");
 
         parser.addArgument("--edits")
@@ -105,7 +105,8 @@ public class Parameters {
         parser.addArgument("--same-device")
                 .type(Boolean.class)
                 .setDefault(true)
-                .help("If true, every thread edits the device at the first port. If false, n-th thread edits device at n-th port.")
+                .help("If true, every thread edits the device at the first port. "
+                    + "If false, n-th thread edits device at n-th port.")
                 .dest("same-device");
 
         parser.addArgument("--device-port-range-start")
@@ -116,8 +117,8 @@ public class Parameters {
         parser.addArgument("--throttle")
                 .type(Integer.class)
                 .setDefault(5000)
-                .help("Maximum amount of async requests that can be open at a time, " +
-                        "with mutltiple threads this gets divided among all threads")
+                .help("Maximum amount of async requests that can be open at a time, "
+                        + "with mutltiple threads this gets divided among all threads")
                 .dest("throttle");
 
         parser.addArgument("--auth")
