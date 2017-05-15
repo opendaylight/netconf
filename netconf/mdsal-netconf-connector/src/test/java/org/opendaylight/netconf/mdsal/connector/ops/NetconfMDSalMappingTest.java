@@ -196,16 +196,14 @@ public class NetconfMDSalMappingTest {
 
     @Test
     public void testEditRunning() throws Exception {
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_running.xml"), RPC_REPLY_OK);
+        verifyResponse(getConfigRunning(), XmlFileLoader.xmlFileToDocument("messages/mapping/editConfigs/editConfig_merge_n1_control.xml"));
+    }
 
-        try {
-            edit("messages/mapping/editConfigs/editConfig_running.xml");
-            fail("Should have failed - edit config on running datastore is not supported");
-        } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.operation_not_supported);
-            assertTrue(e.getErrorType() == ErrorType.protocol);
-        }
-
+    @Test
+    public void testEditRunningTestOnly() throws Exception {
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_running_test_only.xml"), RPC_REPLY_OK);
+        assertEmptyDatastore(getConfigRunning());
     }
 
     @Test
@@ -664,6 +662,39 @@ public class NetconfMDSalMappingTest {
         }
     }
 
+    @Test
+    public void testCopyConfigCandidateToRunning() throws Exception {
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_n1.xml"), RPC_REPLY_OK);
+        assertEmptyDatastore(getConfigRunning());
+        verifyResponse(copyConfig("messages/mapping/copy_config_candidate_to_running.xml"), RPC_REPLY_OK);
+        verifyResponse(getConfigRunning(), XmlFileLoader.xmlFileToDocument("messages/mapping/editConfigs/editConfig_merge_n1_control.xml"));
+    }
+
+    @Test
+    public void testCopyConfigRunningToCandidate() throws Exception {
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_n1.xml"), RPC_REPLY_OK);
+        verifyResponse(copyConfig("messages/mapping/copy_config_running_to_candidate.xml"), RPC_REPLY_OK);
+        assertEmptyDatastore(getConfigRunning());
+        assertEmptyDatastore(getConfigCandidate());
+    }
+
+    @Test
+    public void testCopyConfigIncorrate() throws Exception {
+        copyConfigTest("messages/mapping/copy_config_source_missing.xml");
+        copyConfigTest("messages/mapping/copy_config_target_missing.xml");
+    }
+
+    private void copyConfigTest(String filePath) throws ParserConfigurationException, SAXException, IOException {
+        try {
+            copyConfig(filePath);
+            fail("Copy config should have failed");
+        } catch (DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
+            assertTrue(e.getErrorTag() == ErrorTag.invalid_value);
+            assertTrue(e.getErrorType() == ErrorType.application);
+        }
+    }
+
     private void verifyFilterIdentifier(String resource, YangInstanceIdentifier identifier) throws Exception{
         TestingGetConfig getConfig = new TestingGetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
         Document request = XmlFileLoader.xmlFileToDocument(resource);
@@ -794,6 +825,11 @@ public class NetconfMDSalMappingTest {
     private Document deleteConfig(String resource) throws DocumentedException, ParserConfigurationException, SAXException, IOException {
         DeleteConfig deleteConfig = new DeleteConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
         return executeOperation(deleteConfig, resource);
+    }
+
+    private Document copyConfig(String resource) throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+        CopyConfig copyconfig = new CopyConfig(sessionIdForReporting, transactionProvider);
+        return executeOperation(copyconfig, resource);
     }
 
     private Document executeOperation(NetconfOperation op, String filename) throws ParserConfigurationException, SAXException, IOException, DocumentedException {
