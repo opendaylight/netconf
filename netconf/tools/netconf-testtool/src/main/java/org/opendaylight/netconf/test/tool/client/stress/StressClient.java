@@ -53,41 +53,42 @@ public final class StressClient {
 
     static {
         try {
-            COMMIT_MSG = new NetconfMessage(XmlUtil.readXmlToDocument("<rpc message-id=\"commit-batch\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
-                    "    <commit/>\n" +
-                    "</rpc>"));
-        } catch (SAXException | IOException e) {
+            COMMIT_MSG = new NetconfMessage(XmlUtil.readXmlToDocument(
+                "<rpc message-id=\"commit-batch\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                    + "    <commit/>\n"
+                    + "</rpc>"));
+        } catch (final SAXException | IOException e) {
             throw new ExceptionInInitializerError(e);
         }
     }
 
     static final QName EDIT_QNAME = QName.create(EditConfigInput.QNAME, "edit-config");
-    static final org.w3c.dom.Document editCandidateBlueprint;
-    static final org.w3c.dom.Document editRunningBlueprint;
+    static final org.w3c.dom.Document EDIT_CANDIDATE_BLUEPRINT;
+    static final org.w3c.dom.Document EDIT_RUNNING_BLUEPRINT;
 
     static {
         try {
-            editCandidateBlueprint = XmlUtil.readXmlToDocument(
-                    "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
-                            "    <edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
-                            "        <target>\n" +
-                            "            <candidate/>\n" +
-                            "        </target>\n" +
-                            "        <default-operation>none</default-operation>" +
-                            "        <config/>\n" +
-                            "    </edit-config>\n" +
-                            "</rpc>");
+            EDIT_CANDIDATE_BLUEPRINT = XmlUtil.readXmlToDocument(
+                    "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                            + "    <edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                            + "        <target>\n"
+                            + "            <candidate/>\n"
+                            + "        </target>\n"
+                            + "        <default-operation>none</default-operation>"
+                            + "        <config/>\n"
+                            + "    </edit-config>\n"
+                            + "</rpc>");
 
-            editRunningBlueprint = XmlUtil.readXmlToDocument(
-                    "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
-                            "    <edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n" +
-                            "        <target>\n" +
-                            "            <running/>\n" +
-                            "        </target>\n" +
-                            "        <default-operation>none</default-operation>" +
-                            "        <config/>\n" +
-                            "    </edit-config>\n" +
-                            "</rpc>");
+            EDIT_RUNNING_BLUEPRINT = XmlUtil.readXmlToDocument(
+                    "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                            + "    <edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                            + "        <target>\n"
+                            + "            <running/>\n"
+                            + "        </target>\n"
+                            + "        <default-operation>none</default-operation>"
+                            + "        <config/>\n"
+                            + "    </edit-config>\n"
+                            + "</rpc>");
         } catch (SAXException | IOException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -105,7 +106,8 @@ public final class StressClient {
         params = parseArgs(args, Parameters.getParser());
         params.validate();
 
-        final ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        final ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory
+            .getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(params.debug ? Level.DEBUG : Level.INFO);
 
         final int threadAmount = params.threadAmount;
@@ -193,7 +195,8 @@ public final class StressClient {
     }
 
     static NetconfMessage prepareMessage(final int id, final String editContentString) {
-        final Document msg = XmlUtil.createDocumentCopy(params.candidateDatastore ? editCandidateBlueprint : editRunningBlueprint);
+        final Document msg = XmlUtil.createDocumentCopy(
+            params.candidateDatastore ? EDIT_CANDIDATE_BLUEPRINT : EDIT_RUNNING_BLUEPRINT);
         msg.getDocumentElement().setAttribute("message-id", Integer.toString(id));
         final NetconfMessage netconfMessage = new NetconfMessage(msg);
 
@@ -204,15 +207,15 @@ public final class StressClient {
 
             final StringBuilder stringBuilder = new StringBuilder(specificEditContent);
             int idx = stringBuilder.indexOf(PHYS_ADDR_PLACEHOLDER);
-            while (idx!= -1) {
+            while (idx != -1) {
                 stringBuilder.replace(idx, idx + PHYS_ADDR_PLACEHOLDER.length(), TestToolUtils.getMac(macStart++));
                 idx = stringBuilder.indexOf(PHYS_ADDR_PLACEHOLDER);
             }
             specificEditContent = stringBuilder.toString();
 
             editContentElement = XmlUtil.readXmlToElement(specificEditContent);
-            final Node config = ((Element) msg.getDocumentElement().getElementsByTagName("edit-config").item(0)).
-                    getElementsByTagName("config").item(0);
+            final Node config = ((Element) msg.getDocumentElement().getElementsByTagName("edit-config").item(0))
+                    .getElementsByTagName("config").item(0);
             config.appendChild(msg.importNode(editContentElement, true));
         } catch (final IOException | SAXException e) {
             throw new IllegalArgumentException("Edit content file is unreadable", e);
@@ -221,16 +224,17 @@ public final class StressClient {
         return netconfMessage;
     }
 
-    private static NetconfClientDispatcherImpl configureClientDispatcher(final Parameters params, final NioEventLoopGroup nioGroup, final Timer timer) {
+    private static NetconfClientDispatcherImpl configureClientDispatcher(final Parameters params,
+            final NioEventLoopGroup nioGroup, final Timer timer) {
         final NetconfClientDispatcherImpl netconfClientDispatcher;
-        if(params.exi) {
-            if(params.legacyFraming) {
-                netconfClientDispatcher= ConfigurableClientDispatcher.createLegacyExi(nioGroup, nioGroup, timer);
+        if (params.exi) {
+            if (params.legacyFraming) {
+                netconfClientDispatcher = ConfigurableClientDispatcher.createLegacyExi(nioGroup, nioGroup, timer);
             } else {
                 netconfClientDispatcher = ConfigurableClientDispatcher.createChunkedExi(nioGroup, nioGroup, timer);
             }
         } else {
-            if(params.legacyFraming) {
+            if (params.legacyFraming) {
                 netconfClientDispatcher = ConfigurableClientDispatcher.createLegacy(nioGroup, nioGroup, timer);
             } else {
                 netconfClientDispatcher = ConfigurableClientDispatcher.createChunked(nioGroup, nioGroup, timer);
@@ -252,10 +256,11 @@ public final class StressClient {
         return null;
     }
 
-
-    static class LoggingRemoteDevice implements RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> {
+    static class LoggingRemoteDevice
+            implements RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> {
         @Override
-        public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities, final NetconfDeviceCommunicator netconfDeviceCommunicator) {
+        public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
+                                      final NetconfDeviceCommunicator netconfDeviceCommunicator) {
             LOG.info("Session established");
         }
 

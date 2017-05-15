@@ -26,7 +26,8 @@ public class SyncExecutionStrategy implements ExecutionStrategy {
     private final ArrayList<Request> payloads;
     private final AsyncHttpClient asyncHttpClient;
 
-    SyncExecutionStrategy(final Parameters params, final AsyncHttpClient asyncHttpClient, final ArrayList<Request> payloads) {
+    SyncExecutionStrategy(final Parameters params, final AsyncHttpClient asyncHttpClient,
+                          final ArrayList<Request> payloads) {
         this.params = params;
         this.asyncHttpClient = asyncHttpClient;
         this.payloads = payloads;

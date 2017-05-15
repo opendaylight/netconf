@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.test.tool;
 
-import com.google.common.base.Function;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
@@ -89,13 +88,15 @@ public class NetconfDeviceSimulator implements Closeable {
 
     private boolean sendFakeSchema = false;
 
-    public NetconfDeviceSimulator(final int ThreadPoolSize) {
+    public NetconfDeviceSimulator(final int threadPoolSize) {
         this(new NioEventLoopGroup(), new HashedWheelTimer(),
-                Executors.newScheduledThreadPool(ThreadPoolSize, new ThreadFactoryBuilder().setNameFormat("netconf-ssh-server-mina-timers-%d").build()),
-                ThreadUtils.newFixedThreadPool("netconf-ssh-server-nio-group", ThreadPoolSize));
+                Executors.newScheduledThreadPool(threadPoolSize,
+                    new ThreadFactoryBuilder().setNameFormat("netconf-ssh-server-mina-timers-%d").build()),
+                ThreadUtils.newFixedThreadPool("netconf-ssh-server-nio-group", threadPoolSize));
     }
 
-    private NetconfDeviceSimulator(final NioEventLoopGroup eventExecutors, final HashedWheelTimer hashedWheelTimer, final ScheduledExecutorService minaTimerExecutor, final ExecutorService nioExecutor) {
+    private NetconfDeviceSimulator(final NioEventLoopGroup eventExecutors, final HashedWheelTimer hashedWheelTimer,
+            final ScheduledExecutorService minaTimerExecutor, final ExecutorService nioExecutor) {
         this.nettyThreadgroup = eventExecutors;
         this.hashedWheelTimer = hashedWheelTimer;
         this.minaTimerExecutor = minaTimerExecutor;
@@ -103,48 +104,48 @@ public class NetconfDeviceSimulator implements Closeable {
     }
 
     private NetconfServerDispatcherImpl createDispatcher(final Set<Capability> capabilities,
-                                                         final SchemaSourceProvider<YangTextSchemaSource> sourceProvider,
-                                                         final TesttoolParameters params) {
+            final SchemaSourceProvider<YangTextSchemaSource> sourceProvider, final TesttoolParameters params) {
 
-        final Set<Capability> transformedCapabilities = Sets.newHashSet(Collections2.transform(capabilities, new Function<Capability, Capability>() {
-            @Override
-            public Capability apply(final Capability input) {
-                if (sendFakeSchema) {
-                    sendFakeSchema = false;
-                    return new FakeCapability((YangModuleCapability) input);
-                } else {
-                    return input;
-                }
+        final Set<Capability> transformedCapabilities = Sets.newHashSet(Collections2.transform(capabilities, input -> {
+            if (sendFakeSchema) {
+                sendFakeSchema = false;
+                return new FakeCapability((YangModuleCapability) input);
+            } else {
+                return input;
             }
         }));
         transformedCapabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0"));
         final NetconfMonitoringService monitoringService1 = new DummyMonitoringService(transformedCapabilities);
         final SessionIdProvider idProvider = new SessionIdProvider();
 
-        final NetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory = createOperationServiceFactory(sourceProvider, params, transformedCapabilities, monitoringService1, idProvider);
+        final NetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory = createOperationServiceFactory(
+            sourceProvider, params, transformedCapabilities, monitoringService1, idProvider);
 
         final Set<String> serverCapabilities = params.exi
                 ? NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES
-                : Sets.newHashSet(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0, XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1);
+                : Sets.newHashSet(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
+                    XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1);
 
         final NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new TesttoolNegotiationFactory(
-                hashedWheelTimer, aggregatedNetconfOperationServiceFactory, idProvider, params.generateConfigsTimeout, monitoringService1, serverCapabilities);
+                hashedWheelTimer, aggregatedNetconfOperationServiceFactory, idProvider, params.generateConfigsTimeout,
+                monitoringService1, serverCapabilities);
 
-        final NetconfServerDispatcherImpl.ServerChannelInitializer serverChannelInitializer = new NetconfServerDispatcherImpl.ServerChannelInitializer(
-                serverNegotiatorFactory);
+        final NetconfServerDispatcherImpl.ServerChannelInitializer serverChannelInitializer =
+            new NetconfServerDispatcherImpl.ServerChannelInitializer(serverNegotiatorFactory);
         return new NetconfServerDispatcherImpl(serverChannelInitializer, nettyThreadgroup, nettyThreadgroup);
     }
 
-    private NetconfOperationServiceFactory createOperationServiceFactory(final SchemaSourceProvider<YangTextSchemaSource> sourceProvider,
-                                                                         final TesttoolParameters params,
-                                                                         final Set<Capability> transformedCapabilities,
-                                                                         final NetconfMonitoringService monitoringService1,
-                                                                         final SessionIdProvider idProvider) {
-        final AggregatedNetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory = new AggregatedNetconfOperationServiceFactory();
+    private NetconfOperationServiceFactory createOperationServiceFactory(
+            final SchemaSourceProvider<YangTextSchemaSource> sourceProvider, final TesttoolParameters params,
+            final Set<Capability> transformedCapabilities, final NetconfMonitoringService monitoringService1,
+            final SessionIdProvider idProvider) {
+        final AggregatedNetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory =
+            new AggregatedNetconfOperationServiceFactory();
 
         final NetconfOperationServiceFactory operationProvider;
         if (params.mdSal) {
-            operationProvider = new MdsalOperationProvider(idProvider, transformedCapabilities, schemaContext, sourceProvider);
+            operationProvider = new MdsalOperationProvider(
+                idProvider, transformedCapabilities, schemaContext, sourceProvider);
         } else {
             operationProvider = new SimulatedOperationProvider(idProvider, transformedCapabilities,
                     Optional.fromNullable(params.notificationFile),
@@ -165,18 +166,14 @@ public class NetconfDeviceSimulator implements Closeable {
     }
 
     public List<Integer> start(final TesttoolParameters params) {
-        LOG.info("Starting {}, {} simulated devices starting on port {}", params.deviceCount, params.ssh ? "SSH" : "TCP", params.startingPort);
+        LOG.info("Starting {}, {} simulated devices starting on port {}",
+            params.deviceCount, params.ssh ? "SSH" : "TCP", params.startingPort);
 
         final SharedSchemaRepository schemaRepo = new SharedSchemaRepository("netconf-simulator");
         final Set<Capability> capabilities = parseSchemasToModuleCapabilities(params, schemaRepo);
 
         final NetconfServerDispatcherImpl dispatcher = createDispatcher(capabilities,
-                new SchemaSourceProvider<YangTextSchemaSource>() {
-                    @Override
-                    public CheckedFuture<? extends YangTextSchemaSource, SchemaSourceException> getSource(final SourceIdentifier sourceIdentifier) {
-                        return schemaRepo.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class);
-                    }
-                }, params);
+            sourceIdentifier -> schemaRepo.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class), params);
 
         int currentPort = params.startingPort;
 
@@ -193,20 +190,21 @@ public class NetconfDeviceSimulator implements Closeable {
             final InetSocketAddress address = getAddress(params.ip, currentPort);
 
             final ChannelFuture server;
-            if(params.ssh) {
+            if (params.ssh) {
                 final InetSocketAddress bindingAddress = InetSocketAddress.createUnresolved("0.0.0.0", currentPort);
                 final LocalAddress tcpLocalAddress = new LocalAddress(address.toString());
 
                 server = dispatcher.createLocalServer(tcpLocalAddress);
                 try {
-                    final SshProxyServer sshServer = new SshProxyServer(minaTimerExecutor, nettyThreadgroup, nioExecutor);
+                    final SshProxyServer sshServer = new SshProxyServer(
+                        minaTimerExecutor, nettyThreadgroup, nioExecutor);
                     sshServer.bind(getSshConfiguration(bindingAddress, tcpLocalAddress, keyPairProvider));
                     sshWrappers.add(sshServer);
                 } catch (final BindException e) {
                     LOG.warn("Cannot start simulated device on {}, port already in use. Skipping.", address);
                     // Close local server and continue
                     server.cancel(true);
-                    if(server.isDone()) {
+                    if (server.isDone()) {
                         server.channel().close();
                     }
                     continue;
@@ -248,8 +246,9 @@ public class NetconfDeviceSimulator implements Closeable {
             openDevices.add(currentPort - 1);
         }
 
-        if(openDevices.size() == params.deviceCount) {
-            LOG.info("All simulated devices started successfully from port {} to {}", params.startingPort, currentPort - 1);
+        if (openDevices.size() == params.deviceCount) {
+            LOG.info("All simulated devices started successfully from port {} to {}",
+                params.startingPort, currentPort - 1);
         } else if (openDevices.size() == 0) {
             LOG.warn("No simulated devices started.");
         } else {
@@ -259,7 +258,8 @@ public class NetconfDeviceSimulator implements Closeable {
         return openDevices;
     }
 
-    private SshProxyServerConfiguration getSshConfiguration(final InetSocketAddress bindingAddress, final LocalAddress tcpLocalAddress, final PEMGeneratorHostKeyProvider keyPairProvider) throws IOException {
+    private SshProxyServerConfiguration getSshConfiguration(final InetSocketAddress bindingAddress,
+            final LocalAddress tcpLocalAddress, final PEMGeneratorHostKeyProvider keyPairProvider) throws IOException {
         return new SshProxyServerConfigurationBuilder()
                 .setBindingAddress(bindingAddress)
                 .setLocalAddress(tcpLocalAddress)
@@ -284,7 +284,8 @@ public class NetconfDeviceSimulator implements Closeable {
         }
     }
 
-    private Set<Capability> parseSchemasToModuleCapabilities(final TesttoolParameters params, final SharedSchemaRepository consumer) {
+    private Set<Capability> parseSchemasToModuleCapabilities(final TesttoolParameters params,
+                                                             final SharedSchemaRepository consumer) {
         final Set<SourceIdentifier> loadedSources = Sets.newHashSet();
 
         consumer.registerSchemaSourceListener(TextToASTTransformer.create(consumer, consumer));
@@ -304,8 +305,9 @@ public class NetconfDeviceSimulator implements Closeable {
             public void schemaSourceUnregistered(final PotentialSchemaSource<?> potentialSchemaSource) {}
         });
 
-        if(params.schemasDir != null) {
-            final FilesystemSchemaSourceCache<YangTextSchemaSource> cache = new FilesystemSchemaSourceCache<>(consumer, YangTextSchemaSource.class, params.schemasDir);
+        if (params.schemasDir != null) {
+            final FilesystemSchemaSourceCache<YangTextSchemaSource> cache = new FilesystemSchemaSourceCache<>(
+                consumer, YangTextSchemaSource.class, params.schemasDir);
             consumer.registerSchemaSourceListener(cache);
         }
 
@@ -331,41 +333,46 @@ public class NetconfDeviceSimulator implements Closeable {
         return capabilities;
     }
 
-    private void addModuleCapability(final SharedSchemaRepository consumer, final Set<Capability> capabilities, final Module module) {
+    private void addModuleCapability(final SharedSchemaRepository consumer, final Set<Capability> capabilities,
+                                     final Module module) {
         final SourceIdentifier moduleSourceIdentifier = SourceIdentifier.create(module.getName(),
-                (SimpleDateFormatUtil.DEFAULT_DATE_REV == module.getRevision() ? Optional.<String>absent() :
+                (SimpleDateFormatUtil.DEFAULT_DATE_REV == module.getRevision() ? Optional.absent() :
                         Optional.of(module.getQNameModule().getFormattedRevision())));
         try {
-            final String moduleContent = new String(consumer.getSchemaSource(moduleSourceIdentifier, YangTextSchemaSource.class)
-                    .checkedGet().read());
+            final String moduleContent = new String(
+                consumer.getSchemaSource(moduleSourceIdentifier, YangTextSchemaSource.class).checkedGet().read());
             capabilities.add(new YangModuleCapability(module, moduleContent));
             //IOException would be thrown in creating SchemaContext already
-        } catch (SchemaSourceException |IOException e) {
-            throw new RuntimeException("Cannot retrieve schema source for module " + moduleSourceIdentifier.toString() + " from schema repository", e);
+        } catch (SchemaSourceException | IOException e) {
+            throw new RuntimeException("Cannot retrieve schema source for module "
+                + moduleSourceIdentifier.toString() + " from schema repository", e);
         }
     }
 
     private void addDefaultSchemas(final SharedSchemaRepository consumer) {
-        SourceIdentifier sId = RevisionSourceIdentifier.create("ietf-netconf-monitoring", "2010-10-04");
-        registerSource(consumer, "/META-INF/yang/ietf-netconf-monitoring.yang", sId);
+        SourceIdentifier srcId = RevisionSourceIdentifier.create("ietf-netconf-monitoring", "2010-10-04");
+        registerSource(consumer, "/META-INF/yang/ietf-netconf-monitoring.yang", srcId);
 
-        sId = RevisionSourceIdentifier.create("ietf-netconf-monitoring-extension", "2013-12-10");
-        registerSource(consumer, "/META-INF/yang/ietf-netconf-monitoring-extension.yang", sId);
+        srcId = RevisionSourceIdentifier.create("ietf-netconf-monitoring-extension", "2013-12-10");
+        registerSource(consumer, "/META-INF/yang/ietf-netconf-monitoring-extension.yang", srcId);
 
-        sId = RevisionSourceIdentifier.create("ietf-yang-types", "2013-07-15");
-        registerSource(consumer, "/META-INF/yang/ietf-yang-types@2013-07-15.yang", sId);
+        srcId = RevisionSourceIdentifier.create("ietf-yang-types", "2013-07-15");
+        registerSource(consumer, "/META-INF/yang/ietf-yang-types@2013-07-15.yang", srcId);
 
-        sId = RevisionSourceIdentifier.create("ietf-inet-types", "2013-07-15");
-        registerSource(consumer, "/META-INF/yang/ietf-inet-types@2013-07-15.yang", sId);
+        srcId = RevisionSourceIdentifier.create("ietf-inet-types", "2013-07-15");
+        registerSource(consumer, "/META-INF/yang/ietf-inet-types@2013-07-15.yang", srcId);
     }
 
-    private void registerSource(final SharedSchemaRepository consumer, final String resource, final SourceIdentifier sourceId) {
+    private void registerSource(final SharedSchemaRepository consumer, final String resource,
+                                final SourceIdentifier sourceId) {
         consumer.registerSchemaSource(new SchemaSourceProvider<SchemaSourceRepresentation>() {
             @Override
-            public CheckedFuture<? extends SchemaSourceRepresentation, SchemaSourceException> getSource(final SourceIdentifier sourceIdentifier) {
+            public CheckedFuture<? extends SchemaSourceRepresentation, SchemaSourceException> getSource(
+                    final SourceIdentifier sourceIdentifier) {
                 return Futures.immediateCheckedFuture(new YangTextSchemaSource(sourceId) {
                     @Override
-                    protected MoreObjects.ToStringHelper addToStringAttributes(final MoreObjects.ToStringHelper toStringHelper) {
+                    protected MoreObjects.ToStringHelper addToStringAttributes(
+                            final MoreObjects.ToStringHelper toStringHelper) {
                         return toStringHelper;
                     }
 
@@ -375,7 +382,8 @@ public class NetconfDeviceSimulator implements Closeable {
                     }
                 });
             }
-        }, PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
+        }, PotentialSchemaSource.create(
+            sourceId, YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
     }
 
     private static InetSocketAddress getAddress(final String ip, final int port) {
