@@ -48,15 +48,16 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
 
         Optional<Notifications> notifications;
 
-        if(notificationsFile.isPresent()) {
+        if (notificationsFile.isPresent()) {
             notifications = Optional.of(loadNotifications(notificationsFile.get()));
             scheduledExecutorService = Executors.newScheduledThreadPool(1);
         } else {
             notifications = Optional.absent();
         }
 
-        if(notifications.isPresent()) {
-            Map<Notification, NetconfMessage> preparedMessages = Maps.newHashMapWithExpectedSize(notifications.get().getNotificationList().size());
+        if (notifications.isPresent()) {
+            Map<Notification, NetconfMessage> preparedMessages = Maps.newHashMapWithExpectedSize(
+                notifications.get().getNotificationList().size());
             for (final Notification notification : notifications.get().getNotificationList()) {
                 final NetconfMessage parsedNotification = parseNetconfNotification(notification.getContent());
                 preparedMessages.put(notification, parsedNotification);
@@ -89,7 +90,8 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
+            throws DocumentedException {
         long delayAggregator = 0;
 
         for (final Map.Entry<Notification, NetconfMessage> notification : notifications.entrySet()) {
@@ -113,7 +115,7 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
         final int startEventTime = content.indexOf("<eventTime>") + "<eventTime>".length();
         final int endEventTime = content.indexOf("</eventTime>");
         final String eventTime = content.substring(startEventTime, endEventTime);
-        if(eventTime.equals("XXXX")) {
+        if (eventTime.equals("XXXX")) {
             content = content.replace(eventTime, new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
         }
 
@@ -125,8 +127,8 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
     }
 
     @Override
-    public void setNetconfSession(final NetconfServerSession s) {
-        this.session = s;
+    public void setNetconfSession(final NetconfServerSession session) {
+        this.session = session;
     }
 
     @XmlRootElement(name = "notifications")

@@ -38,7 +38,7 @@ public class RestPerfClient {
 
     private static final String PHYS_ADDR_PLACEHOLDER = "{PHYS_ADDR}";
 
-    private static final String dest = "http://{HOST}:{PORT}";
+    private static final String DEST = "http://{HOST}:{PORT}";
 
     private static long macStart = 0xAABBCCDD0000L;
 
@@ -49,7 +49,7 @@ public class RestPerfClient {
         private final String destination;
         private final String payload;
 
-        public DestToPayload(String destination, String payload) {
+        DestToPayload(String destination, String payload) {
             this.destination = destination;
             this.payload = payload;
         }
@@ -91,34 +91,58 @@ public class RestPerfClient {
         for (int i = 0; i < threadAmount; i++) {
             final ArrayList<DestToPayload> payloads = new ArrayList<>();
             for (int j = 0; j < requestsPerThread; j++) {
-                final int devicePort = parameters.sameDevice ? parameters.devicePortRangeStart : parameters.devicePortRangeStart + i;
-                final StringBuilder destBuilder = new StringBuilder(dest);
-                destBuilder.replace(destBuilder.indexOf(HOST_KEY), destBuilder.indexOf(HOST_KEY) + HOST_KEY.length(), parameters.ip)
-                        .replace(destBuilder.indexOf(PORT_KEY), destBuilder.indexOf(PORT_KEY) + PORT_KEY.length(), parameters.port + "");
+                final int devicePort = parameters.sameDevice
+                    ? parameters.devicePortRangeStart : parameters.devicePortRangeStart + i;
+                final StringBuilder destBuilder = new StringBuilder(DEST);
+                destBuilder.replace(
+                        destBuilder.indexOf(HOST_KEY),
+                        destBuilder.indexOf(HOST_KEY) + HOST_KEY.length(),
+                        parameters.ip)
+                    .replace(
+                        destBuilder.indexOf(PORT_KEY),
+                        destBuilder.indexOf(PORT_KEY) + PORT_KEY.length(),
+                        parameters.port + "");
                 final StringBuilder suffixBuilder = new StringBuilder(parameters.destination);
                 if (suffixBuilder.indexOf(DEVICE_PORT_KEY) != -1) {
-                    suffixBuilder.replace(suffixBuilder.indexOf(DEVICE_PORT_KEY), suffixBuilder.indexOf(DEVICE_PORT_KEY) + DEVICE_PORT_KEY.length(), devicePort + "");
+                    suffixBuilder.replace(
+                        suffixBuilder.indexOf(DEVICE_PORT_KEY),
+                        suffixBuilder.indexOf(DEVICE_PORT_KEY) + DEVICE_PORT_KEY.length(),
+                        devicePort + "");
                 }
                 destBuilder.append(suffixBuilder);
 
-                payloads.add(new DestToPayload(destBuilder.toString(), prepareMessage(i, j, editContentString, devicePort)));
+                payloads.add(
+                    new DestToPayload(destBuilder.toString(), prepareMessage(i, j, editContentString, devicePort)));
             }
             allThreadsPayloads.add(payloads);
         }
 
         for (int i = 0; i < leftoverRequests; i++) {
-            ArrayList<DestToPayload> payloads = allThreadsPayloads.get(allThreadsPayloads.size() - 1);
-
-            final int devicePort = parameters.sameDevice ? parameters.devicePortRangeStart : parameters.devicePortRangeStart + threadAmount - 1;
-            final StringBuilder destBuilder = new StringBuilder(dest);
-            destBuilder.replace(destBuilder.indexOf(HOST_KEY), destBuilder.indexOf(HOST_KEY) + HOST_KEY.length(), parameters.ip)
-                    .replace(destBuilder.indexOf(PORT_KEY), destBuilder.indexOf(PORT_KEY) + PORT_KEY.length(), parameters.port + "");
+            final int devicePort = parameters.sameDevice
+                ? parameters.devicePortRangeStart : parameters.devicePortRangeStart + threadAmount - 1;
+            final StringBuilder destBuilder = new StringBuilder(DEST);
+            destBuilder.replace(
+                    destBuilder.indexOf(HOST_KEY),
+                    destBuilder.indexOf(HOST_KEY) + HOST_KEY.length(),
+                    parameters.ip)
+                .replace(
+                    destBuilder.indexOf(PORT_KEY),
+                    destBuilder.indexOf(PORT_KEY) + PORT_KEY.length(),
+                    parameters.port + "");
             final StringBuilder suffixBuilder = new StringBuilder(parameters.destination);
             if (suffixBuilder.indexOf(DEVICE_PORT_KEY) != -1) {
-                suffixBuilder.replace(suffixBuilder.indexOf(DEVICE_PORT_KEY), suffixBuilder.indexOf(DEVICE_PORT_KEY) + DEVICE_PORT_KEY.length(), devicePort + "");
+                suffixBuilder.replace(
+                    suffixBuilder.indexOf(DEVICE_PORT_KEY),
+                    suffixBuilder.indexOf(DEVICE_PORT_KEY) + DEVICE_PORT_KEY.length(),
+                    devicePort + "");
             }
             destBuilder.append(suffixBuilder);
-            payloads.add(new DestToPayload(destBuilder.toString(), prepareMessage(threadAmount - 1, requestsPerThread + i, editContentString, devicePort)));
+
+            final ArrayList<DestToPayload> payloads = allThreadsPayloads.get(allThreadsPayloads.size() - 1);
+            payloads.add(
+                new DestToPayload(
+                    destBuilder.toString(),
+                    prepareMessage(threadAmount - 1, requestsPerThread + i, editContentString, devicePort)));
         }
 
         final ArrayList<PerfClientCallable> callables = new ArrayList<>();
@@ -132,7 +156,8 @@ public class RestPerfClient {
         boolean allThreadsCompleted = true;
         final Stopwatch started = Stopwatch.createStarted();
         try {
-            final List<Future<Void>> futures = executorService.invokeAll(callables, parameters.timeout, TimeUnit.MINUTES);
+            final List<Future<Void>> futures = executorService.invokeAll(
+                callables, parameters.timeout, TimeUnit.MINUTES);
             for (int i = 0; i < futures.size(); i++) {
                 Future<Void> future = futures.get(i);
                 if (future.isCancelled()) {
@@ -157,8 +182,9 @@ public class RestPerfClient {
         LOG.info("FINISHED. Execution time: {}", started);
         // If some threads failed or timed out, skip calculation of requests per second value
         // and do not log it
-        if(allThreadsCompleted) {
-            LOG.info("Requests per second: {}", (parameters.editCount * 1000.0 / started.elapsed(TimeUnit.MILLISECONDS)));
+        if (allThreadsCompleted) {
+            LOG.info(
+                "Requests per second: {}", (parameters.editCount * 1000.0 / started.elapsed(TimeUnit.MILLISECONDS)));
         }
         System.exit(0);
     }
@@ -176,15 +202,25 @@ public class RestPerfClient {
         return null;
     }
 
-    private static String prepareMessage(final int idi, final int idj, final String editContentString, final int devicePort) {
+    private static String prepareMessage(final int idi, final int idj, final String editContentString,
+                                         final int devicePort) {
         StringBuilder messageBuilder = new StringBuilder(editContentString);
         if (editContentString.contains(PEER_KEY)) {
-            messageBuilder.replace(messageBuilder.indexOf(PEER_KEY), messageBuilder.indexOf(PEER_KEY) + PEER_KEY.length(), Integer.toString(idi))
-                    .replace(messageBuilder.indexOf(INT_LEAF_KEY), messageBuilder.indexOf(INT_LEAF_KEY) + INT_LEAF_KEY.length(), Integer.toString(idj));
+            messageBuilder.replace(
+                    messageBuilder.indexOf(PEER_KEY),
+                    messageBuilder.indexOf(PEER_KEY) + PEER_KEY.length(),
+                    Integer.toString(idi))
+                .replace(
+                    messageBuilder.indexOf(INT_LEAF_KEY),
+                    messageBuilder.indexOf(INT_LEAF_KEY) + INT_LEAF_KEY.length(),
+                    Integer.toString(idj));
         }
 
         if (messageBuilder.indexOf(DEVICE_PORT_KEY) != -1) {
-            messageBuilder.replace(messageBuilder.indexOf(DEVICE_PORT_KEY), messageBuilder.indexOf(DEVICE_PORT_KEY) + DEVICE_PORT_KEY.length(), Integer.toString(devicePort));
+            messageBuilder.replace(
+                messageBuilder.indexOf(DEVICE_PORT_KEY),
+                messageBuilder.indexOf(DEVICE_PORT_KEY) + DEVICE_PORT_KEY.length(),
+                Integer.toString(devicePort));
         }
 
         int idx = messageBuilder.indexOf(PHYS_ADDR_PLACEHOLDER);
