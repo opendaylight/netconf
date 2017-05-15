@@ -27,25 +27,29 @@ public class TesttoolNegotiationFactory extends NetconfServerSessionNegotiatorFa
     private final Map<SocketAddress, NetconfOperationService> cachedOperationServices = new HashMap<>();
 
     public TesttoolNegotiationFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
-                                      final SessionIdProvider idProvider, final long connectionTimeoutMillis,
-                                      final NetconfMonitoringService monitoringService) {
-        super(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis, monitoringService, NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES);
+            final SessionIdProvider idProvider, final long connectionTimeoutMillis,
+            final NetconfMonitoringService monitoringService) {
+        super(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis, monitoringService,
+            NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES);
     }
 
     public TesttoolNegotiationFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
-                                      final SessionIdProvider idProvider, final long connectionTimeoutMillis,
-                                      final NetconfMonitoringService monitoringService, final Set<String> baseCapabilities) {
-        super(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis, monitoringService, baseCapabilities);
+            final SessionIdProvider idProvider, final long connectionTimeoutMillis,
+            final NetconfMonitoringService monitoringService, final Set<String> baseCapabilities) {
+        super(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis,
+            monitoringService, baseCapabilities);
     }
 
     @Override
-    protected NetconfOperationService getOperationServiceForAddress(final String netconfSessionIdForReporting, final SocketAddress socketAddress) {
+    protected NetconfOperationService getOperationServiceForAddress(
+            final String netconfSessionIdForReporting, final SocketAddress socketAddress) {
         if (cachedOperationServices.containsKey(socketAddress)) {
             LOG.debug("Session {}: Getting cached operation service factory for test tool device on address {}",
                     netconfSessionIdForReporting, socketAddress);
             return cachedOperationServices.get(socketAddress);
         } else {
-            final NetconfOperationService service = getOperationServiceFactory().createService(netconfSessionIdForReporting);
+            final NetconfOperationService service = getOperationServiceFactory()
+                .createService(netconfSessionIdForReporting);
             cachedOperationServices.put(socketAddress, service);
             LOG.debug("Session {}: Creating new operation service factory for test tool device on address {}",
                     netconfSessionIdForReporting, socketAddress);
