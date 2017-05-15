@@ -35,11 +35,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema.Location.Enumeration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.SchemaBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.SchemaKey;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 
 public class DummyMonitoringService implements NetconfMonitoringService {
 
-    private static final Sessions EMPTY_SESSIONS = new SessionsBuilder().setSession(Collections.<Session>emptyList()).build();
+    private static final Sessions EMPTY_SESSIONS = new SessionsBuilder().setSession(Collections.emptyList()).build();
     private static final Function<Capability, Uri> CAPABILITY_URI_FUNCTION = new Function<Capability, Uri>() {
         @Nullable
         @Override
@@ -58,7 +57,8 @@ public class DummyMonitoringService implements NetconfMonitoringService {
                     .setFormat(Yang.class)
                     .setVersion(capability.getRevision().get())
                     .setLocation(Collections.singletonList(new Location(Enumeration.NETCONF)))
-                    .setKey(new SchemaKey(Yang.class, capability.getModuleName().get(), capability.getRevision().get())).build();
+                    .setKey(new SchemaKey(Yang.class, capability.getModuleName().get(), capability.getRevision().get()))
+                    .build();
         }
     };
 
@@ -74,13 +74,14 @@ public class DummyMonitoringService implements NetconfMonitoringService {
         Set<Capability> moduleCapabilities = Sets.newHashSet();
         this.capabilityMultiMap = ArrayListMultimap.create();
         for (Capability cap : capabilities) {
-            if(cap.getModuleName().isPresent()) {
+            if (cap.getModuleName().isPresent()) {
                 capabilityMultiMap.put(cap.getModuleName().get(), cap);
                 moduleCapabilities.add(cap);
             }
         }
 
-        this.schemas = new SchemasBuilder().setSchema(Lists.newArrayList(Collections2.transform(moduleCapabilities, CAPABILITY_SCHEMA_FUNCTION))).build();
+        this.schemas = new SchemasBuilder().setSchema(
+            Lists.newArrayList(Collections2.transform(moduleCapabilities, CAPABILITY_SCHEMA_FUNCTION))).build();
     }
 
     @Override
@@ -121,7 +122,8 @@ public class DummyMonitoringService implements NetconfMonitoringService {
                 return capability.getCapabilitySchema().get();
             }
         }
-        throw new IllegalArgumentException("Module with name: " + moduleName + " and revision: " + revision + " does not exist");
+        throw new IllegalArgumentException(
+            "Module with name: " + moduleName + " and revision: " + revision + " does not exist");
     }
 
     @Override

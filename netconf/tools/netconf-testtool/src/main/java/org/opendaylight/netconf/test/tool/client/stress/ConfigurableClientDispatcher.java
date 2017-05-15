@@ -19,41 +19,51 @@ public class ConfigurableClientDispatcher extends NetconfClientDispatcherImpl {
 
     private final Set<String> capabilities;
 
-    private ConfigurableClientDispatcher(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup, final Timer timer, final Set<String> capabilities) {
+    private ConfigurableClientDispatcher(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup,
+                                         final Timer timer, final Set<String> capabilities) {
         super(bossGroup, workerGroup, timer);
         this.capabilities = capabilities;
     }
 
     /**
-     * EXI + chunked framing
+     * EXI + chunked framing.
      */
-    public static ConfigurableClientDispatcher createChunkedExi(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup, final Timer timer) {
-        return new ConfigurableClientDispatcher(bossGroup, workerGroup, timer, NetconfClientSessionNegotiatorFactory.EXI_CLIENT_CAPABILITIES);
+    public static ConfigurableClientDispatcher createChunkedExi(final EventLoopGroup bossGroup,
+                                                                final EventLoopGroup workerGroup, final Timer timer) {
+        return new ConfigurableClientDispatcher(bossGroup, workerGroup, timer,
+            NetconfClientSessionNegotiatorFactory.EXI_CLIENT_CAPABILITIES);
     }
 
     /**
-     * EXI + ]]gt;]]gt; framing
+     * EXI + ]]gt;]]gt; framing.
      */
-    public static ConfigurableClientDispatcher createLegacyExi(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup, final Timer timer) {
-        return new ConfigurableClientDispatcher(bossGroup, workerGroup, timer, NetconfClientSessionNegotiatorFactory.LEGACY_EXI_CLIENT_CAPABILITIES);
+    public static ConfigurableClientDispatcher createLegacyExi(final EventLoopGroup bossGroup,
+                                                               final EventLoopGroup workerGroup, final Timer timer) {
+        return new ConfigurableClientDispatcher(bossGroup, workerGroup, timer,
+            NetconfClientSessionNegotiatorFactory.LEGACY_EXI_CLIENT_CAPABILITIES);
     }
 
     /**
-     * Chunked framing
+     * Chunked framing.
      */
-    public static ConfigurableClientDispatcher createChunked(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup, final Timer timer) {
-        return new ConfigurableClientDispatcher(bossGroup, workerGroup, timer, NetconfClientSessionNegotiatorFactory.DEFAULT_CLIENT_CAPABILITIES);
+    public static ConfigurableClientDispatcher createChunked(final EventLoopGroup bossGroup,
+                                                             final EventLoopGroup workerGroup, final Timer timer) {
+        return new ConfigurableClientDispatcher(bossGroup, workerGroup, timer,
+            NetconfClientSessionNegotiatorFactory.DEFAULT_CLIENT_CAPABILITIES);
     }
 
     /**
-     * ]]gt;]]gt; framing
+     * ]]gt;]]gt; framing.
      */
-    public static ConfigurableClientDispatcher createLegacy(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup, final Timer timer) {
-        return new ConfigurableClientDispatcher(bossGroup, workerGroup, timer, NetconfClientSessionNegotiatorFactory.LEGACY_FRAMING_CLIENT_CAPABILITIES);
+    public static ConfigurableClientDispatcher createLegacy(final EventLoopGroup bossGroup,
+                                                            final EventLoopGroup workerGroup, final Timer timer) {
+        return new ConfigurableClientDispatcher(bossGroup, workerGroup, timer,
+            NetconfClientSessionNegotiatorFactory.LEGACY_FRAMING_CLIENT_CAPABILITIES);
     }
 
     @Override
     protected NetconfClientSessionNegotiatorFactory getNegotiatorFactory(final NetconfClientConfiguration cfg) {
-        return new NetconfClientSessionNegotiatorFactory(getTimer(), cfg.getAdditionalHeader(), cfg.getConnectionTimeoutMillis(), capabilities);
+        return new NetconfClientSessionNegotiatorFactory(getTimer(), cfg.getAdditionalHeader(),
+            cfg.getConnectionTimeoutMillis(), capabilities);
     }
 }
