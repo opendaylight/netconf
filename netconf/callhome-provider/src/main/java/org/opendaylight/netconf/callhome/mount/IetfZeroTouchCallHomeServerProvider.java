@@ -13,7 +13,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
-import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -44,10 +43,10 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataChangeListener {
     private static final String APPNAME = "CallHomeServer";
-    static final InstanceIdentifier<AllowedDevices> ALL_DEVICES = InstanceIdentifier.create(NetconfCallhomeServer.class).child(AllowedDevices.class);
+    static final InstanceIdentifier<AllowedDevices> ALL_DEVICES = InstanceIdentifier.create(NetconfCallhomeServer.class)
+        .child(AllowedDevices.class);
 
     private static final Logger LOG = LoggerFactory.getLogger(IetfZeroTouchCallHomeServerProvider.class);
 
@@ -75,7 +74,8 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
         try {
             LOG.info("Initializing provider for {}", APPNAME);
             initializeServer();
-            dataBroker.registerDataChangeListener(LogicalDatastoreType.CONFIGURATION, ALL_DEVICES, this, AsyncDataBroker.DataChangeScope.SUBTREE);
+            dataBroker.registerDataChangeListener(
+                LogicalDatastoreType.CONFIGURATION, ALL_DEVICES, this, AsyncDataBroker.DataChangeScope.SUBTREE);
             LOG.info("Initialization complete for {}", APPNAME);
         } catch (IOException | Configuration.ConfigurationException e) {
             LOG.error("Unable to successfully initialize", e);
@@ -88,7 +88,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
             configuration.set(CALL_HOME_PORT_KEY, portStr);
             port = configuration.getAsPort(CALL_HOME_PORT_KEY);
             LOG.info("Setting port for call home server to {}", portStr);
-        } catch(Configuration.ConfigurationException e) {
+        } catch (Configuration.ConfigurationException e) {
             LOG.error("Problem trying to set port for call home server {}", portStr, e);
         }
     }
@@ -102,8 +102,9 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
         CallHomeAuthorizationProvider provider = this.getCallHomeAuthorization();
         NetconfCallHomeServerBuilder builder = new NetconfCallHomeServerBuilder(
                 provider, mountDispacher, statusReporter);
-        if (port > 0)
+        if (port > 0) {
             builder.setBindAddress(new InetSocketAddress(port));
+        }
         server = builder.build();
         server.bind();
         mountDispacher.createTopology();
@@ -112,8 +113,10 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
 
     @VisibleForTesting
     void assertValid(Object obj, String description) {
-        if (obj == null)
-            throw new RuntimeException(String.format("Failed to find %s in IetfZeroTouchCallHomeProvider.initialize()", description));
+        if (obj == null) {
+            throw new RuntimeException(
+                String.format("Failed to find %s in IetfZeroTouchCallHomeProvider.initialize()", description));
+        }
     }
 
     @Override
@@ -144,8 +147,9 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
         CheckedFuture<Optional<AllowedDevices>, ReadFailedException> devicesFuture =
                 roConfigTx.read(LogicalDatastoreType.CONFIGURATION, IetfZeroTouchCallHomeServerProvider.ALL_DEVICES);
 
-        if (hasDeletedDevices(change))
+        if (hasDeletedDevices(change)) {
             handleDeletedDevices(change);
+        }
 
         try {
             for (Device confDevice : getReadDevices(devicesFuture)) {
@@ -175,8 +179,9 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
             opTx.delete(LogicalDatastoreType.OPERATIONAL, removedIID);
         }
 
-        if (numRemoved > 0)
+        if (numRemoved > 0) {
             opTx.submit();
+        }
     }
 
     private List<Device> getReadDevices(CheckedFuture<Optional<AllowedDevices>, ReadFailedException> devicesFuture)
@@ -200,7 +205,8 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
                 .child(Device.class, new DeviceKey(cfgDevice.getUniqueId()));
 
         ReadWriteTransaction tx = dataBroker.newReadWriteTransaction();
-        CheckedFuture<Optional<Device>, ReadFailedException> deviceFuture = tx.read(LogicalDatastoreType.OPERATIONAL, deviceIID);
+        CheckedFuture<Optional<Device>, ReadFailedException> deviceFuture = tx.read(
+            LogicalDatastoreType.OPERATIONAL, deviceIID);
 
         Optional<Device> opDevGet = deviceFuture.checkedGet();
         Device1 devStatus = new Device1Builder().setDeviceStatus(Device1.DeviceStatus.DISCONNECTED).build();

@@ -26,8 +26,8 @@ public class Configuration {
     }
 
     public static class ReadException extends ConfigurationException {
-        ReadException(String msg, Exception e) {
-            super(msg, e);
+        ReadException(String msg, Exception exc) {
+            super(msg, exc);
         }
     }
 
@@ -102,20 +102,22 @@ public class Configuration {
 
     String get(String key) {
         String result = (String) properties.get(key);
-        if (result == null)
+        if (result == null) {
             throw new MissingException(key);
+        }
         return result;
     }
 
     public int getAsPort(String key) {
-        String s = get(key);
+        String keyValue = get(key);
         try {
-            int newPort = Integer.parseInt(s);
-            if (newPort < 0 || newPort > 65535)
-                throw new IllegalValueException(key, s);
+            int newPort = Integer.parseInt(keyValue);
+            if (newPort < 0 || newPort > 65535) {
+                throw new IllegalValueException(key, keyValue);
+            }
             return newPort;
         } catch (NumberFormatException e) {
-            throw new IllegalValueException(key, s);
+            throw new IllegalValueException(key, keyValue);
         }
     }
 }

@@ -23,8 +23,10 @@ import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext
 
 public class CallHomeMountSessionManager implements CallHomeMountSessionContext.CloseCallback {
 
-    private final ConcurrentMap<SocketAddress, CallHomeMountSessionContext> contextByAddress = new ConcurrentHashMap<>();
-    private final Multimap<PublicKey, CallHomeMountSessionContext> contextByPublicKey = MultimapBuilder.hashKeys().hashSetValues().build();
+    private final ConcurrentMap<SocketAddress, CallHomeMountSessionContext> contextByAddress =
+        new ConcurrentHashMap<>();
+    private final Multimap<PublicKey, CallHomeMountSessionContext> contextByPublicKey = MultimapBuilder.hashKeys()
+        .hashSetValues().build();
 
     @Nullable
     public CallHomeMountSessionContext getByAddress(InetSocketAddress remoteAddr) {

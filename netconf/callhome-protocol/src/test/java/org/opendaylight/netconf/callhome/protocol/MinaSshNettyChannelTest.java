@@ -32,7 +32,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-
 public class MinaSshNettyChannelTest {
     private CallHomeSessionContext mockContext;
     private ClientSession mockSession;
@@ -44,11 +43,12 @@ public class MinaSshNettyChannelTest {
         IoReadFuture mockFuture = mock(IoReadFuture.class);
         IoInputStream mockIn = mock(IoInputStream.class);
         Mockito.doReturn(mockFuture).when(mockIn).read(any(Buffer.class));
-        IoOutputStream mockOut = mock(IoOutputStream.class);
         mockContext = mock(CallHomeSessionContext.class);
         mockSession = mock(ClientSession.class);
         mockChannel = mock(ClientChannel.class);
         Mockito.doReturn(mockIn).when(mockChannel).getAsyncOut();
+
+        IoOutputStream mockOut = mock(IoOutputStream.class);
         Mockito.doReturn(mockOut).when(mockChannel).getAsyncIn();
 
         IoWriteFuture mockWrFuture = mock(IoWriteFuture.class);
@@ -78,9 +78,6 @@ public class MinaSshNettyChannelTest {
         Mockito.doReturn(mockHandler).when(ctx).handler();
         ChannelPromise promise = mock(ChannelPromise.class);
 
-        ByteBufAllocator mockAlloc = mock(ByteBufAllocator.class);
-        ByteBuf bytes = new EmptyByteBuf(mockAlloc);
-
         // we would really like to just verify that the async handler write() was
         // called but it is a final class, so no mocking. instead we set up the
         // mock channel to have no async input, which will cause a failure later
@@ -95,6 +92,8 @@ public class MinaSshNettyChannelTest {
 
         // when
         ChannelOutboundHandlerAdapter outadapter = (ChannelOutboundHandlerAdapter) instance.pipeline().first();
+        ByteBufAllocator mockAlloc = mock(ByteBufAllocator.class);
+        ByteBuf bytes = new EmptyByteBuf(mockAlloc);
         outadapter.write(ctx, bytes, promise);
 
         // then

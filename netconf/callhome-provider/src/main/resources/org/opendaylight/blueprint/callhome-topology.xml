@@ -46,5 +46,4 @@
         <argument ref="domMountPointService"/>
     </bean>
 
-
 </blueprint>

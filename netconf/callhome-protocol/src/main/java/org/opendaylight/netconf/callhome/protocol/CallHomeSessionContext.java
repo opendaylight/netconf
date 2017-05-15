@@ -94,15 +94,15 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         };
     }
 
-    private void channelOpenFailed(Throwable e) {
-        LOG.error("Unable to open netconf subsystem, disconnecting.", e);
+    private void channelOpenFailed(Throwable throwable) {
+        LOG.error("Unable to open netconf subsystem, disconnecting.", throwable);
         sshSession.close(false);
     }
 
     private void netconfChannelOpened(ClientChannel netconfChannel) {
         nettyChannel = newMinaSshNettyChannel(netconfChannel);
-        factory.getChannelOpenListener().onNetconfSubsystemOpened(CallHomeSessionContext.this,
-                listener -> doActivate(listener));
+        factory.getChannelOpenListener().onNetconfSubsystemOpened(
+            CallHomeSessionContext.this, this::doActivate);
     }
 
     @GuardedBy("this")
