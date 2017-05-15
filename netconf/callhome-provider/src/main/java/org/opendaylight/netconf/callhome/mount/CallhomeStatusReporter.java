@@ -65,15 +65,16 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
 
     CallhomeStatusReporter(DataBroker broker) {
         this.dataBroker = broker;
-        this.reg = dataBroker.registerDataChangeListener(LogicalDatastoreType.OPERATIONAL, NETCONF_TOPO_IID.child(Node.class),
-                this, AsyncDataBroker.DataChangeScope.SUBTREE);
+        this.reg = dataBroker.registerDataChangeListener(LogicalDatastoreType.OPERATIONAL,
+            NETCONF_TOPO_IID.child(Node.class), this, AsyncDataBroker.DataChangeScope.SUBTREE);
     }
 
     @Override
     public void onDataChanged(AsyncDataChangeEvent<InstanceIdentifier<?>, DataObject> change) {
         for (InstanceIdentifier<?> removedPath : change.getRemovedPaths()) {
-            if (removedPath.getTargetType() != NetconfNode.class)
+            if (removedPath.getTargetType() != NetconfNode.class) {
                 continue;
+            }
 
             final NodeId nodeId = getNodeId(removedPath);
             if (nodeId != null) {
@@ -125,8 +126,9 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
             LOG.warn("No corresponding callhome device found - exiting.");
         } else {
             Device modifiedDevice = withConnectedStatus(opDev);
-            if (modifiedDevice == null)
+            if (modifiedDevice == null) {
                 return;
+            }
             LOG.info("Setting successful status for callhome device id:{}.", nodeId);
             writeDevice(nodeId, modifiedDevice);
         }
@@ -140,8 +142,9 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
             LOG.warn("No corresponding callhome device found - exiting.");
         } else {
             Device modifiedDevice = withDisconnectedStatus(opDev);
-            if (modifiedDevice == null)
+            if (modifiedDevice == null) {
                 return;
+            }
             LOG.info("Setting disconnected status for callhome device id:{}.", nodeId);
             writeDevice(nodeId, modifiedDevice);
         }
@@ -158,8 +161,9 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
             LOG.warn("No corresponding callhome device found - exiting.");
         } else {
             Device modifiedDevice = withFailedStatus(opDev);
-            if (modifiedDevice == null)
+            if (modifiedDevice == null) {
                 return;
+            }
             LOG.info("Setting failed status for callhome device id:{}.", nodeId);
             writeDevice(nodeId, modifiedDevice);
         }
@@ -182,7 +186,6 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
         try {
             sshEncodedKey = AuthorizedKeysDecoder.encodePublicKey(serverKey);
         } catch (IOException e) {
-            e.printStackTrace();
             LOG.warn("Unable to encode public key to ssh format.");
         }
         Device1 d1 = new Device1Builder().setDeviceStatus(Device1.DeviceStatus.FAILEDNOTALLOWED).build();
@@ -258,12 +261,12 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
 
     private void setDeviceStatus(Device device) {
         WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
-        InstanceIdentifier<Device> Device_IID =
+        InstanceIdentifier<Device> deviceId =
                 InstanceIdentifier.create(NetconfCallhomeServer.class)
                         .child(AllowedDevices.class)
                         .child(Device.class, device.getKey());
 
-        tx.merge(LogicalDatastoreType.OPERATIONAL, Device_IID, device);
+        tx.merge(LogicalDatastoreType.OPERATIONAL, deviceId, device);
         tx.submit();
     }
 
@@ -302,8 +305,9 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
                 PublicKey pubKey = decoder.decodePublicKey(keyString);
                 if (sshKey.getAlgorithm().equals(pubKey.getAlgorithm()) && sshKey.equals(pubKey)) {
                     Device failedDevice = withFailedAuthStatus(device);
-                    if (failedDevice == null)
+                    if (failedDevice == null) {
                         return;
+                    }
                     LOG.info("Setting auth failed status for callhome device id:{}.", failedDevice.getUniqueId());
                     setDeviceStatus(failedDevice);
                     return;

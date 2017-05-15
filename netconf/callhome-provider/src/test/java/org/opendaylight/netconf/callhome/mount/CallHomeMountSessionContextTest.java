@@ -59,13 +59,13 @@ public class CallHomeMountSessionContextTest {
     public void activationOfListenerSupportsSessionUp() {
         // given
         when(mockActivator.activate(any(NetconfClientSessionListener.class)))
-                .thenAnswer(invocationOnMock -> {
-                        NetconfClientSession mockSession = mock(NetconfClientSession.class);
+            .thenAnswer(invocationOnMock -> {
+                NetconfClientSession mockSession = mock(NetconfClientSession.class);
 
-                        Object arg = invocationOnMock.getArguments()[0];
-                        ((NetconfClientSessionListener) arg).onSessionUp(mockSession);
-                        return null;
-                    });
+                Object arg = invocationOnMock.getArguments()[0];
+                ((NetconfClientSessionListener) arg).onSessionUp(mockSession);
+                return null;
+            });
 
         NetconfClientSessionListener mockListener = mock(NetconfClientSessionListener.class);
         // when
@@ -79,13 +79,12 @@ public class CallHomeMountSessionContextTest {
         // given
         when(mockActivator.activate(any(NetconfClientSessionListener.class)))
                 .thenAnswer(invocationOnMock -> {
-                        NetconfClientSession mockSession = mock(NetconfClientSession.class);
-                        NetconfTerminationReason mockReason = mock(NetconfTerminationReason.class);
-
-                        Object arg = invocationOnMock.getArguments()[0];
-                        ((NetconfClientSessionListener) arg).onSessionTerminated(mockSession, mockReason);
-                        return null;
-                    });
+                    NetconfClientSession mockSession = mock(NetconfClientSession.class);
+                    NetconfTerminationReason mockReason = mock(NetconfTerminationReason.class);
+                    Object arg = invocationOnMock.getArguments()[0];
+                    ((NetconfClientSessionListener) arg).onSessionTerminated(mockSession, mockReason);
+                    return null;
+                });
 
         NetconfClientSessionListener mockListener = mock(NetconfClientSessionListener.class);
         // when
@@ -100,13 +99,13 @@ public class CallHomeMountSessionContextTest {
         // given
         when(mockActivator.activate(any(NetconfClientSessionListener.class)))
                 .thenAnswer(invocationOnMock -> {
-                        NetconfClientSession mockSession = mock(NetconfClientSession.class);
-                        Exception mockException = mock(Exception.class);
+                    NetconfClientSession mockSession = mock(NetconfClientSession.class);
+                    Exception mockException = mock(Exception.class);
 
-                        Object arg = invocationOnMock.getArguments()[0];
-                        ((NetconfClientSessionListener) arg).onSessionDown(mockSession, mockException);
-                        return null;
-                    });
+                    Object arg = invocationOnMock.getArguments()[0];
+                    ((NetconfClientSessionListener) arg).onSessionDown(mockSession, mockException);
+                    return null;
+                });
         // given
         NetconfClientSessionListener mockListener = mock(NetconfClientSessionListener.class);
         // when
@@ -121,13 +120,13 @@ public class CallHomeMountSessionContextTest {
         // given
         when(mockActivator.activate(any(NetconfClientSessionListener.class)))
                 .thenAnswer(invocationOnMock -> {
-                        NetconfClientSession mockSession = mock(NetconfClientSession.class);
-                        NetconfMessage mockMsg = mock(NetconfMessage.class);
+                    NetconfClientSession mockSession = mock(NetconfClientSession.class);
+                    NetconfMessage mockMsg = mock(NetconfMessage.class);
 
-                        Object arg = invocationOnMock.getArguments()[0];
-                        ((NetconfClientSessionListener) arg).onMessage(mockSession, mockMsg);
-                        return null;
-                    });
+                    Object arg = invocationOnMock.getArguments()[0];
+                    ((NetconfClientSessionListener) arg).onMessage(mockSession, mockMsg);
+                    return null;
+                });
         // given
         NetconfClientSessionListener mockListener = mock(NetconfClientSessionListener.class);
         // when
