@@ -39,7 +39,7 @@ public class Execution implements Callable<Void> {
         private final String destination;
         private final String payload;
 
-        public DestToPayload(String destination, String payload) {
+        DestToPayload(String destination, String payload) {
             this.destination = destination;
             this.payload = payload;
         }
@@ -96,8 +96,8 @@ public class Execution implements Callable<Void> {
                 Response response = asyncHttpClient.executeRequest(request).get();
                 if (response.getStatusCode() != 200 && response.getStatusCode() != 204) {
                     if (response.getStatusCode() == 409) {
-                        LOG.warn("Request failed, status code: {} - one or more of the devices" +
-                                " is already configured, skipping the whole batch", response.getStatusCode());
+                        LOG.warn("Request failed, status code: {} - one or more of the devices"
+                                + " is already configured, skipping the whole batch", response.getStatusCode());
                     } else {
                         LOG.warn("Status code: {}", response.getStatusCode());
                         LOG.warn("url: {}", request.getUrl());
@@ -127,10 +127,11 @@ public class Execution implements Callable<Void> {
                     super.onStatusReceived(status);
                     if (status.getStatusCode() != 200 && status.getStatusCode() != 204) {
                         if (status.getStatusCode() == 409) {
-                            LOG.warn("Request failed, status code: {} - one or more of the devices" +
-                                    " is already configured, skipping the whole batch", status.getStatusCode());
+                            LOG.warn("Request failed, status code: {} - one or more of the devices"
+                                    + " is already configured, skipping the whole batch", status.getStatusCode());
                         } else {
-                            LOG.warn("Request failed, status code: {}", status.getStatusCode() + status.getStatusText());
+                            LOG.warn("Request failed, status code: {}",
+                                status.getStatusCode() + status.getStatusText());
                             LOG.warn("request: {}", request.toString());
                         }
                     }

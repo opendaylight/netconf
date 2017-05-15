@@ -18,7 +18,6 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,13 +42,14 @@ import org.slf4j.LoggerFactory;
 
 
 public final class Main {
-
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
-    
+
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public static void main(final String[] args) {
         final TesttoolParameters params = TesttoolParameters.parseArgs(args, TesttoolParameters.getParser());
         params.validate();
-        final ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        final ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory
+            .getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(params.debug ? Level.DEBUG : Level.INFO);
 
         final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator(params.threadPoolSize);
@@ -61,7 +61,8 @@ public final class Main {
                 System.exit(1);
             }
             if (params.controllerDestination != null) {
-                final ArrayList<ArrayList<Execution.DestToPayload>> allThreadsPayloads = params.getThreadsPayloads(openDevices);
+                final ArrayList<ArrayList<Execution.DestToPayload>> allThreadsPayloads = params
+                    .getThreadsPayloads(openDevices);
                 final ArrayList<Execution> executions = new ArrayList<>();
                 for (ArrayList<Execution.DestToPayload> payloads : allThreadsPayloads) {
                     executions.add(new Execution(params, payloads));
@@ -70,7 +71,7 @@ public final class Main {
                 final Stopwatch time = Stopwatch.createStarted();
                 List<Future<Void>> futures = executorService.invokeAll(executions, params.timeOut, TimeUnit.SECONDS);
                 int threadNum = 0;
-                for(Future<Void> future : futures){
+                for (Future<Void> future : futures) {
                     threadNum++;
                     if (future.isCancelled()) {
                         LOG.info("{}. thread timed out.",threadNum);
@@ -128,7 +129,7 @@ public final class Main {
         private final File etcDir;
         private final File loadOrderCfgFile;
 
-        public ConfigGenerator(final File directory, final List<Integer> openDevices) {
+        ConfigGenerator(final File directory, final List<Integer> openDevices) {
             this.configDir = new File(directory, ETC_OPENDAYLIGHT_KARAF_PATH);
             this.etcDir = new File(directory, ETC_KARAF_PATH);
             this.loadOrderCfgFile = new File(etcDir, ORG_OPS4J_PAX_URL_MVN_CFG);
@@ -143,12 +144,8 @@ public final class Main {
                 Preconditions.checkState(configDir.mkdirs(), "Unable to create directory " + configDir);
             }
 
-            for (final File file : configDir.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(final File pathname) {
-                    return !pathname.isDirectory() && pathname.getName().startsWith(SIM_DEVICE_CFG_PREFIX);
-                }
-            })) {
+            for (final File file : configDir.listFiles(pathname ->
+                    !pathname.isDirectory() && pathname.getName().startsWith(SIM_DEVICE_CFG_PREFIX))) {
                 Preconditions.checkState(file.delete(), "Unable to clean previous generated file %s", file);
             }
 
@@ -157,13 +154,15 @@ public final class Main {
                 String configBlueprint = CharStreams.toString(new InputStreamReader(stream, StandardCharsets.UTF_8));
 
                 final String before = configBlueprint.substring(0, configBlueprint.indexOf("<module>"));
-                final String middleBlueprint = configBlueprint.substring(configBlueprint.indexOf("<module>"), configBlueprint.indexOf("</module>"));
-                final String after = configBlueprint.substring(configBlueprint.indexOf("</module>") + "</module>".length());
+                final String middleBlueprint = configBlueprint.substring(
+                    configBlueprint.indexOf("<module>"), configBlueprint.indexOf("</module>"));
+                final String after = configBlueprint.substring(
+                    configBlueprint.indexOf("</module>") + "</module>".length());
 
                 int connectorCount = 0;
                 Integer batchStart = null;
-                StringBuilder b = new StringBuilder();
-                b.append(before);
+                StringBuilder builder = new StringBuilder();
+                builder.append(before);
 
                 final List<File> generatedConfigs = Lists.newArrayList();
 
@@ -173,20 +172,25 @@ public final class Main {
                     }
 
                     for (int i = 0; i < devicesPerPort; i++) {
-                        final String name = String.valueOf(openDevice) + SIM_DEVICE_SUFFIX + (i == 0 ? "" : "-" + String.valueOf(i));
-                        String configContent = String.format(middleBlueprint, name, address, String.valueOf(openDevice), String.valueOf(!useSsh));
-                        configContent = String.format("%s%s%d%s\n%s\n", configContent, "<connection-timeout-millis>", generateConfigsTimeout, "</connection-timeout-millis>", "</module>");
+                        final String name = String.valueOf(openDevice)
+                            + SIM_DEVICE_SUFFIX + (i == 0 ? "" : "-" + String.valueOf(i));
+                        String configContent = String.format(
+                            middleBlueprint, name, address, String.valueOf(openDevice), String.valueOf(!useSsh));
+                        configContent = String.format(
+                            "%s%s%d%s\n%s\n", configContent, "<connection-timeout-millis>",
+                            generateConfigsTimeout, "</connection-timeout-millis>", "</module>");
 
-                        b.append(configContent);
+                        builder.append(configContent);
                         connectorCount++;
                         if (connectorCount == batchSize) {
-                            b.append(after);
-                            final File to = new File(configDir, String.format(SIM_DEVICE_CFG_PREFIX + "%d-%d.xml", batchStart, openDevice));
+                            builder.append(after);
+                            final File to = new File(
+                                configDir, String.format(SIM_DEVICE_CFG_PREFIX + "%d-%d.xml", batchStart, openDevice));
                             generatedConfigs.add(to);
-                            Files.write(b.toString(), to, StandardCharsets.UTF_8);
+                            Files.write(builder.toString(), to, StandardCharsets.UTF_8);
                             connectorCount = 0;
-                            b = new StringBuilder();
-                            b.append(before);
+                            builder = new StringBuilder();
+                            builder.append(before);
                             batchStart = null;
                         }
                     }
@@ -194,10 +198,11 @@ public final class Main {
 
                 // Write remaining
                 if (connectorCount != 0) {
-                    b.append(after);
-                    final File to = new File(configDir, String.format(SIM_DEVICE_CFG_PREFIX + "%d-%d.xml", batchStart, openDevices.get(openDevices.size() - 1)));
+                    builder.append(after);
+                    final File to = new File(configDir, String.format(
+                            SIM_DEVICE_CFG_PREFIX + "%d-%d.xml", batchStart, openDevices.get(openDevices.size() - 1)));
                     generatedConfigs.add(to);
-                    Files.write(b.toString(), to, StandardCharsets.UTF_8);
+                    Files.write(builder.toString(), to, StandardCharsets.UTF_8);
                 }
 
                 LOG.info("Config files generated in {}", configDir);
@@ -206,7 +211,6 @@ public final class Main {
                 throw new RuntimeException("Unable to generate config files", e);
             }
         }
-
 
         public void updateFeatureFile(final List<File> generated) {
             for (final File fileFeatures : ncFeatureFiles) {
@@ -228,9 +232,9 @@ public final class Main {
                                 cf.setLocation("file:" + generatedName);
 
                                 feature.getConfigfile().add(cf);
-                                }
                             }
                         }
+                    }
                     JaxbUtil.marshal(f, new FileWriter(fileFeatures));
                     LOG.info("Feature file {} updated", fileFeatures);
                 } catch (JAXBException | IOException e) {
@@ -239,39 +243,29 @@ public final class Main {
             }
         }
 
-
-        private static List<File> getFeatureFile(final File distroFolder, final String featureName, final String suffix) {
+        private static List<File> getFeatureFile(final File distroFolder, final String featureName,
+                                                 final String suffix) {
             checkExistingDir(distroFolder, String.format("Folder %s does not exist", distroFolder));
 
-            final File systemDir = checkExistingDir(new File(distroFolder, "system"), String.format("Folder %s does not contain a karaf distro, folder system is missing", distroFolder));
+            final File systemDir = checkExistingDir(new File(distroFolder, "system"),
+                String.format("Folder %s does not contain a karaf distro, folder system is missing", distroFolder));
 
             //check if beryllium path exists, if it doesnt check for lithium and fail/succeed after
             File netconfConnectorFeaturesParentDir = new File(systemDir, "org/opendaylight/netconf/" + featureName);
             if (!netconfConnectorFeaturesParentDir.exists() || !netconfConnectorFeaturesParentDir.isDirectory()) {
-                netconfConnectorFeaturesParentDir = checkExistingDir(new File(systemDir, "org/opendaylight/controller/" + featureName), String.format("Karaf distro in %s does not contain netconf-connector features", distroFolder));
+                netconfConnectorFeaturesParentDir = checkExistingDir(new File(systemDir,
+                    "org/opendaylight/controller/" + featureName),
+                    String.format("Karaf distro in %s does not contain netconf-connector features", distroFolder));
             }
 
             // Find newest version for features
             final File newestVersionDir = Collections.max(
-                    Lists.newArrayList(netconfConnectorFeaturesParentDir.listFiles(new FileFilter() {
-                        @Override
-                        public boolean accept(final File pathname) {
-                            return pathname.isDirectory();
-                        }
-                    })), new Comparator<File>() {
-                        @Override
-                        public int compare(final File o1, final File o2) {
-                            return o1.getName().compareTo(o2.getName());
-                        }
-                    });
+                Lists.newArrayList(netconfConnectorFeaturesParentDir.listFiles(File::isDirectory)),
+                Comparator.comparing(File::getName));
 
-            return Lists.newArrayList(newestVersionDir.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(final File pathname) {
-                    return pathname.getName().contains(featureName)
-                            && Files.getFileExtension(pathname.getName()).equals(suffix);
-                }
-            }));
+            return Lists.newArrayList(newestVersionDir.listFiles(
+                pathname -> pathname.getName().contains(featureName)
+                    && Files.getFileExtension(pathname.getName()).equals(suffix)));
         }
 
         private static File checkExistingDir(final File folder, final String msg) {
@@ -282,7 +276,8 @@ public final class Main {
 
         public void changeLoadOrder() {
             try {
-                Files.write(ByteStreams.toByteArray(getClass().getResourceAsStream("/" + ORG_OPS4J_PAX_URL_MVN_CFG)), loadOrderCfgFile);
+                Files.write(ByteStreams.toByteArray(getClass().getResourceAsStream(
+                    "/" + ORG_OPS4J_PAX_URL_MVN_CFG)), loadOrderCfgFile);
                 LOG.info("Load order changed to prefer local bundles/features by rewriting file {}", loadOrderCfgFile);
             } catch (IOException e) {
                 throw new RuntimeException("Unable to rewrite features file " + loadOrderCfgFile, e);
