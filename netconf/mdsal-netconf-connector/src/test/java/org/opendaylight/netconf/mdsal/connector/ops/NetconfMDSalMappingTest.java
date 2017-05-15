@@ -643,6 +643,27 @@ public class NetconfMDSalMappingTest {
 
     }
 
+    @Test
+    public void testDeleteConfigCandidate() throws Exception {
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_n1.xml"), RPC_REPLY_OK);
+        verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument("messages/mapping/editConfigs/editConfig_merge_n1_control.xml"));
+
+        verifyResponse(deleteConfig("messages/mapping/delete_config_candidate.xml"), RPC_REPLY_OK);
+        assertEmptyDatastore(getConfigCandidate());
+    }
+
+    @Test
+    public void testDeleteConfigRunning() throws Exception {
+        try {
+            deleteConfig("messages/mapping/delete_config_running.xml");
+            fail("Delete config should have failed");
+        } catch (DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
+            assertTrue(e.getErrorTag() == ErrorTag.operation_not_supported);
+            assertTrue(e.getErrorType() == ErrorType.protocol);
+        }
+    }
+
     private void verifyFilterIdentifier(String resource, YangInstanceIdentifier identifier) throws Exception{
         TestingGetConfig getConfig = new TestingGetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
         Document request = XmlFileLoader.xmlFileToDocument(resource);
@@ -768,6 +789,11 @@ public class NetconfMDSalMappingTest {
     private Document validate(String resource) throws DocumentedException, ParserConfigurationException, SAXException, IOException {
         Validate validate = new Validate(sessionIdForReporting, currentSchemaContext);
         return executeOperation(validate, resource);
+    }
+
+    private Document deleteConfig(String resource) throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+        DeleteConfig deleteConfig = new DeleteConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
+        return executeOperation(deleteConfig, resource);
     }
 
     private Document executeOperation(NetconfOperation op, String filename) throws ParserConfigurationException, SAXException, IOException, DocumentedException {
