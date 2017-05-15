@@ -73,7 +73,8 @@ public class ConfigReader extends AbstractReader<DataSchemaNode> {
     // FIXME refactor + unite common code with FilterReader
 
     @Override
-    protected List<NormalizedNode<?, ?>> readWithContext(final DataSchemaNode schemaNode) throws IOException, ReadingException {
+    protected List<NormalizedNode<?, ?>> readWithContext(final DataSchemaNode schemaNode)
+            throws IOException, ReadingException {
         console.writeLn("Config " + schemaNode.getQName().getLocalName());
         console.writeLn("Submit path of the data to edit. Use TAB for autocomplete");
 
@@ -97,7 +98,7 @@ public class ConfigReader extends AbstractReader<DataSchemaNode> {
             previous = Collections.<NormalizedNode<?, ?>>singletonList(
                     ImmutableContainerNodeBuilder.create()
                             .withNodeIdentifier(new NodeIdentifier(qName))
-                            .withValue(previous == null ? Collections.<DataContainerChild<?, ?>>emptyList() : (Collection) previous).build()
+                            .withValue(previous == null ? Collections.emptyList() : (Collection) previous).build()
             );
         }
 
@@ -142,7 +143,7 @@ public class ConfigReader extends AbstractReader<DataSchemaNode> {
 
         private final SchemaContext remoteSchemaContext;
 
-        public FilterCompleter(final SchemaContext remoteSchemaContext) {
+        FilterCompleter(final SchemaContext remoteSchemaContext) {
             this.remoteSchemaContext = remoteSchemaContext;
         }
 

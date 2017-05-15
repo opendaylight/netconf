@@ -37,7 +37,8 @@ public class Help extends AbstractCommand {
 
     private final CommandDispatcher commandDispatcher;
 
-    public Help(final QName qName, final InputDefinition argsDefinition, final OutputDefinition output, final String description, final CommandDispatcher commandDispatcher) {
+    public Help(final QName qName, final InputDefinition argsDefinition, final OutputDefinition output,
+                final String description, final CommandDispatcher commandDispatcher) {
         super(qName, argsDefinition, output, description);
         this.commandDispatcher = commandDispatcher;
     }
@@ -75,6 +76,7 @@ public class Help extends AbstractCommand {
     }
 
     public static Command create(final RpcDefinition rpcDefinition, final CommandDispatcher commandDispatcher) {
-        return new Help(rpcDefinition.getQName(), getInputDefinition(rpcDefinition), getOutputDefinition(rpcDefinition), rpcDefinition.getDescription(), commandDispatcher);
+        return new Help(rpcDefinition.getQName(), getInputDefinition(rpcDefinition), getOutputDefinition(rpcDefinition),
+            rpcDefinition.getDescription(), commandDispatcher);
     }
 }

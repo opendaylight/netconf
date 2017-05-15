@@ -138,10 +138,10 @@ public class Main {
         private CliArgumentParser() {
             parser = ArgumentParsers.newArgumentParser("Netconf cli").defaultHelp(true)
                     .description("Generic cli for netconf devices")
-                    .usage("Submit address + port for initial TCP connection (PURE TCP CONNECTIONS ARE NOT SUPPORTED YET)\n" +
-                            "Submit username + password in addition to address + port for initial SSH connection\n" +
-                            "If no arguments(or unexpected combination) is submitted, cli will be started without initial connection\n" +
-                            "To use with ODL controller, run with: java -jar netconf-cli-0.2.5-SNAPSHOT-executable.jar  --server localhost --port 1830 --username admin --password admin");
+                    .usage("Submit address + port for initial TCP connection (PURE TCP CONNECTIONS ARE NOT SUPPORTED YET)\n"
+                        + "Submit username + password in addition to address + port for initial SSH connection\n"
+                        + "If no arguments(or unexpected combination) is submitted, cli will be started without initial connection\n"
+                        + "To use with ODL controller, run with: java -jar netconf-cli-0.2.5-SNAPSHOT-executable.jar  --server localhost --port 1830 --username admin --password admin");
 
             final ArgumentGroup tcpGroup = parser.addArgumentGroup("TCP")
                     .description("Base arguments to initiate TCP connection right away");
@@ -151,8 +151,8 @@ public class Main {
             tcpGroup.addArgument("--" + CONNECT_TIMEOUT)
                     .type(Integer.class)
                     .setDefault(DEFAULT_CONNECTION_TIMEOUT_MS)
-                    .help("Timeout(in ms) for connection to succeed, if the connection is not fully established by the time is up, " +
-                            "connection attempt is considered a failure. This attribute is not working as expected yet");
+                    .help("Timeout(in ms) for connection to succeed, if the connection is not fully established by the time is up, "
+                        + "connection attempt is considered a failure. This attribute is not working as expected yet");
 
             final ArgumentGroup sshGroup = parser.addArgumentGroup("SSH")
                     .description("SSH credentials, if provided, initial connection will be attempted using SSH");

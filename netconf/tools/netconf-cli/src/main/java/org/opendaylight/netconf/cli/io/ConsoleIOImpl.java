@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Jline based IO implementation
+ * Jline based IO implementation.
  */
 public class ConsoleIOImpl implements ConsoleIO {
 
@@ -122,7 +122,7 @@ public class ConsoleIOImpl implements ConsoleIO {
                 newPrompt.append(promptPart.get());
             }
         }
-        if (newPrompt.length() ==0) {
+        if (newPrompt.length() == 0) {
             newPrompt.append(PATH_SEPARATOR);
         }
 
@@ -140,7 +140,7 @@ public class ConsoleIOImpl implements ConsoleIO {
 
     private class QuestionMarkActionListener implements ActionListener {
         @Override
-        public void actionPerformed(final ActionEvent e) {
+        public void actionPerformed(final ActionEvent event) {
             ConsoleIOImpl.this.complete();
         }
     }

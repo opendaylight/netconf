@@ -18,12 +18,14 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 
 /**
- * Local command to shut down the cli
+ * Local command to shut down the cli.
  */
 public class Close extends AbstractCommand {
 
-    public Close(final QName qName, final InputDefinition args, final OutputDefinition output, final String description) {
-        super(qName, args, output, description);
+    public Close(final QName qualifiedName, final InputDefinition args, final OutputDefinition output,
+        final String description)
+    {
+        super(qualifiedName, args, output, description);
     }
 
     @Override

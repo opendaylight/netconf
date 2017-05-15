@@ -11,7 +11,7 @@ import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 
 /**
  * The definition of input arguments represented by schema nodes parsed from
- * yang rpc definition
+ * yang rpc definition.
  */
 public class InputDefinition {
 

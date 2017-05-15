@@ -41,16 +41,17 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLe
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 
 /**
- * Local command to connect to a remote device
+ * Local command to connect to a remote device.
  */
 public class Connect extends AbstractCommand {
 
     private final NetconfDeviceConnectionManager connectManager;
     private final Integer connectionTimeout;
 
-    private Connect(final QName qName, final InputDefinition args, final OutputDefinition output,
-                    final NetconfDeviceConnectionManager connectManager, final String description, final Integer connectionTimeout) {
-        super(qName, args, output, description);
+    private Connect(final QName qualifiedName, final InputDefinition args, final OutputDefinition output,
+                    final NetconfDeviceConnectionManager connectManager, final String description,
+                    final Integer connectionTimeout) {
+        super(qualifiedName, args, output, description);
         this.connectManager = connectManager;
         this.connectionTimeout = connectionTimeout;
     }
@@ -61,7 +62,8 @@ public class Connect extends AbstractCommand {
         return invoke(config, getArgument(inputArgs, "address-name", String.class), inputArgs);
     }
 
-    private Output invoke(final NetconfClientConfigurationBuilder config, final String addressName, final Input inputArgs) {
+    private Output invoke(final NetconfClientConfigurationBuilder config,
+                          final String addressName, final Input inputArgs) {
         final Set<String> remoteCmds = connectManager.connectBlocking(addressName, getAdress(inputArgs), config);
 
         final ArrayList<DataContainerChild<?, ?>> output = Lists.newArrayList();

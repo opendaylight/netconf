@@ -28,15 +28,19 @@ public class EditContentReader extends ChoiceReader {
 
     // FIXME this could be removed if feature/if-feature are supported
 
-    public EditContentReader(final ConsoleIO console, final CommandArgHandlerRegistry argumentHandlerRegistry, final SchemaContext schemaContext) {
+    public EditContentReader(final ConsoleIO console, final CommandArgHandlerRegistry argumentHandlerRegistry,
+                             final SchemaContext schemaContext) {
         super(console, argumentHandlerRegistry, schemaContext);
     }
 
     @Override
-    public List<NormalizedNode<?, ?>> readWithContext(final ChoiceSchemaNode choiceNode) throws IOException, ReadingException {
-        Preconditions.checkState(choiceNode.getQName().equals(EDIT_CONTENT_QNAME), "Unexpected choice %s, expected %s", choiceNode, EDIT_CONTENT_QNAME);
+    public List<NormalizedNode<?, ?>> readWithContext(final ChoiceSchemaNode choiceNode)
+            throws IOException, ReadingException {
+        Preconditions.checkState(choiceNode.getQName().equals(EDIT_CONTENT_QNAME),
+            "Unexpected choice %s, expected %s", choiceNode, EDIT_CONTENT_QNAME);
         final ChoiceCaseNode selectedCase = choiceNode.getCaseNodeByName(CONFIG_QNAME);
-        Preconditions.checkNotNull(selectedCase, "Unexpected choice %s, expected %s that contains %s", choiceNode, EDIT_CONTENT_QNAME, CONFIG_QNAME);
+        Preconditions.checkNotNull(selectedCase,
+            "Unexpected choice %s, expected %s that contains %s", choiceNode, EDIT_CONTENT_QNAME, CONFIG_QNAME);
         return readSelectedCase(selectedCase);
     }
 

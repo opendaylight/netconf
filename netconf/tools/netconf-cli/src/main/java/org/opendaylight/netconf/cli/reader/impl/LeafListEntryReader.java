@@ -23,11 +23,11 @@ import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 class LeafListEntryReader extends BasicDataHolderReader<LeafListSchemaNode> implements
         GenericListEntryReader<LeafListSchemaNode> {
 
-    public LeafListEntryReader(final ConsoleIO console, final SchemaContext schemaContext) {
+    LeafListEntryReader(final ConsoleIO console, final SchemaContext schemaContext) {
         super(console, schemaContext);
     }
 
-    public LeafListEntryReader(final ConsoleIO console, final SchemaContext schemaContext, final boolean readConfigNode) {
+    LeafListEntryReader(final ConsoleIO console, final SchemaContext schemaContext, final boolean readConfigNode) {
         super(console, schemaContext, readConfigNode);
     }
 
@@ -47,7 +47,7 @@ class LeafListEntryReader extends BasicDataHolderReader<LeafListSchemaNode> impl
 
             @Override
             protected List<Completer> getAdditionalCompleters() {
-                return Lists.<Completer> newArrayList(getBaseCompleter(getDataSchemaNode()));
+                return Lists.newArrayList(getBaseCompleter(getDataSchemaNode()));
             }
         };
     }

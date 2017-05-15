@@ -79,9 +79,10 @@ public class CommandArgHandlerRegistry {
         return new GenericReader(consoleIO, this, schemaContext, readConfigNode);
     }
 
-    public synchronized Writer<DataSchemaNode> getCustomWriter(final Class<? extends Writer<DataSchemaNode>> writerType) {
-        return customWriters.get(writerType).provide(consoleIO, getRemoteSchema(writerType, schemaContextRegistry),
-                this);
+    public synchronized Writer<DataSchemaNode> getCustomWriter(final Class<? extends Writer<DataSchemaNode>> writerType)
+    {
+        return customWriters.get(writerType).provide(
+            consoleIO, getRemoteSchema(writerType, schemaContextRegistry), this);
     }
 
     public synchronized Writer<DataSchemaNode> getGenericWriter() {
@@ -91,7 +92,7 @@ public class CommandArgHandlerRegistry {
     /**
      * Reader providers, in order to construct readers lazily
      */
-    private static interface ReaderProvider {
+    private interface ReaderProvider {
         Reader<? extends DataSchemaNode> provide(ConsoleIO consoleIO,
                 final CommandArgHandlerRegistry commandArgHandlerRegistry,
                 final SchemaContextRegistry schemaContextRegistry);
@@ -136,9 +137,9 @@ public class CommandArgHandlerRegistry {
     }
 
     /**
-     * Writer providers, in order to construct readers lazily
+     * Writer providers, in order to construct readers lazily.
      */
-    private static interface WriterProvider {
+    private interface WriterProvider {
         Writer<DataSchemaNode> provide(ConsoleIO consoleIO, SchemaContext schema,
                 final CommandArgHandlerRegistry commandArgHandlerRegistry);
     }

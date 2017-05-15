@@ -74,7 +74,8 @@ public class FilterReader extends AbstractReader<DataSchemaNode> {
     public static final String FILTER_TYPE_VALUE_DEFAULT = "subtree";
 
     @Override
-    protected List<NormalizedNode<?, ?>> readWithContext(final DataSchemaNode schemaNode) throws IOException, ReadingException {
+    protected List<NormalizedNode<?, ?>> readWithContext(final DataSchemaNode schemaNode)
+            throws IOException, ReadingException {
         boolean redSuccessfuly = false;
         DataContainerChild<?, ?> newNode = null;
         do {
@@ -98,10 +99,11 @@ public class FilterReader extends AbstractReader<DataSchemaNode> {
 
                 DataContainerChild<?, ?> previous = null;
 
-                for (final QName qName : Lists.reverse(filterPartsQNames)) {
-                    previous = ImmutableContainerNodeBuilder.create().withNodeIdentifier(new NodeIdentifier(qName))
-                            .withValue(previous == null ? Collections.<DataContainerChild<?, ?>>emptyList()
-                                    : Collections.<DataContainerChild<?, ?>>singletonList(previous)).build();
+                for (final QName qualifiedName : Lists.reverse(filterPartsQNames)) {
+                    previous = ImmutableContainerNodeBuilder.create()
+                        .withNodeIdentifier(new NodeIdentifier(qualifiedName))
+                            .withValue(previous == null ? Collections.emptyList()
+                                    : Collections.singletonList(previous)).build();
                 }
 
                 final Map<QName, String> attributes = Collections.singletonMap(FILTER_TYPE_QNAME,
@@ -127,14 +129,14 @@ public class FilterReader extends AbstractReader<DataSchemaNode> {
 
         private final SchemaContext remoteSchemaContext;
 
-        public FilterConsoleContext(final DataSchemaNode schemaNode, final SchemaContext remoteSchemaContext) {
+        FilterConsoleContext(final DataSchemaNode schemaNode, final SchemaContext remoteSchemaContext) {
             super(schemaNode);
             this.remoteSchemaContext = remoteSchemaContext;
         }
 
         @Override
         protected List<Completer> getAdditionalCompleters() {
-            return Collections.<Completer> singletonList(new FilterCompleter(remoteSchemaContext));
+            return Collections.singletonList(new FilterCompleter(remoteSchemaContext));
         }
 
     }
@@ -146,7 +148,7 @@ public class FilterReader extends AbstractReader<DataSchemaNode> {
         // TODO add skip to filter completer, better soulution would be to add
         // SKIP completer before context completer if possible
 
-        public FilterCompleter(final SchemaContext remoteSchemaContext) {
+        FilterCompleter(final SchemaContext remoteSchemaContext) {
             this.remoteSchemaContext = remoteSchemaContext;
         }
 
@@ -198,14 +200,14 @@ public class FilterReader extends AbstractReader<DataSchemaNode> {
                     return Optional.of(parent);
                 }
 
-                QName qName;
+                QName qualifiedName;
                 try {
-                    qName = IOUtil.qNameFromKeyString(part, mappedModules);
+                    qualifiedName = IOUtil.qNameFromKeyString(part, mappedModules);
                 } catch (final ReadingException e) {
                     return Optional.of(parent);
                 }
 
-                final DataSchemaNode dataChildByName = parent.getDataChildByName(qName);
+                final DataSchemaNode dataChildByName = parent.getDataChildByName(qualifiedName);
                 if (dataChildByName instanceof DataNodeContainer) {
                     parent = (DataNodeContainer) dataChildByName;
                 } else {

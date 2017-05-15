@@ -31,8 +31,8 @@ public class NormalizedNodeWriter extends AbstractWriter<DataSchemaNode> {
         this.out = out;
     }
 
-    public void writeInner(final DataSchemaNode dataSchemaNode, final List<NormalizedNode<?, ?>> dataNodes) throws WriteException,
-            IOException {
+    public void writeInner(final DataSchemaNode dataSchemaNode, final List<NormalizedNode<?, ?>> dataNodes)
+            throws WriteException, IOException {
         //Preconditions.checkState(dataNodes.size() == 1);
         // TODO - add getDispatcher method to CnSnToNormalizedNodeParserFactory
         // to be able call dispatchChildElement

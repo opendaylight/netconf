@@ -80,32 +80,35 @@ public class CommandDispatcher {
     public synchronized Optional<Command> getCommand(final String nameWithModule) {
         final QName commandQName = mergeCommandIds().get(nameWithModule);
         final Map<QName, Command> qNameCommandMap = mergeCommands();
-        if(commandQName == null || qNameCommandMap.containsKey(commandQName) == false) {
+        if (commandQName == null || qNameCommandMap.containsKey(commandQName) == false) {
             return Optional.absent();
         }
 
         return Optional.of(qNameCommandMap.get(commandQName));
     }
 
-    public synchronized Optional<Command> getCommand(final QName qName) {
-        return Optional.fromNullable(mergeCommands().get(qName));
+    public synchronized Optional<Command> getCommand(final QName qualifiedName) {
+        return Optional.fromNullable(mergeCommands().get(qualifiedName));
     }
 
-    private static Optional<Command> getCommand(final Map<String, QName> commandNameMap, final Map<QName, Command> commands, final String nameWithModule) {
+    private static Optional<Command> getCommand(final Map<String, QName> commandNameMap,
+                                                final Map<QName, Command> commands, final String nameWithModule) {
         final QName qName = commandNameMap.get(nameWithModule);
-        if(qName == null)
+        if (qName == null) {
             return Optional.absent();
-
+        }
         final Command command = commands.get(qName);
-        if(command == null) {
+        if (command == null) {
             return Optional.absent();
         }
 
         return Optional.of(command);
     }
 
-    public static final Collection<String> BASE_NETCONF_SCHEMA_PATHS = Lists.newArrayList("/schema/remote/ietf-netconf.yang",
-            "/schema/common/netconf-cli-ext.yang", "/schema/common/ietf-inet-types.yang");
+    public static final Collection<String> BASE_NETCONF_SCHEMA_PATHS = Lists.newArrayList(
+        "/schema/remote/ietf-netconf.yang",
+        "/schema/common/netconf-cli-ext.yang",
+        "/schema/common/ietf-inet-types.yang");
 
     public synchronized void addRemoteCommands(final DOMRpcService rpcService, final SchemaContext remoteSchema) {
         this.addRemoteCommands(rpcService, remoteSchema, parseSchema(BASE_NETCONF_SCHEMA_PATHS));

@@ -37,7 +37,8 @@ public class Input {
         }
 
         final NormalizedNode<?, ?> input = args.iterator().next();
-        Preconditions.checkArgument(input instanceof DataContainerChild<?, ?>, "Input container has to be of type Data Container Child.");
+        Preconditions.checkArgument(
+            input instanceof DataContainerChild<?, ?>, "Input container has to be of type Data Container Child.");
         this.args = new ArrayList<>((Collection<NormalizedNode<?, ?>>) input.getValue());
 
         for (final NormalizedNode<?, ?> arg : this.args) {

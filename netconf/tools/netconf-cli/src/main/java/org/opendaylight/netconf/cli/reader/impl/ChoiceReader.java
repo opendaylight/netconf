@@ -57,7 +57,8 @@ public class ChoiceReader extends AbstractReader<ChoiceSchemaNode> {
     }
 
     @Override
-    public List<NormalizedNode<?, ?>> readWithContext(final ChoiceSchemaNode choiceNode) throws IOException, ReadingException {
+    public List<NormalizedNode<?, ?>> readWithContext(final ChoiceSchemaNode choiceNode)
+            throws IOException, ReadingException {
         final Map<String, ChoiceCaseNode> availableCases = collectAllCases(choiceNode);
         console.formatLn("Select case for choice %s from: %s", choiceNode.getQName().getLocalName(),
                 formatSet(availableCases.keySet()));
@@ -87,8 +88,9 @@ public class ChoiceReader extends AbstractReader<ChoiceSchemaNode> {
         // leaf without question, since the case was selected
         if (containsOnlyOneEmptyLeaf(selectedCase)) {
             final NormalizedNode<?, ?> newNode = ImmutableLeafNodeBuilder.create()
-                    .withNodeIdentifier(new NodeIdentifier(selectedCase.getChildNodes().iterator().next().getQName())).build();
-            return Collections.<NormalizedNode<?, ?>>singletonList(newNode);
+                    .withNodeIdentifier(new NodeIdentifier(selectedCase.getChildNodes().iterator().next().getQName()))
+                    .build();
+            return Collections.singletonList(newNode);
         }
 
         final List<NormalizedNode<?, ?>> newNodes = new ArrayList<>();
@@ -136,8 +138,7 @@ public class ChoiceReader extends AbstractReader<ChoiceSchemaNode> {
         return new BaseConsoleContext<ChoiceSchemaNode>(schemaNode) {
             @Override
             public List<Completer> getAdditionalCompleters() {
-                return Collections
-                        .<Completer> singletonList(new StringsCompleter(collectAllCases(schemaNode).keySet()));
+                return Collections.<ComplsingletonList(new StringsCompleter(collectAllCases(schemaNode).keySet()));
             }
         };
     }

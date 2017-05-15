@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.cli.io;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -27,11 +26,10 @@ public class IOUtil {
     public static final String PROMPT_SUFIX = ">";
     public static final String PATH_SEPARATOR = "/";
 
-    private IOUtil() {
-    }
+    private IOUtil() {}
 
-    public static boolean isQName(final String qName) {
-        final Matcher matcher = patternNew.matcher(qName);
+    public static boolean isQName(final String qualifiedName) {
+        final Matcher matcher = PATTERN.matcher(qualifiedName);
         return matcher.matches();
     }
 
@@ -55,18 +53,18 @@ public class IOUtil {
         return "";
     }
 
-    public static String qNameToKeyString(final QName qName, final String moduleName) {
-        return String.format("%s(%s)", qName.getLocalName(), moduleName);
+    public static String qNameToKeyString(final QName qualifiedName, final String moduleName) {
+        return String.format("%s(%s)", qualifiedName.getLocalName(), moduleName);
     }
 
     // TODO test and check regex + review format of string for QName
-    final static Pattern patternNew = Pattern.compile("([^\\)]+)\\(([^\\)]+)\\)");
+    final static Pattern PATTERN = Pattern.compile("([^\\)]+)\\(([^\\)]+)\\)");
 
-    public static QName qNameFromKeyString(final String qName, final Map<String, QName> mappedModules)
+    public static QName qNameFromKeyString(final String qualifiedName, final Map<String, QName> mappedModules)
             throws ReadingException {
-        final Matcher matcher = patternNew.matcher(qName);
+        final Matcher matcher = PATTERN.matcher(qualifiedName);
         if (!matcher.matches()) {
-            final String message = String.format("QName in wrong format: %s should be: %s", qName, patternNew);
+            final String message = String.format("QName in wrong format: %s should be: %s", qualifiedName, PATTERN);
             throw new ReadingException(message);
         }
         final QName base = mappedModules.get(matcher.group(2));

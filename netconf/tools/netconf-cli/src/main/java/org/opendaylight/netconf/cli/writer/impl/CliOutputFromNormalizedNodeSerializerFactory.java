@@ -85,7 +85,8 @@ public final class CliOutputFromNormalizedNodeSerializerFactory implements FromN
     }
 
     @Override
-    public FromNormalizedNodeSerializer<String, LeafSetEntryNode<?>, LeafListSchemaNode> getLeafSetEntryNodeSerializer() {
+    public FromNormalizedNodeSerializer<String, LeafSetEntryNode<?>, LeafListSchemaNode> getLeafSetEntryNodeSerializer()
+    {
         return leafSetEntryNodeSerializer;
     }
 

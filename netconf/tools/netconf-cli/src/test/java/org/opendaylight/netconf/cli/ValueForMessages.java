@@ -14,7 +14,7 @@ class ValueForMessage {
     List<String> messageKeyWords;
     String value;
 
-    public ValueForMessage(final String value, final String... messageKeyWords) {
+    ValueForMessage(final String value, final String... messageKeyWords) {
         this.messageKeyWords = Arrays.asList(messageKeyWords);
         this.value = value;
     }

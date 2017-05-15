@@ -49,7 +49,8 @@ public class ContainerReader extends AbstractReader<ContainerSchemaNode> {
     }
 
     @Override
-    public List<NormalizedNode<?, ?>> readWithContext(final ContainerSchemaNode containerNode) throws IOException, ReadingException {
+    public List<NormalizedNode<?, ?>> readWithContext(final ContainerSchemaNode containerNode)
+            throws IOException, ReadingException {
         console.formatLn("Submit child nodes for container: %s, %s", containerNode.getQName().getLocalName(),
                 Collections2.transform(containerNode.getChildNodes(), new Function<DataSchemaNode, String>() {
                     @Override
