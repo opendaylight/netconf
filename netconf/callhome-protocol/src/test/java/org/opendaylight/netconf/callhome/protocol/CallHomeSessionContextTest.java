@@ -188,7 +188,6 @@ public class CallHomeSessionContextTest {
         // given
         instance = realFactory.createIfNotExists(mockSession, mockAuth, address);
 
-        SshFutureListener<OpenFuture> listener = instance.newSshFutureListener(mockChannel);
         OpenFuture mockFuture = mock(OpenFuture.class);
         Mockito.doReturn(false).when(mockFuture).isOpened();
         Mockito.doReturn(new RuntimeException("test")).when(mockFuture).getException();
@@ -196,6 +195,7 @@ public class CallHomeSessionContextTest {
         doReturn(null).when(mockSession).close(anyBoolean());
 
         // when
+        SshFutureListener<OpenFuture> listener = instance.newSshFutureListener(mockChannel);
         listener.operationComplete(mockFuture);
         // then
         // You'll see an error message logged to the console - it is expected.

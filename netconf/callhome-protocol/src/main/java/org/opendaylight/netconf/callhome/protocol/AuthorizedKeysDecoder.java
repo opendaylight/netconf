@@ -36,7 +36,7 @@ import org.bouncycastle.jce.spec.ECNamedCurveSpec;
 
 
 /**
- * FIXME: This should be probably located at AAA library
+ * FIXME: This should be probably located at AAA library.
  */
 public class AuthorizedKeysDecoder {
 
@@ -62,35 +62,41 @@ public class AuthorizedKeysDecoder {
     private byte[] bytes = new byte[0];
     private int pos = 0;
 
-
-    public PublicKey decodePublicKey(String keyLine) throws InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException {
+    public PublicKey decodePublicKey(String keyLine)
+            throws InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException {
 
         // look for the Base64 encoded part of the line to decode
         // both ssh-rsa and ssh-dss begin with "AAAA" due to the length bytes
         bytes = Base64.decodeBase64(keyLine.getBytes());
-        if (bytes.length == 0)
+        if (bytes.length == 0) {
             throw new IllegalArgumentException("No Base64 part to decode in " + keyLine);
+        }
+
         pos = 0;
 
         String type = decodeType();
-        if (type.equals(KEY_TYPE_RSA))
+        if (type.equals(KEY_TYPE_RSA)) {
             return decodeAsRSA();
+        }
 
-        if (type.equals(KEY_TYPE_DSA))
+        if (type.equals(KEY_TYPE_DSA)) {
             return decodeAsDSA();
+        }
 
-        if (type.equals(KEY_TYPE_ECDSA))
-            return decodeAsECDSA();
+        if (type.equals(KEY_TYPE_ECDSA)) {
+            return decodeAsEcDSA();
+        }
 
         throw new IllegalArgumentException("Unknown decode key type " + type + " in " + keyLine);
     }
 
-    private PublicKey decodeAsECDSA()
+    private PublicKey decodeAsEcDSA()
             throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {
         KeyFactory ecdsaFactory = SecurityUtils.getKeyFactory(KEY_FACTORY_TYPE_ECDSA);
 
         ECNamedCurveParameterSpec spec256r1 = ECNamedCurveTable.getParameterSpec(ECDSA_SUPPORTED_CURVE_NAME_SPEC);
-        ECNamedCurveSpec params256r1 = new ECNamedCurveSpec(ECDSA_SUPPORTED_CURVE_NAME_SPEC, spec256r1.getCurve(), spec256r1.getG(), spec256r1.getN());
+        ECNamedCurveSpec params256r1 = new ECNamedCurveSpec(
+            ECDSA_SUPPORTED_CURVE_NAME_SPEC, spec256r1.getCurve(), spec256r1.getG(), spec256r1.getN());
         // copy last 65 bytes from ssh key.
         ECPoint point = ECPointUtil.decodePoint(params256r1.getCurve(), Arrays.copyOfRange(bytes, 39, bytes.length));
         ECPublicKeySpec pubKeySpec = new ECPublicKeySpec(point, params256r1);
@@ -100,11 +106,11 @@ public class AuthorizedKeysDecoder {
 
     private PublicKey decodeAsDSA() throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {
         KeyFactory dsaFactory = SecurityUtils.getKeyFactory(KEY_FACTORY_TYPE_DSA);
-        BigInteger p = decodeBigInt();
-        BigInteger q = decodeBigInt();
-        BigInteger g = decodeBigInt();
-        BigInteger y = decodeBigInt();
-        DSAPublicKeySpec spec = new DSAPublicKeySpec(y, p, q, g);
+        BigInteger prime = decodeBigInt();
+        BigInteger subPrime = decodeBigInt();
+        BigInteger base = decodeBigInt();
+        BigInteger publicKey = decodeBigInt();
+        DSAPublicKeySpec spec = new DSAPublicKeySpec(publicKey, prime, subPrime, base);
 
         return dsaFactory.generatePublic(spec);
     }
@@ -172,17 +178,16 @@ public class AuthorizedKeysDecoder {
             dout.writeInt(ECDSA_SUPPORTED_CURVE_NAME.getBytes().length);
             dout.write(ECDSA_SUPPORTED_CURVE_NAME.getBytes());
 
-            byte[] x = ecPublicKey.getQ().getAffineXCoord().getEncoded();
-            byte[] y = ecPublicKey.getQ().getAffineYCoord().getEncoded();
-            dout.writeInt(x.length + y.length + 1);
+            byte[] coordX = ecPublicKey.getQ().getAffineXCoord().getEncoded();
+            byte[] coordY = ecPublicKey.getQ().getAffineYCoord().getEncoded();
+            dout.writeInt(coordX.length + coordY.length + 1);
             dout.writeByte(0x04);
-            dout.write(x);
-            dout.write(y);
+            dout.write(coordX);
+            dout.write(coordY);
         } else {
             throw new IllegalArgumentException("Unknown public key encoding: " + publicKey.getAlgorithm());
         }
         publicKeyEncoded = new String(Base64.encodeBase64(byteOs.toByteArray()));
         return publicKeyEncoded;
-
     }
 }
