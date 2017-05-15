@@ -12,7 +12,7 @@ import java.security.PublicKey;
 import javax.annotation.Nonnull;
 
 /**
- * Provider responsible for resolving CallHomeAuthorization
+ * Provider responsible for resolving CallHomeAuthorization.
  */
 public interface CallHomeAuthorizationProvider {
 

@@ -73,6 +73,7 @@ public class CallHomeMountDispatcherTest {
             public CallHomeMountSessionManager getSessionManager() {
                 return mockSessMgr;
             }
+
             @Override
             void createTopology() {
                 this.topology = mockTopology;

@@ -20,7 +20,6 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
 
-
 public class CallHomeTopology extends BaseCallHomeTopology {
 
     public CallHomeTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
