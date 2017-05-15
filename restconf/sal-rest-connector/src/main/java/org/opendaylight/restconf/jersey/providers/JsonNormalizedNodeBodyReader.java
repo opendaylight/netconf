@@ -147,7 +147,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPr
             LOG.debug("Error parsing json input:", exception);
 
             throw new RestconfDocumentedException("Error parsing json input: Failed to create new parse result data. "
-                    + "Are you creating multiple resources/subresources in POST request?");
+                    + "Are you creating multiple resources/subresources in POST request?", exception);
         }
 
         LOG.debug("Error parsing json input", exception);
