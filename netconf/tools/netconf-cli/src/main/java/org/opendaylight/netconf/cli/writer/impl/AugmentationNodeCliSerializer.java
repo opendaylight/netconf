@@ -14,6 +14,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.transform.base.serializer.AugmentationNodeBaseSerializer;
 import org.opendaylight.yangtools.yang.data.impl.schema.transform.base.serializer.NodeSerializerDispatcher;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchema;
+
 final class AugmentationNodeCliSerializer extends AugmentationNodeBaseSerializer<String> {
 
     private final NodeSerializerDispatcher<String> dispatcher;

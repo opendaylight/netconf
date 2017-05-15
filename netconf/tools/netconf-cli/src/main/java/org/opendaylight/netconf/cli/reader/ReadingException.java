@@ -11,8 +11,8 @@ public class ReadingException extends Exception {
 
     private static final long serialVersionUID = -298382323286156591L;
 
-    public ReadingException(final String msg, final Exception e) {
-        super(msg, e);
+    public ReadingException(final String msg, final Exception ex) {
+        super(msg, ex);
     }
 
     public ReadingException(final String msg) {

@@ -32,6 +32,6 @@ public abstract class AbstractWriter<T extends DataSchemaNode> implements Writer
         }
     }
 
-    protected abstract void writeInner(final T dataSchemaNode, final List<NormalizedNode<?, ?>> dataNodes) throws IOException,
-            WriteException;
+    protected abstract void writeInner(final T dataSchemaNode, final List<NormalizedNode<?, ?>> dataNodes)
+        throws IOException, WriteException;
 }

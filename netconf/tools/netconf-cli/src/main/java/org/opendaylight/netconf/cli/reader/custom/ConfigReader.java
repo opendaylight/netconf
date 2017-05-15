@@ -73,7 +73,8 @@ public class ConfigReader extends AbstractReader<DataSchemaNode> {
     // FIXME refactor + unite common code with FilterReader
 
     @Override
-    protected List<NormalizedNode<?, ?>> readWithContext(final DataSchemaNode schemaNode) throws IOException, ReadingException {
+    protected List<NormalizedNode<?, ?>> readWithContext(final DataSchemaNode schemaNode)
+            throws IOException, ReadingException {
         console.writeLn("Config " + schemaNode.getQName().getLocalName());
         console.writeLn("Submit path of the data to edit. Use TAB for autocomplete");
 
@@ -93,11 +94,11 @@ public class ConfigReader extends AbstractReader<DataSchemaNode> {
 
         List<? extends NormalizedNode<?, ?>> previous = readInnerNode(rawValue);
 
-        for (final QName qName : Lists.reverse(filterPartsQNames).subList(1, filterPartsQNames.size())) {
+        for (final QName qualifiedName : Lists.reverse(filterPartsQNames).subList(1, filterPartsQNames.size())) {
             previous = Collections.<NormalizedNode<?, ?>>singletonList(
                     ImmutableContainerNodeBuilder.create()
-                            .withNodeIdentifier(new NodeIdentifier(qName))
-                            .withValue(previous == null ? Collections.<DataContainerChild<?, ?>>emptyList() : (Collection) previous).build()
+                            .withNodeIdentifier(new NodeIdentifier(qualifiedName))
+                            .withValue(previous == null ? Collections.emptyList() : (Collection) previous).build()
             );
         }
 
@@ -105,11 +106,12 @@ public class ConfigReader extends AbstractReader<DataSchemaNode> {
             return Collections.singletonList(null);
         }
 
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builder = ImmutableContainerNodeBuilder.create();
+        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builder = ImmutableContainerNodeBuilder
+            .create();
         builder.withNodeIdentifier(new NodeIdentifier(schemaNode.getQName()));
         builder.withValue((Collection<DataContainerChild<?, ?>>) previous);
 
-        return Collections.<NormalizedNode<?, ?>> singletonList(builder.build());
+        return Collections.singletonList(builder.build());
     }
 
     private List<NormalizedNode<?, ?>> readInnerNode(final String pathString) throws ReadingException {
@@ -127,14 +129,14 @@ public class ConfigReader extends AbstractReader<DataSchemaNode> {
 
         private final SchemaContext remoteSchemaContext;
 
-        public FilterConsoleContext(final DataSchemaNode schemaNode, final SchemaContext remoteSchemaContext) {
+        FilterConsoleContext(final DataSchemaNode schemaNode, final SchemaContext remoteSchemaContext) {
             super(schemaNode);
             this.remoteSchemaContext = remoteSchemaContext;
         }
 
         @Override
         protected List<Completer> getAdditionalCompleters() {
-            return Collections.<Completer> singletonList(new FilterCompleter(remoteSchemaContext));
+            return Collections.singletonList(new FilterCompleter(remoteSchemaContext));
         }
     }
 
@@ -142,7 +144,7 @@ public class ConfigReader extends AbstractReader<DataSchemaNode> {
 
         private final SchemaContext remoteSchemaContext;
 
-        public FilterCompleter(final SchemaContext remoteSchemaContext) {
+        FilterCompleter(final SchemaContext remoteSchemaContext) {
             this.remoteSchemaContext = remoteSchemaContext;
         }
 

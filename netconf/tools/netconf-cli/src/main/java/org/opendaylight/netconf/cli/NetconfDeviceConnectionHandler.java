@@ -67,6 +67,8 @@ public class NetconfDeviceConnectionHandler implements RemoteDeviceHandler<Netco
     }
 
     /**
+     * Check if device is up.
+     *
      * @return true if connection was fully established
      */
     public synchronized boolean isUp() {
@@ -87,9 +89,7 @@ public class NetconfDeviceConnectionHandler implements RemoteDeviceHandler<Netco
     }
 
     @Override
-    public void onNotification(DOMNotification domNotification) {
-
-    }
+    public void onNotification(DOMNotification domNotification) {}
 
     @Override
     public void close() {

@@ -21,7 +21,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 
 /**
- * Input arguments for and rpc/command execution
+ * Input arguments for and rpc/command execution.
  */
 public class Input {
 
@@ -31,13 +31,14 @@ public class Input {
 
     public Input(final List<NormalizedNode<?, ?>> args) {
         // FIXME empty Input should be constructed from static factory method
-        if(args.isEmpty()) {
+        if (args.isEmpty()) {
             this.args = Collections.emptyList();
             return;
         }
 
         final NormalizedNode<?, ?> input = args.iterator().next();
-        Preconditions.checkArgument(input instanceof DataContainerChild<?, ?>, "Input container has to be of type Data Container Child.");
+        Preconditions.checkArgument(
+            input instanceof DataContainerChild<?, ?>, "Input container has to be of type Data Container Child.");
         this.args = new ArrayList<>((Collection<NormalizedNode<?, ?>>) input.getValue());
 
         for (final NormalizedNode<?, ?> arg : this.args) {

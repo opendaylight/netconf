@@ -36,20 +36,25 @@ public class DataWriter extends AbstractWriter<DataSchemaNode> {
     }
 
     @Override
-    protected void writeInner(final DataSchemaNode dataSchemaNode, final List<NormalizedNode<?, ?>> dataNodes) throws IOException, WriteException {
+    protected void writeInner(final DataSchemaNode dataSchemaNode, final List<NormalizedNode<?, ?>> dataNodes)
+            throws IOException, WriteException {
         Preconditions.checkArgument(dataNodes.size() == 1, "Expected only 1 element for data node");
         final NormalizedNode<?, ?> dataNode = dataNodes.get(0);
-        Preconditions.checkArgument(dataNode instanceof ContainerNode, "Unexpected node type: %s, should be %s", dataNode, ContainerNode.class);
+        Preconditions.checkArgument(dataNode instanceof ContainerNode, "Unexpected node type: %s, should be %s",
+            dataNode, ContainerNode.class);
 
         StringBuilder output = new StringBuilder();
-        out.increaseIndent().addStringWithIndent(output, dataSchemaNode.getQName().getLocalName()).openComposite(output);
+        out.increaseIndent().addStringWithIndent(
+            output, dataSchemaNode.getQName().getLocalName()).openComposite(output);
         console.writeLn(output.toString());
 
-        for (final Object oChildNode : ((DataContainerNode) dataNode).getValue()) {
-            final NormalizedNode<?, ?> childNode = (NormalizedNode<?, ?>) oChildNode;
-            final Optional<DataSchemaNode> schemaNode = XmlDocumentUtils.findFirstSchema(childNode.getNodeType(), remoteSchemaContext.getDataDefinitions());
-            Preconditions.checkState(schemaNode.isPresent(), "Unknown data node %s, not defined in schema", childNode.getNodeType());
-            new NormalizedNodeWriter(console, out).write(schemaNode.get(), Collections.<NormalizedNode<?, ?>>singletonList(childNode));
+        for (final Object childNodeObject : ((DataContainerNode) dataNode).getValue()) {
+            final NormalizedNode<?, ?> childNode = (NormalizedNode<?, ?>) childNodeObject;
+            final Optional<DataSchemaNode> schemaNode = XmlDocumentUtils.findFirstSchema(childNode.getNodeType(),
+                remoteSchemaContext.getDataDefinitions());
+            Preconditions.checkState(schemaNode.isPresent(), "Unknown data node %s, not defined in schema",
+                childNode.getNodeType());
+            new NormalizedNodeWriter(console, out).write(schemaNode.get(), Collections.singletonList(childNode));
         }
 
         output = new StringBuilder();

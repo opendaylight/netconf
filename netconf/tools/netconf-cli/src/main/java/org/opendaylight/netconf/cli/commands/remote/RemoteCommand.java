@@ -28,7 +28,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 /**
  * Generic remote command implementation that sends the rpc xml to the remote device and waits for response
- * Waiting is limited with TIMEOUT
+ * Waiting is limited with TIMEOUT.
  */
 public class RemoteCommand extends AbstractCommand {
 
@@ -37,15 +37,16 @@ public class RemoteCommand extends AbstractCommand {
     private static final TimeUnit DEFAULT_TIMEOUT_UNIT = TimeUnit.MILLISECONDS;
     private final DOMRpcService rpcService;
 
-    public RemoteCommand(final QName qName, final InputDefinition args, final OutputDefinition output, final String description, final DOMRpcService rpcService) {
-        super(qName, args, output, description);
+    public RemoteCommand(final QName qualifiedName, final InputDefinition args, final OutputDefinition output,
+                         final String description, final DOMRpcService rpcService) {
+        super(qualifiedName, args, output, description);
         this.rpcService = rpcService;
     }
 
     @Override
     public Output invoke(final Input inputArgs) throws CommandInvocationException {
-        final CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc =
-                rpcService.invokeRpc(SchemaPath.create(Collections.singletonList(getCommandId()), true), inputArgs.wrap(getCommandId()));
+        final CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc = rpcService.invokeRpc(
+            SchemaPath.create(Collections.singletonList(getCommandId()), true), inputArgs.wrap(getCommandId()));
 
         try {
             return new Output(invokeRpc.get(DEFAULT_TIMEOUT, DEFAULT_TIMEOUT_UNIT).getResult());

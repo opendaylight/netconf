@@ -12,7 +12,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 
 /**
- * Generic provider(reader) of input arguments for commands
+ * Generic provider(reader) of input arguments for commands.
  */
 public interface Reader<T extends DataSchemaNode> {
 

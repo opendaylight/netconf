@@ -23,8 +23,8 @@ class SeparatedNodes {
     private final Set<DataSchemaNode> mandatoryNotKey;
     private final Set<DataSchemaNode> otherNodes;
 
-    public SeparatedNodes(final Set<DataSchemaNode> keyNodes, final Set<DataSchemaNode> mandatoryNotKey,
-            final Set<DataSchemaNode> otherNodes) {
+    private SeparatedNodes(final Set<DataSchemaNode> keyNodes, final Set<DataSchemaNode> mandatoryNotKey,
+                           final Set<DataSchemaNode> otherNodes) {
         this.keyNodes = keyNodes;
         this.mandatoryNotKey = mandatoryNotKey;
         this.otherNodes = otherNodes;
@@ -46,7 +46,8 @@ class SeparatedNodes {
         return separateNodes(dataNodeContainer, false);
     }
 
-    static SeparatedNodes separateNodes(final DataNodeContainer dataNodeContainer, final boolean removeConfigFalseNodes) {
+    static SeparatedNodes separateNodes(final DataNodeContainer dataNodeContainer,
+                                        final boolean removeConfigFalseNodes) {
         final Set<DataSchemaNode> keys = new HashSet<>();
         final Set<DataSchemaNode> mandatoryNotKeys = new HashSet<>();
         final Set<DataSchemaNode> others = new HashSet<>();

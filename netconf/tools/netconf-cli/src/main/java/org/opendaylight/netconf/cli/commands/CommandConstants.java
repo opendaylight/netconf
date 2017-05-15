@@ -15,7 +15,8 @@ public class CommandConstants {
 
     // Local command ids are defined here, this links the implementation to the rpc definition in yang
     // Better way needs to be found to provide this link instead of hardcoded QNames (e.g. yang extension)
-    public static final QName HELP_QNAME = QName.create(URI.create("netconf:cli"), IOUtil.parseDate("2014-05-22"), "help");
+    public static final QName HELP_QNAME = QName.create(
+        URI.create("netconf:cli"), IOUtil.parseDate("2014-05-22"), "help");
     public static final QName CLOSE_QNAME = QName.create(HELP_QNAME, "close");
     public static final QName CONNECT_QNAME = QName.create(HELP_QNAME, "connect");
     public static final QName DISCONNECT_QNAME = QName.create(CONNECT_QNAME, "disconnect");

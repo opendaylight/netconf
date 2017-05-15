@@ -13,6 +13,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 /**
  * Contains the local schema context (containing local commands) and remote schema context (remote commands)
  *
+ * <p>
  * Remote commands are set only after the connection is fully established. So classes using the remote schema context
  */
 public class SchemaContextRegistry {

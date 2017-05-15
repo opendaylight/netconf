@@ -44,7 +44,8 @@ public class AnyXmlReader extends AbstractReader<AnyXmlSchemaNode> {
     }
 
     @Override
-    protected List<NormalizedNode<?, ?>> readWithContext(final AnyXmlSchemaNode schemaNode) throws IOException, ReadingException {
+    protected List<NormalizedNode<?, ?>> readWithContext(final AnyXmlSchemaNode schemaNode)
+            throws IOException, ReadingException {
         console.writeLn(listType(schemaNode) + " " + schemaNode.getQName().getLocalName());
 
         final String rawValue = console.read();
@@ -58,7 +59,8 @@ public class AnyXmlReader extends AbstractReader<AnyXmlSchemaNode> {
                         .withNodeIdentifier(new NodeIdentifier(schemaNode.getQName()))
                         .withChild(value.get()).build();
             } else {
-                newNode = ImmutableLeafNodeBuilder.create().withNodeIdentifier(new NodeIdentifier(schemaNode.getQName())).withValue(rawValue).build();
+                newNode = ImmutableLeafNodeBuilder.create().withNodeIdentifier(
+                    new NodeIdentifier(schemaNode.getQName())).withValue(rawValue).build();
             }
         }
 
@@ -70,11 +72,11 @@ public class AnyXmlReader extends AbstractReader<AnyXmlSchemaNode> {
     private Optional<DataContainerChild<?, ?>> tryParse(final String rawValue, final AnyXmlSchemaNode schemaNode) {
         try {
             final Document dom = XmlUtil.readXmlToDocument(rawValue);
-            return Optional.<DataContainerChild<?, ?>> of(
-                    DomToNormalizedNodeParserFactory.
-                            getInstance(DomUtils.defaultValueCodecProvider(), getSchemaContext()).
-                            getAnyXmlNodeParser().
-                            parse(Collections.singletonList(dom.getDocumentElement()), schemaNode)
+            return Optional.of(
+                    DomToNormalizedNodeParserFactory
+                            .getInstance(DomUtils.defaultValueCodecProvider(), getSchemaContext())
+                            .getAnyXmlNodeParser()
+                            .parse(Collections.singletonList(dom.getDocumentElement()), schemaNode)
             );
         } catch (SAXException | IOException e) {
             // TODO log

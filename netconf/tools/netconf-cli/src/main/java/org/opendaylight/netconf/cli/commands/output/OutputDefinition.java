@@ -14,7 +14,7 @@ import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 
 /**
- * The definition of output elements represented by schema nodes parsed from yang rpc definition
+ * The definition of output elements represented by schema nodes parsed from yang rpc definition.
  */
 public class OutputDefinition implements Iterable<DataSchemaNode> {
 

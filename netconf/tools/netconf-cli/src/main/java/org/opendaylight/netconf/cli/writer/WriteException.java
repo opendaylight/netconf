@@ -11,8 +11,8 @@ public class WriteException extends Exception {
 
     private static final long serialVersionUID = 8401242676753560336L;
 
-    public WriteException(final String msg, final Exception e) {
-        super(msg, e);
+    public WriteException(final String msg, final Exception exc) {
+        super(msg, exc);
     }
 
     public WriteException(final String msg) {

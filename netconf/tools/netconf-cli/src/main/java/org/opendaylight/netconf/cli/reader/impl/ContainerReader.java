@@ -49,7 +49,8 @@ public class ContainerReader extends AbstractReader<ContainerSchemaNode> {
     }
 
     @Override
-    public List<NormalizedNode<?, ?>> readWithContext(final ContainerSchemaNode containerNode) throws IOException, ReadingException {
+    public List<NormalizedNode<?, ?>> readWithContext(final ContainerSchemaNode containerNode)
+            throws IOException, ReadingException {
         console.formatLn("Submit child nodes for container: %s, %s", containerNode.getQName().getLocalName(),
                 Collections2.transform(containerNode.getChildNodes(), new Function<DataSchemaNode, String>() {
                     @Override
@@ -57,7 +58,8 @@ public class ContainerReader extends AbstractReader<ContainerSchemaNode> {
                         return input.getQName().getLocalName();
                     }
                 }));
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builder = ImmutableContainerNodeBuilder.create();
+        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builder = ImmutableContainerNodeBuilder
+            .create();
         builder.withNodeIdentifier(new NodeIdentifier(containerNode.getQName()));
 
         final ArrayList<NormalizedNode<?, ?>> nodesToAdd = new ArrayList<>();
@@ -77,7 +79,7 @@ public class ContainerReader extends AbstractReader<ContainerSchemaNode> {
             nodesToAdd.addAll(argumentHandlerRegistry.getGenericReader(getSchemaContext(),
                     getReadConfigNode()).read(childNode));
         }
-        return Collections.<NormalizedNode<?, ?>> singletonList(builder.withValue((ArrayList) nodesToAdd).build());
+        return Collections.singletonList(builder.withValue((ArrayList) nodesToAdd).build());
     }
 
     private List<DataSchemaNode> sortChildren(final Set<DataSchemaNode> unsortedNodes) {

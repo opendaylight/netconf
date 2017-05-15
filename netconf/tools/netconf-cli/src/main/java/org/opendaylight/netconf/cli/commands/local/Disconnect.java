@@ -21,16 +21,16 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLe
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 
 /**
- * Local disconnect command
+ * Local disconnect command.
  */
 public class Disconnect extends AbstractCommand {
 
     private final NetconfDeviceConnectionManager connectionManager;
 
-    public Disconnect(final QName qName, final InputDefinition inputDefinition,
+    public Disconnect(final QName qualifiedName, final InputDefinition inputDefinition,
             final OutputDefinition outputDefinition, final NetconfDeviceConnectionManager connectionManager,
             final String description) {
-        super(qName, inputDefinition, outputDefinition, description);
+        super(qualifiedName, inputDefinition, outputDefinition, description);
         this.connectionManager = connectionManager;
     }
 

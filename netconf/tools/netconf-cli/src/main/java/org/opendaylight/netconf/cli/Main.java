@@ -30,10 +30,11 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * Parse arguments, start remote device connection and start CLI after the
- * connection is fully up
+ * connection is fully up.
  */
 public class Main {
 
+    @SuppressWarnings("illegalCatch")
     public static void main(final String[] args) {
         final CliArgumentParser cliArgs = new CliArgumentParser();
         try {
@@ -63,19 +64,24 @@ public class Main {
         commandDispatcher.addLocalCommands(connectionManager, localSchema, cliArgs.getConnectionTimeoutMs());
 
         switch (cliArgs.connectionArgsPresent()) {
-        case TCP: {
-            // FIXME support pure TCP
-            handleRunningException(new UnsupportedOperationException("PURE TCP CONNECTIONS ARE NOT SUPPORTED YET, USE SSH INSTEAD BY PROVIDING USERNAME AND PASSWORD AS WELL"));
-            return;
-        }
-        case SSH: {
-            writeStatus(consoleIO, "Connecting to %s via SSH. Please wait.", cliArgs.getAddress());
-            connectionManager.connectBlocking(cliArgs.getAddress(), cliArgs.getServerAddress(), getClientSshConfig(cliArgs));
-            break;
-        }
-        case NONE: {/* Do not connect initially */
-            writeStatus(consoleIO, "No initial connection. To connect use the connect command");
-        }
+            case TCP:
+                // FIXME support pure TCP
+                handleRunningException(new UnsupportedOperationException(
+                    "PURE TCP CONNECTIONS ARE NOT SUPPORTED YET, "
+                        + "USE SSH INSTEAD BY PROVIDING USERNAME AND PASSWORD AS WELL"));
+                return;
+            case SSH:
+                writeStatus(consoleIO, "Connecting to %s via SSH. Please wait.", cliArgs.getAddress());
+                connectionManager.connectBlocking(cliArgs.getAddress(), cliArgs.getServerAddress(),
+                    getClientSshConfig(cliArgs));
+                break;
+            case NONE:
+                /* Do not connect initially */
+                writeStatus(consoleIO, "No initial connection. To connect use the connect command");
+                break;
+            default:
+                // NOOP
+                break;
         }
 
         try {
@@ -102,12 +108,13 @@ public class Main {
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH);
     }
 
-    private static void handleStartupException(final IOException e) {
-        handleException(e, "Unable to initialize CLI");
+    private static void handleStartupException(final IOException exc) {
+        handleException(exc, "Unable to initialize CLI");
     }
 
-    private static void handleException(final Exception e, final String message) {
-        System.console().writer().println(String.format("Error %s cause %s", message, getStackTraceAsString(e.fillInStackTrace())));
+    private static void handleException(final Exception exc, final String message) {
+        System.console().writer().println(
+            String.format("Error %s cause %s", message, getStackTraceAsString(exc.fillInStackTrace())));
     }
 
     private static void writeStatus(final ConsoleIO io, final String blueprint, final Object... args) {
@@ -118,8 +125,8 @@ public class Main {
         }
     }
 
-    private static void handleRunningException(final Exception e) {
-        handleException(e, "Unexpected CLI runtime exception");
+    private static void handleRunningException(final Exception exc) {
+        handleException(exc, "Unexpected CLI runtime exception");
     }
 
     private static final class CliArgumentParser {
@@ -135,13 +142,14 @@ public class Main {
         private final ArgumentParser parser;
         private Namespace parsed;
 
+        @SuppressWarnings("checkstyle:lineLength")
         private CliArgumentParser() {
             parser = ArgumentParsers.newArgumentParser("Netconf cli").defaultHelp(true)
                     .description("Generic cli for netconf devices")
-                    .usage("Submit address + port for initial TCP connection (PURE TCP CONNECTIONS ARE NOT SUPPORTED YET)\n" +
-                            "Submit username + password in addition to address + port for initial SSH connection\n" +
-                            "If no arguments(or unexpected combination) is submitted, cli will be started without initial connection\n" +
-                            "To use with ODL controller, run with: java -jar netconf-cli-0.2.5-SNAPSHOT-executable.jar  --server localhost --port 1830 --username admin --password admin");
+                    .usage("Submit address + port for initial TCP connection (PURE TCP CONNECTIONS ARE NOT SUPPORTED YET)\n"
+                        + "Submit username + password in addition to address + port for initial SSH connection\n"
+                        + "If no arguments(or unexpected combination) is submitted, cli will be started without initial connection\n"
+                        + "To use with ODL controller, run with: java -jar netconf-cli-0.2.5-SNAPSHOT-executable.jar  --server localhost --port 1830 --username admin --password admin");
 
             final ArgumentGroup tcpGroup = parser.addArgumentGroup("TCP")
                     .description("Base arguments to initiate TCP connection right away");
@@ -151,8 +159,8 @@ public class Main {
             tcpGroup.addArgument("--" + CONNECT_TIMEOUT)
                     .type(Integer.class)
                     .setDefault(DEFAULT_CONNECTION_TIMEOUT_MS)
-                    .help("Timeout(in ms) for connection to succeed, if the connection is not fully established by the time is up, " +
-                            "connection attempt is considered a failure. This attribute is not working as expected yet");
+                    .help("Timeout(in ms) for connection to succeed, if the connection is not fully established by the time is up, "
+                        + "connection attempt is considered a failure. This attribute is not working as expected yet");
 
             final ArgumentGroup sshGroup = parser.addArgumentGroup("SSH")
                     .description("SSH credentials, if provided, initial connection will be attempted using SSH");
@@ -216,8 +224,8 @@ public class Main {
         }
 
         public InitialConnectionType connectionArgsPresent() {
-            if(getAddress() != null && getPort() != null) {
-                if(getUsername() != null && getPassword() != null) {
+            if (getAddress() != null && getPort() != null) {
+                if (getUsername() != null && getPassword() != null) {
                     return InitialConnectionType.SSH;
                 }
                 return InitialConnectionType.TCP;

@@ -55,13 +55,13 @@ final class MapEntryNodeCliSerializer extends ListEntryNodeBaseSerializer<String
             return;
         }
 
-        int i = 0;
+        int index = 0;
         output.append(" [");
-        for (final Entry<QName, Object> qNameObjectEntry : keyValues.entrySet()) {
-            output.append(qNameObjectEntry.getKey().getLocalName());
+        for (final Entry<QName, Object> keys : keyValues.entrySet()) {
+            output.append(keys.getKey().getLocalName());
             output.append("=");
-            output.append(qNameObjectEntry.getValue().toString());
-            if (++i != keyValues.size()) {
+            output.append(keys.getValue().toString());
+            if (++index != keyValues.size()) {
                 output.append(", ");
             }
         }
