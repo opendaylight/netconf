@@ -19,8 +19,7 @@ import org.opendaylight.netconf.test.tool.client.stress.ExecutionStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PerfClientCallable implements Callable<Void>{
-
+public class PerfClientCallable implements Callable<Void> {
     private static final Logger LOG = LoggerFactory.getLogger(PerfClientCallable.class);
 
     private final Parameters params;
@@ -43,7 +42,7 @@ public class PerfClientCallable implements Callable<Void>{
                     .setBody(payload.getPayload())
                     .setRequestTimeout(Integer.MAX_VALUE);
 
-            if(params.auth != null) {
+            if (params.auth != null) {
                 requestBuilder.setRealm(new Realm.RealmBuilder()
                         .setScheme(Realm.AuthScheme.BASIC)
                         .setPrincipal(params.auth.get(0))
@@ -64,8 +63,7 @@ public class PerfClientCallable implements Callable<Void>{
     }
 
     @Override
-    public Void call() throws Exception{
-
+    public Void call() throws Exception {
         executionStrategy.invoke();
         asyncHttpClient.closeAsynchronously();
         return null;
