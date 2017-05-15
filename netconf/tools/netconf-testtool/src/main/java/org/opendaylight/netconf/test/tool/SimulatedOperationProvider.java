@@ -33,12 +33,13 @@ class SimulatedOperationProvider implements NetconfOperationServiceFactory {
     private final Set<Capability> caps;
     private final SimulatedOperationService simulatedOperationService;
 
-    public SimulatedOperationProvider(final SessionIdProvider idProvider,
-                                      final Set<Capability> caps,
-                                      final Optional<File> notificationsFile,
-                                      final Optional<File> initialConfigXMLFile) {
+    SimulatedOperationProvider(final SessionIdProvider idProvider,
+                               final Set<Capability> caps,
+                               final Optional<File> notificationsFile,
+                               final Optional<File> initialConfigXMLFile) {
         this.caps = caps;
-        simulatedOperationService = new SimulatedOperationService(idProvider.getCurrentSessionId(), notificationsFile, initialConfigXMLFile);
+        simulatedOperationService = new SimulatedOperationService(
+            idProvider.getCurrentSessionId(), notificationsFile, initialConfigXMLFile);
     }
 
     @Override
@@ -68,7 +69,8 @@ class SimulatedOperationProvider implements NetconfOperationServiceFactory {
         private final Optional<File> notificationsFile;
         private final Optional<File> initialConfigXMLFile;
 
-        public SimulatedOperationService(final long currentSessionId, final Optional<File> notificationsFile, final Optional<File> initialConfigXMLFile) {
+        SimulatedOperationService(final long currentSessionId, final Optional<File> notificationsFile,
+                                  final Optional<File> initialConfigXMLFile) {
             this.currentSessionId = currentSessionId;
             this.notificationsFile = notificationsFile;
             this.initialConfigXMLFile = initialConfigXMLFile;
@@ -79,14 +81,17 @@ class SimulatedOperationProvider implements NetconfOperationServiceFactory {
             final DataList storage = new DataList();
             final SimulatedGet sGet = new SimulatedGet(String.valueOf(currentSessionId), storage);
             final SimulatedEditConfig sEditConfig = new SimulatedEditConfig(String.valueOf(currentSessionId), storage);
-            final SimulatedGetConfig sGetConfig = new SimulatedGetConfig(String.valueOf(currentSessionId), storage, initialConfigXMLFile );
+            final SimulatedGetConfig sGetConfig = new SimulatedGetConfig(
+                String.valueOf(currentSessionId), storage, initialConfigXMLFile);
             final SimulatedCommit sCommit = new SimulatedCommit(String.valueOf(currentSessionId));
             final SimulatedLock sLock = new SimulatedLock(String.valueOf(currentSessionId));
             final SimulatedUnLock sUnlock = new SimulatedUnLock(String.valueOf(currentSessionId));
             final SimulatedCreateSubscription sCreateSubs = new SimulatedCreateSubscription(
                     String.valueOf(currentSessionId), notificationsFile);
-            final SimulatedDiscardChanges sDiscardChanges = new SimulatedDiscardChanges(String.valueOf(currentSessionId));
-            return Sets.<NetconfOperation>newHashSet(sGet, sGetConfig, sEditConfig, sCommit, sLock, sUnlock, sCreateSubs, sDiscardChanges);
+            final SimulatedDiscardChanges sDiscardChanges = new SimulatedDiscardChanges(
+                String.valueOf(currentSessionId));
+            return Sets.newHashSet(
+                sGet, sGetConfig, sEditConfig, sCommit, sLock, sUnlock, sCreateSubs, sDiscardChanges);
         }
 
         @Override

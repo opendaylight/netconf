@@ -40,8 +40,10 @@ public class TesttoolParameters {
     private static final String PORT_KEY = "{PORT}";
     private static final String TCP_ONLY = "{TCP_ONLY}";
     private static final String ADDRESS_PORT = "{ADDRESS:PORT}";
-    private static final String dest = "http://{ADDRESS:PORT}/restconf/config/network-topology:network-topology/topology/topology-netconf/";
-    private static final Pattern YANG_FILENAME_PATTERN = Pattern.compile("(?<name>.*)@(?<revision>\\d{4}-\\d{2}-\\d{2})\\.yang");
+    private static final String DEST =
+        "http://{ADDRESS:PORT}/restconf/config/network-topology:network-topology/topology/topology-netconf/";
+    private static final Pattern YANG_FILENAME_PATTERN = Pattern
+        .compile("(?<name>.*)@(?<revision>\\d{4}-\\d{2}-\\d{2})\\.yang");
     private static final Pattern DATE_PATTERN = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})");
 
     private static final String RESOURCE = "/config-template.json";
@@ -97,6 +99,7 @@ public class TesttoolParameters {
     @Arg(dest = "rpc-config")
     public File rpcConfig;
 
+    @SuppressWarnings("checkstyle:lineLength")
     static ArgumentParser getParser() {
         final ArgumentParser parser = ArgumentParsers.newArgumentParser("netconf testtool");
 
@@ -120,8 +123,8 @@ public class TesttoolParameters {
         parser.addArgument("--throttle")
                 .type(Integer.class)
                 .setDefault(5000)
-                .help("Maximum amount of async requests that can be open at a time, " +
-                        "with mutltiple threads this gets divided among all threads")
+                .help("Maximum amount of async requests that can be open at a time, "
+                        + "with mutltiple threads this gets divided among all threads")
                 .dest("throttle");
 
         parser.addArgument("--auth")
@@ -131,10 +134,10 @@ public class TesttoolParameters {
 
         parser.addArgument("--controller-destination")
                 .type(String.class)
-                .help("Ip address and port of controller. Must be in following format <ip>:<port> " +
-                        "if available it will be used for spawning netconf connectors via topology configuration as " +
-                        "a part of URI. Example (http://<controller destination>/restconf/config/network-topology:network-topology/topology/topology-netconf/node/<node-id>)" +
-                        "otherwise it will just start simulated devices and skip the execution of PUT requests")
+                .help("Ip address and port of controller. Must be in following format <ip>:<port> "
+                        + "if available it will be used for spawning netconf connectors via topology configuration as "
+                        + "a part of URI. Example (http://<controller destination>/restconf/config/network-topology:network-topology/topology/topology-netconf/node/<node-id>)"
+                        + "otherwise it will just start simulated devices and skip the execution of PUT requests")
                 .dest("controller-destination");
 
         parser.addArgument("--device-count")
@@ -226,9 +229,9 @@ public class TesttoolParameters {
         parser.addArgument("-ip")
                 .type(String.class)
                 .setDefault("0.0.0.0")
-                .help("Ip address which will be used for creating a socket address." +
-                        "It can either be a machine name, such as " +
-                        "java.sun.com, or a textual representation of its IP address.")
+                .help("Ip address which will be used for creating a socket address."
+                        + "It can either be a machine name, such as "
+                        + "java.sun.com, or a textual representation of its IP address.")
                 .dest("ip");
 
         parser.addArgument("--thread-pool-size")
@@ -238,8 +241,8 @@ public class TesttoolParameters {
                 .dest("thread-pool-size");
         parser.addArgument("--rpc-config")
                 .type(File.class)
-                .help("Rpc config file. It can be used to define custom rpc behavior, or override the default one." +
-                        "Usable for testing buggy device behavior.")
+                .help("Rpc config file. It can be used to define custom rpc behavior, or override the default one."
+                    + "Usable for testing buggy device behavior.")
                 .dest("rpc-config");
 
         return parser;
@@ -277,6 +280,7 @@ public class TesttoolParameters {
         return payloadBuilder.toString();
     }
 
+    @SuppressWarnings("checkstyle:regexpSinglelineJava")
     void validate() {
         if (editContent == null) {
             stream = TesttoolParameters.class.getResourceAsStream(RESOURCE);
@@ -286,7 +290,8 @@ public class TesttoolParameters {
         }
 
         if (controllerDestination != null) {
-            Preconditions.checkArgument(controllerDestination.contains(":"), "Controller Destination needs to be in a following format <ip>:<port>");
+            Preconditions.checkArgument(controllerDestination.contains(":"),
+                "Controller Destination needs to be in a following format <ip>:<port>");
             final String[] parts = controllerDestination.split(Pattern.quote(":"));
             Preconditions.checkArgument(Integer.parseInt(parts[1]) > 0, "Port =< 0");
         }
@@ -323,8 +328,8 @@ public class TesttoolParameters {
                             final File correctNameFile = new File(correctName);
                             file.renameTo(correctNameFile);
                         }
-
                     } catch (final IOException e) {
+                        // print error to console (test tool is running from console)
                         e.printStackTrace();
                     }
                 }
@@ -349,7 +354,8 @@ public class TesttoolParameters {
             throw new IllegalArgumentException("Cannot read content of " + editContent);
         }
 
-        int from, to;
+        int from;
+        int to;
         Iterator<Integer> iterator;
 
         final ArrayList<ArrayList<Execution.DestToPayload>> allThreadsPayloads = new ArrayList<>();
@@ -360,21 +366,25 @@ public class TesttoolParameters {
             final int leftoverBatchedRequests = (batchedRequests) % threadAmount;
             final int leftoverRequests = openDevices.size() - (batchedRequests * generateConfigBatchSize);
 
-            final StringBuilder destBuilder = new StringBuilder(dest);
-            destBuilder.replace(destBuilder.indexOf(ADDRESS_PORT), destBuilder.indexOf(ADDRESS_PORT) + ADDRESS_PORT.length(), controllerDestination);
+            final StringBuilder destBuilder = new StringBuilder(DEST);
+            destBuilder.replace(destBuilder.indexOf(ADDRESS_PORT),
+                destBuilder.indexOf(ADDRESS_PORT) + ADDRESS_PORT.length(),
+                controllerDestination);
 
             for (int l = 0; l < threadAmount; l++) {
                 from = l * (batchedRequests * batchedRequestsPerThread);
                 to = from + (batchedRequests * batchedRequestsPerThread);
                 iterator = openDevices.subList(from, to).iterator();
-                allThreadsPayloads.add(createBatchedPayloads(batchedRequestsPerThread, iterator, editContentString, destBuilder.toString()));
+                allThreadsPayloads.add(createBatchedPayloads(batchedRequestsPerThread, iterator, editContentString,
+                    destBuilder.toString()));
             }
             ArrayList<Execution.DestToPayload> payloads = null;
             if (leftoverBatchedRequests > 0) {
                 from = threadAmount * (batchedRequests * batchedRequestsPerThread);
                 to = from + (batchedRequests * batchedRequestsPerThread);
                 iterator = openDevices.subList(from, to).iterator();
-                payloads = createBatchedPayloads(leftoverBatchedRequests, iterator, editContentString, destBuilder.toString());
+                payloads = createBatchedPayloads(leftoverBatchedRequests, iterator, editContentString,
+                    destBuilder.toString());
             }
             String payload = "";
 
@@ -382,7 +392,8 @@ public class TesttoolParameters {
                 from = openDevices.size() - leftoverRequests;
                 to = openDevices.size();
                 iterator = openDevices.subList(from, to).iterator();
-                final StringBuilder payloadBuilder = new StringBuilder(prepareMessage(iterator.next(), editContentString));
+                final StringBuilder payloadBuilder = new StringBuilder(
+                    prepareMessage(iterator.next(), editContentString));
                 payload += modifyMessage(payloadBuilder, j, leftoverRequests);
             }
             if (leftoverRequests > 0 || leftoverBatchedRequests > 0) {
@@ -417,37 +428,48 @@ public class TesttoolParameters {
         final StringBuilder messageBuilder = new StringBuilder(editContentString);
 
         if (editContentString.contains(HOST_KEY)) {
-            messageBuilder.replace(messageBuilder.indexOf(HOST_KEY), messageBuilder.indexOf(HOST_KEY) + HOST_KEY.length(), generateConfigsAddress);
+            messageBuilder.replace(messageBuilder.indexOf(HOST_KEY),
+                messageBuilder.indexOf(HOST_KEY) + HOST_KEY.length(),
+                generateConfigsAddress);
         }
         if (editContentString.contains(PORT_KEY)) {
-            while (messageBuilder.indexOf(PORT_KEY) != -1)
-                messageBuilder.replace(messageBuilder.indexOf(PORT_KEY), messageBuilder.indexOf(PORT_KEY) + PORT_KEY.length(), Integer.toString(openDevice));
+            while (messageBuilder.indexOf(PORT_KEY) != -1) {
+                messageBuilder.replace(messageBuilder.indexOf(PORT_KEY),
+                    messageBuilder.indexOf(PORT_KEY) + PORT_KEY.length(),
+                    Integer.toString(openDevice));
+            }
         }
         if (editContentString.contains(TCP_ONLY)) {
-            messageBuilder.replace(messageBuilder.indexOf(TCP_ONLY), messageBuilder.indexOf(TCP_ONLY) + TCP_ONLY.length(), Boolean.toString(!ssh));
+            messageBuilder.replace(messageBuilder.indexOf(TCP_ONLY),
+                messageBuilder.indexOf(TCP_ONLY) + TCP_ONLY.length(),
+                Boolean.toString(!ssh));
         }
         return messageBuilder.toString();
     }
 
-    private ArrayList<Execution.DestToPayload> createPayloads(final Iterator<Integer> openDevices, final String editContentString) {
+    private ArrayList<Execution.DestToPayload> createPayloads(final Iterator<Integer> openDevices,
+                                                              final String editContentString) {
         final ArrayList<Execution.DestToPayload> payloads = new ArrayList<>();
 
         while (openDevices.hasNext()) {
-            final StringBuilder destBuilder = new StringBuilder(dest);
-            destBuilder.replace(destBuilder.indexOf(ADDRESS_PORT), destBuilder.indexOf(ADDRESS_PORT) + ADDRESS_PORT.length(), controllerDestination);
-            payloads.add(new Execution.DestToPayload(destBuilder.toString(), prepareMessage(openDevices.next(), editContentString)));
+            final StringBuilder destBuilder = new StringBuilder(DEST);
+            destBuilder.replace(destBuilder.indexOf(ADDRESS_PORT),
+                destBuilder.indexOf(ADDRESS_PORT) + ADDRESS_PORT.length(), controllerDestination);
+            payloads.add(new Execution.DestToPayload(
+                destBuilder.toString(), prepareMessage(openDevices.next(), editContentString)));
         }
         return payloads;
     }
 
-    private ArrayList<Execution.DestToPayload> createBatchedPayloads(final int batchedRequestsCount, final Iterator<Integer> openDevices, final String editContentString,
-                                                                     final String destination) {
+    private ArrayList<Execution.DestToPayload> createBatchedPayloads(final int batchedRequestsCount,
+            final Iterator<Integer> openDevices, final String editContentString, final String destination) {
         final ArrayList<Execution.DestToPayload> payloads = new ArrayList<>();
 
         for (int i = 0; i < batchedRequestsCount; i++) {
             String payload = "";
             for (int j = 0; j < generateConfigBatchSize; j++) {
-                final StringBuilder payloadBuilder = new StringBuilder(prepareMessage(openDevices.next(), editContentString));
+                final StringBuilder payloadBuilder = new StringBuilder(
+                    prepareMessage(openDevices.next(), editContentString));
                 payload += modifyMessage(payloadBuilder, j, generateConfigBatchSize);
             }
             payloads.add(new Execution.DestToPayload(destination, payload));
