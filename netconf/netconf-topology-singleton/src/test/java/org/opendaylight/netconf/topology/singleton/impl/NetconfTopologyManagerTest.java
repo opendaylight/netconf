@@ -90,7 +90,8 @@ public class NetconfTopologyManagerTest {
         final Config config = new ConfigBuilder().setWriteTransactionIdleTimeout(0).build();
         netconfTopologyManager = new NetconfTopologyManager(dataBroker, rpcProviderRegistry,
                 clusterSingletonServiceProvider, keepaliveExecutor, processingExecutor,
-                actorSystemProvider, eventExecutor, clientDispatcher, topologyId, config, mountPointService, encryptionService);
+                actorSystemProvider, eventExecutor, clientDispatcher, topologyId, config,
+                mountPointService, encryptionService);
     }
 
     @Test

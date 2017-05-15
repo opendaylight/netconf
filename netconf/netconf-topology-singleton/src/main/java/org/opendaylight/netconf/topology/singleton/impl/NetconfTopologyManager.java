@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
-
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
@@ -77,8 +76,8 @@ public class NetconfTopologyManager
     private final String topologyId;
     private final Duration writeTxIdleTimeout;
     private final DOMMountPointService mountPointService;
-    private ListenerRegistration<NetconfTopologyManager> dataChangeListenerRegistration;
     private final AAAEncryptionService encryptionService;
+    private ListenerRegistration<NetconfTopologyManager> dataChangeListenerRegistration;
 
     public NetconfTopologyManager(final DataBroker dataBroker, final RpcProviderRegistry rpcProviderRegistry,
                                   final ClusterSingletonServiceProvider clusterSingletonServiceProvider,

@@ -21,6 +21,11 @@ import io.netty.util.concurrent.EventExecutor;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -104,7 +109,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         final org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node
                 .credentials.credentials.LoginPassword creds =
                 (org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node
-                .credentials.credentials.LoginPassword)netconfNode.getCredentials();
+                        .credentials.credentials.LoginPassword)netconfNode.getCredentials();
         if (!creds.isEncrypted()) {
             LOG.info("Encrypting the provided credentials");
             final AAAEncryptionService encryptionService = netconfTopologyDeviceSetup.getEncryptionService();
@@ -114,36 +119,35 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
             final String password = encryptionService.encrypt(creds.getPassword());
             final Boolean encrypted = Boolean.TRUE;
             org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node
-                    .credentials.credentials.LoginPasswordBuilder passwordBuilder = new org.opendaylight
-                    .yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials
-                    .credentials.LoginPasswordBuilder();
+                    .credentials.credentials.LoginPasswordBuilder passwordBuilder =
+                    new org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114
+                            .netconf.node.credentials.credentials.LoginPasswordBuilder();
             passwordBuilder.setEncrypted(encrypted);
             passwordBuilder.setUsername(username);
             passwordBuilder.setPassword(password);
             NetconfNodeBuilder nnb = new NetconfNodeBuilder();
             nnb.setCredentials(passwordBuilder.build());
 
-            boolean submitSucceeded = false;
+            final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
+            final InstanceIdentifier<NetworkTopology> networkTopologyId =
+                    InstanceIdentifier.builder(NetworkTopology.class).build();
+            final InstanceIdentifier<NetconfNode> niid = networkTopologyId.child(Topology.class,
+                    new TopologyKey(new TopologyId(topologyId))).child(Node.class,
+                    new NodeKey(nodeId)).augmentation(NetconfNode.class);
+            writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, niid, nnb.build());
+            final CheckedFuture<Void, TransactionCommitFailedException> future = writeTransaction.submit();
+            Futures.addCallback(future, new FutureCallback<Void>() {
 
-            while (!submitSucceeded) {
-
-                final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-                final InstanceIdentifier<NetworkTopology> networkTopologyId =
-                        InstanceIdentifier.builder(NetworkTopology.class).build();
-                final InstanceIdentifier<NetconfNode> niid = networkTopologyId.child(Topology.class,
-                        new TopologyKey(new TopologyId(topologyId))).child(Node.class,
-                        new NodeKey(nodeId)).augmentation(NetconfNode.class);
-                writeTransaction.merge(LogicalDatastoreType.CONFIGURATION,
-                        niid, nnb.build());
-                final CheckedFuture<Void, TransactionCommitFailedException> submit = writeTransaction.submit();
-                try {
-                    submit.checkedGet();
-                    submitSucceeded = true;
-                } catch (Exception e) {
-                    LOG.debug("Couldn't encrypt the password, trying again", e);
+                @Override
+                public void onSuccess(Void result) {
+                    LOG.info("Encrypted netconf username/password successfully");
                 }
-            }
 
+                @Override
+                public void onFailure(Throwable exception) {
+                    LOG.error("Unable to encrypt netconf username/password." + exception.getMessage());
+                }
+            });
         }
     }
 
