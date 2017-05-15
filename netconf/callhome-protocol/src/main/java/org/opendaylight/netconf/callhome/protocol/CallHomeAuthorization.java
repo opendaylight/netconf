@@ -43,9 +43,11 @@ public abstract class CallHomeAuthorization {
     /**
      * Returns CallHomeAuthorization object with intent to
      * reject incoming connection.
+     *
      * <p>
      * {@link CallHomeAuthorizationProvider} may use returned object
-     * as return value for {@link CallHomeAuthorizationProvider#provideAuth(java.net.SocketAddress, java.security.PublicKey)}
+     * as return value for
+     * {@link CallHomeAuthorizationProvider#provideAuth(java.net.SocketAddress, java.security.PublicKey)}
      * if the incoming session should be rejected due to policy implemented
      * by provider.
      *
@@ -58,6 +60,7 @@ public abstract class CallHomeAuthorization {
     /**
      * Creates a builder for CallHomeAuthorization with intent
      * to accept incoming connection and to provide credentials.
+     *
      * <p>
      * Note: If session with same sessionName is already opened and
      * active, incoming session will be rejected.
@@ -78,7 +81,7 @@ public abstract class CallHomeAuthorization {
     public abstract boolean isServerAllowed();
 
     /**
-     * Applies provided authentification to Mina SSH Client Session
+     * Applies provided authentification to Mina SSH Client Session.
      *
      * @param session Client Session to which authorization parameters will by applied
      */
@@ -88,6 +91,7 @@ public abstract class CallHomeAuthorization {
 
     /**
      * Builder for CallHomeAuthorization which accepts incoming connection.
+     *
      * <p>
      * Use {@link CallHomeAuthorization#serverAccepted(String, String)} to instantiate
      * builder.
@@ -140,7 +144,8 @@ public abstract class CallHomeAuthorization {
         private final Set<String> passwords;
         private final Set<KeyPair> clientKeyPair;
 
-        ServerAllowed(String nodeId, String username, Collection<String> passwords, Collection<KeyPair> clientKeyPairs) {
+        ServerAllowed(String nodeId, String username, Collection<String> passwords,
+                      Collection<KeyPair> clientKeyPairs) {
             this.username = Preconditions.checkNotNull(username);
             this.passwords = ImmutableSet.copyOf(passwords);
             this.clientKeyPair = ImmutableSet.copyOf(clientKeyPairs);
