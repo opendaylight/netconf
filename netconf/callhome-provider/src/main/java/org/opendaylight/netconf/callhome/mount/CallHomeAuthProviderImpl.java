@@ -89,10 +89,11 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
                 statusReporter.asForceListedDevice(syntheticId, serverKey);
             } else {
                 Device opDevice = deviceOp.get(serverKey);
-                if (opDevice == null)
+                if (opDevice == null) {
                     statusReporter.asUnlistedDevice(syntheticId, serverKey);
-                else
+                } else {
                     LOG.info("Repeating rejection of unlisted device with id of {}", opDevice.getUniqueId());
+                }
                 return CallHomeAuthorization.rejected();
             }
         }
