@@ -45,6 +45,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
 
     private static final BasicCapability VALIDATE_CAPABILITY_1_0 = new BasicCapability("urn:ietf:params:netconf:capability:validate:1.0");
     private static final BasicCapability VALIDATE_CAPABILITY_1_1 = new BasicCapability("urn:ietf:params:netconf:capability:validate:1.1");
+    private static final BasicCapability WRITEABLE_RUNNING_CAPABILITY_1_0 = new BasicCapability("urn:ietf:params:netconf:capability:writable-running:1.0");
 
     private ConsumerSession session = null;
     private DOMDataBroker dataBroker = null;
@@ -99,6 +100,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
         Set<Capability> capabilities = new HashSet<>();
         capabilities.add(VALIDATE_CAPABILITY_1_0);
         capabilities.add(VALIDATE_CAPABILITY_1_1);
+        capabilities.add(WRITEABLE_RUNNING_CAPABILITY_1_0);
         return capabilities;
     }
 
