@@ -36,19 +36,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ScaleUtil {
-    private static Logger RESULTS_LOG ;
-    private static final ScheduledExecutorService executor = new LoggingWrapperExecutor(4);
+    private static Logger RESULTS_LOG;
 
-    private static final int deviceStep = 1000;
-    private static final long retryDelay = 10l;
-    private static final long timeout = 20l;
+    private static final ScheduledExecutorService EXECUTOR = new LoggingWrapperExecutor(4);
+    private static final int DEVICE_STEP = 1000;
+    private static final long RETRY_DELAY = 10L;
+    private static final long TIMEOUT = 20L;
 
-    private static final Stopwatch stopwatch = Stopwatch.createUnstarted();
+    private static final Stopwatch STOPWATCH = Stopwatch.createUnstarted();
 
     private static ScheduledFuture timeoutGuardFuture;
     private static ch.qos.logback.classic.Logger root;
-    private static final Semaphore semaphore = new Semaphore(0);
+    private static final Semaphore SEMAPHORE = new Semaphore(0);
 
+    @SuppressWarnings("checkstyle:illegalCatch")
     public static void main(final String[] args) {
         final TesttoolParameters params = TesttoolParameters.parseArgs(args, TesttoolParameters.getParser());
 
@@ -60,7 +61,7 @@ public class ScaleUtil {
 
         while (true) {
             root.warn("Starting scale test with {} devices", params.deviceCount);
-            timeoutGuardFuture = executor.schedule(new TimeoutGuard(), timeout, TimeUnit.MINUTES);
+            timeoutGuardFuture = EXECUTOR.schedule(new TimeoutGuard(), TIMEOUT, TimeUnit.MINUTES);
             final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator(params.threadAmount);
             try {
                 final List<Integer> openDevices = netconfDeviceSimulator.start(params);
@@ -69,7 +70,8 @@ public class ScaleUtil {
                     System.exit(1);
                 }
                 if (params.distroFolder != null) {
-                    final Main.ConfigGenerator configGenerator = new Main.ConfigGenerator(params.distroFolder, openDevices);
+                    final Main.ConfigGenerator configGenerator = new Main.ConfigGenerator(
+                        params.distroFolder, openDevices);
                     final List<File> generated = configGenerator.generate(
                             params.ssh, params.generateConfigBatchSize,
                             params.generateConfigsTimeout, params.generateConfigsAddress,
@@ -90,17 +92,21 @@ public class ScaleUtil {
                 do {
                     final Process exec = runtime.exec(params.distroFolder.getAbsolutePath() + "/bin/status");
                     try {
-                        Thread.sleep(2000l);
+                        Thread.sleep(2000L);
                     } catch (InterruptedException e) {
                         root.warn("Failed to sleep", e);
                     }
                     status = CharStreams.toString(new BufferedReader(new InputStreamReader(exec.getInputStream())));
                     root.warn("Current status: {}", status);
                 } while (!status.startsWith("Running ..."));
-                root.warn("Doing feature install {}", params.distroFolder.getAbsolutePath() + "/bin/client -u karaf feature:install odl-restconf-noauth odl-netconf-connector-all");
-                final Process featureInstall = runtime.exec(params.distroFolder.getAbsolutePath() + "/bin/client -u karaf feature:install odl-restconf-noauth odl-netconf-connector-all");
-                root.warn(CharStreams.toString(new BufferedReader(new InputStreamReader(featureInstall.getInputStream()))));
-                root.warn(CharStreams.toString(new BufferedReader(new InputStreamReader(featureInstall.getErrorStream()))));
+                root.warn("Doing feature install {}", params.distroFolder.getAbsolutePath()
+                    + "/bin/client -u karaf feature:install odl-restconf-noauth odl-netconf-connector-all");
+                final Process featureInstall = runtime.exec(params.distroFolder.getAbsolutePath()
+                    + "/bin/client -u karaf feature:install odl-restconf-noauth odl-netconf-connector-all");
+                root.warn(
+                    CharStreams.toString(new BufferedReader(new InputStreamReader(featureInstall.getInputStream()))));
+                root.warn(
+                    CharStreams.toString(new BufferedReader(new InputStreamReader(featureInstall.getErrorStream()))));
 
             } catch (IOException e) {
                 root.warn("Failed to start karaf", e);
@@ -108,21 +114,22 @@ public class ScaleUtil {
             }
 
             root.warn("Karaf started, starting stopwatch");
-            stopwatch.start();
+            STOPWATCH.start();
 
             try {
-                executor.schedule(new ScaleVerifyCallable(netconfDeviceSimulator, params.deviceCount), retryDelay, TimeUnit.SECONDS);
+                EXECUTOR.schedule(
+                    new ScaleVerifyCallable(netconfDeviceSimulator, params.deviceCount), RETRY_DELAY, TimeUnit.SECONDS);
                 root.warn("First callable scheduled");
-                semaphore.acquire();
+                SEMAPHORE.acquire();
                 root.warn("semaphore released");
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
 
             timeoutGuardFuture.cancel(false);
-            params.deviceCount += deviceStep;
+            params.deviceCount += DEVICE_STEP;
             netconfDeviceSimulator.close();
-            stopwatch.reset();
+            STOPWATCH.reset();
 
             cleanup(runtime, params);
         }
@@ -147,27 +154,27 @@ public class ScaleUtil {
         }
     }
 
-    private static void stopKaraf(final Runtime runtime, final TesttoolParameters params) throws IOException, InterruptedException {
+    private static void stopKaraf(final Runtime runtime, final TesttoolParameters params)
+            throws IOException, InterruptedException {
         root.info("Stopping karaf and sleeping for 10 sec..");
         String controllerPid = "";
         do {
-
             final Process pgrep = runtime.exec("pgrep -f org.apache.karaf.main.Main");
 
             controllerPid = CharStreams.toString(new BufferedReader(new InputStreamReader(pgrep.getInputStream())));
             root.warn(controllerPid);
             runtime.exec("kill -9 " + controllerPid);
 
-            Thread.sleep(10000l);
+            Thread.sleep(10000L);
         } while (!controllerPid.isEmpty());
         deleteFolder(new File(params.distroFolder.getAbsoluteFile() + "/data"));
     }
 
     private static void deleteFolder(File folder) {
         File[] files = folder.listFiles();
-        if(files!=null) { //some JVMs return null for empty dirs
-            for(File f: files) {
-                if(f.isDirectory()) {
+        if (files != null) { //some JVMs return null for empty dirs
+            for (File f : files) {
+                if (f.isDirectory()) {
                     deleteFolder(f);
                 } else {
                     f.delete();
@@ -206,7 +213,7 @@ public class ScaleUtil {
         private final int deviceCount;
         private final Request request;
 
-        public ScaleVerifyCallable(final NetconfDeviceSimulator simulator, final int deviceCount) {
+        ScaleVerifyCallable(final NetconfDeviceSimulator simulator, final int deviceCount) {
             LOG.info("New callable created");
             this.simulator = simulator;
             this.deviceCount = deviceCount;
@@ -224,7 +231,7 @@ public class ScaleUtil {
 
                 if (response.getStatusCode() != 200 && response.getStatusCode() != 204) {
                     LOG.warn("Request failed, status code: {}", response.getStatusCode() + response.getStatusText());
-                    executor.schedule(new ScaleVerifyCallable(simulator, deviceCount), retryDelay, TimeUnit.SECONDS);
+                    EXECUTOR.schedule(new ScaleVerifyCallable(simulator, deviceCount), RETRY_DELAY, TimeUnit.SECONDS);
                 } else {
                     final String body = response.getResponseBody();
                     final Matcher matcher = PATTERN.matcher(body);
@@ -232,18 +239,20 @@ public class ScaleUtil {
                     while (matcher.find()) {
                         count++;
                     }
-                    RESULTS_LOG.info("Currently connected devices : {} out of {}, time elapsed: {}", count, deviceCount + 1, stopwatch);
+                    RESULTS_LOG.info("Currently connected devices : {} out of {}, time elapsed: {}",
+                        count, deviceCount + 1, STOPWATCH);
                     if (count != deviceCount + 1) {
-                        executor.schedule(new ScaleVerifyCallable(simulator, deviceCount), retryDelay, TimeUnit.SECONDS);
+                        EXECUTOR.schedule(
+                            new ScaleVerifyCallable(simulator, deviceCount), RETRY_DELAY, TimeUnit.SECONDS);
                     } else {
-                        stopwatch.stop();
-                        RESULTS_LOG.info("All devices connected in {}", stopwatch);
-                        semaphore.release();
+                        STOPWATCH.stop();
+                        RESULTS_LOG.info("All devices connected in {}", STOPWATCH);
+                        SEMAPHORE.release();
                     }
                 }
             } catch (ConnectException | ExecutionException e) {
                 LOG.warn("Failed to connect to Restconf, is the controller running?", e);
-                executor.schedule(new ScaleVerifyCallable(simulator, deviceCount), retryDelay, TimeUnit.SECONDS);
+                EXECUTOR.schedule(new ScaleVerifyCallable(simulator, deviceCount), RETRY_DELAY, TimeUnit.SECONDS);
             }
             return null;
         }
@@ -253,13 +262,14 @@ public class ScaleUtil {
 
         @Override
         public Object call() throws Exception {
-            RESULTS_LOG.warn("Timeout for scale test reached after: {} ..aborting", stopwatch);
-            root.warn("Timeout for scale test reached after: {} ..aborting", stopwatch);
+            RESULTS_LOG.warn("Timeout for scale test reached after: {} ..aborting", STOPWATCH);
+            root.warn("Timeout for scale test reached after: {} ..aborting", STOPWATCH);
             System.exit(0);
             return null;
         }
     }
 
+    @SuppressWarnings("checkstyle:illegalCatch")
     public static class LoggingWrapperExecutor extends ScheduledThreadPoolExecutor {
 
         public LoggingWrapperExecutor(int corePoolSize) {
@@ -278,7 +288,7 @@ public class ScaleUtil {
         private class LogOnExceptionCallable implements Callable {
             private Callable theCallable;
 
-            public LogOnExceptionCallable(Callable theCallable) {
+            LogOnExceptionCallable(Callable theCallable) {
                 super();
                 this.theCallable = theCallable;
             }
