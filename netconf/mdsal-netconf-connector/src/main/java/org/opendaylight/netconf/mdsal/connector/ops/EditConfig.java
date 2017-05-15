@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.base.Optional;
+import com.google.common.util.concurrent.CheckedFuture;
 import java.util.List;
 import java.util.ListIterator;
 import org.opendaylight.controller.config.facade.xml.TestOption;
@@ -20,6 +21,8 @@ import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
@@ -56,26 +59,29 @@ public class EditConfig extends ValidateNetconfOperation {
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
         final MdsalNetconfParameter inputParameter = extractTargetParameter(operationElement);
-
-        if (inputParameter.getDatastore() == Datastore.running) {
-            throw new DocumentedException("edit-config on running datastore is not supported",
-                    ErrorType.protocol,
-                    ErrorTag.operation_not_supported,
-                    ErrorSeverity.error);
-        }
-
         final ModifyAction defaultAction = getDefaultOperation(operationElement);
         final TestOption testOption = extractTestOption(operationElement);
         final XmlElement configElement = getElement(operationElement, CONFIG_KEY);
+        DOMDataReadWriteTransaction rwTx = createReadWriteTransaction(inputParameter.getDatastore());
 
         for (final XmlElement element : configElement.getChildElements()) {
             final DataTreeChangeTracker changeTracker = createDataTreeChecker(defaultAction, element);
             if (testOption != TestOption.testOnly) {
-                executeOperations(changeTracker);
+                executeOperations(changeTracker, rwTx);
             }
         }
 
+        if (inputParameter.getDatastore() == Datastore.running && testOption != TestOption.testOnly) {
+            boolean commitStatus = transactionProvider.commitRunningTransaction(rwTx);
+            LOG.trace("Commit completed successfully {}", commitStatus);
+            rwTx = null;
+        }
+
         return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
+    }
+
+    private DOMDataReadWriteTransaction createReadWriteTransaction(Datastore datastore) {
+        return Datastore.candidate == datastore ? transactionProvider.getOrCreateTransaction() : transactionProvider.createRunningTransaction();
     }
 
     /**
@@ -93,8 +99,7 @@ public class EditConfig extends ValidateNetconfOperation {
         return TestOption.getDefault();
     }
 
-    private void executeOperations(final DataTreeChangeTracker changeTracker) throws DocumentedException {
-        final DOMDataReadWriteTransaction rwTx = transactionProvider.getOrCreateTransaction();
+    private void executeOperations(final DataTreeChangeTracker changeTracker, DOMDataReadWriteTransaction rwTx) throws DocumentedException {
         final List<DataTreeChange> aa = changeTracker.getDataTreeChanges();
         final ListIterator<DataTreeChange> iterator = aa.listIterator(aa.size());
 
