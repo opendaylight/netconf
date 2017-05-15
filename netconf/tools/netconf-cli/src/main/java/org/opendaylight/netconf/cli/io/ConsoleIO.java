@@ -10,7 +10,7 @@ package org.opendaylight.netconf.cli.io;
 import java.io.IOException;
 
 /**
- * Definition of IO interface
+ * Definition of IO interface.
  */
 public interface ConsoleIO {
 

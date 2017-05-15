@@ -80,38 +80,42 @@ public class CommandDispatcher {
     public synchronized Optional<Command> getCommand(final String nameWithModule) {
         final QName commandQName = mergeCommandIds().get(nameWithModule);
         final Map<QName, Command> qNameCommandMap = mergeCommands();
-        if(commandQName == null || qNameCommandMap.containsKey(commandQName) == false) {
+        if (commandQName == null || qNameCommandMap.containsKey(commandQName) == false) {
             return Optional.absent();
         }
 
         return Optional.of(qNameCommandMap.get(commandQName));
     }
 
-    public synchronized Optional<Command> getCommand(final QName qName) {
-        return Optional.fromNullable(mergeCommands().get(qName));
+    public synchronized Optional<Command> getCommand(final QName qualifiedName) {
+        return Optional.fromNullable(mergeCommands().get(qualifiedName));
     }
 
-    private static Optional<Command> getCommand(final Map<String, QName> commandNameMap, final Map<QName, Command> commands, final String nameWithModule) {
+    private static Optional<Command> getCommand(final Map<String, QName> commandNameMap,
+                                                final Map<QName, Command> commands, final String nameWithModule) {
         final QName qName = commandNameMap.get(nameWithModule);
-        if(qName == null)
+        if (qName == null) {
             return Optional.absent();
-
+        }
         final Command command = commands.get(qName);
-        if(command == null) {
+        if (command == null) {
             return Optional.absent();
         }
 
         return Optional.of(command);
     }
 
-    public static final Collection<String> BASE_NETCONF_SCHEMA_PATHS = Lists.newArrayList("/schema/remote/ietf-netconf.yang",
-            "/schema/common/netconf-cli-ext.yang", "/schema/common/ietf-inet-types.yang");
+    public static final Collection<String> BASE_NETCONF_SCHEMA_PATHS = Lists.newArrayList(
+        "/schema/remote/ietf-netconf.yang",
+        "/schema/common/netconf-cli-ext.yang",
+        "/schema/common/ietf-inet-types.yang");
 
     public synchronized void addRemoteCommands(final DOMRpcService rpcService, final SchemaContext remoteSchema) {
         this.addRemoteCommands(rpcService, remoteSchema, parseSchema(BASE_NETCONF_SCHEMA_PATHS));
     }
 
-    public synchronized void addRemoteCommands(final DOMRpcService rpcService, final SchemaContext remoteSchema, final SchemaContext baseNetconfSchema) {
+    public synchronized void addRemoteCommands(final DOMRpcService rpcService, final SchemaContext remoteSchema,
+                                               final SchemaContext baseNetconfSchema) {
         for (final SchemaContext context : Lists.newArrayList(remoteSchema, baseNetconfSchema)) {
             for (final Module module : context.getModules()) {
                 for (final RpcDefinition rpcDefinition : module.getRpcs()) {
@@ -128,10 +132,13 @@ public class CommandDispatcher {
         nameToQNameRemote.clear();
     }
 
-    public static final Collection<String> LOCAL_SCHEMA_PATHS = Lists.newArrayList("/schema/local/netconf-cli.yang", "/schema/common/netconf-cli-ext.yang",
-            "/schema/common/ietf-inet-types.yang");
+    public static final Collection<String> LOCAL_SCHEMA_PATHS = Lists.newArrayList(
+        "/schema/local/netconf-cli.yang",
+        "/schema/common/netconf-cli-ext.yang",
+        "/schema/common/ietf-inet-types.yang");
 
-    public synchronized void addLocalCommands(final NetconfDeviceConnectionManager connectionManager, final SchemaContext localSchema, final Integer connectionTimeout) {
+    public synchronized void addLocalCommands(final NetconfDeviceConnectionManager connectionManager,
+                                              final SchemaContext localSchema, final Integer connectionTimeout) {
         for (final Module module : localSchema.getModules()) {
             for (final RpcDefinition rpcDefinition : module.getRpcs()) {
 
@@ -149,7 +156,8 @@ public class CommandDispatcher {
                 } else if (rpcDefinition.getQName().equals(CommandConstants.DISCONNECT_QNAME)) {
                     localCommand = Disconnect.create(rpcDefinition, connectionManager);
                 } else {
-                    throw new IllegalStateException("No command implementation available for local command: " + rpcDefinition.getQName());
+                    throw new IllegalStateException(
+                        "No command implementation available for local command: " + rpcDefinition.getQName());
                 }
 
                 localCommands.put(localCommand.getCommandId(), localCommand);
@@ -179,7 +187,8 @@ public class CommandDispatcher {
                 new Function<String, InputStream>() {
                     @Override
                     public InputStream apply(final String input) {
-                        final InputStream resourceAsStream = NetconfDeviceConnectionHandler.class.getResourceAsStream(input);
+                        final InputStream resourceAsStream = NetconfDeviceConnectionHandler.class
+                            .getResourceAsStream(input);
                         Preconditions.checkNotNull(resourceAsStream, "File %s was null", input);
                         return resourceAsStream;
                     }

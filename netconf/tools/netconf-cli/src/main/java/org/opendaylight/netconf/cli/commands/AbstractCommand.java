@@ -19,14 +19,14 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 
 public abstract class AbstractCommand implements Command {
 
-    private final QName qName;
+    private final QName qualifiedName;
     private final InputDefinition args;
     private final OutputDefinition output;
     private final String description;
 
-    public AbstractCommand(final QName qName, final InputDefinition args, final OutputDefinition output,
+    public AbstractCommand(final QName qualifiedName, final InputDefinition args, final OutputDefinition output,
             final String description) {
-        this.qName = qName;
+        this.qualifiedName = qualifiedName;
         this.args = args;
         this.output = output;
         this.description = description;
@@ -35,6 +35,11 @@ public abstract class AbstractCommand implements Command {
     protected static OutputDefinition getOutputDefinition(final RpcDefinition rpcDefinition) {
         final ContainerSchemaNode output = rpcDefinition.getOutput();
         return output != null ? OutputDefinition.fromOutput(output) : OutputDefinition.empty();
+    }
+
+    @Override
+    public OutputDefinition getOutputDefinition() {
+        return output;
     }
 
     protected static InputDefinition getInputDefinition(final RpcDefinition rpcDefinition) {
@@ -48,13 +53,8 @@ public abstract class AbstractCommand implements Command {
     }
 
     @Override
-    public OutputDefinition getOutputDefinition() {
-        return output;
-    }
-
-    @Override
     public QName getCommandId() {
-        return qName;
+        return qualifiedName;
     }
 
     @Override
@@ -68,7 +68,7 @@ public abstract class AbstractCommand implements Command {
 
             @Override
             public Optional<String> getPrompt() {
-                return Optional.of(qName.getLocalName());
+                return Optional.of(qualifiedName.getLocalName());
             }
         };
     }

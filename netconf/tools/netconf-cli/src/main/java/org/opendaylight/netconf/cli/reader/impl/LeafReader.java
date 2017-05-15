@@ -39,7 +39,7 @@ public class LeafReader extends BasicDataHolderReader<LeafSchemaNode> {
         return new BaseConsoleContext<LeafSchemaNode>(schemaNode) {
             @Override
             public List<Completer> getAdditionalCompleters() {
-                final List<Completer> completers = Lists.<Completer> newArrayList(getBaseCompleter(schemaNode));
+                final List<Completer> completers = Lists.newArrayList(getBaseCompleter(schemaNode));
                 final Optional<String> defaultValue = getDefaultValue(schemaNode);
                 if (defaultValue.isPresent()) {
                     completers.add(new StringsCompleter(defaultValue.get()));

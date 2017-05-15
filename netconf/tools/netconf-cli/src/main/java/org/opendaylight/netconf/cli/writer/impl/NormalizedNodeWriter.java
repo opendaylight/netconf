@@ -31,8 +31,8 @@ public class NormalizedNodeWriter extends AbstractWriter<DataSchemaNode> {
         this.out = out;
     }
 
-    public void writeInner(final DataSchemaNode dataSchemaNode, final List<NormalizedNode<?, ?>> dataNodes) throws WriteException,
-            IOException {
+    public void writeInner(final DataSchemaNode dataSchemaNode, final List<NormalizedNode<?, ?>> dataNodes)
+            throws WriteException, IOException {
         //Preconditions.checkState(dataNodes.size() == 1);
         // TODO - add getDispatcher method to CnSnToNormalizedNodeParserFactory
         // to be able call dispatchChildElement
@@ -46,10 +46,11 @@ public class NormalizedNodeWriter extends AbstractWriter<DataSchemaNode> {
 
     private String serializeToCliOutput(final NormalizedNode<?, ?> dataContainerChild,
             final DataSchemaNode childSchema) {
-        final CliOutputFromNormalizedNodeSerializerFactory factorySerialization = CliOutputFromNormalizedNodeSerializerFactory
-                .getInstance(out, DomUtils.defaultValueCodecProvider());
+        final CliOutputFromNormalizedNodeSerializerFactory factorySerialization =
+            CliOutputFromNormalizedNodeSerializerFactory.getInstance(out, DomUtils.defaultValueCodecProvider());
         final NodeSerializerDispatcher<String> dispatcher = factorySerialization.getDispatcher();
-        final Iterable<String> result = dispatcher.dispatchChildElement(childSchema, (DataContainerChild<?, ?>) dataContainerChild);
+        final Iterable<String> result = dispatcher.dispatchChildElement(childSchema,
+            (DataContainerChild<?, ?>) dataContainerChild);
 
         if (result == null) {
             return "";

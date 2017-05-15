@@ -37,7 +37,7 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.UnknownSchemaNode;
 
 /**
- * The top level cli state that dispatches command executions
+ * The top level cli state that dispatches command executions.
  */
 public class Cli implements Runnable {
     private final CommandDispatcher commandRegistry;
@@ -46,7 +46,8 @@ public class Cli implements Runnable {
     private final ConsoleIO consoleIO;
 
     public Cli(final ConsoleIO consoleIO, final CommandDispatcher commandRegistry,
-            final CommandArgHandlerRegistry argumentHandlerRegistry, final SchemaContextRegistry schemaContextRegistry) {
+           final CommandArgHandlerRegistry argumentHandlerRegistry,
+           final SchemaContextRegistry schemaContextRegistry) {
         this.consoleIO = consoleIO;
         this.commandRegistry = commandRegistry;
         this.argumentHandlerRegistry = argumentHandlerRegistry;
@@ -111,7 +112,8 @@ public class Cli implements Runnable {
 
                 // FIXME move custom writer to GenericWriter/Serializers ...
                 // this checks only first level
-                final Optional<Class<? extends Writer<DataSchemaNode>>> customReaderClassOpt = tryGetCustomHandler(schemaNode);
+                final Optional<Class<? extends Writer<DataSchemaNode>>> customReaderClassOpt = tryGetCustomHandler(
+                    schemaNode);
 
                 if (customReaderClassOpt.isPresent()) {
                     final Writer<DataSchemaNode> customReaderInstance = argumentHandlerRegistry
@@ -164,7 +166,7 @@ public class Cli implements Runnable {
                 try {
                     final Class<?> argumentClass = Class.forName(argumentHandlerClassName);
                     // TODO add check before cast
-                    return Optional.<Class<? extends T>> of((Class<? extends T>) argumentClass);
+                    return Optional.of((Class<? extends T>) argumentClass);
                 } catch (final ClassNotFoundException e) {
                     throw new IllegalArgumentException("Unknown custom reader class " + argumentHandlerClassName
                             + " for: " + dataSchemaNode.getQName());
@@ -184,7 +186,7 @@ public class Cli implements Runnable {
 
         private final Completer completer;
 
-        public RootConsoleContext(final CommandDispatcher commandRegistry) {
+        RootConsoleContext(final CommandDispatcher commandRegistry) {
             completer = new CommandCompleter(commandRegistry);
         }
 
@@ -202,7 +204,7 @@ public class Cli implements Runnable {
 
             private final CommandDispatcher commandRegistry;
 
-            public CommandCompleter(final CommandDispatcher commandRegistry) {
+            CommandCompleter(final CommandDispatcher commandRegistry) {
                 this.commandRegistry = commandRegistry;
             }
 

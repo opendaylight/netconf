@@ -16,7 +16,7 @@ final class LeafSetEntryNodeCliSerializer extends LeafSetEntryNodeBaseSerializer
 
     private final OutFormatter out;
 
-    public LeafSetEntryNodeCliSerializer(final OutFormatter out) {
+    LeafSetEntryNodeCliSerializer(final OutFormatter out) {
         this.out = out;
     }
 

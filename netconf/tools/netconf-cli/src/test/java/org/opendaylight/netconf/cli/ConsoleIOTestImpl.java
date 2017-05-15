@@ -20,8 +20,8 @@ public class ConsoleIOTestImpl extends ConsoleIOImpl {
     String lastMessage;
     private final List<ValueForMessage> valuesForMessages;
 
-    public ConsoleIOTestImpl(final Map<String, Deque<String>> inputValues, final List<ValueForMessage> valuesForMessages)
-            throws IOException {
+    public ConsoleIOTestImpl(final Map<String, Deque<String>> inputValues,
+                             final List<ValueForMessage> valuesForMessages) throws IOException {
         super();
         this.inputValues = inputValues;
         this.valuesForMessages = valuesForMessages;

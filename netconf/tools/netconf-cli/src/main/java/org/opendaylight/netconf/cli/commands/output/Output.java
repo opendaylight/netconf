@@ -18,7 +18,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 
 /**
- * Output values for and rpc/command execution
+ * Output values for and rpc/command execution.
  */
 public class Output {
 
@@ -39,8 +39,8 @@ public class Output {
         final Map<DataSchemaNode, List<NormalizedNode<?, ?>>> mappedNodesToSchema = Maps.newHashMap();
 
         final DataSchemaNode schemaNode = mappedSchemaNodes.get(output.getNodeType().withoutRevision());
-        final List<NormalizedNode<?, ?>> list = mappedNodesToSchema.get(schemaNode) == null ? Lists.<NormalizedNode<?, ?>>newArrayList()
-                : mappedNodesToSchema.get(schemaNode);
+        final List<NormalizedNode<?, ?>> list = mappedNodesToSchema.get(schemaNode) == null
+            ? Lists.newArrayList() : mappedNodesToSchema.get(schemaNode);
         list.add(output);
         mappedNodesToSchema.put(schemaNode, list);
 

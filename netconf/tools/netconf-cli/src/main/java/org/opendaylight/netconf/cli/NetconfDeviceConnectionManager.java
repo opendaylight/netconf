@@ -35,7 +35,7 @@ import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 import org.opendaylight.yangtools.yang.parser.util.TextToASTTransformer;
 
 /**
- * Manages connect/disconnect to 1 remote device
+ * Manages connect/disconnect to 1 remote device.
  */
 public class NetconfDeviceConnectionManager implements Closeable {
 
@@ -70,7 +70,8 @@ public class NetconfDeviceConnectionManager implements Closeable {
 
     // TODO we receive configBuilder in order to add SessionListener, Session
     // Listener should not be part of config
-    public synchronized void connect(final String name, final InetSocketAddress address, final NetconfClientConfigurationBuilder configBuilder) {
+    public synchronized void connect(final String name, final InetSocketAddress address,
+                                     final NetconfClientConfigurationBuilder configBuilder) {
         // TODO change IllegalState exceptions to custom ConnectionException
         Preconditions.checkState(listener == null, "Already connected");
 
@@ -80,11 +81,14 @@ public class NetconfDeviceConnectionManager implements Closeable {
                 console, name);
 
         final SharedSchemaRepository repository = new SharedSchemaRepository("repo");
-        final SchemaContextFactory schemaContextFactory = repository.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
-        final FilesystemSchemaSourceCache<YangTextSchemaSource> cache = new FilesystemSchemaSourceCache<>(repository, YangTextSchemaSource.class, new File(CACHE));
+        final SchemaContextFactory schemaContextFactory = repository
+            .createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
+        final FilesystemSchemaSourceCache<YangTextSchemaSource> cache = new FilesystemSchemaSourceCache<>(
+            repository, YangTextSchemaSource.class, new File(CACHE));
         repository.registerSchemaSourceListener(cache);
         repository.registerSchemaSourceListener(TextToASTTransformer.create(repository, repository));
-        final SchemaResourcesDTO schemaResourcesDTO = new SchemaResourcesDTO(repository, repository, schemaContextFactory, new NetconfStateSchemasResolverImpl());
+        final SchemaResourcesDTO schemaResourcesDTO = new SchemaResourcesDTO(
+            repository, repository, schemaContextFactory, new NetconfStateSchemasResolverImpl());
 
         device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
@@ -100,9 +104,10 @@ public class NetconfDeviceConnectionManager implements Closeable {
     }
 
     /**
-     * Blocks thread until connection is fully established
+     * Blocks thread until connection is fully established.
      */
-    public synchronized Set<String> connectBlocking(final String name, final InetSocketAddress address, final NetconfClientConfigurationBuilder configBuilder) {
+    public synchronized Set<String> connectBlocking(final String name, final InetSocketAddress address,
+                                                    final NetconfClientConfigurationBuilder configBuilder) {
         this.connect(name, address, configBuilder);
         synchronized (handler) {
             while (handler.isUp() == false) {

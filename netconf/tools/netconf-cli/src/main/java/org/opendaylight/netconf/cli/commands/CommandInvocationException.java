@@ -11,8 +11,8 @@ import org.opendaylight.yangtools.yang.common.QName;
 
 public class CommandInvocationException extends Exception {
 
-    public CommandInvocationException(final QName qName, final Throwable cause) {
-        this("Command " + qName + " invocation failed: " + cause.getMessage(), cause);
+    public CommandInvocationException(final QName qualifiedName, final Throwable cause) {
+        this("Command " + qualifiedName + " invocation failed: " + cause.getMessage(), cause);
     }
 
     protected CommandInvocationException(final String message, final Throwable cause) {
@@ -21,8 +21,8 @@ public class CommandInvocationException extends Exception {
 
     public static class CommandTimeoutException extends CommandInvocationException {
 
-        public CommandTimeoutException(final QName qName, final Throwable e) {
-            super("Command " + qName + " timed out: " + e.getMessage(), e);
+        public CommandTimeoutException(final QName qualifiedName, final Throwable throwable) {
+            super("Command " + qualifiedName + " timed out: " + throwable.getMessage(), throwable);
         }
     }
 }

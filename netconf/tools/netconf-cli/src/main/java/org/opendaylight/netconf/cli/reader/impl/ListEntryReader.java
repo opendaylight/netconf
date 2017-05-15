@@ -44,20 +44,21 @@ class ListEntryReader extends AbstractReader<ListSchemaNode> implements GenericL
 
     private final CommandArgHandlerRegistry argumentHandlerRegistry;
 
-    public ListEntryReader(final ConsoleIO console, final CommandArgHandlerRegistry argumentHandlerRegistry,
+    ListEntryReader(final ConsoleIO console, final CommandArgHandlerRegistry argumentHandlerRegistry,
             final SchemaContext schemaContext) {
         super(console, schemaContext);
         this.argumentHandlerRegistry = argumentHandlerRegistry;
     }
 
-    public ListEntryReader(final ConsoleIO console, final CommandArgHandlerRegistry argumentHandlerRegistry,
-            final SchemaContext schemaContext, final boolean readConfigNode) {
+    ListEntryReader(final ConsoleIO console, final CommandArgHandlerRegistry argumentHandlerRegistry,
+                    final SchemaContext schemaContext, final boolean readConfigNode) {
         super(console, schemaContext, readConfigNode);
         this.argumentHandlerRegistry = argumentHandlerRegistry;
     }
 
     @Override
-    public List<NormalizedNode<?, ?>> readWithContext(final ListSchemaNode listNode) throws IOException, ReadingException {
+    public List<NormalizedNode<?, ?>> readWithContext(final ListSchemaNode listNode)
+            throws IOException, ReadingException {
         console.formatLn("Submit child nodes for list entry: %s, %s", listNode.getQName().getLocalName(),
                 Collections2.transform(listNode.getChildNodes(), new Function<DataSchemaNode, String>() {
                     @Override
@@ -123,8 +124,8 @@ class ListEntryReader extends AbstractReader<ListSchemaNode> implements GenericL
         return newNodes;
     }
 
-    private List<NormalizedNode<?, ?>> readMandatoryNotKeys(final Set<DataSchemaNode> mandatoryNotKeys) throws ReadingException,
-            IOException {
+    private List<NormalizedNode<?, ?>> readMandatoryNotKeys(final Set<DataSchemaNode> mandatoryNotKeys)
+            throws ReadingException, IOException {
         final List<NormalizedNode<?, ?>> newNodes = new ArrayList<>();
         console.writeLn("Reading mandatory not keys nodes:");
 

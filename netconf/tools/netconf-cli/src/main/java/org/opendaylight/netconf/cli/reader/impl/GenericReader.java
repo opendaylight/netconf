@@ -49,7 +49,8 @@ public class GenericReader extends AbstractReader<DataSchemaNode> {
     }
 
     @Override
-    protected List<NormalizedNode<?, ?>> readWithContext(final DataSchemaNode schemaNode) throws IOException, ReadingException {
+    protected List<NormalizedNode<?, ?>> readWithContext(final DataSchemaNode schemaNode)
+            throws IOException, ReadingException {
         final Optional<Class<? extends Reader<DataSchemaNode>>> customReaderClassOpt = tryGetCustomHandler(schemaNode);
 
         if (customReaderClassOpt.isPresent()) {
@@ -65,7 +66,8 @@ public class GenericReader extends AbstractReader<DataSchemaNode> {
         // TODO reuse instances
     }
 
-    private List<NormalizedNode<?, ?>> readGeneric(final DataSchemaNode schemaNode) throws ReadingException, IOException {
+    private List<NormalizedNode<?, ?>> readGeneric(final DataSchemaNode schemaNode)
+            throws ReadingException, IOException {
         final List<NormalizedNode<?, ?>> newNodes = new ArrayList<>();
         boolean isRedCorrectly = false;
         do {
@@ -116,7 +118,7 @@ public class GenericReader extends AbstractReader<DataSchemaNode> {
                 try {
                     final Class<?> argumentClass = Class.forName(argumentHandlerClassName);
                     // TODO add check before cast
-                    return Optional.<Class<? extends T>> of((Class<? extends T>) argumentClass);
+                    return Optional.of((Class<? extends T>) argumentClass);
                 } catch (final ClassNotFoundException e) {
                     throw new IllegalArgumentException("Unknown custom reader class " + argumentHandlerClassName
                             + " for: " + dataSchemaNode.getQName());

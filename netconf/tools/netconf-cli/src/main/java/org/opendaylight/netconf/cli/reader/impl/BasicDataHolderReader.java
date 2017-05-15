@@ -58,7 +58,8 @@ public abstract class BasicDataHolderReader<T extends DataSchemaNode> extends Ab
     @Override
     public List<NormalizedNode<?, ?>> readWithContext(final T schemaNode) throws IOException, ReadingException {
         TypeDefinition<?> type = getType(schemaNode);
-        console.formatLn("Submit %s %s(%s)", listType(schemaNode), schemaNode.getQName().getLocalName(), type.getQName().getLocalName());
+        console.formatLn("Submit %s %s(%s)", listType(schemaNode), schemaNode.getQName().getLocalName(),
+            type.getQName().getLocalName());
 
         while (baseTypeFor(type) instanceof UnionTypeDefinition) {
             final Optional<TypeDefinition<?>> optionalTypeDef = new UnionTypeReader(console).read(type);
@@ -142,8 +143,7 @@ public abstract class BasicDataHolderReader<T extends DataSchemaNode> extends Ab
         return currentCompleter;
     }
 
-    private static interface DataHolderCompleter extends Completer {
-
+    private interface DataHolderCompleter extends Completer {
         Object resolveValue(String rawValue) throws ReadingException;
     }
 
@@ -152,7 +152,7 @@ public abstract class BasicDataHolderReader<T extends DataSchemaNode> extends Ab
         private final Optional<TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>>> codec;
         private final TypeDefinition<?> type;
 
-        public GeneralDataHolderCompleter(final TypeDefinition<?> type) {
+        GeneralDataHolderCompleter(final TypeDefinition<?> type) {
             this.type = type;
             codec = getCodecForType(type);
         }
@@ -164,18 +164,17 @@ public abstract class BasicDataHolderReader<T extends DataSchemaNode> extends Ab
         private static Optional<TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>>> getCodecForType(
                 final TypeDefinition<?> type) {
             if (type != null) {
-                return Optional
-                        .<TypeDefinitionAwareCodec<Object, ? extends TypeDefinition<?>>> fromNullable(TypeDefinitionAwareCodec
-                                .from(type));
+                return Optional.fromNullable(TypeDefinitionAwareCodec.from(type));
             }
             return Optional.absent();
         }
 
+        @SuppressWarnings("illegalCatch")
         @Override
         public Object resolveValue(final String rawValue) throws ReadingException {
             try {
                 return codec.isPresent() ? codec.get().deserialize(rawValue) : rawValue;
-            } catch (final RuntimeException e) {
+            } catch (final Exception e) {
                 final String message = "It wasn't possible deserialize value " + rawValue + ".";
                 LOG.error(message, e);
                 throw new ReadingException(message, e);
@@ -190,7 +189,7 @@ public abstract class BasicDataHolderReader<T extends DataSchemaNode> extends Ab
 
     private static final class EnumDataHolderCompleter extends GeneralDataHolderCompleter {
 
-        public EnumDataHolderCompleter(final TypeDefinition<?> type) {
+        EnumDataHolderCompleter(final TypeDefinition<?> type) {
             super(type);
         }
 
@@ -210,7 +209,7 @@ public abstract class BasicDataHolderReader<T extends DataSchemaNode> extends Ab
 
         private final BiMap<String, QName> identityMap;
 
-        public IdentityRefDataHolderCompleter(final TypeDefinition<?> type, final SchemaContext schemaContext) {
+        IdentityRefDataHolderCompleter(final TypeDefinition<?> type, final SchemaContext schemaContext) {
             super(type);
             this.identityMap = getIdentityMap(schemaContext);
         }
