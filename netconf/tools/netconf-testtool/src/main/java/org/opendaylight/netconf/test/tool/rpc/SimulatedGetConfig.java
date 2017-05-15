@@ -30,20 +30,20 @@ public class SimulatedGetConfig extends AbstractConfigNetconfOperation {
     private static final Logger LOG = LoggerFactory
             .getLogger(SimulatedGetConfig.class);
 
-    public SimulatedGetConfig(final String netconfSessionIdForReporting, final DataList storage, final Optional<File> initialConfigXMLFile) {
+    public SimulatedGetConfig(final String netconfSessionIdForReporting, final DataList storage,
+                              final Optional<File> initialConfigXMLFile) {
         super(null, netconfSessionIdForReporting);
 
-        if(initialConfigXMLFile.isPresent()) {
+        if (initialConfigXMLFile.isPresent()) {
             LOG.info("File is present: {}", initialConfigXMLFile.get()
                     .getName());
             this.storage = loadInitialConfigXMLFile(initialConfigXMLFile.get());
-        }
-        else {
+        } else {
             this.storage = storage;
         }
     }
 
-    private final DataList loadInitialConfigXMLFile( final File file ) {
+    private DataList loadInitialConfigXMLFile(final File file) {
         LOG.info("Loading initial config xml file: {}", file.getName());
         DataList configData = new DataList();
         List<XmlElement> xmlElementList = Collections.emptyList();
@@ -52,22 +52,21 @@ public class SimulatedGetConfig extends AbstractConfigNetconfOperation {
             XmlElement xmlElement = XmlElement.fromDomElement(element);
             xmlElementList = xmlElement.getChildElements();
             configData.setConfigList(xmlElementList);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             LOG.info("IO exception loading xml file: {} ", e.getMessage());
 
-        }
-        catch (SAXException e) {
+        } catch (SAXException e) {
             LOG.info("SAXException {}", e.getMessage());
         }
         return configData;
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
-        final Element element = XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.<String>absent());
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
+            throws DocumentedException {
+        final Element element = XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.absent());
 
-        for(final XmlElement e : storage.getConfigList()) {
+        for (final XmlElement e : storage.getConfigList()) {
             final Element domElement = e.getDomElement();
             element.appendChild(element.getOwnerDocument().importNode(domElement, true));
         }

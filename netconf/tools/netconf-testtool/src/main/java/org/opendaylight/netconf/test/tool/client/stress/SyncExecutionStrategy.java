@@ -25,7 +25,8 @@ import org.slf4j.LoggerFactory;
 class SyncExecutionStrategy extends AbstractExecutionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(SyncExecutionStrategy.class);
 
-    public SyncExecutionStrategy(final Parameters params, final List<NetconfMessage> preparedMessages, final NetconfDeviceCommunicator sessionListener) {
+    SyncExecutionStrategy(final Parameters params, final List<NetconfMessage> preparedMessages,
+                          final NetconfDeviceCommunicator sessionListener) {
         super(params, preparedMessages, sessionListener);
     }
 
@@ -38,7 +39,7 @@ class SyncExecutionStrategy extends AbstractExecutionStrategy {
                 final int msgId = i + (batchI * getParams().editBatchSize);
                 final NetconfMessage msg = getPreparedMessages().get(msgId);
                 LOG.debug("Sending message {}", msgId);
-                if(LOG.isDebugEnabled()) {
+                if (LOG.isDebugEnabled()) {
                     LOG.debug("Sending message {}", XmlUtil.toString(msg.getDocument()));
                 }
                 final ListenableFuture<RpcResult<NetconfMessage>> netconfMessageFuture =
@@ -57,11 +58,14 @@ class SyncExecutionStrategy extends AbstractExecutionStrategy {
             }
         }
 
-        Preconditions.checkState(responseCounter.get() == getEditAmount() + (getParams().candidateDatastore ? getEditBatches().size() : 0),
-                "Not all responses were received, only %s from %s", responseCounter.get(), getParams().editCount + getEditBatches().size());
+        Preconditions.checkState(
+            responseCounter.get() == getEditAmount() + (getParams().candidateDatastore ? getEditBatches().size() : 0),
+            "Not all responses were received, only %s from %s",
+            responseCounter.get(), getParams().editCount + getEditBatches().size());
     }
 
-    private void waitForResponse(AtomicInteger responseCounter, final ListenableFuture<RpcResult<NetconfMessage>> netconfMessageFuture) {
+    private void waitForResponse(final AtomicInteger responseCounter,
+                                 final ListenableFuture<RpcResult<NetconfMessage>> netconfMessageFuture) {
         try {
             final RpcResult<NetconfMessage> netconfMessageRpcResult =
                     netconfMessageFuture.get(getParams().msgTimeout, TimeUnit.SECONDS);

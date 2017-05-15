@@ -31,11 +31,12 @@ public class SimulatedEditConfig extends AbstractConfigNetconfOperation {
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
+            throws DocumentedException {
         final XmlElement configElementData = operationElement.getOnlyChildElement(XmlNetconfConstants.CONFIG_KEY);
 
         containsDelete(configElementData);
-        if(containsDelete(configElementData)){
+        if (containsDelete(configElementData)) {
             storage.resetConfigList();
         } else {
             storage.setConfigList(configElementData.getChildElements());
