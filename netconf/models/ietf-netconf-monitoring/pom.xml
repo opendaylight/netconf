@@ -32,4 +32,16 @@
       <artifactId>ietf-yang-types-20130715</artifactId>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <propertyExpansion>checkstyle.violationSeverity=error</propertyExpansion>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
