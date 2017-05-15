@@ -59,7 +59,8 @@ public class NetconfCallHomeServerTest {
         props.put("nio-workers", "1");
         Mockito.doReturn(props).when(mockSshClient).getProperties();
         Mockito.doReturn("test").when(mockSession).toString();
-        instance = new NetconfCallHomeServer(mockSshClient, mockCallHomeAuthProv, mockFactory, mockAddress, mockStatusRecorder);
+        instance = new NetconfCallHomeServer(
+            mockSshClient, mockCallHomeAuthProv, mockFactory, mockAddress, mockStatusRecorder);
     }
 
     @Test
@@ -165,7 +166,8 @@ public class NetconfCallHomeServerTest {
         Mockito.doReturn(mockAcceptor).when(mockMinaFactory).createAcceptor(any(IoHandler.class));
         Mockito.doReturn(mockAcceptor).when(mockMinaFactory).createAcceptor(any(IoHandler.class));
         Mockito.doNothing().when(mockAcceptor).bind(mockAddress);
-        instance = new TestableCallHomeServer(mockSshClient, mockCallHomeAuthProv, mockFactory, mockAddress, mockMinaFactory, mockStatusRecorder);
+        instance = new TestableCallHomeServer(
+            mockSshClient, mockCallHomeAuthProv, mockFactory, mockAddress, mockMinaFactory, mockStatusRecorder);
         // when
         instance.bind();
         // then

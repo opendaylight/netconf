@@ -24,7 +24,6 @@ import org.apache.sshd.ClientSession;
 import org.apache.sshd.client.session.ClientSessionImpl;
 import org.junit.Test;
 
-
 public class CallHomeAuthorizationTest {
     @Test
     public void anAuthorizationOfRejectedIsNotAllowed() {
