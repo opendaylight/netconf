@@ -24,7 +24,8 @@ public class SimulatedCommit extends AbstractConfigNetconfOperation {
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
+            throws DocumentedException {
         return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
     }
 

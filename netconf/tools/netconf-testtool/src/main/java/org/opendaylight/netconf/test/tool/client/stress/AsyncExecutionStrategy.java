@@ -26,7 +26,8 @@ import org.slf4j.LoggerFactory;
 class AsyncExecutionStrategy extends AbstractExecutionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(AsyncExecutionStrategy.class);
 
-    public AsyncExecutionStrategy(final Parameters params, final List<NetconfMessage> editConfigMsgs, final NetconfDeviceCommunicator sessionListener) {
+    AsyncExecutionStrategy(final Parameters params, final List<NetconfMessage> editConfigMsgs,
+                           final NetconfDeviceCommunicator sessionListener) {
         super(params, editConfigMsgs, sessionListener);
     }
 
@@ -41,7 +42,7 @@ class AsyncExecutionStrategy extends AbstractExecutionStrategy {
                 final int msgId = i + (batchI * getParams().editBatchSize);
                 final NetconfMessage msg = getPreparedMessages().get(msgId);
                 LOG.debug("Sending message {}", msgId);
-                if(LOG.isDebugEnabled()) {
+                if (LOG.isDebugEnabled()) {
                     LOG.debug("Sending message {}", XmlUtil.toString(msg.getDocument()));
                 }
                 final ListenableFuture<RpcResult<NetconfMessage>> netconfMessageFuture =
@@ -59,8 +60,9 @@ class AsyncExecutionStrategy extends AbstractExecutionStrategy {
         // Wait for every future
         for (final ListenableFuture<RpcResult<NetconfMessage>> future : futures) {
             try {
-                final RpcResult<NetconfMessage> netconfMessageRpcResult = future.get(getParams().msgTimeout, TimeUnit.SECONDS);
-                if(netconfMessageRpcResult.isSuccessful()) {
+                final RpcResult<NetconfMessage> netconfMessageRpcResult = future.get(
+                    getParams().msgTimeout, TimeUnit.SECONDS);
+                if (netconfMessageRpcResult.isSuccessful()) {
                     responseCounter.incrementAndGet();
                     LOG.debug("Received response {}", responseCounter.get());
                 } else {
@@ -73,7 +75,9 @@ class AsyncExecutionStrategy extends AbstractExecutionStrategy {
             }
         }
 
-        Preconditions.checkState(responseCounter.get() == getEditAmount() + (getParams().candidateDatastore ? getEditBatches().size() : 0),
-                "Not all responses were received, only %s from %s", responseCounter.get(), getParams().editCount + getEditBatches().size());
+        Preconditions.checkState(
+            responseCounter.get() == getEditAmount() + (getParams().candidateDatastore ? getEditBatches().size() : 0),
+            "Not all responses were received, only %s from %s",
+            responseCounter.get(), getParams().editCount + getEditBatches().size());
     }
 }
