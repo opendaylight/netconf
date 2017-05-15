@@ -20,7 +20,8 @@ abstract class AbstractExecutionStrategy implements ExecutionStrategy {
     private final List<Integer> editBatches;
     private final int editAmount;
 
-    public AbstractExecutionStrategy(final Parameters params, final List<NetconfMessage> editConfigMsgs, final NetconfDeviceCommunicator sessionListener) {
+    AbstractExecutionStrategy(final Parameters params, final List<NetconfMessage> editConfigMsgs,
+                              final NetconfDeviceCommunicator sessionListener) {
         editAmount = editConfigMsgs.size();
         this.params = params;
         this.preparedMessages = editConfigMsgs;

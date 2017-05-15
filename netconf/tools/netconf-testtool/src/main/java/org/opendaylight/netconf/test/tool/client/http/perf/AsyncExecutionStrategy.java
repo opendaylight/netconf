@@ -29,7 +29,8 @@ public class AsyncExecutionStrategy implements ExecutionStrategy {
     private final AsyncHttpClient asyncHttpClient;
     private final Semaphore semaphore;
 
-    AsyncExecutionStrategy(final Parameters params, final AsyncHttpClient asyncHttpClient, final ArrayList<Request> payloads) {
+    AsyncExecutionStrategy(final Parameters params, final AsyncHttpClient asyncHttpClient,
+                           final ArrayList<Request> payloads) {
         this.params = params;
         this.asyncHttpClient = asyncHttpClient;
         this.payloads = payloads;
