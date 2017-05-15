@@ -15,6 +15,7 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 public interface CallHomeNetconfSubsystemListener {
     /**
      * Invoked when Netconf Subsystem was successfully opened on incoming SSH Call Home connection.
+     *
      * <p>
      * Implementors of this method should use provided {@link CallHomeChannelActivator} to attach
      * {@link NetconfClientSessionListener} to session and to start NETCONF client session negotiation.
