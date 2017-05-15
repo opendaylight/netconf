@@ -45,8 +45,8 @@ class MinaSshNettyChannel extends AbstractServerChannel {
         this.context = Preconditions.checkNotNull(context);
         this.session = Preconditions.checkNotNull(session);
         this.sshChannel = Preconditions.checkNotNull(sshChannel);
-        this.sshReadHandler = new AsyncSshHandlerReader(new ConnectionClosedDuringRead(), new FireReadMessage(), "netconf",
-                sshChannel.getAsyncOut());
+        this.sshReadHandler = new AsyncSshHandlerReader(
+            new ConnectionClosedDuringRead(), new FireReadMessage(), "netconf", sshChannel.getAsyncOut());
         this.sshWriteAsyncHandler = new AsyncSshHandlerWriter(sshChannel.getAsyncIn());
         pipeline().addFirst(createChannelAdapter());
     }
@@ -163,7 +163,7 @@ class MinaSshNettyChannel extends AbstractServerChannel {
     private final class ConnectionClosedDuringRead implements AutoCloseable {
 
         /**
-         * Invoked when SSH session dropped during read using {@link AsyncSshHandlerReader}
+         * Invoked when SSH session dropped during read using {@link AsyncSshHandlerReader}.
          */
         @Override
         public void close() throws Exception {

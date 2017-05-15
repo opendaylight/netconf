@@ -25,6 +25,7 @@ public class AuthorizedKeysDecoderTest {
         instance = new AuthorizedKeysDecoder();
     }
 
+    @SuppressWarnings("checkstyle:lineLength")
     @Test
     public void authorizedKeysDecoderValidRSAKey() throws GeneralSecurityException {
         // given
@@ -35,6 +36,7 @@ public class AuthorizedKeysDecoderTest {
         assertEquals(serverKey.getAlgorithm(), "RSA");
     }
 
+    @SuppressWarnings("checkstyle:lineLength")
     @Test(expected = Exception.class)
     public void authorizedKeysDecoderInvalidRSAKey() throws GeneralSecurityException {
         // given
@@ -43,6 +45,7 @@ public class AuthorizedKeysDecoderTest {
         instance.decodePublicKey(rsaStr);
     }
 
+    @SuppressWarnings("checkstyle:lineLength")
     @Test
     public void authorizedKeysDecoderValidDSAKey() throws GeneralSecurityException {
         // given
@@ -53,6 +56,7 @@ public class AuthorizedKeysDecoderTest {
         assertEquals(serverKey.getAlgorithm(), "DSA");
     }
 
+    @SuppressWarnings("checkstyle:lineLength")
     @Test(expected = IllegalArgumentException.class)
     public void authorizedKeysDecoderInvalidDSAKey() throws GeneralSecurityException {
         // given
@@ -61,8 +65,9 @@ public class AuthorizedKeysDecoderTest {
         instance.decodePublicKey(dsaStr);
     }
 
+    @SuppressWarnings("checkstyle:lineLength")
     @Test
-    public void authorizedKeysDecoderValidECDSAKey() throws GeneralSecurityException {
+    public void authorizedKeysDecoderValidEcDSAKey() throws GeneralSecurityException {
         // given
         String ecdsaStr = "AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBAP4dTrlwZmz8bZ1f901qWuFk7YelrL2WJG0jrCEAPo9UNM1wywpqjbaYUfoq+cevhLZaukDQ4N2Evux+YQ2zz0=";
         // when
@@ -71,8 +76,9 @@ public class AuthorizedKeysDecoderTest {
         assertEquals(serverKey.getAlgorithm(), "EC");
     }
 
+    @SuppressWarnings("checkstyle:lineLength")
     @Test(expected = IllegalArgumentException.class)
-    public void authorizedKeysDecoderInvalidECDSAKey() throws GeneralSecurityException {
+    public void authorizedKeysDecoderInvalidEcDSAKey() throws GeneralSecurityException {
         // given
         String ecdsaStr = "AAAAE2VjZHNhLXNoItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBAP4dTrlwZmz8bZ1f901qWuFk7YelrL2WJG0jrCEAPo9UNM1wywpqjbaYUfoq+cevhLZaukDQ4N2Evux+YQ2zz0=";
         // when
