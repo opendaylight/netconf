@@ -28,18 +28,13 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang2sources.spi.BasicCodeGenerator;
 import org.opendaylight.yangtools.yang2sources.spi.MavenProjectAware;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class gathers all yang defined {@link Module}s and generates Swagger compliant documentation.
  */
 public class StaticDocGenerator extends ApiDocGenerator implements BasicCodeGenerator, MavenProjectAware {
-
     private static final String DEFAULT_OUTPUT_BASE_DIR_PATH = "target" + File.separator + "generated-resources"
         + File.separator + "swagger-api-documentation";
-
-    private static final Logger _logger = LoggerFactory.getLogger(ApiDocGenerator.class);
 
     private MavenProject mavenProject;
     private File projectBaseDir;
@@ -47,15 +42,17 @@ public class StaticDocGenerator extends ApiDocGenerator implements BasicCodeGene
     private File resourceBaseDir;
 
     /**
+     * Generate sources.
      *
-     * @param context
-     * @param outputDir
-     * @param yangModules
-     * @return
-     * @throws IOException
+     * @param context schema context
+     * @param outputDir output directory
+     * @param yangModules modules
+     * @return {@link Collection} of resource files
+     * @throws IOException when file operation fails
      */
     @Override
-    public Collection<File> generateSources(final SchemaContext context, final File outputDir, final Set<Module> yangModules) throws IOException {
+    public Collection<File> generateSources(final SchemaContext context, final File outputDir,
+            final Set<Module> yangModules) throws IOException {
         List<File> result = new ArrayList<>();
 
         // Create Base Directory
@@ -93,7 +90,8 @@ public class StaticDocGenerator extends ApiDocGenerator implements BasicCodeGene
             ApiDeclaration apiDeclaration = super.getApiDeclaration(name, revision, null, context, "");
             String json = mapper.writeValueAsString(apiDeclaration);
             // Manually insert models because org.json.JSONObject cannot be serialized by ObjectMapper
-            json = json.replace("\"models\":{}", "\"models\":" + apiDeclaration.getModels().toString().replace("\\\"", "\""));
+            json = json.replace(
+                "\"models\":{}", "\"models\":" + apiDeclaration.getModels().toString().replace("\\\"", "\""));
             // Escape single quotes and new lines
             json = json.replace("\'", "\\\'").replace("\\n", "\\\\n");
             bufferedWriter.write("\t\tcase \"" + name + "(" + revision + ")\": return \'" + json + "\';\n");
