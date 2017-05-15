@@ -71,9 +71,10 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
     private final SchemaContext schemaContext;
     private SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
 
-    public MdsalOperationProvider(final SessionIdProvider idProvider,
-                                  final Set<Capability> caps,
-                                  final SchemaContext schemaContext, final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
+    MdsalOperationProvider(final SessionIdProvider idProvider,
+                           final Set<Capability> caps,
+                           final SchemaContext schemaContext,
+                           final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
         this.caps = caps;
         this.schemaContext = schemaContext;
         this.sourceProvider = sourceProvider;
@@ -97,7 +98,8 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
 
     @Override
     public NetconfOperationService createService(String netconfSessionIdForReporting) {
-        return new MdsalOperationService(Long.parseLong(netconfSessionIdForReporting), schemaContext, caps, sourceProvider);
+        return new MdsalOperationService(Long.parseLong(netconfSessionIdForReporting), schemaContext,
+            caps, sourceProvider);
     }
 
     static class MdsalOperationService implements NetconfOperationService {
@@ -108,9 +110,10 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
         private final DOMDataBroker dataBroker;
         private SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
 
-        public MdsalOperationService(final long currentSessionId,
-                                     final SchemaContext schemaContext,
-                                     final Set<Capability> caps, final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
+        MdsalOperationService(final long currentSessionId,
+                              final SchemaContext schemaContext,
+                              final Set<Capability> caps,
+                              final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
             this.currentSessionId = currentSessionId;
             this.schemaContext = schemaContext;
             this.caps = caps;
@@ -123,7 +126,8 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
 
         @Override
         public Set<NetconfOperation> getNetconfOperations() {
-            TransactionProvider transactionProvider = new TransactionProvider(dataBroker, String.valueOf(currentSessionId));
+            TransactionProvider transactionProvider = new TransactionProvider(
+                dataBroker, String.valueOf(currentSessionId));
             CurrentSchemaContext currentSchemaContext = new CurrentSchemaContext(schemaService, sourceProvider);
 
             ContainerNode netconf = createNetconfState();
@@ -149,7 +153,8 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             final Commit commit = new Commit(String.valueOf(currentSessionId), transactionProvider);
             final Lock lock = new Lock(String.valueOf(currentSessionId));
             final Unlock unLock = new Unlock(String.valueOf(currentSessionId));
-            final DiscardChanges discardChanges = new DiscardChanges(String.valueOf(currentSessionId), transactionProvider);
+            final DiscardChanges discardChanges = new DiscardChanges(
+                String.valueOf(currentSessionId), transactionProvider);
 
             return Sets.<NetconfOperation>newHashSet(get, getConfig,
                     editConfig, commit, lock, unLock, discardChanges);
