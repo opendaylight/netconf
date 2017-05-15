@@ -41,7 +41,8 @@ public class FakeCapability extends BasicCapability {
     }
 
     /**
-     l*
+     * Get empty capability schema.
+     *
      * @return empty schema source to trigger schema resolution exception.
      */
     @Override
