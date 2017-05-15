@@ -30,10 +30,9 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHomeNetconfSubsystemListener {
 
-    private final static Logger LOG = LoggerFactory.getLogger(CallHomeMountDispatcher.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CallHomeMountDispatcher.class);
 
     private final String topologyId;
     private final EventExecutor eventExecutor;
@@ -99,7 +98,8 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     @Override
     public void onNetconfSubsystemOpened(final CallHomeProtocolSessionContext session,
                                          final CallHomeChannelActivator activator) {
-        final CallHomeMountSessionContext deviceContext = getSessionManager().createSession(session, activator, onCloseHandler);
+        final CallHomeMountSessionContext deviceContext = getSessionManager()
+            .createSession(session, activator, onCloseHandler);
         final NodeId nodeId = deviceContext.getId();
         final Node configNode = deviceContext.getConfigNode();
         LOG.info("Provisioning fake config {}", configNode);
