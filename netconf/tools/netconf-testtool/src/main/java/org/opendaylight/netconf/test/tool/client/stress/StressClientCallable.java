@@ -28,7 +28,7 @@ import org.opendaylight.protocol.framework.NeverReconnectStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class StressClientCallable implements Callable<Boolean>{
+public class StressClientCallable implements Callable<Boolean> {
 
     private static final Logger LOG = LoggerFactory.getLogger(StressClientCallable.class);
 
@@ -65,37 +65,46 @@ public class StressClientCallable implements Callable<Boolean>{
         return true;
     }
 
-    private static ExecutionStrategy getExecutionStrategy(final Parameters params, final List<NetconfMessage> preparedMessages, final NetconfDeviceCommunicator sessionListener) {
-        if(params.async) {
+    private static ExecutionStrategy getExecutionStrategy(final Parameters params,
+            final List<NetconfMessage> preparedMessages, final NetconfDeviceCommunicator sessionListener) {
+        if (params.async) {
             return new AsyncExecutionStrategy(params, preparedMessages, sessionListener);
         } else {
             return new SyncExecutionStrategy(params, preparedMessages, sessionListener);
         }
     }
 
-    private static NetconfDeviceCommunicator getSessionListener(final InetSocketAddress inetAddress, final int messageLimit) {
-        final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> loggingRemoteDevice = new StressClient.LoggingRemoteDevice();
-        return new NetconfDeviceCommunicator(new RemoteDeviceId("secure-test", inetAddress), loggingRemoteDevice, messageLimit);
+    private static NetconfDeviceCommunicator getSessionListener(
+            final InetSocketAddress inetAddress, final int messageLimit) {
+        final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> loggingRemoteDevice =
+            new StressClient.LoggingRemoteDevice();
+        return new NetconfDeviceCommunicator(
+            new RemoteDeviceId("secure-test", inetAddress), loggingRemoteDevice, messageLimit);
     }
 
-    private static NetconfClientConfiguration getNetconfClientConfiguration(final Parameters params, final NetconfDeviceCommunicator sessionListener) {
-        final NetconfClientConfigurationBuilder netconfClientConfigurationBuilder = NetconfClientConfigurationBuilder.create();
+    private static NetconfClientConfiguration getNetconfClientConfiguration(final Parameters params,
+            final NetconfDeviceCommunicator sessionListener) {
+        final NetconfClientConfigurationBuilder netconfClientConfigurationBuilder = NetconfClientConfigurationBuilder
+            .create();
         netconfClientConfigurationBuilder.withSessionListener(sessionListener);
         netconfClientConfigurationBuilder.withAddress(params.getInetAddress());
-        if(params.tcpHeader != null) {
+        if (params.tcpHeader != null) {
             final String header = params.tcpHeader.replaceAll("\"", "").trim() + "\n";
-            netconfClientConfigurationBuilder.withAdditionalHeader(new NetconfHelloMessageAdditionalHeader(null, null, null, null, null) {
-                @Override
-                public String toFormattedString() {
-                    LOG.debug("Sending TCP header {}", header);
-                    return header;
-                }
-            });
+            netconfClientConfigurationBuilder.withAdditionalHeader(
+                new NetconfHelloMessageAdditionalHeader(null, null, null, null, null) {
+                    @Override
+                    public String toFormattedString() {
+                        LOG.debug("Sending TCP header {}", header);
+                        return header;
+                    }
+                });
         }
-        netconfClientConfigurationBuilder.withProtocol(params.ssh ? NetconfClientConfiguration.NetconfClientProtocol.SSH : NetconfClientConfiguration.NetconfClientProtocol.TCP);
+        netconfClientConfigurationBuilder.withProtocol(params.ssh ? NetconfClientConfiguration.NetconfClientProtocol.SSH
+            : NetconfClientConfiguration.NetconfClientProtocol.TCP);
         netconfClientConfigurationBuilder.withAuthHandler(new LoginPassword(params.username, params.password));
         netconfClientConfigurationBuilder.withConnectionTimeoutMillis(20000L);
-        netconfClientConfigurationBuilder.withReconnectStrategy(new NeverReconnectStrategy(GlobalEventExecutor.INSTANCE, 5000));
+        netconfClientConfigurationBuilder.withReconnectStrategy(
+            new NeverReconnectStrategy(GlobalEventExecutor.INSTANCE, 5000));
         return netconfClientConfigurationBuilder.build();
     }
 }

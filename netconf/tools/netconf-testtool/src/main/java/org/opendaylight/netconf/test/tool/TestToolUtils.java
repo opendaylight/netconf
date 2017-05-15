@@ -11,16 +11,16 @@ package org.opendaylight.netconf.test.tool;
 public class TestToolUtils {
 
     public static String getMac(long mac) {
-        StringBuilder m = new StringBuilder(Long.toString(mac, 16));
+        final StringBuilder builder = new StringBuilder(Long.toString(mac, 16));
 
-        for (int i = m.length(); i < 12; i++) {
-            m.insert(0, "0");
+        for (int i = builder.length(); i < 12; i++) {
+            builder.insert(0, "0");
         }
 
-        for (int j = m.length() - 2; j >= 2; j -= 2) {
-            m.insert(j, ":");
+        for (int j = builder.length() - 2; j >= 2; j -= 2) {
+            builder.insert(j, ":");
         }
 
-        return m.toString();
+        return builder.toString();
     }
 }
