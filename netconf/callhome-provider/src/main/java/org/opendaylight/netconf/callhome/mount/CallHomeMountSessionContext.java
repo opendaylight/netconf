@@ -95,11 +95,11 @@ class CallHomeMountSessionContext {
             }
 
             @Override
-            public void onSessionDown(NetconfClientSession session, Exception e) {
+            public void onSessionDown(NetconfClientSession session, Exception exc) {
                 try {
                     removeSelf();
                 } finally {
-                    delegate.onSessionDown(session, e);
+                    delegate.onSessionDown(session, exc);
                 }
             }
 

@@ -16,7 +16,7 @@ import java.security.PublicKey;
 public interface CallHomeProtocolSessionContext {
 
     /**
-     * Returns session identifier provided by  CallHomeAuthorizationProvider
+     * Returns session identifier provided by  CallHomeAuthorizationProvider.
      *
      * @return Returns application-provided session identifier
      */
