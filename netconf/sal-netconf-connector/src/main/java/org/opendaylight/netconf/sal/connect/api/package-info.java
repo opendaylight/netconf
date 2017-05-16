@@ -7,6 +7,6 @@
  */
 
 /**
- * API for netconf connector
+ * API for netconf connector.
  */
 package org.opendaylight.netconf.sal.connect.api;

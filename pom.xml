@@ -43,7 +43,6 @@
         <yangtools.version>1.2.0-SNAPSHOT</yangtools.version>
     </properties>
 
-
     <dependencyManagement>
       <dependencies>
         <dependency>
