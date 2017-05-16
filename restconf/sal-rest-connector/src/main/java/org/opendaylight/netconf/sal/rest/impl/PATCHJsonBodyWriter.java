@@ -115,6 +115,11 @@ public class PATCHJsonBodyWriter implements MessageBodyWriter<PATCHStatusContext
                 jsonWriter.name("error-message").value(restconfError.getErrorMessage());
             }
 
+            // optional node
+            if (restconfError.getErrorInfo() != null) {
+                jsonWriter.name("error-info").value(restconfError.getErrorInfo());
+            }
+
             jsonWriter.endObject();
         }
 
