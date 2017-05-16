@@ -222,7 +222,8 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          *
          * @return start-time
          */
-        public @Nonnull Instant getStart() {
+        @Nonnull
+        public Instant getStart() {
             return start;
         }
 
