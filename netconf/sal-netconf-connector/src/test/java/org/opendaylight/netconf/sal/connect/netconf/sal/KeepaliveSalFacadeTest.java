@@ -21,7 +21,6 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,8 +28,6 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
@@ -79,15 +76,11 @@ public class KeepaliveSalFacadeTest {
 
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorServiceSpy = Mockito.spy(executorService);
-        doAnswer(new Answer<ScheduledFuture>() {
-            @Override
-            public ScheduledFuture answer(InvocationOnMock invocationOnMock)
-                    throws Throwable {
+        doAnswer(
+            invocationOnMock -> {
                 invocationOnMock.callRealMethod();
                 return currentKeepalive;
-            }
-        }).when(executorServiceSpy).schedule(Mockito.<Runnable>any(),
-                Mockito.anyLong(), Matchers.<TimeUnit>any());
+            }).when(executorServiceSpy).schedule(Mockito.<Runnable>any(), Mockito.anyLong(), Matchers.any());
 
         Mockito.when(currentKeepalive.isDone()).thenReturn(true);
     }
@@ -178,13 +171,11 @@ public class KeepaliveSalFacadeTest {
 
     @Test
     public void testNonKeepaliveRpcFailure() throws Exception {
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(final InvocationOnMock invocationOnMock) throws Throwable {
+        doAnswer(
+            invocationOnMock -> {
                 proxyRpc = (DOMRpcService) invocationOnMock.getArguments()[2];
                 return null;
-            }
-        }).when(underlyingSalFacade).onDeviceConnected(
+            }).when(underlyingSalFacade).onDeviceConnected(
                 any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
 
         doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("illegal-state")))
