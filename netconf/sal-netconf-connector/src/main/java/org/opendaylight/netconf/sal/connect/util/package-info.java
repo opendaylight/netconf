@@ -7,6 +7,6 @@
  */
 
  /**
- * Utility classes for netconf connector
+ * Utility classes for netconf connector.
  */
 package org.opendaylight.netconf.sal.connect.util;
