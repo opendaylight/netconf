@@ -7,6 +7,6 @@
  */
 
  /**
- * Implementation of netconf southbound connector
+ * Implementation of netconf southbound connector.
  */
 package org.opendaylight.netconf.sal.connect.netconf;
