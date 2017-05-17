@@ -16,8 +16,8 @@ import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
+import org.opendaylight.netconf.mdsal.connector.ops.file.NetconfFileService;
 import org.opendaylight.netconf.mdsal.connector.ops.parser.MdsalNetconfParameter;
-import org.opendaylight.netconf.mdsal.connector.ops.parser.MdsalNetconfParameterType;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,20 +30,26 @@ public class Validate extends ValidateNetconfOperation {
 
     private static final String OPERATION_NAME = "validate";
 
-    public Validate(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext) {
-        super(netconfSessionIdForReporting, schemaContext);
+    public Validate(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext, final NetconfFileService netconfFileService) {
+        super(netconfSessionIdForReporting, schemaContext, netconfFileService);
     }
 
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) throws DocumentedException {
         final MdsalNetconfParameter inputParameter = extractSourceParameter(operationElement);
 
-        if (MdsalNetconfParameterType.DATASTORE == inputParameter.getType()) {
-            validateSourceDatastore(inputParameter.getDatastore());
-        } else {
-            validateConfigElement(inputParameter.getConfigElement());
+        switch (inputParameter.getType()) {
+            case DATASTORE:
+                validateSourceDatastore(inputParameter.getDatastore());
+                break;
+            case CONFIG:
+                validateConfigElement(inputParameter.getConfigElement());
+                break;
+            case FILE:
+                XmlElement configElement = readConfigElementFromFile(inputParameter.getFile());
+                validateConfigElement(configElement);
+                break;
         }
-
         return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
     }
 
