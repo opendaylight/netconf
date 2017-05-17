@@ -27,6 +27,18 @@ module netconf-mdsal-mapper {
         case netconf-mdsal-mapper {
             when "/config:modules/config:module/config:type = 'netconf-mdsal-mapper'";
 
+            container folder-white-list {
+                description "Configure externally available services";
+                leaf-list read-write-list  {
+                      type string;
+                      description "A list of user name patterns to allow";
+                }
+
+                leaf-list read-only-list  {
+                      type string;
+                      description "A list of user name patterns to allow";
+                }
+            }
             container root-schema-service {
                 uses config:service-ref {
                     refine type {
