@@ -97,7 +97,8 @@ public final class ReadDataTransactionUtil {
      *             set tagged for {@link WriterParameters}
      * @return {@link WriterParameters}
      */
-    public static @Nonnull WriterParameters parseUriParameters(@Nonnull final InstanceIdentifierContext<?> identifier,
+    @Nonnull
+    public static WriterParameters parseUriParameters(@Nonnull final InstanceIdentifierContext<?> identifier,
             @Nullable final UriInfo uriInfo, final boolean tagged) {
         return parseParams(identifier, uriInfo, tagged);
     }
@@ -112,7 +113,8 @@ public final class ReadDataTransactionUtil {
      *             URI info
      * @return {@link WriterParameters}
      */
-    public static @Nonnull WriterParameters parseUriParameters(@Nonnull final InstanceIdentifierContext<?> identifier,
+    @Nonnull
+    public static WriterParameters parseUriParameters(@Nonnull final InstanceIdentifierContext<?> identifier,
                                                                @Nullable final UriInfo uriInfo) {
         return parseParams(identifier, uriInfo, false);
     }
@@ -198,7 +200,8 @@ public final class ReadDataTransactionUtil {
      *             {@link TransactionVarsWrapper} - wrapper for variables
      * @return {@link NormalizedNode}
      */
-    public static @Nullable NormalizedNode<?, ?> readData(@Nonnull final String valueOfContent,
+    @Nullable
+    public static NormalizedNode<?, ?> readData(@Nonnull final String valueOfContent,
             @Nonnull final TransactionVarsWrapper transactionNode) {
         return readData(valueOfContent, transactionNode, null);
     }
@@ -214,7 +217,8 @@ public final class ReadDataTransactionUtil {
      *             vaule of with-defaults parameter
      * @return {@link NormalizedNode}
      */
-    public static @Nullable NormalizedNode<?, ?> readData(@Nonnull final String valueOfContent,
+    @Nullable
+    public static NormalizedNode<?, ?> readData(@Nonnull final String valueOfContent,
             @Nonnull final TransactionVarsWrapper transactionNode, final String withDefa) {
         switch (valueOfContent) {
             case RestconfDataServiceConstant.ReadData.CONFIG:
@@ -425,7 +429,8 @@ public final class ReadDataTransactionUtil {
      *             {@link TransactionVarsWrapper} - wrapper for variables
      * @return {@link NormalizedNode}
      */
-    private static @Nullable NormalizedNode<?, ?> readDataViaTransaction(
+    @Nullable
+    private static NormalizedNode<?, ?> readDataViaTransaction(
             @Nonnull final TransactionVarsWrapper transactionNode) {
         final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
         try (DOMDataReadOnlyTransaction tx = transactionNode.getTransactionChain().newReadOnlyTransaction()) {
@@ -446,7 +451,8 @@ public final class ReadDataTransactionUtil {
      * @param withDefa with-defaults parameter
      * @return {@link NormalizedNode}
      */
-    private static @Nullable NormalizedNode<?, ?> readAllData(@Nonnull final TransactionVarsWrapper transactionNode,
+    @Nullable
+    private static NormalizedNode<?, ?> readAllData(@Nonnull final TransactionVarsWrapper transactionNode,
             final String withDefa) {
         // PREPARE STATE DATA NODE
         transactionNode.setLogicalDatastoreType(LogicalDatastoreType.OPERATIONAL);
@@ -490,7 +496,8 @@ public final class ReadDataTransactionUtil {
      *             data node of config data
      * @return {@link NormalizedNode}
      */
-    private static @Nonnull NormalizedNode<?, ?> mapNode(@Nonnull final NormalizedNode<?, ?> stateDataNode,
+    @Nonnull
+    private static NormalizedNode<?, ?> mapNode(@Nonnull final NormalizedNode<?, ?> stateDataNode,
                                                          @Nonnull final NormalizedNode<?, ?> configDataNode) {
         validPossibilityOfMergeNodes(stateDataNode, configDataNode);
         if (configDataNode instanceof RpcDefinition) {
@@ -526,7 +533,8 @@ public final class ReadDataTransactionUtil {
      *             data node of state data
      * @return {@link NormalizedNode}
      */
-    private static @Nonnull NormalizedNode<?, ?> prepareRpcData(@Nonnull final NormalizedNode<?, ?> configDataNode,
+    @Nonnull
+    private static NormalizedNode<?, ?> prepareRpcData(@Nonnull final NormalizedNode<?, ?> configDataNode,
                                                                 @Nonnull final NormalizedNode<?, ?> stateDataNode) {
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder = ImmutableNodes
                 .mapEntryBuilder();
@@ -563,7 +571,8 @@ public final class ReadDataTransactionUtil {
      *             data node of state data
      * @return {@link NormalizedNode}
      */
-    private static @Nonnull NormalizedNode<?, ?> prepareData(@Nonnull final NormalizedNode<?, ?> configDataNode,
+    @Nonnull
+    private static NormalizedNode<?, ?> prepareData(@Nonnull final NormalizedNode<?, ?> configDataNode,
                                                              @Nonnull final NormalizedNode<?, ?> stateDataNode) {
         if (configDataNode instanceof MapNode) {
             final CollectionNodeBuilder<MapEntryNode, MapNode> builder = ImmutableNodes
