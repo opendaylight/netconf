@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2017 Pantheon Technologies, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the

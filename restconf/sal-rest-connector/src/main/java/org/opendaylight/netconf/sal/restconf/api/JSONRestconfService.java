@@ -15,7 +15,7 @@ import org.opendaylight.yangtools.yang.common.OperationFailedException;
 
 @Deprecated
 /**
- * @author Thomas Pantelis
+ * @author Thomas Pantelis.
  */
 public interface JSONRestconfService {
     /**
