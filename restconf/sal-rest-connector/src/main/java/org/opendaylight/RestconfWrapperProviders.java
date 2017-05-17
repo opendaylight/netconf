@@ -26,6 +26,7 @@ public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
     // DRAFT18
     private final RestConnectorProvider providerDraft18;
 
+    private final Broker broker;
     /**
      * Init both providers:
      * <ul>
@@ -36,12 +37,13 @@ public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
      * @param port
      *            - port for web sockets in provider for draft02
      */
-    public RestconfWrapperProviders(final PortNumber port) {
+    public RestconfWrapperProviders(final PortNumber port, final Broker broker) {
         // Init draft02 provider
         this.providerDraft02 = new RestconfProviderImpl();
         this.providerDraft02.setWebsocketPort(port);
 
         this.providerDraft18 = new RestConnectorProvider();
+        this.broker = broker;
     }
 
     /**
@@ -51,10 +53,8 @@ public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
      * <li>draft18 - {@link RestConnectorProvider}
      * </ul>
      *
-     * @param broker
-     *            - {@link Broker}
      */
-    public void registerProviders(final Broker broker) {
+    public void start() {
         // Register draft02 provider
         broker.registerProvider(this.providerDraft02);
 
@@ -74,6 +74,9 @@ public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
         return runtimeRegistration.register(this.providerDraft02);
     }
 
+    /**
+     * Invoke by blueprint
+     */
     @Override
     public void close() throws Exception {
         this.providerDraft02.close();

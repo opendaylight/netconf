@@ -4,8 +4,6 @@ module opendaylight-rest-connector {
     prefix "md-sal-rest-connector";
 
     import config { prefix config; revision-date 2013-04-05; }
-    import opendaylight-md-sal-dom {prefix dom; revision-date 2013-10-28;}
-    import opendaylight-md-sal-binding {prefix sal; revision-date 2013-10-28;}
     import ietf-inet-types {prefix inet; revision-date 2013-07-15;}
  
     description
@@ -38,24 +36,6 @@ module opendaylight-rest-connector {
 
         leaf failed-responses {
             type uint64;
-        }
-    }
-
-    augment "/config:modules/config:module/config:configuration" {
-        case rest-connector-impl {
-            when "/config:modules/config:module/config:type = 'rest-connector-impl'";
-            leaf websocket-port {
-                mandatory true;
-                type inet:port-number;
-            }
-            container dom-broker {
-                uses config:service-ref {
-                    refine type {
-                        mandatory true;
-                        config:required-identity dom:dom-broker-osgi-registry;
-                    }
-                }
-            }
         }
     }
     
