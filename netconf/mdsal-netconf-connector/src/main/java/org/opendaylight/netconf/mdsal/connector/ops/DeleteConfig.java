@@ -7,13 +7,18 @@
  */
 package org.opendaylight.netconf.mdsal.connector.ops;
 
+import com.google.common.base.Optional;
+import java.io.File;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeverity;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorType;
 import org.opendaylight.controller.config.util.xml.XmlElement;
+import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
+import org.opendaylight.netconf.mdsal.connector.ops.file.NetconfFileService;
 import org.opendaylight.netconf.mdsal.connector.ops.parser.MdsalNetconfOperation;
 import org.opendaylight.netconf.mdsal.connector.ops.parser.MdsalNetconfParameter;
 import org.opendaylight.netconf.mdsal.connector.ops.parser.MdsalNetconfParameterType;
@@ -25,8 +30,8 @@ public class DeleteConfig extends MdsalNetconfOperation {
 
     private final TransactionProvider transactionProvider;
 
-    public DeleteConfig(final String netconfSessionIdForReporting, final TransactionProvider transactionProvider) {
-        super(netconfSessionIdForReporting);
+    public DeleteConfig(final String netconfSessionIdForReporting, final TransactionProvider transactionProvider, final NetconfFileService netconfFileService) {
+        super(netconfSessionIdForReporting, netconfFileService);
         this.transactionProvider = transactionProvider;
     }
 
@@ -43,6 +48,9 @@ public class DeleteConfig extends MdsalNetconfOperation {
                         ErrorTag.operation_not_supported,
                         ErrorSeverity.error);
             }
+        } else if (MdsalNetconfParameterType.FILE == targetParameter.getType()) {
+            return deleteFile(targetParameter.getFile(), document);
+
         }
         throw new DocumentedException("unsupported input parameters",
                 ErrorType.protocol,
@@ -50,6 +58,16 @@ public class DeleteConfig extends MdsalNetconfOperation {
                 ErrorSeverity.error);
     }
 
+    private Element deleteFile(File file, Document document) throws DocumentedException {
+        if (getNetconfFileService().canWrite(file)) {
+            boolean result = getNetconfFileService().deleteFile(file);
+            if (result) {
+                return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
+            }
+            throw new DocumentedException("Cannot delete files: "+file.getAbsoluteFile(), ErrorType.application, ErrorTag.operation_failed, ErrorSeverity.error);
+        }
+        throw new DocumentedException("Not access to: "+file.getAbsoluteFile(), ErrorType.application, ErrorTag.operation_failed, ErrorSeverity.error);
+    }
 
 
     @Override
