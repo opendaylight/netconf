@@ -9,18 +9,22 @@
 package org.opendaylight.netconf.mdsal.connector;
 
 import java.util.Set;
+import org.opendaylight.controller.config.yang.netconf.mdsal.mapper.FolderWhiteList;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
+import org.opendaylight.netconf.mdsal.connector.ops.file.MdsalNetconfFileService;
+import org.opendaylight.netconf.mdsal.connector.ops.file.NetconfFileService;
 
 public class MdsalNetconfOperationService implements NetconfOperationService {
 
     private final OperationProvider operationProvider;
 
     public MdsalNetconfOperationService(final CurrentSchemaContext schemaContext, final String netconfSessionIdForReporting,
-                                        final DOMDataBroker dataBroker, final DOMRpcService rpcService) {
-        this.operationProvider = new OperationProvider(netconfSessionIdForReporting, schemaContext, dataBroker, rpcService);
+                                        final DOMDataBroker dataBroker, final DOMRpcService rpcService, final FolderWhiteList folderWhiteList) {
+        NetconfFileService netconfFileService = new MdsalNetconfFileService(folderWhiteList);
+        this.operationProvider = new OperationProvider(netconfSessionIdForReporting, schemaContext, dataBroker, rpcService, netconfFileService);
     }
 
     @Override

@@ -9,7 +9,6 @@
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.base.Optional;
-import com.google.common.util.concurrent.CheckedFuture;
 import java.util.List;
 import java.util.ListIterator;
 import org.opendaylight.controller.config.facade.xml.TestOption;
@@ -21,13 +20,12 @@ import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.mdsal.connector.ops.DataTreeChangeTracker.DataTreeChange;
+import org.opendaylight.netconf.mdsal.connector.ops.file.NetconfFileService;
 import org.opendaylight.netconf.mdsal.connector.ops.parser.MdsalNetconfParameter;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -48,11 +46,12 @@ public class EditConfig extends ValidateNetconfOperation {
     private static final String OPERATION_NAME = "edit-config";
     private static final String TEST_OPTION_KEY = "test-option";
     private static final String CONFIG_KEY = "config";
+    private static final String URL_KEY = "url";
     private static final String DEFAULT_OPERATION_KEY = "default-operation";
     private final TransactionProvider transactionProvider;
 
-    public EditConfig(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext, final TransactionProvider transactionProvider) {
-        super(netconfSessionIdForReporting, schemaContext);
+    public EditConfig(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext, final TransactionProvider transactionProvider, final NetconfFileService netconfFileService) {
+        super(netconfSessionIdForReporting, schemaContext, netconfFileService);
         this.transactionProvider = transactionProvider;
     }
 
@@ -61,8 +60,47 @@ public class EditConfig extends ValidateNetconfOperation {
         final MdsalNetconfParameter inputParameter = extractTargetParameter(operationElement);
         final ModifyAction defaultAction = getDefaultOperation(operationElement);
         final TestOption testOption = extractTestOption(operationElement);
-        final XmlElement configElement = getElement(operationElement, CONFIG_KEY);
-        DOMDataReadWriteTransaction rwTx = createReadWriteTransaction(inputParameter.getDatastore());
+        XmlElement configElement = extractConfigElement(operationElement);
+
+        if (configElement == null) {
+            throw new DocumentedException(operationElement + " element is missing",
+                    ErrorType.protocol,
+                    ErrorTag.missing_element,
+                    ErrorSeverity.error);
+        }
+
+
+        executeEditConfig(inputParameter.getDatastore(), defaultAction, testOption, configElement);
+
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
+    }
+
+    private XmlElement extractConfigElement(XmlElement operationElement) throws DocumentedException {
+        final Optional<XmlElement> configElement = operationElement.getOnlyChildElementOptionally(CONFIG_KEY);
+        final Optional<XmlElement> urlElementOpt = operationElement.getOnlyChildElementOptionally(URL_KEY);
+
+        if (urlElementOpt.isPresent() && configElement.isPresent()) {
+            throw new DocumentedException("<url> and <config> in same request is not supported",
+                    ErrorType.protocol,
+                    ErrorTag.operation_failed,
+                    ErrorSeverity.error);
+        }
+        if (urlElementOpt.isPresent()) {
+            return readConfigElementFromFile(urlElementOpt.get().getTextContent());
+        }
+
+        if (configElement.isPresent()) {
+            return configElement.get();
+        }
+
+        throw new DocumentedException(operationElement + " element is missing",
+                ErrorType.protocol,
+                ErrorTag.missing_element,
+                ErrorSeverity.error);
+    }
+
+    public void executeEditConfig(Datastore datastore, ModifyAction defaultAction, TestOption testOption, XmlElement configElement) throws DocumentedException {
+        DOMDataReadWriteTransaction rwTx = createReadWriteTransaction(datastore);
 
         for (final XmlElement element : configElement.getChildElements()) {
             final DataTreeChangeTracker changeTracker = createDataTreeChecker(defaultAction, element);
@@ -71,13 +109,11 @@ public class EditConfig extends ValidateNetconfOperation {
             }
         }
 
-        if (inputParameter.getDatastore() == Datastore.running && testOption != TestOption.testOnly) {
+        if (datastore == Datastore.running && testOption != TestOption.testOnly) {
             boolean commitStatus = transactionProvider.commitRunningTransaction(rwTx);
             LOG.trace("Commit completed successfully {}", commitStatus);
             rwTx = null;
         }
-
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
     }
 
     private DOMDataReadWriteTransaction createReadWriteTransaction(Datastore datastore) {
@@ -177,18 +213,6 @@ public class EditConfig extends ValidateNetconfOperation {
             return ModifyAction.fromXmlValue(elementsByTagName.item(0).getTextContent());
         }
 
-    }
-
-    private XmlElement getElement(final XmlElement operationElement, final String elementName) throws DocumentedException {
-        final Optional<XmlElement> childNode = operationElement.getOnlyChildElementOptionally(elementName);
-        if (!childNode.isPresent()) {
-            throw new DocumentedException(elementName + " element is missing",
-                    ErrorType.protocol,
-                    ErrorTag.missing_element,
-                    ErrorSeverity.error);
-        }
-
-        return childNode.get();
     }
 
     @Override

@@ -10,6 +10,7 @@ package org.opendaylight.netconf.mdsal.connector;
 
 import com.google.common.collect.Sets;
 import java.util.Set;
+import org.opendaylight.controller.config.yang.netconf.mdsal.mapper.FolderWhiteList;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
@@ -22,6 +23,7 @@ import org.opendaylight.netconf.mdsal.connector.ops.Lock;
 import org.opendaylight.netconf.mdsal.connector.ops.RuntimeRpc;
 import org.opendaylight.netconf.mdsal.connector.ops.Unlock;
 import org.opendaylight.netconf.mdsal.connector.ops.Validate;
+import org.opendaylight.netconf.mdsal.connector.ops.file.NetconfFileService;
 import org.opendaylight.netconf.mdsal.connector.ops.get.Get;
 import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
 
@@ -32,29 +34,31 @@ final class OperationProvider {
     private final DOMDataBroker dataBroker;
     private final DOMRpcService rpcService;
     private final TransactionProvider transactionProvider;
+    private final NetconfFileService netconfFileService;
 
     public OperationProvider(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext,
-                             final DOMDataBroker dataBroker, final DOMRpcService rpcService) {
+                             final DOMDataBroker dataBroker, final DOMRpcService rpcService, final NetconfFileService netconfFileService) {
         this.netconfSessionIdForReporting = netconfSessionIdForReporting;
         this.schemaContext = schemaContext;
         this.dataBroker = dataBroker;
         this.rpcService = rpcService;
         this.transactionProvider = new TransactionProvider(this.dataBroker, netconfSessionIdForReporting);
+        this.netconfFileService = netconfFileService;
     }
 
     Set<NetconfOperation> getOperations() {
         return Sets.<NetconfOperation>newHashSet(
                 new Commit(netconfSessionIdForReporting, transactionProvider),
                 new DiscardChanges(netconfSessionIdForReporting, transactionProvider),
-                new EditConfig(netconfSessionIdForReporting, schemaContext, transactionProvider),
+                new EditConfig(netconfSessionIdForReporting, schemaContext, transactionProvider, netconfFileService),
                 new Get(netconfSessionIdForReporting, schemaContext, transactionProvider),
                 new GetConfig(netconfSessionIdForReporting, schemaContext, transactionProvider),
                 new Lock(netconfSessionIdForReporting),
                 new Unlock(netconfSessionIdForReporting),
                 new RuntimeRpc(netconfSessionIdForReporting, schemaContext, rpcService),
-                new Validate(netconfSessionIdForReporting, schemaContext),
-                new DeleteConfig(netconfSessionIdForReporting, transactionProvider),
-                new CopyConfig(netconfSessionIdForReporting, transactionProvider)
+                new Validate(netconfSessionIdForReporting, schemaContext, netconfFileService),
+                new DeleteConfig(netconfSessionIdForReporting, transactionProvider, netconfFileService),
+                new CopyConfig(netconfSessionIdForReporting, schemaContext, transactionProvider, netconfFileService)
 
         );
     }
