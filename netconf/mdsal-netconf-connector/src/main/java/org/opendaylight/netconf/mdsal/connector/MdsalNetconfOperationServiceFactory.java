@@ -22,6 +22,7 @@ import java.util.Set;
 import org.opendaylight.controller.config.util.capability.BasicCapability;
 import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.controller.config.util.capability.YangModuleCapability;
+import org.opendaylight.controller.config.yang.netconf.mdsal.mapper.FolderWhiteList;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.sal.core.api.Broker.ConsumerSession;
@@ -46,22 +47,25 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
     private static final BasicCapability VALIDATE_CAPABILITY_1_0 = new BasicCapability("urn:ietf:params:netconf:capability:validate:1.0");
     private static final BasicCapability VALIDATE_CAPABILITY_1_1 = new BasicCapability("urn:ietf:params:netconf:capability:validate:1.1");
     private static final BasicCapability WRITEABLE_RUNNING_CAPABILITY_1_0 = new BasicCapability("urn:ietf:params:netconf:capability:writable-running:1.0");
+    private static final BasicCapability URL_SCHEME_FILE_CAPABILITY_1_0 = new BasicCapability("urn:ietf:params:netconf:capability:url:1.0?scheme=files");
 
     private ConsumerSession session = null;
     private DOMDataBroker dataBroker = null;
     private DOMRpcService rpcService = null;
+    private final FolderWhiteList folderWhiteList;
     private final CurrentSchemaContext currentSchemaContext;
     private final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency;
 
-    public MdsalNetconfOperationServiceFactory(final SchemaService schemaService, final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency) {
+    public MdsalNetconfOperationServiceFactory(final SchemaService schemaService, final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency, final FolderWhiteList folderWhiteList) {
         this.rootSchemaSourceProviderDependency = rootSchemaSourceProviderDependency;
         this.currentSchemaContext = new CurrentSchemaContext(Preconditions.checkNotNull(schemaService), rootSchemaSourceProviderDependency);
+        this.folderWhiteList = folderWhiteList;
     }
 
     @Override
     public MdsalNetconfOperationService createService(final String netconfSessionIdForReporting) {
         Preconditions.checkState(dataBroker != null, "MD-SAL provider not yet initialized");
-        return new MdsalNetconfOperationService(currentSchemaContext, netconfSessionIdForReporting, dataBroker, rpcService);
+        return new MdsalNetconfOperationService(currentSchemaContext, netconfSessionIdForReporting, dataBroker, rpcService, folderWhiteList);
     }
 
     @Override
@@ -101,6 +105,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
         capabilities.add(VALIDATE_CAPABILITY_1_0);
         capabilities.add(VALIDATE_CAPABILITY_1_1);
         capabilities.add(WRITEABLE_RUNNING_CAPABILITY_1_0);
+        capabilities.add(URL_SCHEME_FILE_CAPABILITY_1_0);
         return capabilities;
     }
 

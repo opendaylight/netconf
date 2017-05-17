@@ -40,6 +40,8 @@ import org.opendaylight.netconf.mdsal.connector.ops.EditConfig;
 import org.opendaylight.netconf.mdsal.connector.ops.Lock;
 import org.opendaylight.netconf.mdsal.connector.ops.Unlock;
 import org.opendaylight.netconf.mdsal.connector.ops.Validate;
+import org.opendaylight.netconf.mdsal.connector.ops.file.MdsalNetconfFileService;
+import org.opendaylight.netconf.mdsal.connector.ops.file.NetconfFileService;
 import org.opendaylight.netconf.mdsal.connector.ops.get.Get;
 import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
@@ -128,6 +130,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
         public Set<NetconfOperation> getNetconfOperations() {
             TransactionProvider transactionProvider = new TransactionProvider(dataBroker, String.valueOf(currentSessionId));
             CurrentSchemaContext currentSchemaContext = new CurrentSchemaContext(schemaService, sourceProvider);
+            NetconfFileService netconfFileService = new MdsalNetconfFileService(null);
 
             ContainerNode netconf = createNetconfState();
 
@@ -146,16 +149,16 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
 
             final Get get = new Get(String.valueOf(currentSessionId), currentSchemaContext, transactionProvider);
             final EditConfig editConfig = new EditConfig(String.valueOf(currentSessionId), currentSchemaContext,
-                    transactionProvider);
+                    transactionProvider, netconfFileService);
             final GetConfig getConfig = new GetConfig(String.valueOf(currentSessionId), currentSchemaContext,
                     transactionProvider);
             final Commit commit = new Commit(String.valueOf(currentSessionId), transactionProvider);
             final Lock lock = new Lock(String.valueOf(currentSessionId));
             final Unlock unLock = new Unlock(String.valueOf(currentSessionId));
             final DiscardChanges discardChanges = new DiscardChanges(String.valueOf(currentSessionId), transactionProvider);
-            final Validate validate = new Validate(String.valueOf(currentSessionId), currentSchemaContext);
-            final DeleteConfig deleteConfig = new DeleteConfig(String.valueOf(currentSessionId), transactionProvider);
-            final CopyConfig copyConfig = new CopyConfig(String.valueOf(currentSessionId), transactionProvider);
+            final Validate validate = new Validate(String.valueOf(currentSessionId), currentSchemaContext, netconfFileService);
+            final DeleteConfig deleteConfig = new DeleteConfig(String.valueOf(currentSessionId), transactionProvider, netconfFileService);
+            final CopyConfig copyConfig = new CopyConfig(String.valueOf(currentSessionId), currentSchemaContext, transactionProvider, netconfFileService);
 
             return Sets.<NetconfOperation>newHashSet(get, getConfig,
                     editConfig, commit, lock, unLock, discardChanges, validate, deleteConfig, copyConfig);

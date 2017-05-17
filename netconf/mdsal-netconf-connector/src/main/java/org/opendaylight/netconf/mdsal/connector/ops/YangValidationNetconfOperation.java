@@ -16,6 +16,7 @@ import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
+import org.opendaylight.netconf.mdsal.connector.ops.file.NetconfFileService;
 import org.opendaylight.netconf.mdsal.connector.ops.parser.MdsalNetconfOperation;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
@@ -35,8 +36,8 @@ public abstract class YangValidationNetconfOperation extends MdsalNetconfOperati
 
     private final CurrentSchemaContext schemaContext;
 
-    protected YangValidationNetconfOperation(String netconfSessionIdForReporting, CurrentSchemaContext schemaContext) {
-        super(netconfSessionIdForReporting);
+    protected YangValidationNetconfOperation(String netconfSessionIdForReporting, CurrentSchemaContext schemaContext, final NetconfFileService netconfFileService) {
+        super(netconfSessionIdForReporting, netconfFileService);
         this.schemaContext = schemaContext;
     }
 
@@ -99,4 +100,7 @@ public abstract class YangValidationNetconfOperation extends MdsalNetconfOperati
         return dataSchemaNode;
     }
 
+    public CurrentSchemaContext getSchemaContext() {
+        return schemaContext;
+    }
 }
