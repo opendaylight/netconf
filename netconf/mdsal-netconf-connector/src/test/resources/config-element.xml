@@ -1,0 +1,7 @@
+<config>
+    <top xmlns="urn:opendaylight:mdsal:mapping:test">
+        <choice-wrapper>
+            <text>augmented nested choice text1</text>
+        </choice-wrapper>
+    </top>
+</config>

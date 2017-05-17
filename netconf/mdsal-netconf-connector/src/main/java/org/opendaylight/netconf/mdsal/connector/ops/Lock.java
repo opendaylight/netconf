@@ -27,7 +27,7 @@ public class Lock extends MdsalNetconfOperation {
     private static final String OPERATION_NAME = "lock";
 
     public Lock(final String netconfSessionIdForReporting) {
-        super(netconfSessionIdForReporting);
+        super(netconfSessionIdForReporting, null);
     }
 
     @Override

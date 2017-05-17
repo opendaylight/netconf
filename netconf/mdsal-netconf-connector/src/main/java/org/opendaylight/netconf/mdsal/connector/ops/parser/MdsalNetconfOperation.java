@@ -9,9 +9,11 @@ package org.opendaylight.netconf.mdsal.connector.ops.parser;
 
 import com.google.common.base.Optional;
 import java.io.File;
+import org.apache.commons.lang3.StringUtils;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.netconf.mdsal.connector.ops.Datastore;
+import org.opendaylight.netconf.mdsal.connector.ops.file.NetconfFileService;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +28,30 @@ public class MdsalNetconfOperation extends AbstractSingletonNetconfOperation {
     private static final String SOURCE_KEY = "source";
     private static final String TARGET_KEY = "target";
 
-    protected MdsalNetconfOperation(String netconfSessionIdForReporting) {
+    private final NetconfFileService netconfFileService;
+
+    protected MdsalNetconfOperation(String netconfSessionIdForReporting, NetconfFileService netconfFileService) {
         super(netconfSessionIdForReporting);
+        this.netconfFileService = netconfFileService;
+    }
+
+    protected XmlElement readConfigElementFromFile(File file) throws DocumentedException {
+        if (netconfFileService.canRead(file)) {
+            try {
+                return netconfFileService.readContent(file);
+            } catch (Exception e) {
+                LOG.error(e.getMessage(),e);
+                throw new DocumentedException(e.getMessage()+": Cannot read the files "+file.getAbsoluteFile(), DocumentedException.ErrorType.application, DocumentedException.ErrorTag.operation_failed, DocumentedException.ErrorSeverity.error);
+            }
+        }
+        throw new DocumentedException("Not access to: "+file.getAbsoluteFile(), DocumentedException.ErrorType.application, DocumentedException.ErrorTag.operation_failed, DocumentedException.ErrorSeverity.error);
+    }
+
+    protected XmlElement readConfigElementFromFile(String filePath) throws DocumentedException {
+        if (StringUtils.isEmpty(filePath)) {
+            throw new DocumentedException("<url> is empty "+filePath, DocumentedException.ErrorType.application, DocumentedException.ErrorTag.operation_failed, DocumentedException.ErrorSeverity.error);
+        }
+        return readConfigElementFromFile (new File(filePath));
     }
 
 
@@ -60,7 +84,11 @@ public class MdsalNetconfOperation extends AbstractSingletonNetconfOperation {
 
         Optional<XmlElement> urlElement = innerElement.getOnlyChildElementOptionally(URL_KEY);
         if (urlElement.isPresent()) {
-            return new MdsalNetconfParameter(new File(urlElement.get().getTextContent()));
+            String filePath = urlElement.get().getTextContent();
+            if (StringUtils.isEmpty(filePath)) {
+                throw new DocumentedException("<url> is empty "+filePath, DocumentedException.ErrorType.application, DocumentedException.ErrorTag.operation_failed, DocumentedException.ErrorSeverity.error);
+            }
+            return new MdsalNetconfParameter(new File(filePath));
         }
 
         final XmlElement datasourceElement = innerElement.getOnlyChildElement();
@@ -78,6 +106,10 @@ public class MdsalNetconfOperation extends AbstractSingletonNetconfOperation {
     @Override
     protected Element handleWithNoSubsequentOperations(Document document, XmlElement operationElement) throws DocumentedException {
         return null;
+    }
+
+    public NetconfFileService getNetconfFileService() {
+        return netconfFileService;
     }
 
     @Override
