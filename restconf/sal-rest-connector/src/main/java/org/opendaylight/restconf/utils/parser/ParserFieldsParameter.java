@@ -38,8 +38,9 @@ public class ParserFieldsParameter {
      * @param input input value of fields parameter
      * @return {@link List}
      */
-    public static @Nonnull List<Set<QName>> parseFieldsParameter(@Nonnull final InstanceIdentifierContext<?> identifier,
-                                                                 @Nonnull final String input) {
+    @Nonnull
+    public static List<Set<QName>> parseFieldsParameter(@Nonnull final InstanceIdentifierContext<?> identifier,
+                                                        @Nonnull final String input) {
         final List<Set<QName>> parsed = new ArrayList<>();
         final SchemaContext context = identifier.getSchemaContext();
         final QNameModule startQNameModule = identifier.getSchemaNode().getQName().getModule();
@@ -173,7 +174,8 @@ public class ParserFieldsParameter {
      * @param level current nodes level
      * @return {@link DataSchemaContextNode}
      */
-    private static @Nonnull DataSchemaContextNode<?> addChildToResult(
+    @Nonnull
+    private static DataSchemaContextNode<?> addChildToResult(
             @Nonnull final DataSchemaContextNode<?> currentNode,
             @Nonnull final String identifier,
             @Nonnull final QNameModule currentQNameModule,
@@ -215,9 +217,10 @@ public class ParserFieldsParameter {
      * @param qualifiedName qname of initial node
      * @return {@link DataSchemaContextNode}
      */
-    private static @Nullable DataSchemaContextNode<?> resolveMixinNode(@Nullable final DataSchemaContextNode<?> node,
-                                                                       @Nonnull final Set<QName> level,
-                                                                       @Nonnull final QName qualifiedName) {
+    @Nullable
+    private static DataSchemaContextNode<?> resolveMixinNode(@Nullable final DataSchemaContextNode<?> node,
+                                                             @Nonnull final Set<QName> level,
+                                                             @Nonnull final QName qualifiedName) {
         DataSchemaContextNode<?> currentNode = node;
         while (currentNode != null && currentNode.isMixin()) {
             level.add(qualifiedName);
