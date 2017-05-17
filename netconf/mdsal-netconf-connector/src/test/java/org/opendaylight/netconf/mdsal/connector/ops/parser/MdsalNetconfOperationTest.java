@@ -28,7 +28,7 @@ public class MdsalNetconfOperationTest {
 
     @Before
     public void setup() {
-        operation = new MdsalNetconfOperation("1");
+        operation = new MdsalNetconfOperation("1", null);
     }
 
     @Test
@@ -51,10 +51,10 @@ public class MdsalNetconfOperationTest {
 
     @Test
     public void testValidFile() throws Exception {
-        XmlElement xmlElement = prepareXmlElement("<url>/path/to/file</url>");
+        XmlElement xmlElement = prepareXmlElement("<url>/path/to/files</url>");
 
         MdsalNetconfParameter result = operation.extractSourceParameter(xmlElement);
-        assertEquals("/path/to/file",result.getFile().getAbsolutePath());
+        assertEquals("/path/to/files",result.getFile().getAbsolutePath());
         assertEquals(MdsalNetconfParameterType.FILE,result.getType());
     }
 
