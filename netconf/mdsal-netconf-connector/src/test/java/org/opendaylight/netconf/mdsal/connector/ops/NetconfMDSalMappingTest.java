@@ -15,25 +15,18 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 
+import com.google.common.collect.Lists;
 import com.google.common.io.ByteSource;
 import com.google.common.util.concurrent.Futures;
-import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.StringWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import org.custommonkey.xmlunit.DetailedDiff;
-import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -49,6 +42,7 @@ import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorType;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.controller.config.yang.netconf.mdsal.mapper.FolderWhiteList;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.store.impl.InMemoryDOMDataStoreFactory;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
@@ -57,9 +51,10 @@ import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
+import org.opendaylight.netconf.mdsal.connector.ops.file.MdsalNetconfFileService;
+import org.opendaylight.netconf.mdsal.connector.ops.file.NetconfFileService;
 import org.opendaylight.netconf.mdsal.connector.ops.get.Get;
 import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
-import org.opendaylight.netconf.util.test.NetconfXmlUnitRecursiveQualifier;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
@@ -79,9 +74,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-public class NetconfMDSalMappingTest {
+public class NetconfMDSalMappingTest extends AbstractNetconfMDSalTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMDSalMappingTest.class);
 
@@ -120,6 +114,7 @@ public class NetconfMDSalMappingTest {
     private String sessionIdForReporting = "netconf-test-session1";
 
     private TransactionProvider transactionProvider = null;
+    private NetconfFileService netconfFileService = null;
 
     @Mock
     private SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
@@ -161,6 +156,13 @@ public class NetconfMDSalMappingTest {
 
         this.currentSchemaContext = new CurrentSchemaContext(schemaService, sourceProvider);
 
+        // define the path, where can read and write
+
+        FolderWhiteList folderWhiteList = new FolderWhiteList();
+        folderWhiteList.setReadOnlyList(Lists.newArrayList(createPathFromClassLoader("messages/mapping/files/read-only/config_element.xml")));
+        folderWhiteList.setReadWriteList(Lists.newArrayList(createPathFromClassLoader("messages/mapping/files/read-write/config_element.xml")));
+        this.netconfFileService = new MdsalNetconfFileService(folderWhiteList);
+
     }
 
     @Test
@@ -177,18 +179,14 @@ public class NetconfMDSalMappingTest {
             executeOperation(new GetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider), "messages/mapping/bad_getConfig.xml");
             fail("Should have failed, this is an incorrect request");
         } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.operation_failed);
-            assertTrue(e.getErrorType() == ErrorType.application);
+            assertOperationFailed(e);
         }
 
         try {
             executeOperation(new GetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider), "messages/mapping/bad_namespace_getConfig.xml");
             fail("Should have failed, this is an incorrect request");
         } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.operation_failed);
-            assertTrue(e.getErrorType() == ErrorType.application);
+            assertOperationFailed(e);
         }
 
 
@@ -303,9 +301,7 @@ public class NetconfMDSalMappingTest {
             validate("messages/mapping/validate/validate_config_element_incorrect_module.xml");
             fail("Should have failed, this is an incorrect request");
         } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.operation_failed);
-            assertTrue(e.getErrorType() == ErrorType.application);
+            assertOperationFailed(e);
         }
 
         // test incorrect element in module
@@ -313,9 +309,7 @@ public class NetconfMDSalMappingTest {
             validate("messages/mapping/validate/validate_config_element_incorrect_element.xml");
             fail("Should have failed, this is an incorrect request");
         } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.operation_failed);
-            assertTrue(e.getErrorType() == ErrorType.application);
+            assertOperationFailed(e);
         }
     }
 
@@ -328,10 +322,43 @@ public class NetconfMDSalMappingTest {
             validate("messages/mapping/validate/validate_config_element_incorrect_value.xml");
             fail("Should have failed, this is an incorrect request");
         } catch (DocumentedException e) {
-            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
-            assertTrue(e.getErrorTag() == ErrorTag.operation_failed);
-            assertTrue(e.getErrorType() == ErrorType.application);
+            assertOperationFailed(e);
         }
+    }
+
+    @Test
+    public void testValidateFromFile() throws Exception {
+        verifyResponse(validateIncludeURL("messages/mapping/files/validate_read_only.xml"), RPC_REPLY_OK);
+    }
+
+    @Test
+    public void testValidateFromFileIncorrect() throws Exception {
+        try {
+            validateIncludeURL("messages/mapping/files/validate_blacklist.xml");
+            fail("Validate should have failed");
+        } catch (DocumentedException e) {
+            assertOperationFailed(e);
+        }
+
+        try {
+            validateIncludeURL("messages/mapping/files/validate_file_not_exist.xml");
+            fail("Validate should have failed");
+        } catch (DocumentedException e) {
+            assertOperationFailed(e);
+        }
+
+        try {
+            validateIncludeURL("messages/mapping/files/validate_url_empty.xml");
+            fail("Validate should have failed");
+        } catch (DocumentedException e) {
+            assertOperationFailed(e);
+        }
+    }
+
+    private void assertOperationFailed(DocumentedException e) {
+        assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
+        assertTrue(e.getErrorTag() == ErrorTag.operation_failed);
+        assertTrue(e.getErrorType() == ErrorType.application);
     }
 
     @Test
@@ -467,6 +494,41 @@ public class NetconfMDSalMappingTest {
     }
 
     @Test
+    public void testEditFromFile() throws Exception {
+        verifyResponse(editIncludeURL("messages/mapping/files/editConfig_read_only.xml"), RPC_REPLY_OK);
+        verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument("messages/mapping/editConfig_create_n1_control.xml"));
+
+        deleteDatastore();
+
+        verifyResponse(editIncludeURL("messages/mapping/files/editConfig_read_write.xml"), RPC_REPLY_OK);
+        verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument("messages/mapping/editConfig_create_n1_control.xml"));
+    }
+
+    @Test
+    public void testEditFromFileIncorrect() throws Exception {
+        try {
+            editIncludeURL("messages/mapping/files/editConfig_blacklist.xml");
+            fail("Edit-config should have failed");
+        } catch (DocumentedException e) {
+            assertOperationFailed(e);
+        }
+
+        try {
+            editIncludeURL("messages/mapping/files/editConfig_file_not_exist.xml");
+            fail("Edit-config should have failed");
+        } catch (DocumentedException e) {
+            assertOperationFailed(e);
+        }
+
+        try {
+            editIncludeURL("messages/mapping/files/editConfig_url_empty.xml");
+            fail("Edit-config should have failed");
+        } catch (DocumentedException e) {
+            assertOperationFailed(e);
+        }
+    }
+
+    @Test
     public void testDeleteNonExisting() throws Exception {
 
         assertEmptyDatastore(getConfigCandidate());
@@ -494,21 +556,6 @@ public class NetconfMDSalMappingTest {
         verifyResponse(getConfigRunning(), XmlFileLoader.xmlFileToDocument("messages/mapping/editConfigs/editConfig_merge_missing_default-operation_control.xml"));
 
         deleteDatastore();
-    }
-
-    public static void printDocument(Document doc) throws IOException, TransformerException {
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer = tf.newTransformer();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-
-        StringWriter writer = new StringWriter();
-        transformer.transform(new DOMSource(doc),
-                new StreamResult(writer));
-        LOG.warn(writer.getBuffer().toString());
     }
 
     @Test
@@ -663,6 +710,45 @@ public class NetconfMDSalMappingTest {
     }
 
     @Test
+    public void testDeleteConfigFromFile() throws Exception {
+        File temporalyFile = new File(createPathFromClassLoader("messages/mapping/files/read-write/config_element.xml")+"/config_element_for_delete.xml");
+        temporalyFile.createNewFile();
+        verifyResponse(deleteConfigIncludeURL("messages/mapping/files/deleteConfig_read_write.xml"), RPC_REPLY_OK);
+        assertFalse(temporalyFile.exists());
+    }
+
+    @Test
+    public void testDeleteConfigFromFileIncorrect() throws Exception {
+        try {
+            deleteConfigIncludeURL("messages/mapping/files/deleteConfig_read_only.xml");
+            fail("Delete-config-config should have failed");
+        } catch (DocumentedException e) {
+            assertOperationFailed(e);
+        }
+
+        try {
+            deleteConfigIncludeURL("messages/mapping/files/deleteConfig_blacklist.xml");
+            fail("Delete-config should have failed");
+        } catch (DocumentedException e) {
+            assertOperationFailed(e);
+        }
+
+        try {
+            deleteConfigIncludeURL("messages/mapping/files/deleteConfig_file_not_exist.xml");
+            fail("Delete-config should have failed");
+        } catch (DocumentedException e) {
+            assertOperationFailed(e);
+        }
+
+        try {
+            deleteConfigIncludeURL("messages/mapping/files/deleteConfig_url_empty.xml");
+            fail("Delete-config should have failed");
+        } catch (DocumentedException e) {
+            assertOperationFailed(e);
+        }
+    }
+
+    @Test
     public void testCopyConfigCandidateToRunning() throws Exception {
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_n1.xml"), RPC_REPLY_OK);
         assertEmptyDatastore(getConfigRunning());
@@ -679,12 +765,83 @@ public class NetconfMDSalMappingTest {
     }
 
     @Test
+    public void testCopyConfigURLToCandidate() throws Exception {
+        verifyResponse(copyConfigIncludeURL("messages/mapping/files/copyConfig_url_to_candidate.xml"), RPC_REPLY_OK);
+        verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument("messages/mapping/editConfig_create_n1_control.xml"));
+    }
+
+    @Test
+    public void testCopyConfigURLToRunning() throws Exception {
+        verifyResponse(copyConfigIncludeURL("messages/mapping/files/copyConfig_url_to_running.xml"), RPC_REPLY_OK);
+        verifyResponse(getConfigRunning(), XmlFileLoader.xmlFileToDocument("messages/mapping/editConfig_create_n1_control.xml"));
+    }
+
+    @Test
+    public void testCopyConfigCandidateToUrl() throws Exception {
+        // prepare candidate
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_create.xml"), RPC_REPLY_OK);
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig-filtering-setup.xml"), RPC_REPLY_OK);
+        //store candidate to file
+        verifyResponse(copyConfigIncludeURL("messages/mapping/files/copyConfig_candidate_to_url.xml"), RPC_REPLY_OK);
+        // read stored file to document
+        String basePath = createPathFromClassLoader("messages/mapping/files/copyConfig_candidate_to_url.xml");
+        Document storedDocument = XmlUtil.readXmlToDocument(new FileInputStream(new File(basePath+"/read-write/candidate.xml")));
+
+        //compare expectations with stored document
+        verifyResponse(storedDocument, XmlFileLoader.xmlFileToDocument("messages/mapping/files/candidate_control.xml"));
+
+        deleteDatastore();
+        // call edit-config on the stored document. And store it to candidate. Then verify
+        verifyResponse(editIncludeURL("messages/mapping/files/copyConfig_verified_candidate.xml"), RPC_REPLY_OK);
+        verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument("messages/mapping/files/candidate_rpc_control.xml"));
+    }
+
+    @Test
+    public void testCopyConfigRunningToUrl() throws Exception {
+        // prepare running
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_create.xml"), RPC_REPLY_OK);
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig-filtering-setup.xml"), RPC_REPLY_OK);
+        verifyResponse(commit(), RPC_REPLY_OK);
+        //store running to file
+        verifyResponse(copyConfigIncludeURL("messages/mapping/files/copyConfig_running_to_url.xml"), RPC_REPLY_OK);
+        // read stored file to document
+        String basePath = createPathFromClassLoader("messages/mapping/files/copyConfig_running_to_url.xml");
+        Document storedDocument = XmlUtil.readXmlToDocument(new FileInputStream(new File(basePath+"/read-write/running.xml")));
+
+        //compare expectations with stored document
+        verifyResponse(storedDocument, XmlFileLoader.xmlFileToDocument("messages/mapping/files/running_control.xml"));
+    }
+
+    @Test
+    public void testCopyConfigEmptyCandidateToUrl() throws Exception {
+        //store candidate to file
+        verifyResponse(copyConfigIncludeURL("messages/mapping/files/copyConfig_candidate_to_url.xml"), RPC_REPLY_OK);
+
+        // read stored file to document
+        String basePath = createPathFromClassLoader("messages/mapping/files/copyConfig_candidate_to_url.xml");
+        Document storedDocument = XmlUtil.readXmlToDocument(new FileInputStream(new File(basePath+"/read-write/candidate.xml")));
+
+        //compare expectations with stored document
+        verifyResponse(storedDocument, XmlFileLoader.xmlFileToDocument("messages/mapping/files/candidate_empty_control.xml"));
+    }
+
+    @Test
+    public void testCopyConfigIncorrect() throws Exception {
+        try {
+            validateIncludeURL("messages/mapping/files/copyConfig_blacklist.xml");
+            fail("Copy-config should have failed");
+        } catch (DocumentedException e) {
+            assertOperationFailed(e);
+        }
+    }
+
+    @Test
     public void testCopyConfigIncorrate() throws Exception {
         copyConfigTest("messages/mapping/copy_config_source_missing.xml");
         copyConfigTest("messages/mapping/copy_config_target_missing.xml");
     }
 
-    private void copyConfigTest(String filePath) throws ParserConfigurationException, SAXException, IOException {
+    private void copyConfigTest(String filePath) throws Exception {
         try {
             copyConfig(filePath);
             fail("Copy config should have failed");
@@ -721,16 +878,6 @@ public class NetconfMDSalMappingTest {
         assertEmptyDatastore(getConfigRunning());
     }
 
-    private void verifyResponse(Document response, Document template) throws IOException, TransformerException {
-        DetailedDiff dd = new DetailedDiff(new Diff(response, template));
-        dd.overrideElementQualifier(new NetconfXmlUnitRecursiveQualifier());
-
-        printDocument(response);
-        printDocument(template);
-
-        assertTrue(dd.toString(), dd.similar());
-    }
-
     private void assertEmptyDatastore(Document response) {
 
         NodeList nodes = response.getChildNodes();
@@ -747,97 +894,132 @@ public class NetconfMDSalMappingTest {
 
     }
 
-    private Document commit() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+    private Document commit() throws Exception {
         Commit commit = new Commit(sessionIdForReporting, transactionProvider);
         return executeOperation(commit, "messages/mapping/commit.xml");
     }
 
-    private Document discardChanges() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+    private Document discardChanges() throws Exception {
         DiscardChanges discardOp = new DiscardChanges(sessionIdForReporting, transactionProvider);
         return executeOperation(discardOp, "messages/mapping/discardChanges.xml");
     }
 
-    private Document edit(String resource) throws DocumentedException, ParserConfigurationException, SAXException, IOException {
-        EditConfig editConfig = new EditConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
+    private Document editIncludeURL(String resource) throws Exception {
+        EditConfig editConfig = new EditConfig(sessionIdForReporting, currentSchemaContext, transactionProvider, netconfFileService);
+        return executeOperation(editConfig, resource, true);
+    }
+
+    private Document edit(String resource) throws Exception {
+        EditConfig editConfig = new EditConfig(sessionIdForReporting, currentSchemaContext, transactionProvider, netconfFileService);
         return executeOperation(editConfig, resource);
     }
 
-    private Document get() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+    private Document get() throws Exception {
         Get get = new Get(sessionIdForReporting, currentSchemaContext, transactionProvider);
         return executeOperation(get, "messages/mapping/get.xml");
     }
 
-    private Document getWithFilter(String resource) throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+    private Document getWithFilter(String resource) throws Exception {
         Get get = new Get(sessionIdForReporting, currentSchemaContext, transactionProvider);
         return executeOperation(get, resource);
     }
 
-    private Document getConfigRunning() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+    private Document getConfigRunning() throws Exception {
         GetConfig getConfig = new GetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
         return executeOperation(getConfig, "messages/mapping/getConfig.xml");
     }
 
-    private Document getConfigCandidate() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+    private Document getConfigCandidate() throws Exception {
         GetConfig getConfig = new GetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
         return executeOperation(getConfig, "messages/mapping/getConfig_candidate.xml");
     }
 
-    private Document getConfigWithFilter(String resource) throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+    private Document getConfigWithFilter(String resource) throws Exception {
         GetConfig getConfig = new GetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
         return executeOperation(getConfig, resource);
     }
 
-    private Document lock() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+    private Document lock() throws Exception {
         Lock lock = new Lock(sessionIdForReporting);
         return executeOperation(lock, "messages/mapping/lock.xml");
     }
 
-    private Document unlock() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+    private Document unlock() throws Exception {
         Unlock unlock = new Unlock(sessionIdForReporting);
         return executeOperation(unlock, "messages/mapping/unlock.xml");
     }
 
-    private Document lockWithoutTarget() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+    private Document lockWithoutTarget() throws Exception {
         Lock lock = new Lock(sessionIdForReporting);
         return executeOperation(lock, "messages/mapping/lock_notarget.xml");
     }
 
-    private Document unlockWithoutTarget() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+    private Document unlockWithoutTarget() throws Exception {
         Unlock unlock = new Unlock(sessionIdForReporting);
         return executeOperation(unlock, "messages/mapping/unlock_notarget.xml");
     }
 
-    private Document lockCandidate() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+    private Document lockCandidate() throws Exception {
         Lock lock = new Lock(sessionIdForReporting);
         return executeOperation(lock, "messages/mapping/lock_candidate.xml");
     }
 
-    private Document unlockCandidate() throws DocumentedException, ParserConfigurationException, SAXException, IOException {
+    private Document unlockCandidate() throws Exception {
         Unlock unlock = new Unlock(sessionIdForReporting);
         return executeOperation(unlock, "messages/mapping/unlock_candidate.xml");
     }
 
-    private Document validate(String resource) throws DocumentedException, ParserConfigurationException, SAXException, IOException {
-        Validate validate = new Validate(sessionIdForReporting, currentSchemaContext);
+    private Document validate(String resource) throws Exception {
+        Validate validate = new Validate(sessionIdForReporting, currentSchemaContext, netconfFileService);
         return executeOperation(validate, resource);
     }
 
-    private Document deleteConfig(String resource) throws DocumentedException, ParserConfigurationException, SAXException, IOException {
-        DeleteConfig deleteConfig = new DeleteConfig(sessionIdForReporting, transactionProvider);
+    private Document validateIncludeURL(String resource) throws Exception {
+        Validate validate = new Validate(sessionIdForReporting, currentSchemaContext, netconfFileService);
+        return executeOperation(validate, resource, true);
+    }
+
+    private Document deleteConfig(String resource) throws Exception {
+        DeleteConfig deleteConfig = new DeleteConfig(sessionIdForReporting, transactionProvider, netconfFileService);
         return executeOperation(deleteConfig, resource);
     }
 
-    private Document copyConfig(String resource) throws DocumentedException, ParserConfigurationException, SAXException, IOException {
-        CopyConfig copyconfig = new CopyConfig(sessionIdForReporting, transactionProvider);
+    private Document deleteConfigIncludeURL(String resource) throws Exception {
+        DeleteConfig deleteConfig = new DeleteConfig(sessionIdForReporting, transactionProvider, netconfFileService);
+        return executeOperation(deleteConfig, resource, true);
+    }
+
+    private Document copyConfig(String resource) throws Exception {
+        CopyConfig copyconfig = new CopyConfig(sessionIdForReporting, currentSchemaContext, transactionProvider, netconfFileService);
         return executeOperation(copyconfig, resource);
     }
 
-    private Document executeOperation(NetconfOperation op, String filename) throws ParserConfigurationException, SAXException, IOException, DocumentedException {
-        final Document request = XmlFileLoader.xmlFileToDocument(filename);
+    private Document copyConfigIncludeURL(String resource) throws Exception {
+        CopyConfig copyconfig = new CopyConfig(sessionIdForReporting, currentSchemaContext, transactionProvider, netconfFileService);
+        return executeOperation(copyconfig, resource, true);
+    }
+
+    private Document executeOperation(NetconfOperation op, String filename) throws Exception {
+        return executeOperation(op,filename,false);
+    }
+
+    private Document executeOperation(NetconfOperation op, String filename, boolean includeURL) throws Exception {
+        Document request = XmlFileLoader.xmlFileToDocument(filename);
+        if (includeURL) {
+            String requestString  = printDocument(request).replace("${path}",createPathFromClassLoader(filename));
+            request = XmlUtil.readXmlToDocument(requestString);
+        }
+
         final Document response = op.handle(request, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
+
 
         LOG.debug("Got response {}" , response);
         return response;
+    }
+
+    private String createPathFromClassLoader(String relativePath) {
+        URL baseURL = XmlFileLoader.class.getClassLoader().getResource(relativePath);
+        return baseURL.getPath().substring(0,baseURL.getPath().lastIndexOf("/"));
     }
 
     private List<InputStream> getYangSchemas() {

@@ -33,6 +33,10 @@
                   <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netconf:north:mapper">prefix:netconf-mapper-registry</type>
                   <name>mapper-aggregator-registry</name>
               </mapper-aggregator>
+              <folder-white-list xmlns="urn:opendaylight:params:xml:ns:yang:controller:netconf:mdsal:mapper">
+                  <read-only-list>/tmp</read-only-list>
+                  <read-write-list>/tmp</read-write-list>
+              </folder-white-list>
           </module>
 
           <module>
