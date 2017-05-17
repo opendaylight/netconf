@@ -63,10 +63,14 @@ public class GetConfig extends AbstractGet {
         // Proper exception should be thrown
         Preconditions.checkState(getConfigExecution.getDatastore().isPresent(), "Source element missing from request");
 
-        DOMDataReadWriteTransaction rwTx = getTransaction(getConfigExecution.getDatastore().get());
+        return readData(document, getConfigExecution.getDatastore().get(), dataRoot);
+    }
+
+    public Element readData(Document document, Datastore datastore, YangInstanceIdentifier dataRoot) throws DocumentedException {
+        DOMDataReadWriteTransaction rwTx = getTransaction(datastore);
         try {
             final Optional<NormalizedNode<?, ?>> normalizedNodeOptional = rwTx.read(LogicalDatastoreType.CONFIGURATION, dataRoot).checkedGet();
-            if (getConfigExecution.getDatastore().get() == Datastore.running) {
+            if (datastore == Datastore.running) {
                 transactionProvider.abortRunningTransaction(rwTx);
             }
 
