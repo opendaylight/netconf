@@ -58,7 +58,7 @@ module opendaylight-rest-connector {
             }
         }
     }
-    
+
     augment "/config:modules/config:module/config:state" {
         case rest-connector-impl {
             when "/config:modules/config:module/config:type = 'rest-connector-impl'";
