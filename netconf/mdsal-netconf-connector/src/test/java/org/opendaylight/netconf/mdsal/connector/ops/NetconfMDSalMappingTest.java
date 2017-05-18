@@ -242,6 +242,24 @@ public class NetconfMDSalMappingTest extends AbstractNetconfMDSalTest {
     }
 
     @Test
+    public void testEditContinueOnError() throws Exception {
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_continueOnError.xml"), RPC_REPLY_OK);
+        verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument("messages/mapping/editConfigs/editConfig_merge_n1_control.xml"));
+    }
+
+    @Test
+    public void testEditRollbackOnError() throws Exception {
+        try {
+            edit("messages/mapping/editConfigs/editConfig_rollbackOnError.xml");
+            fail("Should have failed, this is an incorrect request");
+        } catch (DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.error);
+            assertTrue(e.getErrorTag() == ErrorTag.operation_not_supported);
+            assertTrue(e.getErrorType() == ErrorType.application);
+        }
+    }
+
+    @Test
     public void testValidateCandidate() throws Exception {
         verifyResponse(edit("messages/mapping/editConfigs/editConfig_merge_n1.xml"), RPC_REPLY_OK);
         verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument("messages/mapping/editConfigs/editConfig_merge_n1_control.xml"));
