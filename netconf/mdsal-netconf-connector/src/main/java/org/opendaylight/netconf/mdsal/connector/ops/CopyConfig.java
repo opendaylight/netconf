@@ -9,6 +9,7 @@ package org.opendaylight.netconf.mdsal.connector.ops;
 
 import static org.opendaylight.netconf.mdsal.connector.ops.Datastore.candidate;
 import static org.opendaylight.netconf.mdsal.connector.ops.Datastore.running;
+import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfigInput.ErrorOption.StopOnError;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
@@ -85,7 +86,7 @@ public class CopyConfig extends ValidateNetconfOperation {
             XmlElement configElement = readConfigElementFromFile(source.getFile());
 
             EditConfig editConfig = new EditConfig(getNetconfSessionIdForReporting(), getSchemaContext(), transactionProvider, getNetconfFileService());
-            editConfig.executeEditConfig(datastore, ModifyAction.CREATE, TestOption.testThenSet, configElement);
+            editConfig.executeEditConfig(datastore, ModifyAction.CREATE, TestOption.testThenSet, configElement, StopOnError);
             return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
         }
 
