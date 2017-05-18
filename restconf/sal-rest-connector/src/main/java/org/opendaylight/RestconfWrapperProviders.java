@@ -7,8 +7,6 @@
  */
 package org.opendaylight;
 
-import org.opendaylight.controller.config.yang.md.sal.rest.connector.RestConnectorRuntimeRegistration;
-import org.opendaylight.controller.config.yang.md.sal.rest.connector.RestConnectorRuntimeRegistrator;
 import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.sal.rest.api.RestConnector;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfProviderImpl;
@@ -25,6 +23,7 @@ public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
     private final RestconfProviderImpl providerDraft02;
     // DRAFT18
     private final RestConnectorProvider providerDraft18;
+    private final Broker broker;
 
     /**
      * Init both providers.
@@ -35,14 +34,18 @@ public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
      *
      * @param port port for web sockets in provider for draft02
      */
-    public RestconfWrapperProviders(final PortNumber port) {
+    public RestconfWrapperProviders(final PortNumber port, final Broker broker) {
         // Init draft02 provider
         this.providerDraft02 = new RestconfProviderImpl();
         this.providerDraft02.setWebsocketPort(port);
 
         this.providerDraft18 = new RestConnectorProvider();
+        this.broker = broker;
     }
 
+    /**
+     * Invoke by blueprint
+     */
     /**
      * Register both providers, which will use the SAL layer.
      * <ul>
@@ -50,10 +53,8 @@ public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
      * <li>draft18 - {@link RestConnectorProvider}
      * </ul>
      *
-     * @param broker
-     *             {@link Broker}
      */
-    public void registerProviders(final Broker broker) {
+    public void start() {
         // Register draft02 provider
         broker.registerProvider(this.providerDraft02);
 
@@ -62,16 +63,8 @@ public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
     }
 
     /**
-     * Register runtime beans from restconf draft02 {@link RestconfProviderImpl}.
-     *
-     * @param runtimeRegistration for register runtime beans
-     * @return {@link RestConnectorRuntimeRegistration}
+     * Invoke by blueprint
      */
-    public RestConnectorRuntimeRegistration runtimeRegistration(
-            final RestConnectorRuntimeRegistrator runtimeRegistration) {
-        return runtimeRegistration.register(this.providerDraft02);
-    }
-
     @Override
     public void close() throws Exception {
         this.providerDraft02.close();
