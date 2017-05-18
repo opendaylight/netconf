@@ -10,14 +10,6 @@ package org.opendaylight.netconf.sal.restconf.impl;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Collections;
-import org.opendaylight.controller.config.yang.md.sal.rest.connector.Config;
-import org.opendaylight.controller.config.yang.md.sal.rest.connector.Delete;
-import org.opendaylight.controller.config.yang.md.sal.rest.connector.Get;
-import org.opendaylight.controller.config.yang.md.sal.rest.connector.Operational;
-import org.opendaylight.controller.config.yang.md.sal.rest.connector.Post;
-import org.opendaylight.controller.config.yang.md.sal.rest.connector.Put;
-import org.opendaylight.controller.config.yang.md.sal.rest.connector.RestConnectorRuntimeMXBean;
-import org.opendaylight.controller.config.yang.md.sal.rest.connector.Rpcs;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
@@ -28,10 +20,17 @@ import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.netconf.sal.rest.api.RestConnector;
 import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.rest.connector.rev140724.rest.connector.impl.Config;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.rest.connector.rev140724.rest.connector.impl.Operational;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.rest.connector.rev140724.rest.connector.impl.Rpcs;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.rest.connector.rev140724.rest.connector.impl.config.Delete;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.rest.connector.rev140724.rest.connector.impl.config.Get;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.rest.connector.rev140724.rest.connector.impl.config.Post;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.rest.connector.rev140724.rest.connector.impl.config.Put;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 
-public class RestconfProviderImpl implements Provider, AutoCloseable, RestConnector, RestConnectorRuntimeMXBean {
+public class RestconfProviderImpl implements Provider, AutoCloseable, RestConnector {
 
     private final StatisticsRestconfServiceWrapper stats = StatisticsRestconfServiceWrapper.getInstance();
     private ListenerRegistration<SchemaContextListener> listenerRegistration;
