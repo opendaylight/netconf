@@ -20,11 +20,14 @@ import java.net.URI;
 import java.text.ParseException;
 import java.util.Collection;
 import javax.ws.rs.core.MediaType;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
@@ -60,7 +63,7 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
             return QNameModule.create(URI.create("instance:identifier:module"),
                 SimpleDateFormatUtil.getRevisionFormat().parse("2014-01-17"));
         } catch (final ParseException e) {
-            throw new Error(e);
+            throw new ExceptionInInitializerError(e);
         }
     }
 
@@ -251,5 +254,20 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
                 "foo-bar-container", returnValue.getData().getNodeType().getLocalName());
         assertEquals("Not correct container found, namespace was ignored",
                 "bar:module", returnValue.getData().getNodeType().getNamespace().toString());
+    }
+
+    @Test
+    public void bug7933Test() throws Exception {
+        mockBodyReader("instance-identifier-module:cont", this.xmlBodyReader, false);
+        try {
+            final InputStream inputStream = TestXmlBodyReader.class
+                    .getResourceAsStream("/instanceidentifier/xml/bug7933.xml");
+            this.xmlBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream);
+            Assert.fail();
+        } catch (final RestconfDocumentedException exception) {
+            final RestconfError restconfError = exception.getErrors().get(0);
+            Assert.assertEquals(RestconfError.ErrorType.PROTOCOL, restconfError.getErrorType());
+            Assert.assertEquals(RestconfError.ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
+        }
     }
 }
