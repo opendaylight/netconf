@@ -46,8 +46,9 @@ public class RestConnectorModule
                 WaitingServiceTracker.create(AAAService.class, bundleContext);
         aaaServiceWaitingServiceTracker.waitForService(WaitingServiceTracker.FIVE_MINUTES);
 
-        final RestconfWrapperProviders wrapperProviders = new RestconfWrapperProviders(getWebsocketPort());
-        wrapperProviders.registerProviders(getDomBrokerDependency());
+        final RestconfWrapperProviders wrapperProviders =
+                new RestconfWrapperProviders(getWebsocketPort(), getDomBrokerDependency());
+        wrapperProviders.start();
 
         if (runtimeRegistration != null) {
             runtimeRegistration.close();
@@ -62,4 +63,3 @@ public class RestConnectorModule
         this.bundleContext = bundleContext;
     }
 }
-
