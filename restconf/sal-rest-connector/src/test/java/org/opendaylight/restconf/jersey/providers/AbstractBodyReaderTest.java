@@ -36,7 +36,7 @@ abstract class AbstractBodyReaderTest {
 
     protected final MediaType mediaType;
 
-    AbstractBodyReaderTest() throws NoSuchFieldException, IllegalAccessException {
+    AbstractBodyReaderTest() throws Exception {
         mediaType = getMediaType();
 
         final Field mountPointServiceHandlerField =
@@ -76,6 +76,12 @@ abstract class AbstractBodyReaderTest {
         }
 
         normalizedNodeProvider.setRequest(request);
+    }
+
+    protected static void checkMountPointNormalizedNodeContext(
+            final NormalizedNodeContext nnContext) {
+        checkNormalizedNodeContext(nnContext);
+        assertNotNull(nnContext.getInstanceIdentifierContext().getMountPoint());
     }
 
     protected static void checkNormalizedNodeContext(

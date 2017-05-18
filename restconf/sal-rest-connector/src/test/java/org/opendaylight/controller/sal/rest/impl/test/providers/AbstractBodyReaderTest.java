@@ -35,8 +35,7 @@ public abstract class AbstractBodyReaderTest {
     private static Field uriField;
     private static Field requestField;
 
-    public AbstractBodyReaderTest() throws NoSuchFieldException,
-            SecurityException {
+    public AbstractBodyReaderTest() throws Exception {
         uriField = AbstractIdentifierAwareJaxRsProvider.class
                 .getDeclaredField("uriInfo");
         uriField.setAccessible(true);
