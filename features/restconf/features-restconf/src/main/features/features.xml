@@ -38,7 +38,6 @@
         <bundle>mvn:org.opendaylight.yangtools/yang-data-codec-gson/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.yangtools/yang-model-export/{{VERSION}}</bundle>
         <configfile finalname="${config.configfile.directory}/${config.restconf.configfile}">mvn:org.opendaylight.netconf/sal-rest-connector-config/{{VERSION}}/xml/config</configfile>
-        <configfile finalname="${config.configfile.directory}/${config.restconf.service.configfile}">mvn:org.opendaylight.netconf/sal-rest-connector-config/{{VERSION}}/xml/configrestconfservice</configfile>
     </feature>
     <feature name ='odl-mdsal-apidocs' version='${project.version}' description="OpenDaylight :: MDSAL :: APIDOCS">
         <feature version='${project.version}'>odl-restconf</feature>

@@ -135,13 +135,5 @@
             <type>xml</type>
             <classifier>config</classifier>
         </dependency>
-        <dependency>
-            <!-- finalname="${config.configfile.directory}/${config.restconf.service.configfile}" -->
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>sal-rest-connector-config</artifactId>
-            <version>${project.version}</version>
-            <type>xml</type>
-            <classifier>configrestconfservice</classifier>
-        </dependency>
     </dependencies>
 </project>
