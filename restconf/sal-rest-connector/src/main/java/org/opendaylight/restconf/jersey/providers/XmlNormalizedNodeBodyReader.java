@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.jersey.providers;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +35,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.restconf.Rfc8040;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlUtils;
@@ -133,6 +135,14 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
                     iiToDataList.add(new YangInstanceIdentifier.NodeIdentifier(schemaNode.getQName()));
                 }
             }
+        // PUT
+        } else if (!isRpc) {
+            final QName scQName = schemaNode.getQName();
+            Preconditions.checkState(
+                    docRootElm.equals(scQName.getLocalName())
+                            && docRootNamespace.equals(scQName.getNamespace().toASCIIString()),
+                    String.format("Not correct message root element \"%s\", should be \"%s\"",
+                            docRootElm, scQName));
         }
 
         NormalizedNode<?, ?> parsed = null;
