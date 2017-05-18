@@ -115,14 +115,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>sal-rest-connector-config</artifactId>
-      <version>${restconf.version}</version>
-      <type>xml</type>
-      <classifier>configrestconfservice</classifier>
-    </dependency>
-
-    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
     </dependency>
