@@ -8,6 +8,9 @@
 
 package org.opendaylight.netconf.mdsal.connector.ops;
 
+import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfigInput.ErrorOption.RollbackOnError;
+import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfigInput.ErrorOption.StopOnError;
+
 import com.google.common.base.Optional;
 import java.util.List;
 import java.util.ListIterator;
@@ -27,6 +30,8 @@ import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.mdsal.connector.ops.DataTreeChangeTracker.DataTreeChange;
 import org.opendaylight.netconf.mdsal.connector.ops.file.NetconfFileService;
 import org.opendaylight.netconf.mdsal.connector.ops.parser.MdsalNetconfParameter;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfigInput;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfigInput.ErrorOption;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -45,6 +50,7 @@ public class EditConfig extends ValidateNetconfOperation {
 
     private static final String OPERATION_NAME = "edit-config";
     private static final String TEST_OPTION_KEY = "test-option";
+    private static final String ERROR_OPTION_KEY = "error-option";
     private static final String CONFIG_KEY = "config";
     private static final String URL_KEY = "url";
     private static final String DEFAULT_OPERATION_KEY = "default-operation";
@@ -60,6 +66,7 @@ public class EditConfig extends ValidateNetconfOperation {
         final MdsalNetconfParameter inputParameter = extractTargetParameter(operationElement);
         final ModifyAction defaultAction = getDefaultOperation(operationElement);
         final TestOption testOption = extractTestOption(operationElement);
+        final ErrorOption errorOption = extractErrorOption(operationElement);
         XmlElement configElement = extractConfigElement(operationElement);
 
         if (configElement == null) {
@@ -70,7 +77,7 @@ public class EditConfig extends ValidateNetconfOperation {
         }
 
 
-        executeEditConfig(inputParameter.getDatastore(), defaultAction, testOption, configElement);
+        executeEditConfig(inputParameter.getDatastore(), defaultAction, testOption, configElement, errorOption);
 
         return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
     }
@@ -99,21 +106,30 @@ public class EditConfig extends ValidateNetconfOperation {
                 ErrorSeverity.error);
     }
 
-    public void executeEditConfig(Datastore datastore, ModifyAction defaultAction, TestOption testOption, XmlElement configElement) throws DocumentedException {
-        DOMDataReadWriteTransaction rwTx = createReadWriteTransaction(datastore);
-
+    public void executeEditConfig(Datastore datastore, ModifyAction defaultAction, TestOption testOption, XmlElement configElement, ErrorOption errorOption) throws DocumentedException {
         for (final XmlElement element : configElement.getChildElements()) {
-            final DataTreeChangeTracker changeTracker = createDataTreeChecker(defaultAction, element);
-            if (testOption != TestOption.testOnly) {
-                executeOperations(changeTracker, rwTx);
+            DOMDataReadWriteTransaction rwTx = createReadWriteTransaction(datastore);
+            boolean isValid = true;
+            try {
+                final DataTreeChangeTracker changeTracker = createDataTreeChecker(defaultAction, element);
+                if (testOption != TestOption.testOnly) {
+                    executeOperations(changeTracker, rwTx);
+                }
+            } catch (DocumentedException e) {
+                LOG.error(e.getMessage(),e);
+                if (ErrorOption.StopOnError == errorOption) {
+                    throw e;
+                }
+                isValid = false;
+            }
+
+            if (isValid && datastore == Datastore.running && testOption != TestOption.testOnly) {
+                boolean commitStatus = transactionProvider.commitRunningTransaction(rwTx);
+                LOG.trace("Commit completed successfully {}", commitStatus);
             }
         }
 
-        if (datastore == Datastore.running && testOption != TestOption.testOnly) {
-            boolean commitStatus = transactionProvider.commitRunningTransaction(rwTx);
-            LOG.trace("Commit completed successfully {}", commitStatus);
-            rwTx = null;
-        }
+
     }
 
     private DOMDataReadWriteTransaction createReadWriteTransaction(Datastore datastore) {
@@ -126,13 +142,37 @@ public class EditConfig extends ValidateNetconfOperation {
      * @return
      * @throws DocumentedException
      */
-    public static TestOption extractTestOption(XmlElement operationElement) throws DocumentedException {
+    private TestOption extractTestOption(XmlElement operationElement) throws DocumentedException {
         Optional<XmlElement> testOptionElementOpt = operationElement.getOnlyChildElementWithSameNamespaceOptionally(TEST_OPTION_KEY);
         if (testOptionElementOpt.isPresent()) {
             String testOptionValue = testOptionElementOpt.get().getTextContent();
             return TestOption.getFromXmlName(testOptionValue);
         }
         return TestOption.getDefault();
+    }
+
+    /**
+     * Extract value of error-option.
+     * @param operationElement
+     * @return
+     * @throws DocumentedException
+     */
+    private ErrorOption extractErrorOption(XmlElement operationElement) throws DocumentedException {
+        Optional<XmlElement> errorOptionElementOpt = operationElement.getOnlyChildElementWithSameNamespaceOptionally(ERROR_OPTION_KEY);
+        ErrorOption result = StopOnError;
+        if (errorOptionElementOpt.isPresent()) {
+            String errorOptionValue = errorOptionElementOpt.get().getTextContent();
+            for (ErrorOption option : ErrorOption.values()) {
+                if (option.getName().equals(errorOptionValue)) {
+                    result = option;
+                    break;
+                }
+            }
+            if (RollbackOnError == result) {
+                throw new DocumentedException("Rollback on error is not supported", ErrorType.application, ErrorTag.operation_not_supported, ErrorSeverity.error);
+            }
+        }
+        return result;
     }
 
     private void executeOperations(final DataTreeChangeTracker changeTracker, DOMDataReadWriteTransaction rwTx) throws DocumentedException {
