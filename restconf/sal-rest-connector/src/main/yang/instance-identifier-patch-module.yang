@@ -5,6 +5,16 @@ module instance-identifier-patch-module {
   revision 2015-11-21 {
   }
 
+
+  container bgp-linkstate-app-config {
+      leaf iana-linkstate-attribute-type {
+          description "If true (default) linkstate attribute type (=29) allocated by IANA is used,
+                       else type (=99) is used for parsing/serialization";
+          type boolean;
+          default true;
+      }
+  }
+
   container patch-cont {
     container patch-cont2 {
         leaf cont-leaf {
