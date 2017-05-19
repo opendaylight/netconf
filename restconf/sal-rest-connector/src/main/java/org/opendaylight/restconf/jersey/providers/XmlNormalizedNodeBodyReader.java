@@ -7,217 +7,47 @@
  */
 package org.opendaylight.restconf.jersey.providers;
 
-import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.List;
+import java.net.URISyntaxException;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
-import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
-import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
 import org.opendaylight.restconf.Rfc8040;
 import org.opendaylight.restconf.utils.RestconfConstants;
-import org.opendaylight.yangtools.util.xml.UntrustedXML;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlUtils;
-import org.opendaylight.yangtools.yang.data.impl.schema.SchemaUtils;
-import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
-import org.opendaylight.yangtools.yang.model.api.AugmentationSchema;
-import org.opendaylight.yangtools.yang.model.api.AugmentationTarget;
-import org.opendaylight.yangtools.yang.model.api.ChoiceCaseNode;
-import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 @Provider
 @Consumes({ Rfc8040.MediaTypes.DATA + RestconfConstants.XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsProvider
-        implements MessageBodyReader<NormalizedNodeContext> {
+public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReader {
 
-    private static final Logger LOG = LoggerFactory.getLogger(XmlNormalizedNodeBodyReader.class);
+    private static final XMLInputFactory XIF;
+
+    static {
+        final XMLInputFactory f = XMLInputFactory.newFactory();
+
+        f.setProperty(XMLInputFactory.IS_COALESCING, Boolean.TRUE);
+        f.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, Boolean.TRUE);
+        f.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
+        f.setProperty(XMLInputFactory.SUPPORT_DTD, Boolean.FALSE);
+
+        XIF = f;
+    }
 
     @Override
-    public boolean isReadable(final Class<?> type, final Type genericType, final Annotation[] annotations,
-            final MediaType mediaType) {
-        return true;
-    }
-
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    @Override
-    public NormalizedNodeContext readFrom(final Class<NormalizedNodeContext> type, final Type genericType,
-            final Annotation[] annotations, final MediaType mediaType,
-            final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream) throws IOException,
-            WebApplicationException {
-        try {
-            final InstanceIdentifierContext<?> path = getInstanceIdentifierContext();
-
-            if (entityStream.available() < 1) {
-                // represent empty nopayload input
-                return new NormalizedNodeContext(path, null);
-            }
-
-            final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
-            return parse(path,doc);
-        } catch (final RestconfDocumentedException e) {
-            throw e;
-        } catch (final Exception e) {
-            LOG.debug("Error parsing xml input", e);
-
-            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                    ErrorTag.MALFORMED_MESSAGE);
-        }
-    }
-
-    private NormalizedNodeContext parse(final InstanceIdentifierContext<?> pathContext,final Document doc) {
-
-        final List<Element> elements = Collections.singletonList(doc.getDocumentElement());
-        final SchemaNode schemaNodeContext = pathContext.getSchemaNode();
-        DataSchemaNode schemaNode;
-        boolean isRpc = false;
-        if (schemaNodeContext instanceof RpcDefinition) {
-            schemaNode = ((RpcDefinition) schemaNodeContext).getInput();
-            isRpc = true;
-        } else if (schemaNodeContext instanceof DataSchemaNode) {
-            schemaNode = (DataSchemaNode) schemaNodeContext;
-        } else {
-            throw new IllegalStateException("Unknown SchemaNode");
-        }
-
-        final String docRootElm = doc.getDocumentElement().getLocalName();
-        final String docRootNamespace = doc.getDocumentElement().getNamespaceURI();
-        final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
-        InstanceIdentifierContext<? extends SchemaNode> outIIContext;
-
-        final DomToNormalizedNodeParserFactory parserFactory =
-                DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER,
-                    pathContext.getSchemaContext());
-
-        if (isPost() && !isRpc) {
-            final Deque<Object> foundSchemaNodes = findPathToSchemaNodeByName(schemaNode, docRootElm, docRootNamespace);
-            if (foundSchemaNodes.isEmpty()) {
-                throw new IllegalStateException(String.format("Child \"%s\" was not found in parent schema node \"%s\"",
-                        docRootElm, schemaNode.getQName()));
-            }
-            while (!foundSchemaNodes.isEmpty()) {
-                final Object child = foundSchemaNodes.pop();
-                if (child instanceof AugmentationSchema) {
-                    final AugmentationSchema augmentSchemaNode = (AugmentationSchema) child;
-                    iiToDataList.add(SchemaUtils.getNodeIdentifierForAugmentation(augmentSchemaNode));
-                } else if (child instanceof DataSchemaNode) {
-                    schemaNode = (DataSchemaNode) child;
-                    iiToDataList.add(new YangInstanceIdentifier.NodeIdentifier(schemaNode.getQName()));
-                }
-            }
-        }
-
-        NormalizedNode<?, ?> parsed = null;
-
-        if (schemaNode instanceof ContainerSchemaNode) {
-            parsed = parserFactory.getContainerNodeParser().parse(Collections.singletonList(doc.getDocumentElement()),
-                (ContainerSchemaNode) schemaNode);
-        } else if (schemaNode instanceof ListSchemaNode) {
-            final ListSchemaNode casted = (ListSchemaNode) schemaNode;
-            parsed = parserFactory.getMapEntryNodeParser().parse(elements, casted);
-            if (isPost()) {
-                iiToDataList.add(parsed.getIdentifier());
-            }
-        }
-
-        final YangInstanceIdentifier fullIIToData = YangInstanceIdentifier.create(Iterables.concat(
-                pathContext.getInstanceIdentifier().getPathArguments(), iiToDataList));
-
-        outIIContext = new InstanceIdentifierContext<>(fullIIToData, pathContext.getSchemaNode(),
-                pathContext.getMountPoint(),
-                pathContext.getSchemaContext());
-
-        return new NormalizedNodeContext(outIIContext, parsed);
-    }
-
-    private static Deque<Object> findPathToSchemaNodeByName(final DataSchemaNode schemaNode, final String elementName,
-                                                            final String namespace) {
-        final Deque<Object> result = new ArrayDeque<>();
-        final ArrayList<ChoiceSchemaNode> choiceSchemaNodes = new ArrayList<>();
-        final Collection<DataSchemaNode> children = ((DataNodeContainer) schemaNode).getChildNodes();
-        for (final DataSchemaNode child : children) {
-            if (child instanceof ChoiceSchemaNode) {
-                choiceSchemaNodes.add((ChoiceSchemaNode) child);
-            } else if (child.getQName().getLocalName().equalsIgnoreCase(elementName)
-                    && child.getQName().getNamespace().toString().equalsIgnoreCase(namespace)) {
-                // add child to result
-                result.push(child);
-
-                // find augmentation
-                if (child.isAugmenting()) {
-                    final AugmentationSchema augment = findCorrespondingAugment(schemaNode, child);
-                    if (augment != null) {
-                        result.push(augment);
-                    }
-                }
-
-                // return result
-                return result;
-            }
-        }
-
-        for (final ChoiceSchemaNode choiceNode : choiceSchemaNodes) {
-            for (final ChoiceCaseNode caseNode : choiceNode.getCases()) {
-                final Deque<Object> resultFromRecursion = findPathToSchemaNodeByName(caseNode, elementName, namespace);
-                if (!resultFromRecursion.isEmpty()) {
-                    resultFromRecursion.push(choiceNode);
-                    if (choiceNode.isAugmenting()) {
-                        final AugmentationSchema augment = findCorrespondingAugment(schemaNode, choiceNode);
-                        if (augment != null) {
-                            resultFromRecursion.push(augment);
-                        }
-                    }
-                    return resultFromRecursion;
-                }
-            }
-        }
-        return result;
-    }
-
-    private static AugmentationSchema findCorrespondingAugment(final DataSchemaNode parent,
-                                                               final DataSchemaNode child) {
-        if ((parent instanceof AugmentationTarget) && !(parent instanceof ChoiceSchemaNode)) {
-            for (final AugmentationSchema augmentation : ((AugmentationTarget) parent).getAvailableAugmentations()) {
-                final DataSchemaNode childInAugmentation = augmentation.getDataChildByName(child.getQName());
-                if (childInAugmentation != null) {
-                    return augmentation;
-                }
-            }
-        }
-        return null;
-    }
-
-    public void injectParams(final UriInfo uriInfo, final Request request) {
-        setRequest(request);
-        setUriInfo(uriInfo);
+    void readStream(final InputStream entityStream, final NormalizedNodeStreamWriter writer,
+            final SchemaContext schemaContext, final SchemaNode parentSchema, final SchemaNode schema)
+                    throws XMLStreamException,
+            URISyntaxException, IOException, ParserConfigurationException, SAXException {
+        final XmlParserStream xmlParser = XmlParserStream.create(writer, schemaContext, schema);
+        xmlParser.parse(XIF.createXMLStreamReader(entityStream));
     }
 }
 
