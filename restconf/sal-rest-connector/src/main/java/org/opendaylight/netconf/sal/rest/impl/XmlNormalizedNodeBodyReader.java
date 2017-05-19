@@ -45,6 +45,7 @@ import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -158,6 +159,9 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
             if (isPost()) {
                 iiToDataList.add(parsed.getIdentifier());
             }
+        } else if (schemaNode instanceof LeafSchemaNode) {
+            final LeafSchemaNode casted = (LeafSchemaNode) schemaNode;
+            parsed = parserFactory.getLeafNodeParser().parse(elements, casted);
         }
         // FIXME : add another DataSchemaNode extensions e.g. LeafSchemaNode
 
