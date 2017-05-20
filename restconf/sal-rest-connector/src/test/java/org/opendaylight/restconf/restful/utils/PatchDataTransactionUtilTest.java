@@ -14,6 +14,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static org.opendaylight.netconf.sal.restconf.impl.PatchEditOperation.CREATE;
+import static org.opendaylight.netconf.sal.restconf.impl.PatchEditOperation.DELETE;
+import static org.opendaylight.netconf.sal.restconf.impl.PatchEditOperation.MERGE;
+import static org.opendaylight.netconf.sal.restconf.impl.PatchEditOperation.REMOVE;
+import static org.opendaylight.netconf.sal.restconf.impl.PatchEditOperation.REPLACE;
 
 import com.google.common.util.concurrent.Futures;
 import java.lang.reflect.Field;
@@ -170,9 +175,9 @@ public class PatchDataTransactionUtilTest {
                 .when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeMerge);
 
         final PatchEntity entityReplace =
-                new PatchEntity("edit1", "REPLACE", this.targetNodeMerge, this.buildArtistList);
-        final PatchEntity entityMerge = new PatchEntity("edit2", "MERGE", this.targetNodeMerge, this.buildArtistList);
-        final PatchEntity entityRemove = new PatchEntity("edit3", "REMOVE", this.targetNodeMerge);
+                new PatchEntity("edit1", REPLACE, this.targetNodeMerge, this.buildArtistList);
+        final PatchEntity entityMerge = new PatchEntity("edit2", MERGE, this.targetNodeMerge, this.buildArtistList);
+        final PatchEntity entityRemove = new PatchEntity("edit3", REMOVE, this.targetNodeMerge);
         final List<PatchEntity> entities = new ArrayList<>();
 
         entities.add(entityReplace);
@@ -198,9 +203,9 @@ public class PatchDataTransactionUtilTest {
                 .when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
 
         final PatchEntity entityCreate =
-                new PatchEntity("edit1", "CREATE", this.targetNodeForCreateAndDelete, this.buildBaseContainerForTests);
+                new PatchEntity("edit1", CREATE, this.targetNodeForCreateAndDelete, this.buildBaseContainerForTests);
         final PatchEntity entityDelete =
-                new PatchEntity("edit2", "DELETE", this.targetNodeForCreateAndDelete);
+                new PatchEntity("edit2", DELETE, this.targetNodeForCreateAndDelete);
         final List<PatchEntity> entities = new ArrayList<>();
 
         entities.add(entityCreate);
@@ -225,7 +230,7 @@ public class PatchDataTransactionUtilTest {
                 .when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
 
         final PatchEntity entityDelete =
-                new PatchEntity("edit", "DELETE", this.targetNodeForCreateAndDelete);
+                new PatchEntity("edit", DELETE, this.targetNodeForCreateAndDelete);
         final List<PatchEntity> entities = new ArrayList<>();
 
         entities.add(entityDelete);
@@ -250,7 +255,7 @@ public class PatchDataTransactionUtilTest {
                 .when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
 
         final PatchEntity entityMerge =
-                new PatchEntity("edit1", "MERGE", this.targetNodeForCreateAndDelete, this.buildBaseContainerForTests);
+                new PatchEntity("edit1", MERGE, this.targetNodeForCreateAndDelete, this.buildBaseContainerForTests);
         final List<PatchEntity> entities = new ArrayList<>();
 
         entities.add(entityMerge);

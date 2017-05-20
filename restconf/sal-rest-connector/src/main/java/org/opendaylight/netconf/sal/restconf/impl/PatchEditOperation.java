@@ -8,8 +8,6 @@
 
 package org.opendaylight.netconf.sal.restconf.impl;
 
-import javax.annotation.Nonnull;
-
 /**
  * Each YANG patch edit specifies one edit operation on the target data
  * node.  The set of operations is aligned with the NETCONF edit
@@ -17,31 +15,26 @@ import javax.annotation.Nonnull;
  *
  */
 public enum PatchEditOperation {
-    CREATE,  //post
-    DELETE,  //delete
-    INSERT,  //post
-    MERGE,
-    MOVE,    //delete+post
-    REPLACE, //put
-    REMOVE;  //delete
+    CREATE(true),  // post
+    DELETE(false), // delete
+    INSERT(true),  // post
+    MERGE(true),
+    MOVE(false),   // delete+post
+    REPLACE(true), // put
+    REMOVE(false); // delete
+
+    private final boolean withValue;
+
+    PatchEditOperation(final boolean withValue) {
+        this.withValue = withValue;
+    }
 
     /**
      * Not all patch operations support value node. Check if operation requires value or not.
-     * @param operation Name of the operation to be checked
+     *
      * @return true if operation requires value, false otherwise
      */
-    public static final boolean isPatchOperationWithValue(@Nonnull final String operation) {
-        switch (PatchEditOperation.valueOf(operation.toUpperCase())) {
-            case CREATE:
-                // fall through
-            case MERGE:
-                // fall through
-            case REPLACE:
-                // fall through
-            case INSERT:
-                return true;
-            default:
-                return false;
-        }
+    public boolean isWithValue() {
+        return withValue;
     }
 }

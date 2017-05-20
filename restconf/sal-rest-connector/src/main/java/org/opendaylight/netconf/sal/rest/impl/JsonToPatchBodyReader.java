@@ -8,8 +8,6 @@
 
 package org.opendaylight.netconf.sal.rest.impl;
 
-import static org.opendaylight.netconf.sal.restconf.impl.PatchEditOperation.isPatchOperationWithValue;
-
 import com.google.common.collect.ImmutableList;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
@@ -33,6 +31,7 @@ import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
+import org.opendaylight.netconf.sal.restconf.impl.PatchEditOperation;
 import org.opendaylight.netconf.sal.restconf.impl.PatchEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
@@ -229,7 +228,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
                     edit.setId(in.nextString());
                     break;
                 case "operation" :
-                    edit.setOperation(in.nextString());
+                    edit.setOperation(PatchEditOperation.valueOf(in.nextString().toUpperCase()));
                     break;
                 case "target" :
                     // target can be specified completely in request URI
@@ -375,7 +374,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
     private static PatchEntity prepareEditOperation(@Nonnull final PatchEdit edit) {
         if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
                 && checkDataPresence(edit.getOperation(), edit.getData() != null)) {
-            if (isPatchOperationWithValue(edit.getOperation())) {
+            if (edit.getOperation().isWithValue()) {
                 // for lists allow to manipulate with list items through their parent
                 final YangInstanceIdentifier targetNode;
                 if (edit.getTarget().getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
@@ -400,8 +399,8 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @return true if data is present when operation requires it or if there are no data when operation does not
      *     allow it, false otherwise
      */
-    private static boolean checkDataPresence(@Nonnull final String operation, final boolean hasData) {
-        return isPatchOperationWithValue(operation) == hasData;
+    private static boolean checkDataPresence(@Nonnull final PatchEditOperation operation, final boolean hasData) {
+        return operation.isWithValue() == hasData;
     }
 
     /**
@@ -409,7 +408,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      */
     private static final class PatchEdit {
         private String id;
-        private String operation;
+        private PatchEditOperation operation;
         private YangInstanceIdentifier target;
         private SchemaNode targetSchemaNode;
         private NormalizedNode<?, ?> data;
@@ -422,11 +421,11 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
             this.id = id;
         }
 
-        public String getOperation() {
+        public PatchEditOperation getOperation() {
             return this.operation;
         }
 
-        public void setOperation(final String operation) {
+        public void setOperation(final PatchEditOperation operation) {
             this.operation = operation;
         }
 

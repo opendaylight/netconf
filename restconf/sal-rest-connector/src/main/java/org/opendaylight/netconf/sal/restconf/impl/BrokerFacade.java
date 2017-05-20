@@ -332,8 +332,7 @@ public class BrokerFacade {
         boolean withoutError = true;
 
         for (final PatchEntity patchEntity : patchContext.getData()) {
-            final PatchEditOperation operation = PatchEditOperation.valueOf(patchEntity.getOperation().toUpperCase());
-
+            final PatchEditOperation operation = patchEntity.getOperation();
             switch (operation) {
                 case CREATE:
                     if (withoutError) {

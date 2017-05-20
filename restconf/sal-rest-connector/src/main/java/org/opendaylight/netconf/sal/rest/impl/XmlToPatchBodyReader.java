@@ -114,13 +114,15 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
             DataSchemaNode schemaNode = (DataSchemaNode) pathContext.getSchemaNode();
             final Element element = (Element) editNodes.item(i);
             final String operation = element.getElementsByTagName("operation").item(0).getFirstChild().getNodeValue();
+            final PatchEditOperation oper = PatchEditOperation.valueOf(operation.toUpperCase());
+
             final String editId = element.getElementsByTagName("edit-id").item(0).getFirstChild().getNodeValue();
             final String target = element.getElementsByTagName("target").item(0).getFirstChild().getNodeValue();
-            final List<Element> values = readValueNodes(element, operation);
+            final List<Element> values = readValueNodes(element, oper);
             final Element firstValueElement = values != null ? values.get(0) : null;
 
             // get namespace according to schema node from path context or value
-            final String namespace = (firstValueElement == null)
+            final String namespace = firstValueElement == null
                     ? schemaNode.getQName().getNamespace().toString() : firstValueElement.getNamespaceURI();
 
             // find module according to namespace
@@ -155,24 +157,26 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                 LOG.debug("Target node {} not found in path {} ", target, pathContext.getSchemaNode());
                 throw new RestconfDocumentedException("Error parsing input", ErrorType.PROTOCOL,
                         ErrorTag.MALFORMED_MESSAGE);
-            } else {
-                if (PatchEditOperation.isPatchOperationWithValue(operation)) {
-                    NormalizedNode<?, ?> parsed = null;
-                    if (schemaNode instanceof ContainerSchemaNode) {
-                        parsed = parserFactory.getContainerNodeParser().parse(values, (ContainerSchemaNode) schemaNode);
-                    } else if (schemaNode instanceof ListSchemaNode) {
-                        parsed = parserFactory.getMapNodeParser().parse(values, (ListSchemaNode) schemaNode);
-                    }
+            }
 
-                    // for lists allow to manipulate with list items through their parent
-                    if (targetII.getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
-                        targetII = targetII.getParent();
-                    }
-
-                    resultCollection.add(new PatchEntity(editId, operation, targetII, parsed));
+            if (oper.isWithValue()) {
+                final NormalizedNode<?, ?> parsed;
+                if (schemaNode instanceof ContainerSchemaNode) {
+                    parsed = parserFactory.getContainerNodeParser().parse(values, (ContainerSchemaNode) schemaNode);
+                } else if (schemaNode instanceof ListSchemaNode) {
+                    parsed = parserFactory.getMapNodeParser().parse(values, (ListSchemaNode) schemaNode);
                 } else {
-                    resultCollection.add(new PatchEntity(editId, operation, targetII));
+                    parsed = null;
                 }
+
+                // for lists allow to manipulate with list items through their parent
+                if (targetII.getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
+                    targetII = targetII.getParent();
+                }
+
+                resultCollection.add(new PatchEntity(editId, oper, targetII, parsed));
+            } else {
+                resultCollection.add(new PatchEntity(editId, oper, targetII));
             }
         }
 
@@ -186,15 +190,16 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
      * @param operation Name of current operation
      * @return List of value elements
      */
-    private static List<Element> readValueNodes(@Nonnull final Element element, @Nonnull final String operation) {
+    private static List<Element> readValueNodes(@Nonnull final Element element,
+            @Nonnull final PatchEditOperation operation) {
         final Node valueNode = element.getElementsByTagName("value").item(0);
 
-        if (PatchEditOperation.isPatchOperationWithValue(operation) && (valueNode == null)) {
+        if (operation.isWithValue() && valueNode == null) {
             throw new RestconfDocumentedException("Error parsing input",
                     ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
 
-        if (!PatchEditOperation.isPatchOperationWithValue(operation) && (valueNode != null)) {
+        if (!operation.isWithValue() && valueNode != null) {
             throw new RestconfDocumentedException("Error parsing input",
                     ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
@@ -237,12 +242,12 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
             nonCondXpath.append(s);
             childNode = ((DataNodeContainer) childNode).getDataChildByName(QName.create(namespace, revision, s));
 
-            if ((childNode instanceof ListSchemaNode) && args.hasNext()) {
+            if (childNode instanceof ListSchemaNode && args.hasNext()) {
                 appendKeys(nonCondXpath, ((ListSchemaNode) childNode).getKeyDefinition().iterator(), args);
             }
         }
 
-        if ((childNode instanceof ListSchemaNode) && (value != null)) {
+        if (childNode instanceof ListSchemaNode && value != null) {
             final Iterator<String> keyValues = readKeyValues(value,
                     ((ListSchemaNode) childNode).getKeyDefinition().iterator());
             appendKeys(nonCondXpath, ((ListSchemaNode) childNode).getKeyDefinition().iterator(), keyValues);

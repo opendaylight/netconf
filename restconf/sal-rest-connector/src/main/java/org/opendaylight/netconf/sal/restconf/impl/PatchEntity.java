@@ -14,7 +14,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 public class PatchEntity {
 
-    private final String operation;
+    private final PatchEditOperation operation;
     private final String editId;
     private final YangInstanceIdentifier targetNode;
     private final NormalizedNode<?,?> node;
@@ -26,7 +26,7 @@ public class PatchEntity {
      * @param targetNode Target node for Patch edit operation
      * @param node Data defined by value leaf used by edit operation
      */
-    public PatchEntity(final String editId, final String operation, final YangInstanceIdentifier targetNode,
+    public PatchEntity(final String editId, final PatchEditOperation operation, final YangInstanceIdentifier targetNode,
                        final NormalizedNode<?, ?> node) {
         this.editId = Preconditions.checkNotNull(editId);
         this.operation = Preconditions.checkNotNull(operation);
@@ -41,14 +41,15 @@ public class PatchEntity {
      * @param operation Patch edit operation
      * @param targetNode Target node for Patch edit operation
      */
-    public PatchEntity(final String editId, final String operation, final YangInstanceIdentifier targetNode) {
+    public PatchEntity(final String editId, final PatchEditOperation operation,
+            final YangInstanceIdentifier targetNode) {
         this.editId = Preconditions.checkNotNull(editId);
         this.operation = Preconditions.checkNotNull(operation);
         this.targetNode = Preconditions.checkNotNull(targetNode);
         this.node = null;
     }
 
-    public String getOperation() {
+    public PatchEditOperation getOperation() {
         return operation;
     }
 
