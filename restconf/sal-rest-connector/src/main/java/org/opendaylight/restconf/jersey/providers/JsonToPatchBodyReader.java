@@ -213,7 +213,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
     private void readEditDefinition(@Nonnull final PatchEdit edit, @Nonnull final JsonReader in,
                                     @Nonnull final InstanceIdentifierContext<?> path,
                                     @Nonnull final StringModuleInstanceIdentifierCodec codec) throws IOException {
-        final StringBuffer value = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         in.beginObject();
 
         while (in.hasNext()) {
@@ -242,7 +242,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
                 case "value" :
                     // save data defined in value node for next (later) processing, because target needs to be read
                     // always first and there is no ordering in Json input
-                    readValueNode(value, in);
+                    readValueNode(sb, in);
                     break;
                 default:
                     break;
@@ -253,98 +253,101 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
 
         // read saved data to normalized node when target schema is already known
         edit.setData(
-                readEditData(new JsonReader(new StringReader(value.toString())), edit.getTargetSchemaNode(), path));
+                readEditData(new JsonReader(new StringReader(sb.toString())), edit.getTargetSchemaNode(), path));
     }
 
     /**
      * Parse data defined in value node and saves it to buffer.
-     * @param value Buffer to read value node
+     * @param sb Buffer to read value node
      * @param in JsonReader reader
      * @throws IOException if operation fails
      */
-    private void readValueNode(@Nonnull final StringBuffer value, @Nonnull final JsonReader in) throws IOException {
+    private void readValueNode(@Nonnull final StringBuilder sb, @Nonnull final JsonReader in) throws IOException {
         in.beginObject();
-        value.append("{");
 
-        value.append("\"" + in.nextName() + "\"" + ":");
+        sb.append("{\"").append(in.nextName()).append("\":");
 
-        if (in.peek() == JsonToken.BEGIN_ARRAY) {
-            in.beginArray();
-            value.append("[");
+        switch (in.peek()) {
+            case BEGIN_ARRAY:
+                in.beginArray();
+                sb.append('[');
 
-            while (in.hasNext()) {
-                if (in.peek() == JsonToken.STRING) {
-                    value.append("\"" + in.nextString() + "\"");
-                } else {
-                    readValueObject(value, in);
+                while (in.hasNext()) {
+                    if (in.peek() == JsonToken.STRING) {
+                        sb.append('"').append(in.nextString()).append('"');
+                    } else {
+                        readValueObject(sb, in);
+                    }
+                    if (in.peek() != JsonToken.END_ARRAY) {
+                        sb.append(',');
+                    }
                 }
-                if (in.peek() != JsonToken.END_ARRAY) {
-                    value.append(",");
-                }
-            }
 
-            in.endArray();
-            value.append("]");
-        } else {
-            readValueObject(value, in);
+                in.endArray();
+                sb.append(']');
+                break;
+            default:
+                readValueObject(sb, in);
+                break;
         }
 
         in.endObject();
-        value.append("}");
+        sb.append('}');
     }
 
     /**
      * Parse one value object of data and saves it to buffer.
-     * @param value Buffer to read value object
+     * @param sb Buffer to read value object
      * @param in JsonReader reader
      * @throws IOException if operation fails
      */
-    private void readValueObject(@Nonnull final StringBuffer value, @Nonnull final JsonReader in) throws IOException {
+    private void readValueObject(@Nonnull final StringBuilder sb, @Nonnull final JsonReader in) throws IOException {
         // read simple leaf value
         if (in.peek() == JsonToken.STRING) {
-            value.append("\"" + in.nextString() + "\"");
+            sb.append('"').append(in.nextString()).append('"');
             return;
         }
 
         in.beginObject();
-        value.append("{");
+        sb.append('{');
 
         while (in.hasNext()) {
-            value.append("\"" + in.nextName() + "\"");
-            value.append(":");
+            sb.append('"').append(in.nextName()).append("\":");
 
-            if (in.peek() == JsonToken.STRING) {
-                value.append("\"" + in.nextString() + "\"");
-            } else {
-                if (in.peek() == JsonToken.BEGIN_ARRAY) {
+            switch (in.peek()) {
+                case STRING:
+                    sb.append('"').append(in.nextString()).append('"');
+                    break;
+                case BEGIN_ARRAY:
                     in.beginArray();
-                    value.append("[");
+                    sb.append('[');
 
                     while (in.hasNext()) {
                         if (in.peek() == JsonToken.STRING) {
-                            value.append("\"" + in.nextString() + "\"");
+                            sb.append('"').append(in.nextString()).append('"');
                         } else {
-                            readValueObject(value, in);
+                            readValueObject(sb, in);
                         }
+
                         if (in.peek() != JsonToken.END_ARRAY) {
-                            value.append(",");
+                            sb.append(',');
                         }
                     }
 
                     in.endArray();
-                    value.append("]");
-                } else {
-                    readValueObject(value, in);
-                }
+                    sb.append(']');
+                    break;
+                default:
+                    readValueObject(sb, in);
             }
 
             if (in.peek() != JsonToken.END_OBJECT) {
-                value.append(",");
+                sb.append(',');
             }
         }
 
         in.endObject();
-        value.append("}");
+        sb.append('}');
     }
 
     /**
