@@ -51,7 +51,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWrit
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
-import org.opendaylight.yangtools.yang.data.impl.codec.xml.XMLStreamNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
@@ -165,14 +165,14 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
                 .mapEntryBuilder(listStreamSchemaNode);
 
         List<DataSchemaNode> lsChildDataSchemaNode = ControllerContext.findInstanceDataChildrenByName(
-                (listStreamSchemaNode), "error-type");
+                listStreamSchemaNode, "error-type");
         final DataSchemaNode errTypSchemaNode = Iterables.getFirst(lsChildDataSchemaNode, null);
         Preconditions.checkState(errTypSchemaNode instanceof LeafSchemaNode);
         errNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) errTypSchemaNode)
                 .withValue(error.getErrorType().getErrorTypeTag()).build());
 
         lsChildDataSchemaNode = ControllerContext.findInstanceDataChildrenByName(
-                (listStreamSchemaNode), "error-tag");
+                listStreamSchemaNode, "error-tag");
         final DataSchemaNode errTagSchemaNode = Iterables.getFirst(lsChildDataSchemaNode, null);
         Preconditions.checkState(errTagSchemaNode instanceof LeafSchemaNode);
         errNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) errTagSchemaNode)
@@ -180,7 +180,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
         if (error.getErrorAppTag() != null) {
             lsChildDataSchemaNode = ControllerContext.findInstanceDataChildrenByName(
-                    (listStreamSchemaNode), "error-app-tag");
+                    listStreamSchemaNode, "error-app-tag");
             final DataSchemaNode errAppTagSchemaNode = Iterables.getFirst(lsChildDataSchemaNode, null);
             Preconditions.checkState(errAppTagSchemaNode instanceof LeafSchemaNode);
             errNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) errAppTagSchemaNode)
@@ -188,7 +188,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         }
 
         lsChildDataSchemaNode = ControllerContext.findInstanceDataChildrenByName(
-                (listStreamSchemaNode), "error-message");
+                listStreamSchemaNode, "error-message");
         final DataSchemaNode errMsgSchemaNode = Iterables.getFirst(lsChildDataSchemaNode, null);
         Preconditions.checkState(errMsgSchemaNode instanceof LeafSchemaNode);
         errNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) errMsgSchemaNode)
@@ -264,7 +264,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
                 writeDataRoot(outputWriter,nnWriter,(ContainerNode) data);
             } else {
                 if (data instanceof MapEntryNode) {
-                    data = ImmutableNodes.mapNodeBuilder(data.getNodeType()).withChild(((MapEntryNode) data)).build();
+                    data = ImmutableNodes.mapNodeBuilder(data.getNodeType()).withChild((MapEntryNode) data).build();
                 }
                 nnWriter.write(data);
             }
