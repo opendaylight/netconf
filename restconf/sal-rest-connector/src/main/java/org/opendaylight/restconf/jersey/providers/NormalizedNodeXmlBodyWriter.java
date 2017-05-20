@@ -38,7 +38,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.codec.xml.XMLStreamNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -52,7 +52,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
 
     static {
         XML_FACTORY = XMLOutputFactory.newFactory();
-        XML_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
+        XML_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
     }
 
     @Override
@@ -85,15 +85,15 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             return;
         }
 
-        XMLStreamWriter xmlWriter;
+        final XMLStreamWriter baseWriter;
         try {
-            xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
-            if (context.getWriterParameters().isPrettyPrint()) {
-                xmlWriter = new IndentingXMLStreamWriter(xmlWriter);
-            }
+            baseWriter = XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
         } catch (final XMLStreamException | FactoryConfigurationError e) {
             throw new IllegalStateException(e);
         }
+
+        final XMLStreamWriter xmlWriter = context.getWriterParameters().isPrettyPrint()
+                ? new IndentingXMLStreamWriter(baseWriter) : baseWriter;
         final NormalizedNode<?, ?> data = context.getData();
         final SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
 

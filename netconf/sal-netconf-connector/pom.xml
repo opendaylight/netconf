@@ -120,6 +120,10 @@
       <artifactId>yang-data-codec-gson</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>yang-data-codec-xml</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opendaylight.mdsal.model</groupId>
       <artifactId>ietf-inet-types-2013-07-15</artifactId>
     </dependency>
