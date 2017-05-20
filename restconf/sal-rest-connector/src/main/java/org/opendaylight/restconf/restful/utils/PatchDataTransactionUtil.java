@@ -19,7 +19,6 @@ import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFaile
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
-import org.opendaylight.netconf.sal.restconf.impl.PatchEditOperation;
 import org.opendaylight.netconf.sal.restconf.impl.PatchEntity;
 import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.PatchStatusEntity;
@@ -61,9 +60,8 @@ public final class PatchDataTransactionUtil {
         final DOMDataReadWriteTransaction tx = transactionNode.getTransactionChain().newReadWriteTransaction();
 
         for (final PatchEntity patchEntity : context.getData()) {
-            final PatchEditOperation operation = PatchEditOperation.valueOf(patchEntity.getOperation().toUpperCase());
             if (noError) {
-                switch (operation) {
+                switch (patchEntity.getOperation()) {
                     case CREATE:
                         try {
                             createDataWithinTransaction(LogicalDatastoreType.CONFIGURATION,

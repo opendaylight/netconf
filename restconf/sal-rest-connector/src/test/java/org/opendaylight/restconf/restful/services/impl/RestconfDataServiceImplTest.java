@@ -16,6 +16,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.opendaylight.netconf.sal.restconf.impl.PatchEditOperation.CREATE;
+import static org.opendaylight.netconf.sal.restconf.impl.PatchEditOperation.DELETE;
+import static org.opendaylight.netconf.sal.restconf.impl.PatchEditOperation.REMOVE;
+import static org.opendaylight.netconf.sal.restconf.impl.PatchEditOperation.REPLACE;
 
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
@@ -427,9 +431,9 @@ public class RestconfDataServiceImplTest {
                 .node(this.containerPlayerQname)
                 .node(this.leafQname)
                 .build();
-        entity.add(new PatchEntity("create data", "CREATE", this.iidBase, this.buildBaseCont));
-        entity.add(new PatchEntity("replace data", "REPLACE", this.iidBase, this.buildBaseCont));
-        entity.add(new PatchEntity("delete data", "DELETE", iidleaf));
+        entity.add(new PatchEntity("create data", CREATE, this.iidBase, this.buildBaseCont));
+        entity.add(new PatchEntity("replace data", REPLACE, this.iidBase, this.buildBaseCont));
+        entity.add(new PatchEntity("delete data", DELETE, iidleaf));
         final PatchContext patch = new PatchContext(iidContext, entity, "test patch id");
 
         doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseCont))).when(this.read)
@@ -457,9 +461,9 @@ public class RestconfDataServiceImplTest {
                 .node(this.containerPlayerQname)
                 .node(this.leafQname)
                 .build();
-        entity.add(new PatchEntity("create data", "CREATE", this.iidBase, this.buildBaseCont));
-        entity.add(new PatchEntity("replace data", "REPLACE", this.iidBase, this.buildBaseCont));
-        entity.add(new PatchEntity("delete data", "DELETE", iidleaf));
+        entity.add(new PatchEntity("create data", CREATE, this.iidBase, this.buildBaseCont));
+        entity.add(new PatchEntity("replace data", REPLACE, this.iidBase, this.buildBaseCont));
+        entity.add(new PatchEntity("delete data", DELETE, iidleaf));
         final PatchContext patch = new PatchContext(iidContext, entity, "test patch id");
 
         doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseCont))).when(this.read)
@@ -496,9 +500,9 @@ public class RestconfDataServiceImplTest {
                 .node(this.containerPlayerQname)
                 .node(this.leafQname)
                 .build();
-        entity.add(new PatchEntity("create data", "CREATE", this.iidBase, this.buildBaseCont));
-        entity.add(new PatchEntity("remove data", "REMOVE", iidleaf));
-        entity.add(new PatchEntity("delete data", "DELETE", iidleaf));
+        entity.add(new PatchEntity("create data", CREATE, this.iidBase, this.buildBaseCont));
+        entity.add(new PatchEntity("remove data", REMOVE, iidleaf));
+        entity.add(new PatchEntity("delete data", DELETE, iidleaf));
         final PatchContext patch = new PatchContext(iidContext, entity, "test patch id");
 
         doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseCont))).when(this.read)
