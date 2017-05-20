@@ -135,9 +135,9 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
                 XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, schemaContext, schemaPath);
         if (depth.isPresent()) {
             return DepthAwareNormalizedNodeWriter.forStreamWriter(xmlStreamWriter, depth.get());
-        } else {
-            return RestconfDelegatingNormalizedNodeWriter.forStreamWriter(xmlStreamWriter);
         }
+
+        return RestconfDelegatingNormalizedNodeWriter.forStreamWriter(xmlStreamWriter);
     }
 
     private static void writeElements(final XMLStreamWriter xmlWriter, final RestconfNormalizedNodeWriter nnWriter,

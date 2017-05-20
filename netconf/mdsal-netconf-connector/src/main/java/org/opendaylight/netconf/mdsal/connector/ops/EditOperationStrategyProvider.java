@@ -151,17 +151,17 @@ class EditOperationStrategyProvider extends DomToNormalizedNodeParserFactory.Bui
             if (dataTreeChangeTracker.getDeleteOperationTracker() > 0
                     || dataTreeChangeTracker .getRemoveOperationTracker() > 0) {
                 return node;
-            } else {
-                if (!action.equals(dataTreeChangeTracker.peekAction())) {
-                    dataTreeChangeTracker.pushPath(node.getIdentifier());
-                    dataTreeChangeTracker.addDataTreeChange(new DataTreeChangeTracker.DataTreeChange(node, action,
-                            new ArrayList<>(dataTreeChangeTracker.getCurrentPath())));
-                    dataTreeChangeTracker.popPath();
-                    return null;
-                } else {
-                    return node;
-                }
             }
+
+            if (action.equals(dataTreeChangeTracker.peekAction())) {
+                return node;
+            }
+
+            dataTreeChangeTracker.pushPath(node.getIdentifier());
+            dataTreeChangeTracker.addDataTreeChange(new DataTreeChangeTracker.DataTreeChange(node, action,
+                new ArrayList<>(dataTreeChangeTracker.getCurrentPath())));
+            dataTreeChangeTracker.popPath();
+            return null;
         }
 
         @Override
@@ -200,17 +200,17 @@ class EditOperationStrategyProvider extends DomToNormalizedNodeParserFactory.Bui
             if (dataTreeChangeTracker.getDeleteOperationTracker() > 0
                     || dataTreeChangeTracker.getRemoveOperationTracker() > 0) {
                 return node;
-            } else {
-                if (!action.equals(dataTreeChangeTracker.peekAction())) {
-                    dataTreeChangeTracker.pushPath(node.getIdentifier());
-                    dataTreeChangeTracker.addDataTreeChange(new DataTreeChangeTracker.DataTreeChange(node, action,
-                            new ArrayList<>(dataTreeChangeTracker.getCurrentPath())));
-                    dataTreeChangeTracker.popPath();
-                    return null;
-                } else {
-                    return node;
-                }
             }
+
+            if (action.equals(dataTreeChangeTracker.peekAction())) {
+                return node;
+            }
+
+            dataTreeChangeTracker.pushPath(node.getIdentifier());
+            dataTreeChangeTracker.addDataTreeChange(new DataTreeChangeTracker.DataTreeChange(node, action,
+                new ArrayList<>(dataTreeChangeTracker.getCurrentPath())));
+            dataTreeChangeTracker.popPath();
+            return null;
         }
 
         @Override
@@ -244,19 +244,19 @@ class EditOperationStrategyProvider extends DomToNormalizedNodeParserFactory.Bui
                     || dataTreeChangeTracker.getRemoveOperationTracker() > 0) {
                 dataTreeChangeTracker.popPath();
                 return node;
-            } else {
-                //if parent and current actions dont match create a DataTreeChange and add it to the change list
-                //dont add a new child to the parent node
-                if (!currentAction.equals(dataTreeChangeTracker.peekAction())) {
-                    dataTreeChangeTracker.addDataTreeChange(new DataTreeChangeTracker.DataTreeChange(node,
-                            currentAction, new ArrayList<>(dataTreeChangeTracker.getCurrentPath())));
-                    dataTreeChangeTracker.popPath();
-                    return null;
-                } else {
-                    dataTreeChangeTracker.popPath();
-                    return node;
-                }
             }
+
+            if (currentAction.equals(dataTreeChangeTracker.peekAction())) {
+                dataTreeChangeTracker.popPath();
+                return node;
+            }
+
+            //if parent and current actions dont match create a DataTreeChange and add it to the change list
+            //dont add a new child to the parent node
+            dataTreeChangeTracker.addDataTreeChange(new DataTreeChangeTracker.DataTreeChange(node,
+                currentAction, new ArrayList<>(dataTreeChangeTracker.getCurrentPath())));
+            dataTreeChangeTracker.popPath();
+            return null;
         }
 
         @Override

@@ -116,7 +116,7 @@ public class YangInstanceIdentifierDeserializerTest {
                 YangInstanceIdentifier.NodeIdentifier.create(leafList),
                 iterator.next());
         assertEquals("Not expected path argument",
-                new YangInstanceIdentifier.NodeWithValue(leafList, "instance"),
+                new YangInstanceIdentifier.NodeWithValue<>(leafList, "instance"),
                 iterator.next());
     }
 
@@ -209,7 +209,7 @@ public class YangInstanceIdentifierDeserializerTest {
                 new YangInstanceIdentifier.NodeIdentifier(leafList),
                 iterator.next());
         assertEquals("Not expected path argument",
-                new YangInstanceIdentifier.NodeWithValue(leafList, true).toString(),
+                new YangInstanceIdentifier.NodeWithValue<>(leafList, true).toString(),
                 iterator.next().toString());
     }
 

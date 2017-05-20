@@ -85,7 +85,7 @@ public class PostDataTransactionUtilTest {
                 .node(baseQName)
                 .build();
 
-        final LeafNode buildLeaf = Builders.leafBuilder()
+        final LeafNode<?> buildLeaf = Builders.leafBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(leafQname))
                 .withValue(0.2)
                 .build();
@@ -130,7 +130,7 @@ public class PostDataTransactionUtilTest {
         doReturn(Futures.immediateCheckedFuture(false))
                 .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         final YangInstanceIdentifier.NodeIdentifier identifier =
-                ((ContainerNode) ((SingletonSet) payload.getData().getValue()).iterator().next()).getIdentifier();
+                ((ContainerNode) ((SingletonSet<?>) payload.getData().getValue()).iterator().next()).getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
         doReturn(Futures.immediateCheckedFuture(false))
@@ -180,7 +180,7 @@ public class PostDataTransactionUtilTest {
         doReturn(Futures.immediateCheckedFuture(false))
                 .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         final YangInstanceIdentifier.NodeIdentifier identifier =
-                ((ContainerNode) ((SingletonSet) payload.getData().getValue()).iterator().next()).getIdentifier();
+                ((ContainerNode) ((SingletonSet<?>) payload.getData().getValue()).iterator().next()).getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
         doReturn(Futures.immediateCheckedFuture(false))

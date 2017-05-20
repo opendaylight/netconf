@@ -30,7 +30,7 @@ public class NetconfConfigurationActivatorTest {
     @Mock
     private BundleContext context;
     @Mock
-    private ServiceRegistration registration;
+    private ServiceRegistration<?> registration;
 
     @Before
     public void setUp() throws Exception {

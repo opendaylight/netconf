@@ -82,7 +82,7 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
         public NormalizedNodeContext getData(@Encoded @PathParam("identifier") final String identifier,
                                              @Context final UriInfo uriInfo) {
 
-            final InstanceIdentifierContext iiWithData = ControllerContext.getInstance().toInstanceIdentifier(
+            final InstanceIdentifierContext<?> iiWithData = ControllerContext.getInstance().toInstanceIdentifier(
                     identifier);
 
             NormalizedNode<?, ?> data = null;
@@ -311,8 +311,8 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
                 keys);
     }
 
-    private static NodeWithValue toIdentifier(final String localName, final Object value) {
-        return new NodeWithValue(QName.create("urn:nested:module", "2014-06-3", localName), value);
+    private static NodeWithValue<?> toIdentifier(final String localName, final Object value) {
+        return new NodeWithValue<>(QName.create("urn:nested:module", "2014-06-3", localName), value);
     }
 
     private static UnkeyedListEntryNode nodeDataDepth3Operational() {

@@ -28,6 +28,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListen
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -116,9 +117,9 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
     private static Optional<YangModuleCapability> moduleToCapability(
             final Module module, final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency) {
 
-        final SourceIdentifier moduleSourceIdentifier = SourceIdentifier.create(module.getName(),
-                (SimpleDateFormatUtil.DEFAULT_DATE_REV == module.getRevision() ? Optional.absent() :
-                        Optional.of(module.getQNameModule().getFormattedRevision())));
+        final SourceIdentifier moduleSourceIdentifier = RevisionSourceIdentifier.create(module.getName(),
+                SimpleDateFormatUtil.DEFAULT_DATE_REV == module.getRevision() ? Optional.absent() :
+                        Optional.of(module.getQNameModule().getFormattedRevision()));
 
         InputStream sourceStream = null;
         String source;
@@ -141,10 +142,10 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
 
         if (source != null) {
             return Optional.of(new YangModuleCapability(module, source));
-        } else {
-            LOG.warn("Missing source for module {}. This module will not be available from netconf server",
-                    moduleSourceIdentifier);
         }
+
+        LOG.warn("Missing source for module {}. This module will not be available from netconf server",
+            moduleSourceIdentifier);
         return Optional.absent();
     }
 

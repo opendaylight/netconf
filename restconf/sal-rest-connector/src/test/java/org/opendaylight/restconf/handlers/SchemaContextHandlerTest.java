@@ -16,6 +16,7 @@ import com.google.common.util.concurrent.CheckedFuture;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
@@ -40,10 +41,9 @@ public class SchemaContextHandlerTest {
         Mockito.when(txHandler.get()).thenReturn(domTx);
         final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
         Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
-        final CheckedFuture checked = Mockito.mock(CheckedFuture.class);
+        final CheckedFuture<Void,TransactionCommitFailedException> checked = Mockito.mock(CheckedFuture.class);
         Mockito.when(wTx.submit()).thenReturn(checked);
-        final Object value = null;
-        Mockito.when(checked.checkedGet()).thenReturn(value);
+        Mockito.when(checked.checkedGet()).thenReturn(null);
         this.schemaContextHandler = new SchemaContextHandler(txHandler);
 
         this.schemaContext =

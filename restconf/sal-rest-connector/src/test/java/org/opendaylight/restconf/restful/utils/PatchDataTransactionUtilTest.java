@@ -101,7 +101,7 @@ public class PatchDataTransactionUtilTest {
                 .build();
 
         /* values that are used for creating leaf for testPatchDataCreateAndDelete test */
-        final LeafNode buildGapLeaf = Builders.leafBuilder()
+        final LeafNode<?> buildGapLeaf = Builders.leafBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(leafGapQName))
                 .withValue(0.2)
                 .build();

@@ -92,8 +92,8 @@ public class RestDeleteOperationTest extends JerseyTest {
     @Test
     public void deleteFailTest() throws Exception {
         final String uri = "/config/test-interface:interfaces";
-        final Exception exception = new TransactionCommitFailedException("failed test");
-        final CheckedFuture future = Futures.immediateFailedCheckedFuture(exception);
+        final CheckedFuture<Void, TransactionCommitFailedException> future =
+                Futures.immediateFailedCheckedFuture(new TransactionCommitFailedException("failed test"));
         when(brokerFacade.commitConfigurationDataDelete(any(YangInstanceIdentifier.class))).thenReturn(future);
         final Response response = target(uri).request(MediaType.APPLICATION_XML).delete();
         assertEquals(500, response.getStatus());
