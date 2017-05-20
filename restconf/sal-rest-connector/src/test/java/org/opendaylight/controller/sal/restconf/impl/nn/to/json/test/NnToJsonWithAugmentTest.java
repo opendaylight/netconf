@@ -23,6 +23,7 @@ import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
+@Deprecated
 public class NnToJsonWithAugmentTest extends AbstractBodyReaderTest {
 
     private static SchemaContext schemaContext;

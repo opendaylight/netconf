@@ -381,7 +381,7 @@ public class BrokerFacadeTest {
 
         final DOMTransactionChain transactionChain = mock(DOMTransactionChain.class);
         final DOMDataWriteTransaction wTx = mock(DOMDataWriteTransaction.class);
-        final CheckedFuture checked = Futures.immediateCheckedFuture("");
+        final CheckedFuture<Void, TransactionCommitFailedException> checked = Futures.immediateCheckedFuture(null);
         when(wTx.submit()).thenReturn(checked);
         when(transactionChain.newWriteOnlyTransaction()).thenReturn(wTx);
         final TransactionChainHandler transactionChainHandler = new TransactionChainHandler(transactionChain);

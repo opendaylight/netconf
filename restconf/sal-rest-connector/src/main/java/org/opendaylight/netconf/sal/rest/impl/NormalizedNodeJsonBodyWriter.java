@@ -121,7 +121,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
             path = path.getParent();
 
             if (data instanceof MapEntryNode) {
-                data = ImmutableNodes.mapNodeBuilder(data.getNodeType()).withChild(((MapEntryNode) data)).build();
+                data = ImmutableNodes.mapNodeBuilder(data.getNodeType()).withChild((MapEntryNode) data).build();
             }
             nnWriter = createNormalizedNodeWriter(context,path,jsonWriter, depth);
             nnWriter.write(data);
@@ -144,8 +144,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         final JSONCodecFactory codecs = getCodecFactory(context);
 
         final URI initialNs;
-        if ((schema instanceof DataSchemaNode)
-                && !((DataSchemaNode)schema).isAugmenting()
+        if (schema instanceof DataSchemaNode && !((DataSchemaNode)schema).isAugmenting()
                 && !(schema instanceof SchemaContext)) {
             initialNs = schema.getQName().getNamespace();
         } else if (schema instanceof RpcDefinition) {
@@ -157,23 +156,22 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
                 JSONNormalizedNodeStreamWriter.createNestedWriter(codecs, path, initialNs, jsonWriter);
         if (depth.isPresent()) {
             return DepthAwareNormalizedNodeWriter.forStreamWriter(streamWriter, depth.get());
-        } else {
-            return RestconfDelegatingNormalizedNodeWriter.forStreamWriter(streamWriter);
         }
+
+        return RestconfDelegatingNormalizedNodeWriter.forStreamWriter(streamWriter);
     }
 
     private static JsonWriter createJsonWriter(final OutputStream entityStream, final boolean prettyPrint) {
         if (prettyPrint) {
             return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8),
                     DEFAULT_INDENT_SPACES_NUM);
-        } else {
-            return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8));
         }
+
+        return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8));
     }
 
     private static JSONCodecFactory getCodecFactory(final InstanceIdentifierContext<?> context) {
         // TODO: Performance: Cache JSON Codec factory and schema context
-        return JSONCodecFactory.create(context.getSchemaContext());
+        return JSONCodecFactory.getShared(context.getSchemaContext());
     }
-
 }

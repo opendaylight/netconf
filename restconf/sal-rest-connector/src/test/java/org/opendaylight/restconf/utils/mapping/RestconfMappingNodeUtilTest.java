@@ -132,8 +132,8 @@ public class RestconfMappingNodeUtilTest {
             if (child.getNodeType().equals(MonitoringModule.CONT_CAPABILITES_QNAME)) {
                 for (final DataContainerChild<? extends PathArgument, ?> dataContainerChild : ((ContainerNode) child)
                         .getValue()) {
-                    for (final Object entry : ((LeafSetNode) dataContainerChild).getValue()) {
-                        listOfValues.add(((LeafSetEntryNode) entry).getValue());
+                    for (final Object entry : ((LeafSetNode<?>) dataContainerChild).getValue()) {
+                        listOfValues.add(((LeafSetEntryNode<?>) entry).getValue());
                     }
                 }
             }
@@ -159,7 +159,7 @@ public class RestconfMappingNodeUtilTest {
         final Map<QName, Object> map =
                 prepareMap(path.getLastPathArgument().getNodeType().getLocalName(), uri, start, outputType);
 
-        final NormalizedNode mappedData =
+        final NormalizedNode<?, ?> mappedData =
                 RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(
                         path, start, outputType, uri, monitoringModule, exist, schemaContextMonitoring);
         assertNotNull(mappedData);
@@ -179,7 +179,7 @@ public class RestconfMappingNodeUtilTest {
         map.put(MonitoringModule.LEAF_DESCR_STREAM_QNAME, "Notifi");
 
         final QName notifiQName = QName.create("urn:nested:module", "2014-06-3", "notifi");
-        final NormalizedNode mappedData =
+        final NormalizedNode<?, ?> mappedData =
                 RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(notifiQName,
                     schemaContextMonitoring.getNotifications(), start, outputType, uri, monitoringModule, exist);
         assertNotNull(mappedData);
@@ -191,17 +191,17 @@ public class RestconfMappingNodeUtilTest {
         final Map<QName, Object> map = new HashMap<>();
         map.put(MonitoringModule.LEAF_NAME_STREAM_QNAME, name);
         map.put(MonitoringModule.LEAF_LOCATION_ACCESS_QNAME, uri.toString());
-        map.put(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME, true);
+        map.put(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME, Boolean.TRUE);
         map.put(MonitoringModule.LEAF_START_TIME_STREAM_QNAME, DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(
             OffsetDateTime.ofInstant(start, ZoneId.systemDefault())));
         map.put(MonitoringModule.LEAF_ENCODING_ACCESS_QNAME, outputType);
         return map;
     }
 
-    private static void testData(final Map<QName, Object> map, final NormalizedNode mappedData) {
+    private static void testData(final Map<QName, Object> map, final NormalizedNode<?, ?> mappedData) {
         for (final DataContainerChild<? extends PathArgument, ?> child : ((MapEntryNode) mappedData).getValue()) {
             if (child instanceof LeafNode) {
-                final LeafNode leaf = ((LeafNode) child);
+                final LeafNode<?> leaf = (LeafNode<?>) child;
                 Assert.assertTrue(map.containsKey(leaf.getNodeType()));
                 Assert.assertEquals(map.get(leaf.getNodeType()), leaf.getValue());
             }
@@ -220,7 +220,7 @@ public class RestconfMappingNodeUtilTest {
 
         for (final DataContainerChild<? extends PathArgument, ?> child : containerNode.getValue()) {
             if (child instanceof LeafNode) {
-                assertEquals(IetfYangLibrary.MODULE_SET_ID_LEAF_QNAME, ((LeafNode) child).getNodeType());
+                assertEquals(IetfYangLibrary.MODULE_SET_ID_LEAF_QNAME, ((LeafNode<?>) child).getNodeType());
             }
             if (child instanceof MapNode) {
                 assertEquals(IetfYangLibrary.MODULE_QNAME_LIST, ((MapNode) child).getNodeType());
@@ -231,10 +231,10 @@ public class RestconfMappingNodeUtilTest {
                             .getValue()) {
                         switch (dataContainerChild.getNodeType().getLocalName()) {
                             case IetfYangLibrary.SPECIFIC_MODULE_NAME_LEAF:
-                                name = String.valueOf(((LeafNode) dataContainerChild).getValue());
+                                name = String.valueOf(((LeafNode<?>) dataContainerChild).getValue());
                                 break;
                             case IetfYangLibrary.SPECIFIC_MODULE_REVISION_LEAF:
-                                revision = String.valueOf(((LeafNode) dataContainerChild).getValue());
+                                revision = String.valueOf(((LeafNode<?>) dataContainerChild).getValue());
                                 break;
                             default :
                                 LOG.info("Unknown local name '{}' of node.",

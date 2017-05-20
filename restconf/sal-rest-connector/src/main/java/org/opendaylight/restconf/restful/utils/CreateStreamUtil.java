@@ -221,12 +221,12 @@ public final class CreateStreamUtil {
             streamName = streamName + "/JSON";
         }
 
-        if (!Notificator.existNotificationListenerFor(streamName)) {
-            return Notificator.createNotificationListener(paths, streamName, outputType);
-        } else {
+        if (Notificator.existNotificationListenerFor(streamName)) {
             final List<NotificationListenerAdapter> notificationListenerFor =
                     Notificator.getNotificationListenerFor(streamName);
             return SubscribeToStreamUtil.pickSpecificListenerByOutput(notificationListenerFor, outputType);
         }
+
+        return Notificator.createNotificationListener(paths, streamName, outputType);
     }
 }

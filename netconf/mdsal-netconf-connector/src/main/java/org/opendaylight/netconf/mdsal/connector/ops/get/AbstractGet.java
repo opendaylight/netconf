@@ -132,9 +132,9 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
                 return Optional.absent();
             }
             return Optional.of(getInstanceIdentifierFromFilter(filterElement.get()));
-        } else {
-            return Optional.of(ROOT);
         }
+
+        return Optional.of(ROOT);
     }
 
     @VisibleForTesting

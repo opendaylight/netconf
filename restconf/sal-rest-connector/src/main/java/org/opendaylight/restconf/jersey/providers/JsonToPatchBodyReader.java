@@ -115,7 +115,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
                 ErrorTag.MALFORMED_MESSAGE, exception);
     }
 
-    private List<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext path) throws IOException {
+    private List<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext<?> path) throws IOException {
         final List<PatchEntity> resultCollection = new ArrayList<>();
         final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
                 path.getSchemaContext());
@@ -171,7 +171,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @throws IOException if operation fails
      */
     private void parseByName(@Nonnull final String name, @Nonnull final PatchEdit edit,
-                             @Nonnull final JsonReader in, @Nonnull final InstanceIdentifierContext path,
+                             @Nonnull final JsonReader in, @Nonnull final InstanceIdentifierContext<?> path,
                              @Nonnull final StringModuleInstanceIdentifierCodec codec,
                              @Nonnull final List<PatchEntity> resultCollection) throws IOException {
         switch (name) {
@@ -211,7 +211,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @throws IOException if operation fails
      */
     private void readEditDefinition(@Nonnull final PatchEdit edit, @Nonnull final JsonReader in,
-                                    @Nonnull final InstanceIdentifierContext path,
+                                    @Nonnull final InstanceIdentifierContext<?> path,
                                     @Nonnull final StringModuleInstanceIdentifierCodec codec) throws IOException {
         final StringBuffer value = new StringBuffer();
         in.beginObject();
@@ -352,8 +352,8 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @param in reader JsonReader reader
      * @return NormalizedNode representing data
      */
-    private static NormalizedNode readEditData(@Nonnull final JsonReader in, @Nonnull final SchemaNode targetSchemaNode,
-                                        @Nonnull final InstanceIdentifierContext path) {
+    private static NormalizedNode<?, ?> readEditData(@Nonnull final JsonReader in,
+            @Nonnull final SchemaNode targetSchemaNode, @Nonnull final InstanceIdentifierContext<?> path) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         JsonParserStream.create(writer, path.getSchemaContext(), targetSchemaNode).parse(in);
@@ -369,19 +369,19 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
     private static PatchEntity prepareEditOperation(@Nonnull final PatchEdit edit) {
         if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
                 && checkDataPresence(edit.getOperation(), edit.getData() != null)) {
-            if (isPatchOperationWithValue(edit.getOperation())) {
-                // for lists allow to manipulate with list items through their parent
-                final YangInstanceIdentifier targetNode;
-                if (edit.getTarget().getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
-                    targetNode = edit.getTarget().getParent();
-                } else {
-                    targetNode = edit.getTarget();
-                }
-
-                return new PatchEntity(edit.getId(), edit.getOperation(), targetNode, edit.getData());
-            } else {
+            if (!isPatchOperationWithValue(edit.getOperation())) {
                 return new PatchEntity(edit.getId(), edit.getOperation(), edit.getTarget());
             }
+
+            // for lists allow to manipulate with list items through their parent
+            final YangInstanceIdentifier targetNode;
+            if (edit.getTarget().getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
+                targetNode = edit.getTarget().getParent();
+            } else {
+                targetNode = edit.getTarget();
+            }
+
+            return new PatchEntity(edit.getId(), edit.getOperation(), targetNode, edit.getData());
         }
 
         throw new RestconfDocumentedException("Error parsing input", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
@@ -395,11 +395,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      *     allow it, false otherwise
      */
     private static boolean checkDataPresence(@Nonnull final String operation, final boolean hasData) {
-        if (isPatchOperationWithValue(operation)) {
-            return hasData;
-        } else  {
-            return !hasData;
-        }
+        return isPatchOperationWithValue(operation) == hasData;
     }
 
     /**
@@ -410,7 +406,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
         private String operation;
         private YangInstanceIdentifier target;
         private SchemaNode targetSchemaNode;
-        private NormalizedNode data;
+        private NormalizedNode<?, ?> data;
 
         public String getId() {
             return id;
@@ -444,11 +440,11 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
             this.targetSchemaNode = targetSchemaNode;
         }
 
-        public NormalizedNode getData() {
+        public NormalizedNode<?, ?> getData() {
             return data;
         }
 
-        public void setData(final NormalizedNode data) {
+        public void setData(final NormalizedNode<?, ?> data) {
             this.data = data;
         }
 

@@ -71,7 +71,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
 
         this.outputType = Preconditions.checkNotNull(outputType);
         this.path = Preconditions.checkNotNull(path);
-        Preconditions.checkArgument((streamName != null) && !streamName.isEmpty());
+        Preconditions.checkArgument(streamName != null && !streamName.isEmpty());
         this.streamName = streamName;
     }
 
@@ -156,7 +156,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     private String writeBodyToString() {
         final Writer writer = new StringWriter();
         final NormalizedNodeStreamWriter jsonStream =
-                JSONNormalizedNodeStreamWriter.createExclusiveWriter(JSONCodecFactory.create(this.schemaContext),
+                JSONNormalizedNodeStreamWriter.createExclusiveWriter(JSONCodecFactory.getShared(this.schemaContext),
                         this.notification.getType(), null, JsonWriterFactory.createJsonWriter(writer));
         final NormalizedNodeWriter nodeWriter = NormalizedNodeWriter.forStreamWriter(jsonStream);
         try {

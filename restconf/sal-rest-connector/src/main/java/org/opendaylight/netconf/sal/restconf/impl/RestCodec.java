@@ -212,11 +212,11 @@ public class RestCodec {
             final IdentityValuesDTO identityValuesDTO = new IdentityValuesDTO();
             for (final PathArgument pathArgument : data.getPathArguments()) {
                 final IdentityValue identityValue = qNameToIdentityValue(pathArgument.getNodeType());
-                if ((pathArgument instanceof NodeIdentifierWithPredicates) && (identityValue != null)) {
+                if (pathArgument instanceof NodeIdentifierWithPredicates && identityValue != null) {
                     final List<Predicate> predicates =
                             keyValuesToPredicateList(((NodeIdentifierWithPredicates) pathArgument).getKeyValues());
                     identityValue.setPredicates(predicates);
-                } else if ((pathArgument instanceof NodeWithValue) && (identityValue != null)) {
+                } else if (pathArgument instanceof NodeWithValue && identityValue != null) {
                     final List<Predicate> predicates = new ArrayList<>();
                     final String value = String.valueOf(((NodeWithValue) pathArgument).getValue());
                     predicates.add(new Predicate(null, value));
@@ -266,7 +266,7 @@ public class RestCodec {
                                     String.valueOf(identityValue.getValue()));
                             return null;
                         }
-                        pathArgument = new NodeWithValue(qName, leafListPredicate.getValue());
+                        pathArgument = new NodeWithValue<>(qName, leafListPredicate.getValue());
                     } else if (node instanceof ListSchemaNode) { // predicates are keys of list
                         final DataNodeContainer listNode = (DataNodeContainer) node;
                         final Map<QName, Object> predicatesMap = new HashMap<>();
@@ -286,7 +286,7 @@ public class RestCodec {
                     }
                 }
                 result.add(pathArgument);
-                if (i < (identities.size() - 1)) { // last element in instance-identifier can be other than
+                if (i < identities.size() - 1) { // last element in instance-identifier can be other than
                     // DataNodeContainer
                     if (node instanceof DataNodeContainer) {
                         parentContainer = (DataNodeContainer) node;

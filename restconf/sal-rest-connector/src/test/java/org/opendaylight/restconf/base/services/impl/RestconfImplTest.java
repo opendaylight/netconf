@@ -11,6 +11,7 @@ import com.google.common.util.concurrent.CheckedFuture;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
@@ -34,16 +35,15 @@ public class RestconfImplTest {
         Mockito.when(txHandler.get()).thenReturn(domTx);
         final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
         Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
-        final CheckedFuture checked = Mockito.mock(CheckedFuture.class);
+        final CheckedFuture<Void, TransactionCommitFailedException> checked = Mockito.mock(CheckedFuture.class);
         Mockito.when(wTx.submit()).thenReturn(checked);
-        final Object valueObj = null;
-        Mockito.when(checked.checkedGet()).thenReturn(valueObj);
+        Mockito.when(checked.checkedGet()).thenReturn(null);
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(txHandler);
         schemaContextHandler.onGlobalContextUpdated(schemaContext);
 
         final RestconfImpl restconfImpl = new RestconfImpl(schemaContextHandler);
         final NormalizedNodeContext libraryVersion = restconfImpl.getLibraryVersion();
-        final LeafNode value = (LeafNode) libraryVersion.getData();
+        final LeafNode<?> value = (LeafNode<?>) libraryVersion.getData();
         Assert.assertEquals(IetfYangLibrary.REVISION, value.getValue());
     }
 }

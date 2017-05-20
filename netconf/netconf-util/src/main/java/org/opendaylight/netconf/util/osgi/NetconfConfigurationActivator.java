@@ -28,17 +28,17 @@ public class NetconfConfigurationActivator implements BundleActivator {
         PROPS.put(Constants.SERVICE_PID, CONFIG_PID);
     }
 
-    private ServiceRegistration configService;
+    private ServiceRegistration<?> configService;
 
     @Override
-    public void start(BundleContext bundleContext) {
+    public void start(final BundleContext bundleContext) {
         LOG.debug("Starting netconf configuration service");
         configService = bundleContext.registerService(ManagedService.class,
                 new NetconfConfiguration(), PROPS);
     }
 
     @Override
-    public void stop(BundleContext bundleContext) {
+    public void stop(final BundleContext bundleContext) {
         if (configService != null) {
             LOG.debug("Unregistering netconf configuration service");
             configService.unregister();

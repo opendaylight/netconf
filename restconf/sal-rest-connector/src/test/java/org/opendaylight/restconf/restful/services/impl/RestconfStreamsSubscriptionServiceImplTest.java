@@ -33,6 +33,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
@@ -80,15 +82,15 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
         Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
         final DOMDataReadWriteTransaction rwTx = Mockito.mock(DOMDataReadWriteTransaction.class);
-        final CheckedFuture checkedFuture = Futures.immediateCheckedFuture(true);
+        final CheckedFuture<Boolean, ReadFailedException> checkedFuture = Futures.immediateCheckedFuture(Boolean.TRUE);
         Mockito.when(rwTx.exists(Mockito.any(), Mockito.any())).thenReturn(checkedFuture);
-        final CheckedFuture checkedFutureEmpty = Futures.immediateCheckedFuture("");
+        final CheckedFuture<Void, TransactionCommitFailedException> checkedFutureEmpty =
+                Futures.immediateCheckedFuture(null);
         Mockito.when(rwTx.submit()).thenReturn(checkedFutureEmpty);
         Mockito.when(domTx.newReadWriteTransaction()).thenReturn(rwTx);
-        final CheckedFuture checked = Mockito.mock(CheckedFuture.class);
+        final CheckedFuture<Void, TransactionCommitFailedException> checked = Mockito.mock(CheckedFuture.class);
         Mockito.when(wTx.submit()).thenReturn(checked);
-        final Object valueObj = null;
-        Mockito.when(checked.checkedGet()).thenReturn(valueObj);
+        Mockito.when(checked.checkedGet()).thenReturn(null);
         this.schemaHandler = new SchemaContextHandler(txHandler);
 
         final DOMDataBroker dataBroker = mock(DOMDataBroker.class);

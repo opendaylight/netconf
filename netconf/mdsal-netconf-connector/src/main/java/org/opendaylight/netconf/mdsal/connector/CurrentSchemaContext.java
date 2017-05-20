@@ -23,7 +23,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 
 public class CurrentSchemaContext implements SchemaContextListener, AutoCloseable {
-    private final AtomicReference<SchemaContext> currentContext = new AtomicReference();
+    private final AtomicReference<SchemaContext> currentContext = new AtomicReference<>();
     private final ListenerRegistration<SchemaContextListener> schemaContextListenerListenerRegistration;
     private final Set<CapabilityListener> listeners1 = Collections.synchronizedSet(Sets.newHashSet());
     private final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider;

@@ -57,7 +57,7 @@ public class CnSnToXmlAndJsonInstanceIdentifierTest extends YangAndXmlAndDataSch
                     final Iterator<?> prefixes =
                             startElement.getNamespaceContext().getPrefixes("augment:augment:module");
 
-                    while (prefixes.hasNext() && (augmentAugmentModulePrefix == null)) {
+                    while (prefixes.hasNext() && augmentAugmentModulePrefix == null) {
                         final String prefix = (String) prefixes.next();
                         if (!prefix.isEmpty()) {
                             augmentAugmentModulePrefix = prefix;
@@ -100,7 +100,7 @@ public class CnSnToXmlAndJsonInstanceIdentifierTest extends YangAndXmlAndDataSch
                     final Iterator<?> prefixes =
                             startElement.getNamespaceContext().getPrefixes("augment:module:leaf:list");
 
-                    while (prefixes.hasNext() && (augmentModuleLfLstPrefix == null)) {
+                    while (prefixes.hasNext() && augmentModuleLfLstPrefix == null) {
                         final String prefix = (String) prefixes.next();
                         if (!prefix.isEmpty()) {
                             augmentModuleLfLstPrefix = prefix;
@@ -144,7 +144,7 @@ public class CnSnToXmlAndJsonInstanceIdentifierTest extends YangAndXmlAndDataSch
         final List<PathArgument> pathArguments = new ArrayList<>();
         pathArguments.add(new NodeIdentifier(new QName(new URI("instance:identifier:module"), "cont")));
         pathArguments.add(new NodeIdentifier(new QName(new URI("instance:identifier:module"), "cont1")));
-        pathArguments.add(new NodeWithValue(new QName(new URI("augment:module:leaf:list"), "lflst11"), "lflst11_1"));
+        pathArguments.add(new NodeWithValue<>(new QName(new URI("augment:module:leaf:list"), "lflst11"), "lflst11_1"));
 
         return YangInstanceIdentifier.create(pathArguments);
     }

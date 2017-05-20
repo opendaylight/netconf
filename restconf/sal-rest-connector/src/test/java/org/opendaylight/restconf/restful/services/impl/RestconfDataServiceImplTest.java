@@ -37,6 +37,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
@@ -178,10 +179,9 @@ public class RestconfDataServiceImplTest {
         Mockito.when(txHandler.get()).thenReturn(domTx);
         final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
         Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
-        final CheckedFuture checked = Mockito.mock(CheckedFuture.class);
+        final CheckedFuture<Void, TransactionCommitFailedException> checked = Mockito.mock(CheckedFuture.class);
         Mockito.when(wTx.submit()).thenReturn(checked);
-        final Object valueObj = null;
-        Mockito.when(checked.checkedGet()).thenReturn(valueObj);
+        Mockito.when(checked.checkedGet()).thenReturn(null);
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(txHandler);
 
         schemaContextHandler.onGlobalContextUpdated(this.contextRef.get());

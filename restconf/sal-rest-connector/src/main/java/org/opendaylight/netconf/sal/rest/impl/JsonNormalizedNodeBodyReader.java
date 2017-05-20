@@ -77,9 +77,9 @@ public class JsonNormalizedNodeBodyReader
                         new org.opendaylight.restconf.jersey.providers.JsonNormalizedNodeBodyReader();
                 jsonReaderNewRest.injectParams(getUriInfo(), getRequest());
                 return jsonReaderNewRest.readFrom(type, genericType, annotations, mediaType, httpHeaders, entityStream);
-            } else {
-                return readFrom(getInstanceIdentifierContext(), entityStream, isPost());
             }
+
+            return readFrom(getInstanceIdentifierContext(), entityStream, isPost());
         } catch (final Exception e) {
             propagateExceptionAs(e);
             return null; // no-op
@@ -130,8 +130,8 @@ public class JsonNormalizedNodeBodyReader
         final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
         InstanceIdentifierContext<? extends SchemaNode> newIIContext;
 
-        while ((result instanceof AugmentationNode) || (result instanceof ChoiceNode)) {
-            final Object childNode = ((DataContainerNode) result).getValue().iterator().next();
+        while (result instanceof AugmentationNode || result instanceof ChoiceNode) {
+            final Object childNode = ((DataContainerNode<?>) result).getValue().iterator().next();
             if (isPost) {
                 iiToDataList.add(result.getIdentifier());
             }

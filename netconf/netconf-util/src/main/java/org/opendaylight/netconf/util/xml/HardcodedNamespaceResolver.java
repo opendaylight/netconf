@@ -18,11 +18,11 @@ import javax.xml.namespace.NamespaceContext;
 public class HardcodedNamespaceResolver implements NamespaceContext {
     private final Map<String/* prefix */, String/* namespace */> prefixesToNamespaces;
 
-    public HardcodedNamespaceResolver(String prefix, String namespace) {
+    public HardcodedNamespaceResolver(final String prefix, final String namespace) {
         this(ImmutableMap.of(prefix, namespace));
     }
 
-    public HardcodedNamespaceResolver(Map<String, String> prefixesToNamespaces) {
+    public HardcodedNamespaceResolver(final Map<String, String> prefixesToNamespaces) {
         this.prefixesToNamespaces = Collections.unmodifiableMap(prefixesToNamespaces);
     }
 
@@ -34,22 +34,22 @@ public class HardcodedNamespaceResolver implements NamespaceContext {
      * @return uri      uniform resource identifier
      */
     @Override
-    public String getNamespaceURI(String prefix) {
+    public String getNamespaceURI(final String prefix) {
         if (prefixesToNamespaces.containsKey(prefix)) {
             return prefixesToNamespaces.get(prefix);
-        } else {
-            throw new IllegalStateException("Prefix mapping not found for " + prefix);
         }
+
+        throw new IllegalStateException("Prefix mapping not found for " + prefix);
     }
 
     @Override
-    public String getPrefix(String namespaceURI) {
+    public String getPrefix(final String namespaceURI) {
         // Not needed in this context.
         return null;
     }
 
     @Override
-    public Iterator<?> getPrefixes(String namespaceURI) {
+    public Iterator<?> getPrefixes(final String namespaceURI) {
         // Not needed in this context.
         return null;
     }

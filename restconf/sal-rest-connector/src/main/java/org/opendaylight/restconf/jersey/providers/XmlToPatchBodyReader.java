@@ -61,6 +61,7 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
         MessageBodyReader<PatchContext> {
 
     private static final Logger LOG = LoggerFactory.getLogger(XmlToPatchBodyReader.class);
+    private static final Splitter SLASH_SPLITTER = Splitter.on('/');
 
     @Override
     public boolean isReadable(final Class<?> type, final Type genericType,
@@ -113,7 +114,7 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
             final Element firstValueElement = values != null ? values.get(0) : null;
 
             // get namespace according to schema node from path context or value
-            final String namespace = (firstValueElement == null)
+            final String namespace = firstValueElement == null
                     ? schemaNode.getQName().getNamespace().toString() : firstValueElement.getNamespaceURI();
 
             // find module according to namespace
@@ -148,24 +149,24 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                 LOG.debug("Target node {} not found in path {} ", target, pathContext.getSchemaNode());
                 throw new RestconfDocumentedException("Error parsing input", ErrorType.PROTOCOL,
                         ErrorTag.MALFORMED_MESSAGE);
-            } else {
-                if (PatchEditOperation.isPatchOperationWithValue(operation)) {
-                    NormalizedNode<?, ?> parsed = null;
-                    if (schemaNode instanceof ContainerSchemaNode) {
-                        parsed = parserFactory.getContainerNodeParser().parse(values, (ContainerSchemaNode) schemaNode);
-                    } else if (schemaNode instanceof ListSchemaNode) {
-                        parsed = parserFactory.getMapNodeParser().parse(values, (ListSchemaNode) schemaNode);
-                    }
+            }
 
-                    // for lists allow to manipulate with list items through their parent
-                    if (targetII.getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
-                        targetII = targetII.getParent();
-                    }
-
-                    resultCollection.add(new PatchEntity(editId, operation, targetII, parsed));
-                } else {
-                    resultCollection.add(new PatchEntity(editId, operation, targetII));
+            if (PatchEditOperation.isPatchOperationWithValue(operation)) {
+                NormalizedNode<?, ?> parsed = null;
+                if (schemaNode instanceof ContainerSchemaNode) {
+                    parsed = parserFactory.getContainerNodeParser().parse(values, (ContainerSchemaNode) schemaNode);
+                } else if (schemaNode instanceof ListSchemaNode) {
+                    parsed = parserFactory.getMapNodeParser().parse(values, (ListSchemaNode) schemaNode);
                 }
+
+                // for lists allow to manipulate with list items through their parent
+                if (targetII.getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
+                    targetII = targetII.getParent();
+                }
+
+                resultCollection.add(new PatchEntity(editId, operation, targetII, parsed));
+            } else {
+                resultCollection.add(new PatchEntity(editId, operation, targetII));
             }
         }
 
@@ -219,7 +220,7 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
      */
     private static String prepareNonCondXpath(@Nonnull final DataSchemaNode schemaNode, @Nonnull final String target,
             @Nonnull final Element value, @Nonnull final String namespace, @Nonnull final String revision) {
-        final Iterator<String> args = Splitter.on("/").split(target.substring(target.indexOf(':') + 1)).iterator();
+        final Iterator<String> args = SLASH_SPLITTER.split(target.substring(target.indexOf(':') + 1)).iterator();
 
         final StringBuilder nonCondXpath = new StringBuilder();
         SchemaNode childNode = schemaNode;
@@ -271,13 +272,11 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
     private static void appendKeys(@Nonnull final StringBuilder nonCondXpath, @Nonnull final Iterator<QName> keyNames,
                             @Nonnull final Iterator<String> keyValues) {
         while (keyNames.hasNext()) {
-            nonCondXpath.append("[");
+            nonCondXpath.append('[');
             nonCondXpath.append(keyNames.next().getLocalName());
-            nonCondXpath.append("=");
-            nonCondXpath.append("'");
+            nonCondXpath.append("='");
             nonCondXpath.append(keyValues.next());
-            nonCondXpath.append("'");
-            nonCondXpath.append("]");
+            nonCondXpath.append("']");
         }
     }
 }
