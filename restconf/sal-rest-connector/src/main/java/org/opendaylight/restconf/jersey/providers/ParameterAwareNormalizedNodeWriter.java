@@ -13,7 +13,6 @@ import static org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedN
 import com.google.common.annotations.Beta;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.util.Collection;
@@ -102,11 +101,8 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
                                                                      final boolean orderKeyLeaves,
                                                                      final Integer maxDepth,
                                                                      final List<Set<QName>> fields) {
-        if (orderKeyLeaves) {
-            return new OrderedParameterAwareNormalizedNodeWriter(writer, maxDepth, fields);
-        } else {
-            return new ParameterAwareNormalizedNodeWriter(writer, maxDepth, fields);
-        }
+        return orderKeyLeaves ? new OrderedParameterAwareNormalizedNodeWriter(writer, maxDepth, fields)
+                : new ParameterAwareNormalizedNodeWriter(writer, maxDepth, fields);
     }
 
     /**
@@ -117,6 +113,7 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
      * @return {@code ParameterAwareNormalizedNodeWriter}
      * @throws IOException when thrown from the backing writer.
      */
+    @Override
     public final ParameterAwareNormalizedNodeWriter write(final NormalizedNode<?, ?> node) throws IOException {
         if (wasProcessedAsCompositeNode(node)) {
             return this;
@@ -149,7 +146,7 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
      * @return Best estimate of the collection size required to hold all the children.
      */
     static final int childSizeHint(final Iterable<?> children) {
-        return (children instanceof Collection) ? ((Collection<?>) children).size() : UNKNOWN_SIZE;
+        return children instanceof Collection ? ((Collection<?>) children).size() : UNKNOWN_SIZE;
     }
 
     private boolean wasProcessAsSimpleNode(final NormalizedNode<?, ?> node) throws IOException {
@@ -192,7 +189,7 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
     protected boolean selectedByParameters(final NormalizedNode<?, ?> node, final boolean mixinParent) {
         // nodes to be written are not limited by fields, only by depth
         if (fields == null) {
-            return (maxDepth == null || currentDepth < maxDepth);
+            return maxDepth == null || currentDepth < maxDepth;
         }
 
         // children of mixin nodes are never selected in fields but must be written if they are first in selected target
@@ -207,15 +204,11 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
 
         // write only selected nodes
         if (currentDepth > 0 && currentDepth <= fields.size()) {
-            if (fields.get(currentDepth - 1).contains(node.getNodeType())) {
-                return true;
-            } else {
-                return false;
-            }
+            return fields.get(currentDepth - 1).contains(node.getNodeType());
         }
 
         // after this depth only depth parameter is used to determine when to write node
-        return (maxDepth == null || currentDepth < maxDepth);
+        return maxDepth == null || currentDepth < maxDepth;
     }
 
     /**
@@ -370,20 +363,17 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
             currentDepth++;
             // Write all the rest
             final boolean result =
-                    writeChildren(Iterables.filter(node.getValue(), new Predicate<NormalizedNode<?, ?>>() {
-                            @Override
-                            public boolean apply(final NormalizedNode<?, ?> input) {
-                                if (input instanceof AugmentationNode) {
-                                    return true;
-                                }
-                                if (!qnames.contains(input.getNodeType())) {
-                                    return true;
-                                }
+                    writeChildren(Iterables.filter(node.getValue(), input -> {
+                        if (input instanceof AugmentationNode) {
+                            return true;
+                        }
+                        if (!qnames.contains(input.getNodeType())) {
+                            return true;
+                        }
 
-                                LOG.debug("Skipping key child {}", input);
-                                return false;
-                            }
-                        }), false);
+                        LOG.debug("Skipping key child {}", input);
+                        return false;
+                    }), false);
             currentDepth--;
             return result;
         }

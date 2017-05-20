@@ -110,6 +110,7 @@ public class RuntimeRpcTest {
         public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(
                 @Nonnull final SchemaPath type, @Nullable final NormalizedNode<?, ?> input) {
             return Futures.immediateFailedCheckedFuture(new DOMRpcException("rpc invocation not implemented yet") {
+                private static final long serialVersionUID = 1L;
             });
         }
 
@@ -126,7 +127,8 @@ public class RuntimeRpcTest {
         @Override
         public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(
                 @Nonnull final SchemaPath type, @Nullable final NormalizedNode<?, ?> input) {
-            final Collection<DataContainerChild<? extends PathArgument, ?>> children = (Collection) input.getValue();
+            final Collection<DataContainerChild<? extends PathArgument, ?>> children =
+                    (Collection<DataContainerChild<? extends PathArgument, ?>>) input.getValue();
             final Module module = schemaContext.findModuleByNamespaceAndRevision(
                 type.getLastComponent().getNamespace(), null);
             final RpcDefinition rpcDefinition = getRpcDefinitionFromModule(
@@ -155,7 +157,7 @@ public class RuntimeRpcTest {
     @Mock
     private SchemaContextListener listener;
     @Mock
-    private ListenerRegistration registration;
+    private ListenerRegistration<?> registration;
     @Mock
     private SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
 
@@ -274,14 +276,15 @@ public class RuntimeRpcTest {
         }
     }
 
-    private void verifyResponse(final Document response, final Document template) throws Exception {
+    private static void verifyResponse(final Document response, final Document template) {
         final DetailedDiff dd = new DetailedDiff(new Diff(response, template));
         dd.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
         //we care about order so response has to be identical
         assertTrue(dd.identical());
     }
 
-    private RpcDefinition getRpcDefinitionFromModule(final Module module, final URI namespaceURI, final String name) {
+    private static RpcDefinition getRpcDefinitionFromModule(final Module module, final URI namespaceURI,
+            final String name) {
         for (final RpcDefinition rpcDef : module.getRpcs()) {
             if (rpcDef.getQName().getNamespace().equals(namespaceURI)
                     && rpcDef.getQName().getLocalName().equals(name)) {

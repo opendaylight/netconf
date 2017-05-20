@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
@@ -57,10 +58,9 @@ public class RestconfInvokeOperationsServiceImplTest {
         Mockito.when(txHandler.get()).thenReturn(domTx);
         final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
         Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
-        final CheckedFuture checked = Mockito.mock(CheckedFuture.class);
+        final CheckedFuture<Void, TransactionCommitFailedException> checked = Mockito.mock(CheckedFuture.class);
         Mockito.when(wTx.submit()).thenReturn(checked);
-        final Object valueObj = null;
-        Mockito.when(checked.checkedGet()).thenReturn(valueObj);
+        Mockito.when(checked.checkedGet()).thenReturn(null);
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(txHandler);
         schemaContextHandler.onGlobalContextUpdated(contextRef.get());
         this.invokeOperationsService =
@@ -71,7 +71,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     @Test
     public void testInvokeRpc() throws Exception {
         final String identifier = "invoke-rpc-module:rpcTest";
-        final NormalizedNode result = Mockito.mock(NormalizedNode.class);
+        final NormalizedNode<?, ?> result = Mockito.mock(NormalizedNode.class);
         final NormalizedNodeContext payload = prepNNC(result);
         final UriInfo uriInfo = Mockito.mock(UriInfo.class);
 

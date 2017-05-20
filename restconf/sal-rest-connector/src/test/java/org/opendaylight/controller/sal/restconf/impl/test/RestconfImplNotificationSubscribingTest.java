@@ -8,6 +8,7 @@
 package org.opendaylight.controller.sal.restconf.impl.test;
 
 import java.time.Instant;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -70,11 +71,9 @@ public class RestconfImplNotificationSubscribingTest {
     @Test
     public void startTimeTest() {
         final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final Entry<String, List<String>> entry = Mockito.mock(Entry.class);
-        Mockito.when(entry.getKey()).thenReturn("start-time");
         final List<String> time = new ArrayList<>();
         time.add("2014-10-25T10:02:00Z");
-        Mockito.when(entry.getValue()).thenReturn(time);
+        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("start-time", time);
         list.add(entry);
 
         subscribe(list);
@@ -84,11 +83,9 @@ public class RestconfImplNotificationSubscribingTest {
     @Test
     public void milisecsTest() {
         final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final Entry<String, List<String>> entry = Mockito.mock(Entry.class);
-        Mockito.when(entry.getKey()).thenReturn("start-time");
         final List<String> time = new ArrayList<>();
         time.add("2014-10-25T10:02:00.12345Z");
-        Mockito.when(entry.getValue()).thenReturn(time);
+        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("start-time", time);
         list.add(entry);
 
         subscribe(list);
@@ -98,11 +95,9 @@ public class RestconfImplNotificationSubscribingTest {
     @Test
     public void zonesPlusTest() {
         final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final Entry<String, List<String>> entry = Mockito.mock(Entry.class);
-        Mockito.when(entry.getKey()).thenReturn("start-time");
         final List<String> time = new ArrayList<>();
         time.add("2014-10-25T10:02:00+01:00");
-        Mockito.when(entry.getValue()).thenReturn(time);
+        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("start-time", time);
         list.add(entry);
 
         subscribe(list);
@@ -112,11 +107,9 @@ public class RestconfImplNotificationSubscribingTest {
     @Test
     public void zonesMinusTest() {
         final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final Entry<String, List<String>> entry = Mockito.mock(Entry.class);
-        Mockito.when(entry.getKey()).thenReturn("start-time");
         final List<String> time = new ArrayList<>();
         time.add("2014-10-25T10:02:00-01:00");
-        Mockito.when(entry.getValue()).thenReturn(time);
+        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("start-time", time);
         list.add(entry);
 
         subscribe(list);
@@ -126,17 +119,13 @@ public class RestconfImplNotificationSubscribingTest {
     @Test
     public void startAndStopTimeTest() {
         final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final Entry<String, List<String>> entry = Mockito.mock(Entry.class);
-        Mockito.when(entry.getKey()).thenReturn("start-time");
         final List<String> time = new ArrayList<>();
         time.add("2014-10-25T10:02:00Z");
-        Mockito.when(entry.getValue()).thenReturn(time);
+        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("start-time", time);
 
-        final Entry<String, List<String>> entry2 = Mockito.mock(Entry.class);
-        Mockito.when(entry2.getKey()).thenReturn("stop-time");
         final List<String> time2 = new ArrayList<>();
         time2.add("2014-10-25T12:31:00Z");
-        Mockito.when(entry2.getValue()).thenReturn(time2);
+        final Entry<String, List<String>> entry2 = new SimpleImmutableEntry<>("stop-time", time2);
 
         list.add(entry);
         list.add(entry2);
@@ -148,11 +137,9 @@ public class RestconfImplNotificationSubscribingTest {
     @Test(expected = RestconfDocumentedException.class)
     public void stopTimeTest() {
         final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final Entry<String, List<String>> entry = Mockito.mock(Entry.class);
-        Mockito.when(entry.getKey()).thenReturn("stop-time");
         final List<String> time = new ArrayList<>();
         time.add("2014-10-25T12:31:00Z");
-        Mockito.when(entry.getValue()).thenReturn(time);
+        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("stop-time", time);
         list.add(entry);
 
         subscribe(list);
@@ -162,11 +149,9 @@ public class RestconfImplNotificationSubscribingTest {
     @Test(expected = RestconfDocumentedException.class)
     public void badParamTest() {
         final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final Entry<String, List<String>> entry = Mockito.mock(Entry.class);
-        Mockito.when(entry.getKey()).thenReturn("time");
         final List<String> time = new ArrayList<>();
         time.add("2014-10-25T12:31:00Z");
-        Mockito.when(entry.getValue()).thenReturn(time);
+        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("time", time);
         list.add(entry);
 
         subscribe(list);
@@ -176,11 +161,9 @@ public class RestconfImplNotificationSubscribingTest {
     @Test(expected = IllegalArgumentException.class)
     public void badValueTest() {
         final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final Entry<String, List<String>> entry = Mockito.mock(Entry.class);
-        Mockito.when(entry.getKey()).thenReturn("start-time");
         final List<String> time = new ArrayList<>();
         time.add("badvalue");
-        Mockito.when(entry.getValue()).thenReturn(time);
+        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("start-time", time);
         list.add(entry);
 
         subscribe(list);
@@ -190,11 +173,9 @@ public class RestconfImplNotificationSubscribingTest {
     @Test(expected = IllegalArgumentException.class)
     public void badZonesTest() {
         final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final Entry<String, List<String>> entry = Mockito.mock(Entry.class);
-        Mockito.when(entry.getKey()).thenReturn("start-time");
         final List<String> time = new ArrayList<>();
         time.add("2014-10-25T10:02:00Z+1:00");
-        Mockito.when(entry.getValue()).thenReturn(time);
+        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("start-time", time);
         list.add(entry);
 
         subscribe(list);
@@ -204,11 +185,9 @@ public class RestconfImplNotificationSubscribingTest {
     @Test(expected = IllegalArgumentException.class)
     public void badMilisecsTest() {
         final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final Entry<String, List<String>> entry = Mockito.mock(Entry.class);
-        Mockito.when(entry.getKey()).thenReturn("start-time");
         final List<String> time = new ArrayList<>();
         time.add("2014-10-25T10:02:00:0026Z");
-        Mockito.when(entry.getValue()).thenReturn(time);
+        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("start-time", time);
         list.add(entry);
 
         subscribe(list);
@@ -223,11 +202,9 @@ public class RestconfImplNotificationSubscribingTest {
         final ListenerAdapter listener = Notificator.createListener(path, this.identifier, NotificationOutputType.XML);
 
         final List<Entry<String, List<String>>> list = new ArrayList<>();
-        final Entry<String, List<String>> entry = Mockito.mock(Entry.class);
-        Mockito.when(entry.getKey()).thenReturn("start-time");
         final List<String> time = new ArrayList<>();
         time.add("2014-10-25T10:02:00Z");
-        Mockito.when(entry.getValue()).thenReturn(time);
+        final Entry<String, List<String>> entry = new SimpleImmutableEntry<>("start-time", time);
         list.add(entry);
 
         subscribe(list);

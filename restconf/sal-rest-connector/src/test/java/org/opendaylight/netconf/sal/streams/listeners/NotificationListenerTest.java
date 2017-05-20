@@ -73,7 +73,7 @@ public class NotificationListenerTest {
 
         final DOMNotification notificationData = mock(DOMNotification.class);
 
-        final LeafNode leaf = mockLeaf(QName.create(MODULE, "lf"));
+        final LeafNode<String> leaf = mockLeaf(QName.create(MODULE, "lf"));
         final ContainerNode notifiBody = mockCont(schemaPathNotifi.getLastComponent(), leaf);
 
         when(notificationData.getType()).thenReturn(schemaPathNotifi);
@@ -93,7 +93,7 @@ public class NotificationListenerTest {
 
         final DOMNotification notificationData = mock(DOMNotification.class);
 
-        final LeafNode leaf = mockLeaf(QName.create(MODULE, "lf"));
+        final LeafNode<String> leaf = mockLeaf(QName.create(MODULE, "lf"));
         final ContainerNode cont = mockCont(QName.create(MODULE, "cont"), leaf);
         final ContainerNode notifiBody = mockCont(schemaPathNotifi.getLastComponent(), cont);
 
@@ -115,7 +115,7 @@ public class NotificationListenerTest {
 
         final DOMNotification notificationData = mock(DOMNotification.class);
 
-        final LeafNode leaf = mockLeaf(QName.create(MODULE, "lf"));
+        final LeafNode<String> leaf = mockLeaf(QName.create(MODULE, "lf"));
         final MapEntryNode entry = mockMapEntry(QName.create(MODULE, "lst"), leaf);
         final MapNode list = mockList(QName.create(MODULE, "lst"), entry);
         final ContainerNode cont = mockCont(QName.create(MODULE, "cont"), list);
@@ -139,7 +139,7 @@ public class NotificationListenerTest {
 
         final DOMNotification notificationData = mock(DOMNotification.class);
 
-        final LeafNode leaf = mockLeaf(QName.create(MODULE, "lf"));
+        final LeafNode<String> leaf = mockLeaf(QName.create(MODULE, "lf"));
         final ContainerNode notifiBody = mockCont(schemaPathNotifi.getLastComponent(), leaf);
 
         when(notificationData.getType()).thenReturn(schemaPathNotifi);
@@ -158,7 +158,7 @@ public class NotificationListenerTest {
 
         final DOMNotification notificationData = mock(DOMNotification.class);
 
-        final LeafNode leaf = mockLeaf(QName.create(MODULE, "lf-augm"));
+        final LeafNode<String> leaf = mockLeaf(QName.create(MODULE, "lf-augm"));
         final AugmentationNode augm = mockAugm(leaf);
         final ContainerNode notifiBody = mockCont(schemaPathNotifi.getLastComponent(), augm);
 
@@ -172,7 +172,7 @@ public class NotificationListenerTest {
         assertTrue(result.contains("lf-augm" + '"' + ":" + '"' + "value"));
     }
 
-    private static AugmentationNode mockAugm(final LeafNode leaf) {
+    private static AugmentationNode mockAugm(final LeafNode<String> leaf) {
         final AugmentationNode augm = mock(AugmentationNode.class);
         final AugmentationIdentifier augmId = new AugmentationIdentifier(SingletonSet.of(leaf.getNodeType()));
         when(augm.getIdentifier()).thenReturn(augmId);
@@ -184,7 +184,7 @@ public class NotificationListenerTest {
         return augm;
     }
 
-    private static MapEntryNode mockMapEntry(final QName entryQName, final LeafNode leaf) {
+    private static MapEntryNode mockMapEntry(final QName entryQName, final LeafNode<String> leaf) {
         final MapEntryNode entry = mock(MapEntryNode.class);
         final Map<QName, Object> keyValues = new HashMap<>();
         keyValues.put(leaf.getNodeType(), "value");
@@ -219,8 +219,8 @@ public class NotificationListenerTest {
         return cont;
     }
 
-    private static LeafNode mockLeaf(final QName leafQName) {
-        final LeafNode child = mock(LeafNode.class);
+    private static LeafNode<String> mockLeaf(final QName leafQName) {
+        final LeafNode<String> child = mock(LeafNode.class);
         when(child.getNodeType()).thenReturn(leafQName);
         when(child.getIdentifier()).thenReturn(NodeIdentifier.create(leafQName));
         when(child.getValue()).thenReturn("value");

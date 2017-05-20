@@ -89,7 +89,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .node(new YangInstanceIdentifier.NodeIdentifierWithPredicates(
                         list, QName.create(list, "list-key"), 100))
                 .node(leafList)
-                .node(new NodeWithValue(leafList, "instance"))
+                .node(new NodeWithValue<>(leafList, "instance"))
                 .build();
 
         final String result = YangInstanceIdentifierSerializer.create(this.schemaContext, data);
@@ -175,7 +175,7 @@ public class YangInstanceIdentifierSerializerTest {
     public void serializeLeafListTest() {
         final YangInstanceIdentifier data = YangInstanceIdentifier.builder()
                 .node(QName.create("serializer:test", "2016-06-06", "leaf-list-0"))
-                .node(new NodeWithValue(QName.create("serializer:test", "2016-06-06", "leaf-list-0"), "instance"))
+                .node(new NodeWithValue<>(QName.create("serializer:test", "2016-06-06", "leaf-list-0"), "instance"))
                 .build();
 
         final String result = YangInstanceIdentifierSerializer.create(this.schemaContext, data);

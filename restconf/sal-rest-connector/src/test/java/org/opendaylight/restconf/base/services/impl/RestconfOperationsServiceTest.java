@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.Futures;
 import java.net.URI;
 import java.util.Set;
 import javax.ws.rs.core.UriInfo;
@@ -61,10 +61,7 @@ public class RestconfOperationsServiceTest {
         Mockito.when(txHandler.get()).thenReturn(domTx);
         final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
         Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
-        final CheckedFuture checked = Mockito.mock(CheckedFuture.class);
-        Mockito.when(wTx.submit()).thenReturn(checked);
-        final Object valueObj = null;
-        Mockito.when(checked.checkedGet()).thenReturn(valueObj);
+        Mockito.when(wTx.submit()).thenReturn(Futures.immediateCheckedFuture(null));
         this.schemaContextHandler = new SchemaContextHandler(txHandler);
         this.schemaContextHandler.onGlobalContextUpdated(this.schemaContext);
 

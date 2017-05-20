@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.mdsal.connector.ops.get;
 
-import static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder;
 import static org.opendaylight.yangtools.yang.data.util.ParserStreamUtils.findSchemaNodeByNameAndNamespace;
 
 import com.google.common.base.Optional;
@@ -22,12 +21,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.namespace.NamespaceContext;
+import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.MissingNameSpaceException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
 import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
 import org.opendaylight.yangtools.yang.data.util.codec.TypeAwareCodec;
@@ -210,7 +211,8 @@ public class FilterContentValidator {
                         final NamespaceContext nsContext = new UniversalNamespaceContextImpl(document, false);
                         final XmlCodecFactory xmlCodecFactory =
                                 XmlCodecFactory.create(schemaContext.getCurrentContext());
-                        final TypeAwareCodec identityrefTypeCodec = xmlCodecFactory.codecFor(listKey);
+                        final TypeAwareCodec<?, NamespaceContext, XMLStreamWriter> identityrefTypeCodec =
+                                xmlCodecFactory.codecFor(listKey);
                         final QName deserializedKey =
                                 (QName) identityrefTypeCodec.parseValue(nsContext, keyValue.get());
                         keys.put(qualifiedName, deserializedKey);
@@ -282,6 +284,8 @@ public class FilterContentValidator {
     }
 
     private static class ValidationException extends Exception {
+        private static final long serialVersionUID = 1L;
+
         ValidationException(final XmlElement parent, final XmlElement child) {
             super("Element " + child + " can't be child of " + parent);
         }

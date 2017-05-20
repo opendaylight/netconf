@@ -98,7 +98,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         throw new UnsupportedOperationException("Runtime rpc does not have a stable name");
     }
 
-    private URI createNsUri(final String namespace) {
+    private static URI createNsUri(final String namespace) {
         final URI namespaceURI;
         try {
             namespaceURI = new URI(namespace);
@@ -115,8 +115,8 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
                 schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(namespaceURI, null));
     }
 
-    private Optional<RpcDefinition> getRpcDefinitionFromModule(final Module module, final URI namespaceURI,
-                                                               final String name) {
+    private static Optional<RpcDefinition> getRpcDefinitionFromModule(final Module module, final URI namespaceURI,
+            final String name) {
         for (final RpcDefinition rpcDef : module.getRpcs()) {
             if (rpcDef.getQName().getNamespace().equals(namespaceURI)
                     && rpcDef.getQName().getLocalName().equals(name)) {
@@ -234,7 +234,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         return result.getNode();
     }
 
-    private XMLStreamWriter getXmlStreamWriter(final DOMResult result) {
+    private static XMLStreamWriter getXmlStreamWriter(final DOMResult result) {
         try {
             return XML_OUTPUT_FACTORY.createXMLStreamWriter(result);
         } catch (final XMLStreamException e) {
@@ -242,10 +242,10 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         }
     }
 
-    private void writeRootElement(final XMLStreamWriter xmlWriter, final SchemaOrderedNormalizedNodeWriter nnWriter,
-                                  final ContainerNode data) {
+    private static void writeRootElement(final XMLStreamWriter xmlWriter,
+            final SchemaOrderedNormalizedNodeWriter nnWriter, final ContainerNode data) {
         try {
-            final Collection<DataContainerChild<?, ?>> value = (Collection) data.getValue();
+            final Collection<DataContainerChild<?, ?>> value = data.getValue();
             nnWriter.write(value);
             nnWriter.flush();
             xmlWriter.flush();

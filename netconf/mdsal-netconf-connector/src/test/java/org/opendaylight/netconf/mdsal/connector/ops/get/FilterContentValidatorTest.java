@@ -145,8 +145,8 @@ public class FilterContentValidatorTest {
         final QName qName = QName.create(input);
         if (qName.getModule().getNamespace() != null) {
             return qName;
-        } else {
-            return QName.create(Preconditions.checkNotNull(prev), input);
         }
+
+        return QName.create(Preconditions.checkNotNull(prev), input);
     }
 }

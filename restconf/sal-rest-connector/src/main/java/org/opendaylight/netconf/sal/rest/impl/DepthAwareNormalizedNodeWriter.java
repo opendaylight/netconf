@@ -11,7 +11,6 @@ import static org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedN
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.util.Collection;
@@ -91,11 +90,8 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
      */
     public static DepthAwareNormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
                                                                  final boolean orderKeyLeaves, final int maxDepth) {
-        if (orderKeyLeaves) {
-            return new OrderedDepthAwareNormalizedNodeWriter(writer, maxDepth);
-        } else {
-            return new DepthAwareNormalizedNodeWriter(writer, maxDepth);
-        }
+        return orderKeyLeaves ? new OrderedDepthAwareNormalizedNodeWriter(writer, maxDepth)
+                : new DepthAwareNormalizedNodeWriter(writer, maxDepth);
     }
 
     /**
@@ -106,6 +102,7 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
      * @return DepthAwareNormalizedNodeWriter
      * @throws IOException when thrown from the backing writer.
      */
+    @Override
     public final DepthAwareNormalizedNodeWriter write(final NormalizedNode<?, ?> node) throws IOException {
         if (wasProcessedAsCompositeNode(node)) {
             return this;
@@ -138,7 +135,7 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
      * @return Best estimate of the collection size required to hold all the children.
      */
     static final int childSizeHint(final Iterable<?> children) {
-        return (children instanceof Collection) ? ((Collection<?>) children).size() : UNKNOWN_SIZE;
+        return children instanceof Collection ? ((Collection<?>) children).size() : UNKNOWN_SIZE;
     }
 
     private boolean wasProcessAsSimpleNode(final NormalizedNode<?, ?> node) throws IOException {
@@ -197,7 +194,7 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
         return true;
     }
 
-    private void writeOnlyKeys(Map<QName, Object> keyValues) throws IllegalArgumentException, IOException {
+    private void writeOnlyKeys(final Map<QName, Object> keyValues) throws IllegalArgumentException, IOException {
         for (Map.Entry<QName, Object> entry : keyValues.entrySet()) {
             writer.leafNode(new NodeIdentifier(entry.getKey()), entry.getValue());
         }
@@ -304,19 +301,16 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
 
             // Write all the rest
             currentDepth++;
-            boolean result = writeChildren(Iterables.filter(node.getValue(), new Predicate<NormalizedNode<?, ?>>() {
-                @Override
-                public boolean apply(final NormalizedNode<?, ?> input) {
-                    if (input instanceof AugmentationNode) {
-                        return true;
-                    }
-                    if (!qnames.contains(input.getNodeType())) {
-                        return true;
-                    }
-
-                    LOG.debug("Skipping key child {}", input);
-                    return false;
+            boolean result = writeChildren(Iterables.filter(node.getValue(), input -> {
+                if (input instanceof AugmentationNode) {
+                    return true;
                 }
+                if (!qnames.contains(input.getNodeType())) {
+                    return true;
+                }
+
+                LOG.debug("Skipping key child {}", input);
+                return false;
             }));
             currentDepth--;
             return result;

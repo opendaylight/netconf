@@ -127,7 +127,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
                 // Restconf allows returning one list item. We need to wrap it
                 // in map node in order to serialize it properly
                 nnWriter.write(
-                        ImmutableNodes.mapNodeBuilder(data.getNodeType()).withChild(((MapEntryNode) data)).build());
+                        ImmutableNodes.mapNodeBuilder(data.getNodeType()).withChild((MapEntryNode) data).build());
             } else {
                 nnWriter.write(data);
             }
@@ -151,7 +151,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         final JSONCodecFactory codecs = getCodecFactory(context);
 
         final URI initialNs;
-        if ((schema instanceof DataSchemaNode)
+        if (schema instanceof DataSchemaNode
                 && !((DataSchemaNode)schema).isAugmenting()
                 && !(schema instanceof SchemaContext)) {
             initialNs = schema.getQName().getNamespace();
@@ -169,13 +169,12 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         if (prettyPrint) {
             return JsonWriterFactory.createJsonWriter(
                     new OutputStreamWriter(entityStream, StandardCharsets.UTF_8), DEFAULT_INDENT_SPACES_NUM);
-        } else {
-            return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8));
         }
+        return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8));
     }
 
     private static JSONCodecFactory getCodecFactory(final InstanceIdentifierContext<?> context) {
         // TODO: Performance: Cache JSON Codec factory and schema context
-        return JSONCodecFactory.create(context.getSchemaContext());
+        return JSONCodecFactory.getShared(context.getSchemaContext());
     }
 }

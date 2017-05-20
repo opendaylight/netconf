@@ -59,7 +59,7 @@ public class NetconfUtilTest {
         final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
         moduleInfoBackedContext.addModuleInfos(Collections.singletonList($YangModuleInfoImpl.getInstance()));
         final SchemaContext context = moduleInfoBackedContext.getSchemaContext();
-        final LeafNode username = Builders.leafBuilder()
+        final LeafNode<?> username = Builders.leafBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(Session.QNAME, "username")))
                 .withValue("admin")
                 .build();

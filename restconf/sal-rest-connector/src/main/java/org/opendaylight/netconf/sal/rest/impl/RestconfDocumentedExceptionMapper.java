@@ -234,7 +234,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
         final JsonWriter jsonWriter = JsonWriterFactory.createJsonWriter(outputWriter);
         final NormalizedNodeStreamWriter jsonStreamWriter = JSONNormalizedNodeStreamWriter.createExclusiveWriter(
-                JSONCodecFactory.create(context.getSchemaContext()), path, initialNs, jsonWriter);
+                JSONCodecFactory.getShared(context.getSchemaContext()), path, initialNs, jsonWriter);
 
         // We create a delegating writer to special-case error-info as error-info is defined as an empty
         // container in the restconf yang schema but we create a leaf node so we can output it. The delegate

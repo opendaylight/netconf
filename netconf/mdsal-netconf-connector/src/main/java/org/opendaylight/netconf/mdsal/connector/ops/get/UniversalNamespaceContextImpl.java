@@ -39,7 +39,7 @@ public class UniversalNamespaceContextImpl implements NamespaceContext {
      * A single node is read, the namespace attributes are extracted and stored.
      *
      * @param node            to examine
-     * @param attributesOnly, if true no recursion happens
+     * @param attributesOnly  if true no recursion happens
      */
     private void readNode(final Node node, final boolean attributesOnly) {
         final NamedNodeMap attributes = node.getAttributes();
@@ -93,6 +93,7 @@ public class UniversalNamespaceContextImpl implements NamespaceContext {
      * @param prefix to search for
      * @return uri
      */
+    @Override
     public String getNamespaceURI(final String prefix) {
         if (prefix == null || prefix.equals(XMLConstants.DEFAULT_NS_PREFIX)) {
             return prefix2Uri.get(DEFAULT_NS);
@@ -105,10 +106,12 @@ public class UniversalNamespaceContextImpl implements NamespaceContext {
      * This method is not needed in this context, but can be implemented in a
      * similar way.
      */
+    @Override
     public String getPrefix(final String namespaceURI) {
         return uri2Prefix.get(namespaceURI);
     }
 
+    @Override
     public Iterator getPrefixes(final String namespaceURI) {
         // Not implemented
         return null;

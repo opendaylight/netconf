@@ -36,8 +36,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.opendaylight.controller.cluster.databroker.ConcurrentDOMDataBroker;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeverity;
@@ -148,15 +146,12 @@ public class NetconfMDSalMappingTest {
         final ConcurrentDOMDataBroker cdb = new ConcurrentDOMDataBroker(datastores, listenableFutureExecutor);
         this.transactionProvider = new TransactionProvider(cdb, SESSION_ID_FOR_REPORTING);
 
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(final InvocationOnMock invocationOnMock) throws Throwable {
-                final SourceIdentifier sId = (SourceIdentifier) invocationOnMock.getArguments()[0];
-                final YangTextSchemaSource yangTextSchemaSource =
-                        YangTextSchemaSource.delegateForByteSource(sId, ByteSource.wrap("module test".getBytes()));
-                return Futures.immediateCheckedFuture(yangTextSchemaSource);
+        doAnswer(invocationOnMock -> {
+            final SourceIdentifier sId = (SourceIdentifier) invocationOnMock.getArguments()[0];
+            final YangTextSchemaSource yangTextSchemaSource =
+                    YangTextSchemaSource.delegateForByteSource(sId, ByteSource.wrap("module test".getBytes()));
+            return Futures.immediateCheckedFuture(yangTextSchemaSource);
 
-            }
         }).when(sourceProvider).getSource(any(SourceIdentifier.class));
 
         this.currentSchemaContext = new CurrentSchemaContext(schemaService, sourceProvider);
@@ -613,7 +608,7 @@ public class NetconfMDSalMappingTest {
         assertEmptyDatastore(getConfigRunning());
     }
 
-    private void verifyResponse(final Document response, final Document template) throws Exception {
+    private static void verifyResponse(final Document response, final Document template) throws Exception {
         final DetailedDiff dd = new DetailedDiff(new Diff(response, template));
         dd.overrideElementQualifier(new NetconfXmlUnitRecursiveQualifier());
 
@@ -623,7 +618,7 @@ public class NetconfMDSalMappingTest {
         assertTrue(dd.toString(), dd.similar());
     }
 
-    private void assertEmptyDatastore(final Document response) {
+    private static void assertEmptyDatastore(final Document response) {
         final NodeList nodes = response.getChildNodes();
         assertTrue(nodes.getLength() == 1);
 
@@ -678,37 +673,37 @@ public class NetconfMDSalMappingTest {
         return executeOperation(getConfig, resource);
     }
 
-    private Document lock() throws Exception {
+    private static Document lock() throws Exception {
         final Lock lock = new Lock(SESSION_ID_FOR_REPORTING);
         return executeOperation(lock, "messages/mapping/lock.xml");
     }
 
-    private Document unlock() throws Exception {
+    private static Document unlock() throws Exception {
         final Unlock unlock = new Unlock(SESSION_ID_FOR_REPORTING);
         return executeOperation(unlock, "messages/mapping/unlock.xml");
     }
 
-    private Document lockWithoutTarget() throws Exception {
+    private static Document lockWithoutTarget() throws Exception {
         final Lock lock = new Lock(SESSION_ID_FOR_REPORTING);
         return executeOperation(lock, "messages/mapping/lock_notarget.xml");
     }
 
-    private Document unlockWithoutTarget() throws Exception {
+    private static Document unlockWithoutTarget() throws Exception {
         final Unlock unlock = new Unlock(SESSION_ID_FOR_REPORTING);
         return executeOperation(unlock, "messages/mapping/unlock_notarget.xml");
     }
 
-    private Document lockCandidate() throws Exception {
+    private static Document lockCandidate() throws Exception {
         final Lock lock = new Lock(SESSION_ID_FOR_REPORTING);
         return executeOperation(lock, "messages/mapping/lock_candidate.xml");
     }
 
-    private Document unlockCandidate() throws Exception {
+    private static Document unlockCandidate() throws Exception {
         final Unlock unlock = new Unlock(SESSION_ID_FOR_REPORTING);
         return executeOperation(unlock, "messages/mapping/unlock_candidate.xml");
     }
 
-    private Document executeOperation(final NetconfOperation op, final String filename) throws Exception {
+    private static Document executeOperation(final NetconfOperation op, final String filename) throws Exception {
         final Document request = XmlFileLoader.xmlFileToDocument(filename);
         final Document response = op.handle(request, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
 

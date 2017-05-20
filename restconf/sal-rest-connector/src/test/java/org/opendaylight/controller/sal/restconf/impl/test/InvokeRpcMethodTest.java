@@ -155,7 +155,7 @@ public class InvokeRpcMethodTest {
         final DataSchemaNode lfSchemaNode = ((ContainerSchemaNode) contSchemaNode).getDataChildByName(lfQName);
         assertTrue(lfSchemaNode instanceof LeafSchemaNode);
         final LeafNode<Object> lfNode =
-                (Builders.leafBuilder((LeafSchemaNode) lfSchemaNode).withValue("any value")).build();
+                Builders.leafBuilder((LeafSchemaNode) lfSchemaNode).withValue("any value").build();
         contNode.withChild(lfNode);
         container.withChild(contNode.build());
 
@@ -309,7 +309,6 @@ public class InvokeRpcMethodTest {
 
         assertNotNull(rpcDef);
         assertNotNull(rpcInputSchemaNode);
-        assertTrue(rpcInputSchemaNode instanceof ContainerSchemaNode);
         final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder =
                 Builders.containerBuilder(rpcInputSchemaNode);
 
@@ -359,7 +358,6 @@ public class InvokeRpcMethodTest {
         }
         assertNotNull(rpcDef);
         assertNotNull(rpcOutputSchemaNode);
-        assertTrue(rpcOutputSchemaNode instanceof ContainerSchemaNode);
         final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder =
                 Builders.containerBuilder(rpcOutputSchemaNode);
         final DataSchemaNode leafSchema = rpcOutputSchemaNode
