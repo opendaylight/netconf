@@ -12,8 +12,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,9 +19,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
@@ -57,33 +52,15 @@ import org.w3c.dom.NodeList;
 
 @Provider
 @Consumes({Rfc8040.MediaTypes.PATCH + RestconfConstants.XML})
-public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider implements
-        MessageBodyReader<PatchContext> {
-
+public class XmlToPatchBodyReader extends AbstractToPatchBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(XmlToPatchBodyReader.class);
     private static final Splitter SLASH_SPLITTER = Splitter.on('/');
 
-    @Override
-    public boolean isReadable(final Class<?> type, final Type genericType,
-                              final Annotation[] annotations, final MediaType mediaType) {
-        return true;
-    }
-
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public PatchContext readFrom(final Class<PatchContext> type, final Type genericType,
-                                 final Annotation[] annotations, final MediaType mediaType,
-                                 final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream)
+    protected PatchContext readBody(final InstanceIdentifierContext<?> path, final InputStream entityStream)
             throws IOException, WebApplicationException {
-
         try {
-            final InstanceIdentifierContext<?> path = getInstanceIdentifierContext();
-
-            if (entityStream.available() < 1) {
-                // represent empty nopayload input
-                return new PatchContext(path, null, null);
-            }
-
             final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
             return parse(path, doc);
         } catch (final RestconfDocumentedException e) {
