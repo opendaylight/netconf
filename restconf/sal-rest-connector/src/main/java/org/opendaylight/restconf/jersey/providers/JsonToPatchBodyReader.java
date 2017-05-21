@@ -15,16 +15,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
@@ -51,26 +46,17 @@ import org.slf4j.LoggerFactory;
 
 @Provider
 @Consumes({Rfc8040.MediaTypes.PATCH + RestconfConstants.JSON})
-public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
-        implements MessageBodyReader<PatchContext> {
-
+public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(JsonToPatchBodyReader.class);
-    private String patchId;
 
-    @Override
-    public boolean isReadable(final Class<?> type, final Type genericType,
-                              final Annotation[] annotations, final MediaType mediaType) {
-        return true;
-    }
+    private String patchId;
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public PatchContext readFrom(final Class<PatchContext> type, final Type genericType,
-                                 final Annotation[] annotations, final MediaType mediaType,
-                                 final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream)
+    protected PatchContext readBody(final InstanceIdentifierContext<?> path, final InputStream entityStream)
             throws IOException, WebApplicationException {
         try {
-            return readFrom(getInstanceIdentifierContext(), entityStream);
+            return readFrom(path, entityStream);
         } catch (final Exception e) {
             throw propagateExceptionAs(e);
         }
@@ -78,10 +64,6 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
 
     private PatchContext readFrom(final InstanceIdentifierContext<?> path, final InputStream entityStream)
             throws IOException {
-        if (entityStream.available() < 1) {
-            return new PatchContext(path, null, null);
-        }
-
         final JsonReader jsonReader = new JsonReader(new InputStreamReader(entityStream));
         final List<PatchEntity> resultList = read(jsonReader, path);
         jsonReader.close();
