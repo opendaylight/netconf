@@ -8,6 +8,7 @@
 
 package org.opendaylight.restconf.jersey.providers;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
@@ -156,7 +157,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
                              @Nonnull final StringModuleInstanceIdentifierCodec codec,
                              @Nonnull final List<PatchEntity> resultCollection) throws IOException {
         switch (name) {
-            case "edit" :
+            case "edit":
                 if (in.peek() == JsonToken.BEGIN_ARRAY) {
                     in.beginArray();
 
@@ -174,7 +175,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
                 }
 
                 break;
-            case "patch-id" :
+            case "patch-id":
                 this.patchId = in.nextString();
                 break;
             default:
@@ -194,19 +195,19 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
     private void readEditDefinition(@Nonnull final PatchEdit edit, @Nonnull final JsonReader in,
                                     @Nonnull final InstanceIdentifierContext<?> path,
                                     @Nonnull final StringModuleInstanceIdentifierCodec codec) throws IOException {
-        final StringBuilder sb = new StringBuilder();
+        String deferredValue = null;
         in.beginObject();
 
         while (in.hasNext()) {
             final String editDefinition = in.nextName();
             switch (editDefinition) {
-                case "edit-id" :
+                case "edit-id":
                     edit.setId(in.nextString());
                     break;
-                case "operation" :
+                case "operation":
                     edit.setOperation(PatchEditOperation.valueOf(in.nextString().toUpperCase()));
                     break;
-                case "target" :
+                case "target":
                     // target can be specified completely in request URI
                     final String target = in.nextString();
                     if (target.equals("/")) {
@@ -220,21 +221,35 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
                     }
 
                     break;
-                case "value" :
-                    // save data defined in value node for next (later) processing, because target needs to be read
-                    // always first and there is no ordering in Json input
-                    readValueNode(sb, in);
+                case "value":
+                    Preconditions.checkArgument(edit.getData() == null && deferredValue == null,
+                            "Multiple value entries found");
+
+                    if (edit.getTargetSchemaNode() == null) {
+                        final StringBuilder sb = new StringBuilder();
+
+                        // save data defined in value node for next (later) processing, because target needs to be read
+                        // always first and there is no ordering in Json input
+                        readValueNode(sb, in);
+                        deferredValue = sb.toString();
+                    } else {
+                        // We have a target schema node, reuse this reader without buffering the value.
+                        edit.setData(readEditData(in, edit.getTargetSchemaNode(), path));
+                    }
                     break;
                 default:
+                    // FIXME: this does not look right, as it can wreck our logic
                     break;
             }
         }
 
         in.endObject();
 
-        // read saved data to normalized node when target schema is already known
-        edit.setData(
-                readEditData(new JsonReader(new StringReader(sb.toString())), edit.getTargetSchemaNode(), path));
+        if (deferredValue != null) {
+            // read saved data to normalized node when target schema is already known
+            edit.setData(readEditData(new JsonReader(new StringReader(deferredValue)), edit.getTargetSchemaNode(),
+                path));
+        }
     }
 
     /**
@@ -392,47 +407,47 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
         private SchemaNode targetSchemaNode;
         private NormalizedNode<?, ?> data;
 
-        public String getId() {
+        String getId() {
             return id;
         }
 
-        public void setId(final String id) {
-            this.id = id;
+        void setId(final String id) {
+            this.id = Preconditions.checkNotNull(id);
         }
 
-        public PatchEditOperation getOperation() {
+        PatchEditOperation getOperation() {
             return operation;
         }
 
-        public void setOperation(final PatchEditOperation operation) {
-            this.operation = operation;
+        void setOperation(final PatchEditOperation operation) {
+            this.operation = Preconditions.checkNotNull(operation);
         }
 
-        public YangInstanceIdentifier getTarget() {
+        YangInstanceIdentifier getTarget() {
             return target;
         }
 
-        public void setTarget(final YangInstanceIdentifier target) {
-            this.target = target;
+        void setTarget(final YangInstanceIdentifier target) {
+            this.target = Preconditions.checkNotNull(target);
         }
 
-        public SchemaNode getTargetSchemaNode() {
+        SchemaNode getTargetSchemaNode() {
             return targetSchemaNode;
         }
 
-        public void setTargetSchemaNode(final SchemaNode targetSchemaNode) {
-            this.targetSchemaNode = targetSchemaNode;
+        void setTargetSchemaNode(final SchemaNode targetSchemaNode) {
+            this.targetSchemaNode = Preconditions.checkNotNull(targetSchemaNode);
         }
 
-        public NormalizedNode<?, ?> getData() {
+        NormalizedNode<?, ?> getData() {
             return data;
         }
 
-        public void setData(final NormalizedNode<?, ?> data) {
-            this.data = data;
+        void setData(final NormalizedNode<?, ?> data) {
+            this.data = Preconditions.checkNotNull(data);
         }
 
-        public void clear() {
+        void clear() {
             id = null;
             operation = null;
             target = null;
