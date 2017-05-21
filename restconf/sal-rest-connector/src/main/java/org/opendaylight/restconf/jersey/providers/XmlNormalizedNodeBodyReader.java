@@ -10,8 +10,6 @@ package org.opendaylight.restconf.jersey.providers;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,10 +19,6 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
@@ -56,31 +50,14 @@ import org.w3c.dom.Element;
 
 @Provider
 @Consumes({ Rfc8040.MediaTypes.DATA + RestconfConstants.XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsProvider
-        implements MessageBodyReader<NormalizedNodeContext> {
-
+public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(XmlNormalizedNodeBodyReader.class);
-
-    @Override
-    public boolean isReadable(final Class<?> type, final Type genericType, final Annotation[] annotations,
-            final MediaType mediaType) {
-        return true;
-    }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public NormalizedNodeContext readFrom(final Class<NormalizedNodeContext> type, final Type genericType,
-            final Annotation[] annotations, final MediaType mediaType,
-            final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream) throws IOException,
-            WebApplicationException {
+    protected NormalizedNodeContext readBody(final InstanceIdentifierContext<?> path, final InputStream entityStream)
+            throws IOException, WebApplicationException {
         try {
-            final InstanceIdentifierContext<?> path = getInstanceIdentifierContext();
-
-            if (entityStream.available() < 1) {
-                // represent empty nopayload input
-                return new NormalizedNodeContext(path, null);
-            }
-
             final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
             return parse(path,doc);
         } catch (final RestconfDocumentedException e) {
@@ -204,7 +181,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
 
     private static AugmentationSchema findCorrespondingAugment(final DataSchemaNode parent,
                                                                final DataSchemaNode child) {
-        if ((parent instanceof AugmentationTarget) && !(parent instanceof ChoiceSchemaNode)) {
+        if (parent instanceof AugmentationTarget && !(parent instanceof ChoiceSchemaNode)) {
             for (final AugmentationSchema augmentation : ((AugmentationTarget) parent).getAvailableAugmentations()) {
                 final DataSchemaNode childInAugmentation = augmentation.getDataChildByName(child.getQName());
                 if (childInAugmentation != null) {
@@ -213,11 +190,6 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
             }
         }
         return null;
-    }
-
-    public void injectParams(final UriInfo uriInfo, final Request request) {
-        setRequest(request);
-        setUriInfo(uriInfo);
     }
 }
 
