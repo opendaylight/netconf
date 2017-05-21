@@ -8,7 +8,7 @@
 
 package org.opendaylight.netconf.mdsal.connector;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
@@ -24,32 +24,25 @@ import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
 
 final class OperationProvider {
 
-    private final String netconfSessionIdForReporting;
-    private final CurrentSchemaContext schemaContext;
-    private final DOMDataBroker dataBroker;
-    private final DOMRpcService rpcService;
-    private final TransactionProvider transactionProvider;
+    private final Set<NetconfOperation> operations;
 
     OperationProvider(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext,
                       final DOMDataBroker dataBroker, final DOMRpcService rpcService) {
-        this.netconfSessionIdForReporting = netconfSessionIdForReporting;
-        this.schemaContext = schemaContext;
-        this.dataBroker = dataBroker;
-        this.rpcService = rpcService;
-        this.transactionProvider = new TransactionProvider(this.dataBroker, netconfSessionIdForReporting);
+        final TransactionProvider transactionProvider = new TransactionProvider(dataBroker,
+            netconfSessionIdForReporting);
+
+        this.operations = ImmutableSet.of(
+            new Commit(netconfSessionIdForReporting, transactionProvider),
+            new DiscardChanges(netconfSessionIdForReporting, transactionProvider),
+            new EditConfig(netconfSessionIdForReporting, schemaContext, transactionProvider),
+            new Get(netconfSessionIdForReporting, schemaContext, transactionProvider),
+            new GetConfig(netconfSessionIdForReporting, schemaContext, transactionProvider),
+            new Lock(netconfSessionIdForReporting),
+            new Unlock(netconfSessionIdForReporting),
+            new RuntimeRpc(netconfSessionIdForReporting, schemaContext, rpcService));
     }
 
     Set<NetconfOperation> getOperations() {
-        return Sets.newHashSet(
-                new Commit(netconfSessionIdForReporting, transactionProvider),
-                new DiscardChanges(netconfSessionIdForReporting, transactionProvider),
-                new EditConfig(netconfSessionIdForReporting, schemaContext, transactionProvider),
-                new Get(netconfSessionIdForReporting, schemaContext, transactionProvider),
-                new GetConfig(netconfSessionIdForReporting, schemaContext, transactionProvider),
-                new Lock(netconfSessionIdForReporting),
-                new Unlock(netconfSessionIdForReporting),
-                new RuntimeRpc(netconfSessionIdForReporting, schemaContext, rpcService)
-        );
+        return operations;
     }
-
 }
