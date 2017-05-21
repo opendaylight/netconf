@@ -21,7 +21,7 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.data.impl.codec.xml.XMLStreamNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ public final class NetconfUtil {
 
     private NetconfUtil() {}
 
-    public static Document checkIsMessageOk(Document response) throws DocumentedException {
+    public static Document checkIsMessageOk(final Document response) throws DocumentedException {
         XmlElement element = XmlElement.fromDomDocument(response);
         Preconditions.checkState(element.getName().equals(XmlMappingConstants.RPC_REPLY_KEY));
         element = element.getOnlyChildElement();
@@ -57,6 +57,8 @@ public final class NetconfUtil {
                                            final SchemaPath schemaPath, final SchemaContext context)
             throws IOException, XMLStreamException {
         final XMLStreamWriter writer = XML_FACTORY.createXMLStreamWriter(result);
+        writer.setPrefix("nc", "urn:ietf:params:xml:ns:netconf:base:1.0");
+        writer.writeNamespace("nc", "urn:ietf:params:xml:ns:netconf:base:1.0");
         try (
              NormalizedNodeStreamWriter normalizedNodeStreamWriter =
                      XMLStreamNormalizedNodeStreamWriter.create(writer, context, schemaPath);
