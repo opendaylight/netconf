@@ -12,17 +12,11 @@ import com.google.gson.stream.JsonReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
@@ -52,25 +46,16 @@ import org.slf4j.LoggerFactory;
 
 @Provider
 @Consumes({ Rfc8040.MediaTypes.DATA + RestconfConstants.JSON, MediaType.APPLICATION_JSON })
-public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsProvider
-        implements MessageBodyReader<NormalizedNodeContext> {
+public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReader {
 
     private static final Logger LOG = LoggerFactory.getLogger(JsonNormalizedNodeBodyReader.class);
 
-    @Override
-    public boolean isReadable(final Class<?> type, final Type genericType, final Annotation[] annotations,
-            final MediaType mediaType) {
-        return true;
-    }
-
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public NormalizedNodeContext readFrom(final Class<NormalizedNodeContext> type, final Type genericType,
-            final Annotation[] annotations, final MediaType mediaType,
-            final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream) throws IOException,
-            WebApplicationException {
+    protected NormalizedNodeContext readBody(final InstanceIdentifierContext<?> path, final InputStream entityStream)
+            throws IOException, WebApplicationException {
         try {
-            return readFrom(getInstanceIdentifierContext(), entityStream, isPost());
+            return readFrom(path, entityStream, isPost());
         } catch (final Exception e) {
             propagateExceptionAs(e);
             return null;
@@ -80,9 +65,6 @@ public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPr
     private static NormalizedNodeContext readFrom(
             final InstanceIdentifierContext<?> path, final InputStream entityStream, final boolean isPost)
             throws IOException {
-        if (entityStream.available() < 1) {
-            return new NormalizedNodeContext(path, null);
-        }
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
@@ -155,10 +137,4 @@ public class JsonNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPr
         throw new RestconfDocumentedException("Error parsing input: " + exception.getMessage(), ErrorType.PROTOCOL,
                 ErrorTag.MALFORMED_MESSAGE, exception);
     }
-
-    public void injectParams(final UriInfo uriInfo, final Request request) {
-        setUriInfo(uriInfo);
-        setRequest(request);
-    }
 }
-
