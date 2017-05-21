@@ -13,7 +13,6 @@ import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -61,14 +60,14 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
     private static final Logger LOG = LoggerFactory.getLogger(RuntimeRpc.class);
 
-    private final CurrentSchemaContext schemaContext;
     private static final XMLOutputFactory XML_OUTPUT_FACTORY;
 
     static {
         XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
-        XML_OUTPUT_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
+        XML_OUTPUT_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
     }
 
+    private final CurrentSchemaContext schemaContext;
     private final DOMRpcService rpcService;
 
     public RuntimeRpc(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext,
@@ -99,14 +98,8 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
     }
 
     private static URI createNsUri(final String namespace) {
-        final URI namespaceURI;
-        try {
-            namespaceURI = new URI(namespace);
-        } catch (final URISyntaxException e) {
-            // Cannot occur, namespace in parsed XML cannot be invalid URI
-            throw new IllegalStateException("Unable to parse URI " + namespace, e);
-        }
-        return namespaceURI;
+        // May throw IllegalArgumentException, but that should never happen, as the namespace comes from parsed XML
+        return URI.create(namespace);
     }
 
     //this returns module with the newest revision if more then 1 module with same namespace is found
