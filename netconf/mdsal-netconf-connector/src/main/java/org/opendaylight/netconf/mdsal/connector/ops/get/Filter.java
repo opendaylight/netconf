@@ -1,0 +1,139 @@
+/*
+ * Copyright (c) 2017 Pantheon Technologies s.r.o. and others.  All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+
+package org.opendaylight.netconf.mdsal.connector.ops.get;
+
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+import javax.xml.transform.TransformerException;
+import org.atteo.xmlcombiner.XmlCombiner;
+import org.opendaylight.controller.config.util.xml.DocumentedException;
+import org.opendaylight.controller.config.util.xml.MissingNameSpaceException;
+import org.opendaylight.controller.config.util.xml.XmlElement;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+class Filter {
+
+    private static final String FILTER = "filter";
+
+    private final FilterContentValidator validator;
+
+    Filter(final FilterContentValidator validator) {
+        this.validator = validator;
+    }
+
+    /**
+     * Transforms filter element to collection of non-overlapping sub-filters in form of {@link YidFilter}. It contains
+     * also computed root {@link YangInstanceIdentifier} for each sub-filter. If filter isn't present,
+     * returns one {@link YidFilter} with root path and null filter.
+     *
+     * @param operationElement filter
+     * @return collection of sub-filters.
+     * @throws DocumentedException if filter is invalid
+     */
+    Collection<YidFilter> getDataRootsFromFilter(final XmlElement operationElement)
+            throws DocumentedException {
+        try {
+            final Optional<XmlElement> filter = operationElement.getOnlyChildElementOptionally(FILTER);
+            if (!filter.isPresent()) {
+                return Collections.singleton(new YidFilter(YangInstanceIdentifier.EMPTY, null));
+            }
+            final List<XmlElement> filters = filter.get().getChildElements();
+            final Map<QName, List<XmlElement>> rootToFilters = filters.stream()
+                    .collect(Collectors.groupingBy(this::getFilterRootQName));
+            return rootToFilters.values().stream()
+                    .map(this::merge)
+                    .map(this::createYidFilter)
+                    .collect(Collectors.toList());
+
+        } catch (final UncheckedDocumentedException e) {
+            throw (DocumentedException) e.getCause();
+        }
+    }
+
+    private YidFilter createYidFilter(final XmlElement filter) {
+        return new YidFilter(getIdFromFilter(filter), filter);
+    }
+
+    private QName getFilterRootQName(final XmlElement filter) {
+        try {
+            return QName.create(filter.getNamespace(), filter.getName());
+        } catch (final MissingNameSpaceException e) {
+            throw new UncheckedDocumentedException(e);
+        }
+    }
+
+    private YangInstanceIdentifier getIdFromFilter(final XmlElement filter) {
+        try {
+            return validator.validate(filter);
+        } catch (final DocumentedException e) {
+            throw new UncheckedDocumentedException(e);
+        }
+    }
+
+    private XmlElement merge(final List<XmlElement> idFilters) {
+        if (idFilters.size() == 1) {
+            return idFilters.get(0);
+        }
+        final XmlCombiner combiner = new XmlCombiner(UntrustedXML.newDocumentBuilder());
+        for (final XmlElement idFilter : idFilters) {
+            combiner.combine(idFilter.getDomElement());
+        }
+        //FIXME: combiner doesn't preserve namespaces, so re-read filter
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            combiner.buildDocument(bos);
+            final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+            final Document parse = UntrustedXML.newDocumentBuilder().parse(bis);
+            return XmlElement.fromDomDocument(parse);
+        } catch (final TransformerException | IOException | SAXException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static class UncheckedDocumentedException extends RuntimeException {
+
+        private UncheckedDocumentedException(final DocumentedException cause) {
+            super(cause);
+        }
+    }
+
+    /**
+     * Crate containing {@link XmlElement} with filter content and its root {@link YangInstanceIdentifier}.
+     */
+    static class YidFilter {
+        private final YangInstanceIdentifier path;
+        private final XmlElement filter;
+
+        YidFilter(final YangInstanceIdentifier path, @Nullable final XmlElement filter) {
+            this.path = Preconditions.checkNotNull(path);
+            this.filter = filter;
+        }
+
+        YangInstanceIdentifier getPath() {
+            return path;
+        }
+
+        @Nullable
+        XmlElement getFilter() {
+            return filter;
+        }
+    }
+}
