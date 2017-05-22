@@ -22,7 +22,6 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.impl.osgi.NetconfOperationRouter;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.util.messages.SendErrorExceptionUtil;
-import org.opendaylight.netconf.util.messages.SubtreeFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -122,8 +121,6 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
             checkMessageId(rootNode);
 
             Document rpcReply = operationRouter.onNetconfMessage(incomingDocument, session);
-
-            rpcReply = SubtreeFilter.applyRpcSubtreeFilter(incomingDocument, rpcReply);
 
             session.onIncommingRpcSuccess();
 
