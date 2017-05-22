@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba068154_4b006401",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/NetconfUtil.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-05-22T07:14:00Z",
+      "side": 1,
+      "message": "No element is written at this point, so method call fails. Maybe you want setDefaultNamespace?",
+      "range": {
+        "startLine": 61,
+        "startChar": 8,
+        "endLine": 61,
+        "endChar": 79
+      },
+      "revId": "6756881418ff0c177c3be693c7657a6ee56fcbc9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
