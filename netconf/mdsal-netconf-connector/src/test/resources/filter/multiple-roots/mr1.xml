@@ -1,0 +1,37 @@
+<!--
+  ~ Copyright (c) 2017 Pantheon Technologies s.r.o. and others.  All rights reserved.
+  ~
+  ~ This program and the accompanying materials are made available under the
+  ~ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+  ~ and is available at http://www.eclipse.org/legal/epl-v10.html
+  -->
+
+<get-config>
+    <filter type="subtree">
+        <top xmlns="urn:opendaylight:mdsal:mapping:test">
+            <users>
+                <user>
+                    <full-name/>
+                </user>
+            </users>
+        </top>
+        <top xmlns="urn:opendaylight:mdsal:mapping:test">
+            <users>
+                <user>
+                    <name/>
+                    <company-info/>
+                </user>
+            </users>
+        </top>
+        <mapping-nodes xmlns="urn:opendaylight:mdsal:mapping:test">
+            <multiple-keys>
+                <key1>aaa</key1>
+                <key2>bbb</key2>
+                <key3>ccc</key3>
+            </multiple-keys>
+        </mapping-nodes>
+    </filter>
+    <source>
+        <running/>
+    </source>
+</get-config>
