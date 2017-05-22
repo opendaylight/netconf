@@ -121,8 +121,6 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
 
             Document rpcReply = operationRouter.onNetconfMessage(incomingDocument, session);
 
-            rpcReply = SubtreeFilter.applyRpcSubtreeFilter(incomingDocument, rpcReply);
-
             session.onIncommingRpcSuccess();
 
             responseDocument.appendChild(responseDocument.importNode(rpcReply.getDocumentElement(), true));

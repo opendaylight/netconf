@@ -545,6 +545,61 @@ public class NetconfMDSalMappingTest {
 
     }
 
+    @Test
+    public void testFilteringMultiSubtreeFiltering() throws Exception {
+        edit("messages/mapping/editConfigs/editConfig-filtering-setup.xml");
+        commit();
+
+        verifyResponse(getConfigWithFilter("messages/mapping/filters/get-filter-multi-subtree-filtering-1.xml"),
+                XmlFileLoader.xmlFileToDocument("messages/mapping/filters/response-multi-subtree-filtering-1.xml"));
+    }
+
+    @Test
+    public void testFilteringMultiSubtreeFiltering2() throws Exception {
+        edit("messages/mapping/editConfigs/editConfig-filtering-setup.xml");
+        edit("messages/mapping/editConfigs/editConfig_merge_multiple_keys_1.xml");
+        commit();
+
+        verifyResponse(getConfigWithFilter("messages/mapping/filters/get-filter-multi-subtree-filtering-2.xml"),
+                XmlFileLoader.xmlFileToDocument("messages/mapping/filters/response-multi-subtree-filtering-2.xml"));
+    }
+
+    @Test
+    public void testFilteringMultiSubtreeFiltering3() throws Exception {
+        edit("messages/mapping/editConfigs/editConfig-filtering-setup.xml");
+        commit();
+
+        verifyResponse(getConfigWithFilter("messages/mapping/filters/get-filter-multi-subtree-filtering-3.xml"),
+                XmlFileLoader.xmlFileToDocument("messages/mapping/filters/response-multi-subtree-filtering-3.xml"));
+    }
+
+    @Test
+    public void testFilteringMultiSubtreeFiltering4() throws Exception {
+        edit("messages/mapping/editConfigs/editConfig-filtering-setup.xml");
+        commit();
+
+        verifyResponse(getConfigWithFilter("messages/mapping/filters/get-filter-multi-subtree-filtering-4.xml"),
+                XmlFileLoader.xmlFileToDocument("messages/mapping/filters/response-multi-subtree-filtering-4.xml"));
+    }
+
+    @Test
+    public void testFilteringMultiSubtreeFiltering5() throws Exception {
+        edit("messages/mapping/editConfigs/editConfig-filtering-setup.xml");
+        commit();
+
+        verifyResponse(getConfigWithFilter("messages/mapping/filters/get-filter-multi-subtree-filtering-5.xml"),
+                XmlFileLoader.xmlFileToDocument("messages/mapping/filters/response-multi-subtree-filtering-5.xml"));
+    }
+
+    @Test
+    public void testFilteringMultiSubtreeFiltering6() throws Exception {
+        edit("messages/mapping/editConfigs/editConfig-filtering-setup.xml");
+        commit();
+
+        verifyResponse(getConfigWithFilter("messages/mapping/filters/get-filter-multi-subtree-filtering-6.xml"),
+                XmlFileLoader.xmlFileToDocument("messages/mapping/filters/response-multi-subtree-filtering-6.xml"));
+    }
+
     private void verifyFilterIdentifier(String resource, YangInstanceIdentifier identifier) throws Exception{
         TestingGetConfig getConfig = new TestingGetConfig(sessionIdForReporting, currentSchemaContext, transactionProvider);
         Document request = XmlFileLoader.xmlFileToDocument(resource);
@@ -687,7 +742,7 @@ public class NetconfMDSalMappingTest {
         return schemas;
     }
 
-    private static SchemaContext parseYangStreams(final List<InputStream> streams) {
+    public static SchemaContext parseYangStreams(final List<InputStream> streams) {
         CrossSourceStatementReactor.BuildAction reactor = YangInferencePipeline.RFC6020_REACTOR
                 .newBuild();
         final SchemaContext schemaContext;
