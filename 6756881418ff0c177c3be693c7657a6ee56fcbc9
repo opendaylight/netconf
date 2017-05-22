@@ -22,6 +22,30 @@
       "revId": "6756881418ff0c177c3be693c7657a6ee56fcbc9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a0b7d60_1587f462",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/NetconfUtil.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-05-22T14:25:59Z",
+      "side": 1,
+      "message": "Nope, I want to bind the prefix at root level:\nhttps://docs.oracle.com/javase/8/docs/api/javax/xml/stream/XMLStreamWriter.html#setPrefix-java.lang.String-java.lang.String-\n\nNot sure if it needs to have a namespace declaration, too, though.",
+      "parentUuid": "ba068154_4b006401",
+      "range": {
+        "startLine": 61,
+        "startChar": 8,
+        "endLine": 61,
+        "endChar": 79
+      },
+      "revId": "6756881418ff0c177c3be693c7657a6ee56fcbc9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
