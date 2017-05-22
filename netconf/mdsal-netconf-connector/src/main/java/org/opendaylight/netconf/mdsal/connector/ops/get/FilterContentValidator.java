@@ -31,7 +31,6 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
 import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
 import org.opendaylight.yangtools.yang.data.util.ModuleStringIdentityrefCodec;
 import org.opendaylight.yangtools.yang.data.util.ParserStreamUtils;
-import org.opendaylight.yangtools.yang.model.api.ChoiceCaseNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -66,11 +65,7 @@ public class FilterContentValidator {
      */
     public YangInstanceIdentifier validate(final XmlElement filterContent) throws DocumentedException {
         try {
-            final URI namespace = new URI(filterContent.getNamespace());
-            final Module module = schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(namespace, null);
-            final DataSchemaNode schema = getRootDataSchemaNode(module, namespace, filterContent.getName());
-            final FilterTree filterTree = validateNode(filterContent, schema, new FilterTree(schema.getQName(),
-                    Type.OTHER, schema));
+            final FilterTree filterTree = validateAndCreateFilterTree(filterContent);
             return getFilterDataRoot(filterTree, filterContent, YangInstanceIdentifier.builder());
         } catch (final DocumentedException e) {
             throw e;
@@ -81,6 +76,15 @@ public class FilterContentValidator {
                     DocumentedException.ErrorTag.unknown_namespace,
                     DocumentedException.ErrorSeverity.error);
         }
+    }
+
+    public FilterTree validateAndCreateFilterTree(XmlElement filterContent) throws
+            URISyntaxException, DocumentedException, ValidationException {
+        final URI namespace = new URI(filterContent.getNamespace());
+        final Module module = schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(namespace, null);
+        final DataSchemaNode schema = getRootDataSchemaNode(module, namespace, filterContent.getName());
+        return validateNode(
+                filterContent, schema, new FilterTree(schema.getQName(), FilterTreeType.OTHER, schema));
     }
 
     /**
@@ -149,19 +153,19 @@ public class FilterContentValidator {
      * @param filterContent filter element
      * @param builder       builder  @return YangInstanceIdentifier
      */
-    private YangInstanceIdentifier getFilterDataRoot(FilterTree tree, final XmlElement filterContent,
+    public YangInstanceIdentifier getFilterDataRoot(FilterTree tree, final XmlElement filterContent,
                                                      final InstanceIdentifierBuilder builder) {
         builder.node(tree.getName());
         final List<String> path = new ArrayList<>();
         while (tree.getChildren().size() == 1) {
             final FilterTree child = tree.getChildren().iterator().next();
-            if (child.getType() == Type.CHOICE_CASE) {
+            if (child.getFilterTreeType() == FilterTreeType.CHOICE_CASE) {
                 tree = child;
                 continue;
             }
             builder.node(child.getName());
             path.add(child.getName().getLocalName());
-            if (child.getType() == Type.LIST) {
+            if (child.getFilterTreeType() == FilterTreeType.LIST) {
                 appendKeyIfPresent(child, filterContent, path, builder);
                 return builder.build();
             }
@@ -226,64 +230,11 @@ public class FilterContentValidator {
         return keys;
     }
 
-    /**
-     * Class represents tree of QNames as they are present in the filter.
-     */
-    private static class FilterTree {
 
-        private final QName name;
-        private final Type type;
-        private final DataSchemaNode schemaNode;
-        private final Map<QName, FilterTree> children;
+    static class ValidationException extends Exception {
+        private static final long serialVersionUID = 1L;
 
-        FilterTree(final QName name, final Type type, final DataSchemaNode schemaNode) {
-            this.name = name;
-            this.type = type;
-            this.schemaNode = schemaNode;
-            this.children = new HashMap<>();
-        }
-
-        FilterTree addChild(final DataSchemaNode data) {
-            final Type type;
-            if (data instanceof ChoiceCaseNode) {
-                type = Type.CHOICE_CASE;
-            } else if (data instanceof ListSchemaNode) {
-                type = Type.LIST;
-            } else {
-                type = Type.OTHER;
-            }
-            final QName name = data.getQName();
-            FilterTree childTree = children.get(name);
-            if (childTree == null) {
-                childTree = new FilterTree(name, type, data);
-            }
-            children.put(name, childTree);
-            return childTree;
-        }
-
-        Collection<FilterTree> getChildren() {
-            return children.values();
-        }
-
-        QName getName() {
-            return name;
-        }
-
-        Type getType() {
-            return type;
-        }
-
-        DataSchemaNode getSchemaNode() {
-            return schemaNode;
-        }
-    }
-
-    private enum Type {
-        LIST, CHOICE_CASE, OTHER
-    }
-
-    private static class ValidationException extends Exception {
-        public ValidationException(final XmlElement parent, final XmlElement child) {
+        ValidationException(final XmlElement parent, final XmlElement child) {
             super("Element " + child + " can't be child of " + parent);
         }
     }

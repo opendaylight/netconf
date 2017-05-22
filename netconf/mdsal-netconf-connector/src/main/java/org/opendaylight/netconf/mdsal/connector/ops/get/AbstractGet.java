@@ -8,12 +8,24 @@
 
 package org.opendaylight.netconf.mdsal.connector.ops.get;
 
+import static java.util.function.Function.identity;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
+import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -23,11 +35,17 @@ import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeve
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorType;
 import org.opendaylight.controller.config.util.xml.XmlElement;
+import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
+import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.mdsal.connector.ops.Datastore;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.netconf.util.messages.SubtreeFilter;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -47,28 +65,131 @@ import org.w3c.dom.Node;
 
 public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractGet.class);
-
-    protected static final String FILTER = "filter";
-    static final YangInstanceIdentifier ROOT = YangInstanceIdentifier.builder().build();
-    protected final CurrentSchemaContext schemaContext;
-    private final FilterContentValidator validator;
-
-    public AbstractGet(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext) {
-        super(netconfSessionIdForReporting);
-        this.schemaContext = schemaContext;
-        this.validator = new FilterContentValidator(schemaContext);
-    }
-
     private static final XMLOutputFactory XML_OUTPUT_FACTORY;
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractGet.class);
 
     static {
         XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
         XML_OUTPUT_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
     }
 
-    protected Node transformNormalizedNode(final Document document, final NormalizedNode<?, ?> data, final YangInstanceIdentifier dataRoot) {
+    static final YangInstanceIdentifier ROOT = YangInstanceIdentifier.builder().build();
+    protected final CurrentSchemaContext schemaContext;
+    private final FilterContentValidator validator;
+    private final TransactionProvider transactionProvider;
+    private final LogicalDatastoreType logicalDatastoreType;
+    protected final Filter filter;
 
+    AbstractGet(String netconfSessionIdForReporting,
+                CurrentSchemaContext schemaContext,
+                TransactionProvider transactionProvider,
+                LogicalDatastoreType logicalDatastoreType) {
+        super(netconfSessionIdForReporting);
+        this.schemaContext = schemaContext;
+        this.validator = new FilterContentValidator(schemaContext);
+        this.transactionProvider = transactionProvider;
+        this.logicalDatastoreType = logicalDatastoreType;
+        this.filter = new Filter(validator);
+    }
+
+    @Override
+    protected Element handleWithNoSubsequentOperations(Document document, XmlElement operationElement)
+            throws DocumentedException {
+
+        final Collection<Filter.YidFilter> rootToFilter = filter.getDataRootsFromFilter(operationElement);
+        if (rootToFilter.isEmpty()) {
+            return XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.absent());
+        }
+        final Datastore datastore = getNetconfDatastore(operationElement);
+
+        final DOMDataReadWriteTransaction rwTx = getTransaction(datastore);
+        try {
+
+            final Map<Filter.YidFilter, ListenableFuture<Optional<NormalizedNode<?, ?>>>> results =
+                    rootToFilter.stream()
+                            .collect(Collectors.toMap(identity(), entry -> read(rwTx, entry.getPath())));
+            final List<ListenableFuture<Optional<XmlElement>>> xmlResults = results.entrySet().stream()
+                    .map(e -> toXmlFuture(document, e.getKey(), e.getValue()))
+                    .collect(Collectors.toList());
+            final ListenableFuture<List<Optional<XmlElement>>> allFuture = Futures.allAsList(xmlResults);
+            final XmlElement resultElement = XmlElement.fromDomElement(XmlUtil.createElement(document,
+                    XmlNetconfConstants.DATA_KEY, Optional.absent()));
+            allFuture.get().stream()
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .forEach(n -> appendResult(resultElement, n));
+            if (datastore == Datastore.running) {
+                transactionProvider.abortRunningTransaction(rwTx);
+            }
+            return resultElement.getDomElement();
+        } catch (InterruptedException | ExecutionException e) {
+            LOG.warn("Unable to read data: ", e);
+            throw new IllegalStateException("Unable to read data ", e);
+        }
+    }
+
+    private CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> read(
+            DOMDataReadWriteTransaction rwTx, YangInstanceIdentifier path) {
+        return rwTx.read(logicalDatastoreType, path);
+    }
+
+    private DOMDataReadWriteTransaction getTransaction(Datastore datastore) throws DocumentedException {
+        if (datastore == Datastore.candidate) {
+            return transactionProvider.getOrCreateTransaction();
+        } else if (datastore == Datastore.running) {
+            return transactionProvider.createRunningTransaction();
+        }
+        throw new DocumentedException("Incorrect Datastore: ", ErrorType.protocol, ErrorTag.bad_element,
+                ErrorSeverity.error);
+    }
+
+    private void appendResult(XmlElement aggregatedResult, XmlElement partialResult) {
+        final List<XmlElement> childElements = partialResult.getChildElements();
+        for (XmlElement childElement : childElements) {
+            aggregatedResult.appendChild(childElement.getDomElement());
+        }
+    }
+
+    /**
+     * Transforms {@code ListenableFuture<Optional<NormalizedNode<?, ?>>>} to
+     * {@code ListenableFuture<Optional<XmlElement>>}. First, {@link NormalizedNode} is transformed to
+     * {@link XmlElement}. Then {@link SubtreeFilter} is applied to produce filtered result.
+     *
+     * @param document reply document used for element creation
+     * @param filter   filter element
+     * @param data     normalized node future
+     * @return xml element future
+     */
+    private ListenableFuture<Optional<XmlElement>> toXmlFuture(
+            Document document, Filter.YidFilter filter,
+            ListenableFuture<Optional<NormalizedNode<?, ?>>> data) {
+        return Futures.transform(data,
+                (Function<Optional<NormalizedNode<?, ?>>,
+                        Optional<XmlElement>>) nn -> toElement(nn.orNull(), document, filter));
+    }
+
+    private Optional<XmlElement> toElement(@Nullable NormalizedNode<?, ?> nn,
+                                                  Document document,
+                                                  Filter.YidFilter filter) {
+        if (nn != null) {
+            final Element result = serializeNodeWithParentStructure(document, filter.getPath(), nn);
+            try {
+                final Element filtered;
+                if (filter.getFilter() == null) {
+                    filtered = result;
+                } else {
+                    filtered = SubtreeFilter.filtered(filter.getFilter(), result);
+                }
+                return Optional.of(XmlElement.fromDomElement(filtered));
+            } catch (final DocumentedException e) {
+                throw new UncheckedExecutionException(e);
+            }
+        }
+        return Optional.absent();
+    }
+
+    private Node transformNormalizedNode(Document document, NormalizedNode<?, ?> data,
+                                         YangInstanceIdentifier dataRoot) {
         final DOMResult result = new DOMResult(document.createElement(XmlNetconfConstants.DATA_KEY));
 
         final XMLStreamWriter xmlWriter = getXmlStreamWriter(result);
@@ -82,30 +203,24 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         return result.getNode();
     }
 
-
-    private XMLStreamWriter getXmlStreamWriter(final DOMResult result) {
+    private XMLStreamWriter getXmlStreamWriter(DOMResult result) {
         try {
             return XML_OUTPUT_FACTORY.createXMLStreamWriter(result);
-        } catch (final XMLStreamException e) {
+        } catch (XMLStreamException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static final Function<PathArgument, QName> PATH_ARG_TO_QNAME = new Function<YangInstanceIdentifier.PathArgument, QName>() {
-        @Override
-        public QName apply(final YangInstanceIdentifier.PathArgument input) {
-            return input.getNodeType();
-        }
-    };
-
-    private SchemaPath getSchemaPath(final YangInstanceIdentifier dataRoot) {
-        return SchemaPath.create(Iterables.transform(dataRoot.getPathArguments(), PATH_ARG_TO_QNAME), dataRoot.equals(ROOT));
+    private SchemaPath getSchemaPath(YangInstanceIdentifier dataRoot) {
+        return SchemaPath.create(
+                Iterables.transform(dataRoot.getPathArguments(), PathArgument::getNodeType), dataRoot.equals(ROOT));
     }
 
-    private void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter, final ContainerNode data) {
+    private void writeRootElement(XMLStreamWriter xmlWriter, NormalizedNodeWriter nnWriter,
+                                  ContainerNode data) {
         try {
             if (data.getNodeType().equals(SchemaContext.NAME)) {
-                for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
+                for (DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
                     nnWriter.write(child);
                 }
             } else {
@@ -118,7 +233,8 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         }
     }
 
-    protected Element serializeNodeWithParentStructure(Document document, YangInstanceIdentifier dataRoot, NormalizedNode node) {
+    private Element serializeNodeWithParentStructure(Document document, YangInstanceIdentifier dataRoot,
+                                                     NormalizedNode node) {
         if (!dataRoot.equals(ROOT)) {
             return (Element) transformNormalizedNode(document,
                     ImmutableNodes.fromInstanceId(schemaContext.getCurrentContext(), dataRoot, node),
@@ -127,79 +243,25 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         return  (Element) transformNormalizedNode(document, node, ROOT);
     }
 
-    /**
-     *
-     * @param operationElement operation element
-     * @return if Filter is present and not empty returns Optional of the InstanceIdentifier to the read location in datastore.
-     *          empty filter returns Optional.absent() which should equal an empty &lt;data/&gt; container in the response.
-     *         if filter is not present we want to read the entire datastore - return ROOT.
-     * @throws DocumentedException
-     */
-    protected Optional<YangInstanceIdentifier> getDataRootFromFilter(XmlElement operationElement) throws DocumentedException {
-        Optional<XmlElement> filterElement = operationElement.getOnlyChildElementOptionally(FILTER);
-        if (filterElement.isPresent()) {
-            if (filterElement.get().getChildElements().size() == 0) {
-                return Optional.absent();
-            }
-            return Optional.of(getInstanceIdentifierFromFilter(filterElement.get()));
-        } else {
-            return Optional.of(ROOT);
-        }
-    }
-
     @VisibleForTesting
-    protected YangInstanceIdentifier getInstanceIdentifierFromFilter(XmlElement filterElement) throws DocumentedException {
+    protected YangInstanceIdentifier getInstanceIdentifierFromFilter(XmlElement filterElement)
+            throws DocumentedException {
 
         if (filterElement.getChildElements().size() != 1) {
             throw new DocumentedException("Multiple filter roots not supported yet",
                     ErrorType.application, ErrorTag.operation_not_supported, ErrorSeverity.error);
         }
 
-        XmlElement element = filterElement.getOnlyChildElement();
-        return validator.validate(element);
+        return validator.validate(filterElement.getOnlyChildElement());
     }
 
-    protected static final class GetConfigExecution {
-
-        private final Optional<Datastore> datastore;
-        public GetConfigExecution(final Optional<Datastore> datastore) {
-            this.datastore = datastore;
-        }
-
-        public Optional<Datastore> getDatastore() {
-            return datastore;
-        }
-
-        static GetConfigExecution fromXml(final XmlElement xml, final String operationName) throws DocumentedException {
-            try {
-                validateInputRpc(xml, operationName);
-            } catch (final DocumentedException e) {
-                throw new DocumentedException("Incorrect RPC: " + e.getMessage(), e.getErrorType(), e.getErrorTag(), e.getErrorSeverity(), e.getErrorInfo());
-            }
-
-            final Optional<Datastore> sourceDatastore;
-            try {
-                sourceDatastore = parseSource(xml);
-            } catch (final DocumentedException e) {
-                throw new DocumentedException("Get-config source attribute error: " + e.getMessage(), e.getErrorType(), e.getErrorTag(), e.getErrorSeverity(), e.getErrorInfo());
-            }
-
-            return new GetConfigExecution(sourceDatastore);
-        }
-
-        private static Optional<Datastore> parseSource(final XmlElement xml) throws DocumentedException {
-            final Optional<XmlElement> sourceElement = xml.getOnlyChildElementOptionally(XmlNetconfConstants.SOURCE_KEY,
-                    XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
-
-            return  sourceElement.isPresent() ?
-                    Optional.of(Datastore.valueOf(sourceElement.get().getOnlyChildElement().getName())) : Optional.<Datastore>absent();
-        }
-
-        private static void validateInputRpc(final XmlElement xml, String operationName) throws DocumentedException{
-            xml.checkName(operationName);
-            xml.checkNamespace(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
-        }
-
-    }
+    /**
+     * Returns datastore which is to be read.
+     *
+     * @param operationElement rpc xml
+     * @return datastore
+     * @throws DocumentedException if rpc request is not valid
+     */
+    abstract Datastore getNetconfDatastore(XmlElement operationElement) throws DocumentedException;
 
 }
