@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a0b7d60_d2c0e22c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6614
+      },
+      "writtenOn": "2017-05-22T12:58:59Z",
+      "side": 1,
+      "message": "Please specify exactly what has been implemented with references to RFC chapters (lock, unlock, validate..)",
+      "revId": "33a569d227bf2de59d724b2dae9d60006bd8dc04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a0b7d60_32b68edd",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/Validate.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 6614
+      },
+      "writtenOn": "2017-05-22T12:58:59Z",
+      "side": 1,
+      "message": "I would prefer name ValidateNetconfOperation",
+      "revId": "33a569d227bf2de59d724b2dae9d60006bd8dc04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a0b7d60_12bb8ac5",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/parser/MdsalNetconfOperation.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 6614
+      },
+      "writtenOn": "2017-05-22T12:58:59Z",
+      "side": 1,
+      "message": "is this abstract class?",
+      "revId": "33a569d227bf2de59d724b2dae9d60006bd8dc04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a0b7d60_72b016de",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/parser/MdsalNetconfOperation.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 6614
+      },
+      "writtenOn": "2017-05-22T12:58:59Z",
+      "side": 1,
+      "message": "typo:Too many elements\nFormat the source code according to guidelines https://wiki.opendaylight.org/view/BestPractices/Coding_Guidelines",
+      "revId": "33a569d227bf2de59d724b2dae9d60006bd8dc04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
