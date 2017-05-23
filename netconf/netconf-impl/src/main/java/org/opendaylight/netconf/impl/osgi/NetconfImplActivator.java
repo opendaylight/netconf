@@ -62,6 +62,7 @@ public class NetconfImplActivator implements BundleActivator {
                     .setIdProvider(idProvider)
                     .setMonitoringService(monitoringService)
                     .setConnectionTimeoutMillis(connectionTimeoutMillis)
+                    .setNetconfSessionDatastore(new NetconfSessionDatastore())
                     .build();
 
             eventLoopGroup = new NioEventLoopGroup();
