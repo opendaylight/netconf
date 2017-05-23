@@ -98,7 +98,7 @@ public final class ParserIdentifier {
                 return new InstanceIdentifierContext<SchemaNode>(pathYangInstanceIdentifier, child.getDataSchemaNode(),
                         mountPoint.get(), mountPoint.get().getSchemaContext());
             }
-            final QName rpcQName = mountYangInstanceIdentifier.getLastPathArgument().getNodeType();
+            final QName rpcQName = pathYangInstanceIdentifier.getLastPathArgument().getNodeType();
             RpcDefinition def = null;
             for (final RpcDefinition rpcDefinition : schemaContext
                     .findModuleByNamespaceAndRevision(rpcQName.getNamespace(), rpcQName.getRevision()).getRpcs()) {
@@ -107,7 +107,7 @@ public final class ParserIdentifier {
                     break;
                 }
             }
-            return new InstanceIdentifierContext<>(mountYangInstanceIdentifier, def, mountPoint.get(),
+            return new InstanceIdentifierContext<>(pathYangInstanceIdentifier, def, mountPoint.get(),
                     mountPoint.get().getSchemaContext());
         } else {
             final YangInstanceIdentifier deserialize = IdentifierCodec.deserialize(identifier, schemaContext);
