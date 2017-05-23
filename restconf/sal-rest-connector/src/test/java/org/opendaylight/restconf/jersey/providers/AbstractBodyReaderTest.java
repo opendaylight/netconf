@@ -77,6 +77,12 @@ abstract class AbstractBodyReaderTest {
         normalizedNodeProvider.setRequest(request);
     }
 
+    protected static void checkMountPointNormalizedNodeContext(
+            final NormalizedNodeContext nnContext) {
+        checkNormalizedNodeContext(nnContext);
+        assertNotNull(nnContext.getInstanceIdentifierContext().getMountPoint());
+    }
+
     protected static void checkNormalizedNodeContext(
             final NormalizedNodeContext nnContext) {
         assertNotNull(nnContext.getData());

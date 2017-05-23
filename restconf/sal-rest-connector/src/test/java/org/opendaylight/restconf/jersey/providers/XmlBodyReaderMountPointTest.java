@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2015 Cisco Systems, Inc. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.controller.sal.rest.impl.test.providers;
+package org.opendaylight.restconf.jersey.providers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -28,8 +28,7 @@ import org.junit.Test;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
-import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
-import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
+import org.opendaylight.controller.sal.rest.impl.test.providers.TestXmlBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
@@ -37,25 +36,13 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-/**
- * sal-rest-connector org.opendaylight.controller.sal.rest.impl.test.providers
- *
- *
- *
- * @author <a href="mailto:vdemcak@cisco.com">Vaclav Demcak</a>
- *
- *         Created: Mar 9, 2015
- */
-public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
+public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
     private final XmlNormalizedNodeBodyReader xmlBodyReader;
     private static SchemaContext schemaContext;
 
@@ -70,7 +57,7 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
         }
     }
 
-    public TestXmlBodyReaderMountPoint() throws Exception {
+    public XmlBodyReaderMountPointTest() throws Exception {
         super();
         this.xmlBodyReader = new XmlNormalizedNodeBodyReader();
     }
@@ -86,14 +73,14 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
         schemaContext = YangParserTestUtils.parseYangSources(testFiles);
 
-        final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
-        when(mountInstance.getSchemaContext()).thenReturn(schemaContext);
-        final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
-        when(mockMountService.getMountPoint(any(YangInstanceIdentifier.class)))
-                .thenReturn(Optional.of(mountInstance));
+        final DOMMountPointService mountPointService = mock(DOMMountPointService.class);
+        final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
 
-        ControllerContext.getInstance().setMountService(mockMountService);
-        controllerContext.setSchemas(schemaContext);
+        when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mountPointService);
+        when(mountPointService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountPoint));
+        when(mountPoint.getSchemaContext()).thenReturn(schemaContext);
+
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test
@@ -102,7 +89,7 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
                 .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final String uri = "instance-identifier-module:cont/yang-ext:mount/instance-identifier-module:cont";
         mockBodyReader(uri, this.xmlBodyReader, false);
-        final InputStream inputStream = TestXmlBodyReaderMountPoint.class
+        final InputStream inputStream = XmlBodyReaderMountPointTest.class
                 .getResourceAsStream("/instanceidentifier/xml/xmldata.xml");
         final NormalizedNodeContext returnValue = this.xmlBodyReader.readFrom(null,
                 null, null, this.mediaType, null, inputStream);
@@ -116,7 +103,7 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
                 .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final String uri = "instance-identifier-module:cont/yang-ext:mount/instance-identifier-module:cont/cont1";
         mockBodyReader(uri, this.xmlBodyReader, false);
-        final InputStream inputStream = TestXmlBodyReaderMountPoint.class
+        final InputStream inputStream = XmlBodyReaderMountPointTest.class
                 .getResourceAsStream("/instanceidentifier/xml/xml_sub_container.xml");
         final NormalizedNodeContext returnValue = this.xmlBodyReader.readFrom(null,
                 null, null, this.mediaType, null, inputStream);
@@ -131,34 +118,12 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
                 .getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
         final String uri = "instance-identifier-module:cont/yang-ext:mount/instance-identifier-module:cont";
         mockBodyReader(uri, this.xmlBodyReader, true);
-        final InputStream inputStream = TestXmlBodyReaderMountPoint.class
+        final InputStream inputStream = XmlBodyReaderMountPointTest.class
                 .getResourceAsStream("/instanceidentifier/xml/xml_sub_container.xml");
         final NormalizedNodeContext returnValue = this.xmlBodyReader.readFrom(null,
                 null, null, this.mediaType, null, inputStream);
         checkMountPointNormalizedNodeContext(returnValue);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, returnValue);
-    }
-
-    @Test
-    public void rpcModuleInputTest() throws Exception {
-        final String uri = "instance-identifier-module:cont/yang-ext:mount/invoke-rpc-module:rpc-test";
-        mockBodyReader(uri, this.xmlBodyReader, true);
-        final InputStream inputStream = TestXmlBodyReaderMountPoint.class
-                .getResourceAsStream("/invoke-rpc/xml/rpc-input.xml");
-        final NormalizedNodeContext returnValue = this.xmlBodyReader.readFrom(null,
-                null, null, this.mediaType, null, inputStream);
-        checkNormalizedNodeContext(returnValue);
-        final ContainerNode contNode = (ContainerNode) returnValue.getData();
-        final YangInstanceIdentifier yangCont = YangInstanceIdentifier.of(QName.create(contNode.getNodeType(), "cont"));
-        final Optional<DataContainerChild<? extends PathArgument, ?>> contDataNodePotential = contNode.getChild(yangCont
-                .getLastPathArgument());
-        assertTrue(contDataNodePotential.isPresent());
-        final ContainerNode contDataNode = (ContainerNode) contDataNodePotential.get();
-        final YangInstanceIdentifier yangLeaf = YangInstanceIdentifier.of(QName.create(contDataNode.getNodeType(), "lf"));
-        final Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode = contDataNode.getChild(yangLeaf
-                .getLastPathArgument());
-        assertTrue(leafDataNode.isPresent());
-        assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().getValue().toString()));
     }
 
     private void checkExpectValueNormalizeNodeContext(
@@ -167,9 +132,8 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
         checkExpectValueNormalizeNodeContext(dataSchemaNode, nnContext, null);
     }
 
-    protected void checkExpectValueNormalizeNodeContext(
-            final DataSchemaNode dataSchemaNode,
-            final NormalizedNodeContext nnContext, final QName qName) {
+    private void checkExpectValueNormalizeNodeContext(final DataSchemaNode dataSchemaNode,
+            final NormalizedNodeContext nnContext, final QName qualifiedName) {
         YangInstanceIdentifier dataNodeIdent = YangInstanceIdentifier
                 .of(dataSchemaNode.getQName());
         final DOMMountPoint mountPoint = nnContext
@@ -178,9 +142,9 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
                 .getSchemaContext().getDataChildByName(
                         dataSchemaNode.getQName());
         assertNotNull(mountDataSchemaNode);
-        if ((qName != null) && (dataSchemaNode instanceof DataNodeContainer)) {
+        if ((qualifiedName != null) && (dataSchemaNode instanceof DataNodeContainer)) {
             final DataSchemaNode child = ((DataNodeContainer) dataSchemaNode)
-                    .getDataChildByName(qName);
+                    .getDataChildByName(qualifiedName);
             dataNodeIdent = YangInstanceIdentifier.builder(dataNodeIdent)
                     .node(child.getQName()).build();
             assertTrue(nnContext.getInstanceIdentifierContext().getSchemaNode()
