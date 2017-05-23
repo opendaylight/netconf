@@ -17,6 +17,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.AbstractMap;
 import java.util.Map;
+import org.opendaylight.netconf.impl.osgi.NetconfSessionDatastore;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
@@ -32,14 +33,16 @@ public class NetconfServerSessionNegotiator
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSessionNegotiator.class);
 
     private static final String UNKNOWN = "unknown";
+    private final NetconfSessionDatastore netconfSessionDatastore;
 
     protected NetconfServerSessionNegotiator(
             NetconfServerSessionPreferences sessionPreferences,
             Promise<NetconfServerSession> promise, Channel channel,
             Timer timer, NetconfServerSessionListener sessionListener,
-            long connectionTimeoutMillis) {
+            long connectionTimeoutMillis, NetconfSessionDatastore netconfSessionDatastore) {
         super(sessionPreferences, promise, channel, timer, sessionListener,
                 connectionTimeoutMillis);
+        this.netconfSessionDatastore = netconfSessionDatastore;
     }
 
     @Override
@@ -72,9 +75,11 @@ public class NetconfServerSessionNegotiator
 
         LOG.debug("Additional header from hello parsed as {} from {}",
                 parsedHeader, additionalHeader);
-
-        return new NetconfServerSession(sessionListener, channel,
+        NetconfServerSession netconfServerSession = new NetconfServerSession(sessionListener, channel,
                 getSessionPreferences().getSessionId(), parsedHeader);
+
+        netconfSessionDatastore.put(netconfServerSession, sessionListener.getNetconfOperationRouter());
+        return netconfServerSession;
     }
 
     /**

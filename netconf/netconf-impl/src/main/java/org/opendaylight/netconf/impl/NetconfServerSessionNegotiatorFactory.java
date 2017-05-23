@@ -25,6 +25,7 @@ import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.impl.osgi.NetconfOperationRouter;
 import org.opendaylight.netconf.impl.osgi.NetconfOperationRouterImpl;
+import org.opendaylight.netconf.impl.osgi.NetconfSessionDatastore;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.protocol.framework.SessionListenerFactory;
@@ -51,16 +52,18 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
     private final NetconfMonitoringService monitoringService;
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSessionNegotiatorFactory.class);
     private final Set<String> baseCapabilities;
+    private final NetconfSessionDatastore netconfSessionDatastore;
 
     protected NetconfServerSessionNegotiatorFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
                                                  final SessionIdProvider idProvider, final long connectionTimeoutMillis,
-                                                 final NetconfMonitoringService monitoringService, final Set<String> baseCapabilities) {
+                                                 final NetconfMonitoringService monitoringService, final Set<String> baseCapabilities, final NetconfSessionDatastore netconfSessionDatastore) {
         this.timer = timer;
         this.aggregatedOpService = netconfOperationProvider;
         this.idProvider = idProvider;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.monitoringService = monitoringService;
         this.baseCapabilities = validateBaseCapabilities(baseCapabilities == null ? DEFAULT_BASE_CAPABILITIES : baseCapabilities);
+        this.netconfSessionDatastore = netconfSessionDatastore;
     }
 
 
@@ -100,13 +103,13 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
         }
 
         return new NetconfServerSessionNegotiator(proposal, promise, channel, timer,
-                getListener(Long.toString(sessionId), channel.localAddress()), connectionTimeoutMillis);
+                getListener(Long.toString(sessionId), channel.localAddress()), connectionTimeoutMillis, netconfSessionDatastore);
     }
 
     private NetconfServerSessionListener getListener(final String netconfSessionIdForReporting, final SocketAddress socketAddress) {
         final NetconfOperationService service = getOperationServiceForAddress(netconfSessionIdForReporting, socketAddress);
         final NetconfOperationRouter operationRouter =
-                new NetconfOperationRouterImpl(service, monitoringService, netconfSessionIdForReporting);
+                new NetconfOperationRouterImpl(service, netconfSessionDatastore, netconfSessionIdForReporting);
         return new NetconfServerSessionListener(operationRouter, monitoringService, service);
 
     }
