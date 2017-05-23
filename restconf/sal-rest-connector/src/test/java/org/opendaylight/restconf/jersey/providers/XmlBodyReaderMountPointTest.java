@@ -36,6 +36,9 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -124,6 +127,29 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
                 null, null, this.mediaType, null, inputStream);
         checkMountPointNormalizedNodeContext(returnValue);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, returnValue);
+    }
+
+    @Test
+    public void rpcModuleInputTest() throws Exception {
+        final String uri = "instance-identifier-module:cont/yang-ext:mount/invoke-rpc-module:rpc-test";
+        mockBodyReader(uri, this.xmlBodyReader, true);
+        final InputStream inputStream = XmlBodyReaderMountPointTest.class
+                .getResourceAsStream("/invoke-rpc/xml/rpc-input.xml");
+        final NormalizedNodeContext returnValue = this.xmlBodyReader.readFrom(null,
+                null, null, this.mediaType, null, inputStream);
+        checkNormalizedNodeContext(returnValue);
+        final ContainerNode contNode = (ContainerNode) returnValue.getData();
+        final YangInstanceIdentifier yangCont = YangInstanceIdentifier.of(QName.create(contNode.getNodeType(), "cont"));
+        final Optional<DataContainerChild<? extends PathArgument, ?>> contDataNodePotential = contNode.getChild(
+                yangCont.getLastPathArgument());
+        assertTrue(contDataNodePotential.isPresent());
+        final ContainerNode contDataNode = (ContainerNode) contDataNodePotential.get();
+        final YangInstanceIdentifier yangLeaf =
+                YangInstanceIdentifier.of(QName.create(contDataNode.getNodeType(), "lf"));
+        final Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode = contDataNode.getChild(
+                yangLeaf.getLastPathArgument());
+        assertTrue(leafDataNode.isPresent());
+        assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().getValue().toString()));
     }
 
     private void checkExpectValueNormalizeNodeContext(
