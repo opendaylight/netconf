@@ -46,6 +46,7 @@ import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -134,17 +135,20 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
             }
         }
 
-        NormalizedNode<?, ?> parsed = null;
-
+        final NormalizedNode<?, ?> parsed;
         if (schemaNode instanceof ContainerSchemaNode) {
-            parsed = parserFactory.getContainerNodeParser().parse(Collections.singletonList(doc.getDocumentElement()),
-                (ContainerSchemaNode) schemaNode);
-        } else if(schemaNode instanceof ListSchemaNode) {
-            final ListSchemaNode casted = (ListSchemaNode) schemaNode;
-            parsed = parserFactory.getMapEntryNodeParser().parse(elements, casted);
+            parsed = parserFactory.getContainerNodeParser().parse(
+                    Collections.singletonList(doc.getDocumentElement()), (ContainerSchemaNode) schemaNode);
+        } else if (schemaNode instanceof ListSchemaNode) {
+            parsed = parserFactory.getMapEntryNodeParser().parse(elements, (ListSchemaNode) schemaNode);
             if (isPost()) {
                 iiToDataList.add(parsed.getIdentifier());
             }
+        } else if (schemaNode instanceof LeafSchemaNode) {
+            parsed = parserFactory.getLeafNodeParser().parse(elements, (LeafSchemaNode) schemaNode);
+        } else {
+            LOG.warn("Unknown schema node extension {} was not parsed", schemaNode.getClass());
+            parsed = null;
         }
 
         final YangInstanceIdentifier fullIIToData = YangInstanceIdentifier.create(Iterables.concat(
