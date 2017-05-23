@@ -15,8 +15,8 @@ import java.util.Map;
 import java.util.Set;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory;
-import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactoryBuilder;
 import org.opendaylight.netconf.impl.SessionIdProvider;
+import org.opendaylight.netconf.impl.osgi.NetconfSessionDatastore;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.slf4j.Logger;
@@ -30,13 +30,13 @@ public class TesttoolNegotiationFactory extends NetconfServerSessionNegotiatorFa
     public TesttoolNegotiationFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
                                       final SessionIdProvider idProvider, final long connectionTimeoutMillis,
                                       final NetconfMonitoringService monitoringService) {
-        super(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis, monitoringService, NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES);
+        super(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis, monitoringService, NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES, new NetconfSessionDatastore());
     }
 
     public TesttoolNegotiationFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
                                       final SessionIdProvider idProvider, final long connectionTimeoutMillis,
                                       final NetconfMonitoringService monitoringService, final Set<String> baseCapabilities) {
-        super(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis, monitoringService, baseCapabilities);
+        super(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis, monitoringService, baseCapabilities, new NetconfSessionDatastore());
     }
 
     @Override

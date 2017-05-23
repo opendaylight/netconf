@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import io.netty.util.Timer;
 import java.util.Set;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.impl.osgi.NetconfSessionDatastore;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 
 public class NetconfServerSessionNegotiatorFactoryBuilder {
@@ -21,6 +22,7 @@ public class NetconfServerSessionNegotiatorFactoryBuilder {
     private long connectionTimeoutMillis;
     private NetconfMonitoringService monitoringService;
     private Set<String> baseCapabilities;
+    private NetconfSessionDatastore netconfSessionDatastore;
 
     public NetconfServerSessionNegotiatorFactoryBuilder() {
     }
@@ -50,6 +52,11 @@ public class NetconfServerSessionNegotiatorFactoryBuilder {
         return this;
     }
 
+    public NetconfServerSessionNegotiatorFactoryBuilder setNetconfSessionDatastore(final NetconfSessionDatastore netconfSessionDatastore) {
+        this.netconfSessionDatastore = netconfSessionDatastore;
+        return this;
+    }
+
     public NetconfServerSessionNegotiatorFactoryBuilder setBaseCapabilities(final Set<String> baseCapabilities) {
         this.baseCapabilities = baseCapabilities;
         return this;
@@ -58,7 +65,7 @@ public class NetconfServerSessionNegotiatorFactoryBuilder {
 
     public NetconfServerSessionNegotiatorFactory build() {
         validate();
-        return new NetconfServerSessionNegotiatorFactory(timer, aggregatedOpService, idProvider, connectionTimeoutMillis, monitoringService, baseCapabilities);
+        return new NetconfServerSessionNegotiatorFactory(timer, aggregatedOpService, idProvider, connectionTimeoutMillis, monitoringService, baseCapabilities, netconfSessionDatastore);
     }
 
 

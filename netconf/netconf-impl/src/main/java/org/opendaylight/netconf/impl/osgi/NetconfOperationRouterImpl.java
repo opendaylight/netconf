@@ -18,17 +18,17 @@ import java.util.Set;
 import java.util.TreeMap;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.netconf.impl.NetconfServerSession;
+import org.opendaylight.netconf.impl.mapping.operations.DefaultCloseSession;
+import org.opendaylight.netconf.impl.mapping.operations.DefaultKillSession;
+import org.opendaylight.netconf.impl.mapping.operations.DefaultNetconfOperation;
+import org.opendaylight.netconf.impl.mapping.operations.DefaultStartExi;
+import org.opendaylight.netconf.impl.mapping.operations.DefaultStopExi;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.SessionAwareNetconfOperation;
-import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
-import org.opendaylight.netconf.impl.NetconfServerSession;
-import org.opendaylight.netconf.impl.mapping.operations.DefaultCloseSession;
-import org.opendaylight.netconf.impl.mapping.operations.DefaultNetconfOperation;
-import org.opendaylight.netconf.impl.mapping.operations.DefaultStartExi;
-import org.opendaylight.netconf.impl.mapping.operations.DefaultStopExi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -40,11 +40,12 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
     private final Collection<NetconfOperation> allNetconfOperations;
 
     public NetconfOperationRouterImpl(final NetconfOperationService netconfOperationServiceSnapshot,
-                                      final NetconfMonitoringService netconfMonitoringService, final String sessionId) {
+                                      final NetconfSessionDatastore netconfSessionDatastore, final String sessionId) {
         this.netconfOperationServiceSnapshot = Preconditions.checkNotNull(netconfOperationServiceSnapshot);
 
         final Set<NetconfOperation> ops = new HashSet<>();
         ops.add(new DefaultCloseSession(sessionId, this));
+        ops.add(new DefaultKillSession(sessionId, netconfSessionDatastore));
         ops.add(new DefaultStartExi(sessionId));
         ops.add(new DefaultStopExi(sessionId));
 

@@ -10,6 +10,7 @@ package org.opendaylight.controller.config.yang.config.netconf.northbound.impl;
 
 import org.opendaylight.controller.config.api.JmxAttributeValidationException;
 import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactoryBuilder;
+import org.opendaylight.netconf.impl.osgi.NetconfSessionDatastore;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.impl.NetconfServerDispatcherImpl;
@@ -43,6 +44,7 @@ public class NetconfServerDispatcherModule extends AbstractNetconfServerDispatch
                 .setIdProvider(new SessionIdProvider())
                 .setMonitoringService(monitoringService)
                 .setConnectionTimeoutMillis(getConnectionTimeoutMillis())
+                .setNetconfSessionDatastore(new NetconfSessionDatastore())
                 .build();
         final NetconfServerDispatcherImpl.ServerChannelInitializer serverChannelInitializer = new NetconfServerDispatcherImpl.ServerChannelInitializer(
                 serverNegotiatorFactory);
