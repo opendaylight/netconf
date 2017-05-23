@@ -13,15 +13,15 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYangBodyWriter;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYinBodyWriter;
-import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.PatchJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.PatchXmlBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.RestconfDocumentedExceptionMapper;
-import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.restconf.common.wrapper.services.ServicesWrapperImpl;
+import org.opendaylight.restconf.jersey.providers.JsonNormalizedNodeBodyReader;
 import org.opendaylight.restconf.jersey.providers.JsonToPatchBodyReader;
 import org.opendaylight.restconf.jersey.providers.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.restconf.jersey.providers.NormalizedNodeXmlBodyWriter;
+import org.opendaylight.restconf.jersey.providers.XmlNormalizedNodeBodyReader;
 import org.opendaylight.restconf.jersey.providers.XmlToPatchBodyReader;
 
 public class RestconfApplication extends Application {
