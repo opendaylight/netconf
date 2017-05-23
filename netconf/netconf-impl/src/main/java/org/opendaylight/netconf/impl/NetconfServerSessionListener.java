@@ -159,4 +159,8 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
                 ImmutableMap.of("bad-attribute", XmlNetconfConstants.MESSAGE_ID,
                         "bad-element", XmlNetconfConstants.RPC_KEY));
     }
+
+    public NetconfOperationRouter getNetconfOperationRouter() {
+        return operationRouter;
+    }
 }

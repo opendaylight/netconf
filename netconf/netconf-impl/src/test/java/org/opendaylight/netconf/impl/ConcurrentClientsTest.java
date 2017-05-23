@@ -65,6 +65,7 @@ import org.opendaylight.netconf.client.TestingNetconfClient;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
+import org.opendaylight.netconf.impl.osgi.NetconfSessionDatastore;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
@@ -102,13 +103,13 @@ public class ConcurrentClientsTest {
     @Parameterized.Parameters()
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{{4, TestingNetconfClientRunnable.class, NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES},
-                                            {1, TestingNetconfClientRunnable.class, NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES},
-                                            // empty set of capabilities = only base 1.0 netconf capability
-                                            {4, TestingNetconfClientRunnable.class, Collections.emptySet()},
-                                            {4, TestingNetconfClientRunnable.class, getOnlyExiServerCaps()},
-                                            {4, TestingNetconfClientRunnable.class, getOnlyChunkServerCaps()},
-                                            {4, BlockingClientRunnable.class, getOnlyExiServerCaps()},
-                                            {1, BlockingClientRunnable.class, getOnlyExiServerCaps()},
+                {1, TestingNetconfClientRunnable.class, NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES},
+                // empty set of capabilities = only base 1.0 netconf capability
+                {4, TestingNetconfClientRunnable.class, Collections.emptySet()},
+                {4, TestingNetconfClientRunnable.class, getOnlyExiServerCaps()},
+                {4, TestingNetconfClientRunnable.class, getOnlyChunkServerCaps()},
+                {4, BlockingClientRunnable.class, getOnlyExiServerCaps()},
+                {1, BlockingClientRunnable.class, getOnlyExiServerCaps()},
         });
     }
 
@@ -169,6 +170,7 @@ public class ConcurrentClientsTest {
                 .setIdProvider(idProvider)
                 .setConnectionTimeoutMillis(5000)
                 .setMonitoringService(createMockedMonitoringService())
+                .setNetconfSessionDatastore(new NetconfSessionDatastore())
                 .setBaseCapabilities(serverCaps)
                 .build();
 
