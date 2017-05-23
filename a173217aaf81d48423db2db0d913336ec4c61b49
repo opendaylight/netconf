@@ -94,6 +94,30 @@
     },
     {
       "key": {
+        "uuid": "7af0899e_28045714",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/authentication/LoginPassword.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 6995
+      },
+      "writtenOn": "2017-05-23T23:29:02Z",
+      "side": 1,
+      "message": "Changing this constructor will enforce changes to lots of clients IMO. I think the way you have done initially is the right way to go, but we can probably see if there is any other opinion on this.",
+      "parentUuid": "ba068154_a95e6ee7",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 5
+      },
+      "revId": "a173217aaf81d48423db2db0d913336ec4c61b49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba068154_8963aab0",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
         "patchSetId": 7
@@ -111,6 +135,24 @@
     },
     {
       "key": {
+        "uuid": "7af0899e_c812f357",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 6995
+      },
+      "writtenOn": "2017-05-23T23:29:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba068154_8963aab0",
+      "revId": "a173217aaf81d48423db2db0d913336ec4c61b49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba068154_e95876fc",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImpl.java",
         "patchSetId": 7
@@ -122,6 +164,30 @@
       "writtenOn": "2017-05-11T01:19:25Z",
       "side": 1,
       "message": "I wrote this code as a POC... doesn\u0027t need to be blocking.  I would prefer to see this as non-blocking.",
+      "range": {
+        "startLine": 144,
+        "startChar": 20,
+        "endLine": 144,
+        "endChar": 40
+      },
+      "revId": "a173217aaf81d48423db2db0d913336ec4c61b49",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7af0899e_a80fa72d",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImpl.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 6995
+      },
+      "writtenOn": "2017-05-23T23:29:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba068154_e95876fc",
       "range": {
         "startLine": 144,
         "startChar": 20,
