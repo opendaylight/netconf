@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
@@ -20,6 +19,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -80,10 +80,6 @@ public class NetconfDevice
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDevice.class);
 
-    public static final Function<QName, SourceIdentifier> QNAME_TO_SOURCE_ID_FUNCTION =
-        input -> RevisionSourceIdentifier.create(input.getLocalName(),
-                    Optional.fromNullable(input.getFormattedRevision()));
-
     protected final RemoteDeviceId id;
     private final boolean reconnectOnSchemasChange;
 
@@ -95,7 +91,7 @@ public class NetconfDevice
     private final NetconfDeviceSchemasResolver stateSchemasResolver;
     private final NotificationHandler notificationHandler;
     protected final List<SchemaSourceRegistration<? extends SchemaSourceRepresentation>> sourceRegistrations =
-            Lists.newArrayList();
+            new ArrayList<>();
     @GuardedBy("this")
     private boolean connected = false;
 
@@ -423,15 +419,20 @@ public class NetconfDevice
         }
 
         public Collection<SourceIdentifier> getRequiredSources() {
-            return Collections2.transform(requiredSources, QNAME_TO_SOURCE_ID_FUNCTION);
+            return Collections2.transform(requiredSources, DeviceSources::toSourceId);
         }
 
         public Collection<SourceIdentifier> getProvidedSources() {
-            return Collections2.transform(providedSources, QNAME_TO_SOURCE_ID_FUNCTION);
+            return Collections2.transform(providedSources, DeviceSources::toSourceId);
         }
 
         public SchemaSourceProvider<YangTextSchemaSource> getSourceProvider() {
             return sourceProvider;
+        }
+
+        private static SourceIdentifier toSourceId(final QName input) {
+            return RevisionSourceIdentifier.create(input.getLocalName(),
+                Optional.fromNullable(input.getFormattedRevision()));
         }
     }
 
