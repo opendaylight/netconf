@@ -54,12 +54,7 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     }
 
     private static Map<QName, DataSchemaNode> asMap(final Collection<DataSchemaNode> childNodes) {
-        return Maps.uniqueIndex(childNodes, new Function<DataSchemaNode, QName>() {
-            @Override
-            public QName apply(final DataSchemaNode input) {
-                return input.getQName();
-            }
-        });
+        return Maps.uniqueIndex(childNodes, (Function<DataSchemaNode, QName>) DataSchemaNode::getQName);
     }
 
     @Override
