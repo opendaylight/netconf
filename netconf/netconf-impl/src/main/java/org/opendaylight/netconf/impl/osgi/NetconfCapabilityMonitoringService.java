@@ -49,12 +49,7 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
     private static final List<Schema.Location> NETCONF_LOCATIONS = ImmutableList.of(NETCONF_LOCATION);
     private static final BasicCapability CANDIDATE_CAPABILITY =
             new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0");
-    private static final Function<Capability, Uri> CAPABILITY_TO_URI = new Function<Capability, Uri>() {
-        @Override
-        public Uri apply(final Capability input) {
-            return new Uri(input.getCapabilityUri());
-        }
-    };
+    private static final Function<Capability, Uri> CAPABILITY_TO_URI = input -> new Uri(input.getCapabilityUri());
 
     private final NetconfOperationServiceFactory netconfOperationProvider;
     private final Map<Uri, Capability> capabilities = Maps.newHashMap();
@@ -95,13 +90,13 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
                     revision.get(), revisionMapRequest.keySet());
 
             return schema;
-        } else {
-            Preconditions.checkState(revisionMapRequest.size() == 1,
-                    "Expected 1 capability for module %s, available revisions : %s", moduleName,
-                    revisionMapRequest.keySet());
-            //Only one revision is present, so return it
-            return revisionMapRequest.values().iterator().next();
         }
+
+        Preconditions.checkState(revisionMapRequest.size() == 1,
+                "Expected 1 capability for module %s, available revisions : %s", moduleName,
+                revisionMapRequest.keySet());
+        //Only one revision is present, so return it
+        return revisionMapRequest.values().iterator().next();
     }
 
     private void updateCapabilityToSchemaMap(final Set<Capability> added, final Set<Capability> removed) {
@@ -134,7 +129,7 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
         }
     }
 
-    private static boolean isValidModuleCapability(Capability cap) {
+    private static boolean isValidModuleCapability(final Capability cap) {
         return cap.getModuleName().isPresent()
                 && cap.getRevision().isPresent()
                 && cap.getCapabilitySchema().isPresent();
@@ -149,12 +144,9 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
         listeners.add(listener);
         listener.onCapabilitiesChanged(getCapabilities());
         listener.onSchemasChanged(getSchemas());
-        return new AutoCloseable() {
-            @Override
-            public void close() throws Exception {
-                synchronized (NetconfCapabilityMonitoringService.this) {
-                    listeners.remove(listener);
-                }
+        return () -> {
+            synchronized (NetconfCapabilityMonitoringService.this) {
+                listeners.remove(listener);
             }
         };
     }
@@ -219,7 +211,7 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
     }
 
     @Override
-    public synchronized void onCapabilitiesChanged(Set<Capability> added, Set<Capability> removed) {
+    public synchronized void onCapabilitiesChanged(final Set<Capability> added, final Set<Capability> removed) {
         onCapabilitiesAdded(added);
         onCapabilitiesRemoved(removed);
         updateCapabilityToSchemaMap(added, removed);
@@ -231,7 +223,7 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
         }
     }
 
-    private void notifyCapabilityChanged(Capabilities capabilities) {
+    private void notifyCapabilityChanged(final Capabilities capabilities) {
         for (NetconfMonitoringService.CapabilitiesListener listener : listeners) {
             listener.onCapabilitiesChanged(capabilities);
             listener.onSchemasChanged(getSchemas());
@@ -260,7 +252,7 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
 
     private void onCapabilitiesRemoved(final Set<Capability> removedCaps) {
         for (final Capability addedCap : removedCaps) {
-            capabilities.remove(CAPABILITY_TO_URI.apply(addedCap));
+            capabilities.remove(new Uri(addedCap.getCapabilityUri()));
         }
     }
 
