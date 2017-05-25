@@ -84,16 +84,10 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
                 }
             });
 
-        return Futures.makeChecked(transformed, new Function<Exception, DOMRpcException>() {
-            @Nullable
-            @Override
-            public DOMRpcException apply(@Nullable final Exception exception) {
-                return new DOMRpcImplementationNotAvailableException(
-                        exception, "Unable to invoke rpc %s on device %s", type, deviceId);
-            }
-        });
+        return Futures.makeChecked(transformed,
+            e -> new DOMRpcImplementationNotAvailableException(e,
+                "Unable to invoke rpc %s on device %s", type, deviceId));
     }
-
 
     private static boolean isBaseRpc(final SchemaPath type) {
         return NetconfMessageTransformUtil.NETCONF_URI.equals(type.getLastComponent().getNamespace());

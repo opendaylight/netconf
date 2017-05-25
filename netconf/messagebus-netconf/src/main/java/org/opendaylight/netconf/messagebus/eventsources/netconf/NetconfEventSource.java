@@ -10,7 +10,6 @@ package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
 import static com.google.common.util.concurrent.Futures.immediateFuture;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
@@ -28,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
@@ -142,13 +140,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
         final List<Stream> availableStreams;
         try {
             availableStreams = mount.getAvailableStreams();
-            streamMap = Maps.uniqueIndex(availableStreams, new Function<Stream, String>() {
-                @Nullable
-                @Override
-                public String apply(@Nullable Stream input) {
-                    return input.getName().getValue();
-                }
-            });
+            streamMap = Maps.uniqueIndex(availableStreams, input -> input.getName().getValue());
         } catch (ReadFailedException e) {
             LOG.warn("Can not read streams for node {}", mount.getNodeId());
         }
@@ -165,7 +157,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
     }
 
     @Override
-    public Future<RpcResult<Void>> disJoinTopic(DisJoinTopicInput input) {
+    public Future<RpcResult<Void>> disJoinTopic(final DisJoinTopicInput input) {
         for (NotificationTopicRegistration reg : notificationTopicRegistrations.values()) {
             reg.unRegisterNotificationTopic(input.getTopicId());
         }
@@ -234,7 +226,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
         }
     }
 
-    private void publishNotification(final DOMNotification notification, TopicId topicId) {
+    private void publishNotification(final DOMNotification notification, final TopicId topicId) {
         final ContainerNode topicNotification = Builders.containerBuilder().withNodeIdentifier(TOPIC_NOTIFICATION_ARG)
                 .withChild(ImmutableNodes.leafNode(TOPIC_ID_ARG, topicId))
                 .withChild(ImmutableNodes.leafNode(EVENT_SOURCE_ARG, mount.getNodeId()))
@@ -272,7 +264,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
      * @param notificationPattern pattern
      * @return notification paths
      */
-    private List<SchemaPath> getMatchingNotifications(NotificationPattern notificationPattern) {
+    private List<SchemaPath> getMatchingNotifications(final NotificationPattern notificationPattern) {
         final String regex = notificationPattern.getValue();
 
         final Pattern pattern = Pattern.compile(regex);
