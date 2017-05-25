@@ -15,7 +15,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 
-import com.google.common.base.Function;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -339,12 +338,7 @@ public class NetconfITTest extends AbstractNetconfConfigTest {
     }
 
     public Set<String> getServiceReferences(final List<ObjectName> testingDeps) {
-        return new HashSet<>(Lists.transform(testingDeps, new Function<ObjectName, String>() {
-            @Override
-            public String apply(final ObjectName input) {
-                return ObjectNameUtil.getReferenceName(input);
-            }
-        }));
+        return new HashSet<>(Lists.transform(testingDeps, ObjectNameUtil::getReferenceName));
     }
 
     public void commit(final TestingNetconfClient netconfClient) throws Exception {
