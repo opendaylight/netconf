@@ -73,20 +73,11 @@ public class WriteRunningTx extends AbstractWriteTx {
     @Override
     public synchronized CheckedFuture<Void, TransactionCommitFailedException> submit() {
         final ListenableFuture<Void> commmitFutureAsVoid = Futures.transform(commit(),
-                new Function<RpcResult<TransactionStatus>, Void>() {
-                    @Override
-                    public Void apply(final RpcResult<TransactionStatus> input) {
-                        return null;
-                    }
-                });
+                (Function<RpcResult<TransactionStatus>, Void>) input -> null);
 
-        return Futures.makeChecked(commmitFutureAsVoid, new Function<Exception, TransactionCommitFailedException>() {
-            @Override
-            public TransactionCommitFailedException apply(final Exception input) {
-                return new TransactionCommitFailedException("Submit of transaction " + getIdentifier() + " failed",
-                        input);
-            }
-        });
+        return Futures.makeChecked(commmitFutureAsVoid,
+            input -> new TransactionCommitFailedException("Submit of transaction " + getIdentifier() + " failed",
+                input));
     }
 
     @Override
@@ -125,8 +116,8 @@ public class WriteRunningTx extends AbstractWriteTx {
                                                        final boolean rollbackSupport) {
             final NetconfRpcFutureCallback editConfigCallback = new NetconfRpcFutureCallback("Edit running", id);
             if (defaultOperation.isPresent()) {
-                return netOps.editConfigRunning(
-                        editConfigCallback, editStructure, defaultOperation.get(), rollbackSupport);
+                return netOps.editConfigRunning(editConfigCallback, editStructure, defaultOperation.get(),
+                    rollbackSupport);
             } else {
                 return netOps.editConfigRunning(editConfigCallback, editStructure, rollbackSupport);
             }

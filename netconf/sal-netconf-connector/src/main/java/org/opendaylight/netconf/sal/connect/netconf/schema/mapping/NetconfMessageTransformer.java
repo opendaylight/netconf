@@ -11,7 +11,6 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_URI;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -57,11 +56,6 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformer.class);
 
-    private static final Function<SchemaNode, QName> QNAME_FUNCTION = rpcDefinition -> rpcDefinition.getQName();
-
-    private static final Function<SchemaNode, QName> QNAME_NOREV_FUNCTION =
-        notification -> QNAME_FUNCTION.apply(notification).withoutRevision();
-
     private final SchemaContext schemaContext;
     private final BaseSchema baseSchema;
     private final MessageCounter counter;
@@ -79,8 +73,9 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         this.schemaContext = schemaContext;
         parserFactory = DomToNormalizedNodeParserFactory
                 .getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, schemaContext, strictParsing);
-        mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), QNAME_FUNCTION);
-        mappedNotifications = Multimaps.index(schemaContext.getNotifications(), QNAME_NOREV_FUNCTION);
+        mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), SchemaNode::getQName);
+        mappedNotifications = Multimaps.index(schemaContext.getNotifications(),
+            node -> node.getQName().withoutRevision());
         this.baseSchema = baseSchema;
     }
 
@@ -158,7 +153,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             // use default pre build context with just the base model
             // This way operations like lock/unlock are supported even if the source for base model was not provided
             SchemaContext ctx = needToUseBaseCtx ? baseSchema.getSchemaContext() : schemaContext;
-            NetconfMessageTransformUtil.writeNormalizedRpc(((ContainerNode) payload), result, rpc, ctx);
+            NetconfMessageTransformUtil.writeNormalizedRpc((ContainerNode) payload, result, rpc, ctx);
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize " + rpc, e);
         }
