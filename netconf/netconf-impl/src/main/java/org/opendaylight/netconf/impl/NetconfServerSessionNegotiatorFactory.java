@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.impl;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
@@ -137,12 +136,7 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
     }
 
     public static Set<String> transformCapabilities(final Capabilities capabilities) {
-        return Sets.newHashSet(Collections2.transform(capabilities.getCapability(), new Function<Uri, String>() {
-            @Override
-            public String apply(final Uri uri) {
-                return uri.getValue();
-            }
-        }));
+        return Sets.newHashSet(Collections2.transform(capabilities.getCapability(), Uri::getValue));
     }
 
 }

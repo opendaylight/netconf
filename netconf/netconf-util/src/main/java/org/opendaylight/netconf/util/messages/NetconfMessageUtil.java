@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.util.messages;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
 import java.util.Collection;
@@ -29,15 +28,15 @@ public final class NetconfMessageUtil {
 
     private NetconfMessageUtil() {}
 
-    public static boolean isOKMessage(NetconfMessage message) throws NetconfDocumentedException {
+    public static boolean isOKMessage(final NetconfMessage message) throws NetconfDocumentedException {
         return isOKMessage(message.getDocument());
     }
 
-    public static boolean isOKMessage(Document document) throws NetconfDocumentedException {
+    public static boolean isOKMessage(final Document document) throws NetconfDocumentedException {
         return isOKMessage(XmlElement.fromDomDocument(document));
     }
 
-    public static boolean isOKMessage(XmlElement xmlElement) throws NetconfDocumentedException {
+    public static boolean isOKMessage(final XmlElement xmlElement) throws NetconfDocumentedException {
         if (xmlElement.getChildElements().size() != 1) {
             return false;
         }
@@ -48,15 +47,15 @@ public final class NetconfMessageUtil {
         }
     }
 
-    public static boolean isErrorMessage(NetconfMessage message) throws NetconfDocumentedException {
+    public static boolean isErrorMessage(final NetconfMessage message) throws NetconfDocumentedException {
         return isErrorMessage(message.getDocument());
     }
 
-    public static boolean isErrorMessage(Document document) throws NetconfDocumentedException {
+    public static boolean isErrorMessage(final Document document) throws NetconfDocumentedException {
         return isErrorMessage(XmlElement.fromDomDocument(document));
     }
 
-    public static boolean isErrorMessage(XmlElement xmlElement) throws NetconfDocumentedException {
+    public static boolean isErrorMessage(final XmlElement xmlElement) throws NetconfDocumentedException {
         if (xmlElement.getChildElements().size() != 1) {
             return false;
         }
@@ -67,7 +66,7 @@ public final class NetconfMessageUtil {
         }
     }
 
-    public static Collection<String> extractCapabilitiesFromHello(Document doc) throws NetconfDocumentedException {
+    public static Collection<String> extractCapabilitiesFromHello(final Document doc) throws NetconfDocumentedException {
         XmlElement responseElement = XmlElement.fromDomDocument(doc);
         // Extract child element <capabilities> from <hello> with or without(fallback) the same namespace
         Optional<XmlElement> capabilitiesElement = responseElement
@@ -76,17 +75,13 @@ public final class NetconfMessageUtil {
                         .getOnlyChildElementOptionally(XmlNetconfConstants.CAPABILITIES));
 
         List<XmlElement> caps = capabilitiesElement.get().getChildElements(XmlNetconfConstants.CAPABILITY);
-        return Collections2.transform(caps, new Function<XmlElement, String>() {
-
-            @Override
-            public String apply(@Nonnull XmlElement input) {
-                // Trim possible leading/tailing whitespace
-                try {
-                    return input.getTextContent().trim();
-                } catch (DocumentedException e) {
-                    LOG.trace("Error fetching input text content",e);
-                    return null;
-                }
+        return Collections2.transform(caps, (@Nonnull final XmlElement input) -> {
+            // Trim possible leading/tailing whitespace
+            try {
+                return input.getTextContent().trim();
+            } catch (DocumentedException e) {
+                LOG.trace("Error fetching input text content",e);
+                return null;
             }
         });
 
