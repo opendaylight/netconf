@@ -8,12 +8,9 @@
 
 package org.opendaylight.netconf.monitoring.xml.model;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import java.util.Collection;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.xml.bind.annotation.XmlElement;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
@@ -22,7 +19,7 @@ final class MonitoringSchema {
 
     private final Schema schema;
 
-    MonitoringSchema(Schema schema) {
+    MonitoringSchema(final Schema schema) {
         this.schema = schema;
     }
 
@@ -38,13 +35,7 @@ final class MonitoringSchema {
 
     @XmlElement(name = "location")
     public Collection<String> getLocation() {
-        return Collections2.transform(schema.getLocation(), new Function<Schema.Location, String>() {
-            @Nullable
-            @Override
-            public String apply(@Nonnull Schema.Location input) {
-                return input.getEnumeration().toString();
-            }
-        });
+        return Collections2.transform(schema.getLocation(), input -> input.getEnumeration().toString());
     }
 
     @XmlElement(name = "version")
